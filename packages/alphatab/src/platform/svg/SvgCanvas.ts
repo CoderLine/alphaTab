@@ -1,8 +1,9 @@
+/** biome-ignore-all lint/style/useTemplate: String concatenation is more efficient */
 import { Color } from '@coderline/alphatab/model/Color';
 import { Font, FontStyle } from '@coderline/alphatab/model/Font';
-import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@coderline/alphatab/platform/ICanvas';
-import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
 import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { type ICanvas, MeasuredText, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**

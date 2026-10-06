@@ -233,6 +233,7 @@ export class RenderStaff implements IStaffDisplayContext {
     }
 
     private _systemSkyline: StaffSystemSkyline | null = null;
+    private _contentSkyline: StaffSystemSkyline | null = null;
     private _effectPlacement: EffectSystemPlacement | null = null;
 
     public get effectPlacement(): EffectSystemPlacement {
@@ -242,6 +243,11 @@ export class RenderStaff implements IStaffDisplayContext {
         return this._effectPlacement;
     }
 
+    /**
+     * Full placement surface: content (notes/beams/ties) + the structural bar
+     * header (clef/key/time via each renderer's pre/post-beat skylines). Almost
+     * every effect band is placed against this.
+     */
     public get systemSkyline(): StaffSystemSkyline {
         if (!this._systemSkyline) {
             const pool = this.system.layout.renderer.layout!.skylinePool;
@@ -256,6 +262,53 @@ export class RenderStaff implements IStaffDisplayContext {
         return this._systemSkyline;
     }
 
+    /**
+     * Content-only placement surface: the same as {@link systemSkyline} minus the
+     * structural bar header. Bands with {@link EffectInfo.ignoresStructuralHeader}
+     * (bar numbers) are placed against this so the clef/key/time — a fixed fixture
+     * already priced into the staff via scalar overflow — never shoves them up.
+     * Only built when such a band exists on the staff ({@link placesAgainstContentOnly}).
+     */
+    public get contentSkyline(): StaffSystemSkyline {
+        if (!this._contentSkyline) {
+            const pool = this.system.layout.renderer.layout!.skylinePool;
+            this._contentSkyline = new StaffSystemSkyline(
+                this.staffIndex,
+                this.system.index,
+                0,
+                Number.MAX_SAFE_INTEGER,
+                pool
+            );
+        }
+        return this._contentSkyline;
+    }
+
+    private _placesAgainstContentOnly: boolean | null = null;
+
+    /** True if any effect band on this staff ignores the structural header (needs {@link contentSkyline}). */
+    public get placesAgainstContentOnly(): boolean {
+        if (this._placesAgainstContentOnly === null) {
+            let found = false;
+            for (const i of this.topEffectInfos) {
+                if (i.effect.ignoresStructuralHeader) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                for (const i of this.bottomEffectInfos) {
+                    if (i.effect.ignoresStructuralHeader) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            this._placesAgainstContentOnly = found;
+        }
+        // explicit comparison: the cached value is nullable (bool? on C#)
+        return this._placesAgainstContentOnly === true;
+    }
+
     private _unionBarLocalIntoStaffSkyline(renderer: BarRendererBase): void {
         const sky = this.systemSkyline;
         const baseX = renderer.x;
@@ -266,8 +319,16 @@ export class RenderStaff implements IStaffDisplayContext {
         // group's final x (settled by scaleToWidth) before unioning.
         const postBaseX = baseX + renderer.postBeatGroupOffset;
 
+        // Full surface = content (bar) + structural header (pre/post).
         sky.upSky.unionShifted3(bar.upSky, baseX, pre.upSky, baseX, post.upSky, postBaseX);
         sky.downSky.unionShifted3(bar.downSky, baseX, pre.downSky, baseX, post.downSky, postBaseX);
+
+        // Content-only surface = bar content, header excluded by construction.
+        if (this.placesAgainstContentOnly) {
+            const content = this.contentSkyline;
+            content.upSky.unionShifted(bar.upSky, baseX);
+            content.downSky.unionShifted(bar.downSky, baseX);
+        }
     }
 
     /**
@@ -300,6 +361,9 @@ export class RenderStaff implements IStaffDisplayContext {
         this.height = 0;
 
         this.systemSkyline.reset();
+        if (this.placesAgainstContentOnly) {
+            this.contentSkyline.reset();
+        }
 
         // Only renderer 0 ever yields continuations; hoist out of the per-renderer loop.
         if (this.barRenderers.length > 0) {

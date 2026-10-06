@@ -91,9 +91,8 @@ export class GpifWriter {
         const encoding = gpif.addElement('Encoding');
         encoding.addElement('EncodingDescription').innerText = 'GP8';
 
-        const alphaTabComment = new XmlNode();
-        alphaTabComment.nodeType = XmlNodeType.Comment;
-        alphaTabComment.value = `Written by alphaTab ${VersionInfo.version} (${VersionInfo.commit})`;
+        const alphaTabComment = new XmlNode(XmlNodeType.Comment);
+        alphaTabComment.innerText = `Written by alphaTab ${VersionInfo.version} (${VersionInfo.commit})`;
         encoding.addChild(alphaTabComment);
 
         this._writeScoreNode(gpif, score);
@@ -117,8 +116,8 @@ export class GpifWriter {
                 const stringedTuning = needsFingering ? this._tuningByStaff.get(staff)! : null;
                 // Once the assigner sets note.string/note.fret, note.realValue
                 // routes through staff.tuning — needs to match the tuning we
-                // gave the assigner. Save + restore below leaves the input
-                // model untouched.
+                // gave the assigner. The notes are modified, hence the
+                // Gp7Exporter passes a copy of the input score.
                 const savedTunings = staff.tuning;
                 if (needsFingering && stringedTuning !== null && savedTunings.length === 0) {
                     staff.stringTuning.tunings = stringedTuning.slice();

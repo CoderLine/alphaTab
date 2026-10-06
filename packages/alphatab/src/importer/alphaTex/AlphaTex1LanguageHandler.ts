@@ -65,7 +65,7 @@ import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import { BeamingRules, type MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import type { Note } from '@coderline/alphatab/model/Note';
+import { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
@@ -922,6 +922,27 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     return ApplyNodeResult.NotAppliedSemanticError;
                 }
                 bar.barNumberDisplay = barNumberDisplay!;
+                return ApplyNodeResult.Applied;
+            case 'barnumber':
+                switch (metaData.arguments!.arguments[0].nodeType) {
+                    case AlphaTexNodeType.Number:
+                        bar.masterBar.customBarNumber = (
+                            metaData.arguments!.arguments[0] as AlphaTexNumberLiteral
+                        ).value;
+                        break;
+                    case AlphaTexNodeType.String:
+                        bar.masterBar.customBarNumberText = (metaData.arguments!.arguments[0] as AlphaTexTextNode).text;
+                        break;
+                }
+
+                bar.scoreDisplay ??= {};
+                bar.scoreDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.tabDisplay ??= {};
+                bar.tabDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.slashDisplay ??= {};
+                bar.slashDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.numberedDisplay ??= {};
+                bar.numberedDisplay!.barNumber = BarNumberDisplay.AllBars;
                 return ApplyNodeResult.Applied;
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
@@ -2347,6 +2368,33 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 note.ornament = NoteOrnament.LowerMordent;
                 return ApplyNodeResult.Applied;
             case 'string':
+                if (p.arguments && p.arguments.arguments.length > 0) {
+                    const stringArg = p.arguments.arguments[0] as AlphaTexNumberLiteral;
+                    if (!note.isPiano) {
+                        importer.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT221,
+                            message: `A string number can only be specified on pitched notes, use the 'fret.string' syntax to specify the string of fretted notes.`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: stringArg.start,
+                            end: stringArg.end
+                        });
+                        return ApplyNodeResult.NotAppliedSemanticError;
+                    }
+
+                    const stringCount = Note.getStringCount(note.beat.voice.bar.staff);
+                    const stringNumber = stringArg.value;
+                    if (stringNumber < 1 || stringNumber > stringCount) {
+                        importer.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT211,
+                            message: `Value is out of valid range. Allowed range: 1-${stringCount}, Actual Value: ${stringNumber}`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: stringArg.start,
+                            end: stringArg.end
+                        });
+                        return ApplyNodeResult.NotAppliedSemanticError;
+                    }
+                    note.string = stringCount - stringNumber + 1;
+                }
                 note.showStringNumber = true;
                 return ApplyNodeResult.Applied;
             case 'hide':
@@ -2691,7 +2739,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(Atnf.meta('showSingleStaffBrackets'));
         }
 
-        if (stylesheet.barNumberDisplay !== BarNumberDisplay.AllBars) {
+        if (stylesheet.barNumberDisplay !== BarNumberDisplay.FirstOfSystem) {
             nodes.push(Atnf.identMeta('defaultBarNumberDisplay', BarNumberDisplay[stylesheet.barNumberDisplay]));
         }
 
@@ -2874,7 +2922,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             ];
         }
 
-        if (bar.barNumberDisplay !== undefined) {
+        if (
+            bar.barNumberDisplay !== undefined &&
+            !AlphaTex1LanguageHandler._isImpliedBarNumberDisplay(staff, bar, voice)
+        ) {
             nodes.push(Atnf.identMeta('barNumberDisplay', BarNumberDisplay[bar.barNumberDisplay]));
         }
 
@@ -2963,6 +3014,21 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         return chordNode;
+    }
+
+    /**
+     * A custom bar number (`\barNumber`) implies a forced bar number display on the bar it is written on
+     * (the first staff of the first track). In this case the display does not need to be exported.
+     */
+    private static _isImpliedBarNumberDisplay(staff: Staff, bar: Bar, voice: number): boolean {
+        const masterBar = bar.masterBar;
+        return (
+            voice === 0 &&
+            staff.index === 0 &&
+            staff.track.index === 0 &&
+            (masterBar.customBarNumber !== undefined || masterBar.customBarNumberText !== undefined) &&
+            bar.barNumberDisplay === BarNumberDisplay.AllBars
+        );
     }
 
     private static _buildMasterBarMetaDataNodes(nodes: AlphaTexMetaDataNode[], masterBar: MasterBar) {
@@ -3074,6 +3140,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 tempo.arguments!.closeParenthesis = undefined;
             }
             nodes.push(tempo);
+        }
+
+        if (masterBar.customBarNumber !== undefined) {
+            nodes.push(Atnf.numberMeta('barNumber', masterBar.customBarNumber!));
+        }
+
+        if (masterBar.customBarNumberText !== undefined) {
+            nodes.push(Atnf.meta('barNumber', Atnf.args([Atnf.string(masterBar.barNumberText)])));
         }
 
         if (firstMetaIndex < nodes.length) {
@@ -3244,7 +3318,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (note.showStringNumber) {
-            Atnf.prop(properties, 'string');
+            if (note.isPiano && !Number.isNaN(note.string)) {
+                const stringNumber = Note.getStringCount(note.beat.voice.bar.staff) - note.string + 1;
+                Atnf.prop(properties, 'string', Atnf.numberValue(stringNumber));
+            } else {
+                Atnf.prop(properties, 'string');
+            }
         }
 
         if (note.isTrill) {

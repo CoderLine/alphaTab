@@ -257,7 +257,7 @@ export class RenderStylesheet {
         clef: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
         keySignature: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
         timeSignature: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
-        barNumber: BarNumberDisplay.AllBars
+        barNumber: BarNumberDisplay.FirstOfSystem
     };
 
     /**
@@ -266,7 +266,7 @@ export class RenderStylesheet {
     public tabConfig: TabStaffConfig = {
         clef: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
         timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
-        barNumber: BarNumberDisplay.AllBars,
+        barNumber: BarNumberDisplay.FirstOfSystem,
         rhythm: TabRhythmMode.Automatic,
         rests: { isVisible: true, staffPlacement: StaffPlacement.Primary }
     };
@@ -277,7 +277,7 @@ export class RenderStylesheet {
     public slashConfig: SlashStaffConfig = {
         keySignature: { isVisible: false },
         timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
-        barNumber: BarNumberDisplay.AllBars
+        barNumber: BarNumberDisplay.FirstOfSystem
     };
 
     /**
@@ -285,6 +285,6 @@ export class RenderStylesheet {
      */
     public numberedConfig: NumberedStaffConfig = {
         timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
-        barNumber: BarNumberDisplay.AllBars
+        barNumber: BarNumberDisplay.FirstOfSystem
     };
 }

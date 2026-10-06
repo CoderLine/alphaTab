@@ -333,9 +333,15 @@ export const KotlinLanguage: LanguageDescriptor = {
             _withParameterScope(
                 paramReferences,
                 paramsWithAssignment,
-                () => base(t, p, node) as cs.LocalFunctionDeclaration,
+                () => base(t, p, node) as cs.LocalFunctionDeclaration | cs.MethodDeclaration | null,
                 fun => {
-                    if (fun?.body) {
+                    if (!fun) {
+                        return;
+                    }
+                    if (cs.isMethodDeclaration(fun)) {
+                        // top-level function emitted into the <FileName>Globals wrapper
+                        _injectIntoBlockBody(paramsWithAssignment, paramReferences, fun);
+                    } else if (fun.body) {
                         _injectParametersAsLocal(paramsWithAssignment, paramReferences, fun.body as cs.Block);
                     }
                 }

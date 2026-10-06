@@ -41,19 +41,32 @@ export class Profiler {
     private static readonly _counters = new Map<string, number>();
     private static readonly _stack: ProfilerFrame[] = [];
 
+    // Profiling is diagnostic only and must never break rendering. The stack is shared
+    // across all renderers: on platforms with threads (C#/Kotlin) renders of different
+    // instances can interleave, so unbalanced begin/end calls are tolerated.
+
     static begin(name: string): void {
         if (Profiler._stack.length >= Profiler._stackLimit) {
-            throw new Error(`Profiler stack overflow on '${name}'`);
+            // frames leaked (e.g. interleaved renders), start over
+            Profiler._stack.splice(0);
         }
         Profiler._stack.push({ name, startNs: Profiler._nowNs() });
     }
 
     static end(name: string): void {
-        const top = Profiler._stack.pop();
-        if (!top || top.name !== name) {
-            throw new Error(`Profiler.end('${name}') mismatched; expected '${top?.name ?? '<empty>'}'`);
+        // find the matching frame, frames above it were not ended (e.g. interleaved renders)
+        const stack = Profiler._stack;
+        let index = stack.length - 1;
+        while (index >= 0 && stack[index].name !== name) {
+            index--;
         }
-        const elapsed = Profiler._nowNs() - top.startNs;
+        if (index < 0) {
+            // no matching begin (e.g. dropped by an interleaved render): nothing to record
+            return;
+        }
+        const frame = stack[index];
+        stack.splice(index, stack.length - index);
+        const elapsed = Profiler._nowNs() - frame.startNs;
         if (!Profiler._stages.has(name)) {
             Profiler._stages.set(name, { count: 1, totalNs: elapsed, maxNs: elapsed });
         } else {

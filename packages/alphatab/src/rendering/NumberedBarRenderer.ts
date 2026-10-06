@@ -13,13 +13,11 @@ import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
-import { BarNumberGlyph } from '@coderline/alphatab/rendering/glyphs/BarNumberGlyph';
 import {
     NumberedDashBeatContainerGlyph,
     NumberedNoteBeatContainerGlyphBase
 } from '@coderline/alphatab/rendering/glyphs/NumberedDashBeatContainerGlyph';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
@@ -269,15 +267,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
         if (this.index === 0 || (this.bar.masterBar.isRepeatStart && this.staff!.isCascadePrimary)) {
             this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         }
+        this.createStartSpacing();
         this.createLinePreBeatGlyphs();
-        const hasSpaceAfterStartGlyphs = this.createStartSpacing();
-        if (this.shouldCreateBarNumber()) {
-            const barNumberGlyph = new BarNumberGlyph(0, this.getLineHeight(-0.5), this.bar.index + 1);
-            this.barNumberGlyph = barNumberGlyph;
-            this.addPreBeatGlyph(barNumberGlyph);
-        } else if (!hasSpaceAfterStartGlyphs) {
-            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-        }
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -297,7 +288,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime &&
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
-            this.createStartSpacing();
             this._createTimeSignatureGlyphs();
         }
     }
@@ -315,6 +305,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
                     masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
         );
         g.barSubElement = BarSubElement.NumberedTimeSignature;
+        g.trailingSpacing = this.smuflMetrics.oneStaffSpace;
         this.addPreBeatGlyph(g);
     }
 

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useTemplate: String concatenation is more efficient that templates */
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { SvgCanvas } from '@coderline/alphatab/platform/svg/SvgCanvas';
 
@@ -16,7 +17,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this._fillMusicFontSymbolText(x, y, relativeScale, `&#${symbol};`, centerAtPosition);
+        this._fillMusicFontSymbolText(x, y, relativeScale, '&#' + symbol, centerAtPosition);
     }
 
     public fillMusicFontSymbols(

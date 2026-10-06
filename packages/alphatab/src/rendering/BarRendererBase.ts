@@ -173,7 +173,16 @@ export class BarRendererBase {
     private _preBeatLocalSkyline: BarLocalSkyline | null = null;
     private _postBeatLocalSkyline: BarLocalSkyline | null = null;
 
-    /** Per-bar local skyline of non-effect-band glyphs (renderer-local x). */
+    /**
+     * Per-bar local skyline of the bar's musical content (notes, stems, beams,
+     * flags, ties, beat effects). Renderer-local x. This is the "content"
+     * surface: it deliberately excludes the structural bar header (clef, key
+     * signature, time signature, barlines, repeat counts), which lives in
+     * {@link preBeatLocalSkyline}/{@link postBeatLocalSkyline}. Effect bands that
+     * conceptually sit within the header's own reserved band rather than above
+     * the whole engraving (e.g. bar numbers) are placed against this surface
+     * only — see {@link EffectInfo.ignoresStructuralHeader}.
+     */
     public get barLocalSkyline(): BarLocalSkyline {
         if (!this._barLocalSkyline) {
             this._barLocalSkyline = new BarLocalSkyline(
@@ -185,7 +194,12 @@ export class BarRendererBase {
         return this._barLocalSkyline;
     }
 
-    /** Pre-beat glyphs' skyline contribution. Separate from {@link barLocalSkyline} so the latter's per-cycle reset doesn't wipe it. */
+    /**
+     * Pre-beat (structural header) glyphs' skyline contribution: clef, key
+     * signature, time signature. Kept separate from {@link barLocalSkyline} so
+     * (a) the latter's per-cycle reset doesn't wipe it, and (b) the header can
+     * be excluded from the collision surface for bands that ignore it.
+     */
     public get preBeatLocalSkyline(): BarLocalSkyline {
         if (!this._preBeatLocalSkyline) {
             this._preBeatLocalSkyline = new BarLocalSkyline(
@@ -197,7 +211,7 @@ export class BarRendererBase {
         return this._preBeatLocalSkyline;
     }
 
-    /** Post-beat glyphs' skyline in post-beat-group-local x; shifted by {@link postBeatGroupOffset} when unioned. */
+    /** Post-beat (barlines, repeat counts) skyline in post-beat-group-local x; shifted by {@link postBeatGroupOffset} when unioned. */
     public get postBeatLocalSkyline(): BarLocalSkyline {
         if (!this._postBeatLocalSkyline) {
             this._postBeatLocalSkyline = new BarLocalSkyline(
@@ -443,17 +457,16 @@ export class BarRendererBase {
     /**
      * Gates the voice-container walk in {@link _registerLayoutingInfo}.
      * Broker outputs from the walk are bar-local invariant; only the
-     * pre/post-beat `max` writes need to run each resize cycle (the broker
-     * zeroes `preBeatSize` at the head of every resize).
+     * header rods and post-beat `max` writes need to run each resize cycle
+     * (the broker resets its header rods at the head of every resize).
      */
     private _voiceWalkDone: boolean = false;
 
     public _registerLayoutingInfo(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
-        const preSize: number = this._preBeatGlyphs.width;
-        if (info.preBeatSize < preSize) {
-            info.preBeatSize = preSize;
-        }
+        // header glyphs (clef, key signature, time signature...) register their
+        // columns to be aligned across all staves.
+        this._preBeatGlyphs.registerHeaderRod(info);
         if (!this._voiceWalkDone) {
             const container = this.voiceContainer;
             container.registerLayoutingInfo(info);
@@ -478,7 +491,7 @@ export class BarRendererBase {
     private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
         for (const band of container.bands) {
             const policy = band.info.overlayRodPolicy;
-            if (policy === OverlayRodPolicy.None) {
+            if (policy === undefined) {
                 continue;
             }
             const bandKey = String(band.info.notationElement);
@@ -531,9 +544,11 @@ export class BarRendererBase {
      * must gate themselves to skip unchanged bars.
      */
     public applyLayoutingInfo(): void {
-        // if we need additional space in the preBeat group we simply
-        // add a new spacer
+        // align the header glyphs with the shared columns of all staves
+        this._preBeatGlyphs.applyHeaderRod(this.layoutingInfo);
         this._preBeatGlyphs.width = this.layoutingInfo.preBeatSize;
+        // header glyphs moved: re-emit their skyline spans (overflow magnitudes are x-independent)
+        this._emitPreBeatOverflows(this.height);
 
         // on beat glyphs we apply the glyph spacing
         const container = this.voiceContainer;
@@ -710,17 +725,14 @@ export class BarRendererBase {
     }
 
     protected calculateOverflows(_rendererTop: number, rendererBottom: number) {
-        // Re-emit pre/post-beat skylines from scratch each pass. Pre-beat
-        // group x = 0 so its local x equals bar-local x; post-beat x is
-        // not final until scaleToWidth, so the staff-skyline union shifts
-        // it later.
-        this.preBeatLocalSkyline.reset();
-        this.postBeatLocalSkyline.reset();
+        // Re-emit pre/post-beat (structural header) skylines from scratch each
+        // pass. Pre-beat group x = 0 so its local x equals bar-local x; post-beat
+        // x is not final until scaleToWidth, so the staff-skyline union shifts it
+        // later. These are kept separate from barLocalSkyline (the content
+        // surface) so a band can be placed against content-only.
+        this._emitPreBeatOverflows(rendererBottom);
 
-        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
-        if (preBeatGlyphs) {
-            this._emitGroupOverflows(preBeatGlyphs, this.preBeatLocalSkyline, rendererBottom);
-        }
+        this.postBeatLocalSkyline.reset();
         const postBeatGlyphs = this._postBeatGlyphs.glyphs;
         if (postBeatGlyphs) {
             this._emitGroupOverflows(postBeatGlyphs, this.postBeatLocalSkyline, rendererBottom);
@@ -745,6 +757,14 @@ export class BarRendererBase {
         const beatEffectsMaxY = this.beatEffectsMaxY;
         if (!Number.isNaN(beatEffectsMaxY) && beatEffectsMaxY > rendererBottom) {
             this.registerOverflowBottom(beatEffectsMaxY - rendererBottom);
+        }
+    }
+
+    private _emitPreBeatOverflows(rendererBottom: number): void {
+        this.preBeatLocalSkyline.reset();
+        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
+        if (preBeatGlyphs) {
+            this._emitGroupOverflows(preBeatGlyphs, this.preBeatLocalSkyline, rendererBottom);
         }
     }
 
@@ -951,7 +971,7 @@ export class BarRendererBase {
             this.recreatePreBeatGlyphs();
         }
 
-        // Must always re-register: the broker zeroes `preBeatSize` at the head of every resize cycle.
+        // Must always re-register: the broker resets its header rods at the head of every resize cycle.
         this._registerLayoutingInfo();
         this._registerOverlayRods();
         if (!this._layoutInvariantCached) {

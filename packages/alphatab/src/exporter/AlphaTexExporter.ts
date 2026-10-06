@@ -18,8 +18,8 @@ import {
     type AlphaTexStringLiteral,
     type AlphaTexArgumentList,
     type IAlphaTexAstNode,
-    AlphaTexDotTokenNode,
-    AlphaTexAtTokenNode
+    type AlphaTexDotTokenNode,
+    type AlphaTexAtTokenNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { IAlphaTexLanguageImportHandler } from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';

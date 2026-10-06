@@ -15,6 +15,7 @@ class AccidentalColumnInfo {
  * @internal
  */
 export class AccidentalGroupGlyph extends GlyphGroup {
+    public applyInitialNotePadding = false;
     public constructor() {
         super(0, 0);
     }
@@ -73,7 +74,15 @@ export class AccidentalGroupGlyph extends GlyphGroup {
             column.x = this.width;
         }
 
-        this.width += this.renderer.smuflMetrics.preBeatGlyphSpacing;
+        // Behind bars:
+        // - if no accidental 2.5sp initial spacing (handled in the ScoreBeatPreNotesGlyph)
+        // - if 1 accidental 1.5sp initial spacing (handled here)
+        // - if more accidentals 1sp initial spacing (handled here)
+        // the pre-beat glyphs already have a bit spacing, hence we have reduced values here
+        if (this.applyInitialNotePadding) {
+            const spacing = columns.length > 1 ? 0.2 : 0.4;
+            this.width += spacing * this.renderer.smuflMetrics.oneStaffSpace;
+        }
 
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
             const g: Glyph = this.glyphs[i];

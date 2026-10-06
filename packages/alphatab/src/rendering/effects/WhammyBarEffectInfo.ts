@@ -2,39 +2,24 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectBandPlacementCategory, EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
  */
-export class WhammyBarEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectWhammyBar;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.GroupedOnBeat;
-    }
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+export const whammyBarEffectInfo: EffectInfo = {
+    effectId: 'EffectWhammyBar',
+    notationElement: NotationElement.EffectWhammyBar,
+    hideOnMultiTrack: false,
+    sizingMode: EffectBarGlyphSizing.GroupedOnBeat,
+    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.hasWhammyBar;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
+    },
+    createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph => {
         return new LineRangedGlyph('w/bar', NotationElement.EffectWhammyBar);
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
-        return true;
-    }
-    public override get placementCategory(): EffectBandPlacementCategory {
-        return EffectBandPlacementCategory.Span;
-    }
-}
+    },
+    canExpand: (_from: Beat, _to: Beat): boolean => true,
+    placementCategory: EffectBandPlacementCategory.Span
+};

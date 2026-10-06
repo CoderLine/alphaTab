@@ -212,6 +212,13 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     public play(): void {
         const ctx = this.context!;
         this.activate();
+        this.createSource(ctx);
+    }
+
+    /**
+     * Creates the looping source (silence) which drives the audio graph.
+     */
+    protected createSource(ctx: AudioContext): void {
         // create an empty buffer source (silence)
         this.buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutputBase.BufferSize, ctx.sampleRate);
         this.source = ctx.createBufferSource();

@@ -4,29 +4,21 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { FingeringMode, NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
  */
-export class FingeringEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectFingering;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.SingleOnBeat;
-    }
-
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+export const fingeringEffectInfo: EffectInfo = {
+    effectId: 'EffectFingering',
+    notationElement: NotationElement.EffectFingering,
+    hideOnMultiTrack: false,
+    sizingMode: EffectBarGlyphSizing.SingleOnBeat,
+    shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean => {
+        const settings = renderer.settings;
         if (
             beat.voice.index !== 0 ||
             beat.isRest ||
@@ -39,9 +31,8 @@ export class FingeringEffectInfo extends EffectInfo {
             return false;
         }
         return beat.notes[0].isFingering;
-    }
-
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    },
+    createNewGlyph: (renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         let finger: Fingers = Fingers.Unknown;
         let isLeft: boolean = false;
         const note: Note = beat.notes[0];
@@ -58,9 +49,7 @@ export class FingeringEffectInfo extends EffectInfo {
         g.doLayout();
         g.offsetY = renderer.smuflMetrics.glyphTop.get(g.symbol)!;
         return g;
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
-        return true;
-    }
-}
+    },
+    canExpand: (_from: Beat, _to: Beat): boolean => true,
+    placementCategory: EffectBandPlacementCategory.NoteAttached
+};

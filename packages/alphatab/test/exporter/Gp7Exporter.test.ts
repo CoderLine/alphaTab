@@ -63,15 +63,13 @@ describe('Gp7ExporterTest', () => {
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
-    async function testRoundTripFolderEqual(
-        name: string,
-        ignoredFiles?: string[],
-        ignoreKeys: string[] | null = null
-    ): Promise<void> {
+    // other formats (e.g. MusicXML) have too many differences to the Guitar Pro data model for a full roundtrip
+    const roundTripExtensions = ['.gp3', '.gp4', '.gp5', '.gpx', '.gp'];
+
+    async function testRoundTripFolderEqual(name: string, ignoreKeys: string[] | null = null): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
-        const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files) {
-            if (!ignoredFilesLookup.has(file) && !file.endsWith('.png')) {
+            if (roundTripExtensions.some(e => file.endsWith(e))) {
                 await testRoundTripEqual(`${name}/${file}`, ignoreKeys);
             }
         }
@@ -84,7 +82,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-effects-and-annotations', async () => {
-        await testRoundTripFolderEqual('visual-tests/effects-and-annotations', ['hidden-dots.mxml']);
+        await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
     });
 
     it('visual-general', async () => {
@@ -96,11 +94,11 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-layout', async () => {
-        await testRoundTripFolderEqual('visual-tests/layout', ['extended-barlines.xml']);
+        await testRoundTripFolderEqual('visual-tests/layout');
     });
 
     it('visual-music-notation', async () => {
-        await testRoundTripFolderEqual('visual-tests/music-notation', ['barlines.xml']);
+        await testRoundTripFolderEqual('visual-tests/music-notation');
     });
 
     it('visual-notation-legend', async () => {
@@ -214,7 +212,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp8', async () => {
-        await testRoundTripFolderEqual('guitarpro8', undefined, ['bendpoints', 'bendtype']);
+        await testRoundTripFolderEqual('guitarpro8', ['bendpoints', 'bendtype']);
     });
 
     // Regression: MusicXML using MuseScore's `staff*4+localVoice` convention
@@ -403,6 +401,20 @@ describe('Gp7ExporterTest', () => {
             expect(capo + tuning[tuning.length - str] + fret).toBe(midi);
         }
         expect(noteCount).toBe(4);
+    });
+
+    it('export-keeps-score-untouched', () => {
+        const score = ScoreLoader.loadAlphaTex('\\instrument piano \\tuning piano . c4 d4 e4 f4');
+        const before = JsonConverter.scoreToJsObject(score);
+
+        // pitched staves need string and fret assigned during export, the input score must not change
+        const first = readExportedGpif(exportGp7(score));
+        ComparisonHelpers.expectJsonEqual(before, JsonConverter.scoreToJsObject(score), '<score>', null);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].realValue).toBe(60);
+
+        // a repeated export must produce the same file
+        const second = readExportedGpif(exportGp7(score));
+        expect(second).toBe(first);
     });
 
     /**

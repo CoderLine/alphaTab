@@ -33,6 +33,8 @@ export class MasterBarSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("alternateendings", obj.alternateEndings);
+        o.set("custombarnumbertext", obj.customBarNumberText);
+        o.set("custombarnumber", obj.customBarNumber);
         o.set("isdoublebar", obj.isDoubleBar);
         o.set("isrepeatstart", obj.isRepeatStart);
         o.set("repeatcount", obj.repeatCount);
@@ -75,6 +77,12 @@ export class MasterBarSerializer {
         switch (property) {
             case "alternateendings":
                 obj.alternateEndings = v! as number;
+                return true;
+            case "custombarnumbertext":
+                obj.customBarNumberText = v as string | undefined;
+                return true;
+            case "custombarnumber":
+                obj.customBarNumber = v as number | undefined;
                 return true;
             case "keysignature":
                 obj.keySignature = JsonHelper.parseEnum<KeySignature>(v, KeySignature)!;

@@ -179,8 +179,12 @@ export default class SmartCastResolver {
             return undefined;
         }
 
-        // actual type must match non nullable declaration
-        if (declaredTypeNonNull === contextualType) {
+        // actual type must match non nullable declaration, or a subset of it
+        // (e.g. enum members the variable was narrowed to by assignments)
+        if (
+            declaredTypeNonNull === contextualType ||
+            this._typeChecker.isTypeAssignableTo(contextualType, declaredTypeNonNull)
+        ) {
             return this._ctx.isValueType(declaredTypeNonNull);
         }
 

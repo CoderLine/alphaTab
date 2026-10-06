@@ -6,6 +6,7 @@ import { GhostParenthesisGlyph } from '@coderline/alphatab/rendering/glyphs/Ghos
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
 /**
  * @internal
@@ -16,6 +17,17 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
     private _isCommon: boolean;
     private _isFreeTime: boolean;
     public barSubElement: BarSubElement = BarSubElement.StandardNotationTimeSignature;
+
+    /**
+     * The bar header column of time signatures.
+     */
+    public static readonly HeaderRank: number = 400;
+
+    /**
+     * The spacing after the time signature. If negative, the default
+     * {@link EngravingSettings.preBeatGlyphSpacing} is used.
+     */
+    public trailingSpacing: number = -1;
 
     public constructor(
         x: number,
@@ -38,6 +50,18 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.bar(canvas, this.barSubElement, this.renderer.bar);
         super.paint(cx, cy, canvas);
+    }
+
+    public override registerHeaderRod(info: BarLayoutingInfo): void {
+        // center aligned: time signatures differ in size across staff types (e.g. tabs)
+        const half = this.width / 2;
+        const spacing =
+            this.trailingSpacing >= 0 ? this.trailingSpacing : this.renderer.smuflMetrics.preBeatGlyphSpacing;
+        info.addHeaderRod(TimeSignatureGlyph.HeaderRank, half, half + spacing);
+    }
+
+    public override applyHeaderRod(info: BarLayoutingInfo): void {
+        this.x = info.getHeaderRodX(TimeSignatureGlyph.HeaderRank, this.width / 2);
     }
 
     public override doLayout(): void {

@@ -3,36 +3,24 @@ import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { PickStrokeGlyph } from '@coderline/alphatab/rendering/glyphs/PickStrokeGlyph';
-import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
  */
-export class PickStrokeEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectPickStroke;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.SingleOnBeat;
-    }
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+export const pickStrokeEffectInfo: EffectInfo = {
+    effectId: 'EffectPickStroke',
+    notationElement: NotationElement.EffectPickStroke,
+    hideOnMultiTrack: false,
+    sizingMode: EffectBarGlyphSizing.SingleOnBeat,
+    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.pickStroke !== PickStroke.None;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    },
+    createNewGlyph: (_renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         return new PickStrokeGlyph(0, 0, beat.pickStroke);
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
-        return true;
-    }
-}
+    },
+    canExpand: (_from: Beat, _to: Beat): boolean => true,
+    placementCategory: EffectBandPlacementCategory.NoteAttached
+};

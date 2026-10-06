@@ -494,6 +494,17 @@ export function visitIdentifier(state: AstTransformer, parent: cs.Node, expressi
             default:
                 switch (identifier.tsSymbol.flags) {
                     case ts.SymbolFlags.Alias:
+                        // imported identifiers: only type-shaped symbols (e.g. enums passed as value)
+                        // become a typeof, imported variables and functions stay values.
+                        if (!_isTypeShapedAlias(state, identifier.tsSymbol)) {
+                            break;
+                        }
+                        return {
+                            parent: parent,
+                            nodeType: cs.SyntaxKind.TypeOfExpression,
+                            tsNode: expression,
+                            expression: identifier
+                        } as cs.TypeOfExpression;
                     case ts.SymbolFlags.RegularEnum:
                         return {
                             parent: parent,
@@ -507,6 +518,15 @@ export function visitIdentifier(state: AstTransformer, parent: cs.Node, expressi
     }
 
     return state.smartCastLowering.wrapToSmartCast(parent, identifier, expression);
+}
+
+function _isTypeShapedAlias(state: AstTransformer, symbol: ts.Symbol): boolean {
+    const aliased = state.context.typeChecker.getAliasedSymbol(symbol);
+    return (
+        (aliased.flags &
+            (ts.SymbolFlags.Class | ts.SymbolFlags.Enum | ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias)) !==
+        0
+    );
 }
 
 export function getSymbolName(_state: AstTransformer, parentSymbol: ts.Symbol, symbol: ts.Symbol): string | null {

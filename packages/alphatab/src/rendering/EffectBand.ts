@@ -144,6 +144,10 @@ export class EffectBand extends Glyph {
             for (const g of v) {
                 const left = g.getBoundingBoxLeft();
                 const right = g.getBoundingBoxRight();
+                if (Number.isNaN(left) || Number.isNaN(right)) {
+                    // glyph has no extent in the current layout (NaN convention, cf. ModelUtils.minBoundingBox)
+                    continue;
+                }
                 if (!found) {
                     min = left;
                     max = right;
@@ -192,7 +196,7 @@ export class EffectBand extends Glyph {
     }
 
     public finalizeBand() {
-        this.info.finalizeBand(this);
+        this.info.finalizeBand?.(this);
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
@@ -230,10 +234,7 @@ export class EffectBand extends Glyph {
     }
 
     public static shouldCreateGlyph(beat: Beat, info: EffectInfo, renderer: BarRendererBase) {
-        return (
-            info.shouldCreateGlyph(renderer.settings, beat) &&
-            (!info.hideOnMultiTrack || renderer.staff!.trackIndex === 0)
-        );
+        return info.shouldCreateGlyph(renderer, beat) && (!info.hideOnMultiTrack || renderer.staff!.trackIndex === 0);
     }
 
     public createGlyph(beat: Beat): void {
@@ -275,6 +276,7 @@ export class EffectBand extends Glyph {
         let g: EffectGlyph;
         switch (sizing) {
             case EffectBarGlyphSizing.FullBar:
+            case EffectBarGlyphSizing.SingleStartBar:
                 g = this.info.createNewGlyph(this.renderer, b);
                 g.renderer = this.renderer;
                 g.beat = b;
@@ -319,7 +321,7 @@ export class EffectBand extends Glyph {
                 if (b.index > 0 || this.renderer.index > 0) {
                     // check if the previous beat also had this effect
                     const prevBeat = b.previousBeat!;
-                    if (this.info.shouldCreateGlyph(this.renderer.settings, prevBeat)) {
+                    if (this.info.shouldCreateGlyph(this.renderer, prevBeat)) {
                         // first load the effect bar renderer and glyph
                         let prevEffect: EffectGlyph | null = null;
                         if (b.index > 0 && this._effectGlyphs[b.voice.index].has(prevBeat.index)) {
@@ -395,14 +397,16 @@ export class EffectBand extends Glyph {
                 this._alignGlyph(this.info.sizingMode, voiceGlyphs[i].beat!);
             }
         }
-        this.info.onAlignGlyphs(this);
+        this.info.onAlignGlyphs?.(this);
     }
 
     /**
      * Writes the renderer-local x range into `out`. Unions glyph paint
      * extents (effect glyphs often have width=0, so x/width is not enough)
      * with cross-renderer spans from {@link publishSpanRange}. Returns
-     * `false` when the band has no usable range.
+     * `false` when the band has no usable range. Glyphs reporting `NaN`
+     * horizontal bounds have no extent in the current layout; if no glyph has
+     * an extent, the band does not take part in the placement.
      */
     public computeLocalXRange(out: EffectBandXRange): boolean {
         if (this.isEmpty) {
@@ -445,6 +449,8 @@ export class EffectBand extends Glyph {
                 break;
             case EffectBarGlyphSizing.FullBar:
                 g.width = this.renderer.width;
+                break;
+            case EffectBarGlyphSizing.SingleStartBar:
                 break;
         }
     }

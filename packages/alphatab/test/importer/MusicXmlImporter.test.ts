@@ -4,6 +4,12 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { Settings } from '@coderline/alphatab/Settings';
+import { FlatMidiEventGenerator, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {
@@ -45,11 +51,12 @@ describe('MusicXmlImporterTests', () => {
             'test-data/musicxml3/first-bar-tempo.musicxml'
         );
 
-        expect(score.tempo).toBe(60);
+        // dotted quarter = 60
+        expect(score.tempo).toBe(90);
         expect(score.masterBars[0].tempoAutomations.length).toBe(1);
-        expect(score.masterBars[0].tempoAutomations[0]?.value).toBe(60);
+        expect(score.masterBars[0].tempoAutomations[0]?.value).toBe(90);
         expect(score.masterBars[1].tempoAutomations.length).toBe(1);
-        expect(score.masterBars[1].tempoAutomations[0].value).toBe(60);
+        expect(score.masterBars[1].tempoAutomations[0].value).toBe(90);
     });
     it('tie-destination', async () => {
         let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
@@ -320,6 +327,105 @@ describe('MusicXmlImporterTests', () => {
         expect(notes[1].percussionArticulation).toBeGreaterThanOrEqual(0);
     });
 
+    it('transposed-tie', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/transposed-tie.xml');
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+
+        // ties without number are matched by pitch, this must respect the staff transposition
+        expect(notes[0].isTieOrigin).toBe(true);
+        expect(notes[0].tieDestination).toBe(notes[1]);
+        expect(notes[1].isTieDestination).toBe(true);
+        expect(notes[1].tieOrigin).toBe(notes[0]);
+    });
+
+    it('dead-note', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/dead-note.xml');
+        const notes = (track: number, staff: number) =>
+            score.tracks[track].staves[staff].bars[0].voices[0].beats.flatMap(b => b.notes);
+
+        // tab staff: x notehead
+        const tab = notes(0, 0);
+        expect(tab[0].isDead).toBe(false);
+        expect(tab[1].isDead).toBe(true);
+        expect(tab[1].fret).toBe(2);
+
+        // MuseScore: x notehead on notation and tab staff, tuning only on the tab staff
+        expect(notes(1, 0)[0].isDead).toBe(true);
+        expect(notes(1, 1)[0].isDead).toBe(true);
+
+        // TuxGuitar: x notehead and mute on notation staff, only mute on the tab staff
+        expect(notes(2, 0)[0].isDead).toBe(true);
+        expect(notes(2, 1)[0].isDead).toBe(true);
+
+        // Guitar Pro 5: x notehead with string but without fret
+        const gp5 = notes(3, 0)[0];
+        expect(gp5.isDead).toBe(true);
+        expect(gp5.isStringed).toBe(true);
+        expect(gp5.string).toBe(4);
+        expect(gp5.fret).toBe(2);
+        expect(gp5.showStringNumber).toBe(false);
+
+        // drums: x notehead is a hi-hat
+        const drums = notes(4, 0)[0];
+        expect(drums.isPercussion).toBe(true);
+        expect(drums.isDead).toBe(false);
+
+        // voice: x notehead
+        expect(notes(5, 0)[0].isDead).toBe(false);
+
+        // trumpet: straight mute
+        const trumpet = notes(6, 0)[0];
+        expect(trumpet.isDead).toBe(false);
+        expect(trumpet.isPalmMute).toBe(false);
+    });
+
+    it('string-annotation', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/string-annotation.xml');
+
+        // staff without tuning: <string> is only an annotation on the pitched note
+        const notation = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+        expect(score.tracks[0].staves[0].tuning).toHaveLength(0);
+        for (const note of [notation[0], notation[1]]) {
+            expect(note.isStringed).toBe(false);
+            expect(note.isPiano).toBe(true);
+            expect(note.realValue).toBe(69);
+            expect(note.string).toBe(6);
+            expect(note.showStringNumber).toBe(true);
+            expect(Number.isNaN(note.fret)).toBe(true);
+        }
+        // out of range string
+        expect(Number.isNaN(notation[2].string)).toBe(true);
+        expect(notation[2].showStringNumber).toBe(false);
+        expect(notation[2].realValue).toBe(69);
+        expect(Number.isNaN(notation[3].string)).toBe(true);
+        expect(notation[3].showStringNumber).toBe(false);
+
+        // staff with tuning: string+fret is the tab position, string only is an annotation
+        const tab = score.tracks[1].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+        expect(score.tracks[1].staves[0].tuning).toHaveLength(6);
+        expect(tab[0].isStringed).toBe(true);
+        expect(tab[0].string).toBe(6);
+        expect(tab[0].fret).toBe(5);
+        expect(tab[0].realValue).toBe(69);
+        expect(tab[0].showStringNumber).toBe(false);
+
+        expect(tab[1].isStringed).toBe(false);
+        expect(tab[1].string).toBe(5);
+        expect(tab[1].showStringNumber).toBe(true);
+        expect(tab[1].realValue).toBe(69);
+
+        // out of range string
+        expect(tab[2].isStringed).toBe(false);
+        expect(Number.isNaN(tab[2].string)).toBe(true);
+        expect(Number.isNaN(tab[2].fret)).toBe(true);
+        expect(tab[2].showStringNumber).toBe(false);
+        expect(tab[2].realValue).toBe(69);
+
+        const midiFile = new MidiFile();
+        new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midiFile)).generate();
+        expect(midiFile.events.filter(e => Number.isNaN(e.tick))).toHaveLength(0);
+    });
+
     describe('barnumberdisplay', async () => {
         async function testPartwise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
@@ -363,6 +469,78 @@ describe('MusicXmlImporterTests', () => {
             expect(score.tracks[1].staves[0].bars[0].barNumberDisplay).toBe(BarNumberDisplay.Hide);
             expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).toBeUndefined();
             expect(score.tracks[1].staves[0].bars[3].barNumberDisplay).toBe(BarNumberDisplay.Hide);
+        });
+    });
+
+    describe('metronome-tempo', () => {
+        function loadMetronome(beatUnit: string, dots: number, perMinute: number, soundTempo: number = -1): Score {
+            let beatUnitDots = '';
+            for (let i = 0; i < dots; i++) {
+                beatUnitDots += '<beat-unit-dot/>';
+            }
+            const sound = soundTempo > 0 ? `<sound tempo="${soundTempo}"/>` : '';
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>2</divisions>
+        <time><beats>6</beats><beat-type>8</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <metronome><beat-unit>${beatUnit}</beat-unit>${beatUnitDots}<per-minute>${perMinute}</per-minute></metronome>
+        </direction-type>
+        ${sound}
+      </direction>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>3</duration><type>quarter</type><dot/></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>3</duration><type>quarter</type><dot/></note>
+    </measure>
+  </part>
+</score-partwise>`;
+            return MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+        }
+
+        function expectTempo(score: Score, expected: number) {
+            expect(score.masterBars[0].tempoAutomations.length).toBe(1);
+            expect(score.masterBars[0].tempoAutomations[0].value).toBe(expected);
+            expect(score.tempo).toBe(expected);
+        }
+
+        it('quarter', () => expectTempo(loadMetronome('quarter', 0, 120), 120));
+        it('eighth', () => expectTempo(loadMetronome('eighth', 0, 120), 60));
+        it('16th', () => expectTempo(loadMetronome('16th', 0, 240), 60));
+        it('half', () => expectTempo(loadMetronome('half', 0, 60), 120));
+        it('whole', () => expectTempo(loadMetronome('whole', 0, 30), 120));
+        it('breve', () => expectTempo(loadMetronome('breve', 0, 15), 120));
+
+        it('dotted-quarter', () => expectTempo(loadMetronome('quarter', 1, 40), 60));
+        it('dotted-eighth', () => expectTempo(loadMetronome('eighth', 1, 120), 90));
+        it('dotted-half', () => expectTempo(loadMetronome('half', 1, 60), 180));
+        it('double-dotted-quarter', () => expectTempo(loadMetronome('quarter', 2, 40), 70));
+
+        it('sound-tempo-matching', () => expectTempo(loadMetronome('eighth', 0, 120, 60), 60));
+        it('sound-tempo-precedence', () => expectTempo(loadMetronome('eighth', 0, 120, 200), 200));
+
+        it('playback-tempo', () => {
+            const score = loadMetronome('eighth', 0, 120);
+
+            const handler = new FlatMidiEventGenerator();
+            const generator = new MidiFileGenerator(score, null, handler);
+            generator.generate();
+
+            const tempoChanges: FlatTempoEvent[] = [];
+            for (const evt of handler.midiEvents) {
+                if (evt instanceof FlatTempoEvent) {
+                    tempoChanges.push(evt as FlatTempoEvent);
+                }
+            }
+
+            expect(tempoChanges.length).toBe(1);
+            expect(tempoChanges[0].tick).toBe(0);
+            expect(tempoChanges[0].tempo).toBe(60);
         });
     });
 });

@@ -24,7 +24,7 @@ Integrated Libraries:
     License: MIT
     Copyright: Copyright (C)2005-2025 Haxe Foundation
     URL: https://github.com/HaxeFoundation/haxe/tree/development/std
-    Purpose: XML Parser & Zip Inflate Algorithm
+    Purpose: Zip Inflate Algorithm
 
     Library: SharpZipLib
     License: MIT

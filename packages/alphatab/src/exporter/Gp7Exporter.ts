@@ -1,5 +1,7 @@
 import { Logger } from '@coderline/alphatab/Logger';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
+import type { Settings } from '@coderline/alphatab/Settings';
 import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 import { ScoreExporter } from '@coderline/alphatab/exporter/ScoreExporter';
 import { GpifWriter } from '@coderline/alphatab/exporter//GpifWriter';
@@ -18,6 +20,10 @@ export class Gp7Exporter extends ScoreExporter {
     }
 
     public writeScore(score: Score): void {
+        // GP7+ requires string and fret information for all notes which we might need to assign
+        // during export. We work on a copy to keep the input score untouched.
+        score = Gp7Exporter._cloneScore(score, this.settings);
+
         Logger.debug(this.name, 'Writing data entries');
         const gpifWriter: GpifWriter = new GpifWriter();
         const gpifXml = gpifWriter.writeXml(score);
@@ -39,5 +45,14 @@ export class Gp7Exporter extends ScoreExporter {
         }
 
         fileSystem.end();
+    }
+
+    private static _cloneScore(score: Score, settings: Settings): Score {
+        const clone = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
+        // the raw audio is not serialized, we only read it during export so we can share it
+        if (score.backingTrack && clone.backingTrack) {
+            clone.backingTrack.rawAudioFile = score.backingTrack.rawAudioFile;
+        }
+        return clone;
     }
 }

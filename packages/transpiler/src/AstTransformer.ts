@@ -7,7 +7,7 @@ import { findAllTags, JsDocTag } from './jsDocTags';
 import { SmartCastLowering } from './passes/SmartCastLoweringPass';
 import { createLazyTypeRef } from './TransformerHelpers';
 import { removeExtension } from './transforms/ExprHelpers';
-import { visitTopLevelFunctionDeclaration, visitTopLevelVariableStatement } from './transforms/Members';
+import { visitTopLevelVariableStatement } from './transforms/Members';
 import { AlphaTabCore } from './typeRegistry';
 import { fileNameToWrapperClassName } from './casing';
 
@@ -343,7 +343,8 @@ export default class AstTransformer {
                     continue;
                 }
                 emittedFunctionNames.add(name);
-                visitTopLevelFunctionDeclaration(this, wrapper, d);
+                // dispatch through the registry so target languages can wrap top-level functions too
+                this.visit(wrapper, d);
             } else if (ts.isVariableStatement(d)) {
                 visitTopLevelVariableStatement(this, wrapper, d);
             }

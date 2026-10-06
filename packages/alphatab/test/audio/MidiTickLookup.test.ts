@@ -1,9 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { Logger } from '@coderline/alphatab/Logger';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
-
 import { MasterBarTickLookup, MasterBarTickLookupTempoChange } from '@coderline/alphatab/midi/MasterBarTickLookup';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
@@ -13,22 +12,22 @@ import {
     MidiTickLookupFindBeatResultCursorMode
 } from '@coderline/alphatab/midi/MidiTickLookup';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
+import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { Bar } from '@coderline/alphatab/model/Bar';
 import { Note } from '@coderline/alphatab/model/Note';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
-import { Settings } from '@coderline/alphatab/Settings';
-import { TestPlatform } from 'test/TestPlatform';
-import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
-import { FlatMidiEvent, FlatMidiEventGenerator, FlatNoteEvent } from 'test/audio/FlatMidiEventGenerator';
-import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
-import { TestUiFacade } from 'test/visualTests/TestUiFacade';
 import { PlayerMode } from '@coderline/alphatab/PlayerSettings';
+import { Settings } from '@coderline/alphatab/Settings';
+import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
+import { type FlatMidiEvent, FlatMidiEventGenerator, FlatNoteEvent } from 'test/audio/FlatMidiEventGenerator';
+import { TestPlatform } from 'test/TestPlatform';
+import { TestUiFacade } from 'test/visualTests/TestUiFacade';
+import { describe, expect, it } from 'vitest';
 
 describe('MidiTickLookupTest', () => {
     function buildLookup(score: Score, settings: Settings): MidiTickLookup {

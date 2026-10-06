@@ -119,7 +119,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         this._finalizeStaffSystem();
 
         this.height = Math.floor(this._system.y + this._system.height);
-        this.width = this._system.x + this._system.width + this.pagePadding![2];
+        this.width =
+            (this._system.x + this._system.width + this.pagePadding![2]) * this.renderer.settings.display.scale;
         currentBarIndex = 0;
 
         let x = 0;
@@ -130,7 +131,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             e.reuseViewport = renderHints?.reuseViewport ?? false;
             e.x = x;
             e.y = 0;
-            e.totalWidth = this.width;
+            e.totalWidth = this.scaledWidth;
             e.totalHeight = this.height;
             e.width = partial.width;
             e.height = this.height;

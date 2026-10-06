@@ -25,46 +25,47 @@ import { AlphaTabWebWorker } from '@coderline/alphatab/platform/worker/AlphaTabW
 import type {
     IAlphaTabWorkerGlobalScope
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
-import { EffectBandMode, type BarRendererFactory } from '@coderline/alphatab/rendering/BarRendererFactory';
-import { AlternateEndingsEffectInfo } from '@coderline/alphatab/rendering/effects/AlternateEndingsEffectInfo';
-import { BeatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
-import { BeatTimerEffectInfo } from '@coderline/alphatab/rendering/effects/BeatTimerEffectInfo';
-import { CapoEffectInfo } from '@coderline/alphatab/rendering/effects/CapoEffectInfo';
-import { ChordsEffectInfo } from '@coderline/alphatab/rendering/effects/ChordsEffectInfo';
-import { CrescendoEffectInfo } from '@coderline/alphatab/rendering/effects/CrescendoEffectInfo';
-import { DirectionsEffectInfo } from '@coderline/alphatab/rendering/effects/DirectionsEffectInfo';
-import { DynamicsEffectInfo } from '@coderline/alphatab/rendering/effects/DynamicsEffectInfo';
-import { FadeEffectInfo } from '@coderline/alphatab/rendering/effects/FadeEffectInfo';
-import { FermataEffectInfo } from '@coderline/alphatab/rendering/effects/FermataEffectInfo';
-import { FingeringEffectInfo } from '@coderline/alphatab/rendering/effects/FingeringEffectInfo';
-import { FreeTimeEffectInfo } from '@coderline/alphatab/rendering/effects/FreeTimeEffectInfo';
-import { GolpeEffectInfo } from '@coderline/alphatab/rendering/effects/GolpeEffectInfo';
-import { HarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
-import { LeftHandTapEffectInfo } from '@coderline/alphatab/rendering/effects/LeftHandTapEffectInfo';
-import { LetRingEffectInfo } from '@coderline/alphatab/rendering/effects/LetRingEffectInfo';
-import { LyricsEffectInfo } from '@coderline/alphatab/rendering/effects/LyricsEffectInfo';
-import { MarkerEffectInfo } from '@coderline/alphatab/rendering/effects/MarkerEffectInfo';
-import { NoteOrnamentEffectInfo } from '@coderline/alphatab/rendering/effects/NoteOrnamentEffectInfo';
-import { NumberedBarKeySignatureEffectInfo } from '@coderline/alphatab/rendering/effects/NumberedBarKeySignatureEffectInfo';
-import { OttaviaEffectInfo } from '@coderline/alphatab/rendering/effects/OttaviaEffectInfo';
-import { PalmMuteEffectInfo } from '@coderline/alphatab/rendering/effects/PalmMuteEffectInfo';
-import { PickSlideEffectInfo } from '@coderline/alphatab/rendering/effects/PickSlideEffectInfo';
-import { PickStrokeEffectInfo } from '@coderline/alphatab/rendering/effects/PickStrokeEffectInfo';
-import { RasgueadoEffectInfo } from '@coderline/alphatab/rendering/effects/RasgueadoEffectInfo';
-import { SimpleDipWhammyBarEffectInfo } from '@coderline/alphatab/rendering/effects/SimpleDipWhammyBarEffectInfo';
-import { SlightBeatVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightBeatVibratoEffectInfo';
-import { SlightNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightNoteVibratoEffectInfo';
-import { SustainPedalEffectInfo } from '@coderline/alphatab/rendering/effects/SustainPedalEffectInfo';
-import { TabWhammyEffectInfo } from '@coderline/alphatab/rendering/effects/TabWhammyEffectInfo';
-import { TapEffectInfo } from '@coderline/alphatab/rendering/effects/TapEffectInfo';
-import { TempoEffectInfo } from '@coderline/alphatab/rendering/effects/TempoEffectInfo';
-import { TextEffectInfo } from '@coderline/alphatab/rendering/effects/TextEffectInfo';
-import { TrillEffectInfo } from '@coderline/alphatab/rendering/effects/TrillEffectInfo';
-import { TripletFeelEffectInfo } from '@coderline/alphatab/rendering/effects/TripletFeelEffectInfo';
-import { WahPedalEffectInfo } from '@coderline/alphatab/rendering/effects/WahPedalEffectInfo';
-import { WhammyBarEffectInfo } from '@coderline/alphatab/rendering/effects/WhammyBarEffectInfo';
-import { WideBeatVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/WideBeatVibratoEffectInfo';
-import { WideNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/WideNoteVibratoEffectInfo';
+import { type BarRendererFactory, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { alternateEndingsEffectInfo } from '@coderline/alphatab/rendering/effects/AlternateEndingsEffectInfo';
+import { barNumberEffectInfo } from '@coderline/alphatab/rendering/effects/BarNumberEffectInfo';
+import { beatBarreEffectInfo } from '@coderline/alphatab/rendering/effects/BeatBarreEffectInfo';
+import { beatTimerEffectInfo } from '@coderline/alphatab/rendering/effects/BeatTimerEffectInfo';
+import { capoEffectInfo } from '@coderline/alphatab/rendering/effects/CapoEffectInfo';
+import { chordsEffectInfo } from '@coderline/alphatab/rendering/effects/ChordsEffectInfo';
+import { crescendoEffectInfo } from '@coderline/alphatab/rendering/effects/CrescendoEffectInfo';
+import { directionsEffectInfo } from '@coderline/alphatab/rendering/effects/DirectionsEffectInfo';
+import { dynamicsEffectInfo } from '@coderline/alphatab/rendering/effects/DynamicsEffectInfo';
+import { fadeEffectInfo } from '@coderline/alphatab/rendering/effects/FadeEffectInfo';
+import { fermataEffectInfo } from '@coderline/alphatab/rendering/effects/FermataEffectInfo';
+import { fingeringEffectInfo } from '@coderline/alphatab/rendering/effects/FingeringEffectInfo';
+import { freeTimeEffectInfo } from '@coderline/alphatab/rendering/effects/FreeTimeEffectInfo';
+import { createGolpeEffectInfo } from '@coderline/alphatab/rendering/effects/GolpeEffectInfo';
+import { createHarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
+import { leftHandTapEffectInfo } from '@coderline/alphatab/rendering/effects/LeftHandTapEffectInfo';
+import { letRingEffectInfo } from '@coderline/alphatab/rendering/effects/LetRingEffectInfo';
+import { lyricsEffectInfo } from '@coderline/alphatab/rendering/effects/LyricsEffectInfo';
+import { markerEffectInfo } from '@coderline/alphatab/rendering/effects/MarkerEffectInfo';
+import { noteOrnamentEffectInfo } from '@coderline/alphatab/rendering/effects/NoteOrnamentEffectInfo';
+import { numberedBarKeySignatureEffectInfo } from '@coderline/alphatab/rendering/effects/NumberedBarKeySignatureEffectInfo';
+import { createOttaviaEffectInfo } from '@coderline/alphatab/rendering/effects/OttaviaEffectInfo';
+import { palmMuteEffectInfo } from '@coderline/alphatab/rendering/effects/PalmMuteEffectInfo';
+import { pickSlideEffectInfo } from '@coderline/alphatab/rendering/effects/PickSlideEffectInfo';
+import { pickStrokeEffectInfo } from '@coderline/alphatab/rendering/effects/PickStrokeEffectInfo';
+import { rasgueadoEffectInfo } from '@coderline/alphatab/rendering/effects/RasgueadoEffectInfo';
+import { simpleDipWhammyBarEffectInfo } from '@coderline/alphatab/rendering/effects/SimpleDipWhammyBarEffectInfo';
+import { slightBeatVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightBeatVibratoEffectInfo';
+import { createSlightNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/SlightNoteVibratoEffectInfo';
+import { sustainPedalEffectInfo } from '@coderline/alphatab/rendering/effects/SustainPedalEffectInfo';
+import { tabWhammyEffectInfo } from '@coderline/alphatab/rendering/effects/TabWhammyEffectInfo';
+import { tapEffectInfo } from '@coderline/alphatab/rendering/effects/TapEffectInfo';
+import { tempoEffectInfo } from '@coderline/alphatab/rendering/effects/TempoEffectInfo';
+import { textEffectInfo } from '@coderline/alphatab/rendering/effects/TextEffectInfo';
+import { trillEffectInfo } from '@coderline/alphatab/rendering/effects/TrillEffectInfo';
+import { tripletFeelEffectInfo } from '@coderline/alphatab/rendering/effects/TripletFeelEffectInfo';
+import { wahPedalEffectInfo } from '@coderline/alphatab/rendering/effects/WahPedalEffectInfo';
+import { whammyBarEffectInfo } from '@coderline/alphatab/rendering/effects/WhammyBarEffectInfo';
+import { wideBeatVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/WideBeatVibratoEffectInfo';
+import { wideNoteVibratoEffectInfo } from '@coderline/alphatab/rendering/effects/WideNoteVibratoEffectInfo';
 import { HorizontalScreenLayout } from '@coderline/alphatab/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@coderline/alphatab/rendering/layout/PageViewLayout';
 import { ParchmentLayout } from '@coderline/alphatab/rendering/layout/ParchmentLayout';
@@ -458,106 +459,107 @@ export class Environment {
         //
         // Slash
         new SlashBarRendererFactory([
-            { effect: new TempoEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new TripletFeelEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new MarkerEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new DirectionsEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new FreeTimeEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new TextEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new BeatTimerEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new ChordsEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new AlternateEndingsEffectInfo(), mode: EffectBandMode.SharedTop, order: 1000 }
+            { effect: tempoEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: tripletFeelEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: markerEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: directionsEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: freeTimeEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: textEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: beatTimerEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: chordsEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: alternateEndingsEffectInfo, mode: EffectBandMode.SharedTop, order: 1000 },
+            { effect: barNumberEffectInfo, mode: EffectBandMode.SharedTop, order: 2000 }
         ]),
 
         //
         // Score (standard notation)
         new ScoreBarRendererFactory([
-            { effect: new CapoEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new FermataEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new BeatBarreEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new NoteOrnamentEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new RasgueadoEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new WahPedalEffectInfo(), mode: EffectBandMode.SharedTop },
-            { effect: new WhammyBarEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new SimpleDipWhammyBarEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new TrillEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new OttaviaEffectInfo(true), mode: EffectBandMode.OwnedTop },
-            { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new TapEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new WideBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new SlightBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new WideNoteVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new SlightNoteVibratoEffectInfo(false), mode: EffectBandMode.OwnedTop },
+            { effect: capoEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: fermataEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: beatBarreEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: noteOrnamentEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: rasgueadoEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: wahPedalEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: whammyBarEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: simpleDipWhammyBarEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: trillEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: createOttaviaEffectInfo(true), mode: EffectBandMode.OwnedTop },
+            { effect: leftHandTapEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: tapEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: wideBeatVibratoEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: slightBeatVibratoEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: wideNoteVibratoEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: createSlightNoteVibratoEffectInfo(false), mode: EffectBandMode.OwnedTop },
             {
-                effect: new FadeEffectInfo(),
+                effect: fadeEffectInfo,
                 mode: EffectBandMode.OwnedTop,
                 shouldCreate: staff => !staff.showTablature
             },
             {
-                effect: new LetRingEffectInfo(),
+                effect: letRingEffectInfo,
                 mode: EffectBandMode.OwnedTop,
                 shouldCreate: staff => !staff.showTablature
             },
             {
-                effect: new PickStrokeEffectInfo(),
+                effect: pickStrokeEffectInfo,
                 mode: EffectBandMode.OwnedTop,
                 shouldCreate: staff => !staff.showTablature
             },
             {
-                effect: new PickSlideEffectInfo(),
+                effect: pickSlideEffectInfo,
                 mode: EffectBandMode.OwnedTop,
                 shouldCreate: staff => !staff.showTablature
             },
 
-            { effect: new GolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop },
+            { effect: createGolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop },
 
-            { effect: new GolpeEffectInfo(GolpeType.Thumb), mode: EffectBandMode.OwnedBottom },
-            { effect: new CrescendoEffectInfo(), mode: EffectBandMode.SharedBottom },
+            { effect: createGolpeEffectInfo(GolpeType.Thumb), mode: EffectBandMode.OwnedBottom },
+            { effect: crescendoEffectInfo, mode: EffectBandMode.SharedBottom },
             // NOTE: all octave signs are currently shown above, but 8vb could be shown as 8va below the staff
             // { effect: new OttaviaEffectInfo(false), mode: EffectBandMode.SharedBottom },
-            { effect: new DynamicsEffectInfo(), mode: EffectBandMode.SharedBottom },
-            { effect: new SustainPedalEffectInfo(), mode: EffectBandMode.SharedBottom }
+            { effect: dynamicsEffectInfo, mode: EffectBandMode.SharedBottom },
+            { effect: sustainPedalEffectInfo, mode: EffectBandMode.SharedBottom }
         ]),
 
         //
         // Numbered
         new NumberedBarRendererFactory([
-            { effect: new NumberedBarKeySignatureEffectInfo(), mode: EffectBandMode.OwnedTop, order: 1000 }
+            { effect: numberedBarKeySignatureEffectInfo, mode: EffectBandMode.OwnedTop, order: 1000 }
         ]),
 
         //
         // Tabs
         new TabBarRendererFactory([
-            { effect: new LyricsEffectInfo(), mode: EffectBandMode.SharedTop },
+            { effect: lyricsEffectInfo, mode: EffectBandMode.SharedTop },
 
-            { effect: new TabWhammyEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new TrillEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new WideBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new SlightBeatVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new WideNoteVibratoEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new SlightNoteVibratoEffectInfo(true), mode: EffectBandMode.OwnedTop },
-            { effect: new TapEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new FadeEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new HarmonicsEffectInfo(HarmonicType.Natural), mode: EffectBandMode.OwnedTop },
-            { effect: new HarmonicsEffectInfo(HarmonicType.Artificial), mode: EffectBandMode.OwnedTop },
-            { effect: new HarmonicsEffectInfo(HarmonicType.Pinch), mode: EffectBandMode.OwnedTop },
-            { effect: new HarmonicsEffectInfo(HarmonicType.Tap), mode: EffectBandMode.OwnedTop },
-            { effect: new HarmonicsEffectInfo(HarmonicType.Semi), mode: EffectBandMode.OwnedTop },
-            { effect: new HarmonicsEffectInfo(HarmonicType.Feedback), mode: EffectBandMode.OwnedTop },
-            { effect: new LetRingEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new FingeringEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new PalmMuteEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new PickStrokeEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new PickSlideEffectInfo(), mode: EffectBandMode.OwnedTop },
-            { effect: new LeftHandTapEffectInfo(), mode: EffectBandMode.OwnedTop },
+            { effect: tabWhammyEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: trillEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: wideBeatVibratoEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: slightBeatVibratoEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: wideNoteVibratoEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: createSlightNoteVibratoEffectInfo(true), mode: EffectBandMode.OwnedTop },
+            { effect: tapEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: fadeEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: createHarmonicsEffectInfo(HarmonicType.Natural), mode: EffectBandMode.OwnedTop },
+            { effect: createHarmonicsEffectInfo(HarmonicType.Artificial), mode: EffectBandMode.OwnedTop },
+            { effect: createHarmonicsEffectInfo(HarmonicType.Pinch), mode: EffectBandMode.OwnedTop },
+            { effect: createHarmonicsEffectInfo(HarmonicType.Tap), mode: EffectBandMode.OwnedTop },
+            { effect: createHarmonicsEffectInfo(HarmonicType.Semi), mode: EffectBandMode.OwnedTop },
+            { effect: createHarmonicsEffectInfo(HarmonicType.Feedback), mode: EffectBandMode.OwnedTop },
+            { effect: letRingEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: fingeringEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: palmMuteEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: pickStrokeEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: pickSlideEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: leftHandTapEffectInfo, mode: EffectBandMode.OwnedTop },
             {
-                effect: new GolpeEffectInfo(GolpeType.Finger),
+                effect: createGolpeEffectInfo(GolpeType.Finger),
                 mode: EffectBandMode.OwnedTop,
                 shouldCreate: staff => !staff.showStandardNotation
             },
 
             {
-                effect: new GolpeEffectInfo(GolpeType.Thumb),
+                effect: createGolpeEffectInfo(GolpeType.Thumb),
                 mode: EffectBandMode.OwnedBottom,
                 shouldCreate: staff => !staff.showStandardNotation
             }

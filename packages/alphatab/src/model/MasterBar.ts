@@ -151,6 +151,13 @@ export class BeamingRules {
  */
 export class MasterBar {
     public static readonly MaxAlternateEndings: number = 8;
+
+    /**
+     * @internal
+     * @json_ignore
+     */
+    public _realBarNumber = Number.NaN;
+
     /**
      * Gets or sets the bitflag for the alternate endings. Each bit defines for which repeat counts
      * the bar is played.
@@ -174,6 +181,53 @@ export class MasterBar {
      * @json_ignore
      */
     public index: number = 0;
+
+    /**
+     * A custom string to display for the bar number as override. 
+     * Even with a custom string, this masterbar contributes to the incremental bar numbers 
+     * across the score. Set the {@link customBarNumber} for the next master bar if you want 
+     * alternative counting.
+     */
+    public customBarNumberText?: string;
+
+    /**
+     * A custom bar number affecting this and subsequent bar numbers.
+     * e.g. allows setting the initial bar number to 10 and the second will be 11.
+     * Any change to {@link customBarNumber} requires an additional call to {@link Score.finish} 
+     * to consolidate the counting.
+     */
+    public customBarNumber?: number;
+
+    /**
+     * The actual bar number of this masterbar respecting any Pick-Up bars and manually overriden bar numbers.
+     * Returns NaN for pick-up bars (see {@link isAnacrusis}) Only available after data model finish.
+     * The final bar number is not guaranteed to be unique. using {@see customBarNumber} 
+     * users might reset or change counting in any custom fashion. Do not rely on the bar number
+     * for lookup or indexing.
+     */
+    public get barNumber(): number {
+        return this._realBarNumber;
+    }
+
+    /**
+     * Returns the actual text displayed for this master bar respecting any custom overrides and
+     * out-of-order numbers. Only available after data model finish.
+     */
+    public get barNumberText(): string {
+        let text = this.customBarNumberText;
+        if (text !== undefined) {
+            return text;
+        }
+
+        const barNumber = this._realBarNumber;
+        if (!Number.isNaN(barNumber)) {
+            text = barNumber.toString();
+        } else {
+            text = '';
+        }
+
+        return text;
+    }
 
     /**
      * Whether the masterbar is has any changes applied to it (e.g. tempo changes, time signature changes etc)

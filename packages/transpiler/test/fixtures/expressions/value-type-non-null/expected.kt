@@ -64,6 +64,24 @@ public class ValueNonNull
         return this.mode!!
     }
     
+    /**
+     */
+    public fun readNarrowed(on: alphaTab.collections.BooleanList): alphaTab.Mode{
+        var mode: alphaTab.Mode? = null
+        for (v in on)
+        {
+            if (v)
+            {
+                mode = alphaTab.Mode.On
+            }
+        }
+        if (((mode as alphaTab.Mode?)) == null)
+        {
+            return alphaTab.Mode.Off
+        }
+        return mode
+    }
+    
     public constructor()
 }
 

@@ -135,7 +135,17 @@ describe('AlphaTexExporterTest', () => {
     });
 
     it('visual-effects-and-annotations', async () => {
-        await testRoundTripFolderEqual('visual-tests/effects-and-annotations', ['hidden-dots.mxml']);
+        await testRoundTripFolderEqual('visual-tests/effects-and-annotations', [
+            'hidden-dots.mxml',
+            'string-numbers-pitched.mxml'
+        ]);
+    });
+
+    it('musicxml-string-numbers-pitched', async () => {
+        // MusicXML always specifies an explicit display duration which alphaTex does not need
+        await testRoundTripEqual('visual-tests/effects-and-annotations/string-numbers-pitched.mxml', [
+            'overridedisplayduration'
+        ]);
     });
 
     it('visual-general', async () => {

@@ -5,6 +5,7 @@ import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/gl
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
 /**
  * @internal
@@ -184,6 +185,11 @@ class BarLineTickGlyph extends BarLineGlyphBase {
  * @internal
  */
 export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
+    /**
+     * The bar header column of the start barline.
+     */
+    public static readonly HeaderRank: number = 0;
+
     private _isRight: boolean;
     private _extendToNextStaff: boolean;
 
@@ -331,6 +337,18 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             g.y = top;
             g.x += xShift;
             g.height = h;
+        }
+    }
+
+    public override registerHeaderRod(info: BarLayoutingInfo): void {
+        if (!this._isRight) {
+            info.addHeaderRod(BarLineGlyph.HeaderRank, 0, this.width);
+        }
+    }
+
+    public override applyHeaderRod(info: BarLayoutingInfo): void {
+        if (!this._isRight) {
+            this.x = info.getHeaderRodX(BarLineGlyph.HeaderRank, 0);
         }
     }
 

@@ -490,7 +490,8 @@ export class AlphaTex1LanguageDefinitions {
                     [[106], 5]
                 ]
             ]
-        ]
+        ],
+        ['barnumber', [[[[107, 100], 0]], [[[106], 0]]]]
     ]);
     public static readonly metaDataProperties = AlphaTex1LanguageDefinitions._metaProps([
         [
@@ -608,7 +609,8 @@ export class AlphaTex1LanguageDefinitions {
         ['db', null],
         ['voicemode', null],
         ['barnumberdisplay', null],
-        ['beaming', null]
+        ['beaming', null],
+        ['barnumber', null]
     ]);
     public static readonly metaDataSignatures = [
         AlphaTex1LanguageDefinitions.scoreMetaDataSignatures,
@@ -880,7 +882,7 @@ export class AlphaTex1LanguageDefinitions {
         ['iturn', null],
         ['umordent', null],
         ['lmordent', null],
-        ['string', null],
+        ['string', [[], [[[106], 0]]]],
         ['hide', null],
         [
             'b',

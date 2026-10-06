@@ -31,6 +31,24 @@ namespace AlphaTab
         }
         
         
+        public AlphaTab.Mode ReadNarrowed(System.Collections.Generic.IList<bool> on)
+        {
+            AlphaTab.Mode? mode = null;
+            foreach (bool v in on)
+            {
+                if (v)
+                {
+                    mode = AlphaTab.Mode.On;
+                }
+            }
+            if (((AlphaTab.Mode?)mode) == null)
+            {
+                return AlphaTab.Mode.Off;
+            }
+            return mode.Value;
+        }
+        
+        
     }
     
 }

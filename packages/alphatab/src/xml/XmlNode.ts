@@ -1,134 +1,224 @@
-// This XML parser is based on the XML Parser of the Haxe Standard Library (MIT)
-/*
- * Copyright (C)2005-2019 Haxe Foundation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
 /**
+ * The types of nodes in a {@link XmlNode} tree.
  * @internal
  */
 export enum XmlNodeType {
-    None = 0,
-    Element = 1,
-    Text = 2,
-    CDATA = 3,
-    Document = 4,
-    DocumentType = 5,
-    Comment = 6
+    Element = 0,
+    Document = 1,
+    Comment = 2,
+    DocumentType = 3
 }
 
 /**
+ * A node of a lightweight XML tree tailored to the data oriented XML formats alphaTab reads and writes
+ * (MusicXML, Guitar Pro GPIF, Capella).
+ *
+ * These formats do not use mixed content, hence character data is not represented as own nodes but
+ * as text of the element containing it:
+ * - Each run of character data between markup is trimmed, runs with only whitespace (formatting) are dropped.
+ * - CDATA sections are kept as written.
+ * - The text of an element is the concatenation of its runs and CDATA sections.
+ *
+ * Comments and processing instructions are skipped while parsing, comments can be added for writing.
  * @internal
  */
 export class XmlNode {
-    public nodeType: XmlNodeType = XmlNodeType.None;
-    public localName: string | null = null;
-    public value: string | null = null;
-    public childNodes: XmlNode[] = [];
-    public attributes: Map<string, string> = new Map<string, string>();
-    public firstChild: XmlNode | null = null;
-    public firstElement: XmlNode | null = null;
+    private static readonly _noNodes: XmlNode[] = [];
 
-    public *childElements() {
-        for (const c of this.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                yield c;
-            }
-        }
+    private _text: string | null = null;
+    private _isCData: boolean = false;
+    private _attributes: Map<string, string> | null = null;
+    private _childNodes: XmlNode[] | null = null;
+    // only separated from the child nodes when non-element children (comments, doctype) are added
+    private _childElements: XmlNode[] | null = null;
+
+    /**
+     * The type of this node.
+     */
+    public nodeType: XmlNodeType;
+
+    /**
+     * The name of an element node, empty for other node types.
+     */
+    public localName: string;
+
+    public constructor(nodeType: XmlNodeType = XmlNodeType.Element, localName: string = '') {
+        this.nodeType = nodeType;
+        this.localName = localName;
     }
 
-    public addChild(node: XmlNode): void {
-        this.childNodes.push(node);
-        this.firstChild = node;
-        if (node.nodeType === XmlNodeType.Element || node.nodeType === XmlNodeType.CDATA) {
-            this.firstElement = node;
-        }
+    /**
+     * All child nodes in document order. The returned list must not be modified, use {@link addChild}.
+     */
+    public get childNodes(): XmlNode[] {
+        return this._childNodes ?? XmlNode._noNodes;
     }
 
+    /**
+     * The child element nodes in document order. The returned list must not be modified, use {@link addChild}.
+     */
+    public childElements(): XmlNode[] {
+        return this._childElements ?? this._childNodes ?? XmlNode._noNodes;
+    }
+
+    /**
+     * The first child element or null if there is none.
+     */
+    public get firstElement(): XmlNode | null {
+        const elements = this.childElements();
+        return elements.length > 0 ? elements[0] : null;
+    }
+
+    /**
+     * Whether any attributes are set on this node.
+     */
+    public get hasAttributes(): boolean {
+        return this._attributes !== null && this._attributes.size > 0;
+    }
+
+    /**
+     * The attributes of this node.
+     */
+    public get attributes(): Map<string, string> {
+        let attributes = this._attributes;
+        if (attributes === null) {
+            attributes = new Map<string, string>();
+            this._attributes = attributes;
+        }
+        return attributes;
+    }
+
+    /**
+     * Gets the value of the attribute with the given name or the default value if the attribute is not set.
+     */
     public getAttribute(name: string, defaultValue: string = ''): string {
-        if (this.attributes.has(name)) {
-            return this.attributes.get(name)!;
+        const attributes = this._attributes;
+        if (attributes !== null && attributes.has(name)) {
+            return attributes.get(name)!;
         }
         return defaultValue;
     }
 
-    public getElementsByTagName(name: string, recursive: boolean = false): XmlNode[] {
-        const tags: XmlNode[] = [];
-        this._searchElementsByTagName(this.childNodes, tags, name, recursive);
-        return tags;
+    /**
+     * Whether the text of this node was written as CDATA section.
+     */
+    public get isCData(): boolean {
+        return this._isCData;
     }
 
-    private _searchElementsByTagName(all: XmlNode[], result: XmlNode[], name: string, recursive: boolean = false): void {
-        for (const c of all) {
-            if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
-                result.push(c);
-            }
-            if (recursive) {
-                this._searchElementsByTagName(c.childNodes, result, name, true);
-            }
+    /**
+     * Whether a text was set for this node (also if it is empty).
+     */
+    public get hasText(): boolean {
+        return this._text !== null;
+    }
+
+    /**
+     * The text of this node. For elements with child elements, the texts of the children are appended.
+     * Setting the text removes all child nodes.
+     */
+    public get innerText(): string {
+        const text = this._text ?? '';
+        const elements = this.childElements();
+        if (elements.length === 0) {
+            return text;
+        }
+
+        let result = text;
+        for (const e of elements) {
+            result += e.innerText;
+        }
+        return result;
+    }
+
+    public set innerText(value: string) {
+        this._text = value;
+        this._isCData = false;
+        this._childNodes = null;
+        this._childElements = null;
+    }
+
+    /**
+     * Sets the text of this node to be written as CDATA section. Removes all child nodes.
+     */
+    public setCData(value: string) {
+        this.innerText = value;
+        this._isCData = true;
+    }
+
+    /**
+     * Appends the given character data to the text of this node.
+     * @param text The text to append.
+     * @param isCData Whether the text originates from a CDATA section.
+     */
+    public appendText(text: string, isCData: boolean) {
+        const current = this._text;
+        this._text = current === null ? text : current + text;
+        if (isCData) {
+            this._isCData = true;
         }
     }
 
+    public addChild(node: XmlNode): void {
+        let childNodes = this._childNodes;
+        if (childNodes === null) {
+            childNodes = [];
+            this._childNodes = childNodes;
+        }
+
+        const childElements = this._childElements;
+        if (node.nodeType === XmlNodeType.Element) {
+            // separate list only exists after a non element child was added
+            if (childElements !== null) {
+                childElements.push(node);
+            }
+        } else if (childElements === null) {
+            this._childElements = childNodes.slice();
+        }
+
+        childNodes.push(node);
+    }
+
+    /**
+     * Creates a new element with the given name and adds it as child.
+     */
+    public addElement(name: string): XmlNode {
+        const element = new XmlNode(XmlNodeType.Element, name);
+        this.addChild(element);
+        return element;
+    }
+
+    /**
+     * Finds the first child element with the given name.
+     */
     public findChildElement(name: string): XmlNode | null {
-        for (const c of this.childNodes) {
-            if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
-                return c;
+        for (const e of this.childElements()) {
+            if (e.localName === name) {
+                return e;
             }
         }
         return null;
     }
 
-    public addElement(name: string): XmlNode {
-        const newNode = new XmlNode();
-        newNode.nodeType = XmlNodeType.Element;
-        newNode.localName = name;
-        this.addChild(newNode);
-        return newNode;
+    /**
+     * Collects all child elements with the given name.
+     * @param name The name of the elements.
+     * @param recursive Whether to also search the descendants of the child elements.
+     */
+    public getElementsByTagName(name: string, recursive: boolean = false): XmlNode[] {
+        const result: XmlNode[] = [];
+        this._collectElementsByTagName(result, name, recursive);
+        return result;
     }
 
-    public get innerText(): string {
-        if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
-            if (this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
-                return this.firstElement.innerText;
+    private _collectElementsByTagName(result: XmlNode[], name: string, recursive: boolean) {
+        for (const e of this.childElements()) {
+            if (e.localName === name) {
+                result.push(e);
             }
-            let txt: string = '';
-            for (const c of this.childNodes) {
-                txt += c.innerText?.toString();
+            if (recursive) {
+                e._collectElementsByTagName(result, name, true);
             }
-            const s: string = txt;
-            return s.trim();
         }
-        return this.value ?? '';
-    }
-
-    public set innerText(value: string) {
-        const textNode = new XmlNode();
-        textNode.nodeType = XmlNodeType.Text;
-        textNode.value = value;
-        this.childNodes = [textNode];
-    }
-
-    public setCData(s: string) {
-        const textNode = new XmlNode();
-        textNode.nodeType = XmlNodeType.CDATA;
-        textNode.value = s;
-        this.childNodes = [textNode];
     }
 }

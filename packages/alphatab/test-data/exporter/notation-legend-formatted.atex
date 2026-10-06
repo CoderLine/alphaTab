@@ -7,6 +7,7 @@
 // Score Stylesheet
 \bracketExtendMode nobrackets
 \otherSystemsTrackNameOrientation horizontal
+\defaultBarNumberDisplay AllBars
 \track ("Distortion Guitar" "dist.guit.") {
   // Track Properties
   color "#EB987D"
