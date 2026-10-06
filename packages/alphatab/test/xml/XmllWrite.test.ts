@@ -89,16 +89,32 @@ describe('XmlWriteTest', () => {
         xml.firstElement!.attributes.set('quot', '"');
         expect(xml.toFormattedString()).toBe('<test lt="&lt;" gt="&gt;" amp="&amp;" apos="&apos;" quot="&quot;"/>');
     });
+    it('writeText', () => {
+        const xml = new XmlDocument();
+        const root = xml.addElement('root');
+        root.addElement('escaped').innerText = '<a> & "b"';
+        root.addElement('empty').innerText = '';
+        root.addElement('none');
+        root.addElement('cdata').setCData('<a> &');
+        expect(xml.toFormattedString()).toBe(
+            '<root><escaped>&lt;a> &amp; "b"</escaped><empty></empty><none/><cdata><![CDATA[<a> &]]></cdata></root>'
+        );
+
+        const reparsed = new XmlDocument();
+        reparsed.parse(xml.toFormattedString('  '));
+        expect(reparsed.firstElement!.findChildElement('escaped')!.innerText).toBe('<a> & "b"');
+        expect(reparsed.firstElement!.findChildElement('cdata')!.innerText).toBe('<a> &');
+    });
+
     it('writeComment', () => {
         const s: string = '<test/>';
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
 
-        xml.firstElement!.addElement('test2')
+        xml.firstElement!.addElement('test2');
 
-        const alphaTabComment = new XmlNode();
-        alphaTabComment.nodeType = XmlNodeType.Comment;
-        alphaTabComment.value = 'Written by alphaTab';
+        const alphaTabComment = new XmlNode(XmlNodeType.Comment);
+        alphaTabComment.innerText = 'Written by alphaTab';
         xml.firstElement!.addChild(alphaTabComment);
         expect(xml.toFormattedString()).toBe('<test><test2/><!-- Written by alphaTab --></test>');
     });

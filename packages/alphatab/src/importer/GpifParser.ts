@@ -55,7 +55,7 @@ import { WahPedal } from '@coderline/alphatab/model/WahPedal';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
-import { type XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
+import type { XmlNode } from '@coderline/alphatab/xml/XmlNode';
 
 /**
  * This structure represents a duration within a gpif
@@ -480,13 +480,9 @@ export class GpifParser {
                     ratioPosition = GpifParser._parseFloatSafe(c.innerText, 0);
                     break;
                 case 'Value':
-                    if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
+                    if (c.isCData) {
                         textValue = c.innerText;
-                    } else if (
-                        c.firstElement &&
-                        c.firstElement.nodeType === XmlNodeType.Element &&
-                        type === 'SyncPoint'
-                    ) {
+                    } else if (c.firstElement && type === 'SyncPoint') {
                         syncPointValue = new SyncPointData();
                         for (const vc of c.childElements()) {
                             switch (vc.localName) {
@@ -1335,8 +1331,9 @@ export class GpifParser {
     }
 
     private _parseChannelStripParameters(track: Track, node: XmlNode): void {
-        if (node.firstChild && node.firstChild.value) {
-            const parameters = GpifParser._splitSafe(node.firstChild.value);
+        const text = node.innerText;
+        if (text) {
+            const parameters = GpifParser._splitSafe(text);
             if (parameters.length >= 12) {
                 track.playbackInfo.balance = Math.floor(GpifParser._parseFloatSafe(parameters[11], 0.5) * 16);
                 track.playbackInfo.volume = Math.floor(GpifParser._parseFloatSafe(parameters[12], 0.9) * 16);

@@ -2074,13 +2074,15 @@ export class MusicXmlImporter extends ScoreImporter {
 
         for (const c of element.childElements()) {
             switch (c.localName) {
-                case 'direction-type':
+                case 'direction-type': {
                     // See https://github.com/CoderLine/alphaTab/issues/2102
-                    const type = c.firstElement;
-                    if (type) {
-                        directionTypes.push(type);
+                    // only one type per direction-type is handled, the last one wins
+                    const types = c.childElements();
+                    if (types.length > 0) {
+                        directionTypes.push(types[types.length - 1]);
                     }
                     break;
+                }
                 case 'offset':
                     offset = Number.parseFloat(c.innerText);
                     break;

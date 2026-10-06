@@ -1300,11 +1300,11 @@ export class CapellaParser {
             switch (c.localName) {
                 // encodingSoftware ignored
                 case 'author':
-                    this.score.tab = c.firstChild!.innerText;
+                    this.score.tab = c.innerText;
                     break;
                 // keywords ignored
                 case 'comment':
-                    this.score.notices = c.firstChild!.innerText;
+                    this.score.notices = c.innerText;
                     break;
             }
         }
