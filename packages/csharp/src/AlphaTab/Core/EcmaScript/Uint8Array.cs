@@ -41,6 +41,11 @@ public class Uint8Array : IEnumerable<byte>, IEnumerable<double>
     {
     }
 
+    public Uint8Array(IEnumerable<double> values)
+        : this(values.Select(d => (byte)d).ToArray())
+    {
+    }
+
     public double this[double index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
