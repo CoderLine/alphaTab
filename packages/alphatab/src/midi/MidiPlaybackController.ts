@@ -41,7 +41,9 @@ class Repeat {
         this.hasAlternateEndings = group.masterBars.some(m => m.alternateEndings !== 0);
         this.iterations = group.closings.map(c => (finalPass ? Math.max(0, c.repeatCount - 1) : 0));
         if (finalPass) {
-            this.pass = Math.max(0, ...this.iterations);
+            for (const iteration of this.iterations) {
+                this.pass = Math.max(this.pass, iteration);
+            }
         }
     }
 }
