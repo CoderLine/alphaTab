@@ -1,100 +1,253 @@
-import type { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
 import type { Score } from '@coderline/alphatab/model/Score';
 
 /**
- * Helper container to handle repeats correctly
+ * Describes how a D.C./D.S. jump is played.
+ * @internal
+ * @record
+ */
+interface JumpDefinition {
+    /**
+     * The direction marking the jump.
+     */
+    jump: Direction;
+    /**
+     * The direction marking the jump target, null to jump to the start (Da Capo).
+     */
+    target: Direction | null;
+    /**
+     * The direction until which we play after the jump (To Coda or Fine), null to play until the end.
+     */
+    playUntil: Direction | null;
+    /**
+     * The direction where we continue after reaching {@link playUntil} (the Coda), null to stop (Fine).
+     */
+    continueAt: Direction | null;
+}
+
+/**
+ * @internal
+ */
+enum RepeatAction {
+    /**
+     * Continue with the next bar.
+     */
+    Continue = 0,
+    /**
+     * Jump back to the opening of the repeat.
+     */
+    RepeatFromStart = 1,
+    /**
+     * The repeat is done, continue with the next bar.
+     */
+    Finished = 2
+}
+
+/**
+ * The playback state of a started repeat.
  * @internal
  */
 class Repeat {
-    public group: RepeatGroup;
-    public opening: MasterBar;
+    public readonly group: RepeatGroup;
 
     /**
-     * Whether the group has alternate endings. In this case every closing ends the current pass
-     * and all closings share the {@link pass} counter. Otherwise every closing repeats on its own
-     * (tracked via {@link iterations}).
+     * With alternate endings every closing ends the current pass and all closings share the pass counter.
+     * Without, every closing repeats on its own (e.g. "open, close, bar, close" repeats the first part again).
      */
-    public hasAlternateEndings: boolean;
+    private readonly _hasAlternateEndings: boolean;
 
     /**
-     * The current pass through the group (0-based), the alternate endings of this pass are played.
+     * The current pass (0-based), selects the alternate endings to play.
      */
-    public pass: number = 0;
+    private _pass: number = 0;
 
     /**
-     * The number of repeats done per closing (only for groups without alternate endings).
+     * The repeats done per closing (only for repeats without alternate endings).
      */
-    public iterations: number[];
-    public closingIndex: number = 0;
+    private readonly _iterations: number[];
 
     /**
-     * @param finalPass Whether the group is played as its final pass (e.g. after a jump).
+     * The alternate endings of the last bar with endings, bars without explicit endings continue them.
+     */
+    private _currentEndings: number = 0;
+
+    /**
+     * @param finalPass Whether the repeat is played as its final pass (e.g. after a jump).
      * All repeats are then considered done and only the last alternate ending is played.
      */
-    public constructor(group: RepeatGroup, opening: MasterBar, finalPass: boolean) {
+    public constructor(group: RepeatGroup, finalPass: boolean) {
         this.group = group;
-        this.opening = opening;
-        // sort ascending according to index
-        group.closings = group.closings.sort((a, b) => a.index - b.index);
-        this.hasAlternateEndings = group.masterBars.some(m => m.alternateEndings !== 0);
-        this.iterations = group.closings.map(c => (finalPass ? Math.max(0, c.repeatCount - 1) : 0));
+        this._hasAlternateEndings = group.masterBars.some(m => m.alternateEndings !== 0);
+        this._iterations = group.closings.map(c => (finalPass ? Math.max(0, c.repeatCount - 1) : 0));
         if (finalPass) {
-            for (const iteration of this.iterations) {
-                this.pass = Math.max(this.pass, iteration);
+            for (const iteration of this._iterations) {
+                this._pass = Math.max(this._pass, iteration);
             }
         }
+    }
+
+    /**
+     * Whether the given bar is played in the current pass (respecting the alternate endings).
+     */
+    public isPlayed(masterBar: MasterBar): boolean {
+        let endings = masterBar.alternateEndings;
+        if (endings === 0) {
+            endings = this._currentEndings;
+        } else {
+            this._currentEndings = endings;
+        }
+        return endings === 0 || (endings & (1 << this._pass)) !== 0;
+    }
+
+    /**
+     * Decides how to continue after the given closing of this repeat.
+     * @param played Whether the closing bar was played in the current pass.
+     */
+    public onClosing(closing: MasterBar, played: boolean): RepeatAction {
+        const closings = this.group.closings;
+        const isLastClosing = closing === closings[closings.length - 1];
+
+        if (this._hasAlternateEndings) {
+            // closings in skipped endings are ignored. except the last closing: files might only
+            // have the repeat sign on the last ending, then it is respected on all passes.
+            if (!played && !isLastClosing) {
+                return RepeatAction.Continue;
+            }
+
+            if (this._pass < closing.repeatCount - 1) {
+                this._pass++;
+                this._currentEndings = 0;
+                return RepeatAction.RepeatFromStart;
+            }
+
+            // all passes done, after the last closing the repeat is done
+            // otherwise we proceed to the endings of the current pass
+            return isLastClosing ? RepeatAction.Finished : RepeatAction.Continue;
+        }
+
+        const closingIndex = closings.indexOf(closing);
+        if (closingIndex === -1) {
+            return RepeatAction.Continue;
+        }
+
+        if (this._iterations[closingIndex] < closing.repeatCount - 1) {
+            this._iterations[closingIndex]++;
+            // clear iterations for previous closings and start over all repeats
+            // this ensures on scenarios like "open, bar, close, bar, close"
+            // that the second close will repeat again the first repeat.
+            for (let i = 0; i < closingIndex; i++) {
+                this._iterations[i] = 0;
+            }
+            this._currentEndings = 0;
+            return RepeatAction.RepeatFromStart;
+        }
+
+        return isLastClosing ? RepeatAction.Finished : RepeatAction.Continue;
+    }
+
+    /**
+     * Whether a closing of this repeat will still jump back over the given bar.
+     */
+    public willRepeat(masterBar: MasterBar): boolean {
+        const closings = this.group.closings;
+        for (let i = 0; i < closings.length; i++) {
+            const closing = closings[i];
+            if (closing.index >= masterBar.index) {
+                const repeatsDone = this._hasAlternateEndings ? this._pass : this._iterations[i];
+                if (repeatsDone < closing.repeatCount - 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
 
 /**
- * @internal
- */
-enum MidiPlaybackControllerState {
-    /**
-     * Normally playing with repeats.
-     */
-    PlayingNormally = 0,
-
-    /**
-     * We "jumped" to a new location (e.g. via Da Capo). So we're playing all repeats as their final pass
-     * (no repeating, only the last alternate ending).
-     */
-    DirectionJumped = 1,
-
-    /**
-     * We "jumped" to a new location via a 'al Coda' jump, hence respecting 'DaCoda' now.
-     */
-    DirectionJumpedAlCoda = 2,
-
-    /**
-     * We "jumped" to a new location via a 'al Double Coda' jump, hence respecting 'DaDoubleCoda' now.
-     */
-    DirectionJumpedAlDoubleCoda = 3,
-
-    /**
-     * We "jumped" to a new location via a 'al Fine' jump, hence respecting 'Fine' now.
-     */
-    DirectionJumpedAlFine = 4
-}
-
-/**
+ * Walks through the master bars of a song in playback order respecting repeats, alternate endings
+ * and jump directions (D.C., D.S., Coda, Fine).
  * @internal
  */
 export class MidiPlaybackController {
+    /**
+     * The jumps in the order they are checked if a bar has multiple ones.
+     */
+    private static readonly _jumps: JumpDefinition[] = [
+        { jump: Direction.JumpDaCapo, target: null, playUntil: null, continueAt: null },
+        {
+            jump: Direction.JumpDaCapoAlCoda,
+            target: null,
+            playUntil: Direction.JumpDaCoda,
+            continueAt: Direction.TargetCoda
+        },
+        {
+            jump: Direction.JumpDaCapoAlDoubleCoda,
+            target: null,
+            playUntil: Direction.JumpDaDoubleCoda,
+            continueAt: Direction.TargetDoubleCoda
+        },
+        { jump: Direction.JumpDaCapoAlFine, target: null, playUntil: Direction.TargetFine, continueAt: null },
+
+        { jump: Direction.JumpDalSegno, target: Direction.TargetSegno, playUntil: null, continueAt: null },
+        {
+            jump: Direction.JumpDalSegnoAlCoda,
+            target: Direction.TargetSegno,
+            playUntil: Direction.JumpDaCoda,
+            continueAt: Direction.TargetCoda
+        },
+        {
+            jump: Direction.JumpDalSegnoAlDoubleCoda,
+            target: Direction.TargetSegno,
+            playUntil: Direction.JumpDaDoubleCoda,
+            continueAt: Direction.TargetDoubleCoda
+        },
+        {
+            jump: Direction.JumpDalSegnoAlFine,
+            target: Direction.TargetSegno,
+            playUntil: Direction.TargetFine,
+            continueAt: null
+        },
+
+        { jump: Direction.JumpDalSegnoSegno, target: Direction.TargetSegnoSegno, playUntil: null, continueAt: null },
+        {
+            jump: Direction.JumpDalSegnoSegnoAlCoda,
+            target: Direction.TargetSegnoSegno,
+            playUntil: Direction.JumpDaCoda,
+            continueAt: Direction.TargetCoda
+        },
+        {
+            jump: Direction.JumpDalSegnoSegnoAlDoubleCoda,
+            target: Direction.TargetSegnoSegno,
+            playUntil: Direction.JumpDaDoubleCoda,
+            continueAt: Direction.TargetDoubleCoda
+        },
+        {
+            jump: Direction.JumpDalSegnoSegnoAlFine,
+            target: Direction.TargetSegnoSegno,
+            playUntil: Direction.TargetFine,
+            continueAt: null
+        }
+    ];
+
     private _score: Score;
 
+    /**
+     * The started repeats, the innermost on top.
+     */
     private _repeatStack: Repeat[] = [];
-    private _groupsOnStack: Set<RepeatGroup> = new Set<RepeatGroup>();
-    private _previousAlternateEndings: number = 0;
+
+    /**
+     * The D.C./D.S. we followed, null if we play normally (before any jump or after the coda).
+     * After a jump all repeats are played as their final pass (no repeating, only the last alternate ending).
+     */
+    private _activeJump: JumpDefinition | null = null;
 
     /**
      * The bars on which a D.C./D.S. jump was already taken. Each jump is only taken once.
      */
     private _takenJumps: Set<MasterBar> = new Set<MasterBar>();
-
-    private _state: MidiPlaybackControllerState = MidiPlaybackControllerState.PlayingNormally;
 
     public shouldPlay: boolean = true;
     public index: number = 0;
@@ -111,36 +264,10 @@ export class MidiPlaybackController {
     public processCurrent(): void {
         const masterBar: MasterBar = this._score.masterBars[this.index];
 
-        let masterBarAlternateEndings: number = masterBar.alternateEndings;
-        // if there are no alternate endings set on this bar. take the ones
-        // from the previously played bar which had alternate endings
-        if (masterBarAlternateEndings === 0) {
-            masterBarAlternateEndings = this._previousAlternateEndings;
-        }
+        this._enterRepeat(masterBar);
 
-        // Repeat start (only properly closed ones)
-        if (masterBar === masterBar.repeatGroup.opening && masterBar.repeatGroup.isClosed) {
-            // first encounter of the repeat group? -> initialize repeats accordingly
-            if (!this._groupsOnStack.has(masterBar.repeatGroup)) {
-                this._pushRepeat(masterBar.repeatGroup, masterBar);
-                masterBarAlternateEndings = masterBar.alternateEndings;
-            }
-        }
-
-        // if we're not within repeats or not alternative endings set -> simply play
-        if (this._repeatStack.length === 0 || masterBarAlternateEndings === 0) {
-            this.shouldPlay = true;
-        } else {
-            const repeat = this._repeatStack[this._repeatStack.length - 1];
-            this._previousAlternateEndings = masterBarAlternateEndings;
-
-            // do we need to skip this section?
-            if ((masterBarAlternateEndings & (1 << repeat.pass)) === 0) {
-                this.shouldPlay = false;
-            } else {
-                this.shouldPlay = true;
-            }
-        }
+        const repeat = this._repeatStack.length > 0 ? this._repeatStack[this._repeatStack.length - 1] : null;
+        this.shouldPlay = repeat === null || repeat.isPlayed(masterBar);
 
         if (this.shouldPlay) {
             this.currentTick += masterBar.calculateDuration();
@@ -152,397 +279,132 @@ export class MidiPlaybackController {
             return;
         }
 
-        this._moveNextWithNormalRepeats();
-    }
-
-    private _resetRepeats() {
-        this._groupsOnStack.clear();
-        this._previousAlternateEndings = 0;
-        this._repeatStack = [];
-    }
-
-    private _pushRepeat(group: RepeatGroup, opening: MasterBar): Repeat {
-        // after a jump all repeats are played as their final pass
-        const finalPass = this._state !== MidiPlaybackControllerState.PlayingNormally;
-        const repeat = new Repeat(group, opening, finalPass);
-        this._repeatStack.push(repeat);
-        this._groupsOnStack.add(group);
-        this._previousAlternateEndings = 0;
-        return repeat;
-    }
-
-    /**
-     * Called after a jump: if we landed within a repeat (after its opening), the opening is never
-     * visited, hence we start the repeat here to correctly respect the alternate endings.
-     */
-    private _enterRepeatAfterJump() {
-        const masterBar = this._score.masterBars[this.index];
-        const group = masterBar.repeatGroup;
-        if (
-            group.isClosed &&
-            masterBar !== group.opening &&
-            masterBar.index <= group.closings[group.closings.length - 1].index
-        ) {
-            const repeat = this._pushRepeat(group, group.opening!);
-            // continue with the next closing after the jump target
-            while (repeat.group.closings[repeat.closingIndex].index < masterBar.index) {
-                repeat.closingIndex++;
-            }
-        }
-    }
-
-    /**
-     * Checks whether the given bar is played the last time, meaning no started repeat will jump back
-     * over it anymore. Jumps (D.C./D.S.) within repeats are only taken on this final pass.
-     */
-    private _isFinalPass(masterBar: MasterBar): boolean {
-        for (const repeat of this._repeatStack) {
-            const closings = repeat.group.closings;
-            for (let i = 0; i < closings.length; i++) {
-                const closing = closings[i];
-                if (closing.index < masterBar.index) {
-                    continue;
-                }
-
-                const repeatsDone = repeat.hasAlternateEndings ? repeat.pass : repeat.iterations[i];
-                if (repeatsDone < closing.repeatCount - 1) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private _handleDaCapo(directions: Set<Direction>, daCapo: Direction, newState: MidiPlaybackControllerState): boolean {
-        if (directions.has(daCapo)) {
-            this._takenJumps.add(this._score.masterBars[this.index]);
-            this.index = 0; // jump to start
-            this._state = newState;
-            this._resetRepeats();
-            this._enterRepeatAfterJump();
-            return true;
-        }
-        return false;
-    }
-
-    private _handleDalSegno(
-        directions: Set<Direction>,
-        dalSegno: Direction,
-        newState: MidiPlaybackControllerState,
-        jumpTarget: Direction
-    ): boolean {
-        if (directions!.has(dalSegno)) {
-            const segno = this._findJumpTarget(jumpTarget, this.index, true /* typically jumps are backwards */);
-            if (segno === -1) {
-                // no jump target found, keep playing normally
-                return false;
-            }
-
-            this._takenJumps.add(this._score.masterBars[this.index]);
-            this.index = segno;
-            this._state = newState;
-            this._resetRepeats();
-            this._enterRepeatAfterJump();
-            return true;
-        }
-        return false;
-    }
-
-    private _handleDaCoda(directions: Set<Direction>, daCoda: Direction, jumpTarget: Direction): boolean {
-        // Found the "Da Coda" after the jump -> Jump further
-        if (directions.has(daCoda)) {
-            const coda = this._findJumpTarget(jumpTarget, this.index, false /* typically da coda jumps are forwards */);
-            if (coda === -1) {
-                // no coda found, continue playing normally to end.
-                return false;
-            }
-
-            this.index = coda;
-            // back to normal playback (with repeats) after target jump.
-            this._state = MidiPlaybackControllerState.PlayingNormally;
-            this._resetRepeats();
-            return true;
-        }
-        return false;
-    }
-
-    private _moveNextWithDirections() {
         const masterBar: MasterBar = this._score.masterBars[this.index];
-        // directions on bars which are not played (skipped alternate endings) are not respected
-        const hasDirections = this.shouldPlay && masterBar.directions !== null && masterBar.directions.size > 0;
+        if (this._repeatStack.length > 0 && masterBar.repeatCount > 1) {
+            const repeat = this._repeatStack[this._repeatStack.length - 1];
+            switch (repeat.onClosing(masterBar, this.shouldPlay)) {
+                case RepeatAction.RepeatFromStart:
+                    this.index = repeat.group.opening!.index;
+                    return;
+                case RepeatAction.Finished:
+                    this._repeatStack.pop();
+                    break;
+            }
+        }
 
-        // fast exit path: no directions to respect, continue with the repeats
-        // (after jumps all repeats are on their final pass, hence we simply continue playing one after another)
-        if (!hasDirections) {
+        this.index++;
+    }
+
+    /**
+     * Starts the repeat of the given bar if needed: when reaching its opening, or after a jump
+     * which landed within the repeat (the opening is then never visited).
+     */
+    private _enterRepeat(masterBar: MasterBar) {
+        const group = masterBar.repeatGroup;
+        // only properly closed repeats
+        if (!group.isClosed || this._repeatStack.some(r => r.group === group)) {
+            return;
+        }
+
+        const isWithinRepeat = masterBar.index <= group.closings[group.closings.length - 1].index;
+        if (masterBar === group.opening || (this._activeJump !== null && isWithinRepeat)) {
+            this._repeatStack.push(new Repeat(group, this._activeJump !== null));
+        }
+    }
+
+    private _moveNextWithDirections(): boolean {
+        const masterBar: MasterBar = this._score.masterBars[this.index];
+        const directions = masterBar.directions;
+        // directions on bars which are not played (skipped alternate endings) are not respected
+        if (!this.shouldPlay || directions === null || directions.size === 0) {
             return false;
         }
 
-        // longer path: respect directions based on the state we're in
-
-        switch (this._state) {
-            case MidiPlaybackControllerState.PlayingNormally:
-                // jump already taken (e.g. reached again after the coda) or we're within a repeat
-                // which is not on its final pass yet -> continue normal playback
-                if (this._takenJumps.has(masterBar) || !this._isFinalPass(masterBar)) {
-                    return false;
-                }
-
-                // Da capo Jumps (to start)
-                // prettier-ignore
-                if (
-                    this._handleDaCapo(
-                        masterBar.directions!,
-                        Direction.JumpDaCapo,
-                        MidiPlaybackControllerState.DirectionJumped
-                    ) ||
-                    this._handleDaCapo(
-                        masterBar.directions!,
-                        Direction.JumpDaCapoAlCoda,
-                        MidiPlaybackControllerState.DirectionJumpedAlCoda
-                    ) ||
-                    this._handleDaCapo(
-                        masterBar.directions!,
-                        Direction.JumpDaCapoAlDoubleCoda,
-                        MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda
-                    ) ||
-                    this._handleDaCapo(
-                        masterBar.directions!,
-                        Direction.JumpDaCapoAlFine,
-                        MidiPlaybackControllerState.DirectionJumpedAlFine
-                    )
-                ) {
-                    return true;
-                }
-
-                // Dal Segno Jumps
-                // prettier-ignore
-                if (
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegno,
-                        MidiPlaybackControllerState.DirectionJumped,
-                        Direction.TargetSegno
-                    ) ||
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegnoAlCoda,
-                        MidiPlaybackControllerState.DirectionJumpedAlCoda,
-                        Direction.TargetSegno
-                    ) ||
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegnoAlDoubleCoda,
-                        MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda,
-                        Direction.TargetSegno
-                    ) ||
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegnoAlFine,
-                        MidiPlaybackControllerState.DirectionJumpedAlFine,
-                        Direction.TargetSegno
-                    )
-                ) {
-                    return true;
-                }
-
-                // Dal SegnoSegno Jumps
-                // prettier-ignore
-                if (
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegnoSegno,
-                        MidiPlaybackControllerState.DirectionJumped,
-                        Direction.TargetSegnoSegno
-                    ) ||
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegnoSegnoAlCoda,
-                        MidiPlaybackControllerState.DirectionJumpedAlCoda,
-                        Direction.TargetSegnoSegno
-                    ) ||
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegnoSegnoAlDoubleCoda,
-                        MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda,
-                        Direction.TargetSegnoSegno
-                    ) ||
-                    this._handleDalSegno(
-                        masterBar.directions!,
-                        Direction.JumpDalSegnoSegnoAlFine,
-                        MidiPlaybackControllerState.DirectionJumpedAlFine,
-                        Direction.TargetSegnoSegno
-                    )
-                ) {
-                    return true;
-                }
-
-                // no relevant direction found, continue normal playback
-                return false;
-
-            case MidiPlaybackControllerState.DirectionJumped:
-                // when we had a jump without special indication, we just keep playing until the end
-                return false;
-
-            case MidiPlaybackControllerState.DirectionJumpedAlCoda:
-                // Found the "Da Coda" after the jump -> Jump further
-                if (this._handleDaCoda(masterBar.directions!, Direction.JumpDaCoda, Direction.TargetCoda)) {
-                    return true;
-                }
-
-                // no relevant direction found, we just keep playing (repeats are on their final pass)
-                return false;
-
-            case MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda:
-                if (this._handleDaCoda(masterBar.directions!, Direction.JumpDaDoubleCoda, Direction.TargetDoubleCoda)) {
-                    return true;
-                }
-
-                // no relevant direction found, we just keep playing (repeats are on their final pass)
-                return false;
-
-            case MidiPlaybackControllerState.DirectionJumpedAlFine:
-                if (masterBar.directions!.has(Direction.TargetFine)) {
-                    this.index = this._score.masterBars.length; // finished
-                    return true;
-                }
-
-                // no relevant direction found, we just keep playing (repeats are on their final pass)
-                return false;
+        if (this._activeJump === null) {
+            return this._takeJump(masterBar, directions);
         }
 
+        // after a jump only the end of the jump (To Coda or Fine) is respected
+        const playUntil = this._activeJump.playUntil;
+        if (playUntil !== null && directions.has(playUntil)) {
+            return this._continueAfterJump(this._activeJump.continueAt);
+        }
+
+        return false;
+    }
+
+    private _takeJump(masterBar: MasterBar, directions: Set<Direction>): boolean {
+        // each jump is only taken once (e.g. when reached again after the coda) and within repeats
+        // only on the final pass (the repeats are played first)
+        if (this._takenJumps.has(masterBar) || this._repeatStack.some(r => r.willRepeat(masterBar))) {
+            return false;
+        }
+
+        for (const jump of MidiPlaybackController._jumps) {
+            if (!directions.has(jump.jump)) {
+                continue;
+            }
+
+            const target = jump.target;
+            const targetIndex =
+                target === null ? 0 : this._findJumpTarget(target, true /* typically jumps are backwards */);
+            if (targetIndex === -1) {
+                // no jump target found, keep playing normally
+                continue;
+            }
+
+            this._takenJumps.add(masterBar);
+            this._activeJump = jump;
+            this._repeatStack = [];
+            this.index = targetIndex;
+            return true;
+        }
+
+        return false;
+    }
+
+    private _continueAfterJump(continueAt: Direction | null): boolean {
+        // Fine
+        if (continueAt === null) {
+            this.index = this._score.masterBars.length;
+            return true;
+        }
+
+        const coda = this._findJumpTarget(continueAt, false /* typically da coda jumps are forwards */);
+        if (coda === -1) {
+            // no coda found, continue playing normally to end.
+            return false;
+        }
+
+        // back to normal playback (with repeats) after the coda.
+        this._activeJump = null;
+        this._repeatStack = [];
+        this.index = coda;
         return true;
     }
 
     /**
      * Finds the index of the masterbar with the given direction applied which fits best
-     * the given start index. In best case in one piece we only have single jump marks, but it could happen
+     * the current index. In best case in one piece we only have single jump marks, but it could happen
      * that you have multiple Segno/Coda symbols placed at different sections.
      * @param toFind
-     * @param searchIndex
      * @param backwardsFirst whether to first search backwards before looking forwards.
      * @returns the index of the masterbar found with the given direction or -1 if no masterbar with the given direction was found.
      */
-    private _findJumpTarget(toFind: Direction, searchIndex: number, backwardsFirst: boolean): number {
-        let index: number;
-        if (backwardsFirst) {
-            index = this._findJumpTargetBackwards(toFind, searchIndex);
-            if (index === -1) {
-                index = this._findJumpTargetForwards(toFind, searchIndex);
-            }
-            return index;
-        }
-
-        index = this._findJumpTargetForwards(toFind, searchIndex);
-        if (index === -1) {
-            index = this._findJumpTargetBackwards(toFind, searchIndex);
-        }
-        return index;
+    private _findJumpTarget(toFind: Direction, backwardsFirst: boolean): number {
+        const firstStep = backwardsFirst ? -1 : 1;
+        const index = this._findDirection(toFind, firstStep);
+        return index !== -1 ? index : this._findDirection(toFind, -firstStep);
     }
 
-    private _findJumpTargetForwards(toFind: Direction, searchIndex: number): number {
-        let index = searchIndex;
-        while (index < this._score.masterBars.length) {
-            const d = this._score.masterBars[index].directions;
-            if (d && d.has(toFind)) {
+    private _findDirection(toFind: Direction, step: number): number {
+        const masterBars = this._score.masterBars;
+        for (let index = this.index; index >= 0 && index < masterBars.length; index += step) {
+            const directions = masterBars[index].directions;
+            if (directions !== null && directions.has(toFind)) {
                 return index;
             }
-            index++;
         }
         return -1;
-    }
-
-    private _findJumpTargetBackwards(toFind: Direction, searchIndex: number): number {
-        let index = searchIndex;
-        while (index >= 0) {
-            const d = this._score.masterBars[index].directions;
-            if (d && d.has(toFind)) {
-                return index;
-            }
-            index--;
-        }
-        return -1;
-    }
-
-    private _moveNextWithNormalRepeats() {
-        const masterBar: MasterBar = this._score.masterBars[this.index];
-        // if we encounter a repeat end...
-        if (this._repeatStack.length > 0 && masterBar.repeatCount > 1) {
-            const repeat = this._repeatStack[this._repeatStack.length - 1];
-            if (repeat.hasAlternateEndings) {
-                this._moveNextWithAlternateEndings(repeat, masterBar);
-            } else {
-                this._moveNextWithClosings(repeat, masterBar);
-            }
-        } else {
-            // we have no started repeat, just proceed to next bar
-            this.index++;
-        }
-    }
-
-    /**
-     * Repeats with alternate endings: every closing ends the current pass,
-     * the next pass plays the next ending.
-     */
-    private _moveNextWithAlternateEndings(repeat: Repeat, closing: MasterBar) {
-        const isLastClosing = closing === repeat.group.closings[repeat.group.closings.length - 1];
-
-        // closings in skipped endings are ignored. except the last closing: files might only
-        // have the repeat sign on the last ending, then it is respected on all passes.
-        if (!this.shouldPlay && !isLastClosing) {
-            this.index++;
-            return;
-        }
-
-        if (repeat.pass < closing.repeatCount - 1) {
-            // next pass
-            this.index = repeat.opening.index;
-            repeat.pass++;
-            this._previousAlternateEndings = 0;
-        } else {
-            // all passes done, on the last closing the repeat is done and handled
-            // otherwise we proceed to the endings of the current pass
-            if (isLastClosing) {
-                this._repeatStack.pop();
-                this._groupsOnStack.delete(repeat.group);
-            }
-            this.index++;
-        }
-    }
-
-    /**
-     * Repeats without alternate endings: every closing repeats on its own.
-     */
-    private _moveNextWithClosings(repeat: Repeat, closing: MasterBar) {
-        // ...more repeats required?
-        const iteration = repeat.iterations[repeat.closingIndex];
-
-        // -> if yes, increase the iteration and jump back to start
-        if (iteration < closing.repeatCount - 1) {
-            // jump to start
-            this.index = repeat.opening.index;
-            repeat.iterations[repeat.closingIndex]++;
-
-            // clear iterations for previous closings and start over all repeats
-            // this ensures on scenarios like "open, bar, close, bar, close"
-            // that the second close will repeat again the first repeat.
-            for (let i = 0; i < repeat.closingIndex; i++) {
-                repeat.iterations[i] = 0;
-            }
-            repeat.closingIndex = 0;
-            this._previousAlternateEndings = 0;
-        } else {
-            // if we don't have further iterations left but we have additional closings in this group
-            // proceed heading to the next close but keep the repeat group active
-            if (repeat.closingIndex < repeat.group.closings.length - 1) {
-                repeat.closingIndex++;
-                this.index++; // go to next bar after current close
-            } else {
-                // if there are no further closings in the current group, we consider the current repeat done and handled
-                this._repeatStack.pop();
-                this._groupsOnStack.delete(repeat.group);
-
-                this.index++; // go to next bar after current close
-            }
-        }
     }
 }
