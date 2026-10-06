@@ -356,6 +356,88 @@ describe('SyncPointTests', () => {
         expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
         expect(testOutput.seekTimes).toMatchSnapshot();
     });
+
+    /**
+     * See #2397: backing tracks and external media cannot play the count-in,
+     * enabling it must not freeze the playback.
+     */
+    it('count-in-playback-backing-track', async () => {
+        const player = await prepareBackingTrackPlayer();
+        player.countInVolume = 1;
+        player.play();
+
+        (player.output as TestBackingTrackOutput).playThroughSong(0, 5000, 50);
+
+        expect(player.timePosition).toBeGreaterThan(0);
+    });
+
+    it('count-in-playback-external-media', async () => {
+        const player = await prepareExternalMediaPlayer();
+        player.countInVolume = 1;
+        player.play();
+
+        ((player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler).playThroughSong(
+            0,
+            5000,
+            50
+        );
+
+        expect(player.timePosition).toBeGreaterThan(0);
+    });
+
+    /**
+     * See #2397: starting the playback with count-in must not rewind the media to the song start.
+     */
+    it('count-in-keeps-position-backing-track', async () => {
+        const player = await prepareBackingTrackPlayer();
+        const testOutput = player.output as TestBackingTrackOutput;
+        player.timePosition = 30000;
+        player.countInVolume = 1;
+        const seekCount = testOutput.seekTimes.length;
+
+        player.play();
+
+        expect(testOutput.seekTimes.length).toBe(seekCount);
+        expect(player.timePosition).toBe(30000);
+    });
+
+    it('count-in-keeps-position-external-media', async () => {
+        const player = await prepareExternalMediaPlayer();
+        const testOutput = (player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler;
+        player.timePosition = 30000;
+        player.countInVolume = 1;
+        const seekCount = testOutput.seekTimes.length;
+
+        player.play();
+
+        expect(testOutput.seekTimes.length).toBe(seekCount);
+        expect(player.timePosition).toBe(30000);
+    });
+
+    /**
+     * See #2397: filling the queue up to a time position must advance the active
+     * (count-in) state, otherwise the loop never ends.
+     */
+    it('fill-to-end-time-during-count-in', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            .
+            C4 * 4
+        `);
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, new Settings(), handler);
+        generator.generate();
+
+        const sequencer = new MidiFileSequencer(new EmptyAudioSynthesizer());
+        sequencer.loadMidi(midi);
+        sequencer.startCountIn();
+
+        sequencer.fillMidiEventQueueToEndTime(1000);
+
+        expect(sequencer.isPlayingCountIn).toBe(true);
+        expect(sequencer.currentTime).toBe(1000);
+    });
 });
 
 /**

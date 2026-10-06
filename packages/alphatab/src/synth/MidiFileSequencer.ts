@@ -337,8 +337,8 @@ export class MidiFileSequencer {
     }
 
     public fillMidiEventQueueToEndTime(endTime: number) {
-        while (this._mainState.currentTime < endTime) {
-            if (this._fillMidiEventQueueLimited(endTime - this._mainState.currentTime)) {
+        while (this._currentState.currentTime < endTime) {
+            if (this._fillMidiEventQueueLimited(endTime - this._currentState.currentTime)) {
                 this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
             }
         }
