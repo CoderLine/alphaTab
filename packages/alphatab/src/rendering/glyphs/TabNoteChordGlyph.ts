@@ -3,7 +3,7 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
-import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
@@ -87,12 +87,12 @@ export class TabNoteChordGlyph extends Glyph {
                     break;
                 case NoteYPosition.TopWithStem:
                     pos = -this.renderer.settings.notation.rhythmHeight;
-                    pos -= this.calculateTremoloHeightForStem();
+                    pos -= TabNoteChordGlyph.calculateTremoloHeightForStem(this.renderer, this.beat);
                     break;
 
                 case NoteYPosition.BottomWithStem:
                     pos = this.renderer.height + this.renderer.settings.notation.rhythmHeight;
-                    pos += this.calculateTremoloHeightForStem();
+                    pos += TabNoteChordGlyph.calculateTremoloHeightForStem(this.renderer, this.beat);
                     break;
             }
 
@@ -101,8 +101,7 @@ export class TabNoteChordGlyph extends Glyph {
         return 0;
     }
 
-    public calculateTremoloHeightForStem() {
-        const beat = this.beat;
+    public static calculateTremoloHeightForStem(renderer: BarRendererBase, beat: Beat) {
         if (!beat.isTremolo) {
             return 0;
         }
@@ -110,7 +109,7 @@ export class TabNoteChordGlyph extends Glyph {
             return 0;
         }
         const symbol = TremoloPickingGlyph._getSymbol(beat.tremoloPicking!);
-        const smufl = this.renderer.smuflMetrics;
+        const smufl = renderer.smuflMetrics;
         return smufl.glyphHeights.has(symbol) ? smufl.glyphHeights.get(symbol)! : 0;
     }
 
