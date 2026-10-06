@@ -2722,7 +2722,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     ? BeatBeamingMode.ForceSplitToNext
                     : BeatBeamingMode.Auto;
             } else {
-                beat.beamingMode = beamMode!;
+                beat.beamingMode = beamMode;
                 this._getStaffContext(staff).isExplicitlyBeamed = true;
             }
 
