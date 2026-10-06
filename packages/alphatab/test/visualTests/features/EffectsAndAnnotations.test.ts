@@ -161,6 +161,10 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/string-numbers.gp');
     });
 
+    it('string-numbers-pitched', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/string-numbers-pitched.mxml');
+    });
+
     it('beat-slash', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/beat-slash.gp');
     });

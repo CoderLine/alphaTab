@@ -6,6 +6,9 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { Settings } from '@coderline/alphatab/Settings';
 import { FlatMidiEventGenerator, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
 
 describe('MusicXmlImporterTests', () => {
@@ -322,6 +325,53 @@ describe('MusicXmlImporterTests', () => {
         // <midi-instrument><midi-unpitched> -> IS a genuine percussion sound.
         expect(notes[1].isPercussion).toBe(true);
         expect(notes[1].percussionArticulation).toBeGreaterThanOrEqual(0);
+    });
+
+    it('string-annotation', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/string-annotation.xml');
+
+        // staff without tuning: <string> is only an annotation on the pitched note
+        const notation = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+        expect(score.tracks[0].staves[0].tuning).toHaveLength(0);
+        for (const note of [notation[0], notation[1]]) {
+            expect(note.isStringed).toBe(false);
+            expect(note.isPiano).toBe(true);
+            expect(note.realValue).toBe(69);
+            expect(note.string).toBe(6);
+            expect(note.showStringNumber).toBe(true);
+            expect(Number.isNaN(note.fret)).toBe(true);
+        }
+        // out of range string
+        expect(Number.isNaN(notation[2].string)).toBe(true);
+        expect(notation[2].showStringNumber).toBe(false);
+        expect(notation[2].realValue).toBe(69);
+        expect(Number.isNaN(notation[3].string)).toBe(true);
+        expect(notation[3].showStringNumber).toBe(false);
+
+        // staff with tuning: string+fret is the tab position, string only is an annotation
+        const tab = score.tracks[1].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+        expect(score.tracks[1].staves[0].tuning).toHaveLength(6);
+        expect(tab[0].isStringed).toBe(true);
+        expect(tab[0].string).toBe(6);
+        expect(tab[0].fret).toBe(5);
+        expect(tab[0].realValue).toBe(69);
+        expect(tab[0].showStringNumber).toBe(false);
+
+        expect(tab[1].isStringed).toBe(false);
+        expect(tab[1].string).toBe(5);
+        expect(tab[1].showStringNumber).toBe(true);
+        expect(tab[1].realValue).toBe(69);
+
+        // out of range string
+        expect(tab[2].isStringed).toBe(false);
+        expect(Number.isNaN(tab[2].string)).toBe(true);
+        expect(Number.isNaN(tab[2].fret)).toBe(true);
+        expect(tab[2].showStringNumber).toBe(false);
+        expect(tab[2].realValue).toBe(69);
+
+        const midiFile = new MidiFile();
+        new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midiFile)).generate();
+        expect(midiFile.events.filter(e => Number.isNaN(e.tick))).toHaveLength(0);
     });
 
     describe('barnumberdisplay', async () => {

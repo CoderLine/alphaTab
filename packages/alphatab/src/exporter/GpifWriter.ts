@@ -117,8 +117,8 @@ export class GpifWriter {
                 const stringedTuning = needsFingering ? this._tuningByStaff.get(staff)! : null;
                 // Once the assigner sets note.string/note.fret, note.realValue
                 // routes through staff.tuning — needs to match the tuning we
-                // gave the assigner. Save + restore below leaves the input
-                // model untouched.
+                // gave the assigner. The notes are modified, hence the
+                // Gp7Exporter passes a copy of the input score.
                 const savedTunings = staff.tuning;
                 if (needsFingering && stringedTuning !== null && savedTunings.length === 0) {
                     staff.stringTuning.tunings = stringedTuning.slice();
