@@ -380,6 +380,44 @@ describe('MidiPlaybackControllerTest', () => {
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
 
+    // Alternate endings after jumps (final pass: only the last ending is played)
+
+    it('da-capo-in-second-ending', () => {
+        const tex: string = `
+        .
+        :1 r | \\ro r | \\ae 1 \\rc 2 r | \\ae 2 \\jump DaCapo r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 1, 3, 0, 1, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('to-coda-in-second-ending', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 2 r | \\ae 2 \\jump DaCoda r | \\jump DaCapoAlCoda r | \\jump Coda r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2, 3, 0, 2, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('to-coda-in-skipped-first-ending', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\ae 1 \\rc 2 \\jump DaCoda r | \\ae 2 r | \\jump DaCapoAlCoda r | \\jump Coda r
+        `;
+        const expectedBars: number[] = [0, 1, 0, 2, 3, 0, 2, 3, 4];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-into-repeat-with-endings', () => {
+        const tex: string = `
+        .
+        \\ro :1 r | \\jump Segno r | \\ae 1 \\rc 2 r | \\ae 2 r | \\jump DalSegno r | r
+        `;
+        const expectedBars: number[] = [0, 1, 2, 0, 1, 3, 4, 1, 3, 4, 5];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
     it('multiple-jumps-same-target', () => {
         const tex: string = `
         .

@@ -13,12 +13,16 @@ class Repeat {
     public iterations: number[];
     public closingIndex: number = 0;
 
-    public constructor(group: RepeatGroup, opening: MasterBar) {
+    /**
+     * @param finalPass Whether the group is played as its final pass (e.g. after a jump).
+     * All repeats are then considered done and only the last alternate ending is played.
+     */
+    public constructor(group: RepeatGroup, opening: MasterBar, finalPass: boolean) {
         this.group = group;
         this.opening = opening;
         // sort ascending according to index
         group.closings = group.closings.sort((a, b) => a.index - b.index);
-        this.iterations = group.closings.map(_ => 0);
+        this.iterations = group.closings.map(c => (finalPass ? Math.max(0, c.repeatCount - 1) : 0));
     }
 }
 
@@ -32,7 +36,8 @@ enum MidiPlaybackControllerState {
     PlayingNormally = 0,
 
     /**
-     * We "jumped" to a new location (e.g. via Da Capo). So we're ignoring repeats.
+     * We "jumped" to a new location (e.g. via Da Capo). So we're playing all repeats as their final pass
+     * (no repeating, only the last alternate ending).
      */
     DirectionJumped = 1,
 
@@ -84,43 +89,36 @@ export class MidiPlaybackController {
     public processCurrent(): void {
         const masterBar: MasterBar = this._score.masterBars[this.index];
 
-        if (this._state === MidiPlaybackControllerState.PlayingNormally) {
-            let masterBarAlternateEndings: number = masterBar.alternateEndings;
-            // if there are no alternate endings set on this bar. take the ones
-            // from the previously played bar which had alternate endings
-            if (masterBarAlternateEndings === 0) {
-                masterBarAlternateEndings = this._previousAlternateEndings;
-            }
+        let masterBarAlternateEndings: number = masterBar.alternateEndings;
+        // if there are no alternate endings set on this bar. take the ones
+        // from the previously played bar which had alternate endings
+        if (masterBarAlternateEndings === 0) {
+            masterBarAlternateEndings = this._previousAlternateEndings;
+        }
 
-            // Repeat start (only properly closed ones)
-            if (masterBar === masterBar.repeatGroup.opening && masterBar.repeatGroup.isClosed) {
-                // first encounter of the repeat group? -> initialize repeats accordingly
-                if (!this._groupsOnStack.has(masterBar.repeatGroup)) {
-                    const repeat = new Repeat(masterBar.repeatGroup, masterBar);
-                    this._repeatStack.push(repeat);
-                    this._groupsOnStack.add(masterBar.repeatGroup);
-                    this._previousAlternateEndings = 0;
-                    masterBarAlternateEndings = masterBar.alternateEndings;
-                }
+        // Repeat start (only properly closed ones)
+        if (masterBar === masterBar.repeatGroup.opening && masterBar.repeatGroup.isClosed) {
+            // first encounter of the repeat group? -> initialize repeats accordingly
+            if (!this._groupsOnStack.has(masterBar.repeatGroup)) {
+                this._pushRepeat(masterBar.repeatGroup, masterBar);
+                masterBarAlternateEndings = masterBar.alternateEndings;
             }
+        }
 
-            // if we're not within repeats or not alternative endings set -> simply play
-            if (this._repeatStack.length === 0 || masterBarAlternateEndings === 0) {
-                this.shouldPlay = true;
-            } else {
-                const repeat = this._repeatStack[this._repeatStack.length - 1];
-                const iteration = repeat.iterations[repeat.closingIndex];
-                this._previousAlternateEndings = masterBarAlternateEndings;
-
-                // do we need to skip this section?
-                if ((masterBarAlternateEndings & (1 << iteration)) === 0) {
-                    this.shouldPlay = false;
-                } else {
-                    this.shouldPlay = true;
-                }
-            }
-        } else {
+        // if we're not within repeats or not alternative endings set -> simply play
+        if (this._repeatStack.length === 0 || masterBarAlternateEndings === 0) {
             this.shouldPlay = true;
+        } else {
+            const repeat = this._repeatStack[this._repeatStack.length - 1];
+            const iteration = repeat.iterations[repeat.closingIndex];
+            this._previousAlternateEndings = masterBarAlternateEndings;
+
+            // do we need to skip this section?
+            if ((masterBarAlternateEndings & (1 << iteration)) === 0) {
+                this.shouldPlay = false;
+            } else {
+                this.shouldPlay = true;
+            }
         }
 
         if (this.shouldPlay) {
@@ -142,12 +140,43 @@ export class MidiPlaybackController {
         this._repeatStack = [];
     }
 
+    private _pushRepeat(group: RepeatGroup, opening: MasterBar): Repeat {
+        // after a jump all repeats are played as their final pass
+        const finalPass = this._state !== MidiPlaybackControllerState.PlayingNormally;
+        const repeat = new Repeat(group, opening, finalPass);
+        this._repeatStack.push(repeat);
+        this._groupsOnStack.add(group);
+        this._previousAlternateEndings = 0;
+        return repeat;
+    }
+
+    /**
+     * Called after a jump: if we landed within a repeat (after its opening), the opening is never
+     * visited, hence we start the repeat here to correctly respect the alternate endings.
+     */
+    private _enterRepeatAfterJump() {
+        const masterBar = this._score.masterBars[this.index];
+        const group = masterBar.repeatGroup;
+        if (
+            group.isClosed &&
+            masterBar !== group.opening &&
+            masterBar.index <= group.closings[group.closings.length - 1].index
+        ) {
+            const repeat = this._pushRepeat(group, group.opening!);
+            // continue with the next closing after the jump target
+            while (repeat.group.closings[repeat.closingIndex].index < masterBar.index) {
+                repeat.closingIndex++;
+            }
+        }
+    }
+
     private _handleDaCapo(directions: Set<Direction>, daCapo: Direction, newState: MidiPlaybackControllerState): boolean {
         if (directions.has(daCapo)) {
             this._takenJumps.add(this._score.masterBars[this.index]);
             this.index = 0; // jump to start
             this._state = newState;
             this._resetRepeats();
+            this._enterRepeatAfterJump();
             return true;
         }
         return false;
@@ -170,6 +199,7 @@ export class MidiPlaybackController {
             this.index = segno;
             this._state = newState;
             this._resetRepeats();
+            this._enterRepeatAfterJump();
             return true;
         }
         return false;
@@ -181,13 +211,13 @@ export class MidiPlaybackController {
             const coda = this._findJumpTarget(jumpTarget, this.index, false /* typically da coda jumps are forwards */);
             if (coda === -1) {
                 // no coda found, continue playing normally to end.
-                this.index++;
-                return true;
+                return false;
             }
 
             this.index = coda;
-            // back to normal playback after target jump.
+            // back to normal playback (with repeats) after target jump.
             this._state = MidiPlaybackControllerState.PlayingNormally;
+            this._resetRepeats();
             return true;
         }
         return false;
@@ -195,26 +225,13 @@ export class MidiPlaybackController {
 
     private _moveNextWithDirections() {
         const masterBar: MasterBar = this._score.masterBars[this.index];
-        const hasDirections = masterBar.directions !== null && masterBar.directions.size > 0;
+        // directions on bars which are not played (skipped alternate endings) are not respected
+        const hasDirections = this.shouldPlay && masterBar.directions !== null && masterBar.directions.size > 0;
 
-        // fast exit paths:
-
-        // normal playback and no directions to respect
-        if (this._state === MidiPlaybackControllerState.PlayingNormally && !hasDirections) {
-            return false;
-        }
-
+        // fast exit path: no directions to respect, continue with the repeats
+        // (after jumps all repeats are on their final pass, hence we simply continue playing one after another)
         if (!hasDirections) {
-            // playing in a directions state, we ignore all repeats and just continue playing one after another
-
-            // NOTE: its not really clearly defined what to do if we have repeats and directions combined in a piece
-            // e.g. if there is a repeat with alternate endings, it makes sense to only play the "initial path" without
-            // any repeats but skipping the bars which would only be played as part of endings?
-
-            // for now we keep it simple. if somebody reports special needs we can still add them.
-
-            this.index++;
-            return true;
+            return false;
         }
 
         // longer path: respect directions based on the state we're in
@@ -319,9 +336,8 @@ export class MidiPlaybackController {
                 return false;
 
             case MidiPlaybackControllerState.DirectionJumped:
-                // when we had a jump without special indication, we just keep playing 1-by-1 until the end
-                this.index++;
-                return true;
+                // when we had a jump without special indication, we just keep playing until the end
+                return false;
 
             case MidiPlaybackControllerState.DirectionJumpedAlCoda:
                 // Found the "Da Coda" after the jump -> Jump further
@@ -329,18 +345,16 @@ export class MidiPlaybackController {
                     return true;
                 }
 
-                // no relevant direction found, we just keep playing 1-by-1 without repeats
-                this.index++;
-                return true;
+                // no relevant direction found, we just keep playing (repeats are on their final pass)
+                return false;
 
             case MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda:
                 if (this._handleDaCoda(masterBar.directions!, Direction.JumpDaDoubleCoda, Direction.TargetDoubleCoda)) {
                     return true;
                 }
 
-                // no relevant direction found, we just keep playing 1-by-1 without repeats
-                this.index++;
-                return true;
+                // no relevant direction found, we just keep playing (repeats are on their final pass)
+                return false;
 
             case MidiPlaybackControllerState.DirectionJumpedAlFine:
                 if (masterBar.directions!.has(Direction.TargetFine)) {
@@ -348,9 +362,8 @@ export class MidiPlaybackController {
                     return true;
                 }
 
-                // no relevant direction found, we just keep playing 1-by-1 without repeats
-                this.index++;
-                return true;
+                // no relevant direction found, we just keep playing (repeats are on their final pass)
+                return false;
         }
 
         return true;
