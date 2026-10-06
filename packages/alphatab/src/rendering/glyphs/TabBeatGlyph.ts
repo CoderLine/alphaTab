@@ -13,6 +13,7 @@ import { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteC
 import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph';
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 
 /**
@@ -230,8 +231,10 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             );
         }
 
+        // effects like tremolos sit on the (potentially hidden) stem
+        const effectX = BeamingHelper.beatHasStem(this.container.beat) ? this.stemX : this.onTimeX;
         for (const g of centeredEffectGlyphs) {
-            g.x = this.onTimeX;
+            g.x = effectX;
         }
     }
 
