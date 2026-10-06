@@ -484,9 +484,6 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         side: ScoreChordNoteHeadGroupSide,
         leftOfStem: boolean
     ) {
-        const scale = this.scale;
-        const smufl = this.renderer.smuflMetrics;
-
         for (const stepInfos of side.notes.values()) {
             // NOTE: for now we do not displace "third" voices even further but they overlap
             for (const info of stepInfos) {
@@ -499,17 +496,9 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 }
                 // shift left/right according to stem position or glyph size
                 else if (leftOfStem) {
-                    // stem-up is the offset on the right side of the notehead
-                    if (smufl.stemUp.has(info.glyph.symbol)) {
-                        info.glyph.x -= smufl.stemUp.get(info.glyph.symbol)!.x * scale;
-                    } else {
-                        info.glyph.x -= smufl.glyphWidths.get(info.glyph.symbol)! * scale;
-                    }
+                    info.glyph.x -= info.glyph.getStemX(this.renderer.smuflMetrics, BeamDirection.Up);
                 } else {
-                    // stem-down is the offset on the left side of the notehead
-                    if (smufl.stemDown.has(info.glyph.symbol)) {
-                        info.glyph.x += smufl.stemDown.get(info.glyph.symbol)!.x * scale;
-                    }
+                    info.glyph.x += info.glyph.getStemX(this.renderer.smuflMetrics, BeamDirection.Down);
                 }
 
                 // update side
@@ -573,26 +562,10 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     }
 
     private _updateGroupStemXPosition(info: ScoreNoteGlyphInfo, noteGroup: ScoreChordNoteHeadGroup) {
-        const smufl = this.renderer.smuflMetrics;
-        const scale = this.scale;
-        let stemX: number;
-
-        if (noteGroup.direction === BeamDirection.Up || noteGroup.displacedNotes) {
-            if (smufl.stemUp.has(info.glyph.symbol)) {
-                const stemInfo = smufl.stemUp.get(info.glyph.symbol)!;
-                stemX = stemInfo.x * scale;
-            } else {
-                stemX = smufl.glyphWidths.get(info.glyph.symbol)! * scale;
-            }
-        } else {
-            if (smufl.stemDown.has(info.glyph.symbol)) {
-                const stemInfo = smufl.stemDown.get(info.glyph.symbol)!;
-                stemX = stemInfo.x * scale;
-            } else {
-                stemX = 0;
-            }
-        }
-
+        let stemX = info.glyph.getStemX(
+            this.renderer.smuflMetrics,
+            noteGroup.direction === BeamDirection.Up || noteGroup.displacedNotes ? BeamDirection.Up : BeamDirection.Down
+        );
         stemX += this.noteStartX;
 
         if (stemX > noteGroup.stemX) {

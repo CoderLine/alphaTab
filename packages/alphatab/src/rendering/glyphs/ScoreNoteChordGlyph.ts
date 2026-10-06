@@ -7,7 +7,6 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import type { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import type { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import {
     ScoreChordNoteHeadInfo,
@@ -25,7 +24,7 @@ import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
  * @internal
  */
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
-    private _noteGlyphLookup: Map<number, MusicFontGlyph> = new Map();
+    private _noteGlyphLookup: Map<number, NoteHeadGlyphBase> = new Map();
     private _notes: Note[] = [];
     private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: TremoloPickingGlyph | null = null;
@@ -103,18 +102,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return this.minStepsNote ? this._internalGetNoteY(this.minStepsNote.glyph, requestedPosition) : 0;
     }
 
-    private _internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
-        let pos = this.y + n.y;
-
+    private _internalGetNoteY(n: NoteHeadGlyphBase, requestedPosition: NoteYPosition): number {
         const sr = this.renderer as ScoreBarRenderer;
-        const scale = this.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1;
+        const scale = this.scale;
         switch (requestedPosition) {
-            case NoteYPosition.TopWithStem:
-                // stem start
-                pos -=
-                    (sr.smuflMetrics.stemUp.has(n.symbol) ? sr.smuflMetrics.stemUp.get(n.symbol)!.bottomY : 0) * scale;
-
-                // stem size according to duration
+            case NoteYPosition.TopWithStem: {
+                // stem start and size according to duration
+                let pos = this.y + n.getNoteHeadY(sr.smuflMetrics, NoteYPosition.StemUp);
                 pos -= sr.smuflMetrics.getStemLength(this.beat.duration, sr.hasFlag(this.beat)) * scale;
                 pos -= this._stemLengthExtension;
 
@@ -122,22 +116,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 topCenterY -= this._stemLengthExtension;
 
                 return Math.min(topCenterY, pos);
-
-            case NoteYPosition.Top:
-                pos -= n.height / 2;
-                break;
-            case NoteYPosition.Center:
-                break;
-            case NoteYPosition.Bottom:
-                pos += n.height / 2;
-                break;
-            case NoteYPosition.BottomWithStem:
-                pos -=
-                    (this.renderer.smuflMetrics.stemDown.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
-                        : -this.renderer.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
-
-                // stem size according to duration
+            }
+            case NoteYPosition.BottomWithStem: {
+                // stem start and size according to duration
+                let pos = this.y + n.getNoteHeadY(sr.smuflMetrics, NoteYPosition.StemDown);
                 pos += sr.smuflMetrics.getStemLength(this.beat.duration, sr.hasFlag(this.beat)) * scale;
                 pos += this._stemLengthExtension;
 
@@ -145,20 +127,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 bottomCenterY += this._stemLengthExtension;
 
                 return Math.max(bottomCenterY, pos);
-
-            case NoteYPosition.StemUp:
-                pos -=
-                    (sr.smuflMetrics.stemUp.has(n.symbol) ? sr.smuflMetrics.stemUp.get(n.symbol)!.bottomY : 0) * scale;
-                break;
-            case NoteYPosition.StemDown:
-                pos -=
-                    (sr.smuflMetrics.stemDown.has(n.symbol)
-                        ? sr.smuflMetrics.stemDown.get(n.symbol)!.topY
-                        : -sr.smuflMetrics.glyphHeights.get(n.symbol)! / 2) * scale;
-                break;
+            }
         }
-
-        return pos;
+        return this.y + n.getNoteHeadY(sr.smuflMetrics, requestedPosition);
     }
 
     public addMainNoteGlyph(noteGlyph: NoteHeadGlyphBase, note: Note, noteLine: number): void {
