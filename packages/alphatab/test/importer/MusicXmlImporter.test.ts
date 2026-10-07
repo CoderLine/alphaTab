@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BendType } from '@coderline/alphatab/model/BendType';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -424,6 +425,81 @@ describe('MusicXmlImporterTests', () => {
         const midiFile = new MidiFile();
         new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midiFile)).generate();
         expect(midiFile.events.filter(e => Number.isNaN(e.tick))).toHaveLength(0);
+    });
+
+    it('fingering', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/fingering.xml');
+        // each part has every value once as <fingering> (bars 0-5) and once as <pluck> (bars 6-11)
+        const notes = (track: number, firstBar: number) =>
+            score.tracks[track].staves[0].bars
+                .slice(firstBar, firstBar + 6)
+                .flatMap(b => b.voices[0].beats)
+                .map(b => b.notes[0]);
+
+        const letters = [
+            Fingers.Thumb, // p
+            Fingers.Thumb, // t
+            Fingers.Thumb, // T
+            Fingers.Thumb, // P
+            Fingers.IndexFinger, // i
+            Fingers.IndexFinger, // I
+            Fingers.MiddleFinger, // m
+            Fingers.MiddleFinger, // M
+            Fingers.AnnularFinger, // a
+            Fingers.AnnularFinger, // A
+            Fingers.LittleFinger, // c
+            Fingers.LittleFinger, // C
+            Fingers.LittleFinger, // e
+            Fingers.LittleFinger, // o
+            Fingers.LittleFinger, // q
+            Fingers.LittleFinger, // s
+            Fingers.LittleFinger, // x
+            Fingers.Unknown // 6
+        ];
+        // 0 1 2 3 4 5
+        const keyboardDigits = [
+            Fingers.NoOrDead,
+            Fingers.Thumb,
+            Fingers.IndexFinger,
+            Fingers.MiddleFinger,
+            Fingers.AnnularFinger,
+            Fingers.LittleFinger
+        ];
+        const fretDigits = [
+            Fingers.NoOrDead,
+            Fingers.IndexFinger,
+            Fingers.MiddleFinger,
+            Fingers.AnnularFinger,
+            Fingers.LittleFinger,
+            Fingers.Thumb
+        ];
+
+        function expectFingers(actual: Fingers[], digits: Fingers[]) {
+            expect(actual.slice(0, 6)).toEqual(digits);
+            expect(actual.slice(6)).toEqual(letters);
+        }
+
+        // guitar
+        expect(score.tracks[0].playbackInfo.program).toBe(24);
+        expectFingers(
+            notes(0, 0).map(n => n.leftHandFinger),
+            fretDigits
+        );
+        expectFingers(
+            notes(0, 6).map(n => n.rightHandFinger),
+            keyboardDigits
+        );
+
+        // piano
+        expect(score.tracks[1].playbackInfo.program).toBe(0);
+        expectFingers(
+            notes(1, 0).map(n => n.leftHandFinger),
+            keyboardDigits
+        );
+        expectFingers(
+            notes(1, 6).map(n => n.rightHandFinger),
+            keyboardDigits
+        );
     });
 
     describe('barnumberdisplay', async () => {
