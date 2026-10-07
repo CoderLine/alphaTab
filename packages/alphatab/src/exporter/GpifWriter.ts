@@ -5,7 +5,6 @@ import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
-import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import { type Automation, AutomationType } from '@coderline/alphatab/model/Automation';
 import { type Bar, SustainPedalMarkerType } from '@coderline/alphatab/model/Bar';
 import { BarreShape } from '@coderline/alphatab/model/BarreShape';
@@ -451,7 +450,8 @@ export class GpifWriter {
         }
     }
 
-    private static readonly _defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
+    private static readonly _steps: string[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    private static readonly _accidentals: string[] = ['bb', 'b', '', '#', 'x'];
 
     private _writePitchForValue(
         properties: XmlNode,
@@ -460,74 +460,15 @@ export class GpifWriter {
         accidentalMode: NoteAccidentalMode,
         keySignature: KeySignature
     ) {
-        let index = 0;
-        let octave = 0;
-
-        let step = '';
-        let accidental = '';
-
-        const updateParts: () => void = () => {
-            index = value % 12;
-            octave = (value / 12) | 0;
-
-            step = GpifWriter._defaultSteps[index];
-            switch (ModelUtils.computeAccidental(keySignature, NoteAccidentalMode.Default, value, false)) {
-                case AccidentalType.None:
-                case AccidentalType.Natural:
-                    accidental = '';
-                    break;
-                case AccidentalType.Sharp:
-                    accidental = '#';
-                    break;
-                case AccidentalType.Flat:
-                    accidental = 'b';
-                    break;
-                case AccidentalType.DoubleSharp:
-                    accidental = 'x';
-                    break;
-                case AccidentalType.DoubleFlat:
-                    accidental = 'bb';
-                    break;
-            }
-        };
-        updateParts();
-
-        switch (accidentalMode) {
-            case NoteAccidentalMode.Default:
-                break;
-            case NoteAccidentalMode.ForceNone:
-                accidental = '';
-                break;
-            case NoteAccidentalMode.ForceNatural:
-                accidental = '';
-                break;
-            case NoteAccidentalMode.ForceSharp:
-                accidental = '#';
-                break;
-            case NoteAccidentalMode.ForceDoubleSharp:
-                if (accidental === '#') {
-                    value -= 2;
-                    updateParts();
-                }
-                accidental = 'x';
-                break;
-            case NoteAccidentalMode.ForceFlat:
-                if (accidental === '#') {
-                    value += 1;
-                    updateParts();
-                }
-                accidental = 'b';
-                break;
-            case NoteAccidentalMode.ForceDoubleFlat:
-                if (accidental === '#') {
-                    value += 2;
-                    updateParts();
-                }
-                accidental = 'bb';
-                break;
-        }
-
-        this._writePitch(properties, propertyName, step, octave.toString(), accidental);
+        // Guitar Pro stores the spelled pitch, the octave belongs to the step (B#4 = C5, Cb5 = B4)
+        const spelling = ModelUtils.resolveSpelling(keySignature, value, accidentalMode);
+        this._writePitch(
+            properties,
+            propertyName,
+            GpifWriter._steps[spelling.degree],
+            (spelling.octave + 1).toString(),
+            GpifWriter._accidentals[spelling.accidentalOffset + 2]
+        );
     }
 
     private _writePitch(properties: XmlNode, propertyName: string, step: string, octave: string, accidental: string) {
