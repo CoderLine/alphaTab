@@ -31,7 +31,7 @@ import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
-import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import type { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';

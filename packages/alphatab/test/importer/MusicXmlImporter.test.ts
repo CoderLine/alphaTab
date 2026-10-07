@@ -332,9 +332,7 @@ describe('MusicXmlImporterTests', () => {
     });
 
     it('accidental-spelling', async () => {
-        const score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml4/accidental-spelling.xml'
-        );
+        const score = await MusicXmlImporterTestHelper.testReferenceFile('test-data/musicxml4/accidental-spelling.xml');
 
         // written spelling of all notes as [bar, degree, accidental offset, octave]
         const expected = [
@@ -355,7 +353,11 @@ describe('MusicXmlImporterTests', () => {
         for (const bar of score.tracks[0].staves[0].bars) {
             for (const beat of bar.voices[0].beats) {
                 for (const note of beat.notes) {
-                    const spelling = ModelUtils.resolveSpelling(bar.keySignature, note.displayValue, note.accidentalMode);
+                    const spelling = ModelUtils.resolveSpelling(
+                        bar.keySignature,
+                        note.displayValue,
+                        note.accidentalMode
+                    );
                     const context = `note ${i}`;
                     expect(bar.index, context).toBe(expected[i][0]);
                     expect(spelling.degree, context).toBe(expected[i][1]);

@@ -194,7 +194,9 @@ describe('AlphaTexExporterTest', () => {
 
     it('accidental-mode-only-when-needed', () => {
         // in F major: F# needs a hint (default spelling is Gb), Gb, Bb and B natural are spelled like this by default
-        const score = ScoreLoader.loadAlphaTex('\\instrument piano \\tuning piano \\ks f . F#4.4 Gb4.4 Bb4.4 B4{acc n}.4');
+        const score = ScoreLoader.loadAlphaTex(
+            '\\instrument piano \\tuning piano \\ks f . F#4.4 Gb4.4 Bb4.4 B4{acc n}.4'
+        );
         const exported = exportAlphaTex(score);
 
         expect(exported).toContain('Gb4{acc #}.4');
