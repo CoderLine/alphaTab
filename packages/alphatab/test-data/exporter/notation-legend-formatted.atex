@@ -144,17 +144,17 @@
         7.3{be (prebendbend 0 4 15 6)}.1{txt "grad." beam Down}
       |
         // Bar 16 / Voice 1 contents
-        (7.2{be (bend 0 0 14.399999999999999 2) acc #} 7.3{be (bend 0 0 15 4)}).1{beam Down}
+        (7.2{be (bend 0 0 14.399999999999999 2)} 7.3{be (bend 0 0 15 4)}).1{beam Down}
       |
         // Bar 17 / Voice 1 contents
-        (7.2{be (bend 0 0 14.399999999999999 2) acc #} 7.3{be (bend 0 0 15 4)}).4{beam Down}
+        (7.2{be (bend 0 0 14.399999999999999 2)} 7.3{be (bend 0 0 15 4)}).4{beam Down}
         (7.2{be (release 0 2 15 0) t} 7.3{be (release 0 4 15 0) t}).4{beam Down}
-        (7.3{t} 7.2{t acc #}).2{beam Down}
+        (7.3{t} 7.2{t}).2{beam Down}
       |
         // Bar 18 / Voice 1 contents
-        (7.2{be (bend 0 0 14.399999999999999 2) acc #} 7.3{be (bend 0 0 15 4)}).8{gr onbeat beam Up}
+        (7.2{be (bend 0 0 14.399999999999999 2)} 7.3{be (bend 0 0 15 4)}).8{gr onbeat beam Up}
         (7.2{be (release 0 2 15 0) t} 7.3{be (release 0 4 15 0) t}).4{beam Down}
-        (7.3{t} 7.2{t acc #}).2{d beam Down}
+        (7.3{t} 7.2{t}).2{d beam Down}
       |
         // Bar 19 / Voice 1 contents
         (10.2 12.3{be (bend 0 0 15 4)}).1{beam Down}
@@ -315,20 +315,20 @@
         // Bar 51 / Voice 1 contents
         5.3{h}.8{beam Down}
         7.3{sl}.8{beam Down}
-        8.3{sl acc #}.8{beam Down}
+        8.3{sl}.8{beam Down}
         7.3{h}.8{beam Down}
         5.3{sl}.8{beam Down}
-        3.3{h acc #}.8{beam Down}
+        3.3{h}.8{beam Down}
         5.3{h}.8{beam Down}
-        3.3{acc #}.8{beam Down}
+        3.3.8{beam Down}
       |
         // Bar 52 / Voice 1 contents
         5.3{h}.8{beam Down}
-        6.3{h acc #}.8{beam Down}
+        6.3{h}.8{beam Down}
         7.3{h}.8{beam Down}
-        8.3{h acc #}.8{beam Down}
+        8.3{h}.8{beam Down}
         7.3{h}.8{beam Down}
-        6.3{h acc #}.8{beam Down}
+        6.3{h}.8{beam Down}
         5.3.4{beam Down}
       |
         // Bar 53 / Voice 1 contents
@@ -377,7 +377,7 @@
         // Bar 58 / Voice 1 contents
         7.5.4{tp 3 beam Up}
         8.5.4{tp 3 beam Up}
-        9.5{acc #}.2{tp 3 beam Up}
+        9.5.2{tp 3 beam Up}
       |
         // Bar 59 / Voice 1 contents
         7.3{tr (9 16)}.1{beam Down}
@@ -393,7 +393,7 @@
         7.5{x}.8{beam Up}
       |
         // Bar 61 / Voice 1 contents
-        (7.5{psd x} 6.4{psd x acc #}).1{beam Up}
+        (7.5{psd x} 6.4{psd x}).1{beam Up}
       |
         // Bar 62 / Voice 1 contents
         12.2{nh}.4{beam Down}
@@ -409,13 +409,13 @@
       |
         // Bar 64 / Voice 1 contents
         5.2{ph 12}.4{beam Down}
-        7.2{ph 12 acc #}.4{beam Down}
+        7.2{ph 12}.4{beam Down}
         8.2.4{beam Down}
         10.2{ph 12}.4{beam Down}
       |
         // Bar 65 / Voice 1 contents
         5.2{th 12}.4{beam Down}
-        7.2{th 12 acc #}.4{beam Down}
+        7.2{th 12}.4{beam Down}
         8.2.4{beam Down}
         10.2{th 12}.4{beam Down}
       |
@@ -430,10 +430,10 @@
       |
         // Bar 69 / Voice 1 contents
         5.6{h}.16{tu (6 4) beam Up}
-        9.6{h acc #}.16{tu (6 4) beam Up}
+        9.6{h}.16{tu (6 4) beam Up}
         12.6{h}.16{tt tu (6 4) beam Up}
         7.4.16{tu (6 4) beam Up}
-        9.6{h acc #}.16{tu (6 4) beam Up}
+        9.6{h}.16{tu (6 4) beam Up}
         12.6.16{tt tu (6 4) beam Up}
         r.2{d beam Up}
       |
@@ -453,18 +453,18 @@
       \simile none
         // Bar 73 / Voice 1 contents
         1.1.8{dy mf beam Up}
-        2.1{acc #}.8{beam Up}
+        2.1.8{beam Up}
         3.1.8{beam Up}
-        4.1{acc #}.8{beam Up}
+        4.1.8{beam Up}
         3.1.4{beam Up}
         1.1.8{beam Up}
-        4.1{acc #}.8{beam Up}
+        4.1.8{beam Up}
       |
         // Bar 74 / Voice 1 contents
-        (0.6 2.5 4.4{acc #} 0.3 0.2 0.1).1{ad 0 beam Up}
+        (0.6 2.5 4.4 0.3 0.2 0.1).1{ad 0 beam Up}
       |
         // Bar 75 / Voice 1 contents
-        (0.6 2.5 4.4{acc #} 0.3 0.2 0.1).1{au 0 beam Up}
+        (0.6 2.5 4.4 0.3 0.2 0.1).1{au 0 beam Up}
       |
       // Masterbar 76 Metadata
       \tf triplet8th
@@ -472,23 +472,23 @@
         0.6.8{tu (3 2) beam Up}
         0.6.8{tu (3 2) beam Up}
         0.6.8{tu (3 2) beam Up}
-        4.6{acc #}.8{beam Up}
-        4.6{acc #}.8{beam Up}
+        4.6.8{beam Up}
+        4.6.8{beam Up}
         5.6.8{beam Up}
         5.6.8{beam Up}
-        1.5{acc #}.8{tu (3 2) beam Up}
-        1.5{acc #}.8{tu (3 2) beam Up}
-        1.5{acc #}.8{tu (3 2) beam Up}
+        1.5.8{tu (3 2) beam Up}
+        1.5.8{tu (3 2) beam Up}
+        1.5.8{tu (3 2) beam Up}
       |
         // Bar 77 / Voice 1 contents
         2.5.8{beam Up}
         2.5.8{beam Up}
         0.5.8{beam Up}
         0.5.8{beam Up}
-        4.6{acc #}.8{beam Up}
-        4.6{acc #}.8{beam Up}
-        2.6{acc #}.8{beam Up}
-        2.6{acc #}.8{beam Up}
+        4.6.8{beam Up}
+        4.6.8{beam Up}
+        2.6.8{beam Up}
+        2.6.8{beam Up}
       |
         // Bar 78 / Voice 1 contents
         0.6.1{fermata (medium 0.5) beam Up}
@@ -496,14 +496,14 @@
       // Masterbar 79 Metadata
       \tf none
         // Bar 79 / Voice 1 contents
-        21.1{acc #}.8{ot 8va beam Down}
-        21.1{acc #}.8{ot 8va beam Down}
-        21.1{acc #}.8{ot 8va beam Down}
-        21.1{acc #}.8{ot 8va beam Down}
-        21.1{acc #}.8{beam Down}
-        21.1{acc #}.8{ot 8va beam Down}
-        21.1{acc #}.8{beam Down}
-        21.1{acc #}.8{ot 8va beam Down}
+        21.1.8{ot 8va beam Down}
+        21.1.8{ot 8va beam Down}
+        21.1.8{ot 8va beam Down}
+        21.1.8{ot 8va beam Down}
+        21.1.8{beam Down}
+        21.1.8{ot 8va beam Down}
+        21.1.8{beam Down}
+        21.1.8{ot 8va beam Down}
       |
         // Bar 80 / Voice 1 contents
         24.1.1{ot 15ma beam Down}
@@ -557,29 +557,29 @@
         (3.1 3.2 0.3 5.4 5.5 3.6{lf 1}).1{beam Up}
       |
         // Bar 86 / Voice 1 contents
-        (0.5 2.4 2.3 2.2{acc #} 0.1).8{beam Up}
-        (0.5 2.4 2.3 2.2{acc #} 0.1).8{slashed beam Up}
-        (0.5 2.4 2.3 2.2{acc #} 0.1).4{slashed beam Up}
-        (0.5 2.4 2.3 2.2{acc #} 0.1).4{slashed beam Up}
-        (0.5 2.4 2.3 2.2{acc #} 0.1).8{slashed beam Up}
-        (0.5 2.4 2.3 2.2{acc #} 0.1).8{slashed beam Up}
+        (0.5 2.4 2.3 2.2 0.1).8{beam Up}
+        (0.5 2.4 2.3 2.2 0.1).8{slashed beam Up}
+        (0.5 2.4 2.3 2.2 0.1).4{slashed beam Up}
+        (0.5 2.4 2.3 2.2 0.1).4{slashed beam Up}
+        (0.5 2.4 2.3 2.2 0.1).8{slashed beam Up}
+        (0.5 2.4 2.3 2.2 0.1).8{slashed beam Up}
       |
         // Bar 87 / Voice 1 contents
         5.5.8{txt "V." beam Up}
-        6.5{acc #}.8{beam Up}
+        6.5.8{beam Up}
         8.5.8{beam Up}
         10.5.8{txt "X." beam Up}
         12.5.4{beam Up}
-        13.5{acc #}.4{beam Up}
+        13.5.4{beam Up}
       |
         // Bar 88 / Voice 1 contents
-        (3.5 2.4 3.3{acc #} 3.2 3.1).4{ch "C9" beam Up}
+        (3.5 2.4 3.3 3.2 3.1).4{ch "C9" beam Up}
         (3.5 2.4 0.3 1.2 0.1).8{ch "C" beam Up}
         (3.5 2.4 0.3 1.2 0.1).8{beam Up}
         (3.6 2.5 0.4 0.3 0.2 3.1).8{ch "G" beam Up}
         (3.6 2.5 0.4 0.3 0.2 3.1).8{beam Up}
-        (1.6 3.5 3.4 1.3{acc #} 3.2 1.1).8{ch "Fm6" beam Up}
-        (1.6 3.5 3.4 1.3{acc #} 3.2 1.1).8{beam Up}
+        (1.6 3.5 3.4 1.3 3.2 1.1).8{ch "Fm6" beam Up}
+        (1.6 3.5 3.4 1.3 3.2 1.1).8{beam Up}
       |
         // Bar 89 / Voice 1 contents
         (3.5 5.4 3.3{acc b} 6.2 3.1).4{ch "C7sus4" beam Up}
@@ -588,22 +588,22 @@
       |
         // Bar 90 / Voice 1 contents
         5.5.8{beam Up}
-        6.5{acc #}.8{beam Up}
+        6.5.8{beam Up}
         8.5.8{beam Up}
         10.5.8{beam Up}
         12.5.4{beam Up}
-        13.5{acc #}.4{beam Up}
+        13.5.4{beam Up}
       |
         // Bar 91 / Voice 1 contents
         5.5.8{waho beam Up}
-        6.5{acc #}.8{wahc beam Up}
+        6.5.8{wahc beam Up}
         8.5.8{waho beam Up}
         10.5.8{wahc beam Up}
         12.5.4{waho beam Up}
-        13.5{acc #}.4{wahc beam Up}
+        13.5.4{wahc beam Up}
       |
         // Bar 92 / Voice 1 contents
-        4.4{acc #}.8{dy ppp beam Up}
+        4.4.8{dy ppp beam Up}
         5.4.8{dy pp beam Up}
         5.4.8{dy p beam Up}
         5.4.8{dy mp beam Up}
@@ -630,38 +630,38 @@
         8.2.32{sd beam Down}
         8.1.32{sd beam Down}
         7.1.32{su beam Down}
-        7.2{acc #}.32{su beam Down}
-        8.3{acc #}.32{su beam Down}
+        7.2.32{su beam Down}
+        8.3.32{su beam Down}
         9.4.32{su beam Down}
         9.4.32{sd beam Down}
-        8.3{acc #}.32{sd beam Down}
-        7.2{acc #}.32{sd beam Down}
+        8.3.32{sd beam Down}
+        7.2.32{sd beam Down}
         7.1.32{sd beam Down}
-        6.1{acc #}.32{su beam Down}
+        6.1.32{su beam Down}
         6.2.32{su beam Down}
         7.3.32{su beam Down}
-        8.4{acc #}.32{su beam Down}
-        8.4{acc #}.32{sd beam Down}
+        8.4.32{su beam Down}
+        8.4.32{sd beam Down}
         7.3.32{sd beam Down}
         6.2.32{sd beam Down}
-        6.1{acc #}.32{sd beam Down}
+        6.1.32{sd beam Down}
       |
         // Bar 94 / Voice 1 contents
         5.5{lf 2}.8{dy mf beam Up}
-        6.5{lf 3 acc #}.8{beam Up}
+        6.5{lf 3}.8{beam Up}
         8.5{lf 5}.8{beam Up}
         10.5{lf 2}.8{beam Up}
         12.5{lf 4}.4{beam Up}
-        13.5{lf 5 acc #}.4{beam Up}
+        13.5{lf 5}.4{beam Up}
       |
         // Bar 95 / Voice 1 contents
         1.1{lf 2}.8{beam Up}
-        2.1{lf 3 acc #}.8{beam Up}
+        2.1{lf 3}.8{beam Up}
         3.1{lf 3}.8{beam Up}
-        4.1{lf 5 acc #}.8{beam Up}
+        4.1{lf 5}.8{beam Up}
         3.1{lf 3}.4{beam Up}
         1.1{lf 2}.8{beam Up}
-        4.1{lf 5 acc #}.8{beam Up}
+        4.1{lf 5}.8{beam Up}
       |
         // Bar 96 / Voice 1 contents
         (5.2 5.3 5.4).4{tbe (dive default 0 0 45 -4) beam Down}
@@ -720,13 +720,13 @@
       |
         // Bar 106 / Voice 1 contents
         7.3.4{tbe (dip default 0 0 7.199999999999999 -4 7.8 -4 13.799999999999999 0) beam Down}
-        8.3{acc #}.4{tbe (dip default 0 0 5.3999999999999995 -4 6 -4 12 0) beam Down}
+        8.3.4{tbe (dip default 0 0 5.3999999999999995 -4 6 -4 12 0) beam Down}
         10.3.4{tbe (dip default 0 0 6.6 -4 7.199999999999999 -4 13.799999999999999 0) beam Down}
         12.3.4{tbe (dip default 0 0 15 -4 30 0) beam Down}
       |
         // Bar 107 / Voice 1 contents
         7.3.8{tbe (dip default 0 0 15 -4 30 0) beam Down}
-        8.3{acc #}.8{tbe (dip default 0 0 15 -4 30 0) beam Down}
+        8.3.8{tbe (dip default 0 0 15 -4 30 0) beam Down}
         10.3.8{tbe (dip default 0 0 15 -4 30 0) beam Down}
         12.3.8{tbe (dip default 0 0 15 -4 30 0) beam Down}
         r.2{beam Down}
@@ -755,19 +755,19 @@
         0.1{lr}.8{beam Up}
       |
         // Bar 112 / Voice 1 contents
-        (1.4{acc #} 3.3{acc #} 4.2{acc #}).4{beam Up}
+        (1.4 3.3 4.2).4{beam Up}
         3.1{lr}.16{beam Down}
-        4.2{lr acc #}.16{beam Down}
-        3.3{lr acc #}.16{beam Down}
-        4.2{lr acc #}.16{beam Down}
+        4.2{lr}.16{beam Down}
+        3.3{lr}.16{beam Down}
+        4.2{lr}.16{beam Down}
         3.1{lr}.16{beam Down}
-        4.2{lr acc #}.16{beam Down}
-        3.3{lr acc #}.16{beam Down}
-        4.2{lr acc #}.16{beam Down}
+        4.2{lr}.16{beam Down}
+        3.3{lr}.16{beam Down}
+        4.2{lr}.16{beam Down}
         3.1{lr}.16{beam Down}
-        4.2{lr acc #}.16{beam Down}
-        3.3{lr acc #}.16{beam Down}
-        4.2{lr acc #}.16{beam Down}
+        4.2{lr}.16{beam Down}
+        3.3{lr}.16{beam Down}
+        4.2{lr}.16{beam Down}
       |
         // Bar 113 / Voice 1 contents
         r.1{beam Down}
@@ -783,19 +783,19 @@
         (0.1{lr} 0.6{t} 0.3{t}).8{beam Up}
       |
         // Bar 115 / Voice 1 contents
-        (1.4{acc #} 3.3{acc #} 4.2{acc #}).4{beam Up}
+        (1.4 3.3 4.2).4{beam Up}
         3.1{lr}.16{beam Down}
-        (4.2{lr acc #} 3.1{t}).16{beam Down}
-        (3.3{lr acc #} 3.1{t} 4.2{t acc #}).16{beam Down}
-        (4.2{lr acc #} 3.1{t} 3.3{t acc #}).16{beam Down}
-        (3.1{lr} 4.2{t acc #} 3.3{t acc #}).16{beam Down}
-        (4.2{lr acc #} 3.1{t} 3.3{t acc #}).16{beam Down}
-        (3.3{lr acc #} 3.1{t} 4.2{t acc #}).16{beam Down}
-        (4.2{lr acc #} 3.1{t} 3.3{t acc #}).16{beam Down}
-        (3.1{lr} 4.2{t acc #} 3.3{t acc #}).16{beam Down}
-        (4.2{lr acc #} 3.1{t} 3.3{t acc #}).16{beam Down}
-        (3.3{lr acc #} 3.1{t} 4.2{t acc #}).16{beam Down}
-        (4.2{lr acc #} 3.1{t} 3.3{t acc #}).16{beam Down}
+        (4.2{lr} 3.1{t}).16{beam Down}
+        (3.3{lr} 3.1{t} 4.2{t}).16{beam Down}
+        (4.2{lr} 3.1{t} 3.3{t}).16{beam Down}
+        (3.1{lr} 4.2{t} 3.3{t}).16{beam Down}
+        (4.2{lr} 3.1{t} 3.3{t}).16{beam Down}
+        (3.3{lr} 3.1{t} 4.2{t}).16{beam Down}
+        (4.2{lr} 3.1{t} 3.3{t}).16{beam Down}
+        (3.1{lr} 4.2{t} 3.3{t}).16{beam Down}
+        (4.2{lr} 3.1{t} 3.3{t}).16{beam Down}
+        (3.3{lr} 3.1{t} 4.2{t}).16{beam Down}
+        (4.2{lr} 3.1{t} 3.3{t}).16{beam Down}
       |
         // Bar 116 / Voice 1 contents
         r.1{beam Down}
@@ -812,20 +812,20 @@
         (0.3{lr} 0.6{lr t} 0.2{lr t} 0.1{lr t}).8{beam Up}
       |
         // Bar 118 / Voice 1 contents
-        1.5{lr acc #}.8{beam Up}
-        (3.4{lr} 1.5{lr t acc #}).8{beam Up}
-        (3.3{lr acc #} 1.5{lr t acc #} 3.4{lr t}).8{beam Up}
-        (1.5{lr t acc #} 3.4{lr} 3.3{lr t acc #}).8{beam Up}
-        (1.5{lr acc #} 3.4{lr t} 3.3{lr t acc #}).8{beam Up}
-        (3.4{lr} 1.5{lr t acc #} 3.3{lr t acc #}).8{beam Up}
+        1.5{lr}.8{beam Up}
+        (3.4{lr} 1.5{lr t}).8{beam Up}
+        (3.3{lr} 1.5{lr t} 3.4{lr t}).8{beam Up}
+        (1.5{lr t} 3.4{lr} 3.3{lr t}).8{beam Up}
+        (1.5{lr} 3.4{lr t} 3.3{lr t}).8{beam Up}
+        (3.4{lr} 1.5{lr t} 3.3{lr t}).8{beam Up}
       |
         // Bar 119 / Voice 1 contents
-        2.1{lr acc #}.8{beam Down}
-        (3.2{lr} 2.1{lr t acc #}).8{beam Down}
-        (2.3{lr} 2.1{lr t acc #} 3.2{lr t}).8{beam Down}
-        (3.2{lr} 2.1{lr t acc #} 2.3{lr t}).8{beam Down}
-        (2.1{lr acc #} 3.2{lr t} 2.3{lr t}).8{beam Down}
-        (3.2{lr} 2.1{lr t acc #} 2.3{lr t}).8{beam Down}
+        2.1{lr}.8{beam Down}
+        (3.2{lr} 2.1{lr t}).8{beam Down}
+        (2.3{lr} 2.1{lr t} 3.2{lr t}).8{beam Down}
+        (3.2{lr} 2.1{lr t} 2.3{lr t}).8{beam Down}
+        (2.1{lr} 3.2{lr t} 2.3{lr t}).8{beam Down}
+        (3.2{lr} 2.1{lr t} 2.3{lr t}).8{beam Down}
       |
         // Bar 120 / Voice 1 contents
         r.2{d beam Down}
@@ -952,7 +952,7 @@
       |
         // Bar 24 / Voice 2 contents
         r.4{beam Down}
-        9.2{acc #}.2{d beam Down}
+        9.2.2{d beam Down}
       |
         // Bar 25 / Voice 2 contents
         r.4{beam Down}
@@ -1065,12 +1065,12 @@
       // Bar 73 Metadata
       \simile none
         // Bar 73 / Voice 2 contents
-        3.3{acc #}.4{dy mf beam Down}
+        3.3.4{dy mf beam Down}
         4.3.4{beam Down}
         r.8{beam Down}
         5.3.8{beam Down}
-        3.3{acc #}.8{beam Down}
-        1.3{acc #}.8{beam Down}
+        3.3.8{beam Down}
+        1.3.8{beam Down}
       |
       // Bar 74 / Voice 2 no contents
       |
@@ -1115,11 +1115,11 @@
       // Bar 94 / Voice 2 no contents
       |
         // Bar 95 / Voice 2 contents
-        3.3{lf 4 acc #}.4{dy mf beam Down}
+        3.3{lf 4}.4{dy mf beam Down}
         4.3{lf 4}.4{beam Down}
         r.8{beam Down}
         5.3{lf 5}.8{beam Down}
-        3.3{lf 4 acc #}.4{beam Down}
+        3.3{lf 4}.4{beam Down}
       |
       // Bar 96 / Voice 2 no contents
       |
