@@ -582,7 +582,15 @@ class TestExternalMediaHandler implements IExternalMediaHandler {
 class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
     public masterVolume: number = 0;
     public metronomeVolume: number = 0;
-    public outSampleRate: number = 44100;
+    private _sampleRateReads: number = 0;
+    public get outSampleRate(): number {
+        // the sequencer reads this once per fill iteration: fail instead of hanging if it stops making progress
+        this._sampleRateReads++;
+        if (this._sampleRateReads > 100000) {
+            throw new Error('Sequencer is not making progress');
+        }
+        return 44100;
+    }
     public currentTempo: number = 120;
     public timeSignatureNumerator: number = 4;
     public timeSignatureDenominator: number = 4;
