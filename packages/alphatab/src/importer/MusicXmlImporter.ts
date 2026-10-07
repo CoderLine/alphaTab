@@ -1,3 +1,4 @@
+import { type MusicXmlSpanEvent, MusicXmlSpans, MusicXmlSpanTracker } from '@coderline/alphatab/importer/MusicXmlSpans';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
@@ -117,6 +118,11 @@ class TrackInfo {
     >();
 
     private _instrumentIdToArticulationIndex: Map<string, number> = new Map<string, number>();
+
+    /**
+     * The spans of directions (e.g. let ring), span numbers are unique within a part.
+     */
+    public spans: MusicXmlSpanTracker = new MusicXmlSpanTracker();
 
     private _lyricsLine = 0;
     private _lyricsLines: Map<string, number> = new Map<string, number>();
@@ -252,11 +258,25 @@ export class MusicXmlImporter extends ScoreImporter {
         this._score.stylesheet.hideDynamics = true;
 
         this._parseDom(dom);
+        this._applySpans();
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
 
         return this._score;
+    }
+
+    /**
+     * Applies the spans of all parts once all beats are known: a span can cover beats which appear before
+     * its start or after its stop in the document (other voices or staves). Must run before the model is finished
+     * as the note effects are linked there.
+     */
+    private _applySpans() {
+        for (const info of this._indexToTrackInfo.values()) {
+            for (const span of info.spans.finish(this._score.masterBars)) {
+                MusicXmlSpans.apply(span, info.track);
+            }
+        }
     }
 
     private _extractMusicXml(): string {
@@ -1459,8 +1479,6 @@ export class MusicXmlImporter extends ScoreImporter {
     private _nextBeatAutomations: Automation[] | null = null;
     private _nextBeatChord: Chord | null = null;
     private _nextBeatCrescendo: CrescendoType | null = null;
-    private _nextBeatLetRing: boolean = false;
-    private _nextBeatPalmMute: boolean = false;
     private _nextBeatOttavia: Ottavia | null = null;
     private _nextBeatText: string | null = null;
 
@@ -2221,6 +2239,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         let previousWords: string = '';
+        const spanEvents: MusicXmlSpanEvent[] = [];
 
         for (const direction of directionTypes) {
             switch (direction.localName) {
@@ -2266,15 +2285,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'dashes':
-                    const type = direction.getAttribute('type', 'start');
-                    switch (previousWords) {
-                        case 'LetRing':
-                            this._nextBeatLetRing = type === 'start' || type === 'continue';
-                            break;
-                        case 'P.M.':
-                            this._nextBeatPalmMute = type === 'start' || type === 'continue';
-                            break;
+                    const spanEvent = MusicXmlSpans.readLine(direction, previousWords);
+                    if (spanEvent !== null) {
+                        spanEvents.push(spanEvent);
                     }
+                    // the words are the label of the line
                     previousWords = '';
                     break;
                 // case 'bracket': Ignored
@@ -2315,6 +2330,15 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'staff-divide': Not supported
                 // case 'other-direction': Not supported
             }
+        }
+
+        if (spanEvents.length > 0) {
+            // the staff of the direction (-1 if not specified) is resolved when the span is applied
+            const offsetTicks = offset !== null ? this._musicXmlDivisionsToAlphaTabTicks(offset!) : 0;
+            this._indexToTrackInfo.get(track.index)!.spans.processDirection(spanEvents, staffIndex, {
+                barIndex: masterBar.index,
+                ticks: this._musicalPosition + offsetTicks
+            });
         }
 
         // words printing the label of a <sound> direction are not repeated as text, the direction renders it
@@ -2943,8 +2967,6 @@ export class MusicXmlImporter extends ScoreImporter {
             newBeat.ottava = ottavia;
         }
 
-        newBeat.isLetRing = this._nextBeatLetRing;
-        newBeat.isPalmMute = this._nextBeatPalmMute;
         if (this._nextBeatText) {
             newBeat.text = this._nextBeatText;
             this._nextBeatText = null;

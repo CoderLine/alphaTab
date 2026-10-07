@@ -1,19 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
-import type { Note } from '@coderline/alphatab/model/Note';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Note } from '@coderline/alphatab/model/Note';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
-import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
-import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
-import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
-import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { Settings } from '@coderline/alphatab/Settings';
-import { FlatMidiEventGenerator, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
+import { FlatMidiEventGenerator, FlatNoteEvent, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
+import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
+import { describe, expect, it } from 'vitest';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {
@@ -837,6 +837,293 @@ describe('MusicXmlImporterTests', () => {
             ]);
             expectDirections(score, 0, [Direction.TargetSegno]);
             expectDirections(score, 1, [Direction.TargetCoda]);
+        });
+    });
+
+    describe('direction-spans', () => {
+        const tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'];
+
+        // parts of 4/4 measures, a single tablature staff or two notation staves
+        function load(parts: string[][], staves: number = 1, divisions: number = 1): Score {
+            let attributes = `<attributes><divisions>${divisions}</divisions><time><beats>4</beats><beat-type>4</beat-type></time>`;
+            if (staves === 1) {
+                attributes += '<clef><sign>TAB</sign><line>5</line></clef><staff-details><staff-lines>6</staff-lines>';
+                for (let i = 0; i < tuning.length; i++) {
+                    attributes += `<staff-tuning line="${i + 1}"><tuning-step>${tuning[i][0]}</tuning-step><tuning-octave>${tuning[i][1]}</tuning-octave></staff-tuning>`;
+                }
+                attributes += '</staff-details>';
+            } else {
+                attributes += `<staves>${staves}</staves><clef number="1"><sign>G</sign><line>2</line></clef><clef number="2"><sign>F</sign><line>4</line></clef>`;
+            }
+            attributes += '</attributes>';
+
+            let xml = '<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list>';
+            for (let i = 0; i < parts.length; i++) {
+                xml += `<score-part id="P${i + 1}"><part-name>P${i + 1}</part-name></score-part>`;
+            }
+            xml += '</part-list>';
+            for (let i = 0; i < parts.length; i++) {
+                xml += `<part id="P${i + 1}">`;
+                for (let j = 0; j < parts[i].length; j++) {
+                    xml += `<measure number="${j + 1}">${j === 0 ? attributes : ''}${parts[i][j]}</measure>`;
+                }
+                xml += '</part>';
+            }
+            xml += '</score-partwise>';
+            return MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+        }
+
+        // a quarter note, on the tablature if a string is given
+        function note(
+            pitch: string,
+            string: number = 0,
+            fret: number = 0,
+            chord: boolean = false,
+            voice: number = 1,
+            staff: number = 0
+        ): string {
+            const technical =
+                string > 0
+                    ? `<notations><technical><string>${string}</string><fret>${fret}</fret></technical></notations>`
+                    : '';
+            return (
+                `<note>${chord ? '<chord/>' : ''}<pitch><step>${pitch[0]}</step><octave>${pitch[1]}</octave></pitch>` +
+                `<duration>1</duration><voice>${voice}</voice><type>quarter</type>${staff > 0 ? `<staff>${staff}</staff>` : ''}${technical}</note>`
+            );
+        }
+
+        function open(count: number): string {
+            let notes = '';
+            for (let i = 0; i < count; i++) {
+                notes += note('E2', 6);
+            }
+            return notes;
+        }
+
+        function dashes(words: string, type: string, number: string = '1', extra: string = ''): string {
+            const label = words.length > 0 ? `<direction-type><words>${words}</words></direction-type>` : '';
+            return `<direction>${label}<direction-type><dashes type="${type}" number="${number}"/></direction-type>${extra}</direction>`;
+        }
+
+        function notesOf(score: Score, track: number, staff: number, bar: number, voice: number): Note[] {
+            const notes: Note[] = [];
+            for (const b of score.tracks[track].staves[staff].bars[bar].voices[voice].beats) {
+                for (const n of b.notes) {
+                    notes.push(n);
+                }
+            }
+            return notes;
+        }
+
+        function expectLetRing(
+            score: Score,
+            expected: boolean[],
+            track: number = 0,
+            staff: number = 0,
+            bar: number = 0,
+            voice: number = 0
+        ) {
+            expect(notesOf(score, track, staff, bar, voice).map(n => n.isLetRing)).toEqual(expected);
+        }
+
+        function expectPalmMute(score: Score, expected: boolean[], bar: number = 0) {
+            expect(notesOf(score, 0, 0, bar, 0).map(n => n.isPalmMute)).toEqual(expected);
+        }
+
+        function noteLengths(score: Score): number[] {
+            const handler = new FlatMidiEventGenerator();
+            new MidiFileGenerator(score, new Settings(), handler).generate();
+            const lengths: number[] = [];
+            for (const e of handler.midiEvents) {
+                if (e instanceof FlatNoteEvent) {
+                    lengths.push(e.length);
+                }
+            }
+            return lengths;
+        }
+
+        it('let-ring', () => {
+            const score = load([
+                [
+                    dashes('LetRing', 'start') +
+                        note('E2', 6) +
+                        note('A2', 5) +
+                        note('D3', 4) +
+                        note('G3', 3) +
+                        dashes('LetRing', 'stop')
+                ]
+            ]);
+            expectLetRing(score, [true, true, true, true]);
+            expect(noteLengths(score)).toEqual([3840, 2880, 1920, 960]);
+
+            const serialized = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), new Settings());
+            expectLetRing(serialized, [true, true, true, true]);
+            expect(serialized.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.isLetRing)).toEqual([
+                true,
+                true,
+                true,
+                true
+            ]);
+        });
+
+        it('let-ring-same-string', () => {
+            // ringing ends when the string is struck again
+            const score = load([
+                [
+                    dashes('LetRing', 'start') +
+                        note('E2', 6, 0) +
+                        note('G2', 6, 3) +
+                        note('A2', 5, 0) +
+                        note('B2', 5, 2) +
+                        dashes('LetRing', 'stop')
+                ]
+            ]);
+            expect(noteLengths(score)).toEqual([960, 2880, 960, 960]);
+        });
+
+        it('palm-mute', () => {
+            const score = load([[dashes('P.M.', 'start') + open(2) + dashes('P.M.', 'stop') + open(2)]]);
+            expectPalmMute(score, [true, true, false, false]);
+        });
+
+        it('stop-without-words', () => {
+            const score = load([[dashes('LetRing', 'start') + open(2) + dashes('', 'stop') + open(2), open(4)]]);
+            expectLetRing(score, [true, true, false, false]);
+            expectLetRing(score, [false, false, false, false], 0, 0, 1);
+        });
+
+        it('offset', () => {
+            // the offset (in divisions) moves start and stop by a quarter note back
+            const offset: string = '<offset>-2</offset>';
+            const quarter = (pitch: string) =>
+                `<note><pitch><step>${pitch[0]}</step><octave>${pitch[1]}</octave></pitch><duration>2</duration><voice>1</voice><type>quarter</type></note>`;
+            const score = load(
+                [
+                    [
+                        quarter('E2') +
+                            dashes('LetRing', 'start', '1', offset) +
+                            quarter('E2') +
+                            quarter('E2') +
+                            dashes('', 'stop', '1', offset) +
+                            quarter('E2')
+                    ]
+                ],
+                1,
+                2
+            );
+            expectLetRing(score, [true, true, false, false]);
+        });
+
+        it('across-bars-and-chords', () => {
+            const score = load([
+                [
+                    open(2) + dashes('LetRing', 'start') + note('E2', 6) + note('E2', 6) + note('A2', 5, 0, true),
+                    open(1) + dashes('', 'stop') + open(3)
+                ]
+            ]);
+            expectLetRing(score, [false, false, true, true, true], 0, 0, 0);
+            expectLetRing(score, [true, false, false, false], 0, 0, 1);
+        });
+
+        it('numbers', () => {
+            // overlapping let ring (1) and palm mute (2), stopped without words
+            const score = load([
+                [
+                    dashes('LetRing', 'start', '1') +
+                        note('E2', 6) +
+                        dashes('P.M.', 'start', '2') +
+                        note('E2', 6) +
+                        dashes('', 'stop', '1') +
+                        note('E2', 6) +
+                        dashes('', 'stop', '2') +
+                        note('E2', 6),
+                    // one direction starting a new span with the number of the span it stops
+                    dashes('LetRing', 'start', '1') +
+                        open(2) +
+                        '<direction><direction-type><words>P.M.</words></direction-type>' +
+                        '<direction-type><dashes type="start" number="1"/></direction-type>' +
+                        '<direction-type><dashes type="stop" number="1"/></direction-type></direction>' +
+                        open(2) +
+                        dashes('', 'stop', '1')
+                ]
+            ]);
+            expectLetRing(score, [true, true, false, false]);
+            expectPalmMute(score, [false, true, true, false]);
+            expectLetRing(score, [true, true, false, false], 0, 0, 1);
+            expectPalmMute(score, [false, false, true, true], 1);
+        });
+
+        it('staves-and-voices', () => {
+            // the stop (voice 1) appears in the document before the start (voice 2)
+            const staff1: string = '<staff>1</staff>';
+            const score = load(
+                [
+                    [
+                        note('C5', 0, 0, false, 1, 1) +
+                            note('C5', 0, 0, false, 1, 1) +
+                            dashes('', 'stop', '1', staff1) +
+                            note('C5', 0, 0, false, 1, 1) +
+                            note('C5', 0, 0, false, 1, 1) +
+                            '<backup><duration>4</duration></backup>' +
+                            note('A4', 0, 0, false, 2, 1) +
+                            dashes('LetRing', 'start', '1', staff1) +
+                            note('A4', 0, 0, false, 2, 1) +
+                            note('A4', 0, 0, false, 2, 1) +
+                            note('A4', 0, 0, false, 2, 1) +
+                            '<backup><duration>4</duration></backup>' +
+                            note('C3', 0, 0, false, 5, 2) +
+                            note('C3', 0, 0, false, 5, 2) +
+                            note('C3', 0, 0, false, 5, 2) +
+                            note('C3', 0, 0, false, 5, 2)
+                    ]
+                ],
+                2
+            );
+            expectLetRing(score, [false, true, false, false], 0, 0, 0, 0);
+            expectLetRing(score, [false, true, false, false], 0, 0, 0, 1);
+            expectLetRing(score, [false, false, false, false], 0, 1, 0, 0);
+        });
+
+        it('unclosed-per-part', () => {
+            const score = load([
+                [dashes('LetRing', 'start') + open(4), open(4)],
+                [open(4), open(4)]
+            ]);
+            expectLetRing(score, [true, true, true, true], 0, 0, 0);
+            expectLetRing(score, [true, true, true, true], 0, 0, 1);
+            expectLetRing(score, [false, false, false, false], 1, 0, 0);
+            expectLetRing(score, [false, false, false, false], 1, 0, 1);
+        });
+
+        it('stop-and-start-without-open-span', () => {
+            // a stray stop in the direction starting a span must not end the new span
+            const score = load([
+                [
+                    '<direction><direction-type><dashes type="stop" number="1"/></direction-type>' +
+                        '<direction-type><words>LetRing</words></direction-type>' +
+                        '<direction-type><dashes type="start" number="1"/></direction-type></direction>' +
+                        open(2) +
+                        dashes('', 'stop') +
+                        open(2)
+                ]
+            ]);
+            expectLetRing(score, [true, true, false, false]);
+        });
+
+        it('continue-and-unknown-words', () => {
+            const score = load([
+                [
+                    dashes('LetRing', 'continue') +
+                        open(2) +
+                        dashes('', 'stop') +
+                        dashes('cresc.', 'start') +
+                        open(2) +
+                        dashes('', 'stop')
+                ]
+            ]);
+            expectLetRing(score, [true, true, false, false]);
+            expectPalmMute(score, [false, false, false, false]);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].text).toBeNull();
         });
     });
 });
