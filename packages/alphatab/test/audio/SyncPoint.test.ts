@@ -6,6 +6,7 @@ import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { Settings } from '@coderline/alphatab/Settings';
+import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import {
     ExternalMediaPlayer,
@@ -19,6 +20,7 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
 import type { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
 import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
 import { FlatMidiEventGenerator } from 'test/audio/FlatMidiEventGenerator';
+import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
 
 describe('SyncPointTests', () => {
@@ -437,6 +439,31 @@ describe('SyncPointTests', () => {
 
         expect(sequencer.isPlayingCountIn).toBe(true);
         expect(sequencer.currentTime).toBe(1000);
+    });
+
+    /**
+     * See #2397: the synthesizer player still plays the count-in.
+     */
+    it('count-in-playback-synthesizer', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            .
+            C4 * 4
+        `);
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, new Settings(), handler);
+        generator.generate();
+
+        const synth = new AlphaSynth(new TestOutput(), 500);
+        synth.loadMidiFile(midi);
+        synth.timePosition = 1000;
+        synth.countInVolume = 1;
+
+        expect(synth.play()).toBe(true);
+
+        // the count-in plays from its own start, the song continues at 1000ms after it
+        expect(synth.timePosition).toBe(0);
     });
 });
 
