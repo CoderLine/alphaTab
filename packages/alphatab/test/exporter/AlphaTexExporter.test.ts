@@ -200,7 +200,8 @@ describe('AlphaTexExporterTest', () => {
         const exported = exportAlphaTex(score);
 
         expect(exported).toContain('Gb4{acc #}.4');
-        expect(exported.split('acc ').length).toBe(2);
+        const firstAccidental = exported.indexOf('acc ');
+        expect(exported.indexOf('acc ', firstAccidental + 1)).toBe(-1);
 
         const reimported = ScoreLoader.loadAlphaTex(exported);
         ComparisonHelpers.alphaTexExportRoundtripEqual('accidental-mode-only-when-needed', reimported, score);
