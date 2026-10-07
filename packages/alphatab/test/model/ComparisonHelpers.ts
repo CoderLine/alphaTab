@@ -48,6 +48,30 @@ export class ComparisonHelpers {
         }
     }
 
+    /**
+     * Accidental modes are spelling hints, formats store them differently (e.g. Guitar Pro always stores the spelling).
+     * This reduces them to the hints which matter for the rendering to compare them across formats.
+     */
+    public static simplifyAccidentalModes(score: Score) {
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            for (const note of beat.notes) {
+                                note.accidentalMode = ModelUtils.simplifyAccidentalMode(
+                                    bar.keySignature,
+                                    note.displayValue,
+                                    note.accidentalMode
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static alphaTexExportRoundtripPrepare(expected: Score) {
         // the exporter will clear out empty voices and bars, to have correct assertions we do that before
         ModelUtils.trimEmptyBarsAtEnd(expected);
@@ -68,6 +92,8 @@ export class ComparisonHelpers {
         expected: Score,
         ignoreKeys: string[] | null = null
     ) {
+        ComparisonHelpers.simplifyAccidentalModes(expected);
+        ComparisonHelpers.simplifyAccidentalModes(actual);
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
@@ -97,7 +123,6 @@ export class ComparisonHelpers {
             // note level
             'ratioposition',
             'percussionarticulation',
-            'accidentalmode', // we need a better way to check defaults against forced modes
 
             // for now ignore the automations as they get reorganized from beat to masterbar level
             // which messes with the 1:1 validation

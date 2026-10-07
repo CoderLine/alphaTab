@@ -1046,6 +1046,33 @@ export class ModelUtils {
         };
     }
 
+    /**
+     * Returns the simplest accidental mode which results in the same rendering as the given one.
+     * The forced modes are only spelling hints: when the hint resolves to the spelling which
+     * {@link NoteAccidentalMode.Default} would choose anyhow, the hint is not needed.
+     * The rendering only uses the accidental mode via {@link resolveSpelling} and checks for
+     * {@link NoteAccidentalMode.ForceNone}. If this changes, this method has to be adapted.
+     * @param keySignature The key signature of the bar holding the note.
+     * @param noteValue The display value of the note.
+     * @param accidentalMode The accidental mode of the note.
+     */
+    public static simplifyAccidentalMode(
+        keySignature: KeySignature,
+        noteValue: number,
+        accidentalMode: NoteAccidentalMode
+    ): NoteAccidentalMode {
+        if (accidentalMode === NoteAccidentalMode.Default || accidentalMode === NoteAccidentalMode.ForceNone) {
+            return accidentalMode;
+        }
+
+        const forced = ModelUtils.resolveSpelling(keySignature, noteValue, accidentalMode);
+        const preferred = ModelUtils.resolveSpelling(keySignature, noteValue, NoteAccidentalMode.Default);
+        if (forced.degree === preferred.degree && forced.accidentalOffset === preferred.accidentalOffset) {
+            return NoteAccidentalMode.Default;
+        }
+        return accidentalMode;
+    }
+
     public static computeAccidental(
         keySignature: KeySignature,
         accidentalMode: NoteAccidentalMode,

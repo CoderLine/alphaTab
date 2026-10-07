@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+    <part-list>
+        <score-part id="P1">
+            <part-name>Music</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <!-- F major: the second F# has no printed sign, it must not become Gb -->
+        <measure number="1">
+            <attributes>
+                <divisions>1</divisions>
+                <key>
+                    <fifths>-1</fifths>
+                </key>
+                <time>
+                    <beats>4</beats>
+                    <beat-type>4</beat-type>
+                </time>
+                <clef>
+                    <sign>G</sign>
+                    <line>2</line>
+                </clef>
+            </attributes>
+            <note>
+                <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+                <accidental>sharp</accidental>
+            </note>
+            <note>
+                <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch><step>G</step><octave>4</octave></pitch>
+                <duration>2</duration>
+                <voice>1</voice>
+                <type>half</type>
+            </note>
+        </measure>
+        <!-- F# tied over the bar line, the sign is not repeated on the tied note -->
+        <measure number="2">
+            <note>
+                <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+                <duration>4</duration>
+                <tie type="start"/>
+                <voice>1</voice>
+                <type>whole</type>
+                <accidental>sharp</accidental>
+                <notations><tied type="start"/></notations>
+            </note>
+        </measure>
+        <measure number="3">
+            <note>
+                <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+                <duration>4</duration>
+                <tie type="stop"/>
+                <voice>1</voice>
+                <type>whole</type>
+                <notations><tied type="stop"/></notations>
+            </note>
+        </measure>
+        <!-- Gb major: B natural must not become Cb -->
+        <measure number="4">
+            <attributes>
+                <key>
+                    <fifths>-6</fifths>
+                </key>
+            </attributes>
+            <note>
+                <pitch><step>B</step><octave>4</octave></pitch>
+                <duration>2</duration>
+                <voice>1</voice>
+                <type>half</type>
+                <accidental>natural</accidental>
+            </note>
+            <note>
+                <pitch><step>B</step><octave>4</octave></pitch>
+                <duration>2</duration>
+                <voice>1</voice>
+                <type>half</type>
+            </note>
+        </measure>
+        <!-- C major: a sign contradicting the pitch, the pitch defines the spelling -->
+        <measure number="5">
+            <attributes>
+                <key>
+                    <fifths>0</fifths>
+                </key>
+            </attributes>
+            <note>
+                <pitch><step>F</step><alter>1</alter><octave>4</octave></pitch>
+                <duration>4</duration>
+                <voice>1</voice>
+                <type>whole</type>
+                <accidental>flat</accidental>
+            </note>
+        </measure>
+        <!-- spellings across the octave boundary -->
+        <measure number="6">
+            <note>
+                <pitch><step>B</step><alter>1</alter><octave>4</octave></pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+                <accidental>sharp</accidental>
+            </note>
+            <note>
+                <pitch><step>C</step><octave>5</octave></pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch><step>C</step><alter>-1</alter><octave>5</octave></pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+                <accidental>flat</accidental>
+            </note>
+            <note>
+                <rest/>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+        </measure>
+    </part>
+</score-partwise>

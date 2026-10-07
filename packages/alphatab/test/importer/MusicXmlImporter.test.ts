@@ -4,6 +4,7 @@ import { Direction } from '@coderline/alphatab/model/Direction';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
@@ -328,6 +329,46 @@ describe('MusicXmlImporterTests', () => {
         // <midi-instrument><midi-unpitched> -> IS a genuine percussion sound.
         expect(notes[1].isPercussion).toBe(true);
         expect(notes[1].percussionArticulation).toBeGreaterThanOrEqual(0);
+    });
+
+    it('accidental-spelling', async () => {
+        const score = await MusicXmlImporterTestHelper.testReferenceFile('test-data/musicxml4/accidental-spelling.xml');
+
+        // written spelling of all notes as [bar, degree, accidental offset, octave]
+        const expected = [
+            [0, 3, 1, 4], // F#4
+            [0, 3, 1, 4], // F#4 without printed sign
+            [0, 4, 0, 4], // G4
+            [1, 3, 1, 4], // F#4 tied
+            [2, 3, 1, 4], // F#4 tie destination without printed sign
+            [3, 6, 0, 4], // B4 in Gb major
+            [3, 6, 0, 4], // B4 in Gb major without printed sign
+            [4, 3, 1, 4], // F#4 with a contradicting flat sign
+            [5, 6, 1, 4], // B#4
+            [5, 0, 0, 5], // C5
+            [5, 0, -1, 5] // Cb5
+        ];
+
+        let i = 0;
+        for (const bar of score.tracks[0].staves[0].bars) {
+            for (const beat of bar.voices[0].beats) {
+                for (const note of beat.notes) {
+                    const spelling = ModelUtils.resolveSpelling(
+                        bar.keySignature,
+                        note.displayValue,
+                        note.accidentalMode
+                    );
+                    const context = `note ${i}`;
+                    expect(bar.index, context).toBe(expected[i][0]);
+                    expect(spelling.degree, context).toBe(expected[i][1]);
+                    expect(spelling.accidentalOffset, context).toBe(expected[i][2]);
+                    expect(spelling.octave, context).toBe(expected[i][3]);
+                    i++;
+                }
+            }
+        }
+        expect(i).toBe(expected.length);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].isTieDestination).toBe(true);
     });
 
     it('transposed-tie', async () => {

@@ -4085,25 +4085,28 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
+    /**
+     * The spelling of the note is defined by its `<pitch>`, the `<accidental>` only describes the printed sign
+     * which is computed during rendering. We only report signs which contradict the pitch.
+     * https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/accidental/
+     */
     private _parseAccidental(element: XmlNode, note: Note) {
-        // NOTE: this can currently lead to wrong notes shown,
-        // TODO: check partwise-complex-measures.xml where accidentals and notes get wrong
-        // in combination with key signatures
+        let accidentalMode = NoteAccidentalMode.Default;
         switch (element.innerText) {
             case 'sharp':
-                note.accidentalMode = NoteAccidentalMode.ForceSharp;
+                accidentalMode = NoteAccidentalMode.ForceSharp;
                 break;
             case 'natural':
-                note.accidentalMode = NoteAccidentalMode.ForceNatural;
+                accidentalMode = NoteAccidentalMode.ForceNatural;
                 break;
             case 'flat':
-                note.accidentalMode = NoteAccidentalMode.ForceFlat;
+                accidentalMode = NoteAccidentalMode.ForceFlat;
                 break;
             case 'double-sharp':
-                note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
+                accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
                 break;
             case 'flat-flat':
-                note.accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
+                accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
                 break;
             // case 'sharp-sharp': Not supported
             // case 'natural-sharp': Not supported
@@ -4146,6 +4149,17 @@ export class MusicXmlImporter extends ScoreImporter {
             // default:
             //     Logger.warning('MusicXML', `Unsupported accidental ${element.innerText}`);
             //     break;
+        }
+
+        if (
+            accidentalMode !== NoteAccidentalMode.Default &&
+            note.accidentalMode !== NoteAccidentalMode.Default &&
+            accidentalMode !== note.accidentalMode
+        ) {
+            Logger.warning(
+                'MusicXML',
+                `Accidental '${element.innerText}' does not match the pitch of the note, the pitch is used`
+            );
         }
     }
 
@@ -4214,8 +4228,32 @@ export class MusicXmlImporter extends ScoreImporter {
 
         note.octave = (value / 12) | 0;
         note.tone = value - note.octave * 12;
+        note.accidentalMode = MusicXmlImporter._accidentalModeForAlter(semitones);
 
         return note;
+    }
+
+    /**
+     * The `<step>` and `<alter>` define the spelling of the note (e.g. F# vs Gb), also if no `<accidental>` is printed.
+     * https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/pitch/
+     */
+    private static _accidentalModeForAlter(alter: number): NoteAccidentalMode {
+        if (alter === 0) {
+            return NoteAccidentalMode.ForceNatural;
+        }
+        if (alter === 1) {
+            return NoteAccidentalMode.ForceSharp;
+        }
+        if (alter === 2) {
+            return NoteAccidentalMode.ForceDoubleSharp;
+        }
+        if (alter === -1) {
+            return NoteAccidentalMode.ForceFlat;
+        }
+        if (alter === -2) {
+            return NoteAccidentalMode.ForceDoubleFlat;
+        }
+        return NoteAccidentalMode.Default;
     }
 
     private _applyNoteHead(
