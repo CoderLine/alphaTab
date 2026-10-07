@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BendType } from '@coderline/alphatab/model/BendType';
+import { Direction } from '@coderline/alphatab/model/Direction';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
@@ -628,6 +629,139 @@ describe('MusicXmlImporterTests', () => {
             expect(tempoChanges.length).toBe(1);
             expect(tempoChanges[0].tick).toBe(0);
             expect(tempoChanges[0].tempo).toBe(60);
+        });
+    });
+
+    describe('sound-directions', () => {
+        function loadMeasures(measures: string[]): Score {
+            let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>
+  <part id="P1">`;
+            for (let i = 0; i < measures.length; i++) {
+                xml += `<measure number="${i + 1}">`;
+                if (i === 0) {
+                    xml +=
+                        '<attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>';
+                }
+                xml += measures[i];
+                xml +=
+                    '<note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><voice>1</voice><type>whole</type></note>';
+                xml += '</measure>';
+            }
+            xml += '</part></score-partwise>';
+            return MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+        }
+
+        function direction(content: string): string {
+            return `<direction placement="above">${content}</direction>`;
+        }
+
+        function expectDirections(score: Score, barIndex: number, expected: Direction[]) {
+            const actual = score.masterBars[barIndex].directions;
+            expect(actual === null ? 0 : actual.size).toBe(expected.length);
+            for (const d of expected) {
+                expect(actual!.has(d)).toBe(true);
+            }
+        }
+
+        function beatText(score: Score, barIndex: number): string | null {
+            return score.tracks[0].staves[0].bars[barIndex].voices[0].beats[0].text;
+        }
+
+        it('direction-level', () => {
+            const score = loadMeasures([
+                '',
+                direction('<direction-type><words>To Coda</words></direction-type><sound tocoda="coda1"/>'),
+                direction('<direction-type><words>D.C. al Coda</words></direction-type><sound dacapo="yes"/>'),
+                direction('<direction-type><coda/></direction-type><sound coda="coda1"/>')
+            ]);
+            expectDirections(score, 0, []);
+            expectDirections(score, 1, [Direction.JumpDaCoda]);
+            expectDirections(score, 2, [Direction.JumpDaCapo]);
+            expectDirections(score, 3, [Direction.TargetCoda]);
+            expect(beatText(score, 1)).toBeNull();
+            expect(beatText(score, 2)).toBeNull();
+        });
+
+        it('measure-level', () => {
+            const score = loadMeasures([
+                '',
+                `${direction('<direction-type><words>To Coda</words></direction-type>')}<sound tocoda="coda1"/>`,
+                `${direction('<direction-type><words>D.C. al Coda</words></direction-type>')}<sound dacapo="yes"/>`,
+                `${direction('<direction-type><coda/></direction-type>')}<sound coda="coda1"/>`
+            ]);
+            expectDirections(score, 0, []);
+            expectDirections(score, 1, [Direction.JumpDaCoda]);
+            expectDirections(score, 2, [Direction.JumpDaCapo]);
+            expectDirections(score, 3, [Direction.TargetCoda]);
+        });
+
+        it('segno-fine-dalsegno', () => {
+            const score = loadMeasures([
+                direction('<direction-type><segno/></direction-type><sound segno="segno1"/>'),
+                direction('<direction-type><words>Fine</words></direction-type><sound fine="yes"/>'),
+                direction('<direction-type><words>D.S. al Fine</words></direction-type><sound dalsegno="segno1"/>')
+            ]);
+            expectDirections(score, 0, [Direction.TargetSegno]);
+            expectDirections(score, 1, [Direction.TargetFine]);
+            expectDirections(score, 2, [Direction.JumpDalSegno]);
+            expect(beatText(score, 1)).toBeNull();
+            expect(beatText(score, 2)).toBeNull();
+        });
+
+        it('coda-symbol-with-tocoda', () => {
+            const score = loadMeasures([
+                direction(
+                    '<direction-type><words>To Coda</words></direction-type><direction-type><coda/></direction-type><sound tocoda="coda1"/>'
+                )
+            ]);
+            expectDirections(score, 0, [Direction.JumpDaCoda]);
+            expect(beatText(score, 0)).toBeNull();
+        });
+
+        it('unknown-words-kept', () => {
+            const score = loadMeasures([
+                direction('<direction-type><words>Andante</words></direction-type><sound dacapo="yes"/>'),
+                direction('<direction-type><words>Fine</words></direction-type><sound dacapo="yes"/>')
+            ]);
+            expectDirections(score, 0, [Direction.JumpDaCapo]);
+            expectDirections(score, 1, [Direction.JumpDaCapo]);
+            expect(beatText(score, 0)).toBe('Andante');
+            expect(beatText(score, 1)).toBe('Fine');
+        });
+
+        it('label-variants', () => {
+            const score = loadMeasures([
+                direction('<direction-type><words>D. C.  al Fine</words></direction-type><sound dacapo="yes"/>'),
+                direction(
+                    '<direction-type><words>D.S. al </words><words>Coda</words></direction-type><sound dalsegno="segno1"/>'
+                ),
+                direction('<direction-type><words>To\u00a0Coda</words></direction-type><sound tocoda="coda1"/>')
+            ]);
+            expectDirections(score, 0, [Direction.JumpDaCapo]);
+            expectDirections(score, 1, [Direction.JumpDalSegno]);
+            expectDirections(score, 2, [Direction.JumpDaCoda]);
+            expect(beatText(score, 0)).toBeNull();
+            expect(beatText(score, 1)).toBeNull();
+            expect(beatText(score, 2)).toBeNull();
+        });
+
+        it('dacapo-no', () => {
+            const score = loadMeasures([
+                direction('<direction-type><words>Andante</words></direction-type><sound dacapo="no"/>')
+            ]);
+            expectDirections(score, 0, []);
+            expect(beatText(score, 0)).toBe('Andante');
+        });
+
+        it('display-only-symbols', () => {
+            const score = loadMeasures([
+                direction('<direction-type><segno/></direction-type>'),
+                direction('<direction-type><coda/></direction-type>')
+            ]);
+            expectDirections(score, 0, [Direction.TargetSegno]);
+            expectDirections(score, 1, [Direction.TargetCoda]);
         });
     });
 });
