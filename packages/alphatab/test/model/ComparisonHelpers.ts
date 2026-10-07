@@ -92,6 +92,8 @@ export class ComparisonHelpers {
         expected: Score,
         ignoreKeys: string[] | null = null
     ) {
+        ComparisonHelpers.simplifyAccidentalModes(expected);
+        ComparisonHelpers.simplifyAccidentalModes(actual);
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
@@ -121,7 +123,6 @@ export class ComparisonHelpers {
             // note level
             'ratioposition',
             'percussionarticulation',
-            'accidentalmode', // we need a better way to check defaults against forced modes
 
             // for now ignore the automations as they get reorganized from beat to masterbar level
             // which messes with the 1:1 validation
