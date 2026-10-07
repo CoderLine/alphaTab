@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
+import type { Note } from '@coderline/alphatab/model/Note';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -430,11 +431,15 @@ describe('MusicXmlImporterTests', () => {
     it('fingering', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/fingering.xml');
         // each part has every value once as <fingering> (bars 0-5) and once as <pluck> (bars 6-11)
-        const notes = (track: number, firstBar: number) =>
-            score.tracks[track].staves[0].bars
-                .slice(firstBar, firstBar + 6)
-                .flatMap(b => b.voices[0].beats)
-                .map(b => b.notes[0]);
+        const notes = (track: number, firstBar: number): Note[] => {
+            const result: Note[] = [];
+            for (let i = firstBar; i < firstBar + 6; i++) {
+                for (const b of score.tracks[track].staves[0].bars[i].voices[0].beats) {
+                    result.push(b.notes[0]);
+                }
+            }
+            return result;
+        };
 
         const letters = [
             Fingers.Thumb, // p
@@ -475,8 +480,14 @@ describe('MusicXmlImporterTests', () => {
         ];
 
         function expectFingers(actual: Fingers[], digits: Fingers[]) {
-            expect(actual.slice(0, 6)).toEqual(digits);
-            expect(actual.slice(6)).toEqual(letters);
+            const expected: Fingers[] = [];
+            for (const f of digits) {
+                expected.push(f);
+            }
+            for (const f of letters) {
+                expected.push(f);
+            }
+            expect(actual).toEqual(expected);
         }
 
         // guitar
