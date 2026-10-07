@@ -2,6 +2,7 @@ import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { Logger } from '@coderline/alphatab/Logger';
+import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
@@ -3672,12 +3673,15 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'thumb-position': Not supported
                 case 'fingering':
                     if (note) {
-                        note.leftHandFinger = this._parseFingering(c);
+                        note.leftHandFinger = this._parseFingering(
+                            c,
+                            !GeneralMidi.isPiano(beat.voice.bar.staff.track.playbackInfo.program)
+                        );
                     }
                     break;
                 case 'pluck':
                     if (note) {
-                        note.rightHandFinger = this._parseFingering(c);
+                        note.rightHandFinger = this._parseFingering(c, false);
                     }
                     break;
                 // case 'double-tongue': Not supported
@@ -3788,25 +3792,53 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private _parseFingering(c: XmlNode): Fingers {
-        switch (c.innerText) {
+    /**
+     * Parses the text of a `<fingering>` or `<pluck>` element into a finger.
+     * @param c The element to parse.
+     * @param fretNumbering Whether digits follow the fretting hand numbering instead of the keyboard numbering.
+     * @remarks
+     * MusicXML defines the fingering as free text, "typically indicated 1,2,3,4,5", and leaves open which
+     * number means which finger (see also https://github.com/w3c-cg/musicxml/issues/438).
+     * The digits are therefore read in the convention of the instrument and hand:
+     * - Keyboards and the plucking hand (`<pluck>`): 1 = thumb … 5 = little finger.
+     * - Fretting hand on fretted and bowed instruments: 0 = open, 1 = index … 4 = little finger. 5 is mapped to the
+     *   thumb as it is the only finger not covered by 1-4.
+     *
+     * The piano check used by the caller must match the one in `FingeringGroupGlyph.fingerToMusicFontSymbol`,
+     * so that the fingering is displayed as written in the file.
+     * Letters follow the SMuFL fingering vocabulary (T, t, p: thumb; i: index; m: middle; a: ring;
+     * c, e, o, q, s, x: little finger) and are matched case-insensitive. Text which cannot be mapped to a finger is
+     * ignored.
+     */
+    private _parseFingering(c: XmlNode, fretNumbering: boolean): Fingers {
+        switch (c.innerText.toLowerCase()) {
             case '0':
                 return Fingers.NoOrDead;
             case '1':
+                return fretNumbering ? Fingers.IndexFinger : Fingers.Thumb;
+            case '2':
+                return fretNumbering ? Fingers.MiddleFinger : Fingers.IndexFinger;
+            case '3':
+                return fretNumbering ? Fingers.AnnularFinger : Fingers.MiddleFinger;
+            case '4':
+                return fretNumbering ? Fingers.LittleFinger : Fingers.AnnularFinger;
+            case '5':
+                return fretNumbering ? Fingers.Thumb : Fingers.LittleFinger;
             case 'p':
             case 't':
                 return Fingers.Thumb;
-            case '2':
             case 'i':
                 return Fingers.IndexFinger;
-            case '3':
             case 'm':
                 return Fingers.MiddleFinger;
-            case '4':
             case 'a':
                 return Fingers.AnnularFinger;
-            case '5':
             case 'c':
+            case 'e':
+            case 'o':
+            case 'q':
+            case 's':
+            case 'x':
                 return Fingers.LittleFinger;
         }
 
