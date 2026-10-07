@@ -16,6 +16,7 @@ import {
 import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
 import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 import { MidiFileSequencer } from '@coderline/alphatab/synth/MidiFileSequencer';
+import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
 import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 import type { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
 import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
@@ -396,11 +397,19 @@ describe('SyncPointTests', () => {
         player.timePosition = 30000;
         player.countInVolume = 1;
         const seekCount = testOutput.seekTimes.length;
+        const mediaTime = testOutput.seekTimes[testOutput.seekTimes.length - 1];
 
-        player.play();
+        expect(player.play()).toBe(true);
 
+        expect(player.state).toBe(PlayerState.Playing);
+        expect(testOutput.playCount).toBe(1);
         expect(testOutput.seekTimes.length).toBe(seekCount);
         expect(player.timePosition).toBe(30000);
+
+        // the next media time update continues from there, no seek back
+        testOutput.simulateSeek(mediaTime + 100);
+        expect(testOutput.seekTimes.length).toBe(seekCount);
+        expect(player.timePosition).toBeGreaterThan(30000);
     });
 
     it('count-in-keeps-position-external-media', async () => {
@@ -409,11 +418,19 @@ describe('SyncPointTests', () => {
         player.timePosition = 30000;
         player.countInVolume = 1;
         const seekCount = testOutput.seekTimes.length;
+        const mediaTime = testOutput.seekTimes[testOutput.seekTimes.length - 1];
 
-        player.play();
+        expect(player.play()).toBe(true);
 
+        expect(player.state).toBe(PlayerState.Playing);
+        expect(testOutput.playCount).toBe(1);
         expect(testOutput.seekTimes.length).toBe(seekCount);
         expect(player.timePosition).toBe(30000);
+
+        // the next media time update continues from there, no seek back
+        testOutput.simulateSeek(mediaTime + 100);
+        expect(testOutput.seekTimes.length).toBe(seekCount);
+        expect(player.timePosition).toBeGreaterThan(30000);
     });
 
     /**
@@ -499,7 +516,10 @@ class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     public open(_bufferTimeInMilliseconds: number): void {
         (this.ready as EventEmitter).trigger();
     }
-    public play(): void {}
+    public playCount: number = 0;
+    public play(): void {
+        this.playCount++;
+    }
     public destroy(): void {}
     public pause(): void {}
     public addSamples(_samples: Float32Array): void {}
@@ -549,7 +569,10 @@ class TestExternalMediaHandler implements IExternalMediaHandler {
     seekTo(time: number): void {
         this.seekTimes.push(time);
     }
-    play(): void {}
+    public playCount: number = 0;
+    play(): void {
+        this.playCount++;
+    }
     pause(): void {}
 }
 
