@@ -1279,29 +1279,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        if (element.attributes.has('coda')) {
-            masterBar.addDirection(Direction.TargetCoda);
-        }
-
-        if (element.attributes.has('tocoda')) {
-            masterBar.addDirection(Direction.JumpDaCoda);
-        }
-
-        if (element.attributes.has('dacapo')) {
-            masterBar.addDirection(Direction.JumpDaCapo);
-        }
-
-        if (element.attributes.has('dalsegno')) {
-            masterBar.addDirection(Direction.JumpDalSegno);
-        }
-
-        if (element.attributes.has('fine')) {
-            masterBar.addDirection(Direction.TargetFine);
-        }
-
-        if (element.attributes.has('segno')) {
-            masterBar.addDirection(Direction.TargetSegno);
-        }
+        this._parseSoundDirections(element, masterBar);
 
         // damper-pedal="" Ignored -> Handled via pedal direction
         // dynamics="" Ignored -> Handled via dynamics direction
@@ -1337,6 +1315,101 @@ export class MusicXmlImporter extends ScoreImporter {
             this._nextBeatAutomations.push(automation);
         }
     }
+
+    /**
+     * Applies the jump and marker attributes of a `<sound>` (measure or direction level) as directions.
+     * @returns true if any direction was applied.
+     */
+    private _parseSoundDirections(element: XmlNode, masterBar: MasterBar): boolean {
+        let hasDirections = false;
+        if (element.attributes.has('coda')) {
+            masterBar.addDirection(Direction.TargetCoda);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('tocoda')) {
+            masterBar.addDirection(Direction.JumpDaCoda);
+            hasDirections = true;
+        }
+
+        // yes-no typed, "no" means no jump
+        if (element.getAttribute('dacapo', 'no') !== 'no') {
+            masterBar.addDirection(Direction.JumpDaCapo);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('dalsegno')) {
+            masterBar.addDirection(Direction.JumpDalSegno);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('fine')) {
+            masterBar.addDirection(Direction.TargetFine);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('segno')) {
+            masterBar.addDirection(Direction.TargetSegno);
+            hasDirections = true;
+        }
+
+        return hasDirections;
+    }
+
+    /**
+     * The texts (normalized via {@link _normalizeDirectionLabel}) with which `<words>` print the directions
+     * of the `<sound>` attributes. Such words are only the visual counterpart of the direction which renders its
+     * own label, they are not added as additional beat text. Any other words next to a jump are kept as text.
+     * Covers the default labels of the MuseScore export and the spelled-out forms, but no double segno/coda
+     * or numbered forms as the directions are not mapped to their double variants.
+     */
+    private static readonly _soundDirectionLabels: Map<string, string[]> = new Map<string, string[]>([
+        ['dacapo', ['dc', 'dacapo', 'dcalfine', 'dacapoalfine', 'dcalcoda', 'dacapoalcoda']],
+        [
+            'dalsegno',
+            [
+                'ds',
+                'dalsegno',
+                'delsegno',
+                'dsalfine',
+                'dalsegnoalfine',
+                'delsegnoalfine',
+                'dsalcoda',
+                'dalsegnoalcoda',
+                'delsegnoalcoda'
+            ]
+        ],
+        ['tocoda', ['tocoda', 'dacoda']],
+        ['fine', ['fine']],
+        ['coda', ['coda']],
+        ['segno', ['segno']]
+    ]);
+
+    /**
+     * Lower-cases the text and removes dots and whitespace ("D. C. al Coda" -> "dcalcoda").
+     */
+    private static _normalizeDirectionLabel(text: string): string {
+        const lower = text.toLowerCase();
+        let normalized = '';
+        for (let i = 0; i < lower.length; i++) {
+            const c = lower.charAt(i);
+            if (c !== '.' && c !== ' ' && c !== '\t' && c !== '\r' && c !== '\n' && c !== '\u00a0') {
+                normalized += c;
+            }
+        }
+        return normalized;
+    }
+
+    private static _isSoundDirectionLabel(words: string, sound: XmlNode): boolean {
+        const normalized = MusicXmlImporter._normalizeDirectionLabel(words);
+        for (const [attribute, labels] of MusicXmlImporter._soundDirectionLabels) {
+            if (sound.attributes.has(attribute) && labels.indexOf(normalized) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private _parseSwing(element: XmlNode, masterBar: MasterBar) {
         let first = 0;
         let second = 0;
@@ -2072,6 +2145,10 @@ export class MusicXmlImporter extends ScoreImporter {
         // let voiceIndex = -1;
         let staffIndex = -1;
         let tempo = -1;
+        let sound: XmlNode | null = null;
+        let hasSoundDirections = false;
+        // all words of the direction, also split ones like "D.S. al " + "Coda"
+        let allWords = '';
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -2081,6 +2158,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     const types = c.childElements();
                     if (types.length > 0) {
                         directionTypes.push(types[types.length - 1]);
+                    }
+                    for (const t of types) {
+                        if (t.localName === 'words') {
+                            allWords += t.innerText;
+                        }
                     }
                     break;
                 }
@@ -2099,6 +2181,8 @@ export class MusicXmlImporter extends ScoreImporter {
                     if (c.attributes.has('tempo')) {
                         tempo = Number.parseFloat(c.attributes.get('tempo')!);
                     }
+                    sound = c;
+                    hasSoundDirections = this._parseSoundDirections(c, masterBar);
                     break;
                 // case 'listening': Ignored
             }
@@ -2144,11 +2228,17 @@ export class MusicXmlImporter extends ScoreImporter {
                     masterBar.section = new Section();
                     masterBar.section.marker = direction.innerText;
                     break;
+                // <sound> jump attributes are the authoritative directions, the symbols are only their visual counterpart
+                // (e.g. a coda symbol printed next to "To Coda")
                 case 'segno':
-                    masterBar.addDirection(Direction.TargetSegno);
+                    if (!hasSoundDirections) {
+                        masterBar.addDirection(Direction.TargetSegno);
+                    }
                     break;
                 case 'coda':
-                    masterBar.addDirection(Direction.TargetCoda);
+                    if (!hasSoundDirections) {
+                        masterBar.addDirection(Direction.TargetCoda);
+                    }
                     break;
                 case 'words':
                     previousWords = direction.innerText;
@@ -2227,7 +2317,8 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        if (previousWords) {
+        // words printing the label of a <sound> direction are not repeated as text, the direction renders it
+        if (previousWords && !(hasSoundDirections && MusicXmlImporter._isSoundDirectionLabel(allWords, sound!))) {
             this._nextBeatText = previousWords;
         }
     }
