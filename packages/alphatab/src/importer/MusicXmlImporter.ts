@@ -2977,6 +2977,10 @@ export class MusicXmlImporter extends ScoreImporter {
             return;
         }
 
+        // the note was attached to its beat before the string was known, register it now for the lookups by string
+        // (e.g. hammer-on destinations, let ring ending on the same string)
+        note.beat.noteStringLookup.set(note.string, note);
+
         // dead notes are commonly written without fret (e.g. Guitar Pro 5), the string still defines the tab position
         if (!note.isStringed && note.isDead && note.beat.voice.bar.staff.tuning.length > 0) {
             note.fret = Math.max(0, this._calculatePitchedNoteValue(note) - note.stringTuning);
@@ -3797,7 +3801,8 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 case 'hammer-on':
                 case 'pull-off':
-                    if (note) {
+                    // only the start is the origin, the destination (stop) is resolved by the model
+                    if (note && c.getAttribute('type', 'start') === 'start') {
                         note.isHammerPullOrigin = true;
                     }
                     break;

@@ -555,6 +555,40 @@ describe('MusicXmlImporterTests', () => {
         );
     });
 
+    it('hammer-pull', () => {
+        // 5h7p5 5 on the low E string
+        const note = (step: string, fret: number, technical: string) =>
+            `<note><pitch><step>${step}</step><octave>2</octave></pitch><duration>1</duration><voice>1</voice><type>quarter</type>` +
+            `<notations><technical>${technical}<string>6</string><fret>${fret}</fret></technical></notations></note>`;
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Guitar</part-name></score-part></part-list>
+  <part id="P1"><measure number="1">
+    <attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>TAB</sign><line>5</line></clef>
+      <staff-details><staff-lines>6</staff-lines>
+        <staff-tuning line="1"><tuning-step>E</tuning-step><tuning-octave>2</tuning-octave></staff-tuning>
+        <staff-tuning line="2"><tuning-step>A</tuning-step><tuning-octave>2</tuning-octave></staff-tuning>
+        <staff-tuning line="3"><tuning-step>D</tuning-step><tuning-octave>3</tuning-octave></staff-tuning>
+        <staff-tuning line="4"><tuning-step>G</tuning-step><tuning-octave>3</tuning-octave></staff-tuning>
+        <staff-tuning line="5"><tuning-step>B</tuning-step><tuning-octave>3</tuning-octave></staff-tuning>
+        <staff-tuning line="6"><tuning-step>E</tuning-step><tuning-octave>4</tuning-octave></staff-tuning>
+      </staff-details>
+    </attributes>
+    ${note('A', 5, '<hammer-on type="start">H</hammer-on>')}
+    ${note('B', 7, '<hammer-on type="stop"/><pull-off type="start">P</pull-off>')}
+    ${note('A', 5, '<pull-off type="stop"/>')}
+    ${note('A', 5, '')}
+  </measure></part>
+</score-partwise>`;
+        const score = MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+
+        expect(notes.map(n => n.isHammerPullOrigin)).toEqual([true, true, false, false]);
+        expect(notes[0].hammerPullDestination).toBe(notes[1]);
+        expect(notes[1].hammerPullDestination).toBe(notes[2]);
+        expect(notes[3].isHammerPullDestination).toBe(false);
+    });
+
     describe('barnumberdisplay', async () => {
         async function testPartwise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
