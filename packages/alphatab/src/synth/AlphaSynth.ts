@@ -118,9 +118,6 @@ export class AlphaSynthBase implements IAlphaSynth {
         this._countInVolume = value;
     }
 
-    /**
-     * Whether this player can play a count-in before the playback starts.
-     */
     protected get supportsCountIn(): boolean {
         return true;
     }
