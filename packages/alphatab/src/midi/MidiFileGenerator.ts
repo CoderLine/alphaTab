@@ -153,12 +153,19 @@ export class MidiFileGenerator {
         Logger.debug('Midi', 'Begin midi generation');
 
         this.syncPoints = [];
+        let masterBarDuration = 0;
         MidiFileGenerator._playThroughSong(
             this._score,
             this.syncPoints,
             false,
             (bar, previousMasterBar, currentTick, currentTempo, occurence) => {
-                this._generateMasterBar(bar, previousMasterBar, currentTick, currentTempo, occurence);
+                masterBarDuration = this._generateMasterBar(
+                    bar,
+                    previousMasterBar,
+                    currentTick,
+                    currentTempo,
+                    occurence
+                );
                 if (bar.index === 0 && occurence === 0) {
                     // tickshift is added after initial track channel details
                     this._detectTickShift();
@@ -172,6 +179,8 @@ export class MidiFileGenerator {
                         }
                     }
                 }
+                // added after the bar contents to dispatch clicks after other events on the same tick
+                this._generateMetronome(this._score.masterBars[index], currentTick, masterBarDuration);
             },
             endTick => {
                 for (const track of this._score.tracks) {
@@ -581,7 +590,7 @@ export class MidiFileGenerator {
         currentTick: number,
         currentTempo: number,
         _barOccurence: number
-    ): void {
+    ): number {
         // time signature
         if (
             !previousMasterBar ||
@@ -620,6 +629,30 @@ export class MidiFileGenerator {
         masterBarLookup.start = currentTick;
         masterBarLookup.end = masterBarLookup.start + masterBarDuration;
         this.tickLookup.addMasterBar(masterBarLookup);
+
+        return masterBarDuration;
+    }
+
+    private _generateMetronome(masterBar: MasterBar, currentTick: number, masterBarDuration: number) {
+        // one click per beat of the time signature. pick-up bars form the end of a full bar,
+        // hence the clicks are placed at the beats of the nominal meter which fall into the bar.
+        const beatLength = MidiUtils.valueToTicks(masterBar.timeSignatureDenominator);
+        if (beatLength <= 0 || masterBar.timeSignatureNumerator <= 0) {
+            return;
+        }
+
+        const anacrusisOffset = masterBar.anacrusisOffset;
+        let beatIndex = Math.ceil(anacrusisOffset / beatLength);
+        let clickTick = beatIndex * beatLength - anacrusisOffset;
+        while (clickTick < masterBarDuration) {
+            this._handler.addMetronome(
+                currentTick + clickTick,
+                beatIndex % masterBar.timeSignatureNumerator,
+                beatLength
+            );
+            beatIndex++;
+            clickTick += beatLength;
+        }
     }
 
     private _generateBar(bar: Bar, barStartTick: number, tempoOnBarStart: number, barStartTime: number): void {

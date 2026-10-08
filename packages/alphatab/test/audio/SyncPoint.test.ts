@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT, EventEmitter } from '@coderline/alphatab/EventEmitter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import type { AlphaTabMetronomeEvent } from '@coderline/alphatab/midi/MidiEvent';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
@@ -358,6 +359,45 @@ describe('SyncPointTests', () => {
     });
 });
 
+describe('MidiFileSequencerCountInTests', () => {
+    function testCountIn(tex: string, startTime: number, expectedClicks: string, expectedEndTime: number) {
+        const score = ScoreLoader.loadAlphaTex(tex);
+        const midi = new MidiFile();
+        new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midi)).generate();
+
+        const synthesizer = new RecordingAudioSynthesizer();
+        const sequencer = new MidiFileSequencer(synthesizer);
+        sequencer.loadMidi(midi);
+        sequencer.mainSeek(startTime);
+
+        synthesizer.events = [];
+        sequencer.startCountIn();
+        while (!sequencer.isFinished) {
+            sequencer.fillMidiEventQueue();
+        }
+
+        const actualClicks = synthesizer.events
+            .filter(e => e.isMetronome)
+            .map(e => `${Math.round(e.time)}:${(e.event as AlphaTabMetronomeEvent).metronomeNumerator}`);
+        expect(actualClicks.join(' ')).toBe(expectedClicks);
+        expect(Math.round(sequencer.currentEndTime)).toBe(expectedEndTime);
+    }
+
+    it('bar-start', () => {
+        testCountIn('\\tempo 120 . \\ts 4 4 C4.4*4 | C4.1', 0, '0:0 500:1 1000:2 1500:3', 2000);
+    });
+
+    it('anacrusis', () => {
+        // one full bar, then the counting continues until the pick-up enters on the offbeat of beat 1
+        testCountIn('\\tempo 120 . \\ts 2 4 \\ac C4.8*3 | C4.2', 0, '0:0 500:1 1000:0', 1250);
+    });
+
+    it('mid-bar', () => {
+        // start on beat 3: one full bar, then beats 1 and 2
+        testCountIn('\\tempo 120 . \\ts 4 4 C4.4*4 | C4.1', 1000, '0:0 500:1 1000:2 1500:3 2000:0 2500:1', 3000);
+    });
+});
+
 /**
  * @internal
  */
@@ -481,5 +521,15 @@ class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
     }
     public hasSamplesForPercussion(_key: number): boolean {
         return true;
+    }
+}
+
+/**
+ * @internal
+ */
+class RecordingAudioSynthesizer extends EmptyAudioSynthesizer {
+    public events: SynthEvent[] = [];
+    public override dispatchEvent(synthEvent: SynthEvent): void {
+        this.events.push(synthEvent);
     }
 }

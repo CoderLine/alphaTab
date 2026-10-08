@@ -1933,6 +1933,44 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualTimers.join(',')).toBe(expectedTimers.join(','));
     });
 
+    describe('metronome', () => {
+        function testMetronome(tex: string, expectedClicks: string) {
+            const score: Score = parseTex(tex);
+            const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+            const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+            generator.generate();
+            const actualClicks = handler.metronomeEvents.map(e => `${e.tick}:${e.counter}`).join(' ');
+            expect(actualClicks).toBe(expectedClicks);
+        }
+
+        it('regular', () => {
+            testMetronome('\\ts 3 4 3.3.4*3 | 3.3.4*3', '0:0 960:1 1920:2 2880:0 3840:1 4800:2');
+        });
+
+        it('time-signature-change', () => {
+            testMetronome(
+                '\\ts 7 8 3.3.8*7 | \\ts 4 4 3.3.1',
+                '0:0 480:1 960:2 1440:3 1920:4 2400:5 2880:6 3360:0 4320:1 5280:2 6240:3'
+            );
+        });
+
+        it('anacrusis', () => {
+            // 3/8 pick-up in 2/4: the pick-up starts on the offbeat of beat 1
+            testMetronome('\\ts 2 4 \\ac 3.3.8*3 | 3.3.2 | 3.3.2', '480:1 1440:0 2400:1 3360:0 4320:1');
+        });
+
+        it('anacrusis-full-beats', () => {
+            testMetronome('\\ts 4 4 \\ac 3.3.4 | 3.3.1', '0:3 960:0 1920:1 2880:2 3840:3');
+        });
+
+        it('anacrusis-repeat', () => {
+            testMetronome(
+                '\\ts 2 4 \\ac 3.3.8*3 | \\ro 3.3.2 | \\rc 2 3.3.2',
+                '480:1 1440:0 2400:1 3360:0 4320:1 5280:0 6240:1 7200:0 8160:1'
+            );
+        });
+    });
+
     it('anacrusis-tempo-automation', () => {
         // automation positions are relative to the full time signature (like in Guitar Pro)
         const score: Score = parseTex('\\ts 2 4 \\ac 3.3.8 3.3.8 3.3.8 { tempo 60 } | 3.3.2');
