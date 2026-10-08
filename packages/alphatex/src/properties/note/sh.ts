@@ -15,7 +15,7 @@ export const sh: PropertyDefinition = {
                     shortDescription: 'The harmonic value',
                     longDescription: harmonicValueDocs,
                     type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
-                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Optional
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.OptionalAsFloat
                 }
             ]
         }

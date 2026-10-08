@@ -843,11 +843,11 @@ export class AlphaTex1LanguageDefinitions {
     ]);
     public static readonly noteProperties = AlphaTex1LanguageDefinitions._props([
         ['nh', null],
-        ['ah', [[[[106], 1]]]],
-        ['th', [[[[106], 1]]]],
-        ['ph', [[[[106], 1]]]],
-        ['sh', [[[[106], 1]]]],
-        ['fh', [[[[106], 1]]]],
+        ['ah', [[[[106], 3]]]],
+        ['th', [[[[106], 3]]]],
+        ['ph', [[[[106], 3]]]],
+        ['sh', [[[[106], 3]]]],
+        ['fh', [[[[106], 3]]]],
         ['v', null],
         ['vw', null],
         ['sl', null],
