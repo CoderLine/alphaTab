@@ -1844,6 +1844,48 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualTimers.join(',')).toBe(expectedTimers.join(','));
     });
 
+    it('beat-timer-multiple-tracks', () => {
+        const score: Score = parseTex(`
+            \\tempo 120
+            .
+            \\track "T1"
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3
+            \\track "T2"
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3
+        `);
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        for (const track of score.tracks) {
+            const actualTimers = track.staves[0].bars.map(b => b.voices[0].beats[0].timer ?? -1);
+            expect(actualTimers.join(','), track.name).toBe('0,2000,4000');
+        }
+    });
+
+    it('beat-timer-tempo-change-mid-bar', () => {
+        const score: Score = parseTex(`
+            \\tempo 120
+            .
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4 3.3.4 { tempo 60 } 3.3.4 |
+                3.3.4 { timer } 3.3.4*3
+        `);
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const actualTimers = score.tracks[0].staves[0].bars.map(b => b.voices[0].beats[0].timer ?? -1);
+        // 2 beats at 120bpm (1000ms) + 2 beats at 60bpm (2000ms)
+        expect(actualTimers.join(',')).toBe('0,2000,5000');
+    });
+
     it('beat-timer-tempo-changes', () => {
         const score: Score = parseTex(`
             \\tempo 120

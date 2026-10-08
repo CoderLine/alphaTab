@@ -164,11 +164,11 @@ export class MidiFileGenerator {
                     this._detectTickShift();
                 }
             },
-            (index, currentTick, currentTempo) => {
+            (index, currentTick, currentTempo, currentTime) => {
                 for (const track of this._score.tracks) {
                     for (const staff of track.staves) {
                         if (index < staff.bars.length) {
-                            this._generateBar(staff.bars[index], currentTick, currentTempo);
+                            this._generateBar(staff.bars[index], currentTick, currentTempo, currentTime);
                         }
                     }
                 }
@@ -285,7 +285,7 @@ export class MidiFileGenerator {
             (_masterBar, _previousMasterBar, _currentTick, _currentTempo, _barOccurence) => {
                 // no generation
             },
-            (_barIndex, _currentTick, _currentTempo) => {
+            (_barIndex, _currentTick, _currentTempo, _currentTime) => {
                 // no generation
             },
             _endTick => {
@@ -309,7 +309,7 @@ export class MidiFileGenerator {
             (_masterBar, _previousMasterBar, _currentTick, _currentTempo, _barOccurence) => {
                 // no generation
             },
-            (_barIndex, _currentTick, _currentTempo) => {
+            (_barIndex, _currentTick, _currentTempo, _currentTime) => {
                 // no generation
             },
             _endTick => {
@@ -331,7 +331,7 @@ export class MidiFileGenerator {
             currentTempo: number,
             barOccurence: number
         ) => void,
-        generateTracks: (barIndex: number, currentTick: number, currentTempo: number) => void,
+        generateTracks: (barIndex: number, currentTick: number, currentTempo: number, currentTime: number) => void,
         finish: (endTick: number) => void
     ) {
         const controller: MidiPlaybackController = new MidiPlaybackController(score);
@@ -359,7 +359,8 @@ export class MidiFileGenerator {
 
                 const trackTempo =
                     bar.tempoAutomations.length > 0 ? bar.tempoAutomations[0].value : playContext.currentTempo;
-                generateTracks(index, currentTick, trackTempo);
+                // the time position is tracked consistently on the play-through (respecting tempo changes)
+                generateTracks(index, currentTick, trackTempo, playContext.synthTime);
 
                 playContext.synthTick = currentTick;
                 MidiFileGenerator._processBarTime(bar, occurence, playContext);
@@ -621,56 +622,18 @@ export class MidiFileGenerator {
         this.tickLookup.addMasterBar(masterBarLookup);
     }
 
-    private _generateBar(bar: Bar, barStartTick: number, tempoOnBarStart: number): void {
+    private _generateBar(bar: Bar, barStartTick: number, tempoOnBarStart: number, barStartTime: number): void {
         const playbackBar: Bar = this._getPlaybackBar(bar);
 
-        const barStartTime = this._currentTime;
+        // all staves and voices start at the same time position of the bar
         for (const v of playbackBar.voices) {
             this._currentTime = barStartTime;
             this._generateVoice(v, barStartTick, bar, tempoOnBarStart);
         }
 
-        // calculate the real bar end time (bars might be not full or overfilled)
-        const masterBar = playbackBar.masterBar;
-        const tickDuration = masterBar.calculateDuration();
-        const tempoAutomations = masterBar.tempoAutomations.slice();
-        if (tempoAutomations.length === 0) {
-            // fast path: no tempo automations -> simply apply whole duration
-            this._currentTime = barStartTime + MidiUtils.ticksToMillis(tickDuration, tempoOnBarStart);
-        } else {
-            // slow path: loop through slices and advance time
-            this._currentTime = barStartTime;
-
-            let currentTick = barStartTick;
-            let currentTempo = tempoOnBarStart;
-
-            const endTick = barStartTick + tickDuration;
-
-            for (const automation of tempoAutomations) {
-                // calculate the tick difference to the next tempo automation
-                const automationTick = tickDuration * automation.ratioPosition;
-                const diff = automationTick - currentTick;
-
-                // apply the time
-                if (diff > 0) {
-                    this._currentTime += MidiUtils.ticksToMillis(diff, currentTempo);
-                }
-
-                // apply automation advance time
-                currentTempo = automation.value;
-                currentTick += diff;
-            }
-
-            // apply time until end
-            const remainingTick = endTick - currentTick;
-            if (remainingTick > 0) {
-                this._currentTime += MidiUtils.ticksToMillis(remainingTick, currentTempo);
-            }
-        }
-
         // in case of simile marks where we repeat we register the empty beat for the whole bar
         if (playbackBar.id !== bar.id) {
-            this.tickLookup.addBeat(bar.voices[0].beats[0], 0, tickDuration);
+            this.tickLookup.addBeat(bar.voices[0].beats[0], 0, playbackBar.masterBar.calculateDuration());
             //this.tickLookup.addBeat(beat, 0, audioDuration);
         }
     }
