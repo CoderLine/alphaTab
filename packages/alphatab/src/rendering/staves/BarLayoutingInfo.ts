@@ -538,8 +538,7 @@ export class BarLayoutingInfo {
                 requiredSpace = currentSpring.postSpringWidth + this.barlineContentPadding;
             } else {
                 const nextSpring = sortedSprings[i + 1];
-                requiredSpace =
-                    currentSpring.postSpringWidth + this.beatContentPadding + nextSpring.preSpringWidth;
+                requiredSpace = currentSpring.postSpringWidth + this.beatContentPadding + nextSpring.preSpringWidth;
             }
 
             // the first spring's pre-spring width is not part of the requirement:
