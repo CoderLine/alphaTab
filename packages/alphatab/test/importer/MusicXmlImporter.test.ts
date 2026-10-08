@@ -2,14 +2,20 @@ import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import { SustainPedalMarkerType } from '@coderline/alphatab/model/Bar';
+import type { Beat } from '@coderline/alphatab/model/Beat';
 import { BendType } from '@coderline/alphatab/model/BendType';
+import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Settings } from '@coderline/alphatab/Settings';
 import { FlatMidiEventGenerator, FlatNoteEvent, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
 import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
@@ -840,11 +846,11 @@ describe('MusicXmlImporterTests', () => {
         });
     });
 
-    describe('direction-spans', () => {
+    describe('spans', () => {
         const tuning = ['E2', 'A2', 'D3', 'G3', 'B3', 'E4'];
 
-        // parts of 4/4 measures, a single tablature staff or two notation staves
-        function load(parts: string[][], staves: number = 1, divisions: number = 1): Score {
+        // parts of 4/4 measures on a single tablature staff, or on the given number of notation staves
+        function load(parts: string[][], staves: number = 1, divisions: number = 1, software: string = ''): Score {
             let attributes = `<attributes><divisions>${divisions}</divisions><time><beats>4</beats><beat-type>4</beat-type></time>`;
             if (staves === 1) {
                 attributes += '<clef><sign>TAB</sign><line>5</line></clef><staff-details><staff-lines>6</staff-lines>';
@@ -857,7 +863,11 @@ describe('MusicXmlImporterTests', () => {
             }
             attributes += '</attributes>';
 
-            let xml = '<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list>';
+            let xml = '<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0">';
+            if (software.length > 0) {
+                xml += `<identification><encoding><software>${software}</software></encoding></identification>`;
+            }
+            xml += '<part-list>';
             for (let i = 0; i < parts.length; i++) {
                 xml += `<score-part id="P${i + 1}"><part-name>P${i + 1}</part-name></score-part>`;
             }
@@ -873,39 +883,70 @@ describe('MusicXmlImporterTests', () => {
             return MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
         }
 
-        // a quarter note, on the tablature if a string is given
-        function note(
-            pitch: string,
-            string: number = 0,
-            fret: number = 0,
-            chord: boolean = false,
-            voice: number = 1,
-            staff: number = 0
-        ): string {
-            const technical =
-                string > 0
-                    ? `<notations><technical><string>${string}</string><fret>${fret}</fret></technical></notations>`
-                    : '';
+        // a quarter note on the tablature
+        function tab(pitch: string, stringNumber: number, fret: number = 0, notations: string = ''): string {
             return (
-                `<note>${chord ? '<chord/>' : ''}<pitch><step>${pitch[0]}</step><octave>${pitch[1]}</octave></pitch>` +
-                `<duration>1</duration><voice>${voice}</voice><type>quarter</type>${staff > 0 ? `<staff>${staff}</staff>` : ''}${technical}</note>`
+                `<note><pitch><step>${pitch[0]}</step><octave>${pitch[1]}</octave></pitch>` +
+                '<duration>1</duration><voice>1</voice><type>quarter</type>' +
+                `<notations><technical><string>${stringNumber}</string><fret>${fret}</fret></technical>${notations}</notations></note>`
             );
         }
 
-        function open(count: number): string {
+        // a quarter (or longer) note on a notation staff
+        function note(
+            pitch: string,
+            voice: number = 1,
+            staff: number = 0,
+            notations: string = '',
+            duration: number = 1,
+            type: string = 'quarter'
+        ): string {
+            return (
+                `<note><pitch><step>${pitch[0]}</step><octave>${pitch[1]}</octave></pitch>` +
+                `<duration>${duration}</duration><voice>${voice}</voice><type>${type}</type>` +
+                `${staff > 0 ? `<staff>${staff}</staff>` : ''}${notations.length > 0 ? `<notations>${notations}</notations>` : ''}</note>`
+            );
+        }
+
+        function chordNote(pitch: string, stringNumber: number, fret: number, notations: string = ''): string {
+            return tab(pitch, stringNumber, fret, notations).replace('<note>', '<note><chord/>');
+        }
+
+        function openStrings(count: number): string {
             let notes = '';
             for (let i = 0; i < count; i++) {
-                notes += note('E2', 6);
+                notes += tab('E2', 6);
             }
             return notes;
         }
 
-        function dashes(words: string, type: string, number: string = '1', extra: string = ''): string {
-            const label = words.length > 0 ? `<direction-type><words>${words}</words></direction-type>` : '';
-            return `<direction>${label}<direction-type><dashes type="${type}" number="${number}"/></direction-type>${extra}</direction>`;
+        function quarters(count: number, pitch: string = 'C4', voice: number = 1, staff: number = 0): string {
+            let notes = '';
+            for (let i = 0; i < count; i++) {
+                notes += note(pitch, voice, staff);
+            }
+            return notes;
         }
 
-        function notesOf(score: Score, track: number, staff: number, bar: number, voice: number): Note[] {
+        function direction(directionTypes: string, extra: string = ''): string {
+            return `<direction>${directionTypes}${extra}</direction>`;
+        }
+
+        function dashes(words: string, type: string, number: string = '1', extra: string = ''): string {
+            const label = words.length > 0 ? `<direction-type><words>${words}</words></direction-type>` : '';
+            return direction(
+                `${label}<direction-type><dashes type="${type}" number="${number}"/></direction-type>`,
+                extra
+            );
+        }
+
+        function notesOf(
+            score: Score,
+            bar: number = 0,
+            staff: number = 0,
+            voice: number = 0,
+            track: number = 0
+        ): Note[] {
             const notes: Note[] = [];
             for (const b of score.tracks[track].staves[staff].bars[bar].voices[voice].beats) {
                 for (const n of b.notes) {
@@ -915,19 +956,14 @@ describe('MusicXmlImporterTests', () => {
             return notes;
         }
 
-        function expectLetRing(
+        function beatsOf(
             score: Score,
-            expected: boolean[],
-            track: number = 0,
-            staff: number = 0,
             bar: number = 0,
-            voice: number = 0
-        ) {
-            expect(notesOf(score, track, staff, bar, voice).map(n => n.isLetRing)).toEqual(expected);
-        }
-
-        function expectPalmMute(score: Score, expected: boolean[], bar: number = 0) {
-            expect(notesOf(score, 0, 0, bar, 0).map(n => n.isPalmMute)).toEqual(expected);
+            staff: number = 0,
+            voice: number = 0,
+            track: number = 0
+        ): Beat[] {
+            return score.tracks[track].staves[staff].bars[bar].voices[voice].beats;
         }
 
         function noteLengths(score: Score): number[] {
@@ -942,188 +978,708 @@ describe('MusicXmlImporterTests', () => {
             return lengths;
         }
 
-        it('let-ring', () => {
-            const score = load([
-                [
-                    dashes('LetRing', 'start') +
-                        note('E2', 6) +
-                        note('A2', 5) +
-                        note('D3', 4) +
-                        note('G3', 3) +
-                        dashes('LetRing', 'stop')
-                ]
-            ]);
-            expectLetRing(score, [true, true, true, true]);
-            expect(noteLengths(score)).toEqual([3840, 2880, 1920, 960]);
+        describe('lines', () => {
+            it('let-ring', () => {
+                const score = load([
+                    [
+                        dashes('LetRing', 'start') +
+                            tab('E2', 6) +
+                            tab('A2', 5) +
+                            tab('D3', 4) +
+                            tab('G3', 3) +
+                            dashes('LetRing', 'stop')
+                    ]
+                ]);
+                expect(notesOf(score).map(n => n.isLetRing)).toEqual([true, true, true, true]);
+                expect(noteLengths(score)).toEqual([3840, 2880, 1920, 960]);
 
-            const serialized = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), new Settings());
-            expectLetRing(serialized, [true, true, true, true]);
-            expect(serialized.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.isLetRing)).toEqual([
-                true,
-                true,
-                true,
-                true
-            ]);
+                const serialized = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), new Settings());
+                expect(notesOf(serialized).map(n => n.isLetRing)).toEqual([true, true, true, true]);
+                expect(beatsOf(serialized).map(b => b.isLetRing)).toEqual([true, true, true, true]);
+            });
+
+            it('let-ring-same-string', () => {
+                // ringing ends when the string is struck again
+                const score = load([
+                    [
+                        dashes('LetRing', 'start') +
+                            tab('E2', 6, 0) +
+                            tab('G2', 6, 3) +
+                            tab('A2', 5, 0) +
+                            tab('B2', 5, 2) +
+                            dashes('LetRing', 'stop')
+                    ]
+                ]);
+                expect(noteLengths(score)).toEqual([960, 2880, 960, 960]);
+            });
+
+            it('palm-mute', () => {
+                const score = load([
+                    [dashes('P.M.', 'start') + openStrings(2) + dashes('P.M.', 'stop') + openStrings(2)]
+                ]);
+                expect(notesOf(score).map(n => n.isPalmMute)).toEqual([true, true, false, false]);
+            });
+
+            it('musescore-brackets', () => {
+                // MuseScore writes let ring and palm mute as words with brackets
+                const bracket = (type: string, words: string) =>
+                    direction(
+                        `${words.length > 0 ? `<direction-type><words>${words}</words></direction-type>` : ''}` +
+                            `<direction-type><bracket type="${type}" number="1" line-end="${type === 'start' ? 'none' : 'both'}" line-type="dashed"/></direction-type>`
+                    );
+                const score = load([
+                    [bracket('start', 'let ring') + openStrings(2) + bracket('stop', '') + openStrings(2)],
+                    [bracket('start', 'P.M.') + openStrings(3) + bracket('stop', '') + openStrings(1)]
+                ]);
+                expect(notesOf(score, 0).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score, 0, 0, 0, 1).map(n => n.isPalmMute)).toEqual([true, true, true, false]);
+                expect(beatsOf(score)[0].text).toBeNull();
+            });
+
+            it('words-in-separate-direction', () => {
+                // e.g. music21 writes the label as separate direction
+                const score = load([
+                    [
+                        direction('<direction-type><words>let ring</words></direction-type>') +
+                            dashes('', 'start') +
+                            openStrings(2) +
+                            dashes('', 'stop') +
+                            openStrings(2)
+                    ]
+                ]);
+                expect(notesOf(score).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(beatsOf(score)[0].text).toBeNull();
+            });
+
+            it('stop-without-words', () => {
+                const score = load([
+                    [dashes('LetRing', 'start') + openStrings(2) + dashes('', 'stop') + openStrings(2), openStrings(4)]
+                ]);
+                expect(notesOf(score, 0).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score, 1).map(n => n.isLetRing)).toEqual([false, false, false, false]);
+            });
+
+            it('across-bars-and-chords', () => {
+                const score = load([
+                    [
+                        openStrings(2) +
+                            dashes('LetRing', 'start') +
+                            tab('E2', 6) +
+                            tab('E2', 6) +
+                            chordNote('A2', 5, 0),
+                        openStrings(1) + dashes('', 'stop') + openStrings(3)
+                    ]
+                ]);
+                expect(notesOf(score, 0).map(n => n.isLetRing)).toEqual([false, false, true, true, true]);
+                expect(notesOf(score, 1).map(n => n.isLetRing)).toEqual([true, false, false, false]);
+            });
+
+            it('numbers', () => {
+                // overlapping let ring (1) and palm mute (2), stopped without words
+                const score = load([
+                    [
+                        dashes('LetRing', 'start', '1') +
+                            tab('E2', 6) +
+                            dashes('P.M.', 'start', '2') +
+                            tab('E2', 6) +
+                            dashes('', 'stop', '1') +
+                            tab('E2', 6) +
+                            dashes('', 'stop', '2') +
+                            tab('E2', 6),
+                        // one direction starting a new span with the number of the span it stops
+                        dashes('LetRing', 'start', '1') +
+                            openStrings(2) +
+                            direction(
+                                '<direction-type><words>P.M.</words></direction-type>' +
+                                    '<direction-type><dashes type="start" number="1"/></direction-type>' +
+                                    '<direction-type><dashes type="stop" number="1"/></direction-type>'
+                            ) +
+                            openStrings(2) +
+                            dashes('', 'stop', '1')
+                    ]
+                ]);
+                expect(notesOf(score, 0).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score, 0).map(n => n.isPalmMute)).toEqual([false, true, true, false]);
+                expect(notesOf(score, 1).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score, 1).map(n => n.isPalmMute)).toEqual([false, false, true, true]);
+            });
+
+            it('words-identify-same-number', () => {
+                // let ring and palm mute with the same number, identified by the words on their stops
+                const score = load([
+                    [
+                        dashes('LetRing', 'start', '1') +
+                            tab('E2', 6) +
+                            dashes('P.M.', 'start', '1') +
+                            tab('E2', 6) +
+                            dashes('LetRing', 'stop', '1') +
+                            tab('E2', 6) +
+                            dashes('P.M.', 'stop', '1') +
+                            tab('E2', 6)
+                    ]
+                ]);
+                expect(notesOf(score).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score).map(n => n.isPalmMute)).toEqual([false, true, true, false]);
+            });
+
+            it('restart', () => {
+                // a start without stop is ended by the next start
+                const score = load([
+                    [
+                        dashes('LetRing', 'start') +
+                            openStrings(2) +
+                            dashes('LetRing', 'start') +
+                            openStrings(1) +
+                            dashes('', 'stop') +
+                            openStrings(1)
+                    ]
+                ]);
+                expect(notesOf(score).map(n => n.isLetRing)).toEqual([true, true, true, false]);
+            });
+
+            it('stop-and-start-without-open-span', () => {
+                // a stray stop in the direction starting a span must not end the new span
+                const score = load([
+                    [
+                        direction(
+                            '<direction-type><dashes type="stop" number="1"/></direction-type>' +
+                                '<direction-type><words>LetRing</words></direction-type>' +
+                                '<direction-type><dashes type="start" number="1"/></direction-type>'
+                        ) +
+                            openStrings(2) +
+                            dashes('', 'stop') +
+                            openStrings(2)
+                    ]
+                ]);
+                expect(notesOf(score).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+            });
+
+            it('staves-and-voices', () => {
+                // the stop (voice 1) appears in the document before the start (voice 2), staff 2 has no span
+                const staff1: string = '<staff>1</staff>';
+                const score = load(
+                    [
+                        [
+                            note('C5', 1, 1) +
+                                note('C5', 1, 1) +
+                                dashes('', 'stop', '1', staff1) +
+                                note('C5', 1, 1) +
+                                note('C5', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                note('A4', 2, 1) +
+                                dashes('LetRing', 'start', '1', staff1) +
+                                quarters(3, 'A4', 2, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(4, 'C3', 5, 2)
+                        ]
+                    ],
+                    2
+                );
+                expect(notesOf(score, 0, 0, 0).map(n => n.isLetRing)).toEqual([false, true, false, false]);
+                expect(notesOf(score, 0, 0, 1).map(n => n.isLetRing)).toEqual([false, true, false, false]);
+                expect(notesOf(score, 0, 1, 0).map(n => n.isLetRing)).toEqual([false, false, false, false]);
+            });
+
+            it('direction-voice', () => {
+                const score = load(
+                    [
+                        [
+                            dashes('LetRing', 'start', '1', '<voice>2</voice><staff>1</staff>') +
+                                quarters(4, 'C5', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(4, 'A4', 2, 1) +
+                                dashes('', 'stop', '1', '<voice>2</voice><staff>1</staff>')
+                        ]
+                    ],
+                    2
+                );
+                expect(notesOf(score, 0, 0, 0).map(n => n.isLetRing)).toEqual([false, false, false, false]);
+                expect(notesOf(score, 0, 0, 1).map(n => n.isLetRing)).toEqual([true, true, true, true]);
+            });
+
+            it('same-staff-preference', () => {
+                // exporters reuse numbers on different staves (e.g. MuseScore)
+                const score = load(
+                    [
+                        [
+                            dashes('LetRing', 'start', '1', '<staff>1</staff>') +
+                                quarters(2, 'C5', 1, 1) +
+                                dashes('', 'stop', '1', '<staff>1</staff>') +
+                                quarters(2, 'C5', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                dashes('LetRing', 'start', '1', '<staff>2</staff>') +
+                                quarters(3, 'C3', 5, 2) +
+                                dashes('', 'stop', '1', '<staff>2</staff>') +
+                                quarters(1, 'C3', 5, 2)
+                        ]
+                    ],
+                    2
+                );
+                expect(notesOf(score, 0, 0).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score, 0, 1).map(n => n.isLetRing)).toEqual([true, true, true, false]);
+            });
+
+            it('offsets', () => {
+                // the offset nudges the stop visually (e.g. Finale), the written voice is covered as written,
+                // other voices are covered by the exact position
+                const parts = (offset: number) => [
+                    [
+                        dashes('LetRing', 'start', '1', '<staff>1</staff>') +
+                            note('C5', 1, 1, '', 4) +
+                            note('C5', 1, 1, '', 4) +
+                            dashes('', 'stop', '1', `<offset>${offset}</offset><staff>1</staff>`) +
+                            note('C5', 1, 1, '', 4) +
+                            note('C5', 1, 1, '', 4) +
+                            '<backup><duration>16</duration></backup>' +
+                            note('A4', 2, 1, '', 4) +
+                            note('A4', 2, 1, '', 8, 'half') +
+                            note('A4', 2, 1, '', 4)
+                    ]
+                ];
+                let score = load(parts(3), 2, 4);
+                expect(notesOf(score, 0, 0, 0).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score, 0, 0, 1).map(n => n.isLetRing)).toEqual([true, true, false]);
+
+                score = load(parts(0), 2, 4);
+                expect(notesOf(score, 0, 0, 1).map(n => n.isLetRing)).toEqual([true, false, false]);
+            });
+
+            it('overfull-bar', () => {
+                // a stop at the end of a bar longer than its time signature stays in the bar
+                const score = load([
+                    [dashes('LetRing', 'start') + openStrings(5) + dashes('', 'stop'), openStrings(4)]
+                ]);
+                expect(notesOf(score, 0).map(n => n.isLetRing)).toEqual([true, true, true, true, true]);
+                expect(notesOf(score, 1).map(n => n.isLetRing)).toEqual([false, false, false, false]);
+            });
+
+            it('unclosed-per-part', () => {
+                const score = load([
+                    [dashes('LetRing', 'start') + openStrings(4), openStrings(4)],
+                    [openStrings(4), openStrings(4)]
+                ]);
+                expect(notesOf(score, 1).map(n => n.isLetRing)).toEqual([true, true, true, true]);
+                expect(notesOf(score, 0, 0, 0, 1).map(n => n.isLetRing)).toEqual([false, false, false, false]);
+            });
+
+            it('continue-and-unknown-words', () => {
+                const score = load([
+                    [
+                        dashes('LetRing', 'continue') +
+                            openStrings(2) +
+                            dashes('', 'stop') +
+                            dashes('cresc.', 'start') +
+                            openStrings(2) +
+                            dashes('', 'stop')
+                    ]
+                ]);
+                expect(notesOf(score).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+                expect(notesOf(score).map(n => n.isPalmMute)).toEqual([false, false, false, false]);
+                // lines without meaning keep their label
+                expect(beatsOf(score)[2].text).toBe('cresc.');
+            });
+
+            it('tied-let-ring', () => {
+                const score = load([
+                    [
+                        tab('E2', 6, 0, '<tied type="let-ring"/>') +
+                            // TuxGuitar writes the tie outside the notations
+                            tab('A2', 5, 0).replace('<notations>', '<tied type="let-ring"/><notations>') +
+                            openStrings(2)
+                    ]
+                ]);
+                expect(notesOf(score).map(n => n.isLetRing)).toEqual([true, true, false, false]);
+            });
         });
 
-        it('let-ring-same-string', () => {
-            // ringing ends when the string is struck again
-            const score = load([
-                [
-                    dashes('LetRing', 'start') +
-                        note('E2', 6, 0) +
-                        note('G2', 6, 3) +
-                        note('A2', 5, 0) +
-                        note('B2', 5, 2) +
-                        dashes('LetRing', 'stop')
-                ]
-            ]);
-            expect(noteLengths(score)).toEqual([960, 2880, 960, 960]);
+        describe('wedges', () => {
+            it('staff-and-restart', () => {
+                const wedge = (type: string, staff: number) =>
+                    direction(`<direction-type><wedge type="${type}"/></direction-type>`, `<staff>${staff}</staff>`);
+                const score = load(
+                    [
+                        [
+                            wedge('crescendo', 1) +
+                                quarters(2, 'C5', 1, 1) +
+                                // a new wedge with the same number ends the previous one
+                                wedge('diminuendo', 1) +
+                                quarters(2, 'C5', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(4, 'C3', 5, 2) +
+                                // the open wedge of staff 1 does not apply to staff 2
+                                wedge('stop', 1)
+                        ]
+                    ],
+                    2
+                );
+                expect(beatsOf(score, 0, 0).map(b => b.crescendo)).toEqual([
+                    CrescendoType.Crescendo,
+                    CrescendoType.Crescendo,
+                    CrescendoType.Decrescendo,
+                    CrescendoType.Decrescendo
+                ]);
+                expect(beatsOf(score, 0, 1).map(b => b.crescendo)).toEqual([
+                    CrescendoType.None,
+                    CrescendoType.None,
+                    CrescendoType.None,
+                    CrescendoType.None
+                ]);
+            });
+
+            it('grace-notes', () => {
+                // the wedge starts before and ends after the grace notes at the same position
+                const grace = (pitch: string) =>
+                    `<note><grace/><pitch><step>${pitch[0]}</step><octave>${pitch[1]}</octave></pitch><voice>1</voice><type>16th</type></note>`;
+                const score = load(
+                    [
+                        [
+                            direction('<direction-type><wedge type="diminuendo"/></direction-type>') +
+                                grace('G5') +
+                                grace('F5') +
+                                direction('<direction-type><wedge type="stop"/></direction-type>') +
+                                note('C5', 1, 0, '', 4, 'whole')
+                        ]
+                    ],
+                    2
+                );
+                expect(beatsOf(score).map(b => b.crescendo)).toEqual([
+                    CrescendoType.Decrescendo,
+                    CrescendoType.Decrescendo,
+                    CrescendoType.None
+                ]);
+            });
         });
 
-        it('palm-mute', () => {
-            const score = load([[dashes('P.M.', 'start') + open(2) + dashes('P.M.', 'stop') + open(2)]]);
-            expectPalmMute(score, [true, true, false, false]);
+        describe('octave-shifts', () => {
+            const shift = (type: string, size: number, number: string, extra: string) =>
+                direction(
+                    `<direction-type><octave-shift type="${type}" size="${size}" number="${number}"/></direction-type>`,
+                    extra
+                );
+
+            it('staff-and-numbers', () => {
+                const score = load(
+                    [
+                        [
+                            shift('down', 8, '1', '<staff>1</staff>') +
+                                quarters(1, 'C6', 1, 1) +
+                                // unsupported sizes are paired but have no effect
+                                shift('down', 22, '2', '<staff>1</staff>') +
+                                quarters(1, 'C6', 1, 1) +
+                                shift('stop', 22, '2', '<staff>1</staff>') +
+                                quarters(1, 'C6', 1, 1) +
+                                shift('stop', 8, '1', '<staff>1</staff>') +
+                                quarters(1, 'C6', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(4, 'C3', 5, 2)
+                        ]
+                    ],
+                    2
+                );
+                expect(beatsOf(score, 0, 0).map(b => b.ottava)).toEqual([
+                    Ottavia._8va,
+                    Ottavia._8va,
+                    Ottavia._8va,
+                    Ottavia.Regular
+                ]);
+                expect(beatsOf(score, 0, 1).map(b => b.ottava)).toEqual([
+                    Ottavia.Regular,
+                    Ottavia.Regular,
+                    Ottavia.Regular,
+                    Ottavia.Regular
+                ]);
+            });
+
+            it('stop-conventions', () => {
+                // Finale writes the stop before the last shifted note, MuseScore after it (see MusicXML test suite 33da/33db)
+                const shifted = (software: string) =>
+                    load(
+                        [
+                            [
+                                shift('down', 8, '1', '') +
+                                    note('C6', 1, 0, '', 4) +
+                                    note('C6', 1, 0, '', 4) +
+                                    shift('stop', 8, '1', '<offset>1</offset>') +
+                                    note('C6', 1, 0, '', 4) +
+                                    note('C6', 1, 0, '', 4)
+                            ]
+                        ],
+                        2,
+                        4,
+                        software
+                    );
+                expect(beatsOf(shifted('Finale 2011 for Windows')).map(b => b.ottava)).toEqual([
+                    Ottavia._8va,
+                    Ottavia._8va,
+                    Ottavia._8va,
+                    Ottavia.Regular
+                ]);
+                expect(beatsOf(shifted('MuseScore 4.3.0')).map(b => b.ottava)).toEqual([
+                    Ottavia._8va,
+                    Ottavia._8va,
+                    Ottavia.Regular,
+                    Ottavia.Regular
+                ]);
+            });
         });
 
-        it('stop-without-words', () => {
-            const score = load([[dashes('LetRing', 'start') + open(2) + dashes('', 'stop') + open(2), open(4)]]);
-            expectLetRing(score, [true, true, false, false]);
-            expectLetRing(score, [false, false, false, false], 0, 0, 1);
+        describe('pedals', () => {
+            const pedal = (type: string, extra: string) =>
+                direction(`<direction-type><pedal type="${type}" line="yes"/></direction-type>`, extra);
+
+            it('across-bars', () => {
+                const score = load(
+                    [[pedal('start', '') + quarters(4), quarters(2) + pedal('stop', '') + quarters(2)]],
+                    2
+                );
+                const bars = score.tracks[0].staves[0].bars;
+                expect(bars[0].sustainPedals.map(p => p.pedalType)).toEqual([SustainPedalMarkerType.Down]);
+                expect(bars[1].sustainPedals.map(p => p.pedalType)).toEqual([SustainPedalMarkerType.Up]);
+                expect(bars[1].sustainPedals[0].ratioPosition).toBe(0.5);
+            });
+
+            it('change', () => {
+                // a change in a bar after a held bar lifts and retakes the pedal
+                const score = load(
+                    [
+                        [
+                            pedal('start', '') + quarters(4),
+                            quarters(2) + pedal('change', '') + quarters(2) + pedal('stop', '')
+                        ]
+                    ],
+                    2
+                );
+                const bar = score.tracks[0].staves[0].bars[1];
+                expect(bar.sustainPedals.map(p => p.pedalType)).toEqual([
+                    SustainPedalMarkerType.Up,
+                    SustainPedalMarkerType.Down,
+                    SustainPedalMarkerType.Up
+                ]);
+                expect(bar.sustainPedals.map(p => p.ratioPosition)).toEqual([0.5, 0.5, 1]);
+            });
+
+            it('offset', () => {
+                // the offset is given in divisions
+                const score = load(
+                    [
+                        [
+                            quarters(1) +
+                                pedal('start', '<offset>1</offset>') +
+                                quarters(1) +
+                                pedal('stop', '') +
+                                quarters(2)
+                        ]
+                    ],
+                    2
+                );
+                expect(score.tracks[0].staves[0].bars[0].sustainPedals.map(p => p.ratioPosition)).toEqual([0.5, 0.5]);
+            });
         });
 
-        it('offset', () => {
-            // the offset (in divisions) moves start and stop by a quarter note back
-            const offset: string = '<offset>-2</offset>';
-            const quarter = (pitch: string) =>
-                `<note><pitch><step>${pitch[0]}</step><octave>${pitch[1]}</octave></pitch><duration>2</duration><voice>1</voice><type>quarter</type></note>`;
+        describe('wavy-lines', () => {
+            it('trill-line', () => {
+                const score = load(
+                    [
+                        [
+                            note(
+                                'C5',
+                                1,
+                                1,
+                                '<ornaments><trill-mark trill-step="half"/><wavy-line type="start"/></ornaments>'
+                            ) +
+                                note('C5', 1, 1) +
+                                note('C5', 1, 1, '<ornaments><wavy-line type="stop"/></ornaments>') +
+                                note('C5', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(4, 'A4', 2, 1)
+                        ]
+                    ],
+                    2
+                );
+                expect(notesOf(score, 0, 0, 0).map(n => n.trillValue)).toEqual([73, 73, 73, -1]);
+                expect(notesOf(score, 0, 0, 1).map(n => n.isTrill)).toEqual([false, false, false, false]);
+            });
+
+            it('trill-on-tablature', () => {
+                const score = load([[tab('A2', 6, 5, '<ornaments><trill-mark/></ornaments>') + openStrings(3)]]);
+                const trill = notesOf(score)[0];
+                expect(trill.trillValue).toBe(47);
+                expect(trill.trillFret).toBe(7);
+            });
+
+            it('vibrato-line', () => {
+                const score = load(
+                    [
+                        [
+                            note('C5', 1, 0, '<ornaments><wavy-line type="start"/></ornaments>') +
+                                note('C5') +
+                                note('C5', 1, 0, '<ornaments><wavy-line type="stop"/></ornaments>') +
+                                quarters(1, 'C5')
+                        ]
+                    ],
+                    2
+                );
+                expect(notesOf(score).map(n => n.vibrato)).toEqual([
+                    VibratoType.Slight,
+                    VibratoType.Slight,
+                    VibratoType.Slight,
+                    VibratoType.None
+                ]);
+            });
+        });
+
+        describe('measure-styles', () => {
+            const style = (content: string) => `<attributes><measure-style>${content}</measure-style></attributes>`;
+
+            it('slash-per-part', () => {
+                const score = load(
+                    [
+                        [style('<slash type="start"/>') + quarters(4), quarters(4)],
+                        [quarters(4), quarters(4)]
+                    ],
+                    2
+                );
+                expect(beatsOf(score, 1).map(b => b.slashed)).toEqual([true, true, true, true]);
+                expect(beatsOf(score, 0, 0, 0, 1).map(b => b.slashed)).toEqual([false, false, false, false]);
+            });
+
+            it('measure-repeat', () => {
+                const score = load(
+                    [
+                        [
+                            quarters(4),
+                            style('<measure-repeat type="start" slashes="1"/>') + quarters(4),
+                            quarters(4),
+                            style('<measure-repeat type="stop"/>') + quarters(4)
+                        ]
+                    ],
+                    2
+                );
+                expect(score.tracks[0].staves[0].bars.map(b => b.simileMark)).toEqual([
+                    SimileMark.None,
+                    SimileMark.Simple,
+                    SimileMark.Simple,
+                    SimileMark.None
+                ]);
+            });
+        });
+
+        it('endings-of-all-parts', () => {
+            const start = '<barline location="left"><ending number="1" type="start"/></barline>';
+            const stop =
+                '<barline location="right"><ending number="1" type="stop"/><repeat direction="backward"/></barline>';
+            // a later part without endings keeps the endings of the first part
             const score = load(
                 [
-                    [
-                        quarter('E2') +
-                            dashes('LetRing', 'start', '1', offset) +
-                            quarter('E2') +
-                            quarter('E2') +
-                            dashes('', 'stop', '1', offset) +
-                            quarter('E2')
-                    ]
-                ],
-                1,
-                2
-            );
-            expectLetRing(score, [true, true, false, false]);
-        });
-
-        it('across-bars-and-chords', () => {
-            const score = load([
-                [
-                    open(2) + dashes('LetRing', 'start') + note('E2', 6) + note('E2', 6) + note('A2', 5, 0, true),
-                    open(1) + dashes('', 'stop') + open(3)
-                ]
-            ]);
-            expectLetRing(score, [false, false, true, true, true], 0, 0, 0);
-            expectLetRing(score, [true, false, false, false], 0, 0, 1);
-        });
-
-        it('numbers', () => {
-            // overlapping let ring (1) and palm mute (2), stopped without words
-            const score = load([
-                [
-                    dashes('LetRing', 'start', '1') +
-                        note('E2', 6) +
-                        dashes('P.M.', 'start', '2') +
-                        note('E2', 6) +
-                        dashes('', 'stop', '1') +
-                        note('E2', 6) +
-                        dashes('', 'stop', '2') +
-                        note('E2', 6),
-                    // one direction starting a new span with the number of the span it stops
-                    dashes('LetRing', 'start', '1') +
-                        open(2) +
-                        '<direction><direction-type><words>P.M.</words></direction-type>' +
-                        '<direction-type><dashes type="start" number="1"/></direction-type>' +
-                        '<direction-type><dashes type="stop" number="1"/></direction-type></direction>' +
-                        open(2) +
-                        dashes('', 'stop', '1')
-                ]
-            ]);
-            expectLetRing(score, [true, true, false, false]);
-            expectPalmMute(score, [false, true, true, false]);
-            expectLetRing(score, [true, true, false, false], 0, 0, 1);
-            expectPalmMute(score, [false, false, true, true], 1);
-        });
-
-        it('staves-and-voices', () => {
-            // the stop (voice 1) appears in the document before the start (voice 2)
-            const staff1: string = '<staff>1</staff>';
-            const score = load(
-                [
-                    [
-                        note('C5', 0, 0, false, 1, 1) +
-                            note('C5', 0, 0, false, 1, 1) +
-                            dashes('', 'stop', '1', staff1) +
-                            note('C5', 0, 0, false, 1, 1) +
-                            note('C5', 0, 0, false, 1, 1) +
-                            '<backup><duration>4</duration></backup>' +
-                            note('A4', 0, 0, false, 2, 1) +
-                            dashes('LetRing', 'start', '1', staff1) +
-                            note('A4', 0, 0, false, 2, 1) +
-                            note('A4', 0, 0, false, 2, 1) +
-                            note('A4', 0, 0, false, 2, 1) +
-                            '<backup><duration>4</duration></backup>' +
-                            note('C3', 0, 0, false, 5, 2) +
-                            note('C3', 0, 0, false, 5, 2) +
-                            note('C3', 0, 0, false, 5, 2) +
-                            note('C3', 0, 0, false, 5, 2)
-                    ]
+                    [quarters(4), start + quarters(4) + stop, quarters(4)],
+                    [quarters(4), quarters(4), quarters(4)]
                 ],
                 2
             );
-            expectLetRing(score, [false, true, false, false], 0, 0, 0, 0);
-            expectLetRing(score, [false, true, false, false], 0, 0, 0, 1);
-            expectLetRing(score, [false, false, false, false], 0, 1, 0, 0);
+            expect(score.masterBars.map(m => m.alternateEndings)).toEqual([0, 1, 0]);
         });
 
-        it('unclosed-per-part', () => {
-            const score = load([
-                [dashes('LetRing', 'start') + open(4), open(4)],
-                [open(4), open(4)]
-            ]);
-            expectLetRing(score, [true, true, true, true], 0, 0, 0);
-            expectLetRing(score, [true, true, true, true], 0, 0, 1);
-            expectLetRing(score, [false, false, false, false], 1, 0, 0);
-            expectLetRing(score, [false, false, false, false], 1, 0, 1);
+        describe('note-links', () => {
+            it('ties', () => {
+                const score = load(
+                    [
+                        [
+                            // a tie without end is tied to the next note
+                            note('C5', 1, 0, '<tied type="start"/>') +
+                                note('C5') +
+                                // a stop of a note which is not the next one is ignored
+                                note('C5', 1, 0, '<tied type="stop"/><tied type="start"/>') +
+                                note('C5', 1, 0, '<tied type="stop"/>')
+                        ]
+                    ],
+                    2
+                );
+                const notes = notesOf(score);
+                expect(notes[1].tieOrigin).toBe(notes[0]);
+                expect(notes[2].isTieDestination).toBe(false);
+                expect(notes[3].tieOrigin).toBe(notes[2]);
+            });
+
+            it('ties-on-unisons', () => {
+                const score = load([
+                    [
+                        tab('E4', 1, 0, '<tied type="start"/>') +
+                            chordNote('E4', 2, 5, '<tied type="start"/>') +
+                            tab('E4', 1, 0, '<tied type="stop"/>') +
+                            chordNote('E4', 2, 5, '<tied type="stop"/>') +
+                            openStrings(2)
+                    ]
+                ]);
+                const notes = notesOf(score);
+                expect(notes[2].tieOrigin).toBe(notes[0]);
+                expect(notes[3].tieOrigin).toBe(notes[1]);
+            });
+
+            it('slides-and-glissandos', () => {
+                const score = load(
+                    [
+                        [
+                            note(
+                                'C5',
+                                1,
+                                0,
+                                '<glissando type="start" number="1"/><slide type="start" number="1"/>',
+                                1
+                            ) +
+                                note('E5', 1, 0, '<slide type="stop" number="1"/>') +
+                                note('G5', 1, 0, '<glissando type="stop" number="1"/>') +
+                                // a stray stop does not link to a previous start
+                                note('C5', 1, 0, '<slide type="stop" number="1"/>')
+                        ]
+                    ],
+                    2
+                );
+                const notes = notesOf(score);
+                expect(notes[1].slideOrigin).toBe(notes[0]);
+                expect(notes[2].slideOrigin).toBe(notes[0]);
+                expect(notes[3].slideOrigin).toBeNull();
+            });
+
+            it('slur-on-hammer-on', () => {
+                // the hammer-on is drawn as slur, the slur written along is not added
+                const score = load([
+                    [
+                        tab(
+                            'A2',
+                            6,
+                            5,
+                            '<slur type="start"/><technical><hammer-on type="start">H</hammer-on></technical>'
+                        ) +
+                            tab('B2', 6, 7, '<slur type="stop"/><technical><hammer-on type="stop"/></technical>') +
+                            openStrings(2)
+                    ]
+                ]);
+                const notes = notesOf(score);
+                expect(notes[0].isHammerPullOrigin).toBe(true);
+                expect(notes[1].isSlurDestination).toBe(false);
+            });
         });
 
-        it('stop-and-start-without-open-span', () => {
-            // a stray stop in the direction starting a span must not end the new span
-            const score = load([
-                [
-                    '<direction><direction-type><dashes type="stop" number="1"/></direction-type>' +
-                        '<direction-type><words>LetRing</words></direction-type>' +
-                        '<direction-type><dashes type="start" number="1"/></direction-type></direction>' +
-                        open(2) +
-                        dashes('', 'stop') +
-                        open(2)
-                ]
-            ]);
-            expectLetRing(score, [true, true, false, false]);
-        });
-
-        it('continue-and-unknown-words', () => {
-            const score = load([
-                [
-                    dashes('LetRing', 'continue') +
-                        open(2) +
-                        dashes('', 'stop') +
-                        dashes('cresc.', 'start') +
-                        open(2) +
-                        dashes('', 'stop')
-                ]
-            ]);
-            expectLetRing(score, [true, true, false, false]);
-            expectPalmMute(score, [false, false, false, false]);
-            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].text).toBeNull();
+        it('tempo-offset', () => {
+            // the offset is given in divisions and only affects the sound if specified
+            const tempoPosition = (sound: string) => {
+                const score = load(
+                    [
+                        [
+                            quarters(1) +
+                                direction(
+                                    '<direction-type><words>Andante</words></direction-type>',
+                                    `<offset${sound}>1</offset><sound tempo="90"/>`
+                                ) +
+                                quarters(3)
+                        ]
+                    ],
+                    2
+                );
+                return score.masterBars[0].tempoAutomations.filter(a => a.value === 90)[0].ratioPosition;
+            };
+            expect(tempoPosition('')).toBe(0.25);
+            expect(tempoPosition(' sound="yes"')).toBe(0.5);
         });
     });
 });

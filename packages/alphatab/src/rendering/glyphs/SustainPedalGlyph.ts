@@ -32,7 +32,10 @@ export class SustainPedalGlyph extends EffectGlyph {
         while (markerIndex < markers.length) {
             let marker: SustainPedalMarker | null = markers[markerIndex];
             while (marker != null) {
-                const markerX = cx + this.renderer.getRatioPositionX(marker.ratioPosition);
+                const markerX =
+                    cx +
+                    this.renderer.getRatioPositionX(marker.ratioPosition) +
+                    this._changeOffset(marker, textWidth, starSize);
 
                 // real own marker
                 let linePadding = 0;
@@ -47,7 +50,10 @@ export class SustainPedalGlyph extends EffectGlyph {
                 // line to next marker or end-of-bar
                 if (marker.nextPedalMarker) {
                     if (marker.nextPedalMarker.bar === marker.bar) {
-                        let nextX = cx + this.renderer.getRatioPositionX(marker.nextPedalMarker.ratioPosition);
+                        let nextX =
+                            cx +
+                            this.renderer.getRatioPositionX(marker.nextPedalMarker.ratioPosition) +
+                            this._changeOffset(marker.nextPedalMarker, textWidth, starSize);
 
                         switch (marker.nextPedalMarker.pedalType) {
                             case SustainPedalMarkerType.Down:
@@ -89,5 +95,31 @@ export class SustainPedalGlyph extends EffectGlyph {
                 }
             }
         }
+    }
+
+    /**
+     * On a pedal change (lift and retake at the same position) the symbols are placed next to each other.
+     */
+    private _changeOffset(marker: SustainPedalMarker, textWidth: number, starSize: number): number {
+        const markers = marker.bar.sustainPedals;
+        const index = markers.indexOf(marker);
+        const padding = this.renderer.smuflMetrics.sustainPedalLinePadding / 2;
+        if (
+            marker.pedalType === SustainPedalMarkerType.Up &&
+            index + 1 < markers.length &&
+            markers[index + 1].pedalType === SustainPedalMarkerType.Down &&
+            markers[index + 1].ratioPosition === marker.ratioPosition
+        ) {
+            return -(starSize / 2 + padding);
+        }
+        if (
+            marker.pedalType === SustainPedalMarkerType.Down &&
+            index > 0 &&
+            markers[index - 1].pedalType === SustainPedalMarkerType.Up &&
+            markers[index - 1].ratioPosition === marker.ratioPosition
+        ) {
+            return textWidth / 2 + padding;
+        }
+        return 0;
     }
 }

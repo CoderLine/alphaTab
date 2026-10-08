@@ -1,4 +1,12 @@
-import { type MusicXmlSpanEvent, MusicXmlSpans, MusicXmlSpanTracker } from '@coderline/alphatab/importer/MusicXmlSpans';
+import {
+    MusicXmlSpanAction,
+    MusicXmlSpanElement,
+    type MusicXmlSpanEvent,
+    MusicXmlSpanKind,
+    type MusicXmlSpanPosition,
+    MusicXmlSpans,
+    MusicXmlSpanTracker
+} from '@coderline/alphatab/importer/MusicXmlSpans';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
@@ -7,13 +15,12 @@ import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
-import { Bar, BarLineStyle, SustainPedalMarkerType, SustainPedalMarker } from '@coderline/alphatab/model/Bar';
+import { Bar, BarLineStyle } from '@coderline/alphatab/model/Bar';
 import { Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { Chord } from '@coderline/alphatab/model/Chord';
 import { Clef } from '@coderline/alphatab/model/Clef';
-import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
@@ -36,8 +43,6 @@ import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
-import { SimileMark } from '@coderline/alphatab/model/SimileMark';
-import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
@@ -55,20 +60,9 @@ import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
  * @internal
  */
 class StaffContext {
-    public slurStarts!: Map<string, Note>;
     public currentDynamics = DynamicValue.F;
-    public tieStarts!: Set<Note>;
-    public tieStartIds!: Map<string, Note>;
-    public slideOrigins: Map<string, Note> = new Map<string, Note>();
     public transpose: number = 0;
     public isExplicitlyBeamed = false;
-
-    constructor() {
-        this.tieStarts = new Set<Note>();
-        this.tieStartIds = new Map<string, Note>();
-        this.slideOrigins = new Map<string, Note>();
-        this.slurStarts = new Map<string, Note>();
-    }
 }
 
 /**
@@ -239,6 +233,10 @@ export class MusicXmlImporter extends ScoreImporter {
     private _nextBarNumber: number = 1;
 
     private _divisionsPerQuarterNote: number = 1;
+    /**
+     * Whether the exporter writes the stop of octave shifts before the last shifted note instead of after it.
+     */
+    private _octaveShiftEndsBeforeLastNote: boolean = false;
     private _currentDynamics = DynamicValue.F;
 
     public get name(): string {
@@ -273,9 +271,22 @@ export class MusicXmlImporter extends ScoreImporter {
      */
     private _applySpans() {
         for (const info of this._indexToTrackInfo.values()) {
-            for (const span of info.spans.finish(this._score.masterBars)) {
-                MusicXmlSpans.apply(span, info.track);
-            }
+            const spans = info.spans.finish(info.track, this._score.masterBars);
+            MusicXmlSpans.apply(
+                spans,
+                info.track,
+                this._score.masterBars,
+                (staff, voice) => {
+                    if (this._staffVoicePacking.has(staff)) {
+                        const mapping = this._staffVoicePacking.get(staff)!.mapping;
+                        if (mapping.has(voice)) {
+                            return mapping.get(voice)!;
+                        }
+                    }
+                    return -1;
+                },
+                this._beatSequence
+            );
         }
     }
 
@@ -618,7 +629,18 @@ export class MusicXmlImporter extends ScoreImporter {
                         this._score.tab += ` (${c.attributes.get('type')})`;
                     }
                     break;
-                // case 'software': Ignored
+                case 'software':
+                    // Finale and Sibelius write the end of octave shifts before the last shifted note
+                    // (see MusicXML test suite 33da, MuseScore import)
+                    const software = c.innerText.toLowerCase();
+                    if (
+                        software.indexOf('finale') >= 0 ||
+                        software.indexOf('sibelius') >= 0 ||
+                        software.indexOf('dolet') >= 0
+                    ) {
+                        this._octaveShiftEndsBeforeLastNote = true;
+                    }
+                    break;
                 case 'encoding-description':
                     this._score.notices += MusicXmlImporter._sanitizeDisplay(c.innerText);
                     break;
@@ -1020,8 +1042,6 @@ export class MusicXmlImporter extends ScoreImporter {
         this._musicalPosition = 0;
         this._lastBeat = null;
 
-        masterBar.alternateEndings = this._nextMasterBarRepeatEnding;
-
         const barLines: XmlNode[] = [];
 
         for (const c of element.childElements()) {
@@ -1061,12 +1081,13 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
+        // directions at the end of the measure
+        this._processPendingSpanEvents('');
+
         // parse barline at end of bar (to apply style to all bars of all staves)
         for (const barLine of barLines) {
             this._parseBarLine(barLine, masterBar, track);
         }
-
-        this._applySimileMarks(masterBar, track);
 
         // initial empty staff and voice (if no other elements created something already)
         const staff = this._getOrCreateStaff(track, 0);
@@ -1119,54 +1140,6 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private _applySimileMarks(masterBar: MasterBar, track: Track) {
-        if (this._simileMarkAllStaves !== null) {
-            for (const s of track.staves) {
-                const bar = this._getOrCreateBar(s, masterBar);
-                bar.simileMark = this._simileMarkAllStaves!;
-                if (bar.simileMark !== SimileMark.None) {
-                    this._clearBar(bar);
-                }
-            }
-
-            if (this._simileMarkAllStaves === SimileMark.FirstOfDouble) {
-                this._simileMarkAllStaves = SimileMark.SecondOfDouble;
-            } else {
-                this._simileMarkAllStaves = null;
-            }
-        }
-
-        if (this._simileMarkPerStaff !== null) {
-            const keys = Array.from(this._simileMarkPerStaff!.keys());
-            for (const i of keys) {
-                const s = this._getOrCreateStaff(track, i);
-                const bar = this._getOrCreateBar(s, masterBar);
-                bar.simileMark = this._simileMarkPerStaff!.get(i)!;
-
-                if (bar.simileMark !== SimileMark.None) {
-                    this._clearBar(bar);
-                }
-
-                if (bar.simileMark === SimileMark.FirstOfDouble) {
-                    this._simileMarkPerStaff!.set(i, SimileMark.SecondOfDouble);
-                } else {
-                    this._simileMarkPerStaff!.delete(i);
-                }
-            }
-            if (this._simileMarkPerStaff.size === 0) {
-                this._simileMarkPerStaff = null;
-            }
-        }
-    }
-
-    private _clearBar(bar: Bar) {
-        for (const v of bar.voices) {
-            const emptyBeat: Beat = new Beat();
-            emptyBeat.isEmpty = true;
-            v.addBeat(emptyBeat);
-        }
-    }
-
     private _parseBarLine(element: XmlNode, masterBar: MasterBar, track: Track) {
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -1180,7 +1153,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'coda': Ignored (use directions)
                 // case 'fermata': Ignored (on barline, they exist on beat notations)
                 case 'ending':
-                    this._parseEnding(c, masterBar);
+                    this._parseEnding(c, masterBar, track);
                     break;
                 case 'repeat':
                     this._parseRepeat(c, masterBar);
@@ -1202,8 +1175,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private _nextMasterBarRepeatEnding: number = 0;
-    private _parseEnding(element: XmlNode, masterBar: MasterBar): void {
+    private _parseEnding(element: XmlNode, masterBar: MasterBar, track: Track): void {
         const numbers = element
             .getAttribute('number')
             .split(',')
@@ -1214,20 +1186,35 @@ export class MusicXmlImporter extends ScoreImporter {
             flags = flags | ((0x01 << (num - 1)) & 0xff);
         }
 
-        masterBar.alternateEndings = flags;
-
+        let action: MusicXmlSpanAction;
+        let barIndex = masterBar.index;
         switch (element.getAttribute('type', '')) {
             case 'start':
-                this._nextMasterBarRepeatEnding = this._nextMasterBarRepeatEnding | flags;
+                action = MusicXmlSpanAction.Start;
                 break;
+            // the stop is at the right barline of the last measure of the ending
             case 'stop':
             case 'discontinue':
-                this._nextMasterBarRepeatEnding = this._nextMasterBarRepeatEnding & ~flags;
+                action = MusicXmlSpanAction.Stop;
+                barIndex++;
                 break;
             case 'continue':
-                // keep
+                action = MusicXmlSpanAction.Continue;
                 break;
+            default:
+                return;
         }
+
+        // the endings are a property of the master bar, they are the union of all parts
+        const e = MusicXmlSpans.createEvent(
+            MusicXmlSpanElement.Ending,
+            action,
+            MusicXmlSpanKind.AlternateEnding,
+            `${flags}`
+        );
+        e.value = flags;
+        e.position = MusicXmlSpans.position(barIndex, 0, this._beatCount, 0);
+        this._indexToTrackInfo.get(track.index)!.spans.process([e]);
     }
 
     private _parseBarStyle(element: XmlNode, masterBar: MasterBar, track: Track, location: string) {
@@ -1478,9 +1465,31 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private _nextBeatAutomations: Automation[] | null = null;
     private _nextBeatChord: Chord | null = null;
-    private _nextBeatCrescendo: CrescendoType | null = null;
-    private _nextBeatOttavia: Ottavia | null = null;
     private _nextBeatText: string | null = null;
+    private _nextBeatTextTrackIndex: number = -1;
+    private _nextBeatTextPosition: MusicXmlSpanPosition = MusicXmlSpans.position(0, 0, 0, 0);
+    /**
+     * The document order of the beats (see {@link MusicXmlSpanPosition.sequence}).
+     */
+    private _beatSequence: Map<Beat, number> = new Map<Beat, number>();
+    private _beatCount: number = 0;
+    /**
+     * The span events of the last direction, processed with the voice of the following note.
+     */
+    private _pendingSpanEvents: MusicXmlSpanEvent[] = [];
+    private _pendingSpanTrack: Track | null = null;
+
+    private _processPendingSpanEvents(writtenVoice: string) {
+        if (this._pendingSpanEvents.length === 0) {
+            return;
+        }
+        for (const e of this._pendingSpanEvents) {
+            e.writtenVoice = writtenVoice;
+        }
+        this._indexToTrackInfo.get(this._pendingSpanTrack!.index)!.spans.process(this._pendingSpanEvents);
+        this._pendingSpanEvents = [];
+        this._pendingSpanTrack = null;
+    }
 
     private _parseSoundMidiInstrument(element: XmlNode, _masterBar: MasterBar) {
         let automation: Automation;
@@ -1830,7 +1839,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     // case 'for-part': not supported
                     // case 'directive': Ignored
                     case 'measure-style':
-                        this._parseMeasureStyle(c, track, false);
+                        this._parseMeasureStyle(c, masterBar, track, false);
                         break;
                 }
             }
@@ -1854,69 +1863,99 @@ export class MusicXmlImporter extends ScoreImporter {
                     // case 'for-part': not supported
                     // case 'directive': Ignored
                     case 'measure-style':
-                        this._parseMeasureStyle(c, track, true);
+                        this._parseMeasureStyle(c, masterBar, track, true);
                         break;
                 }
             }
         }
     }
 
-    private _simileMarkAllStaves: SimileMark | null = null;
-    private _simileMarkPerStaff: Map<number, SimileMark> | null = null;
-    private _isBeatSlash: boolean = false;
-    private _parseMeasureStyle(element: XmlNode, _track: Track, midBar: boolean) {
+    private _parseMeasureStyle(element: XmlNode, masterBar: MasterBar, track: Track, midBar: boolean) {
+        const events: MusicXmlSpanEvent[] = [];
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'multiple-rest': Ignored, when multibar rests are enabled for rendering this info shouldn't matter.
                 case 'measure-repeat':
                     if (!midBar) {
-                        let simileMark: SimileMark | null = null;
                         switch (c.getAttribute('type')) {
                             case 'start':
+                                let kind = MusicXmlSpanKind.None;
                                 switch (Number.parseInt(c.getAttribute('slashes', '1'), 10)) {
                                     case 1:
-                                        simileMark = SimileMark.Simple;
+                                        kind = MusicXmlSpanKind.SimileSimple;
                                         break;
                                     case 2:
-                                        simileMark = SimileMark.FirstOfDouble;
+                                        kind = MusicXmlSpanKind.SimileDouble;
                                         break;
-                                    default:
-                                        // not supported
-                                        break;
+                                    // default: not supported
                                 }
+                                events.push(
+                                    MusicXmlSpans.createEvent(
+                                        MusicXmlSpanElement.MeasureRepeat,
+                                        MusicXmlSpanAction.Start,
+                                        kind,
+                                        '1'
+                                    )
+                                );
                                 break;
+                            // the first measure not repeating anymore
                             case 'stop':
-                                simileMark = null;
+                                events.push(
+                                    MusicXmlSpans.createEvent(
+                                        MusicXmlSpanElement.MeasureRepeat,
+                                        MusicXmlSpanAction.Stop,
+                                        MusicXmlSpanKind.None,
+                                        '1'
+                                    )
+                                );
                                 break;
-                        }
-
-                        if (element.attributes.has('number')) {
-                            this._simileMarkPerStaff = this._simileMarkPerStaff ?? new Map<number, SimileMark>();
-                            const staff = Number.parseInt(element.attributes.get('number')!, 10) - 1;
-                            if (simileMark == null) {
-                                this._simileMarkPerStaff!.delete(staff);
-                            } else {
-                                this._simileMarkPerStaff!.set(staff, simileMark!);
-                            }
-                        } else {
-                            this._simileMarkAllStaves = simileMark;
                         }
                     }
-
                     break;
                 // case 'beat-repeat': Not supported
                 case 'slash':
                     // use-stems: not supported
                     switch (c.getAttribute('type')) {
                         case 'start':
-                            this._isBeatSlash = true;
+                            events.push(
+                                MusicXmlSpans.createEvent(
+                                    MusicXmlSpanElement.Slash,
+                                    MusicXmlSpanAction.Start,
+                                    MusicXmlSpanKind.Slash,
+                                    '1'
+                                )
+                            );
                             break;
                         case 'stop':
-                            this._isBeatSlash = false;
+                            events.push(
+                                MusicXmlSpans.createEvent(
+                                    MusicXmlSpanElement.Slash,
+                                    MusicXmlSpanAction.Stop,
+                                    MusicXmlSpanKind.None,
+                                    '1'
+                                )
+                            );
                             break;
                     }
                     break;
             }
+        }
+
+        if (events.length > 0) {
+            // the number of the measure style is the staff it applies to
+            const staffIndex = element.attributes.has('number')
+                ? Number.parseInt(element.attributes.get('number')!, 10) - 1
+                : -1;
+            for (const e of events) {
+                e.staffIndex = staffIndex;
+                e.position = MusicXmlSpans.position(
+                    masterBar.index,
+                    midBar ? this._musicalPosition : 0,
+                    this._beatCount,
+                    0
+                );
+            }
+            this._indexToTrackInfo.get(track.index)!.spans.process(events);
         }
     }
 
@@ -2160,7 +2199,8 @@ export class MusicXmlImporter extends ScoreImporter {
     private _parseDirection(element: XmlNode, masterBar: MasterBar, track: Track) {
         const directionTypes: XmlNode[] = [];
         let offset: number | null = null;
-        // let voiceIndex = -1;
+        let offsetAffectsSound = false;
+        let voice = '';
         let staffIndex = -1;
         let tempo = -1;
         let sound: XmlNode | null = null;
@@ -2186,11 +2226,12 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
                 case 'offset':
                     offset = Number.parseFloat(c.innerText);
+                    offsetAffectsSound = c.getAttribute('sound', 'no') === 'yes';
                     break;
                 // case 'footnote': Ignored
                 // case 'level': Ignored
                 case 'voice':
-                    // voiceIndex = parseInt(c.innerText) - 1;
+                    voice = c.innerText.trim();
                     break;
                 case 'staff':
                     staffIndex = Number.parseInt(c.innerText, 10) - 1;
@@ -2206,7 +2247,8 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        let staff: Staff | null = null;
+        // the staff of directions without staff, e.g. for pedal markers
+        let staff: Staff;
         if (staffIndex >= 0) {
             staff = this._getOrCreateStaff(track, staffIndex);
         } else if (this._lastBeat !== null) {
@@ -2214,24 +2256,19 @@ export class MusicXmlImporter extends ScoreImporter {
         } else {
             staff = this._getOrCreateStaff(track, 0);
         }
+        this._getOrCreateBar(staff, masterBar);
 
-        const bar = staff ? this._getOrCreateBar(staff, masterBar) : null;
-
-        const getRatioPosition = () => {
-            let timelyPosition = this._musicalPosition;
-            if (offset !== null) {
-                timelyPosition += offset!;
-            }
-
-            const totalDuration = masterBar.calculateDuration(false);
-            return timelyPosition / totalDuration;
-        };
+        const offsetTicks = offset !== null ? this._musicXmlDivisionsToAlphaTabTicks(offset!) : 0;
+        const totalDuration = masterBar.calculateDuration(false);
+        // the offset always affects the display, the sound only if specified
+        const displayRatioPosition = (this._musicalPosition + offsetTicks) / totalDuration;
+        const soundRatioPosition = offsetAffectsSound ? displayRatioPosition : this._musicalPosition / totalDuration;
 
         if (tempo > 0) {
             const tempoAutomation = new Automation();
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = tempo;
-            tempoAutomation.ratioPosition = getRatioPosition();
+            tempoAutomation.ratioPosition = soundRatioPosition;
 
             if (!this._hasSameTempo(masterBar, tempoAutomation)) {
                 masterBar.tempoAutomations.push(tempoAutomation);
@@ -2264,18 +2301,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'symbol': Not supported
                 case 'wedge':
-                    switch (direction.getAttribute('type')) {
-                        case 'crescendo':
-                            this._nextBeatCrescendo = CrescendoType.Crescendo;
-                            break;
-                        case 'diminuendo':
-                            this._nextBeatCrescendo = CrescendoType.Decrescendo;
-                            break;
-                        // case 'continue': Ignore
-                        case 'stop':
-                            this._nextBeatCrescendo = null;
-                            break;
-                    }
+                    MusicXmlSpans.readWedge(direction, spanEvents);
                     break;
                 case 'dynamics':
                     const newDynamics = this._parseDynamics(direction);
@@ -2285,37 +2311,23 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'dashes':
-                    const spanEvent = MusicXmlSpans.readLine(direction, previousWords);
-                    if (spanEvent !== null) {
-                        spanEvents.push(spanEvent);
+                case 'bracket':
+                    if (this._parseLine(direction, previousWords, track, masterBar, spanEvents)) {
+                        // the words are the label of the line, unknown lines keep their words as text
+                        previousWords = '';
                     }
-                    // the words are the label of the line
-                    previousWords = '';
                     break;
-                // case 'bracket': Ignored
                 case 'pedal':
-                    const pedal = this._parsePedal(direction);
-                    if (pedal && bar) {
-                        pedal.ratioPosition = getRatioPosition();
-
-                        // up or holds without a previous down/hold?
-                        const canHaveUp =
-                            bar.sustainPedals.length > 0 &&
-                            bar.sustainPedals[bar.sustainPedals.length - 1].pedalType !== SustainPedalMarkerType.Up;
-
-                        if (pedal.pedalType !== SustainPedalMarkerType.Up || canHaveUp) {
-                            bar.sustainPedals.push(pedal);
-                        }
-                    }
+                    MusicXmlSpans.readPedal(direction, spanEvents);
                     break;
                 case 'metronome':
                     // <sound tempo> is the authoritative playback tempo, the metronome is only its visual counterpart
                     if (tempo <= 0) {
-                        this._parseMetronome(direction, masterBar, getRatioPosition());
+                        this._parseMetronome(direction, masterBar, displayRatioPosition);
                     }
                     break;
                 case 'octave-shift':
-                    this._nextBeatOttavia = this._parseOctaveShift(direction);
+                    MusicXmlSpans.readOctaveShift(direction, spanEvents);
                     break;
                 // case 'harp-pedals': Not supported
                 // case 'damp': Not supported
@@ -2333,51 +2345,89 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         if (spanEvents.length > 0) {
-            // the staff of the direction (-1 if not specified) is resolved when the span is applied
-            const offsetTicks = offset !== null ? this._musicXmlDivisionsToAlphaTabTicks(offset!) : 0;
-            this._indexToTrackInfo.get(track.index)!.spans.processDirection(spanEvents, staffIndex, {
-                barIndex: masterBar.index,
-                ticks: this._musicalPosition + offsetTicks
-            });
+            const position = MusicXmlSpans.position(
+                masterBar.index,
+                this._musicalPosition,
+                this._beatCount,
+                offsetTicks
+            );
+            for (const e of spanEvents) {
+                // directions without staff apply to all staves (resolved when the span is applied)
+                e.staffIndex = staffIndex;
+                e.voice = voice;
+                e.position = position;
+                switch (e.element) {
+                    case MusicXmlSpanElement.Pedal:
+                        // pedal markers are placed on a single staff
+                        e.staffIndex = staff.index;
+                        break;
+                    case MusicXmlSpanElement.OctaveShift:
+                        // the stop is placed within the last shifted note
+                        e.endIncludesBeat = e.action === MusicXmlSpanAction.Stop && this._octaveShiftEndsBeforeLastNote;
+                        break;
+                }
+            }
+            // the voice the direction is written at is the voice of the following note
+            if (this._pendingSpanTrack !== null && this._pendingSpanTrack !== track) {
+                this._processPendingSpanEvents('');
+            }
+            for (const e of spanEvents) {
+                this._pendingSpanEvents.push(e);
+            }
+            this._pendingSpanTrack = track;
+            if (voice.length > 0) {
+                this._processPendingSpanEvents(voice);
+            }
         }
 
         // words printing the label of a <sound> direction are not repeated as text, the direction renders it
         if (previousWords && !(hasSoundDirections && MusicXmlImporter._isSoundDirectionLabel(allWords, sound!))) {
             this._nextBeatText = previousWords;
+            this._nextBeatTextTrackIndex = track.index;
+            this._nextBeatTextPosition = MusicXmlSpans.position(
+                masterBar.index,
+                this._musicalPosition,
+                this._beatCount,
+                0
+            );
         }
     }
-    private _parseOctaveShift(element: XmlNode): Ottavia | null {
-        const type = element.getAttribute('type');
-        const size = Number.parseInt(element.getAttribute('size', '8'), 10);
 
-        switch (size) {
-            case 15:
-                switch (type) {
-                    case 'up':
-                        return Ottavia._15mb;
-                    case 'down':
-                        return Ottavia._15ma;
-                    case 'stop':
-                        return Ottavia.Regular;
-                    case 'continue':
-                        return this._nextBeatOttavia;
-                }
-                break;
-            case 8:
-                switch (type) {
-                    case 'up':
-                        return Ottavia._8vb;
-                    case 'down':
-                        return Ottavia._8va;
-                    case 'stop':
-                        return Ottavia.Regular;
-                    case 'continue':
-                        return this._nextBeatOttavia;
-                }
-                break;
+    /**
+     * Reads a `<dashes>` or `<bracket>` line.
+     * @returns Whether the words were used as the label of the line.
+     */
+    private _parseLine(
+        element: XmlNode,
+        words: string,
+        track: Track,
+        masterBar: MasterBar,
+        spanEvents: MusicXmlSpanEvent[]
+    ): boolean {
+        const lineElement = element.localName === 'bracket' ? MusicXmlSpanElement.Bracket : MusicXmlSpanElement.Dashes;
+
+        // the label can be a separate direction at the same position (e.g. music21)
+        let label = words;
+        let usesPendingText = false;
+        if (
+            label.length === 0 &&
+            this._nextBeatText !== null &&
+            this._nextBeatTextTrackIndex === track.index &&
+            this._nextBeatTextPosition.barIndex === masterBar.index &&
+            this._nextBeatTextPosition.ticks === this._musicalPosition &&
+            element.getAttribute('type', 'start') === 'start'
+        ) {
+            label = this._nextBeatText!;
+            usesPendingText = true;
         }
 
-        return null;
+        const count = spanEvents.length;
+        MusicXmlSpans.readLine(element, lineElement, label, spanEvents);
+        const isKnown = spanEvents.length > count && spanEvents[count].kind !== MusicXmlSpanKind.None;
+        if (isKnown && usesPendingText) {
+            this._nextBeatText = null;
+        }
+        return isKnown;
     }
     private _parseMetronome(element: XmlNode, masterBar: MasterBar, ratioPosition: number) {
         let unit: Duration | null = null;
@@ -2422,28 +2472,6 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
         return false;
-    }
-
-    private _parsePedal(element: XmlNode): SustainPedalMarker | null {
-        const marker = new SustainPedalMarker();
-        switch (element.getAttribute('type')) {
-            case 'start':
-                marker.pedalType = SustainPedalMarkerType.Down;
-                break;
-            case 'stop':
-                marker.pedalType = SustainPedalMarkerType.Up;
-                break;
-            // case 'sostenuto': Not supported
-            // case 'change': Not supported
-            case 'continue':
-                marker.pedalType = SustainPedalMarkerType.Hold;
-                break;
-            // case 'discontinue': Not supported
-            // case 'resume': Not supported
-            default:
-                return null;
-        }
-        return marker;
     }
 
     private _parseDynamics(element: XmlNode) {
@@ -2679,6 +2707,8 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
+        this._processPendingSpanEvents(voiceRaw);
+
         if (isChord && !this._lastBeat) {
             Logger.warning('MusicXML', 'Malformed MusicXML, <chord /> cannot be set on the first note of a measure');
             isChord = false;
@@ -2755,6 +2785,12 @@ export class MusicXmlImporter extends ScoreImporter {
                     durationInTicks = this._parseDuration(c);
                     break;
                 // case 'tie': Ignored -> "tie" is sound, "tied" is notation
+                case 'tied':
+                    // not valid at this place but written for let ring by TuxGuitar
+                    if (note && c.getAttribute('type') === 'let-ring') {
+                        note.isLetRing = true;
+                    }
+                    break;
                 // case 'instrument': handled in pass 1
 
                 // case 'footnote': Ignored
@@ -2821,7 +2857,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'notations':
-                    this._parseNotations(c, note, beat);
+                    this._parseNotations(c, note, beat, voiceRaw);
                     break;
                 case 'lyric':
                     this._parseLyric(c, beat, track);
@@ -2932,11 +2968,10 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         const newBeat = new Beat();
+        this._beatSequence.set(newBeat, this._beatCount);
+        this._beatCount++;
         newBeat.isEmpty = false;
         newBeat.dynamics = this._currentDynamics;
-        if (this._isBeatSlash) {
-            newBeat.slashed = true;
-        }
 
         const automations = this._nextBeatAutomations;
         this._nextBeatAutomations = null;
@@ -2953,18 +2988,6 @@ export class MusicXmlImporter extends ScoreImporter {
             if (!voice.bar.staff.hasChord(chord.uniqueId)) {
                 voice.bar.staff.addChord(newBeat.chordId!, chord);
             }
-        }
-
-        const crescendo = this._nextBeatCrescendo;
-        // Don't reset until 'stop' this._nextBeatCrescendo = null;
-        if (crescendo !== null) {
-            newBeat.crescendo = crescendo;
-        }
-
-        const ottavia = this._nextBeatOttavia;
-        // Don't set until 'stop'
-        if (ottavia !== null) {
-            newBeat.ottava = ottavia;
         }
 
         if (this._nextBeatText) {
@@ -3593,35 +3616,32 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private _parseNotations(element: XmlNode, note: Note | null, beat: Beat) {
+    private _parseNotations(element: XmlNode, note: Note | null, beat: Beat, voice: string) {
+        const spanEvents: MusicXmlSpanEvent[] = [];
+        let singleTrillStep = -1;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'footnote': Ignored
                 // case 'level': Ignored
                 case 'tied':
                     if (note) {
-                        this._parseTied(c, note, beat.voice.bar.staff);
+                        this._parseTied(c, note, spanEvents);
                     }
                     break;
                 case 'slur':
-                    if (note) {
-                        this._parseSlur(c, note);
-                    }
+                    MusicXmlSpans.readLink(c, MusicXmlSpanElement.Slur, MusicXmlSpanKind.Slur, spanEvents);
                     break;
                 // case 'tuplet': Handled via time-modification
                 case 'glissando':
-                    if (note) {
-                        this._parseGlissando(c, note);
-                    }
+                    // glissandos are imported as shift slides, wavy lines are not supported
+                    MusicXmlSpans.readLink(c, MusicXmlSpanElement.Glissando, MusicXmlSpanKind.Slide, spanEvents);
                     break;
                 case 'slide':
-                    if (note) {
-                        this._parseSlide(c, note);
-                    }
+                    MusicXmlSpans.readLink(c, MusicXmlSpanElement.Slide, MusicXmlSpanKind.Slide, spanEvents);
                     break;
                 case 'ornaments':
                     if (note) {
-                        this._parseOrnaments(c, note);
+                        singleTrillStep = this._parseOrnaments(c, note, spanEvents);
                     }
                     break;
                 case 'technical':
@@ -3650,6 +3670,44 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'other-notation': Not supported
             }
         }
+
+        if (note === null) {
+            return;
+        }
+
+        const spans = this._indexToTrackInfo.get(beat.voice.bar.staff.track.index)!.spans;
+        const position = MusicXmlSpans.position(
+            beat.voice.bar.index,
+            beat.displayStart,
+            this._beatSequence.has(beat) ? this._beatSequence.get(beat)! : this._beatCount,
+            0
+        );
+        if (spanEvents.length > 0) {
+            for (const e of spanEvents) {
+                e.staffIndex = beat.voice.bar.staff.index;
+                e.voice = voice;
+                e.position = position;
+                e.note = note;
+            }
+            spans.process(spanEvents);
+        }
+
+        if (singleTrillStep >= 0) {
+            spans.add({
+                element: MusicXmlSpanElement.WavyLine,
+                kind: MusicXmlSpanKind.Trill,
+                value: singleTrillStep,
+                number: '',
+                staffIndex: beat.voice.bar.staff.index,
+                voice: voice,
+                writtenVoice: voice,
+                start: position,
+                end: null,
+                startNote: note,
+                endNote: note,
+                endIncludesBeat: false
+            });
+        }
     }
 
     private _getStaffContext(staff: Staff) {
@@ -3659,49 +3717,6 @@ export class MusicXmlImporter extends ScoreImporter {
             return context;
         }
         return this._staffToContext.get(staff)!;
-    }
-
-    private _parseGlissando(element: XmlNode, note: Note) {
-        const type = element.getAttribute('type');
-        const number = element.getAttribute('number', '1');
-
-        const context = this._getStaffContext(note.beat.voice.bar.staff);
-
-        switch (type) {
-            case 'start':
-                context.slideOrigins.set(number, note);
-                break;
-            case 'stop':
-                if (context.slideOrigins.has(number)) {
-                    const origin = context.slideOrigins.get(number)!;
-                    origin.slideTarget = note;
-                    note.slideOrigin = origin;
-                    origin.slideOutType = SlideOutType.Shift; // TODO: wavy lines
-                }
-                break;
-        }
-    }
-
-    private _parseSlur(element: XmlNode, note: Note) {
-        const slurNumber: string = element.getAttribute('number', '1');
-
-        const context = this._getStaffContext(note.beat.voice.bar.staff);
-
-        switch (element.getAttribute('type')) {
-            case 'start':
-                context.slurStarts.set(slurNumber, note);
-                break;
-            case 'stop':
-                if (context.slurStarts.has(slurNumber)) {
-                    note.isSlurDestination = true;
-                    const slurStart = context.slurStarts.get(slurNumber)!;
-                    slurStart.slurDestination = note;
-                    note.slurOrigin = slurStart;
-
-                    context.slurStarts.delete(slurNumber);
-                }
-                break;
-        }
     }
 
     private _parseArpeggiate(element: XmlNode, beat: Beat) {
@@ -3963,20 +3978,23 @@ export class MusicXmlImporter extends ScoreImporter {
         return Fingers.Unknown;
     }
 
-    private _currentTrillStep: number = -1;
+    /**
+     * Reads the ornaments of a note.
+     * @returns The trill step of a trill on this note only, -1 if there is none.
+     */
+    private _parseOrnaments(element: XmlNode, note: Note, spanEvents: MusicXmlSpanEvent[]): number {
+        // a trill mark defines the meaning of the wavy line, without it the line is a vibrato
+        let trillStep = -1;
+        for (const c of element.childElements()) {
+            if (c.localName === 'trill-mark') {
+                trillStep = MusicXmlSpans.trillStep(c.getAttribute('trill-step', 'whole'));
+            }
+        }
 
-    private _parseOrnaments(element: XmlNode, note: Note): void {
-        let currentTrillStep = -1;
+        let hasLine = false;
         for (const c of element.childElements()) {
             switch (c.localName) {
-                case 'trill-mark':
-                    currentTrillStep = Number.parseInt(c.getAttribute('trill-step', '2'), 10);
-                    if (note.isStringed) {
-                        note.trillValue = note.stringTuning + currentTrillStep;
-                    } else if (!note.isPercussion) {
-                        note.trillValue = note.calculateRealValue(false, false) + currentTrillStep;
-                    }
-                    break;
+                // case 'trill-mark': handled above
                 case 'turn':
                     note.ornament = NoteOrnament.Turn;
                     break;
@@ -3989,20 +4007,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'inverted-vertical-turn': Not supported
                 // case 'shake': Not supported
                 case 'wavy-line':
-                    if (currentTrillStep > 0) {
-                        if (c.getAttribute('type') === 'start') {
-                            this._currentTrillStep = currentTrillStep;
-                        }
-                    } else if (this._currentTrillStep > 0) {
-                        if (c.getAttribute('type') === 'stop') {
-                            this._currentTrillStep = -1;
-                        } else if (note.isStringed) {
-                            note.trillValue = note.stringTuning + this._currentTrillStep;
-                        } else if (!note.isPercussion) {
-                            note.trillValue = note.calculateRealValue(false, false) + this._currentTrillStep;
-                        }
-                    } else {
-                        note.vibrato = VibratoType.Slight;
+                    const action = MusicXmlSpans.readWavyLine(c, trillStep, spanEvents);
+                    if (action === MusicXmlSpanAction.Start || action === MusicXmlSpanAction.Continue) {
+                        hasLine = true;
                     }
                     break;
                 case 'mordent':
@@ -4029,74 +4036,29 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'other-element': Not supported
             }
         }
+
+        return hasLine ? -1 : trillStep;
     }
 
-    private _parseSlide(element: XmlNode, note: Note) {
-        const type = element.getAttribute('type');
-        const number = element.getAttribute('number', '1');
-
-        const context = this._getStaffContext(note.beat.voice.bar.staff);
-
-        switch (type) {
+    private _parseTied(element: XmlNode, note: Note, spanEvents: MusicXmlSpanEvent[]): void {
+        switch (element.getAttribute('type')) {
             case 'start':
-                context.slideOrigins.set(number, note);
-                break;
             case 'stop':
-                if (context.slideOrigins.has(number)) {
-                    const origin = context.slideOrigins.get(number)!;
-                    origin.slideTarget = note;
-                    note.slideOrigin = origin;
-                    origin.slideOutType = SlideOutType.Shift;
-                }
+                // ties are identified by the pitch, the number is rarely given (see MusicXML spec)
+                spanEvents.push(
+                    MusicXmlSpans.createEvent(
+                        MusicXmlSpanElement.Tied,
+                        element.getAttribute('type') === 'start' ? MusicXmlSpanAction.Start : MusicXmlSpanAction.Stop,
+                        MusicXmlSpanKind.Tie,
+                        MusicXmlSpans.tieKey(note)
+                    )
+                );
                 break;
-        }
-    }
-
-    private _parseTied(element: XmlNode, note: Note, staff: Staff): void {
-        const type = element.getAttribute('type');
-        const number = element.getAttribute('number', '');
-
-        const context = this._getStaffContext(staff);
-
-        if (type === 'start') {
-            if (number) {
-                // start without end
-                if (context.tieStartIds.has(number)) {
-                    const unclosed = context.tieStartIds.get(number)!;
-                    context.tieStarts.delete(unclosed);
-                }
-
-                context.tieStartIds.set(number, note);
-            }
-
-            context.tieStarts.add(note);
-        } else if (type === 'stop' && !note.isTieDestination) {
-            let tieOrigin: Note | null = null;
-            if (number) {
-                if (!context.tieStartIds.has(number)) {
-                    return;
-                }
-
-                tieOrigin = context.tieStartIds.get(number)!;
-                context.tieStartIds.delete(number);
-                context.tieStarts.delete(note);
-            } else {
-                const realValue = this._calculatePitchedNoteValue(note);
-                for (const t of context.tieStarts) {
-                    if (this._calculatePitchedNoteValue(t) === realValue) {
-                        tieOrigin = t;
-                        context.tieStarts.delete(tieOrigin);
-                        break;
-                    }
-                }
-            }
-
-            if (!tieOrigin) {
-                return;
-            }
-
-            note.isTieDestination = true;
-            note.tieOrigin = tieOrigin;
+            // an undamped note (e.g. MuseScore l.v., TuxGuitar let ring)
+            case 'let-ring':
+                note.isLetRing = true;
+                break;
+            // case 'continue': no meaning for the playback
         }
     }
 
