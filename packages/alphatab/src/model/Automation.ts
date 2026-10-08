@@ -104,6 +104,10 @@ export class Automation {
 
     /**
      * Gets or sets the relative position of of the automation.
+     * @remarks
+     * The position is relative to the full duration of the bar's time signature (0 = bar start, 1 = bar end).
+     * This also applies to pick-up bars (`MasterBar.isAnacrusis`) which are shorter than their time signature:
+     * an automation on the 3rd eighth note of a 3/8 pick-up in 2/4 has the position 0.5 (as written by Guitar Pro).
      */
     public ratioPosition: number = 0;
 

@@ -198,8 +198,9 @@ export abstract class AlphaTabSysExEvent extends MidiEvent {
 }
 
 /**
- * Represents a metronome event. This event is emitted by the synthesizer only during playback and
- * is typically not part of the midi file itself.
+ * Represents a metronome event. alphaTab places these events bar by bar into the midi files generated for playback
+ * (respecting repeats, time signatures and pick-up bars). They are not written into standard midi files (SMF1 mode).
+ * For midi files without these events the synthesizer generates them during playback according to the time signatures.
  * @public
  */
 export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {

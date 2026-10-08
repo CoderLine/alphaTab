@@ -285,8 +285,10 @@ export class BeamingHelper {
         }
 
         // check if they are on the same group as per rule definitions
-        const groupId1 = this._beamingRuleLookup.calculateGroupIndex(start1);
-        const groupId2 = this._beamingRuleLookup.calculateGroupIndex(start2);
+        // (pick-up bars form the end of a full bar, the rules apply to their position in the nominal meter)
+        const anacrusisOffset = m1.masterBar.anacrusisOffset;
+        const groupId1 = this._beamingRuleLookup.calculateGroupIndex(start1 + anacrusisOffset);
+        const groupId2 = this._beamingRuleLookup.calculateGroupIndex(start2 + anacrusisOffset);
         return groupId1 === groupId2;
     }
 

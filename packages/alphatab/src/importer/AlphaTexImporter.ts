@@ -300,8 +300,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
         for (const [sustainPedal, beat] of this._state.sustainPedalToBeat) {
             if (sustainPedal.ratioPosition < 1) {
-                const duration = beat.voice.bar.masterBar.calculateDuration();
-                sustainPedal.ratioPosition = beat.playbackStart / duration;
+                sustainPedal.ratioPosition = ModelUtils.tickToRatioPosition(beat.voice.bar.masterBar, beat.playbackStart);
             }
         }
         return this._state.score;

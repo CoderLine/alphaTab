@@ -12,7 +12,7 @@ import {
     NoteOnEvent,
     type TimeSignatureEvent
 } from '@coderline/alphatab/midi/MidiEvent';
-import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFile, MidiFileFormat } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { MidiTickLookup } from '@coderline/alphatab/midi/MidiTickLookup';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
@@ -729,6 +729,17 @@ describe('MidiFileGeneratorTest', () => {
                     // Swing on second bar
                     640, 320, 640, 320, 640, 320, 640, 320
                 ]
+            );
+        });
+
+        it('anacrusis', () => {
+            // the pick-up forms the end of a full bar: the first eighth is an offbeat
+            testTripletFeel(
+                '\\ts 2 4 \\ac \\tf t8 3.2.8*3 | \\tf t8 3.2.8*4',
+                [0, 480, 960, 0, 480, 960, 1440],
+                [480, 480, 480, 480, 480, 480, 480],
+                [0, 480, 1120, 1440, 2080, 2400, 3040],
+                [480, 640, 320, 640, 320, 640, 320]
             );
         });
     });
@@ -1833,6 +1844,48 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualTimers.join(',')).toBe(expectedTimers.join(','));
     });
 
+    it('beat-timer-multiple-tracks', () => {
+        const score: Score = parseTex(`
+            \\tempo 120
+            .
+            \\track "T1"
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3
+            \\track "T2"
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3
+        `);
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        for (const track of score.tracks) {
+            const actualTimers = track.staves[0].bars.map(b => b.voices[0].beats[0].timer ?? -1);
+            expect(actualTimers.join(','), track.name).toBe('0,2000,4000');
+        }
+    });
+
+    it('beat-timer-tempo-change-mid-bar', () => {
+        const score: Score = parseTex(`
+            \\tempo 120
+            .
+                3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4 3.3.4 { tempo 60 } 3.3.4 |
+                3.3.4 { timer } 3.3.4*3
+        `);
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const actualTimers = score.tracks[0].staves[0].bars.map(b => b.voices[0].beats[0].timer ?? -1);
+        // 2 beats at 120bpm (1000ms) + 2 beats at 60bpm (2000ms)
+        expect(actualTimers.join(',')).toBe('0,2000,5000');
+    });
+
     it('beat-timer-tempo-changes', () => {
         const score: Score = parseTex(`
             \\tempo 120
@@ -1878,6 +1931,86 @@ describe('MidiFileGeneratorTest', () => {
         ];
 
         expect(actualTimers.join(',')).toBe(expectedTimers.join(','));
+    });
+
+    describe('metronome', () => {
+        function testMetronome(tex: string, expectedClicks: string) {
+            const score: Score = parseTex(tex);
+            const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+            const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+            generator.generate();
+            const actualClicks = handler.metronomeEvents.map(e => `${e.tick}:${e.counter}`).join(' ');
+            expect(actualClicks).toBe(expectedClicks);
+        }
+
+        it('regular', () => {
+            testMetronome('\\ts 3 4 3.3.4*3 | 3.3.4*3', '0:0 960:1 1920:2 2880:0 3840:1 4800:2');
+        });
+
+        it('time-signature-change', () => {
+            testMetronome(
+                '\\ts 7 8 3.3.8*7 | \\ts 4 4 3.3.1',
+                '0:0 480:1 960:2 1440:3 1920:4 2400:5 2880:6 3360:0 4320:1 5280:2 6240:3'
+            );
+        });
+
+        it('anacrusis', () => {
+            // 3/8 pick-up in 2/4: the pick-up starts on the offbeat of beat 1
+            testMetronome('\\ts 2 4 \\ac 3.3.8*3 | 3.3.2 | 3.3.2', '480:1 1440:0 2400:1 3360:0 4320:1');
+        });
+
+        it('anacrusis-full-beats', () => {
+            testMetronome('\\ts 4 4 \\ac 3.3.4 | 3.3.1', '0:3 960:0 1920:1 2880:2 3840:3');
+        });
+
+        it('anacrusis-repeat', () => {
+            testMetronome(
+                '\\ts 2 4 \\ac 3.3.8*3 | \\ro 3.3.2 | \\rc 2 3.3.2',
+                '480:1 1440:0 2400:1 3360:0 4320:1 5280:0 6240:1 7200:0 8160:1'
+            );
+        });
+    });
+
+    it('anacrusis-tempo-automation', () => {
+        // automation positions are relative to the full time signature (like in Guitar Pro)
+        const score: Score = parseTex('\\ts 2 4 \\ac 3.3.8 3.3.8 3.3.8 { tempo 60 } | 3.3.2');
+        expect(score.masterBars[0].tempoAutomations.map(a => a.ratioPosition).join(',')).toBe('0.5');
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const tempoChanges: string[] = [];
+        for (const e of handler.midiEvents) {
+            if (e instanceof FlatTempoEvent) {
+                tempoChanges.push(`${e.tick}:${e.tempo}`);
+            }
+        }
+        expect(tempoChanges.join(' ')).toBe('960:60');
+    });
+
+    it('multi-track-format-events', () => {
+        const score: Score = parseTex('\\track "T1" 3.3.4*4 | 3.3.1 \\track "T2" 3.4.2*2 | 3.4.1');
+        const midi = new MidiFile();
+        midi.format = MidiFileFormat.MultiTrack;
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
+        generator.generate();
+
+        expect(midi.tracks.length).toBe(2);
+        const events = midi.events;
+        expect(events.length).toBe(midi.tracks[0].events.length + midi.tracks[1].events.length);
+
+        // sorted by tick and keeping the order within each track
+        const positions: number[] = [0, 0];
+        let previousTick = 0;
+        for (const e of events) {
+            expect(e.tick).toBeGreaterThanOrEqual(previousTick);
+            previousTick = e.tick;
+            const track =
+                positions[0] < midi.tracks[0].events.length && midi.tracks[0].events[positions[0]] === e ? 0 : 1;
+            expect(midi.tracks[track].events[positions[track]]).toBe(e);
+            positions[track]++;
+        }
     });
 
     it('transpose', () => {
