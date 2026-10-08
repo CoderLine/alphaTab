@@ -17,6 +17,7 @@ import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -453,9 +454,8 @@ export class MidiFileGenerator {
         }
 
         // walk tempo changes and create points
-        const duration = bar.calculateDuration();
         for (const change of bar.tempoAutomations) {
-            const absoluteTick = barStartTick + change.ratioPosition * duration;
+            const absoluteTick = barStartTick + ModelUtils.ratioPositionToTick(bar, change.ratioPosition);
             const tickOffset = absoluteTick - context.synthTick;
             if (tickOffset > 0) {
                 context.synthTick = absoluteTick;
@@ -481,7 +481,6 @@ export class MidiFileGenerator {
 
     private static _processBarTimeWithSyncPoints(bar: MasterBar, occurence: number, context: PlayThroughContext) {
         const barStartTick = context.synthTick;
-        const duration = bar.calculateDuration();
 
         let tempoChangeIndex = 0;
         let tickOffset: number;
@@ -491,7 +490,7 @@ export class MidiFileGenerator {
                 continue;
             }
 
-            const syncPointTick = barStartTick + syncPoint.ratioPosition * duration;
+            const syncPointTick = barStartTick + ModelUtils.ratioPositionToTick(bar, syncPoint.ratioPosition);
 
             // first process all tempo changes until this sync point
             while (
@@ -499,7 +498,7 @@ export class MidiFileGenerator {
                 bar.tempoAutomations[tempoChangeIndex].ratioPosition <= syncPoint.ratioPosition
             ) {
                 const tempoChange = bar.tempoAutomations[tempoChangeIndex];
-                const absoluteTick = barStartTick + tempoChange.ratioPosition * duration;
+                const absoluteTick = barStartTick + ModelUtils.ratioPositionToTick(bar, tempoChange.ratioPosition);
                 tickOffset = absoluteTick - context.synthTick;
 
                 if (tickOffset > 0) {
@@ -543,7 +542,7 @@ export class MidiFileGenerator {
         // process remaining tempo changes after all sync points
         while (tempoChangeIndex < bar.tempoAutomations.length) {
             const tempoChange = bar.tempoAutomations[tempoChangeIndex];
-            const absoluteTick = barStartTick + tempoChange.ratioPosition * duration;
+            const absoluteTick = barStartTick + ModelUtils.ratioPositionToTick(bar, tempoChange.ratioPosition);
             tickOffset = absoluteTick - context.synthTick;
             if (tickOffset > 0) {
                 context.synthTick = absoluteTick;
@@ -558,9 +557,8 @@ export class MidiFileGenerator {
     private static _processBarTimeNoSyncPoints(bar: MasterBar, context: PlayThroughContext) {
         // walk through the tempo changes
         const barStartTick = context.synthTick;
-        const duration = bar.calculateDuration();
         for (const changes of bar.tempoAutomations) {
-            const absoluteTick = barStartTick + changes.ratioPosition * duration;
+            const absoluteTick = barStartTick + ModelUtils.ratioPositionToTick(bar, changes.ratioPosition);
             const tickOffset = absoluteTick - context.synthTick;
             if (tickOffset > 0) {
                 context.synthTick = absoluteTick;
@@ -606,7 +604,7 @@ export class MidiFileGenerator {
             }
 
             for (const automation of masterBar.tempoAutomations) {
-                const tick = currentTick + masterBarDuration * automation.ratioPosition;
+                const tick = currentTick + ModelUtils.ratioPositionToTick(masterBar, automation.ratioPosition);
                 this._handler.addTempo(tick, automation.value);
                 masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(tick, automation.value));
             }
@@ -706,10 +704,8 @@ export class MidiFileGenerator {
         const remainingBarTempoAutomations = realBar.masterBar.tempoAutomations.slice();
         let tempoOnBeatStart = tempoOnVoiceStart;
 
-        const barDuration = realBar.masterBar.calculateDuration();
-
         for (const b of voice.beats) {
-            const ratio = b.playbackStart / barDuration;
+            const ratio = ModelUtils.tickToRatioPosition(realBar.masterBar, b.playbackStart);
 
             while (remainingBarTempoAutomations.length > 0 && remainingBarTempoAutomations[0].ratioPosition <= ratio) {
                 tempoOnBeatStart = remainingBarTempoAutomations.shift()!.value;
@@ -2413,7 +2409,7 @@ export class MidiFileGenerator {
             tempo = masterBar.score.tempo;
         }
 
-        const positionRatio = beat.playbackStart / masterBar.calculateDuration();
+        const positionRatio = ModelUtils.tickToRatioPosition(masterBar, beat.playbackStart);
         for (const automation of masterBar.tempoAutomations) {
             if (automation.ratioPosition <= positionRatio) {
                 tempo = automation.value;

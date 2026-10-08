@@ -1005,6 +1005,13 @@ describe('AlphaTexImporterTest', () => {
         testExportRoundtrip(score);
     });
 
+    it('anacrusis-sustain-pedal', () => {
+        // automation positions are relative to the full time signature (like in Guitar Pro)
+        const score = parseTex('\\ts 2 4 \\ac C4.8 D4.8 E4.8 {spd} | F4.4 {spu} G4.4');
+        expect(score.tracks[0].staves[0].bars[0].sustainPedals.map(p => p.ratioPosition).join(',')).toBe('0.5');
+        testExportRoundtrip(score);
+    });
+
     it('simple-anacrusis', () => {
         const tex: string = '\\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         const score = parseTex(tex);

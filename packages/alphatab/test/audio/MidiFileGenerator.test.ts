@@ -1891,6 +1891,24 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualTimers.join(',')).toBe(expectedTimers.join(','));
     });
 
+    it('anacrusis-tempo-automation', () => {
+        // automation positions are relative to the full time signature (like in Guitar Pro)
+        const score: Score = parseTex('\\ts 2 4 \\ac 3.3.8 3.3.8 3.3.8 { tempo 60 } | 3.3.2');
+        expect(score.masterBars[0].tempoAutomations.map(a => a.ratioPosition).join(',')).toBe('0.5');
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const tempoChanges: string[] = [];
+        for (const e of handler.midiEvents) {
+            if (e instanceof FlatTempoEvent) {
+                tempoChanges.push(`${e.tick}:${e.tempo}`);
+            }
+        }
+        expect(tempoChanges.join(' ')).toBe('960:60');
+    });
+
     it('transpose', () => {
         const score = parseTex(`
             \\track \\staff \\instrument piano

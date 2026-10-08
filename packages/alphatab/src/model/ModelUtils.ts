@@ -79,6 +79,24 @@ export class ModelUtils {
         return ModelUtils._durationIndices.get(duration)!;
     }
 
+    /**
+     * Converts a {@link Automation.ratioPosition} within the given bar into a midi tick offset relative to the bar start.
+     * @remarks
+     * The ratio is relative to the full duration of the time signature, also in pick-up bars which are shorter.
+     * This matches Guitar Pro which stores e.g. 0.5 for an automation on the 3rd eighth note of a 3/8 pick-up in 2/4.
+     */
+    public static ratioPositionToTick(masterBar: MasterBar, ratioPosition: number): number {
+        return masterBar.calculateDuration(false) * ratioPosition;
+    }
+
+    /**
+     * Converts a midi tick offset relative to the bar start into a {@link Automation.ratioPosition}.
+     * See {@link ratioPositionToTick} for the convention.
+     */
+    public static tickToRatioPosition(masterBar: MasterBar, tick: number): number {
+        return tick / masterBar.calculateDuration(false);
+    }
+
     public static keySignatureIsFlat(ks: number): boolean {
         return ks < 0;
     }
