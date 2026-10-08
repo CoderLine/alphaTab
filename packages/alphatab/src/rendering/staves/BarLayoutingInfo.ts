@@ -522,11 +522,9 @@ export class BarLayoutingInfo {
                 requiredSpace = currentSpring.postSpringWidth + nextSpring.preSpringWidth;
             }
 
-            // for the first spring we need to ensure we take the initial
-            // pre-spring width into account
-            if (i === 0) {
-                requiredSpace += currentSpring.preSpringWidth;
-            }
+            // the first spring's pre-spring width is not part of the requirement:
+            // it is a fixed offset in front of the first spring (see calculateVoiceWidth,
+            // spaceToForce and buildOnTimePositions) and does not need to be stretched in.
 
             const requiredSpaceForce = requiredSpace * currentSpring.springConstant;
             this._updateMinStretchForce(requiredSpaceForce);
