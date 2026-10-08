@@ -11,13 +11,12 @@ import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
 import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
+import { ScoreEffectSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreEffectSlurGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
 import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
-import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
@@ -133,22 +132,25 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             const tie: ScoreSlurGlyph = new ScoreSlurGlyph(`score.slur.${n.slurOrigin!.id}`, n.slurOrigin!, n, true);
             this.addTie(tie);
         }
+        // effect slurs (hammer-on, pull-off, legato slide) are a single slur per chord chain
         // start effect slur on first beat
-        if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
-            const effectSlur = new ScoreSlurGlyph(`score.slur.effect.${n.beat.id}`, n, n.effectSlurDestination, false);
+        const beat = n.beat;
+        if (!this._effectSlur && beat.isEffectSlurOrigin && beat.effectSlurDestination) {
+            const effectSlur = new ScoreEffectSlurGlyph(
+                `score.slur.effect.${beat.id}`,
+                beat,
+                beat.effectSlurDestination,
+                false
+            );
             this._effectSlur = effectSlur;
             this.addTie(effectSlur);
         }
         // end effect slur on last beat
-        if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
-            const direction = (this.renderer as LineBarRenderer).getBeatDirection(n.beat);
-            const startNote =
-                direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
-            const endNote = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
-            const effectEndSlur = new ScoreSlurGlyph(
-                `score.slur.effect.${startNote.beat.id}`,
-                startNote,
-                endNote,
+        if (!this._effectEndSlur && beat.isEffectSlurDestination && beat.effectSlurOrigin) {
+            const effectEndSlur = new ScoreEffectSlurGlyph(
+                `score.slur.effect.${beat.effectSlurOrigin.id}`,
+                beat.effectSlurOrigin,
+                beat,
                 true
             );
             this._effectEndSlur = effectEndSlur;
