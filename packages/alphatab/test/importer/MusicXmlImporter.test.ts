@@ -1219,6 +1219,31 @@ describe('MusicXmlImporterTests', () => {
                 expect(notesOf(score, 0, 1).map(n => n.isLetRing)).toEqual([true, true, true, false]);
             });
 
+            it('stop-before-start-with-number-on-other-staff', () => {
+                // staff 1 has an open span with the same number while the stop of the staff 2 span is read before its start
+                const score = load(
+                    [
+                        [
+                            dashes('LetRing', 'start', '1', '<staff>1</staff>') +
+                                quarters(4, 'C5', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(2, 'C3', 5, 2) +
+                                dashes('', 'stop', '1', '<staff>2</staff>') +
+                                quarters(2, 'C3', 5, 2) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(1, 'E3', 6, 2) +
+                                dashes('LetRing', 'start', '1', '<staff>2</staff>') +
+                                quarters(3, 'E3', 6, 2) +
+                                dashes('', 'stop', '1', '<staff>1</staff>')
+                        ]
+                    ],
+                    2
+                );
+                expect(notesOf(score, 0, 0).map(n => n.isLetRing)).toEqual([true, true, true, true]);
+                expect(notesOf(score, 0, 1, 0).map(n => n.isLetRing)).toEqual([false, true, false, false]);
+                expect(notesOf(score, 0, 1, 1).map(n => n.isLetRing)).toEqual([false, true, false, false]);
+            });
+
             it('offsets', () => {
                 // the offset nudges the stop visually (e.g. Finale), the written voice is covered as written,
                 // other voices are covered by the exact position
@@ -1319,6 +1344,66 @@ describe('MusicXmlImporterTests', () => {
                     CrescendoType.Decrescendo
                 ]);
                 expect(beatsOf(score, 0, 1).map(b => b.crescendo)).toEqual([
+                    CrescendoType.None,
+                    CrescendoType.None,
+                    CrescendoType.None,
+                    CrescendoType.None
+                ]);
+            });
+
+            it('directions-in-order', () => {
+                // directions separated by a forward are processed in their order
+                const wedge = (type: string) => direction(`<direction-type><wedge type="${type}"/></direction-type>`);
+                const score = load(
+                    [
+                        [
+                            wedge('crescendo') +
+                                quarters(2) +
+                                wedge('diminuendo') +
+                                '<forward><duration>1</duration></forward>' +
+                                wedge('stop') +
+                                quarters(1),
+                            quarters(4)
+                        ]
+                    ],
+                    2
+                );
+                expect(beatsOf(score, 0).map(b => b.crescendo)).toEqual([
+                    CrescendoType.Crescendo,
+                    CrescendoType.Crescendo,
+                    CrescendoType.Decrescendo,
+                    CrescendoType.None
+                ]);
+                expect(beatsOf(score, 1).map(b => b.crescendo)).toEqual([
+                    CrescendoType.None,
+                    CrescendoType.None,
+                    CrescendoType.None,
+                    CrescendoType.None
+                ]);
+            });
+
+            it('written-voice', () => {
+                // a wedge is shown on the voice of the following note, other directions do not change it
+                const score = load(
+                    [
+                        [
+                            direction('<direction-type><wedge type="crescendo"/></direction-type>') +
+                                dashes('LetRing', 'start', '1', '<voice>2</voice>') +
+                                quarters(4, 'C5', 1, 1) +
+                                '<backup><duration>4</duration></backup>' +
+                                quarters(4, 'A4', 2, 1) +
+                                direction('<direction-type><wedge type="stop"/></direction-type>')
+                        ]
+                    ],
+                    2
+                );
+                expect(beatsOf(score, 0, 0, 0).map(b => b.crescendo)).toEqual([
+                    CrescendoType.Crescendo,
+                    CrescendoType.Crescendo,
+                    CrescendoType.Crescendo,
+                    CrescendoType.Crescendo
+                ]);
+                expect(beatsOf(score, 0, 0, 1).map(b => b.crescendo)).toEqual([
                     CrescendoType.None,
                     CrescendoType.None,
                     CrescendoType.None,
@@ -1456,6 +1541,11 @@ describe('MusicXmlImporterTests', () => {
                     SustainPedalMarkerType.Up
                 ]);
                 expect(bar.sustainPedals.map(p => p.ratioPosition)).toEqual([0.5, 0.5, 1]);
+            });
+
+            it('overfull-bar', () => {
+                const score = load([[pedal('start', '') + quarters(5) + pedal('stop', '')]], 2);
+                expect(score.tracks[0].staves[0].bars[0].sustainPedals.map(p => p.ratioPosition)).toEqual([0, 1]);
             });
 
             it('offset', () => {

@@ -1,10 +1,10 @@
+import { MusicXmlNoteLinks, MusicXmlNoteLinkType } from '@coderline/alphatab/importer/MusicXmlNoteLinks';
+import { MusicXmlSpanApplier } from '@coderline/alphatab/importer/MusicXmlSpanApplier';
 import {
-    MusicXmlSpanAction,
-    MusicXmlSpanElement,
     type MusicXmlSpanEvent,
     MusicXmlSpanKind,
-    type MusicXmlSpanPosition,
-    MusicXmlSpans,
+    type MusicXmlSpanPlacement,
+    MusicXmlSpanReader,
     MusicXmlSpanTracker
 } from '@coderline/alphatab/importer/MusicXmlSpans';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
@@ -114,9 +114,14 @@ class TrackInfo {
     private _instrumentIdToArticulationIndex: Map<string, number> = new Map<string, number>();
 
     /**
-     * The spans of directions (e.g. let ring), span numbers are unique within a part.
+     * The spans of directions and measure styles (e.g. let ring), span numbers are unique within a part.
      */
     public spans: MusicXmlSpanTracker = new MusicXmlSpanTracker();
+    public noteLinks: MusicXmlNoteLinks = new MusicXmlNoteLinks();
+    /**
+     * The alternate endings started but not stopped yet.
+     */
+    public openEndings: number = 0;
 
     private _lyricsLine = 0;
     private _lyricsLines: Map<string, number> = new Map<string, number>();
@@ -270,23 +275,24 @@ export class MusicXmlImporter extends ScoreImporter {
      * as the note effects are linked there.
      */
     private _applySpans() {
+        const voiceIndexOf = (staff: Staff, voice: string) => {
+            if (this._staffVoicePacking.has(staff)) {
+                const mapping = this._staffVoicePacking.get(staff)!.mapping;
+                if (mapping.has(voice)) {
+                    return mapping.get(voice)!;
+                }
+            }
+            return -1;
+        };
         for (const info of this._indexToTrackInfo.values()) {
-            const spans = info.spans.finish(info.track, this._score.masterBars);
-            MusicXmlSpans.apply(
-                spans,
+            new MusicXmlSpanApplier(
                 info.track,
                 this._score.masterBars,
-                (staff, voice) => {
-                    if (this._staffVoicePacking.has(staff)) {
-                        const mapping = this._staffVoicePacking.get(staff)!.mapping;
-                        if (mapping.has(voice)) {
-                            return mapping.get(voice)!;
-                        }
-                    }
-                    return -1;
-                },
-                this._beatSequence
-            );
+                this._beats,
+                voiceIndexOf,
+                this._octaveShiftEndsBeforeLastNote
+            ).apply(info.spans.finish());
+            info.noteLinks.apply();
         }
     }
 
@@ -1042,6 +1048,10 @@ export class MusicXmlImporter extends ScoreImporter {
         this._musicalPosition = 0;
         this._lastBeat = null;
 
+        // bars within an alternate ending
+        const info = this._indexToTrackInfo.get(track.index)!;
+        masterBar.alternateEndings = masterBar.alternateEndings | info.openEndings;
+
         const barLines: XmlNode[] = [];
 
         for (const c of element.childElements()) {
@@ -1080,9 +1090,6 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'bookmark': Not supported
             }
         }
-
-        // directions at the end of the measure
-        this._processPendingSpanEvents('');
 
         // parse barline at end of bar (to apply style to all bars of all staves)
         for (const barLine of barLines) {
@@ -1186,35 +1193,19 @@ export class MusicXmlImporter extends ScoreImporter {
             flags = flags | ((0x01 << (num - 1)) & 0xff);
         }
 
-        let action: MusicXmlSpanAction;
-        let barIndex = masterBar.index;
+        // the endings of the master bar are the union of all parts
+        masterBar.alternateEndings = masterBar.alternateEndings | flags;
+        const info = this._indexToTrackInfo.get(track.index)!;
         switch (element.getAttribute('type', '')) {
             case 'start':
-                action = MusicXmlSpanAction.Start;
+                info.openEndings = info.openEndings | flags;
                 break;
-            // the stop is at the right barline of the last measure of the ending
             case 'stop':
             case 'discontinue':
-                action = MusicXmlSpanAction.Stop;
-                barIndex++;
+                info.openEndings = info.openEndings & ~flags;
                 break;
-            case 'continue':
-                action = MusicXmlSpanAction.Continue;
-                break;
-            default:
-                return;
+            // case 'continue': keep
         }
-
-        // the endings are a property of the master bar, they are the union of all parts
-        const e = MusicXmlSpans.createEvent(
-            MusicXmlSpanElement.Ending,
-            action,
-            MusicXmlSpanKind.AlternateEnding,
-            `${flags}`
-        );
-        e.value = flags;
-        e.position = MusicXmlSpans.position(barIndex, 0, this._beatCount, 0);
-        this._indexToTrackInfo.get(track.index)!.spans.process([e]);
     }
 
     private _parseBarStyle(element: XmlNode, masterBar: MasterBar, track: Track, location: string) {
@@ -1466,29 +1457,31 @@ export class MusicXmlImporter extends ScoreImporter {
     private _nextBeatAutomations: Automation[] | null = null;
     private _nextBeatChord: Chord | null = null;
     private _nextBeatText: string | null = null;
+    /**
+     * Where the pending beat text is written, it can be the label of a following line (e.g. music21).
+     */
     private _nextBeatTextTrackIndex: number = -1;
-    private _nextBeatTextPosition: MusicXmlSpanPosition = MusicXmlSpans.position(0, 0, 0, 0);
+    private _nextBeatTextBarIndex: number = -1;
+    private _nextBeatTextTicks: number = -1;
     /**
-     * The document order of the beats (see {@link MusicXmlSpanPosition.sequence}).
+     * All beats in document order (see {@link MusicXmlSpanPosition.sequence}).
      */
-    private _beatSequence: Map<Beat, number> = new Map<Beat, number>();
-    private _beatCount: number = 0;
-    /**
-     * The span events of the last direction, processed with the voice of the following note.
-     */
-    private _pendingSpanEvents: MusicXmlSpanEvent[] = [];
-    private _pendingSpanTrack: Track | null = null;
+    private _beats: Beat[] = [];
 
-    private _processPendingSpanEvents(writtenVoice: string) {
-        if (this._pendingSpanEvents.length === 0) {
-            return;
-        }
-        for (const e of this._pendingSpanEvents) {
-            e.writtenVoice = writtenVoice;
-        }
-        this._indexToTrackInfo.get(this._pendingSpanTrack!.index)!.spans.process(this._pendingSpanEvents);
-        this._pendingSpanEvents = [];
-        this._pendingSpanTrack = null;
+    /**
+     * The placement of a span element at the current cursor.
+     */
+    private _placement(masterBar: MasterBar, staffIndex: number, voice: string, offset: number): MusicXmlSpanPlacement {
+        return {
+            staffIndex: staffIndex,
+            voice: voice,
+            position: {
+                barIndex: masterBar.index,
+                ticks: this._musicalPosition,
+                offset: offset,
+                sequence: this._beats.length
+            }
+        };
     }
 
     private _parseSoundMidiInstrument(element: XmlNode, _masterBar: MasterBar) {
@@ -1872,90 +1865,15 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private _parseMeasureStyle(element: XmlNode, masterBar: MasterBar, track: Track, midBar: boolean) {
         const events: MusicXmlSpanEvent[] = [];
-        for (const c of element.childElements()) {
-            switch (c.localName) {
-                // case 'multiple-rest': Ignored, when multibar rests are enabled for rendering this info shouldn't matter.
-                case 'measure-repeat':
-                    if (!midBar) {
-                        switch (c.getAttribute('type')) {
-                            case 'start':
-                                let kind = MusicXmlSpanKind.None;
-                                switch (Number.parseInt(c.getAttribute('slashes', '1'), 10)) {
-                                    case 1:
-                                        kind = MusicXmlSpanKind.SimileSimple;
-                                        break;
-                                    case 2:
-                                        kind = MusicXmlSpanKind.SimileDouble;
-                                        break;
-                                    // default: not supported
-                                }
-                                events.push(
-                                    MusicXmlSpans.createEvent(
-                                        MusicXmlSpanElement.MeasureRepeat,
-                                        MusicXmlSpanAction.Start,
-                                        kind,
-                                        '1'
-                                    )
-                                );
-                                break;
-                            // the first measure not repeating anymore
-                            case 'stop':
-                                events.push(
-                                    MusicXmlSpans.createEvent(
-                                        MusicXmlSpanElement.MeasureRepeat,
-                                        MusicXmlSpanAction.Stop,
-                                        MusicXmlSpanKind.None,
-                                        '1'
-                                    )
-                                );
-                                break;
-                        }
-                    }
-                    break;
-                // case 'beat-repeat': Not supported
-                case 'slash':
-                    // use-stems: not supported
-                    switch (c.getAttribute('type')) {
-                        case 'start':
-                            events.push(
-                                MusicXmlSpans.createEvent(
-                                    MusicXmlSpanElement.Slash,
-                                    MusicXmlSpanAction.Start,
-                                    MusicXmlSpanKind.Slash,
-                                    '1'
-                                )
-                            );
-                            break;
-                        case 'stop':
-                            events.push(
-                                MusicXmlSpans.createEvent(
-                                    MusicXmlSpanElement.Slash,
-                                    MusicXmlSpanAction.Stop,
-                                    MusicXmlSpanKind.None,
-                                    '1'
-                                )
-                            );
-                            break;
-                    }
-                    break;
-            }
-        }
-
+        MusicXmlSpanReader.readMeasureStyle(element, midBar, events);
         if (events.length > 0) {
             // the number of the measure style is the staff it applies to
             const staffIndex = element.attributes.has('number')
                 ? Number.parseInt(element.attributes.get('number')!, 10) - 1
                 : -1;
-            for (const e of events) {
-                e.staffIndex = staffIndex;
-                e.position = MusicXmlSpans.position(
-                    masterBar.index,
-                    midBar ? this._musicalPosition : 0,
-                    this._beatCount,
-                    0
-                );
-            }
-            this._indexToTrackInfo.get(track.index)!.spans.process(events);
+            this._indexToTrackInfo
+                .get(track.index)!
+                .spans.process(events, this._placement(masterBar, staffIndex, '', 0));
         }
     }
 
@@ -2277,6 +2195,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
         let previousWords: string = '';
         const spanEvents: MusicXmlSpanEvent[] = [];
+        const pedalEvents: MusicXmlSpanEvent[] = [];
 
         for (const direction of directionTypes) {
             switch (direction.localName) {
@@ -2301,7 +2220,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'symbol': Not supported
                 case 'wedge':
-                    MusicXmlSpans.readWedge(direction, spanEvents);
+                    MusicXmlSpanReader.readWedge(direction, spanEvents);
                     break;
                 case 'dynamics':
                     const newDynamics = this._parseDynamics(direction);
@@ -2312,13 +2231,13 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 case 'dashes':
                 case 'bracket':
-                    if (this._parseLine(direction, previousWords, track, masterBar, spanEvents)) {
+                    if (this._parseLine(direction, previousWords, track, masterBar.index, spanEvents)) {
                         // the words are the label of the line, unknown lines keep their words as text
                         previousWords = '';
                     }
                     break;
                 case 'pedal':
-                    MusicXmlSpans.readPedal(direction, spanEvents);
+                    MusicXmlSpanReader.readPedal(direction, pedalEvents);
                     break;
                 case 'metronome':
                     // <sound tempo> is the authoritative playback tempo, the metronome is only its visual counterpart
@@ -2327,7 +2246,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'octave-shift':
-                    MusicXmlSpans.readOctaveShift(direction, spanEvents);
+                    MusicXmlSpanReader.readOctaveShift(direction, spanEvents);
                     break;
                 // case 'harp-pedals': Not supported
                 // case 'damp': Not supported
@@ -2344,52 +2263,21 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
+        // directions without staff apply to all staves of the part, pedal markers are placed on a single staff
+        const spans = this._indexToTrackInfo.get(track.index)!.spans;
         if (spanEvents.length > 0) {
-            const position = MusicXmlSpans.position(
-                masterBar.index,
-                this._musicalPosition,
-                this._beatCount,
-                offsetTicks
-            );
-            for (const e of spanEvents) {
-                // directions without staff apply to all staves (resolved when the span is applied)
-                e.staffIndex = staffIndex;
-                e.voice = voice;
-                e.position = position;
-                switch (e.element) {
-                    case MusicXmlSpanElement.Pedal:
-                        // pedal markers are placed on a single staff
-                        e.staffIndex = staff.index;
-                        break;
-                    case MusicXmlSpanElement.OctaveShift:
-                        // the stop is placed within the last shifted note
-                        e.endIncludesBeat = e.action === MusicXmlSpanAction.Stop && this._octaveShiftEndsBeforeLastNote;
-                        break;
-                }
-            }
-            // the voice the direction is written at is the voice of the following note
-            if (this._pendingSpanTrack !== null && this._pendingSpanTrack !== track) {
-                this._processPendingSpanEvents('');
-            }
-            for (const e of spanEvents) {
-                this._pendingSpanEvents.push(e);
-            }
-            this._pendingSpanTrack = track;
-            if (voice.length > 0) {
-                this._processPendingSpanEvents(voice);
-            }
+            spans.process(spanEvents, this._placement(masterBar, staffIndex, voice, offsetTicks));
+        }
+        if (pedalEvents.length > 0) {
+            spans.process(pedalEvents, this._placement(masterBar, staff.index, voice, offsetTicks));
         }
 
         // words printing the label of a <sound> direction are not repeated as text, the direction renders it
         if (previousWords && !(hasSoundDirections && MusicXmlImporter._isSoundDirectionLabel(allWords, sound!))) {
             this._nextBeatText = previousWords;
             this._nextBeatTextTrackIndex = track.index;
-            this._nextBeatTextPosition = MusicXmlSpans.position(
-                masterBar.index,
-                this._musicalPosition,
-                this._beatCount,
-                0
-            );
+            this._nextBeatTextBarIndex = masterBar.index;
+            this._nextBeatTextTicks = this._musicalPosition;
         }
     }
 
@@ -2401,34 +2289,29 @@ export class MusicXmlImporter extends ScoreImporter {
         element: XmlNode,
         words: string,
         track: Track,
-        masterBar: MasterBar,
+        barIndex: number,
         spanEvents: MusicXmlSpanEvent[]
     ): boolean {
-        const lineElement = element.localName === 'bracket' ? MusicXmlSpanElement.Bracket : MusicXmlSpanElement.Dashes;
-
         // the label can be a separate direction at the same position (e.g. music21)
-        let label = words;
-        let usesPendingText = false;
-        if (
-            label.length === 0 &&
+        const usesPendingText =
+            words.length === 0 &&
             this._nextBeatText !== null &&
             this._nextBeatTextTrackIndex === track.index &&
-            this._nextBeatTextPosition.barIndex === masterBar.index &&
-            this._nextBeatTextPosition.ticks === this._musicalPosition &&
-            element.getAttribute('type', 'start') === 'start'
-        ) {
-            label = this._nextBeatText!;
-            usesPendingText = true;
+            this._nextBeatTextBarIndex === barIndex &&
+            this._nextBeatTextTicks === this._musicalPosition &&
+            element.getAttribute('type', 'start') === 'start';
+        const label = usesPendingText ? this._nextBeatText! : words;
+        if (MusicXmlSpanReader.lineKind(label) === MusicXmlSpanKind.None) {
+            MusicXmlSpanReader.readLine(element, '', spanEvents);
+            return false;
         }
-
-        const count = spanEvents.length;
-        MusicXmlSpans.readLine(element, lineElement, label, spanEvents);
-        const isKnown = spanEvents.length > count && spanEvents[count].kind !== MusicXmlSpanKind.None;
-        if (isKnown && usesPendingText) {
+        MusicXmlSpanReader.readLine(element, label, spanEvents);
+        if (usesPendingText) {
             this._nextBeatText = null;
         }
-        return isKnown;
+        return true;
     }
+
     private _parseMetronome(element: XmlNode, masterBar: MasterBar, ratioPosition: number) {
         let unit: Duration | null = null;
         let dots = 0;
@@ -2707,8 +2590,6 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        this._processPendingSpanEvents(voiceRaw);
-
         if (isChord && !this._lastBeat) {
             Logger.warning('MusicXML', 'Malformed MusicXML, <chord /> cannot be set on the first note of a measure');
             isChord = false;
@@ -2787,8 +2668,8 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'tie': Ignored -> "tie" is sound, "tied" is notation
                 case 'tied':
                     // not valid at this place but written for let ring by TuxGuitar
-                    if (note && c.getAttribute('type') === 'let-ring') {
-                        note.isLetRing = true;
+                    if (note) {
+                        this._parseTied(c, note, voiceRaw);
                     }
                     break;
                 // case 'instrument': handled in pass 1
@@ -2968,8 +2849,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         const newBeat = new Beat();
-        this._beatSequence.set(newBeat, this._beatCount);
-        this._beatCount++;
+        this._beats.push(newBeat);
         newBeat.isEmpty = false;
         newBeat.dynamics = this._currentDynamics;
 
@@ -3617,31 +3497,34 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _parseNotations(element: XmlNode, note: Note | null, beat: Beat, voice: string) {
-        const spanEvents: MusicXmlSpanEvent[] = [];
-        let singleTrillStep = -1;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'footnote': Ignored
                 // case 'level': Ignored
                 case 'tied':
                     if (note) {
-                        this._parseTied(c, note, spanEvents);
+                        this._parseTied(c, note, voice);
                     }
                     break;
                 case 'slur':
-                    MusicXmlSpans.readLink(c, MusicXmlSpanElement.Slur, MusicXmlSpanKind.Slur, spanEvents);
+                    if (note) {
+                        this._parseNoteLink(c, MusicXmlNoteLinkType.Slur, note, voice);
+                    }
                     break;
                 // case 'tuplet': Handled via time-modification
                 case 'glissando':
-                    // glissandos are imported as shift slides, wavy lines are not supported
-                    MusicXmlSpans.readLink(c, MusicXmlSpanElement.Glissando, MusicXmlSpanKind.Slide, spanEvents);
+                    if (note) {
+                        this._parseNoteLink(c, MusicXmlNoteLinkType.Glissando, note, voice);
+                    }
                     break;
                 case 'slide':
-                    MusicXmlSpans.readLink(c, MusicXmlSpanElement.Slide, MusicXmlSpanKind.Slide, spanEvents);
+                    if (note) {
+                        this._parseNoteLink(c, MusicXmlNoteLinkType.Slide, note, voice);
+                    }
                     break;
                 case 'ornaments':
                     if (note) {
-                        singleTrillStep = this._parseOrnaments(c, note, spanEvents);
+                        this._parseOrnaments(c, note, voice);
                     }
                     break;
                 case 'technical':
@@ -3670,43 +3553,25 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'other-notation': Not supported
             }
         }
+    }
 
-        if (note === null) {
-            return;
-        }
+    private _noteLinks(note: Note): MusicXmlNoteLinks {
+        return this._indexToTrackInfo.get(note.beat.voice.bar.staff.track.index)!.noteLinks;
+    }
 
-        const spans = this._indexToTrackInfo.get(beat.voice.bar.staff.track.index)!.spans;
-        const position = MusicXmlSpans.position(
-            beat.voice.bar.index,
-            beat.displayStart,
-            this._beatSequence.has(beat) ? this._beatSequence.get(beat)! : this._beatCount,
-            0
-        );
-        if (spanEvents.length > 0) {
-            for (const e of spanEvents) {
-                e.staffIndex = beat.voice.bar.staff.index;
-                e.voice = voice;
-                e.position = position;
-                e.note = note;
-            }
-            spans.process(spanEvents);
-        }
-
-        if (singleTrillStep >= 0) {
-            spans.add({
-                element: MusicXmlSpanElement.WavyLine,
-                kind: MusicXmlSpanKind.Trill,
-                value: singleTrillStep,
-                number: '',
-                staffIndex: beat.voice.bar.staff.index,
-                voice: voice,
-                writtenVoice: voice,
-                start: position,
-                end: null,
-                startNote: note,
-                endNote: note,
-                endIncludesBeat: false
-            });
+    /**
+     * Reads an element linking notes (e.g. `<slur>`, `<slide>`) identified by its number.
+     */
+    private _parseNoteLink(element: XmlNode, type: MusicXmlNoteLinkType, note: Note, voice: string) {
+        const number = element.getAttribute('number', '1');
+        switch (element.getAttribute('type')) {
+            case 'start':
+                this._noteLinks(note).start(type, number, note, voice, 0);
+                break;
+            case 'stop':
+                this._noteLinks(note).stop(type, number, note, voice);
+                break;
+            // case 'continue': no meaning for the link
         }
     }
 
@@ -3978,19 +3843,26 @@ export class MusicXmlImporter extends ScoreImporter {
         return Fingers.Unknown;
     }
 
-    /**
-     * Reads the ornaments of a note.
-     * @returns The trill step of a trill on this note only, -1 if there is none.
-     */
-    private _parseOrnaments(element: XmlNode, note: Note, spanEvents: MusicXmlSpanEvent[]): number {
+    private _parseOrnaments(element: XmlNode, note: Note, voice: string): void {
         // a trill mark defines the meaning of the wavy line, without it the line is a vibrato
         let trillStep = -1;
         for (const c of element.childElements()) {
             if (c.localName === 'trill-mark') {
-                trillStep = MusicXmlSpans.trillStep(c.getAttribute('trill-step', 'whole'));
+                switch (c.getAttribute('trill-step', 'whole')) {
+                    case 'half':
+                        trillStep = 1;
+                        break;
+                    case 'unison':
+                        trillStep = 0;
+                        break;
+                    default:
+                        trillStep = 2;
+                        break;
+                }
             }
         }
 
+        const links = this._noteLinks(note);
         let hasLine = false;
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -4007,9 +3879,19 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'inverted-vertical-turn': Not supported
                 // case 'shake': Not supported
                 case 'wavy-line':
-                    const action = MusicXmlSpans.readWavyLine(c, trillStep, spanEvents);
-                    if (action === MusicXmlSpanAction.Start || action === MusicXmlSpanAction.Continue) {
-                        hasLine = true;
+                    const number = c.getAttribute('number', '1');
+                    switch (c.getAttribute('type')) {
+                        case 'start':
+                            links.start(MusicXmlNoteLinkType.WavyLine, number, note, voice, trillStep);
+                            hasLine = true;
+                            break;
+                        case 'continue':
+                            links.continue(MusicXmlNoteLinkType.WavyLine, number, note, voice, trillStep);
+                            hasLine = true;
+                            break;
+                        case 'stop':
+                            links.stop(MusicXmlNoteLinkType.WavyLine, number, note, voice);
+                            break;
                     }
                     break;
                 case 'mordent':
@@ -4037,22 +3919,21 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        return hasLine ? -1 : trillStep;
+        // a trill on this note only
+        if (trillStep >= 0 && !hasLine) {
+            links.single(MusicXmlNoteLinkType.WavyLine, note, trillStep);
+        }
     }
 
-    private _parseTied(element: XmlNode, note: Note, spanEvents: MusicXmlSpanEvent[]): void {
+    private _parseTied(element: XmlNode, note: Note, voice: string): void {
+        // ties are identified by the pitch, the number is rarely given (see MusicXML spec)
+        const pitch = `${this._calculatePitchedNoteValue(note)}`;
         switch (element.getAttribute('type')) {
             case 'start':
+                this._noteLinks(note).start(MusicXmlNoteLinkType.Tie, pitch, note, voice, 0);
+                break;
             case 'stop':
-                // ties are identified by the pitch, the number is rarely given (see MusicXML spec)
-                spanEvents.push(
-                    MusicXmlSpans.createEvent(
-                        MusicXmlSpanElement.Tied,
-                        element.getAttribute('type') === 'start' ? MusicXmlSpanAction.Start : MusicXmlSpanAction.Stop,
-                        MusicXmlSpanKind.Tie,
-                        MusicXmlSpans.tieKey(note)
-                    )
-                );
+                this._noteLinks(note).stop(MusicXmlNoteLinkType.Tie, pitch, note, voice);
                 break;
             // an undamped note (e.g. MuseScore l.v., TuxGuitar let ring)
             case 'let-ring':
