@@ -249,6 +249,9 @@ export class MusicXmlImporter extends ScoreImporter {
         this._score = new Score();
         this._nextBarNumber = 1;
         this._score.stylesheet.hideDynamics = true;
+        this._activeDashes.clear();
+        this._nextBeatLetRing = false;
+        this._nextBeatPalmMute = false;
 
         this._parseDom(dom);
         ModelUtils.consolidate(this._score);
@@ -889,6 +892,9 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _parsePartwisePart(element: XmlNode) {
+        this._activeDashes.clear();
+        this._nextBeatLetRing = false;
+        this._nextBeatPalmMute = false;
         const id = element.attributes.get('id');
         if (!id || !this._idToTrackInfo.has(id)) {
             return;
@@ -1387,8 +1393,34 @@ export class MusicXmlImporter extends ScoreImporter {
     private _nextBeatCrescendo: CrescendoType | null = null;
     private _nextBeatLetRing: boolean = false;
     private _nextBeatPalmMute: boolean = false;
+    // Issue #2867: Track active dashed spanners (e.g. LetRing, P.M.) by spanner number
+    private _activeDashes: Map<string, string> = new Map<string, string>();
     private _nextBeatOttavia: Ottavia | null = null;
     private _nextBeatText: string | null = null;
+
+    // Issue #2867: Normalize dashed spanner labels
+    private _getDashesSpannerKind(words: string): 'LetRing' | 'P.M.' | null {
+        const normalized = words
+            .trim()
+            .toLowerCase()
+            .replace(/[\s.-]/g, '');
+        if (normalized === 'letring') {
+            return 'LetRing';
+        }
+        if (normalized === 'pm' || normalized === 'palmmute') {
+            return 'P.M.';
+        }
+        return null;
+    }
+
+    private _hasActiveDashes(kind: string): boolean {
+        for (const val of this._activeDashes.values()) {
+            if (val === kind) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private _parseSoundMidiInstrument(element: XmlNode, _masterBar: MasterBar) {
         let automation: Automation;
@@ -2174,18 +2206,51 @@ export class MusicXmlImporter extends ScoreImporter {
                         this._score.stylesheet.hideDynamics = false;
                     }
                     break;
-                case 'dashes':
+                case 'dashes': {
+                    // Issue #2867: Evaluate dashed spanner start/stop using active dashes state machine
                     const type = direction.getAttribute('type', 'start');
-                    switch (previousWords) {
-                        case 'LetRing':
-                            this._nextBeatLetRing = type === 'start' || type === 'continue';
-                            break;
-                        case 'P.M.':
-                            this._nextBeatPalmMute = type === 'start' || type === 'continue';
-                            break;
+                    const number = direction.getAttribute('number', '1');
+                    const rawWords = previousWords || this._nextBeatText || '';
+                    const kindFromWords = this._getDashesSpannerKind(rawWords);
+                    if (kindFromWords !== null) {
+                        previousWords = '';
+                        this._nextBeatText = null;
                     }
-                    previousWords = '';
+
+                    switch (type) {
+                        case 'start':
+                        case 'continue':
+                            if (kindFromWords !== null) {
+                                this._activeDashes.set(number, kindFromWords);
+                                if (kindFromWords === 'LetRing') {
+                                    this._nextBeatLetRing = true;
+                                } else if (kindFromWords === 'P.M.') {
+                                    this._nextBeatPalmMute = true;
+                                }
+                            }
+                            break;
+                        case 'stop': {
+                            let kind = this._activeDashes.get(number) ?? kindFromWords;
+                            if (!kind && this._activeDashes.size === 1) {
+                                for (const val of this._activeDashes.values()) {
+                                    kind = val;
+                                    break;
+                                }
+                                this._activeDashes.clear();
+                            } else if (kind) {
+                                this._activeDashes.delete(number);
+                            }
+
+                            if (kind === 'LetRing') {
+                                this._nextBeatLetRing = this._hasActiveDashes('LetRing');
+                            } else if (kind === 'P.M.') {
+                                this._nextBeatPalmMute = this._hasActiveDashes('P.M.');
+                            }
+                            break;
+                        }
+                    }
                     break;
+                }
                 // case 'bracket': Ignored
                 case 'pedal':
                     const pedal = this._parsePedal(direction);
@@ -2580,6 +2645,15 @@ export class MusicXmlImporter extends ScoreImporter {
         let beat: Beat;
         if (isChord) {
             beat = this._lastBeat!;
+            // Issue #2867: Propagate let ring and palm mute to chord note instance
+            if (note !== null) {
+                if (this._nextBeatLetRing) {
+                    note.isLetRing = true;
+                }
+                if (this._nextBeatPalmMute) {
+                    note.isPalmMute = true;
+                }
+            }
             beat.addNote(note!);
         } else {
             beat = this._createBeat(staff, masterBar, voiceRaw, note);
@@ -2860,6 +2934,13 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // the note needs to be added before inserting (voice checks for rests)
         if (note !== null) {
+            // Issue #2867: Propagate let ring and palm mute to note instance
+            if (this._nextBeatLetRing) {
+                note.isLetRing = true;
+            }
+            if (this._nextBeatPalmMute) {
+                note.isPalmMute = true;
+            }
             newBeat.addNote(note!);
         }
 

@@ -1,15 +1,15 @@
-import { describe, expect, it } from 'vitest';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
-import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
-import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
-import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
-import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { Settings } from '@coderline/alphatab/Settings';
-import { FlatMidiEventGenerator, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
+import { FlatMidiEventGenerator, FlatNoteEvent, FlatTempoEvent } from 'test/audio/FlatMidiEventGenerator';
+import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHelper';
+import { describe, expect, it } from 'vitest';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {
@@ -541,6 +541,126 @@ describe('MusicXmlImporterTests', () => {
             expect(tempoChanges.length).toBe(1);
             expect(tempoChanges[0].tick).toBe(0);
             expect(tempoChanges[0].tempo).toBe(60);
+        });
+    });
+
+    describe('let-ring-and-palm-mute-spanners', () => {
+        it('let-ring-spanner', () => {
+            // 1. Isolated single 4/4 bar matching issue #2867 description (ticks ring to end of bar 1)
+            const singleBarXml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type><words>LetRing</words></direction-type>
+        <direction-type><dashes type="start" number="1"/></direction-type>
+      </direction>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+    </measure>
+  </part>
+</score-partwise>`;
+            const singleBarScore = MusicXmlImporterTestHelper.prepareImporterWithBytes(
+                IOHelper.stringToBytes(singleBarXml)
+            ).readScore();
+
+            const singleBarHandler = new FlatMidiEventGenerator();
+            new MidiFileGenerator(singleBarScore, null, singleBarHandler).generate();
+
+            const singleBarNoteEvents = singleBarHandler.midiEvents.filter(
+                (evt): evt is FlatNoteEvent => evt instanceof FlatNoteEvent
+            );
+            expect(singleBarNoteEvents.map(e => e.length)).toEqual([3840, 2880, 1920, 960]);
+            expect(singleBarScore.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isLetRing).toBe(true);
+
+            // 2. Multi-bar score testing spanner termination after <dashes type="stop"/>
+            const twoBarXml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type><words>LetRing</words></direction-type>
+        <direction-type><dashes type="start" number="1"/></direction-type>
+      </direction>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+    </measure>
+    <measure number="2">
+      <direction placement="above">
+        <direction-type><dashes type="stop" number="1"/></direction-type>
+      </direction>
+      <note><pitch><step>G</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+    </measure>
+  </part>
+</score-partwise>`;
+            const twoBarScore = MusicXmlImporterTestHelper.prepareImporterWithBytes(
+                IOHelper.stringToBytes(twoBarXml)
+            ).readScore();
+
+            const twoBarHandler = new FlatMidiEventGenerator();
+            new MidiFileGenerator(twoBarScore, null, twoBarHandler).generate();
+
+            const twoBarNoteEvents = twoBarHandler.midiEvents.filter(
+                (evt): evt is FlatNoteEvent => evt instanceof FlatNoteEvent
+            );
+            // In 2-bar score without rest in bar 2, bar 1 notes sustain through bar 2 beat 0 up to maxDuration (3840 ticks)
+            expect(twoBarNoteEvents.slice(0, 4).map(e => e.length)).toEqual([3840, 3840, 2880, 1920]);
+            expect(twoBarNoteEvents[4].length).toBe(960);
+
+            expect(twoBarScore.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isLetRing).toBe(true);
+            expect(twoBarScore.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isLetRing).toBe(false);
+            expect(twoBarScore.tracks[0].staves[0].bars[1].voices[0].beats[0].isLetRing).toBe(false);
+        });
+
+        it('palm-mute-spanner', () => {
+            const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>Music</part-name></score-part></part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type><words>P.M.</words></direction-type>
+        <direction-type><dashes type="start" number="1"/></direction-type>
+      </direction>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>D</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>E</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+      <note><pitch><step>F</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+    </measure>
+    <measure number="2">
+      <direction placement="above">
+        <direction-type><dashes type="stop" number="1"/></direction-type>
+      </direction>
+      <note><pitch><step>G</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type></note>
+    </measure>
+  </part>
+</score-partwise>`;
+            const score = MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isPalmMute).toBe(true);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPalmMute).toBe(false);
+            expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].isPalmMute).toBe(false);
         });
     });
 });
