@@ -108,6 +108,7 @@ export abstract class ScoreLayout {
             return;
         }
 
+        // bars are reported in layout order (system by system, left to right)
         const barNumbers: number[] = [];
         let maxMissingWidth = 0;
         for (const [index, missingWidth] of compressedBars) {
@@ -116,10 +117,9 @@ export abstract class ScoreLayout {
                 maxMissingWidth = missingWidth;
             }
         }
-        barNumbers.sort((a, b) => a - b);
 
         const maxReported = ScoreLayout._maxReportedCompressedBars;
-        let bars = barNumbers.slice(0, maxReported).join(', ');
+        let bars = barNumbers.slice(0, Math.min(maxReported, barNumbers.length)).join(', ');
         if (barNumbers.length > maxReported) {
             bars += ` and ${barNumbers.length - maxReported} more`;
         }

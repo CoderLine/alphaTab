@@ -6,8 +6,25 @@ import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { Logger } from '@coderline/alphatab/Logger';
+import { type ILogger, Logger } from '@coderline/alphatab/Logger';
 import { LogLevel } from '@coderline/alphatab/LogLevel';
+
+/**
+ * @internal
+ */
+class WarningCollectingLogger implements ILogger {
+    public warnings: string[] = [];
+
+    public debug(_category: string, _msg: string, ..._details: unknown[]): void {}
+
+    public warning(_category: string, msg: string, ..._details: unknown[]): void {
+        this.warnings.push(msg);
+    }
+
+    public info(_category: string, _msg: string, ..._details: unknown[]): void {}
+
+    public error(_category: string, _msg: string, ..._details: unknown[]): void {}
+}
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {
@@ -133,25 +150,17 @@ describe('BrokenRendersTests', () => {
         settings.core.enableLazyLoading = false;
         const score = ScoreLoader.loadAlphaTex(squeezedLegatoTex);
 
-        const warnings: string[] = [];
         const originalLogger = Logger.log;
         const originalLogLevel = Logger.logLevel;
         Logger.logLevel = LogLevel.Warning;
-        Logger.log = {
-            debug: () => {},
-            info: () => {},
-            error: () => {},
-            warning: (_category: string, msg: string) => {
-                warnings.push(msg);
-            }
-        };
         try {
             const render = (width: number) => {
-                warnings.length = 0;
+                const logger = new WarningCollectingLogger();
+                Logger.log = logger;
                 const api = new ScoreRenderer(settings);
                 api.width = width;
                 api.renderScore(score, [0]);
-                return warnings.filter(w => w.includes('not fit into the available width'));
+                return logger.warnings.filter(w => w.includes('not fit into the available width'));
             };
 
             const narrow = render(400);
