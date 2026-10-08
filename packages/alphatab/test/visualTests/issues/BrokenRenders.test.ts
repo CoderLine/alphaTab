@@ -89,6 +89,40 @@ describe('BrokenRendersTests', () => {
         }
     });
 
+    // https://github.com/CoderLine/alphaTab/issues/2904
+    it('squeezed-legato-slur', () => {
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
+
+        const score = ScoreLoader.loadAlphaTex(`
+            \\staff {score tabs}
+            \\tuning e4 b3 g3 d3 a2 e2
+            \\ts 4 4
+            (14.1{sl} 11.3{sl}).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+            (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+            (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+            (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 |
+        `);
+
+        for (const width of [400, 300]) {
+            const api = new ScoreRenderer(settings);
+            const results: string[] = [];
+            api.partialRenderFinished.on(e => {
+                if (e.renderResult !== null) {
+                    results.push(e.renderResult as string);
+                }
+            });
+            api.width = width;
+            api.renderScore(score, [0]);
+
+            expect(results.length).toBeGreaterThan(0);
+            for (const r of results) {
+                expect(r.includes('NaN'), `NaN in SVG at width ${width}`).toBe(false);
+            }
+        }
+    });
+
     describe('no-label-padding-left', () => {
         it('no-padding', async () => {
             await VisualTestHelper.runVisualTestTex(

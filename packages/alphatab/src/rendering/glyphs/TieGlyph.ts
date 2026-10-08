@@ -117,6 +117,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 } else {
                     this._endX = this.calculateEndX();
                     this._endY = this.caclculateEndY();
+                    this._ensureMinimumSpan();
                 }
             } else {
                 this._shouldPaint = true;
@@ -124,6 +125,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 this._endX = this.calculateEndX();
                 this._startY = this.calculateStartY();
                 this._endY = this.caclculateEndY();
+                this._ensureMinimumSpan();
             }
             this._shouldPaint = true;
         } else if (startNoteRenderer.staff !== endNoteRenderer!.staff) {
@@ -276,6 +278,20 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             if (overlap > 0) {
                 this.y -= overlap;
             }
+        }
+    }
+
+    /**
+     * Keeps ties and slurs at least as long as the padding the spacing keeps between beats. Only bars
+     * squeezed below their minimum width (overlapping content) can bring the anchors closer than this or
+     * even reverse their order, which would otherwise produce degenerated or inverted curves.
+     */
+    private _ensureMinimumSpan(): void {
+        const minSpan = this.renderer.smuflMetrics.beatContentPadding;
+        if (this._endX - this._startX < minSpan) {
+            const center = (this._startX + this._endX) / 2;
+            this._startX = center - minSpan / 2;
+            this._endX = center + minSpan / 2;
         }
     }
 
