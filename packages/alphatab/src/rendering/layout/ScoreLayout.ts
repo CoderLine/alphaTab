@@ -83,12 +83,66 @@ export abstract class ScoreLayout {
     public slurRegistry = new SlurRegistry();
     public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
 
+    /**
+     * The master bars which had to be compressed below their minimum width in the current layout pass,
+     * mapped to the largest missing width across their staves.
+     */
+    private _compressedBars: Map<number, number> = new Map();
+    private static readonly _maxReportedCompressedBars: number = 10;
+
+    /**
+     * Registers a bar which had to be compressed below its minimum width (overlapping content).
+     * @param masterBarIndex The index of the master bar.
+     * @param missingWidth The width missing to fit the content without overlaps.
+     */
+    public reportCompressedBar(masterBarIndex: number, missingWidth: number): void {
+        const existing = this._compressedBars.get(masterBarIndex);
+        if (existing === undefined || existing < missingWidth) {
+            this._compressedBars.set(masterBarIndex, missingWidth);
+        }
+    }
+
+    private _logCompressedBars(): void {
+        const compressedBars = this._compressedBars;
+        if (compressedBars.size === 0) {
+            return;
+        }
+
+        const barNumbers: number[] = [];
+        let maxMissingWidth = 0;
+        for (const [index, missingWidth] of compressedBars) {
+            barNumbers.push(index + 1);
+            if (missingWidth > maxMissingWidth) {
+                maxMissingWidth = missingWidth;
+            }
+        }
+        barNumbers.sort((a, b) => a - b);
+
+        const maxReported = ScoreLayout._maxReportedCompressedBars;
+        let bars = barNumbers.slice(0, maxReported).join(', ');
+        if (barNumbers.length > maxReported) {
+            bars += ` and ${barNumbers.length - maxReported} more`;
+        }
+
+        const subject = barNumbers.length === 1 ? `Bar ${bars} does` : `Bars ${bars} do`;
+        const missingPixels = Math.ceil(maxMissingWidth * this.renderer.settings.display.scale);
+        Logger.warning(
+            this.name,
+            `${subject} not fit into the available width and had to be compressed below the minimum size ` +
+                `(up to ${missingPixels}px missing). Notation elements might overlap. ` +
+                'Increase the available width or reduce the display scale.'
+        );
+        compressedBars.clear();
+    }
+
     public resize(): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
+        this._compressedBars.clear();
         Profiler.begin('layout.doResize');
         this.doResize();
         Profiler.end('layout.doResize');
+        this._logCompressedBars();
     }
     public abstract doResize(): void;
 
@@ -96,6 +150,7 @@ export abstract class ScoreLayout {
 
     public layoutAndRender(renderHints?: RenderHints): void {
         this.slurRegistry.clear();
+        this._compressedBars.clear();
 
         const score: Score = this.renderer.score!;
 
@@ -110,6 +165,7 @@ export abstract class ScoreLayout {
         const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
         if (firstChangedMasterBar !== undefined) {
             if (this.doUpdateForBars(renderHints!)) {
+                this._logCompressedBars();
                 return;
             }
         }
@@ -134,6 +190,7 @@ export abstract class ScoreLayout {
         Profiler.begin('layout.doLayoutAndRender');
         this.doLayoutAndRender(renderHints);
         Profiler.end('layout.doLayoutAndRender');
+        this._logCompressedBars();
     }
 
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();

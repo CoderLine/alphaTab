@@ -6,6 +6,8 @@ import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { Logger } from '@coderline/alphatab/Logger';
+import { LogLevel } from '@coderline/alphatab/LogLevel';
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {
@@ -90,20 +92,22 @@ describe('BrokenRendersTests', () => {
     });
 
     // https://github.com/CoderLine/alphaTab/issues/2904
+    const squeezedLegatoTex = `
+        \\staff {score tabs}
+        \\tuning e4 b3 g3 d3 a2 e2
+        \\ts 4 4
+        (14.1{sl} 11.3{sl}).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+        (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+        (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+        (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 |
+    `;
+
     it('squeezed-legato-slur', () => {
         const settings = new Settings();
         settings.core.engine = 'svg';
         settings.core.enableLazyLoading = false;
 
-        const score = ScoreLoader.loadAlphaTex(`
-            \\staff {score tabs}
-            \\tuning e4 b3 g3 d3 a2 e2
-            \\ts 4 4
-            (14.1{sl} 11.3{sl}).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
-            (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
-            (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
-            (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 |
-        `);
+        const score = ScoreLoader.loadAlphaTex(squeezedLegatoTex);
 
         for (const width of [400, 300]) {
             const api = new ScoreRenderer(settings);
@@ -120,6 +124,44 @@ describe('BrokenRendersTests', () => {
             for (const r of results) {
                 expect(r.includes('NaN'), `NaN in SVG at width ${width}`).toBe(false);
             }
+        }
+    });
+
+    it('squeezed-bar-warning', () => {
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
+        const score = ScoreLoader.loadAlphaTex(squeezedLegatoTex);
+
+        const warnings: string[] = [];
+        const originalLogger = Logger.log;
+        const originalLogLevel = Logger.logLevel;
+        Logger.logLevel = LogLevel.Warning;
+        Logger.log = {
+            debug: () => {},
+            info: () => {},
+            error: () => {},
+            warning: (_category: string, msg: string) => {
+                warnings.push(msg);
+            }
+        };
+        try {
+            const render = (width: number) => {
+                warnings.length = 0;
+                const api = new ScoreRenderer(settings);
+                api.width = width;
+                api.renderScore(score, [0]);
+                return warnings.filter(w => w.includes('not fit into the available width'));
+            };
+
+            const narrow = render(400);
+            expect(narrow.length).toBe(1);
+            expect(narrow[0]).toContain('Bar 1 does not fit');
+
+            expect(render(1200).length).toBe(0);
+        } finally {
+            Logger.log = originalLogger;
+            Logger.logLevel = originalLogLevel;
         }
     });
 
