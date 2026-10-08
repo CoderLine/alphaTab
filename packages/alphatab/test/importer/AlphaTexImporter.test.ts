@@ -1775,6 +1775,24 @@ describe('AlphaTexImporterTest', () => {
         testExportRoundtrip(score);
     });
 
+    it('harmonic-values-fractional', () => {
+        const score = parseTex(`
+        2.3{ah 2.4} 2.3{th 2.7} 2.3{ph 3.5} 2.3{sh 8.5} 2.3{fh 2.4}
+        `);
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        expect(beats[0].notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(beats[0].notes[0].harmonicValue).toBe(2.4);
+        expect(beats[1].notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(beats[1].notes[0].harmonicValue).toBe(2.7);
+        expect(beats[2].notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(beats[2].notes[0].harmonicValue).toBe(3.5);
+        expect(beats[3].notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(beats[3].notes[0].harmonicValue).toBe(8.5);
+        expect(beats[4].notes[0].harmonicType).toBe(HarmonicType.Feedback);
+        expect(beats[4].notes[0].harmonicValue).toBe(2.4);
+        testExportRoundtrip(score);
+    });
+
     it('time-signature-commons', () => {
         const score = parseTex(`
         \\ts common
