@@ -209,6 +209,14 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
         expect(info.minStretchForce).toBeCloseTo((4 + 5 + 6) * k, 10);
     });
 
+    it('minimum stretch force covers post + barline padding for the last beat', () => {
+        const info = new BarLayoutingInfo(Math.SQRT2, 5, 7);
+        info.addSpring(0, 960, 0, 3, 4);
+        info.finish();
+        const k = info.springs.get(0)!.springConstant;
+        expect(info.minStretchForce).toBeCloseTo((4 + 7) * k, 10);
+    });
+
     describe('spacingExponentFromRatio clamps to documented range', () => {
         it('returns log2(r) for r in range', () => {
             expect(BarLayoutingInfo.spacingExponentFromRatio(1.5)).toBeCloseTo(Math.log2(1.5), 10);

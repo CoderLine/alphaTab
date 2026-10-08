@@ -109,9 +109,20 @@ export class BarLayoutingInfo {
      */
     public readonly beatContentPadding: number;
 
-    public constructor(spacingRatio: number = Math.SQRT2, beatContentPadding: number = 0) {
+    /**
+     * The minimum padding between the content of the last beat and the bar line
+     * ({@link EngravingSettings.barlineContentPadding}).
+     */
+    public readonly barlineContentPadding: number;
+
+    public constructor(
+        spacingRatio: number = Math.SQRT2,
+        beatContentPadding: number = 0,
+        barlineContentPadding: number = 0
+    ) {
         this._spacingExponent = BarLayoutingInfo.spacingExponentFromRatio(spacingRatio);
         this.beatContentPadding = beatContentPadding;
+        this.barlineContentPadding = barlineContentPadding;
     }
 
     /**
@@ -524,7 +535,7 @@ export class BarLayoutingInfo {
             let requiredSpace = 0;
 
             if (i === sortedSprings.length - 1) {
-                requiredSpace = currentSpring.postSpringWidth;
+                requiredSpace = currentSpring.postSpringWidth + this.barlineContentPadding;
             } else {
                 const nextSpring = sortedSprings[i + 1];
                 requiredSpace =

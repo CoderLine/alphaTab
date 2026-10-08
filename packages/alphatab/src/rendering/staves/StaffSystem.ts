@@ -369,7 +369,8 @@ export class StaffSystem {
         const display = this.layout.renderer.settings.display;
         result.layoutingInfo = new BarLayoutingInfo(
             display.spacingRatio,
-            display.resources.engravingSettings.beatContentPadding
+            display.resources.engravingSettings.beatContentPadding,
+            display.resources.engravingSettings.barlineContentPadding
         );
         result.masterBar = tracks[0].score.masterBars[barIndex];
         this.masterBarsRenderers.push(result);

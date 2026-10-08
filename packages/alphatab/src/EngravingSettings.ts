@@ -522,6 +522,7 @@ export class EngravingSettings {
         this.multiVoiceDisplacedNoteHeadSpacing = 0.2 * this.oneStaffSpace;
         this.staffContentPadding = 1 * this.oneStaffSpace;
         this.beatContentPadding = 0.5 * this.oneStaffSpace;
+        this.barlineContentPadding = 1 * this.oneStaffSpace;
 
         this.tuningGlyphStringRowPadding = 0.2 * this.oneStaffSpace;
     }
@@ -799,6 +800,14 @@ export class EngravingSettings {
      * Behind Bars: where space is limited, characters should not be closer than 1/2 stave-space and never collide.
      */
     public beatContentPadding = 0;
+
+    /**
+     * The minimum horizontal padding between the content of the last beat in a bar and the bar line.
+     * Additional space is only added where the content would come closer than this.
+     * @remarks
+     * Behind Bars: stems must never come closer to a barline than one stave-space.
+     */
+    public barlineContentPadding = 0;
 
     /**
      * Calculates the stem height for a note of the given duration.
