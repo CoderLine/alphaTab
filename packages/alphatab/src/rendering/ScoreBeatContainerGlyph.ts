@@ -132,29 +132,25 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             const tie: ScoreSlurGlyph = new ScoreSlurGlyph(`score.slur.${n.slurOrigin!.id}`, n.slurOrigin!, n, true);
             this.addTie(tie);
         }
-        // effect slurs (hammer-on, pull-off, legato slide) are a single slur per chord chain
+        // effect slurs (hammer-on, pull-off, legato slide) are a single slur per chord
         // start effect slur on first beat
         const beat = n.beat;
-        if (!this._effectSlur && beat.isEffectSlurOrigin && beat.effectSlurDestination) {
-            const effectSlur = new ScoreEffectSlurGlyph(
-                `score.slur.effect.${beat.id}`,
-                beat,
-                beat.effectSlurDestination,
-                false
-            );
-            this._effectSlur = effectSlur;
-            this.addTie(effectSlur);
+        if (!this._effectSlur && n.isEffectSlurOrigin) {
+            const destination = ScoreEffectSlurGlyph.getDestinationBeat(beat);
+            if (destination) {
+                const effectSlur = new ScoreEffectSlurGlyph(`score.slur.effect.${beat.id}`, beat, destination, false);
+                this._effectSlur = effectSlur;
+                this.addTie(effectSlur);
+            }
         }
         // end effect slur on last beat
-        if (!this._effectEndSlur && beat.isEffectSlurDestination && beat.effectSlurOrigin) {
-            const effectEndSlur = new ScoreEffectSlurGlyph(
-                `score.slur.effect.${beat.effectSlurOrigin.id}`,
-                beat.effectSlurOrigin,
-                beat,
-                true
-            );
-            this._effectEndSlur = effectEndSlur;
-            this.addTie(effectEndSlur);
+        if (!this._effectEndSlur && n.effectSlurOrigin) {
+            const origin = n.effectSlurOrigin.beat;
+            if (ScoreEffectSlurGlyph.getDestinationBeat(origin) === beat) {
+                const effectEndSlur = new ScoreEffectSlurGlyph(`score.slur.effect.${origin.id}`, origin, beat, true);
+                this._effectEndSlur = effectEndSlur;
+                this.addTie(effectEndSlur);
+            }
         }
         if (n.hasBend) {
             if (!this._bend) {
