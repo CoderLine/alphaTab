@@ -619,6 +619,35 @@ describe('EffectsAndAnnotationsTests', () => {
         it('chord-with-chain', async () =>
             await test('chord-with-chain', ':4 (5.3{h} 5.4 5.5) (7.3{h} 7.4 7.5) (5.3 5.4 5.5) r'));
 
+        // Chords: a single slur outside the chord, centered on the outer noteheads (Behind Bars)
+        // destination chord with accidentals must not move the end anchor
+        it('chord-slide-accidentals', async () =>
+            await test('chord-slide-accidentals', ':4 (14.1{sl} 11.3{sl}) (16.1 13.3) r r'));
+        // stems up: slur below the chord
+        it('chord-stems-up', async () => await test('chord-stems-up', ':4 (3.5{h} 2.6{h}) (5.5 3.6) r r'));
+        // opposite stem directions: slur ends at the stem end of the destination
+        it('chord-opposite-stems', async () =>
+            await test('chord-opposite-stems', ':4 (2.3{sl} 2.4{sl}) (14.3 14.4) r r'));
+        // chains of different length within the chord: one slur over the longest chain
+        it('chord-different-chain-lengths', async () =>
+            await test('chord-different-chain-lengths', ':8 (5.1{h} 5.3{h}) (7.1{h} 7.3) (8.1 7.3) r r.2'));
+        // hammer-on and legato slide in one chord: still a single slur
+        it('chord-mixed-kinds', async () => await test('chord-mixed-kinds', ':4 (5.1{h} 5.3{sl}) (7.1 9.3) r r'));
+        // slur on the outer notes, tie on the inner notes
+        it('chord-with-tie', async () => await test('chord-with-tie', ':4 (5.1{h} 5.3) (7.1 -.3) r r'));
+        // chain continues across a beat played on another string: a single slur
+        it('chain-across-other-string', async () =>
+            await test('chain-across-other-string', ':8 5.5{h} 9.5{h} 12.5{h} 7.3 9.5{h} 12.5 r.4'));
+
+        // Multi-voice: one slur per voice at the stem end (Behind Bars: double-stemmed writing)
+        it('multi-voice', async () =>
+            await test('multi-voice', '\\voice :4 5.1{h} 7.1 r.2 | \\voice :4 5.4{h} 7.4 r.2 |'));
+        it('multi-voice-beamed', async () =>
+            await test(
+                'multi-voice-beamed',
+                '\\voice :8 5.1{h} 7.1 5.1{h} 7.1 r.2 | \\voice :8 5.4{h} 7.4 5.4{h} 7.4 r.2 |'
+            ));
+
         // Score-only — confirms ScoreSlurGlyph paints labels even
         // without the tab staff present.
         it('score-only', async () =>
