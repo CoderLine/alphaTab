@@ -12,7 +12,7 @@ import {
     NoteOnEvent,
     type TimeSignatureEvent
 } from '@coderline/alphatab/midi/MidiEvent';
-import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFile, MidiFileFormat } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { MidiTickLookup } from '@coderline/alphatab/midi/MidiTickLookup';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
@@ -1987,6 +1987,30 @@ describe('MidiFileGeneratorTest', () => {
             }
         }
         expect(tempoChanges.join(' ')).toBe('960:60');
+    });
+
+    it('multi-track-format-events', () => {
+        const score: Score = parseTex('\\track "T1" 3.3.4*4 | 3.3.1 \\track "T2" 3.4.2*2 | 3.4.1');
+        const midi = new MidiFile();
+        midi.format = MidiFileFormat.MultiTrack;
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
+        generator.generate();
+
+        expect(midi.tracks.length).toBe(2);
+        const events = midi.events;
+        expect(events.length).toBe(midi.tracks[0].events.length + midi.tracks[1].events.length);
+
+        // sorted by tick and keeping the order within each track
+        const positions: number[] = [0, 0];
+        let previousTick = 0;
+        for (const e of events) {
+            expect(e.tick).toBeGreaterThanOrEqual(previousTick);
+            previousTick = e.tick;
+            const track =
+                positions[0] < midi.tracks[0].events.length && midi.tracks[0].events[positions[0]] === e ? 0 : 1;
+            expect(midi.tracks[track].events[positions[track]]).toBe(e);
+            positions[track]++;
+        }
     });
 
     it('transpose', () => {
