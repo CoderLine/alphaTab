@@ -94,6 +94,7 @@ export class EngravingSettingsCloner {
         clone.directionsScale = original.directionsScale;
         clone.multiVoiceDisplacedNoteHeadSpacing = original.multiVoiceDisplacedNoteHeadSpacing;
         clone.staffContentPadding = original.staffContentPadding;
+        clone.beatContentPadding = original.beatContentPadding;
         clone.stemFlagHeight = new Map(original.stemFlagHeight);
         return clone;
     }

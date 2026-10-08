@@ -104,8 +104,14 @@ export class BarLayoutingInfo {
     // (rare; in normal layouts justification slack dominates).
     private static readonly _overlayMinPadding: number = 3;
 
-    public constructor(spacingRatio: number = Math.SQRT2) {
+    /**
+     * The minimum padding between the content of two adjacent beats ({@link EngravingSettings.beatContentPadding}).
+     */
+    public readonly beatContentPadding: number;
+
+    public constructor(spacingRatio: number = Math.SQRT2, beatContentPadding: number = 0) {
         this._spacingExponent = BarLayoutingInfo.spacingExponentFromRatio(spacingRatio);
+        this.beatContentPadding = beatContentPadding;
     }
 
     /**
@@ -461,6 +467,8 @@ export class BarLayoutingInfo {
         }
         this._incompleteGraceRodsWidth = 0;
         for (const s of this.incompleteGraceRods.values()) {
+            // padding to the beat before the grace group (see MultiVoiceContainerGlyph)
+            this._incompleteGraceRodsWidth += this.beatContentPadding;
             for (const sp of s) {
                 this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
             }
@@ -519,7 +527,8 @@ export class BarLayoutingInfo {
                 requiredSpace = currentSpring.postSpringWidth;
             } else {
                 const nextSpring = sortedSprings[i + 1];
-                requiredSpace = currentSpring.postSpringWidth + nextSpring.preSpringWidth;
+                requiredSpace =
+                    currentSpring.postSpringWidth + this.beatContentPadding + nextSpring.preSpringWidth;
             }
 
             // the first spring's pre-spring width is not part of the requirement:
