@@ -853,8 +853,9 @@ export class MidiFileGenerator {
         // e.g. the eighth notes on a 4/4 time signature must start exactly on the following
         // times to get a triplet feel applied
         // 0 480 960 1440 1920 2400 2880 3360
+        // (pick-up bars form the end of a full bar, the alignment is checked in the nominal meter)
         const pairSlot = interval * 2;
-        if (beatStart % pairSlot !== 0) {
+        if ((beatStart + beat.voice.bar.masterBar.anacrusisOffset) % pairSlot !== 0) {
             return null;
         }
 

@@ -731,6 +731,17 @@ describe('MidiFileGeneratorTest', () => {
                 ]
             );
         });
+
+        it('anacrusis', () => {
+            // the pick-up forms the end of a full bar: the first eighth is an offbeat
+            testTripletFeel(
+                '\\ts 2 4 \\ac \\tf t8 3.2.8*3 | \\tf t8 3.2.8*4',
+                [0, 480, 960, 0, 480, 960, 1440],
+                [480, 480, 480, 480, 480, 480, 480],
+                [0, 480, 1120, 1440, 2080, 2400, 3040],
+                [480, 640, 320, 640, 320, 640, 320]
+            );
+        });
     });
 
     it('beat-multi-bend', () => {
