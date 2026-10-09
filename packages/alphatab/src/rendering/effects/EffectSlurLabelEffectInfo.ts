@@ -50,7 +50,10 @@ function createEffectSlurLabelEffectInfo(
         contributesToBeatSpacing: false,
         shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => hasSegment(beat, kind),
         createNewGlyph: (renderer: BarRendererBase, beat: Beat): EffectGlyph => {
+            // different texts (e.g. H on one string, P on another) are stacked,
+            // the label of the higher note on top
             const texts: string[] = [];
+            const textPitches: number[] = [];
             let endBeat: Beat = beat;
             for (const n of beat.notes) {
                 const segment = n.effectSlurSegment;
@@ -58,15 +61,32 @@ function createEffectSlurLabelEffectInfo(
                     continue;
                 }
                 const text = labelText(segment);
-                if (texts.indexOf(text) === -1) {
+                const existing = texts.indexOf(text);
+                if (existing === -1) {
                     texts.push(text);
+                    textPitches.push(n.realValue);
+                } else if (n.realValue > textPitches[existing]) {
+                    textPitches[existing] = n.realValue;
                 }
-                if (segment.toNote.beat.absoluteDisplayStart > endBeat.absoluteDisplayStart) {
+                // isAfter (not the display start): grace notes share the display start of their main note
+                if (segment.toNote.beat.isAfter(endBeat)) {
                     endBeat = segment.toNote.beat;
                 }
             }
+            const lines: string[] = [];
+            while (texts.length > 0) {
+                let highest = 0;
+                for (let i = 1; i < texts.length; i++) {
+                    if (textPitches[i] > textPitches[highest]) {
+                        highest = i;
+                    }
+                }
+                lines.push(texts[highest]);
+                texts.splice(highest, 1);
+                textPitches.splice(highest, 1);
+            }
             return new EffectSlurLabelGlyph(
-                texts.join(' '),
+                lines.join('\n'),
                 renderer.resources.getFontForNotationElement(notationElement),
                 endBeat
             );
