@@ -58,6 +58,7 @@ import { createSlightNoteVibratoEffectInfo } from '@coderline/alphatab/rendering
 import { sustainPedalEffectInfo } from '@coderline/alphatab/rendering/effects/SustainPedalEffectInfo';
 import { tabWhammyEffectInfo } from '@coderline/alphatab/rendering/effects/TabWhammyEffectInfo';
 import { tapEffectInfo } from '@coderline/alphatab/rendering/effects/TapEffectInfo';
+import { hammerPullLabelEffectInfo, slideLabelEffectInfo } from '@coderline/alphatab/rendering/effects/EffectSlurLabelEffectInfo';
 import { tempoEffectInfo } from '@coderline/alphatab/rendering/effects/TempoEffectInfo';
 import { textEffectInfo } from '@coderline/alphatab/rendering/effects/TextEffectInfo';
 import { trillEffectInfo } from '@coderline/alphatab/rendering/effects/TrillEffectInfo';
@@ -512,6 +513,9 @@ export class Environment {
             },
 
             { effect: createGolpeEffectInfo(GolpeType.Finger), mode: EffectBandMode.OwnedTop },
+            // last = closest to the staff: H/P directly above the staff, sl. stacked above
+            { effect: slideLabelEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: hammerPullLabelEffectInfo, mode: EffectBandMode.OwnedTop },
 
             { effect: createGolpeEffectInfo(GolpeType.Thumb), mode: EffectBandMode.OwnedBottom },
             { effect: crescendoEffectInfo, mode: EffectBandMode.SharedBottom },
@@ -524,7 +528,9 @@ export class Environment {
         //
         // Numbered
         new NumberedBarRendererFactory([
-            { effect: numberedBarKeySignatureEffectInfo, mode: EffectBandMode.OwnedTop, order: 1000 }
+            { effect: numberedBarKeySignatureEffectInfo, mode: EffectBandMode.OwnedTop, order: 1000 },
+            { effect: slideLabelEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: hammerPullLabelEffectInfo, mode: EffectBandMode.OwnedTop }
         ]),
 
         //
@@ -557,6 +563,9 @@ export class Environment {
                 mode: EffectBandMode.OwnedTop,
                 shouldCreate: staff => !staff.showStandardNotation
             },
+            // last = closest to the staff: H/P directly above the staff, sl. stacked above
+            { effect: slideLabelEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: hammerPullLabelEffectInfo, mode: EffectBandMode.OwnedTop },
 
             {
                 effect: createGolpeEffectInfo(GolpeType.Thumb),

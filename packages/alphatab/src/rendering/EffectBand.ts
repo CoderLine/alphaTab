@@ -118,6 +118,14 @@ export class EffectBand extends Glyph {
         }
     }
 
+    /**
+     * Marks the x-range as stale after glyph extents changed outside {@link alignGlyphs}
+     * (e.g. resolved in {@link EffectInfo.finalizeBand}).
+     */
+    public invalidateXRange(): void {
+        this._xRangeBaseDirty = true;
+    }
+
     public clearPublishedSpans(): void {
         // Defer base recomputation if stale (alignGlyphs invalidated it).
         if (this._xRangeBaseDirty) {
