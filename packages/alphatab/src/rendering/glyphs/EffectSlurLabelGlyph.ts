@@ -2,6 +2,7 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
+import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 
 /**
@@ -15,17 +16,45 @@ import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
  * In the vertical placement the label keeps its whole segment (start to end beat) clear, so it is placed
  * above everything on the segment (e.g. fret numbers sticking out of the tab staff), but it only occupies
  * the range of its text, so other markers can share the row next to it.
+ *
+ * Several labels of one beat (e.g. H on one string, P on another) are stacked with the usual effect band
+ * padding between them, as if they were separate bands.
  * @internal
  */
-export class EffectSlurLabelGlyph extends TextGlyph {
+export class EffectSlurLabelGlyph extends EffectGlyph {
     private _endBeat: Beat;
+    private _texts: string[];
+    private _font: Font;
+    private _lines: TextGlyph[] = [];
     private _labelOffset: number = 0;
     private _segmentStart: number = 0;
     private _segmentEnd: number = 0;
 
-    public constructor(text: string, font: Font, endBeat: Beat) {
-        super(0, 0, text, font, TextAlign.Center);
+    public constructor(lines: string[], font: Font, endBeat: Beat) {
+        super(0, 0);
         this._endBeat = endBeat;
+        this._texts = lines;
+        this._font = font;
+    }
+
+    public override doLayout(): void {
+        const padding = this.renderer.settings.display.effectBandPaddingBottom;
+        let y = 0;
+        let width = 0;
+        this._lines = [];
+        for (const text of this._texts) {
+            const line = new TextGlyph(0, 0, text, this._font, TextAlign.Center);
+            this._lines.push(line);
+            line.renderer = this.renderer;
+            line.y = y;
+            line.doLayout();
+            y += line.height + padding;
+            if (line.width > width) {
+                width = line.width;
+            }
+        }
+        this.width = width;
+        this.height = this._lines.length > 0 ? y - padding : 0;
     }
 
     /**
@@ -52,11 +81,11 @@ export class EffectSlurLabelGlyph extends TextGlyph {
     }
 
     public override getBoundingBoxLeft(): number {
-        return super.getBoundingBoxLeft() + this._labelOffset;
+        return this.x + this._labelOffset - this.width / 2;
     }
 
     public override getBoundingBoxRight(): number {
-        return super.getBoundingBoxRight() + this._labelOffset;
+        return this.x + this._labelOffset + this.width / 2;
     }
 
     public override getPlacementClearanceLeft(): number {
@@ -68,6 +97,8 @@ export class EffectSlurLabelGlyph extends TextGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx + this._labelOffset, cy, canvas);
+        for (const line of this._lines) {
+            line.paint(cx + this.x + this._labelOffset, cy + this.y, canvas);
+        }
     }
 }

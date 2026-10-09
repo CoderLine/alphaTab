@@ -86,7 +86,7 @@ function createEffectSlurLabelEffectInfo(
                 textPitches.splice(highest, 1);
             }
             return new EffectSlurLabelGlyph(
-                lines.join('\n'),
+                lines,
                 renderer.resources.getFontForNotationElement(notationElement),
                 endBeat
             );
