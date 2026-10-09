@@ -12,9 +12,9 @@ import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
  * on the next system). The offset to this center is resolved via {@link resolveOffset} once all bars
  * of the system have their final positions.
  *
- * For the vertical placement the glyph reports the whole segment (start to end beat) as its extent,
- * so the label is placed above everything on the segment (e.g. fret numbers sticking out of the tab staff)
- * and not only above the gap between the notes.
+ * In the vertical placement the label keeps its whole segment (start to end beat) clear, so it is placed
+ * above everything on the segment (e.g. fret numbers sticking out of the tab staff), but it only occupies
+ * the range of its text, so other markers can share the row next to it.
  * @internal
  */
 export class EffectSlurLabelGlyph extends TextGlyph {
@@ -52,11 +52,19 @@ export class EffectSlurLabelGlyph extends TextGlyph {
     }
 
     public override getBoundingBoxLeft(): number {
-        return Math.min(super.getBoundingBoxLeft() + this._labelOffset, this._segmentStart);
+        return super.getBoundingBoxLeft() + this._labelOffset;
     }
 
     public override getBoundingBoxRight(): number {
-        return Math.max(super.getBoundingBoxRight() + this._labelOffset, this._segmentEnd);
+        return super.getBoundingBoxRight() + this._labelOffset;
+    }
+
+    public override getPlacementClearanceLeft(): number {
+        return Math.min(this.getBoundingBoxLeft(), this._segmentStart);
+    }
+
+    public override getPlacementClearanceRight(): number {
+        return Math.max(this.getBoundingBoxRight(), this._segmentEnd);
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

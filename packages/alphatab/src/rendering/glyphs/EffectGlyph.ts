@@ -34,4 +34,20 @@ export class EffectGlyph extends Glyph {
     public constructor(x: number = 0, y: number = 0) {
         super(x, y);
     }
+
+    /**
+     * The left edge of the range this glyph must keep clear of other content in the vertical placement.
+     * Defaults to the bounding box; glyphs can reach further than they occupy themselves.
+     */
+    public getPlacementClearanceLeft(): number {
+        return this.getBoundingBoxLeft();
+    }
+
+    /**
+     * The right edge of the range this glyph must keep clear of other content in the vertical placement.
+     * @see getPlacementClearanceLeft
+     */
+    public getPlacementClearanceRight(): number {
+        return this.getBoundingBoxRight();
+    }
 }

@@ -4,7 +4,7 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
@@ -428,6 +428,61 @@ export class EffectBand extends Glyph {
         }
         out.xStart = this._xRangeMin;
         out.xEnd = this._xRangeMax;
+        return true;
+    }
+
+    private readonly _placementRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
+    /**
+     * Collects the renderer-local x-ranges of this band for the vertical placement: the ranges which must be
+     * clear of other content (`clearStarts`/`clearEnds`) and the ranges the band occupies (`xStarts`/`xEnds`).
+     * @remarks
+     * Note-attached bands (markers like tap or the hammer-on/pull-off labels) place each glyph on its own
+     * ({@link EffectGlyph.getPlacementClearanceLeft}), so other markers can share the row in the gaps
+     * between them. All other bands (lines, spans, system markers) and bands with cross-bar spans keep and
+     * occupy their whole range ({@link computeLocalXRange}).
+     * @returns `false` when the band has no usable range.
+     */
+    public collectPlacementRanges(
+        clearStarts: number[],
+        clearEnds: number[],
+        xStarts: number[],
+        xEnds: number[]
+    ): boolean {
+        if (this.isEmpty) {
+            return false;
+        }
+        if (
+            this.info.placementCategory === EffectBandPlacementCategory.NoteAttached &&
+            this.info.sizingMode !== EffectBarGlyphSizing.FullBar &&
+            this._chainHeads.length === 0
+        ) {
+            let found = false;
+            for (const v of this._uniqueEffectGlyphs) {
+                for (const g of v) {
+                    const left = g.getBoundingBoxLeft();
+                    const right = g.getBoundingBoxRight();
+                    if (Number.isNaN(left) || Number.isNaN(right)) {
+                        continue;
+                    }
+                    clearStarts.push(Math.min(left, g.getPlacementClearanceLeft()));
+                    clearEnds.push(Math.max(right, g.getPlacementClearanceRight()));
+                    xStarts.push(left);
+                    xEnds.push(right);
+                    found = true;
+                }
+            }
+            return found;
+        }
+
+        const range = this._placementRangeScratch;
+        if (!this.computeLocalXRange(range)) {
+            return false;
+        }
+        clearStarts.push(range.xStart);
+        clearEnds.push(range.xEnd);
+        xStarts.push(range.xStart);
+        xEnds.push(range.xEnd);
         return true;
     }
 

@@ -1,4 +1,4 @@
-import type { EffectBand, EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
+import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
@@ -17,7 +17,8 @@ export class EffectSystemPlacement {
     private readonly _groupBands: EffectBand[] = [];
     private readonly _groupXStarts: number[] = [];
     private readonly _groupXEnds: number[] = [];
-    private readonly _xRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+    private readonly _clearXStarts: number[] = [];
+    private readonly _clearXEnds: number[] = [];
 
     public constructor(staff: RenderStaff) {
         this._staff = staff;
@@ -158,24 +159,31 @@ export class EffectSystemPlacement {
             groupBands.splice(0, groupBands.length);
             groupXStarts.splice(0, groupXStarts.length);
             groupXEnds.splice(0, groupXEnds.length);
-            const xRange = this._xRangeScratch;
             let groupMagnitude = 0;
             for (let k = i; k < groupEnd; k++) {
                 const m = bands[k];
-                if (!m.computeLocalXRange(xRange)) {
+                // one entry per occupied range (note-attached bands: one per glyph)
+                const clearStarts = this._clearXStarts;
+                const clearEnds = this._clearXEnds;
+                clearStarts.splice(0, clearStarts.length);
+                clearEnds.splice(0, clearEnds.length);
+                const firstRange = groupXStarts.length;
+                if (!m.collectPlacementRanges(clearStarts, clearEnds, groupXStarts, groupXEnds)) {
                     continue;
                 }
-                const xStart = m.renderer.x + xRange.xStart;
-                const xEnd = m.renderer.x + xRange.xEnd;
-                const mag = isTop
-                    ? querySky.placeAbove(xStart, xEnd, m.height, pad)
-                    : querySky.placeBelow(xStart, xEnd, m.height, pad);
-                if (mag > groupMagnitude) {
-                    groupMagnitude = mag;
+                for (let r = firstRange; r < groupXStarts.length; r++) {
+                    groupXStarts[r] = m.renderer.x + groupXStarts[r];
+                    groupXEnds[r] = m.renderer.x + groupXEnds[r];
+                    const clearStart = m.renderer.x + clearStarts[r - firstRange];
+                    const clearEnd = m.renderer.x + clearEnds[r - firstRange];
+                    const mag = isTop
+                        ? querySky.placeAbove(clearStart, clearEnd, m.height, pad)
+                        : querySky.placeBelow(clearStart, clearEnd, m.height, pad);
+                    if (mag > groupMagnitude) {
+                        groupMagnitude = mag;
+                    }
+                    groupBands.push(m);
                 }
-                groupBands.push(m);
-                groupXStarts.push(xStart);
-                groupXEnds.push(xEnd);
             }
             for (let k = 0; k < groupBands.length; k++) {
                 const b = groupBands[k];
