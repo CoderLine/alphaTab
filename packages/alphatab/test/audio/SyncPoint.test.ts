@@ -7,6 +7,7 @@ import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { Settings } from '@coderline/alphatab/Settings';
+import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import {
     ExternalMediaPlayer,
@@ -20,6 +21,7 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
 import type { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
 import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
 import { FlatMidiEventGenerator } from 'test/audio/FlatMidiEventGenerator';
+import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
 
 describe('SyncPointTests', () => {
@@ -357,6 +359,89 @@ describe('SyncPointTests', () => {
         expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
         expect(testOutput.seekTimes).toMatchSnapshot();
     });
+
+    /**
+     * See #2397: starting the playback with count-in must not rewind the media to the song start.
+     */
+    it('count-in-keeps-position-backing-track', async () => {
+        const player = await prepareBackingTrackPlayer();
+        const testOutput = player.output as TestBackingTrackOutput;
+        player.timePosition = 30000;
+        player.countInVolume = 1;
+        const seekCount = testOutput.seekTimes.length;
+
+        player.play();
+
+        // no seek back to the song start, the next media update continues from 30s
+        testOutput.simulateSeek(testOutput.seekTimes[seekCount - 1] + 100);
+        expect(testOutput.seekTimes.length).toBe(seekCount);
+        expect(player.timePosition).toBeGreaterThan(30000);
+    });
+
+    it('count-in-keeps-position-external-media', async () => {
+        const player = await prepareExternalMediaPlayer();
+        const testOutput = (player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler;
+        player.timePosition = 30000;
+        player.countInVolume = 1;
+        const seekCount = testOutput.seekTimes.length;
+
+        player.play();
+
+        // no seek back to the song start, the next media update continues from 30s
+        testOutput.simulateSeek(testOutput.seekTimes[seekCount - 1] + 100);
+        expect(testOutput.seekTimes.length).toBe(seekCount);
+        expect(player.timePosition).toBeGreaterThan(30000);
+    });
+
+    /**
+     * See #2397: filling the queue up to a time position must advance the active
+     * (count-in) state, otherwise the loop never ends.
+     */
+    it('fill-to-end-time-during-count-in', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            .
+            C4 * 4
+        `);
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, new Settings(), handler);
+        generator.generate();
+
+        const sequencer = new MidiFileSequencer(new EmptyAudioSynthesizer());
+        sequencer.loadMidi(midi);
+        sequencer.startCountIn();
+
+        sequencer.fillMidiEventQueueToEndTime(1000);
+
+        expect(sequencer.isPlayingCountIn).toBe(true);
+        expect(sequencer.currentTime).toBe(1000);
+    });
+
+    /**
+     * See #2397: the synthesizer player still plays the count-in.
+     */
+    it('count-in-playback-synthesizer', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            .
+            C4 * 4
+        `);
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, new Settings(), handler);
+        generator.generate();
+
+        const synth = new AlphaSynth(new TestOutput(), 500);
+        synth.loadMidiFile(midi);
+        synth.timePosition = 1000;
+        synth.countInVolume = 1;
+
+        expect(synth.play()).toBe(true);
+
+        // the count-in plays from its own start, the song continues at 1000ms after it
+        expect(synth.timePosition).toBe(0);
+    });
 });
 
 describe('MidiFileSequencerCountInTests', () => {
@@ -490,7 +575,15 @@ class TestExternalMediaHandler implements IExternalMediaHandler {
 class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
     public masterVolume: number = 0;
     public metronomeVolume: number = 0;
-    public outSampleRate: number = 44100;
+    private _sampleRateReads: number = 0;
+    public get outSampleRate(): number {
+        // the sequencer reads this once per fill iteration: fail instead of hanging if it stops making progress
+        this._sampleRateReads++;
+        if (this._sampleRateReads > 100000) {
+            throw new Error('Sequencer is not making progress');
+        }
+        return 44100;
+    }
     public currentTempo: number = 120;
     public timeSignatureNumerator: number = 4;
     public timeSignatureDenominator: number = 4;

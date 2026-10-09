@@ -118,6 +118,10 @@ export class AlphaSynthBase implements IAlphaSynth {
         this._countInVolume = value;
     }
 
+    protected get supportsCountIn(): boolean {
+        return true;
+    }
+
     public get midiEventsPlayedFilter(): MidiEventType[] {
         return Array.from(this.midiEventsPlayedFilterSet);
     }
@@ -321,7 +325,7 @@ export class AlphaSynthBase implements IAlphaSynth {
 
         this._playInternal();
 
-        if (this._countInVolume > 0) {
+        if (this._countInVolume > 0 && this.supportsCountIn) {
             Logger.debug('AlphaSynth', 'Starting countin');
             this.sequencer.startCountIn();
             this.synthesizer.setupMetronomeChannel(this.sequencer.metronomeChannel, this._countInVolume);
