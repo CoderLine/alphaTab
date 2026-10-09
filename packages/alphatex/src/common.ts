@@ -1,4 +1,9 @@
-import type { MetadataTagDefinition, PropertyDefinition } from '@coderline/alphatab-alphatex/types';
+import * as alphaTab from '@coderline/alphatab';
+import type {
+    MetadataTagDefinition,
+    PropertyDefinition,
+    SignatureDefinition
+} from '@coderline/alphatab-alphatex/types';
 
 export const generalMidiInstruments = [
     'Acoustic Grand Piano',
@@ -137,4 +142,62 @@ export function properties(...props: PropertyDefinition[]): Map<string, Property
 
 export function metadata(...metadata: MetadataTagDefinition[]) {
     return new Map<string, MetadataTagDefinition>(metadata.map(t => [t.tag.toLowerCase(), t]));
+}
+
+/**
+ * Creates the signatures for a boolean-like value: no value (= true), `true|false`, `"true"|"false"` or `1|0`.
+ */
+export function booleanSignatures(
+    name: string,
+    shortDescription: string,
+    trueDescription: string,
+    falseDescription: string
+): SignatureDefinition[] {
+    return [
+        {
+            parameters: []
+        },
+        {
+            parameters: [
+                {
+                    name,
+                    shortDescription,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
+                    values: [
+                        { name: 'true', snippet: '"true"', shortDescription: trueDescription },
+                        { name: 'false', snippet: '"false"', shortDescription: falseDescription }
+                    ]
+                }
+            ]
+        },
+        {
+            parameters: [
+                {
+                    name,
+                    shortDescription,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
+                    values: [
+                        { name: 'true', snippet: 'true', shortDescription: trueDescription },
+                        { name: 'false', snippet: 'false', shortDescription: falseDescription }
+                    ]
+                }
+            ]
+        },
+        {
+            parameters: [
+                {
+                    name,
+                    shortDescription,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
+                    values: [
+                        { name: '1', snippet: '1', shortDescription: trueDescription },
+                        { name: '0', snippet: '0', shortDescription: falseDescription }
+                    ]
+                }
+            ]
+        }
+    ];
 }

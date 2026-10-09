@@ -238,6 +238,11 @@ export enum AlphaTexDiagnosticCode {
     AT306 = 306,
 
     /**
+     * The staff display property is not supported by the staff type, the value has no effect.
+     */
+    AT307 = 307,
+
+    /**
      * The dots separating score metadata, score contents and the sync points can be removed.
      */
     AT400 = 400
@@ -284,6 +289,30 @@ export enum AlphaTexAccidentalMode {
 export enum AlphaTexVoiceMode {
     StaffWise = 0,
     BarWise = 1
+}
+
+/**
+ * The staff types to which the alphaTex staff display tags
+ * (`\defaultStaffDisplay`, `\staffDisplay`, `\barDisplay`) apply.
+ * @public
+ */
+export enum AlphaTexStaffType {
+    /**
+     * The standard notation staff.
+     */
+    Score = 0,
+    /**
+     * The guitar tablature staff.
+     */
+    Tabs = 1,
+    /**
+     * The slash notation staff.
+     */
+    Slash = 2,
+    /**
+     * The numbered notation (Jianpu) staff.
+     */
+    Numbered = 3
 }
 
 /**

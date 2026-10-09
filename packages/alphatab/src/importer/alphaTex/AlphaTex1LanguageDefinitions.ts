@@ -195,7 +195,8 @@ export class AlphaTex1LanguageDefinitions {
         ['hideemptystaves', null],
         ['hideemptystavesinfirstsystem', null],
         ['showsinglestaffbrackets', null],
-        ['defaultbarnumberdisplay', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]]
+        ['defaultbarnumberdisplay', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]],
+        ['defaultstaffdisplay', [[[[100, 107], 5, ['score', 'tabs', 'slash', 'numbered']]]]]
     ]);
     public static readonly staffMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
         ['tuning', [[[[100, 107], 0, ['piano', 'none', 'voice']]], [[[100, 107], 5]]]],
@@ -231,7 +232,8 @@ export class AlphaTex1LanguageDefinitions {
         ],
         ['displaytranspose', [[[[106], 0]]]],
         ['transpose', [[[[106], 0]]]],
-        ['instrument', [[[[106], 0]], [[[107, 100], 0]], [[[100], 0, ['percussion']]]]]
+        ['instrument', [[[[106], 0]], [[[107, 100], 0]], [[[100], 0, ['percussion']]]]],
+        ['staffdisplay', [[[[100, 107], 5, ['score', 'tabs', 'slash', 'numbered']]]]]
     ]);
     public static readonly structuralMetaDataSignatures = AlphaTex1LanguageDefinitions._signatures([
         [
@@ -491,7 +493,8 @@ export class AlphaTex1LanguageDefinitions {
                 ]
             ]
         ],
-        ['barnumber', [[[[107, 100], 0]], [[[106], 0]]]]
+        ['barnumber', [[[[107, 100], 0]], [[[106], 0]]]],
+        ['bardisplay', [[[[100, 107], 5, ['score', 'tabs', 'slash', 'numbered']]]]]
     ]);
     public static readonly metaDataProperties = AlphaTex1LanguageDefinitions._metaProps([
         [
@@ -552,6 +555,37 @@ export class AlphaTex1LanguageDefinitions {
         ['showsinglestaffbrackets', null],
         ['defaultbarnumberdisplay', null],
         [
+            'defaultstaffdisplay',
+            [
+                [
+                    'clefvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['clefplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['clefsystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'ksvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['ksplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['kssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'tsvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['tsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['tssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'restsvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['restsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['restssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                ['barnumber', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]],
+                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]]
+            ]
+        ],
+        [
             'tuning',
             [
                 ['hide', null],
@@ -583,6 +617,37 @@ export class AlphaTex1LanguageDefinitions {
         ['displaytranspose', null],
         ['transpose', null],
         ['instrument', null],
+        [
+            'staffdisplay',
+            [
+                [
+                    'clefvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['clefplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['clefsystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'ksvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['ksplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['kssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'tsvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['tsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['tssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'restsvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['restsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['restssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                ['barnumber', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]],
+                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]]
+            ]
+        ],
         ['ts', null],
         ['ro', null],
         ['rc', null],
@@ -610,7 +675,31 @@ export class AlphaTex1LanguageDefinitions {
         ['voicemode', null],
         ['barnumberdisplay', null],
         ['beaming', null],
-        ['barnumber', null]
+        ['barnumber', null],
+        [
+            'bardisplay',
+            [
+                [
+                    'clefvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['clefplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['clefsystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'ksvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['ksplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['kssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                [
+                    'tsvisibility',
+                    [[], [[[107], 0, ['true', 'false']]], [[[100], 0, ['true', 'false']]], [[[106], 0, ['1', '0']]]]
+                ],
+                ['tsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
+                ['tssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
+                ['barnumber', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]]
+            ]
+        ]
     ]);
     public static readonly metaDataSignatures = [
         AlphaTex1LanguageDefinitions.scoreMetaDataSignatures,

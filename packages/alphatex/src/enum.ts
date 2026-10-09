@@ -10,6 +10,7 @@ export const alphaTexMappedEnumLookup = {
     FermataType: alphaTab.model.FermataType,
     AlphaTexAccidentalMode: alphaTab.importer.alphaTex.AlphaTexAccidentalMode,
     AlphaTexVoiceMode: alphaTab.importer.alphaTex.AlphaTexVoiceMode,
+    AlphaTexStaffType: alphaTab.importer.alphaTex.AlphaTexStaffType,
     NoteAccidentalMode: alphaTab.model.NoteAccidentalMode,
     BarreShape: alphaTab.model.BarreShape,
     Ottavia: alphaTab.model.Ottavia,
@@ -30,7 +31,10 @@ export const alphaTexMappedEnumLookup = {
     SimileMark: alphaTab.model.SimileMark,
     Direction: alphaTab.model.Direction,
     TremoloPickingStyle: alphaTab.model.TremoloPickingStyle,
-    BarNumberDisplay: alphaTab.model.BarNumberDisplay
+    BarNumberDisplay: alphaTab.model.BarNumberDisplay,
+    StaffPlacement: alphaTab.model.StaffPlacement,
+    SystemDisplay: alphaTab.model.SystemDisplay,
+    TabRhythmMode: alphaTab.TabRhythmMode
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -121,6 +125,12 @@ export const alphaTexMappedEnumMapping: {
             shortDescription: 'Bar-Wise voices',
             longDescription: 'A new voice adds a new voice to the current bar only.'
         }
+    },
+    AlphaTexStaffType: {
+        Score: { snippet: 'score', shortDescription: 'The standard notation staff' },
+        Tabs: { snippet: 'tabs', shortDescription: 'The guitar tablature staff' },
+        Slash: { snippet: 'slash', shortDescription: 'The slash notation staff' },
+        Numbered: { snippet: 'numbered', shortDescription: 'The numbered notation (Jianpu) staff' }
     },
     NoteAccidentalMode: {
         Default: { snippet: 'default', shortDescription: 'Auto-detect the accidentals', aliases: ['d'] },
@@ -464,6 +474,34 @@ export const alphaTexMappedEnumMapping: {
         AllBars: { snippet: 'allBars', shortDescription: 'All bars' },
         FirstOfSystem: { snippet: 'firstOfSystem', shortDescription: 'First bar of every system' },
         Hide: { snippet: 'hide', shortDescription: 'Hide' }
+    },
+    StaffPlacement: {
+        AllStaves: { snippet: 'allStaves', shortDescription: 'Show the element on all staves' },
+        Primary: {
+            snippet: 'primary',
+            shortDescription: 'Show the element only on the primary staff',
+            longDescription:
+                'Show the element only on the topmost displayed notation of the staff (priority: score, tabs, slash, numbered).'
+        }
+    },
+    SystemDisplay: {
+        AllSystems: { snippet: 'allSystems', shortDescription: 'Show the element on all systems' },
+        FirstSystemOnly: { snippet: 'firstSystemOnly', shortDescription: 'Show the element only on the first system' }
+    },
+    TabRhythmMode: {
+        Hidden: { snippet: 'hidden', shortDescription: 'Hide the rhythm notation' },
+        ShowWithBeams: {
+            snippet: 'showWithBeams',
+            shortDescription: 'Show rhythm notation with individual beams per beat'
+        },
+        ShowWithBars: {
+            snippet: 'showWithBars',
+            shortDescription: 'Show rhythm notation with connected bars like in standard notation'
+        },
+        Automatic: {
+            snippet: 'automatic',
+            shortDescription: 'Show rhythm notation automatically if no standard notation is shown'
+        }
     }
 };
 
