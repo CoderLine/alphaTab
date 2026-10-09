@@ -28,6 +28,7 @@ import { FermataType, Fermata } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { InstrumentArticulation } from '@coderline/alphatab/model/InstrumentArticulation';
 import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
@@ -55,6 +56,42 @@ import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import type { XmlNode } from '@coderline/alphatab/xml/XmlNode';
 import type { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+
+/**
+ * The pitch a note of a MusicXML harmonic describes.
+ * @internal
+ */
+enum MusicXmlHarmonicPitch {
+    None = 0,
+    Base = 1,
+    Touching = 2,
+    Sounding = 3
+}
+
+/**
+ * @internal
+ * @record
+ */
+interface MusicXmlHarmonic {
+    type: HarmonicType;
+    pitch: MusicXmlHarmonicPitch;
+    /**
+     * Groups the notes of one harmonic when a chord holds several of them (number-level, MusicXML 4.1).
+     */
+    group: string;
+}
+
+/**
+ * The note which represents a MusicXML harmonic in the current beat.
+ * @internal
+ * @record
+ */
+interface MusicXmlHarmonicGroup {
+    note: Note;
+    type: HarmonicType;
+    isBasePitch: boolean;
+    hasTouchingPitch: boolean;
+}
 
 /**
  * @internal
@@ -1037,6 +1074,11 @@ export class MusicXmlImporter extends ScoreImporter {
      * to access the current voice/staff (e.g. on rests when we don't have notes)
      */
     private _lastBeat: Beat | null = null;
+
+    /**
+     * The harmonic groups of the last created beat, by their group number.
+     */
+    private _harmonicGroups = new Map<string, MusicXmlHarmonicGroup>();
 
     private _parsePartMeasure(
         element: XmlNode,
@@ -2600,6 +2642,11 @@ export class MusicXmlImporter extends ScoreImporter {
             isChord = false;
         }
 
+        const harmonic = note !== null ? MusicXmlImporter._readHarmonic(element) : null;
+        if (isChord && harmonic !== null && this._foldHarmonicNote(note!, harmonic, track, staffIndex)) {
+            return;
+        }
+
         // the stem direction relates to the written pitch, hence remember it before the staff transposition is applied
         const writtenNoteValue = note !== null ? this._calculatePitchedNoteValue(note) : 0;
 
@@ -2615,6 +2662,14 @@ export class MusicXmlImporter extends ScoreImporter {
         if (note !== null) {
             note.isVisible = element.getAttribute('print-object', 'yes') !== 'no';
             this._resolveAttachedNote(note, instrumentId, isPitched);
+            if (harmonic !== null && harmonic.pitch !== MusicXmlHarmonicPitch.None) {
+                this._harmonicGroups.set(harmonic.group, {
+                    note,
+                    type: harmonic.type,
+                    isBasePitch: harmonic.pitch === MusicXmlHarmonicPitch.Base,
+                    hasTouchingPitch: false
+                });
+            }
         }
 
         // Pass 2: interpret all other children with the note attached
@@ -2787,7 +2842,117 @@ export class MusicXmlImporter extends ScoreImporter {
         if (note !== null) {
             // <technical><string> is only known after pass 2
             this._finalizeStringNumber(note);
+            // natural harmonics are touched at the fret, artificial harmonics need the touching or sounding pitch of a following chord note
+            if (
+                harmonic !== null &&
+                harmonic.type === HarmonicType.Natural &&
+                (!note.isStringed || ModelUtils.harmonicValueToPitch(note.fret) > 0)
+            ) {
+                note.harmonicType = HarmonicType.Natural;
+                note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
+            }
         }
+    }
+
+    /**
+     * Reads the `<technical><harmonic>` of the note.
+     * A harmonic without `<natural/>` or `<artificial/>` only shows the harmonic circle, like Guitar Pro 8 we ignore it
+     * (it exports pinch, tap and semi harmonics like this).
+     */
+    private static _readHarmonic(element: XmlNode): MusicXmlHarmonic | null {
+        for (const notations of element.childElements()) {
+            if (notations.localName !== 'notations') {
+                continue;
+            }
+            for (const technical of notations.childElements()) {
+                if (technical.localName !== 'technical') {
+                    continue;
+                }
+                for (const c of technical.childElements()) {
+                    if (c.localName !== 'harmonic') {
+                        continue;
+                    }
+                    const harmonic: MusicXmlHarmonic = {
+                        type: HarmonicType.None,
+                        pitch: MusicXmlHarmonicPitch.None,
+                        group: c.getAttribute('number', '1')
+                    };
+                    for (const h of c.childElements()) {
+                        switch (h.localName) {
+                            case 'natural':
+                                harmonic.type = HarmonicType.Natural;
+                                break;
+                            case 'artificial':
+                                harmonic.type = HarmonicType.Artificial;
+                                break;
+                            case 'base-pitch':
+                                harmonic.pitch = MusicXmlHarmonicPitch.Base;
+                                break;
+                            case 'touching-pitch':
+                                harmonic.pitch = MusicXmlHarmonicPitch.Touching;
+                                break;
+                            case 'sounding-pitch':
+                                harmonic.pitch = MusicXmlHarmonicPitch.Sounding;
+                                break;
+                        }
+                    }
+                    return harmonic.type !== HarmonicType.None ? harmonic : null;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * MusicXML writes a harmonic as separate chord notes for the base pitch (the played note),
+     * the touching pitch (where the string is touched) and the sounding pitch (what is heard).
+     * In alphaTab a harmonic is one note: the touching and sounding notes are folded into the note
+     * of their harmonic (which they follow in all known files: the MusicXML examples, the LilyPond test suite, Guitar Pro 8)
+     * and only define its harmonic value. A base pitch note starts a new harmonic.
+     * The touching pitch defines the harmonic more precisely than the sounding pitch (e.g. fret 7 and 19 sound the same),
+     * Guitar Pro 8 writes both consistently.
+     * The pitch is relative to the staff the note specifies, Guitar Pro 8 omits the `<staff>` on these chord notes
+     * of a tablature staff and writes them in the pitch of the first staff.
+     * @returns true if the note was folded and must not be added to the beat.
+     */
+    private _foldHarmonicNote(note: Note, harmonic: MusicXmlHarmonic, track: Track, staffIndex: number): boolean {
+        const group = this._harmonicGroups.get(harmonic.group);
+        if (
+            group === undefined ||
+            harmonic.pitch === MusicXmlHarmonicPitch.Base ||
+            harmonic.pitch === MusicXmlHarmonicPitch.None
+        ) {
+            return false;
+        }
+
+        // only the base pitch is a reference for the harmonic value
+        const played = group.note;
+        if (group.isBasePitch && !group.hasTouchingPitch) {
+            const transpose = this._getStaffContext(this._getOrCreateStaff(track, staffIndex)).transpose;
+            let interval = this._calculatePitchedNoteValue(note) + transpose - this._calculatePitchedNoteValue(played);
+            // natural harmonics are touched relative to the open string
+            if (played.isStringed && group.type === HarmonicType.Natural) {
+                interval += played.fret;
+            }
+
+            if (harmonic.pitch === MusicXmlHarmonicPitch.Touching) {
+                played.harmonicType = group.type;
+                played.harmonicValue = ModelUtils.deltaFretToHarmonicValue(interval);
+                group.hasTouchingPitch = true;
+            } else {
+                // the lowest fret sounding the interval
+                for (let fret = 1; fret <= 24; fret++) {
+                    const value = ModelUtils.deltaFretToHarmonicValue(fret);
+                    if (ModelUtils.harmonicValueToPitch(value) === interval) {
+                        played.harmonicType = group.type;
+                        played.harmonicValue = value;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -2850,6 +3015,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
         const newBeat = new Beat();
         this._beats.push(newBeat);
+        this._harmonicGroups.clear();
         newBeat.isEmpty = false;
         newBeat.dynamics = this._currentDynamics;
 
@@ -3664,8 +3830,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'down-bow':
                     beat.pickStroke = PickStroke.Down;
                     break;
-                case 'harmonic':
-                    break;
+                // case 'harmonic': handled in _parseNote
                 // case 'open-string': Not supported
                 // case 'thumb-position': Not supported
                 case 'fingering':
