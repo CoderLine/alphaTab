@@ -127,10 +127,10 @@ export const alphaTexMappedEnumMapping: {
         }
     },
     AlphaTexStaffType: {
-        Score: { snippet: 'score', shortDescription: 'The standard notation staff' },
-        Tabs: { snippet: 'tabs', shortDescription: 'The guitar tablature staff' },
-        Slash: { snippet: 'slash', shortDescription: 'The slash notation staff' },
-        Numbered: { snippet: 'numbered', shortDescription: 'The numbered notation (Jianpu) staff' }
+        Score: { snippet: 'score', shortDescription: 'Standard notation' },
+        Tabs: { snippet: 'tabs', shortDescription: 'Guitar tablature' },
+        Slash: { snippet: 'slash', shortDescription: 'Slash notation' },
+        Numbered: { snippet: 'numbered', shortDescription: 'Numbered notation (Jianpu)' }
     },
     NoteAccidentalMode: {
         Default: { snippet: 'default', shortDescription: 'Auto-detect the accidentals', aliases: ['d'] },
@@ -476,32 +476,18 @@ export const alphaTexMappedEnumMapping: {
         Hide: { snippet: 'hide', shortDescription: 'Hide' }
     },
     StaffPlacement: {
-        AllStaves: { snippet: 'allStaves', shortDescription: 'Show the element on all staves' },
-        Primary: {
-            snippet: 'primary',
-            shortDescription: 'Show the element only on the primary staff',
-            longDescription:
-                'Show the element only on the topmost displayed notation of the staff (priority: score, tabs, slash, numbered).'
-        }
+        AllStaves: { snippet: 'allStaves', shortDescription: 'All staves' },
+        Primary: { snippet: 'primary', shortDescription: 'Only the primary (topmost) staff' }
     },
     SystemDisplay: {
-        AllSystems: { snippet: 'allSystems', shortDescription: 'Show the element on all systems' },
-        FirstSystemOnly: { snippet: 'firstSystemOnly', shortDescription: 'Show the element only on the first system' }
+        AllSystems: { snippet: 'allSystems', shortDescription: 'All systems' },
+        FirstSystemOnly: { snippet: 'firstSystemOnly', shortDescription: 'Only the first system' }
     },
     TabRhythmMode: {
-        Hidden: { snippet: 'hidden', shortDescription: 'Hide the rhythm notation' },
-        ShowWithBeams: {
-            snippet: 'showWithBeams',
-            shortDescription: 'Show rhythm notation with individual beams per beat'
-        },
-        ShowWithBars: {
-            snippet: 'showWithBars',
-            shortDescription: 'Show rhythm notation with connected bars like in standard notation'
-        },
-        Automatic: {
-            snippet: 'automatic',
-            shortDescription: 'Show rhythm notation automatically if no standard notation is shown'
-        }
+        Hidden: { snippet: 'hidden', shortDescription: 'Hidden' },
+        ShowWithBeams: { snippet: 'showWithBeams', shortDescription: 'Individual beams per beat' },
+        ShowWithBars: { snippet: 'showWithBars', shortDescription: 'Connected bars like standard notation' },
+        Automatic: { snippet: 'automatic', shortDescription: 'Shown if no standard notation is shown' }
     }
 };
 

@@ -292,26 +292,17 @@ export enum AlphaTexVoiceMode {
 }
 
 /**
- * The staff types to which the alphaTex staff display tags
- * (`\defaultStaffDisplay`, `\staffDisplay`, `\barDisplay`) apply.
+ * The staff types selected by the alphaTex staff display tags (`\defaultStaffDisplay`, `\staffDisplay`, `\barDisplay`).
  * @public
  */
 export enum AlphaTexStaffType {
-    /**
-     * The standard notation staff.
-     */
+    /** Standard notation */
     Score = 0,
-    /**
-     * The guitar tablature staff.
-     */
+    /** Guitar tablature */
     Tabs = 1,
-    /**
-     * The slash notation staff.
-     */
+    /** Slash notation */
     Slash = 2,
-    /**
-     * The numbered notation (Jianpu) staff.
-     */
+    /** Numbered notation (Jianpu) */
     Numbered = 3
 }
 

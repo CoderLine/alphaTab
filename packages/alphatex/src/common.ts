@@ -153,51 +153,25 @@ export function booleanSignatures(
     trueDescription: string,
     falseDescription: string
 ): SignatureDefinition[] {
+    const overload = (type: alphaTab.importer.alphaTex.AlphaTexNodeType, t: string, f: string, quote: string) => ({
+        parameters: [
+            {
+                name,
+                shortDescription,
+                parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                type,
+                values: [
+                    { name: t, snippet: `${quote}${t}${quote}`, shortDescription: trueDescription },
+                    { name: f, snippet: `${quote}${f}${quote}`, shortDescription: falseDescription }
+                ]
+            }
+        ]
+    });
+    const types = alphaTab.importer.alphaTex.AlphaTexNodeType;
     return [
-        {
-            parameters: []
-        },
-        {
-            parameters: [
-                {
-                    name,
-                    shortDescription,
-                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
-                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.String,
-                    values: [
-                        { name: 'true', snippet: '"true"', shortDescription: trueDescription },
-                        { name: 'false', snippet: '"false"', shortDescription: falseDescription }
-                    ]
-                }
-            ]
-        },
-        {
-            parameters: [
-                {
-                    name,
-                    shortDescription,
-                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
-                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
-                    values: [
-                        { name: 'true', snippet: 'true', shortDescription: trueDescription },
-                        { name: 'false', snippet: 'false', shortDescription: falseDescription }
-                    ]
-                }
-            ]
-        },
-        {
-            parameters: [
-                {
-                    name,
-                    shortDescription,
-                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
-                    type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number,
-                    values: [
-                        { name: '1', snippet: '1', shortDescription: trueDescription },
-                        { name: '0', snippet: '0', shortDescription: falseDescription }
-                    ]
-                }
-            ]
-        }
+        { parameters: [] },
+        overload(types.String, 'true', 'false', '"'),
+        overload(types.Ident, 'true', 'false', ''),
+        overload(types.Number, '1', '0', '')
     ];
 }
