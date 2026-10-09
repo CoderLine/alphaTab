@@ -636,6 +636,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
 
+    /**
+     * Gets the y position of the stem end of the given beat, respecting the beam or flag it belongs to.
+     */
+    public getBeatStemEndY(beat: Beat): number {
+        const helper = this.helpers.getBeamingHelperForBeat(beat)!;
+        return this.calculateBeamY(helper, this.getBeatX(beat, BeatXPosition.Stem));
+    }
+
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));

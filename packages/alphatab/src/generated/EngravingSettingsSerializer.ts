@@ -156,6 +156,8 @@ export class EngravingSettingsSerializer {
         o.set("directionsscale", obj.directionsScale);
         o.set("multivoicedisplacednoteheadspacing", obj.multiVoiceDisplacedNoteHeadSpacing);
         o.set("staffcontentpadding", obj.staffContentPadding);
+        o.set("beatcontentpadding", obj.beatContentPadding);
+        o.set("barlinecontentpadding", obj.barlineContentPadding);
         {
             const m = new Map<string, unknown>();
             o.set("stemflagheight", m);
@@ -446,6 +448,12 @@ export class EngravingSettingsSerializer {
                 return true;
             case "staffcontentpadding":
                 obj.staffContentPadding = v! as number;
+                return true;
+            case "beatcontentpadding":
+                obj.beatContentPadding = v! as number;
+                return true;
+            case "barlinecontentpadding":
+                obj.barlineContentPadding = v! as number;
                 return true;
             case "stemflagheight":
                 obj.stemFlagHeight = new Map<Duration, number>();

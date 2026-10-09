@@ -409,6 +409,21 @@ export interface EngravingSettingsJson {
      */
     staffContentPadding?: number;
     /**
+     * The minimum horizontal padding between the content of two adjacent beats
+     * (e.g. a notehead and the accidental or grace notes of the following beat).
+     * Additional space is only added between beats where their content would come closer than this.
+     * @remarks
+     * Behind Bars: where space is limited, characters should not be closer than 1/2 stave-space and never collide.
+     */
+    beatContentPadding?: number;
+    /**
+     * The minimum horizontal padding between the content of the last beat in a bar and the bar line.
+     * Additional space is only added where the content would come closer than this.
+     * @remarks
+     * Behind Bars: stems must never come closer to a barline than one stave-space.
+     */
+    barlineContentPadding?: number;
+    /**
      * The space needed by flags on the stem-side from top to bottom to place.
      */
     stemFlagHeight?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;

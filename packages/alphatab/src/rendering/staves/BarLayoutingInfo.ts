@@ -104,8 +104,25 @@ export class BarLayoutingInfo {
     // (rare; in normal layouts justification slack dominates).
     private static readonly _overlayMinPadding: number = 3;
 
-    public constructor(spacingRatio: number = Math.SQRT2) {
+    /**
+     * The minimum padding between the content of two adjacent beats ({@link EngravingSettings.beatContentPadding}).
+     */
+    public readonly beatContentPadding: number;
+
+    /**
+     * The minimum padding between the content of the last beat and the bar line
+     * ({@link EngravingSettings.barlineContentPadding}).
+     */
+    public readonly barlineContentPadding: number;
+
+    public constructor(
+        spacingRatio: number = Math.SQRT2,
+        beatContentPadding: number = 0,
+        barlineContentPadding: number = 0
+    ) {
         this._spacingExponent = BarLayoutingInfo.spacingExponentFromRatio(spacingRatio);
+        this.beatContentPadding = beatContentPadding;
+        this.barlineContentPadding = barlineContentPadding;
     }
 
     /**
@@ -461,6 +478,8 @@ export class BarLayoutingInfo {
         }
         this._incompleteGraceRodsWidth = 0;
         for (const s of this.incompleteGraceRods.values()) {
+            // padding to the beat before the grace group (see MultiVoiceContainerGlyph)
+            this._incompleteGraceRodsWidth += this.beatContentPadding;
             for (const sp of s) {
                 this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
             }
@@ -516,17 +535,15 @@ export class BarLayoutingInfo {
             let requiredSpace = 0;
 
             if (i === sortedSprings.length - 1) {
-                requiredSpace = currentSpring.postSpringWidth;
+                requiredSpace = currentSpring.postSpringWidth + this.barlineContentPadding;
             } else {
                 const nextSpring = sortedSprings[i + 1];
-                requiredSpace = currentSpring.postSpringWidth + nextSpring.preSpringWidth;
+                requiredSpace = currentSpring.postSpringWidth + this.beatContentPadding + nextSpring.preSpringWidth;
             }
 
-            // for the first spring we need to ensure we take the initial
-            // pre-spring width into account
-            if (i === 0) {
-                requiredSpace += currentSpring.preSpringWidth;
-            }
+            // the first spring's pre-spring width is not part of the requirement:
+            // it is a fixed offset in front of the first spring (see calculateVoiceWidth,
+            // spaceToForce and buildOnTimePositions) and does not need to be stretched in.
 
             const requiredSpaceForce = requiredSpace * currentSpring.springConstant;
             this._updateMinStretchForce(requiredSpaceForce);
