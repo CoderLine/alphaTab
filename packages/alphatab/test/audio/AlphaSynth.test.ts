@@ -17,6 +17,7 @@ import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
+import { Mdct } from '@coderline/alphatab/synth/vorbis/Mdct';
 import { VorbisFile } from '@coderline/alphatab/synth/vorbis/VorbisFile';
 import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
@@ -140,6 +141,38 @@ describe('AlphaSynthTests', () => {
 
     it('ogg-vorbis-example', { timeout: 30000 }, async () => {
         await testVorbisFile('Example');
+    });
+
+    it('vorbis-imdct', () => {
+        // all Vorbis block sizes against the definition, angles as multiples of pi / (2n) from a table
+        let seed = 7;
+        for (let n = 64; n <= 8192; n *= 2) {
+            const half = n / 2;
+            const input = new Float32Array(half);
+            for (let k = 0; k < half; k++) {
+                seed = (seed * 75 + 74) % 65537;
+                input[k] = seed / 65537 - 0.5;
+            }
+            const cos = new Float32Array(4 * n);
+            for (let i = 0; i < 4 * n; i++) {
+                cos[i] = Math.cos((Math.PI * i) / (2 * n));
+            }
+
+            const output = new Float32Array(n);
+            new Mdct(n).inverse(input, output, new Float32Array(half));
+
+            let maxError = 0;
+            let maxValue = 0;
+            for (let i = 0; i < n; i++) {
+                let expected = 0;
+                for (let k = 0; k < half; k++) {
+                    expected += input[k] * cos[((2 * i + 1 + half) * (2 * k + 1)) % (4 * n)];
+                }
+                maxError = Math.max(maxError, Math.abs(output[i] - expected));
+                maxValue = Math.max(maxValue, Math.abs(expected));
+            }
+            expect(maxError / maxValue, `n=${n}`).toBeLessThan(1e-5);
+        }
     });
 
     async function testAudioExport(
