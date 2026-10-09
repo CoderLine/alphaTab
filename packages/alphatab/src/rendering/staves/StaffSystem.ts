@@ -1206,20 +1206,28 @@ export class StaffSystem {
      * @param padding The minimum padding between the content of the staves.
      * @returns The additional space to add between the staves (0 if the existing space is enough).
      */
-    private static _requiredStaffContentPadding(upper: RenderStaff, lower: RenderStaff, padding: number): number {
+    private static _requiredStaffContentPadding(
+        upper: RenderStaff,
+        lower: RenderStaff,
+        padding: number,
+        horizontalPadding: number
+    ): number {
         const upperSky = upper.systemSkyline.downSky;
         const lowerSky = lower.systemSkyline.upSky;
 
         // the maximum combined extent of both staves into the space between them.
-        // the padding also applies horizontally: content of the other staff closer than the padding next to
-        // a segment counts as well (e.g. a fingering number next to a stem of the staff above).
+        // content of the other staff horizontally closer than `horizontalPadding` to a segment counts as well
+        // (e.g. a fingering number right next to a stem of the staff above).
         let contentExtent = 0;
         for (let i = 0, n = upperSky.segmentCount; i < n; i++) {
             const h = upperSky.segmentHeight(i);
             if (h > 0) {
                 const combined =
                     h +
-                    lowerSky.maxHeightInRange(upperSky.segmentXStart(i) - padding, upperSky.segmentXEnd(i) + padding);
+                    lowerSky.maxHeightInRange(
+                        upperSky.segmentXStart(i) - horizontalPadding,
+                        upperSky.segmentXEnd(i) + horizontalPadding
+                    );
                 if (combined > contentExtent) {
                     contentExtent = combined;
                 }
@@ -1230,7 +1238,10 @@ export class StaffSystem {
             if (h > 0) {
                 const combined =
                     h +
-                    upperSky.maxHeightInRange(lowerSky.segmentXStart(i) - padding, lowerSky.segmentXEnd(i) + padding);
+                    upperSky.maxHeightInRange(
+                        lowerSky.segmentXStart(i) - horizontalPadding,
+                        lowerSky.segmentXEnd(i) + horizontalPadding
+                    );
                 if (combined > contentExtent) {
                     contentExtent = combined;
                 }
@@ -1301,7 +1312,8 @@ export class StaffSystem {
                         const extra = StaffSystem._requiredStaffContentPadding(
                             previousStaff,
                             staff,
-                            smufl.staffContentPadding
+                            smufl.staffContentPadding,
+                            smufl.beatContentPadding
                         );
                         if (extra > 0) {
                             staff.y += extra;
