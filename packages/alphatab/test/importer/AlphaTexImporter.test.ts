@@ -15,6 +15,7 @@ import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { FermataType } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
@@ -50,6 +51,7 @@ import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { harmonicToString } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
@@ -2688,6 +2690,143 @@ describe('AlphaTexImporterTest', () => {
             ));
         it('hide', () =>
             test('\\defaultBarNumberDisplay allBars C4 | \\barNumberDisplay hide C4 ', BarNumberDisplay.Hide));
+    });
+
+    describe('staffDisplay', () => {
+        function semanticDiagnosticCodes(tex: string): AlphaTexDiagnosticCode[] {
+            const importer: AlphaTexImporter = new AlphaTexImporter();
+            importer.initFromString(tex, new Settings());
+            try {
+                importer.readScore();
+            } catch {
+                // checked by caller
+            }
+            return importer.semanticDiagnostics.items.map(d => d.code!);
+        }
+
+        it('score-level', () => {
+            const score = parseTex(
+                '\\defaultStaffDisplay tabs { tsVisibility false tsPlacement allStaves restsSystems firstSystemOnly rhythm showWithBeams } C4'
+            );
+            const tabs = score.stylesheet.tabConfig;
+            expect(tabs.timeSignature!.isVisible).toBe(false);
+            expect(tabs.timeSignature!.staffPlacement).toBe(StaffPlacement.AllStaves);
+            expect(tabs.timeSignature!.systemDisplay).toBe(SystemDisplay.AllSystems);
+            expect(tabs.rests!.isVisible).toBe(true);
+            expect(tabs.rests!.systemDisplay).toBe(SystemDisplay.FirstSystemOnly);
+            expect(tabs.rhythm).toBe(TabRhythmMode.ShowWithBeams);
+            expect(score.stylesheet.scoreConfig.timeSignature!.isVisible).toBe(true);
+
+            testExportRoundtrip(score);
+        });
+
+        it('staff-level-all-types', () => {
+            const score = parseTex('\\staff {score tabs} \\staffDisplay { tsPlacement primary barNumber hide } C4');
+            const staff = score.tracks[0].staves[0];
+            for (const config of [staff.scoreConfig, staff.tabConfig, staff.slashConfig, staff.numberedConfig]) {
+                expect(config!.timeSignature!.staffPlacement).toBe(StaffPlacement.Primary);
+                expect(config!.timeSignature!.isVisible).toBeUndefined();
+                expect(config!.timeSignature!.systemDisplay).toBeUndefined();
+                expect(config!.barNumber).toBe(BarNumberDisplay.Hide);
+            }
+            expect(staff.scoreConfig!.clef).toBeUndefined();
+
+            testExportRoundtrip(score);
+        });
+
+        it('staff-level-supported-types-only', () => {
+            const score = parseTex('\\staffDisplay { ksVisibility false } C4');
+            const staff = score.tracks[0].staves[0];
+            expect(staff.scoreConfig!.keySignature!.isVisible).toBe(false);
+            expect(staff.slashConfig!.keySignature!.isVisible).toBe(false);
+            expect(staff.tabConfig).toBeUndefined();
+            expect(staff.numberedConfig).toBeUndefined();
+
+            testExportRoundtrip(score);
+        });
+
+        it('bar-level', () => {
+            const score = parseTex(
+                'C4 | \\barDisplay (score tabs) { clefVisibility false tsSystems firstSystemOnly } C4 | C4'
+            );
+            const bars = score.tracks[0].staves[0].bars;
+            expect(bars[0].scoreDisplay).toBeUndefined();
+            expect(bars[1].scoreDisplay!.clef!.isVisible).toBe(false);
+            expect(bars[1].scoreDisplay!.timeSignature!.systemDisplay).toBe(SystemDisplay.FirstSystemOnly);
+            expect(bars[1].tabDisplay!.clef!.isVisible).toBe(false);
+            expect(bars[1].slashDisplay).toBeUndefined();
+            expect(bars[1].numberedDisplay).toBeUndefined();
+            expect(bars[2].scoreDisplay).toBeUndefined();
+
+            testExportRoundtrip(score);
+        });
+
+        it('later-tags-win', () => {
+            const score = parseTex(
+                '\\defaultStaffDisplay { tsVisibility false } \\defaultStaffDisplay tabs { tsVisibility true tsPlacement allStaves } C4'
+            );
+            expect(score.stylesheet.scoreConfig.timeSignature!.isVisible).toBe(false);
+            expect(score.stylesheet.slashConfig.timeSignature!.isVisible).toBe(false);
+            expect(score.stylesheet.tabConfig.timeSignature!.isVisible).toBe(true);
+            expect(score.stylesheet.tabConfig.timeSignature!.staffPlacement).toBe(StaffPlacement.AllStaves);
+
+            testExportRoundtrip(score);
+        });
+
+        it('visibility-values', () => {
+            const visibility = (value: string) =>
+                parseTex(`\\staffDisplay score { tsVisibility ${value} } C4`).tracks[0].staves[0].scoreConfig!
+                    .timeSignature!.isVisible;
+            expect(visibility('')).toBe(true);
+            expect(visibility('true')).toBe(true);
+            expect(visibility('false')).toBe(false);
+            expect(visibility('"false"')).toBe(false);
+            expect(visibility('1')).toBe(true);
+            expect(visibility('0')).toBe(false);
+        });
+
+        it('unsupported-staff-type', () => {
+            expect(semanticDiagnosticCodes('\\staffDisplay tabs { ksVisibility false } C4')).toContain(
+                AlphaTexDiagnosticCode.AT307
+            );
+            const score = parseTex('\\staffDisplay tabs { ksVisibility false } C4');
+            expect(score.tracks[0].staves[0].tabConfig).toBeUndefined();
+        });
+
+        it('bar-level-unsupported-properties', () => {
+            for (const tex of [
+                'C4 | \\barDisplay { restsVisibility false } C4',
+                'C4 | \\barDisplay { rhythm hidden } C4'
+            ]) {
+                const importer: AlphaTexImporter = new AlphaTexImporter();
+                importer.initFromString(tex, new Settings());
+                try {
+                    importer.readScore();
+                } catch {
+                    // checked below
+                }
+                expect(importer.parserDiagnostics.items.map(d => d.code)).toContain(AlphaTexDiagnosticCode.AT205);
+            }
+        });
+
+        it('legacy-shorthands', () => {
+            const score = parseTex('\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay allBars C4');
+            const stylesheet = score.stylesheet;
+            for (const config of [
+                stylesheet.scoreConfig,
+                stylesheet.tabConfig,
+                stylesheet.slashConfig,
+                stylesheet.numberedConfig
+            ]) {
+                expect(config.barNumber).toBe(BarNumberDisplay.Hide);
+            }
+            const bar = score.tracks[0].staves[0].bars[1];
+            for (const display of [bar.scoreDisplay, bar.tabDisplay, bar.slashDisplay, bar.numberedDisplay]) {
+                expect(display!.barNumber).toBe(BarNumberDisplay.AllBars);
+            }
+
+            testExportRoundtrip(score);
+        });
     });
 
     it('custom-beaming', () => {
