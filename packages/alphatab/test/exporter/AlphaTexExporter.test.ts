@@ -233,14 +233,13 @@ describe('AlphaTexExporterTest', () => {
             .map(l => l.trim())
             .join(' ');
 
-        // equal values are grouped, staff types are omitted if all supported types are affected
-        expect(exported).toContain('\\defaultStaffDisplay { clefSystems firstsystemonly rhythm showwithbars }');
-        expect(exported).toContain('\\defaultStaffDisplay tabs { tsPlacement allstaves }');
-        expect(exported).toContain('\\staffDisplay score { barNumber allbars }');
+        expect(exported).toContain('\\defaultStaffDisplay score { clefSystems FirstSystemOnly }');
+        expect(exported).toContain(
+            '\\defaultStaffDisplay tabs { clefSystems FirstSystemOnly tsPlacement AllStaves rhythm ShowWithBars }'
+        );
         expect(exported).toContain('\\staffDisplay slash { ksVisibility true }');
-        expect(exported).toContain('\\barDisplay (score tabs) { tsVisibility false }');
-        expect(exported).toContain('\\barDisplay tabs { barNumber hide }');
-        // equal bar number display on all staff types uses the shorthand
+        expect(exported).toContain('\\barDisplay tabs { tsVisibility false barNumber Hide }');
+        // a bar number display shared by all staff types uses the shorthand
         expect(exported).toContain('\\barNumberDisplay Hide');
 
         const reimported = ScoreLoader.loadAlphaTex(exportAlphaTex(score));
