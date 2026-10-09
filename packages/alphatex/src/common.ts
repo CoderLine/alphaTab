@@ -1,4 +1,9 @@
-import type { MetadataTagDefinition, PropertyDefinition } from '@coderline/alphatab-alphatex/types';
+import * as alphaTab from '@coderline/alphatab';
+import type {
+    MetadataTagDefinition,
+    PropertyDefinition,
+    SignatureDefinition
+} from '@coderline/alphatab-alphatex/types';
 
 export const generalMidiInstruments = [
     'Acoustic Grand Piano',
@@ -137,4 +142,36 @@ export function properties(...props: PropertyDefinition[]): Map<string, Property
 
 export function metadata(...metadata: MetadataTagDefinition[]) {
     return new Map<string, MetadataTagDefinition>(metadata.map(t => [t.tag.toLowerCase(), t]));
+}
+
+/**
+ * Creates the signatures for a boolean-like value: no value (= true), `true|false`, `"true"|"false"` or `1|0`.
+ */
+export function booleanSignatures(
+    name: string,
+    shortDescription: string,
+    trueDescription: string,
+    falseDescription: string
+): SignatureDefinition[] {
+    const overload = (type: alphaTab.importer.alphaTex.AlphaTexNodeType, t: string, f: string, quote: string) => ({
+        parameters: [
+            {
+                name,
+                shortDescription,
+                parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                type,
+                values: [
+                    { name: t, snippet: `${quote}${t}${quote}`, shortDescription: trueDescription },
+                    { name: f, snippet: `${quote}${f}${quote}`, shortDescription: falseDescription }
+                ]
+            }
+        ]
+    });
+    const types = alphaTab.importer.alphaTex.AlphaTexNodeType;
+    return [
+        { parameters: [] },
+        overload(types.String, 'true', 'false', '"'),
+        overload(types.Ident, 'true', 'false', ''),
+        overload(types.Number, '1', '0', '')
+    ];
 }

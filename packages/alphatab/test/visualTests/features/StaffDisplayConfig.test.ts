@@ -87,15 +87,11 @@ describe('StaffDisplayConfig', () => {
                 `
                     \\track
                     \\staff {tabs}
+                    \\staffDisplay tabs { tsVisibility false }
                     3.3.4 3.3 3.3 3.3 |
                     3.3 3.3 3.3 3.3 |
                 `,
-                'test-data/visual-tests/staff-display-config/override-l2-tab-ts-hide.png',
-                undefined,
-                o => {
-                    const staff = o.score.tracks[0].staves[0];
-                    staff.tabConfig = { timeSignature: { isVisible: false } };
-                }
+                'test-data/visual-tests/staff-display-config/override-l2-tab-ts-hide.png'
             );
         });
 
@@ -104,16 +100,12 @@ describe('StaffDisplayConfig', () => {
                 `
                     \\track
                     \\staff {score}
+                    \\staffDisplay score { clefVisibility false }
                     \\ks D
                     3.3.4 3.3 3.3 3.3 |
                     3.3 3.3 3.3 3.3 |
                 `,
-                'test-data/visual-tests/staff-display-config/override-l2-score-clef-hide.png',
-                undefined,
-                o => {
-                    const staff = o.score.tracks[0].staves[0];
-                    staff.scoreConfig = { clef: { isVisible: false } };
-                }
+                'test-data/visual-tests/staff-display-config/override-l2-score-clef-hide.png'
             );
         });
     });
@@ -127,15 +119,11 @@ describe('StaffDisplayConfig', () => {
                     \\ks D
                     3.3.4 3.3 3.3 3.3 |
                     \\ks A
+                    \\barDisplay score { ksVisibility false }
                     3.3.4 3.3 3.3 3.3 |
                     3.3.4 3.3 3.3 3.3 |
                 `,
-                'test-data/visual-tests/staff-display-config/override-l1-ks-change-hide.png',
-                undefined,
-                o => {
-                    const bars = o.score.tracks[0].staves[0].bars;
-                    bars[1].scoreDisplay = { keySignature: { isVisible: false } };
-                }
+                'test-data/visual-tests/staff-display-config/override-l1-ks-change-hide.png'
             );
         });
 
@@ -144,15 +132,11 @@ describe('StaffDisplayConfig', () => {
                 `
                     \\track
                     \\staff {score tabs}
+                    \\barDisplay score { tsVisibility false }
                     3.3.4 3.3 3.3 3.3 |
                     3.3 3.3 3.3 3.3 |
                 `,
-                'test-data/visual-tests/staff-display-config/override-l1-ts-hide-firstbar.png',
-                undefined,
-                o => {
-                    const bars = o.score.tracks[0].staves[0].bars;
-                    bars[0].scoreDisplay = { timeSignature: { isVisible: false } };
-                }
+                'test-data/visual-tests/staff-display-config/override-l1-ts-hide-firstbar.png'
             );
         });
     });

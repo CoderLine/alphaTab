@@ -10,6 +10,7 @@ export const alphaTexMappedEnumLookup = {
     FermataType: alphaTab.model.FermataType,
     AlphaTexAccidentalMode: alphaTab.importer.alphaTex.AlphaTexAccidentalMode,
     AlphaTexVoiceMode: alphaTab.importer.alphaTex.AlphaTexVoiceMode,
+    AlphaTexStaffType: alphaTab.importer.alphaTex.AlphaTexStaffType,
     NoteAccidentalMode: alphaTab.model.NoteAccidentalMode,
     BarreShape: alphaTab.model.BarreShape,
     Ottavia: alphaTab.model.Ottavia,
@@ -30,7 +31,10 @@ export const alphaTexMappedEnumLookup = {
     SimileMark: alphaTab.model.SimileMark,
     Direction: alphaTab.model.Direction,
     TremoloPickingStyle: alphaTab.model.TremoloPickingStyle,
-    BarNumberDisplay: alphaTab.model.BarNumberDisplay
+    BarNumberDisplay: alphaTab.model.BarNumberDisplay,
+    StaffPlacement: alphaTab.model.StaffPlacement,
+    SystemDisplay: alphaTab.model.SystemDisplay,
+    TabRhythmMode: alphaTab.TabRhythmMode
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -121,6 +125,12 @@ export const alphaTexMappedEnumMapping: {
             shortDescription: 'Bar-Wise voices',
             longDescription: 'A new voice adds a new voice to the current bar only.'
         }
+    },
+    AlphaTexStaffType: {
+        Score: { snippet: 'score', shortDescription: 'Standard notation' },
+        Tabs: { snippet: 'tabs', shortDescription: 'Guitar tablature' },
+        Slash: { snippet: 'slash', shortDescription: 'Slash notation' },
+        Numbered: { snippet: 'numbered', shortDescription: 'Numbered notation (Jianpu)' }
     },
     NoteAccidentalMode: {
         Default: { snippet: 'default', shortDescription: 'Auto-detect the accidentals', aliases: ['d'] },
@@ -464,6 +474,20 @@ export const alphaTexMappedEnumMapping: {
         AllBars: { snippet: 'allBars', shortDescription: 'All bars' },
         FirstOfSystem: { snippet: 'firstOfSystem', shortDescription: 'First bar of every system' },
         Hide: { snippet: 'hide', shortDescription: 'Hide' }
+    },
+    StaffPlacement: {
+        AllStaves: { snippet: 'allStaves', shortDescription: 'All staves' },
+        Primary: { snippet: 'primary', shortDescription: 'Only the primary (topmost) staff' }
+    },
+    SystemDisplay: {
+        AllSystems: { snippet: 'allSystems', shortDescription: 'All systems' },
+        FirstSystemOnly: { snippet: 'firstSystemOnly', shortDescription: 'Only the first system' }
+    },
+    TabRhythmMode: {
+        Hidden: { snippet: 'hidden', shortDescription: 'Hidden' },
+        ShowWithBeams: { snippet: 'showWithBeams', shortDescription: 'Individual beams per beat' },
+        ShowWithBars: { snippet: 'showWithBars', shortDescription: 'Connected bars like standard notation' },
+        Automatic: { snippet: 'automatic', shortDescription: 'Shown if no standard notation is shown' }
     }
 };
 

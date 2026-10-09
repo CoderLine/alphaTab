@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
@@ -205,5 +208,41 @@ describe('AlphaTexExporterTest', () => {
 
         const reimported = ScoreLoader.loadAlphaTex(exported);
         ComparisonHelpers.alphaTexExportRoundtripEqual('accidental-mode-only-when-needed', reimported, score);
+    });
+
+    it('staff-display', () => {
+        const score = ScoreLoader.loadAlphaTex(
+            '\\track \\staff {score tabs} \\tuning (E4 B3 G3 D3 A2 E2) 3.3.4 3.3 3.3 3.3 | 3.3 3.3 3.3 3.3 | 3.3 3.3 3.3 3.3'
+        );
+        const stylesheet = score.stylesheet;
+        stylesheet.scoreConfig.clef!.systemDisplay = SystemDisplay.FirstSystemOnly;
+        stylesheet.tabConfig.clef!.systemDisplay = SystemDisplay.FirstSystemOnly;
+        stylesheet.tabConfig.timeSignature!.staffPlacement = StaffPlacement.AllStaves;
+        stylesheet.tabConfig.rhythm = TabRhythmMode.ShowWithBars;
+
+        const staff = score.tracks[0].staves[0];
+        staff.scoreConfig = { barNumber: BarNumberDisplay.AllBars };
+        staff.slashConfig = { keySignature: { isVisible: true } };
+
+        staff.bars[1].scoreDisplay = { timeSignature: { isVisible: false } };
+        staff.bars[1].tabDisplay = { timeSignature: { isVisible: false }, barNumber: BarNumberDisplay.Hide };
+        staff.bars[2].barNumberDisplay = BarNumberDisplay.Hide;
+
+        const exported = exportAlphaTex(score)
+            .split('\n')
+            .map(l => l.trim())
+            .join(' ');
+
+        expect(exported).toContain('\\defaultStaffDisplay score { clefSystems FirstSystemOnly }');
+        expect(exported).toContain(
+            '\\defaultStaffDisplay tabs { clefSystems FirstSystemOnly tsPlacement AllStaves rhythm ShowWithBars }'
+        );
+        expect(exported).toContain('\\staffDisplay slash { ksVisibility true }');
+        expect(exported).toContain('\\barDisplay tabs { tsVisibility false barNumber Hide }');
+        // a bar number display shared by all staff types uses the shorthand
+        expect(exported).toContain('\\barNumberDisplay Hide');
+
+        const reimported = ScoreLoader.loadAlphaTex(exportAlphaTex(score));
+        ComparisonHelpers.alphaTexExportRoundtripEqual('staff-display', reimported, score);
     });
 });

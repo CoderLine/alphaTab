@@ -1,4 +1,9 @@
-import type { AlphaTexAccidentalMode, AlphaTexVoiceMode } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
+import type { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
+import type {
+    AlphaTexAccidentalMode,
+    AlphaTexStaffType,
+    AlphaTexVoiceMode
+} from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
 import type { BarLineStyle } from '@coderline/alphatab/model/Bar';
 import type { BarreShape } from '@coderline/alphatab/model/BarreShape';
 import type { BendStyle } from '@coderline/alphatab/model/BendStyle';
@@ -6,6 +11,7 @@ import type { BendType } from '@coderline/alphatab/model/BendType';
 import type { Clef } from '@coderline/alphatab/model/Clef';
 import type { Direction } from '@coderline/alphatab/model/Direction';
 import type { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import type { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import type { FermataType } from '@coderline/alphatab/model/Fermata';
 import type { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
@@ -83,6 +89,15 @@ export class AlphaTex1EnumMappings {
     ]);
     public static readonly alphaTexVoiceModeReversed = AlphaTex1EnumMappings._reverse(
         AlphaTex1EnumMappings.alphaTexVoiceMode
+    );
+    public static readonly alphaTexStaffType = new Map<string, AlphaTexStaffType>([
+        ['score', 0],
+        ['tabs', 1],
+        ['slash', 2],
+        ['numbered', 3]
+    ]);
+    public static readonly alphaTexStaffTypeReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.alphaTexStaffType
     );
     public static readonly noteAccidentalMode = new Map<string, NoteAccidentalMode>([
         ['default', 0],
@@ -422,6 +437,25 @@ export class AlphaTex1EnumMappings {
     public static readonly barNumberDisplayReversed = AlphaTex1EnumMappings._reverse(
         AlphaTex1EnumMappings.barNumberDisplay
     );
+    public static readonly staffPlacement = new Map<string, StaffPlacement>([
+        ['allstaves', 0],
+        ['primary', 1]
+    ]);
+    public static readonly staffPlacementReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.staffPlacement
+    );
+    public static readonly systemDisplay = new Map<string, SystemDisplay>([
+        ['allsystems', 0],
+        ['firstsystemonly', 1]
+    ]);
+    public static readonly systemDisplayReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.systemDisplay);
+    public static readonly tabRhythmMode = new Map<string, TabRhythmMode>([
+        ['hidden', 0],
+        ['showwithbeams', 1],
+        ['showwithbars', 2],
+        ['automatic', 3]
+    ]);
+    public static readonly tabRhythmModeReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.tabRhythmMode);
     public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
         [-7, 'abminor'],
         [-6, 'ebminor'],
