@@ -15,10 +15,11 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
+import { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
 import { Mdct } from '@coderline/alphatab/synth/vorbis/Mdct';
-import { VorbisFile } from '@coderline/alphatab/synth/vorbis/VorbisFile';
+import { VorbisDecoder } from '@coderline/alphatab/synth/vorbis/VorbisDecoder';
 import { TestOutput } from 'test/audio/TestOutput';
 import { TestPlatform } from 'test/TestPlatform';
 
@@ -108,31 +109,30 @@ describe('AlphaSynthTests', () => {
         expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).toBe(true);
     });
 
-    async function testVorbisFile(name: string) {
-        const data = await TestPlatform.loadFile(`test-data/audio/${name}.ogg`);
-        const vorbis = new VorbisFile(ByteBuffer.fromBuffer(data));
-
-        expect(vorbis.streams.length).toBe(1);
-        expect(vorbis.streams[0].audioChannels).toBe(2);
-        expect(vorbis.streams[0].audioSampleRate).toBe(44100);
-        expect(vorbis.streams[0].samples.length).toBeGreaterThan(44100 * 0.05);
-
-        const generated = vorbis.streams[0].samples;
-        const reference = new DataView((await TestPlatform.loadFile(`test-data/audio/${name}_alphaTab.pcm`)).buffer);
+    /**
+     * Compares decoded samples with the output of libvorbis (libvorbisfile with float output).
+     */
+    async function expectLibVorbisOutput(samples: Float32Array, name: string) {
+        const reference = new DataView((await TestPlatform.loadFile(`test-data/audio/${name}_libvorbis.pcm`)).buffer);
         try {
-            expect(generated.length).toBe(reference.buffer.byteLength / 4);
-
-            for (let i = 0; i < generated.length; i++) {
-                expect(generated[i], `Difference at index ${i}`).toBe(reference.getFloat32(i * 4, true));
+            expect(samples.length).toBe(reference.buffer.byteLength / 4);
+            let maxDifference = 0;
+            for (let i = 0; i < samples.length; i++) {
+                maxDifference = Math.max(maxDifference, Math.abs(samples[i] - reference.getFloat32(i * 4, true)));
             }
+            expect(maxDifference).toBeLessThan(1e-5);
         } catch (e) {
-            await TestPlatform.saveFile(
-                `test-data/audio/${name}_alphaTab_new.pcm`,
-                new Uint8Array(vorbis.streams[0].samples.buffer)
-            );
-
+            await TestPlatform.saveFile(`test-data/audio/${name}_alphaTab_new.pcm`, new Uint8Array(samples.buffer));
             throw e;
         }
+    }
+
+    async function testVorbisFile(name: string) {
+        const data = await TestPlatform.loadFile(`test-data/audio/${name}.ogg`);
+        const stream = new VorbisDecoder().decode(data, 0, data.length);
+        expect(stream.channels).toBe(2);
+        expect(stream.sampleRate).toBe(44100);
+        await expectLibVorbisOutput(stream.samples, name);
     }
 
     it('ogg-vorbis-short', async () => {
@@ -141,6 +141,27 @@ describe('AlphaSynthTests', () => {
 
     it('ogg-vorbis-example', { timeout: 30000 }, async () => {
         await testVorbisFile('Example');
+    });
+
+    it('vorbis-sf3-samples', async () => {
+        // one sample per block size pair: 512/1024, 512/512 and 256/2048
+        const hydra = new Hydra();
+        hydra.load(ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/audio/default.sf3')));
+        const parts: Float32Array[] = [];
+        let length = 0;
+        for (const name of ['001', '032', '159']) {
+            const header = hydra.sHdrs.find(h => h.sampleName === name)!;
+            const samples = hydra.decodeSamples(header.start, header.end, true);
+            parts.push(samples);
+            length += samples.length;
+        }
+        const all = new Float32Array(length);
+        let offset = 0;
+        for (const part of parts) {
+            all.set(part, offset);
+            offset += part.length;
+        }
+        await expectLibVorbisOutput(all, 'default-sf3');
     });
 
     it('vorbis-imdct', () => {
