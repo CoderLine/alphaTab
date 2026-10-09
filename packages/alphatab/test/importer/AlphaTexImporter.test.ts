@@ -2701,7 +2701,7 @@ describe('AlphaTexImporterTest', () => {
             } catch {
                 // checked by caller
             }
-            return importer.semanticDiagnostics.items.map(d => d.code!);
+            return importer.semanticDiagnostics.items.map(d => d.code);
         }
 
         it('score-level', () => {
@@ -2723,12 +2723,23 @@ describe('AlphaTexImporterTest', () => {
         it('staff-level-all-types', () => {
             const score = parseTex('\\staff {score tabs} \\staffDisplay { tsPlacement primary barNumber hide } C4');
             const staff = score.tracks[0].staves[0];
-            for (const config of [staff.scoreConfig, staff.tabConfig, staff.slashConfig, staff.numberedConfig]) {
-                expect(config!.timeSignature!.staffPlacement).toBe(StaffPlacement.Primary);
-                expect(config!.timeSignature!.isVisible).toBeUndefined();
-                expect(config!.timeSignature!.systemDisplay).toBeUndefined();
-                expect(config!.barNumber).toBe(BarNumberDisplay.Hide);
+            const timeSignatures = [
+                staff.scoreConfig!.timeSignature!,
+                staff.tabConfig!.timeSignature!,
+                staff.slashConfig!.timeSignature!,
+                staff.numberedConfig!.timeSignature!
+            ];
+            for (const ts of timeSignatures) {
+                expect(ts.staffPlacement).toBe(StaffPlacement.Primary);
+                expect(ts.isVisible).toBeUndefined();
+                expect(ts.systemDisplay).toBeUndefined();
             }
+            expect([
+                staff.scoreConfig!.barNumber,
+                staff.tabConfig!.barNumber,
+                staff.slashConfig!.barNumber,
+                staff.numberedConfig!.barNumber
+            ]).toEqual([BarNumberDisplay.Hide, BarNumberDisplay.Hide, BarNumberDisplay.Hide, BarNumberDisplay.Hide]);
             expect(staff.scoreConfig!.clef).toBeUndefined();
 
             testExportRoundtrip(score);
@@ -2812,18 +2823,24 @@ describe('AlphaTexImporterTest', () => {
         it('legacy-shorthands', () => {
             const score = parseTex('\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay allBars C4');
             const stylesheet = score.stylesheet;
-            for (const config of [
-                stylesheet.scoreConfig,
-                stylesheet.tabConfig,
-                stylesheet.slashConfig,
-                stylesheet.numberedConfig
-            ]) {
-                expect(config.barNumber).toBe(BarNumberDisplay.Hide);
-            }
+            expect([
+                stylesheet.scoreConfig.barNumber,
+                stylesheet.tabConfig.barNumber,
+                stylesheet.slashConfig.barNumber,
+                stylesheet.numberedConfig.barNumber
+            ]).toEqual([BarNumberDisplay.Hide, BarNumberDisplay.Hide, BarNumberDisplay.Hide, BarNumberDisplay.Hide]);
             const bar = score.tracks[0].staves[0].bars[1];
-            for (const display of [bar.scoreDisplay, bar.tabDisplay, bar.slashDisplay, bar.numberedDisplay]) {
-                expect(display!.barNumber).toBe(BarNumberDisplay.AllBars);
-            }
+            expect([
+                bar.scoreDisplay!.barNumber,
+                bar.tabDisplay!.barNumber,
+                bar.slashDisplay!.barNumber,
+                bar.numberedDisplay!.barNumber
+            ]).toEqual([
+                BarNumberDisplay.AllBars,
+                BarNumberDisplay.AllBars,
+                BarNumberDisplay.AllBars,
+                BarNumberDisplay.AllBars
+            ]);
 
             testExportRoundtrip(score);
         });

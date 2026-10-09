@@ -3671,21 +3671,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             if (props.length === 0) {
                 continue;
             }
-            const types = groupTypes.get(group)!;
-            nodes.push(
-                Atnf.meta(
-                    tag,
-                    Atnf.args(
-                        types.map(
-                            t =>
-                                Atnf.ident(
-                                    AlphaTex1EnumMappings.alphaTexStaffTypeReversed.get(t)!
-                                ) as IAlphaTexArgumentValue
-                        )
-                    ),
-                    Atnf.props(props.map(p => [p[0], Atnf.identValue(p[1])] as [string, AlphaTexArgumentList]))
-                )
-            );
+            const args: IAlphaTexArgumentValue[] = [];
+            for (const t of groupTypes.get(group)!) {
+                args.push(Atnf.ident(AlphaTex1EnumMappings.alphaTexStaffTypeReversed.get(t)!));
+            }
+            const propNodes = Atnf.props([]);
+            for (const p of props) {
+                Atnf.prop(propNodes.properties, p[0], Atnf.identValue(p[1]));
+            }
+            nodes.push(Atnf.meta(tag, Atnf.args(args), propNodes));
         }
     }
 
