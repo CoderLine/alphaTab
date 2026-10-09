@@ -20,17 +20,5 @@ Integrated Libraries:
     URL: https://github.com/stevefolta/SFZero
     Purpose: TinySoundFont is based on SFZEro
 
-    Library: NVorbis
-    License: MIT
-    Copyright: Copyright (c) 2020 Andrew Ward
-    URL: https://github.com/NVorbis/NVorbis
-    Purpose: Vorbis Stream Decoding
-
-    Library: libvorbis
-    License: BSD-3-Clause
-    Copyright: Copyright (c) 2002-2020 Xiph.org Foundation
-    URL: https://github.com/xiph/vorbis
-    Purpose: NVorbis adopted some code from libvorbis.
-
 @preserve
 @license
