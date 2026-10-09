@@ -2,6 +2,7 @@ import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
@@ -439,8 +440,8 @@ export class EffectBand extends Glyph {
      * @remarks
      * Note-attached bands (markers like tap or the hammer-on/pull-off labels) place each glyph on its own
      * ({@link EffectGlyph.getPlacementClearanceLeft}), so other markers can share the row in the gaps
-     * between them. Their clearance range is widened by `horizontalPadding`, so they also keep their distance
-     * to content horizontally next to them (e.g. a stem next to a marker). All other bands (lines, spans,
+     * between them. Markers attached to a beat keep the noteheads and stems of their beat clear, even where
+     * the marker is narrower (e.g. a pick stroke above the stem of its note). All other bands (lines, spans,
      * system markers) and bands with cross-bar spans keep and occupy their whole range
      * ({@link computeLocalXRange}).
      * @returns `false` when the band has no usable range.
@@ -449,8 +450,7 @@ export class EffectBand extends Glyph {
         clearStarts: number[],
         clearEnds: number[],
         xStarts: number[],
-        xEnds: number[],
-        horizontalPadding: number
+        xEnds: number[]
     ): boolean {
         if (this.isEmpty) {
             return false;
@@ -460,6 +460,12 @@ export class EffectBand extends Glyph {
             this.info.sizingMode !== EffectBarGlyphSizing.FullBar &&
             this._chainHeads.length === 0
         ) {
+            const sizing = this.info.sizingMode;
+            const beatAttached =
+                sizing === EffectBarGlyphSizing.SingleOnBeat ||
+                sizing === EffectBarGlyphSizing.SingleOnBeatToEnd ||
+                sizing === EffectBarGlyphSizing.GroupedOnBeat ||
+                sizing === EffectBarGlyphSizing.GroupedOnBeatToEnd;
             let found = false;
             for (const v of this._uniqueEffectGlyphs) {
                 for (const g of v) {
@@ -468,8 +474,14 @@ export class EffectBand extends Glyph {
                     if (Number.isNaN(left) || Number.isNaN(right)) {
                         continue;
                     }
-                    clearStarts.push(Math.min(left, g.getPlacementClearanceLeft()) - horizontalPadding);
-                    clearEnds.push(Math.max(right, g.getPlacementClearanceRight()) + horizontalPadding);
+                    let clearStart = Math.min(left, g.getPlacementClearanceLeft());
+                    let clearEnd = Math.max(right, g.getPlacementClearanceRight());
+                    if (beatAttached && g.beat) {
+                        clearStart = Math.min(clearStart, this.renderer.getBeatX(g.beat, BeatXPosition.OnNotes));
+                        clearEnd = Math.max(clearEnd, this.renderer.getBeatX(g.beat, BeatXPosition.PostNotes));
+                    }
+                    clearStarts.push(clearStart);
+                    clearEnds.push(clearEnd);
                     xStarts.push(left);
                     xEnds.push(right);
                     found = true;

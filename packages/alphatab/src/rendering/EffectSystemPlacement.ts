@@ -168,7 +168,7 @@ export class EffectSystemPlacement {
                 clearStarts.splice(0, clearStarts.length);
                 clearEnds.splice(0, clearEnds.length);
                 const firstRange = groupXStarts.length;
-                if (!m.collectPlacementRanges(clearStarts, clearEnds, groupXStarts, groupXEnds, pad)) {
+                if (!m.collectPlacementRanges(clearStarts, clearEnds, groupXStarts, groupXEnds)) {
                     continue;
                 }
                 for (let r = firstRange; r < groupXStarts.length; r++) {
