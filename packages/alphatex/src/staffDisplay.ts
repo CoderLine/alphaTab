@@ -145,7 +145,7 @@ const staffDisplayElements: StaffDisplayElement[] = [
             target: '',
             props: 'tsSystems firstSystemOnly',
             staff: 'score tabs',
-            bars: ['3.3.4 3.3 3.3 3.3', '3.3 3.3 3.3 3.3', '\\ts 3 4 3.3.4 3.3 3.3', '3.3 3.3 3.3'],
+            bars: ['3.3.4 3.3 3.3 3.3', '3.3 3.3 3.3 3.3', '\\ts (3 4) 3.3.4 3.3 3.3', '3.3 3.3 3.3'],
             systems: true
         }
     },
