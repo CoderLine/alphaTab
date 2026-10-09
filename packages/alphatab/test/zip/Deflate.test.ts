@@ -4,6 +4,7 @@ import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { type IReadable, ThrowingReadable } from '@coderline/alphatab/io/IReadable';
 import { Crc32 } from '@coderline/alphatab/zip/Crc32';
+import { Deflater } from '@coderline/alphatab/zip/Deflater';
 import { Inflater } from '@coderline/alphatab/zip/Inflater';
 
 const words = ['<Note>', 'alphaTab', ' ', 'Beat', '</Note>', 'Rhythm', '\n', 'Voice', '="1"', 'Bar'];
@@ -23,6 +24,69 @@ function text(size: number, seed: number): Uint8Array {
         }
     }
     return data;
+}
+
+/**
+ * Deterministic data without repetitions longer than a few bytes.
+ */
+function noise(size: number, seed: number): Uint8Array {
+    const data = new Uint8Array(size);
+    let x = seed;
+    for (let i = 0; i < size; i++) {
+        x = (x * 75 + 74) % 65537;
+        data[i] = x & 0xff;
+    }
+    return data;
+}
+
+/**
+ * Symbols with Fibonacci frequencies in shuffled order.
+ */
+function skewed(): Uint8Array {
+    const counts: number[] = [1, 1];
+    while (counts.length < 25) {
+        counts.push(counts[counts.length - 1] + counts[counts.length - 2]);
+    }
+    let size = 0;
+    for (const c of counts) {
+        size += c;
+    }
+    const data = new Uint8Array(size);
+    let pos = 0;
+    for (let s = 0; s < counts.length; s++) {
+        for (let i = 0; i < counts[s]; i++) {
+            data[pos++] = s * 10;
+        }
+    }
+    let x = 7;
+    for (let i = size - 1; i > 0; i--) {
+        x = (x * 75 + 74) % 65537;
+        const j = (x * 31 + i) % (i + 1);
+        const t = data[i];
+        data[i] = data[j];
+        data[j] = t;
+    }
+    return data;
+}
+
+function concat(parts: Uint8Array[]): Uint8Array {
+    let size = 0;
+    for (const p of parts) {
+        size += p.length;
+    }
+    const data = new Uint8Array(size);
+    let pos = 0;
+    for (const p of parts) {
+        data.set(p, pos);
+        pos += p.length;
+    }
+    return data;
+}
+
+function crcOf(data: Uint8Array): number {
+    const crc = new Crc32();
+    crc.update(data, 0, data.length);
+    return crc.value;
 }
 
 function expectBytes(actual: Uint8Array | null, expected: Uint8Array) {
@@ -192,3 +256,138 @@ describe('InflaterTests', () => {
     });
 });
 
+describe('DeflaterTests', () => {
+    function roundTrip(data: Uint8Array): Uint8Array {
+        const compressed = new Deflater().deflate(data);
+        expectBytes(inflate(ByteBuffer.fromBuffer(compressed)), data);
+        return compressed;
+    }
+
+    it('empty', () => {
+        const compressed = roundTrip(new Uint8Array(0));
+        // a final fixed block with only the end-of-block code
+        expectBytes(compressed, new Uint8Array([3, 0]));
+    });
+
+    it('single-byte', () => {
+        roundTrip(new Uint8Array([42]));
+    });
+
+    it('two-bytes', () => {
+        roundTrip(new Uint8Array([1, 200]));
+    });
+
+    it('text', () => {
+        const data = text(200000, 3);
+        const compressed = roundTrip(data);
+        expect(compressed.length).toBeLessThan(data.length / 5);
+    });
+
+    it('long-runs', () => {
+        // overlapping matches with distance 1 and maximum length, blocks limited by their input size
+        const compressed = roundTrip(concat([new Uint8Array(100000), new Uint8Array([1, 2, 3]), new Uint8Array(70000)]));
+        expect(compressed.length).toBeLessThan(1000);
+    });
+
+    it('far-repeat', () => {
+        // the second copy matches at distance 32767, the maximum distance used
+        const part = noise(32767, 5);
+        const data = concat([part, part]);
+        const compressed = roundTrip(data);
+        expect(compressed.length).toBeLessThan(part.length + 2000);
+    });
+
+    it('incompressible', () => {
+        // stored blocks
+        const data = noise(150000, 9);
+        const compressed = roundTrip(data);
+        expect(compressed.length).toBeLessThan(data.length + 100);
+    });
+
+    it('skewed-frequencies', () => {
+        roundTrip(skewed());
+    });
+
+    it('mixed', () => {
+        roundTrip(concat([text(50000, 1), noise(70000, 2), new Uint8Array(1000), text(20000, 4), noise(10, 3)]));
+    });
+
+    it('reuse', () => {
+        const deflater = new Deflater();
+        const first = deflater.deflate(text(30000, 1));
+        deflater.deflate(noise(70000, 2));
+        const again = deflater.deflate(text(30000, 1));
+        expectBytes(again, first);
+    });
+
+    function fibonacci(count: number): Int32Array {
+        const frequencies = new Int32Array(count);
+        frequencies[0] = 1;
+        frequencies[1] = 1;
+        for (let i = 2; i < count; i++) {
+            frequencies[i] = frequencies[i - 1] + frequencies[i - 2];
+        }
+        return frequencies;
+    }
+
+    function checkCodeLengths(frequencies: Int32Array, limit: number): Uint8Array {
+        const lengths = new Uint8Array(frequencies.length);
+        Deflater.buildCodeLengths(frequencies, lengths, limit);
+        let kraft = 0;
+        for (let i = 0; i < lengths.length; i++) {
+            expect(lengths[i]).toBeLessThanOrEqual(limit);
+            if (frequencies[i] > 0) {
+                expect(lengths[i]).toBeGreaterThan(0);
+            }
+            if (lengths[i] > 0) {
+                kraft += 1 << (15 - lengths[i]);
+            }
+            // more frequent symbols never get longer codes
+            for (let j = 0; j < lengths.length; j++) {
+                if (frequencies[i] > frequencies[j] && frequencies[j] > 0) {
+                    expect(lengths[i]).toBeLessThanOrEqual(lengths[j]);
+                }
+            }
+        }
+        // a complete code
+        expect(kraft).toBe(32768);
+        return lengths;
+    }
+
+    it('code-lengths-optimal', () => {
+        const lengths = checkCodeLengths(new Int32Array([1, 1, 2, 3, 0, 10]), 15);
+        const parts: string[] = [];
+        for (let i = 0; i < lengths.length; i++) {
+            parts.push(`${lengths[i]}`);
+        }
+        expect(parts.join(',')).toBe('4,4,3,2,0,1');
+    });
+
+    it('code-lengths-limited', () => {
+        // the optimal code for Fibonacci frequencies is as deep as there are symbols
+        checkCodeLengths(fibonacci(30), 15);
+        checkCodeLengths(fibonacci(19), 7);
+        const lengths = checkCodeLengths(fibonacci(16), 15);
+        expect(lengths[0]).toBe(15);
+    });
+
+    it('code-lengths-minimum-two', () => {
+        const single = new Int32Array(30);
+        single[7] = 5;
+        const lengths = checkCodeLengths(single, 15);
+        expect(lengths[7]).toBe(1);
+        expect(lengths[0]).toBe(1);
+        checkCodeLengths(new Int32Array(30), 15);
+    });
+
+    it('golden', () => {
+        // the compressed data must be identical on all platforms
+        const cases: Uint8Array[] = [text(3000, 1), text(200000, 3), skewed(), noise(1000, 4)];
+        const results: string[] = [];
+        for (const data of cases) {
+            const compressed = new Deflater().deflate(data);
+            results.push(`${compressed.length}:${crcOf(compressed)}`);
+        }
+        expect(results.join(',')).toBe('634:1518865721,32538:-661243832,76301:652498640,1005:957314967');
+    });
+});
