@@ -439,15 +439,18 @@ export class EffectBand extends Glyph {
      * @remarks
      * Note-attached bands (markers like tap or the hammer-on/pull-off labels) place each glyph on its own
      * ({@link EffectGlyph.getPlacementClearanceLeft}), so other markers can share the row in the gaps
-     * between them. All other bands (lines, spans, system markers) and bands with cross-bar spans keep and
-     * occupy their whole range ({@link computeLocalXRange}).
+     * between them. Their clearance range is widened by `horizontalPadding`, so they also keep their distance
+     * to content horizontally next to them (e.g. a stem next to a marker). All other bands (lines, spans,
+     * system markers) and bands with cross-bar spans keep and occupy their whole range
+     * ({@link computeLocalXRange}).
      * @returns `false` when the band has no usable range.
      */
     public collectPlacementRanges(
         clearStarts: number[],
         clearEnds: number[],
         xStarts: number[],
-        xEnds: number[]
+        xEnds: number[],
+        horizontalPadding: number
     ): boolean {
         if (this.isEmpty) {
             return false;
@@ -465,8 +468,8 @@ export class EffectBand extends Glyph {
                     if (Number.isNaN(left) || Number.isNaN(right)) {
                         continue;
                     }
-                    clearStarts.push(Math.min(left, g.getPlacementClearanceLeft()));
-                    clearEnds.push(Math.max(right, g.getPlacementClearanceRight()));
+                    clearStarts.push(Math.min(left, g.getPlacementClearanceLeft()) - horizontalPadding);
+                    clearEnds.push(Math.max(right, g.getPlacementClearanceRight()) + horizontalPadding);
                     xStarts.push(left);
                     xEnds.push(right);
                     found = true;

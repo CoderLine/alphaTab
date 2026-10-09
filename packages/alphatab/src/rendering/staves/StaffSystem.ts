@@ -1210,12 +1210,16 @@ export class StaffSystem {
         const upperSky = upper.systemSkyline.downSky;
         const lowerSky = lower.systemSkyline.upSky;
 
-        // the maximum combined extent of both staves into the space between them
+        // the maximum combined extent of both staves into the space between them.
+        // the padding also applies horizontally: content of the other staff closer than the padding next to
+        // a segment counts as well (e.g. a fingering number next to a stem of the staff above).
         let contentExtent = 0;
         for (let i = 0, n = upperSky.segmentCount; i < n; i++) {
             const h = upperSky.segmentHeight(i);
             if (h > 0) {
-                const combined = h + lowerSky.maxHeightInRange(upperSky.segmentXStart(i), upperSky.segmentXEnd(i));
+                const combined =
+                    h +
+                    lowerSky.maxHeightInRange(upperSky.segmentXStart(i) - padding, upperSky.segmentXEnd(i) + padding);
                 if (combined > contentExtent) {
                     contentExtent = combined;
                 }
@@ -1224,7 +1228,9 @@ export class StaffSystem {
         for (let i = 0, n = lowerSky.segmentCount; i < n; i++) {
             const h = lowerSky.segmentHeight(i);
             if (h > 0) {
-                const combined = h + upperSky.maxHeightInRange(lowerSky.segmentXStart(i), lowerSky.segmentXEnd(i));
+                const combined =
+                    h +
+                    upperSky.maxHeightInRange(lowerSky.segmentXStart(i) - padding, lowerSky.segmentXEnd(i) + padding);
                 if (combined > contentExtent) {
                     contentExtent = combined;
                 }
