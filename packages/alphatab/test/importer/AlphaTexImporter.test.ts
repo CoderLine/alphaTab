@@ -312,6 +312,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toBe(HarmonicType.Semi);
     });
 
+    it('harmonics-pitched', () => {
+        // without string the interval of the non-natural harmonics applies to the pitch, natural ones need the open string
+        const notes = parseTex('C4{ah 12} C4{ah 7} C4{nh}').tracks[0].staves[0].bars[0].voices[0].beats.map(
+            b => b.notes[0]
+        );
+        expect(notes.map(n => n.realValue)).toEqual([72, 79, 60]);
+        expect(notes.map(n => n.displayValue)).toEqual([60, 60, 60]);
+    });
+
     it('hamonics-rendering-text-issue79', async () => {
         const tex: string = ':8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}';
         const score = parseTex(tex);
@@ -329,25 +338,13 @@ describe('AlphaTexImporterTest', () => {
         });
         renderer.renderScore(score, [0]);
         const regexTemplate: string = '<text[^>]+>\\s*{0}\\s*</text>';
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Natural))).exec(svg)).toBeTruthy();
         expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Natural))).exec(
-                svg
-            )
+            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Artificial))).exec(svg)
         ).toBeTruthy();
-        expect(
-            new RegExp(
-                regexTemplate.replace('{0}', harmonicToString(HarmonicType.Artificial))
-            ).exec(svg)
-        ).toBeTruthy();
-        expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Tap))).exec(svg)
-        ).toBeTruthy();
-        expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Pinch))).exec(svg)
-        ).toBeTruthy();
-        expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Semi))).exec(svg)
-        ).toBeTruthy();
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Tap))).exec(svg)).toBeTruthy();
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Pinch))).exec(svg)).toBeTruthy();
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Semi))).exec(svg)).toBeTruthy();
     });
 
     it('grace-issue79', () => {

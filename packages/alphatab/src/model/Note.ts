@@ -684,15 +684,11 @@ export class Note {
         const transpositionPitch = applyTranspositionPitch ? this.beat.voice.bar.staff.transpositionPitch : 0;
 
         if (applyHarmonic) {
-            let realValue = this.calculateRealValue(applyTranspositionPitch, false);
-            if (this.isStringed) {
-                if (this.harmonicType === HarmonicType.Natural) {
-                    realValue = this.harmonicPitch + this.stringTuning - transpositionPitch;
-                } else {
-                    realValue += this.harmonicPitch;
-                }
+            const realValue = this.calculateRealValue(applyTranspositionPitch, false);
+            if (this.isStringed && this.harmonicType === HarmonicType.Natural) {
+                return this.harmonicPitch + this.stringTuning - transpositionPitch;
             }
-            return realValue;
+            return realValue + this.harmonicPitch;
         }
 
         if (this.isPercussion) {
@@ -708,84 +704,16 @@ export class Note {
         return 0;
     }
 
+    /**
+     * The interval in semitones the harmonic sounds above the played pitch. Natural harmonics are relative to the open string
+     * and therefore need a string, the other types are an interval above the played note on any pitched note.
+     */
     public get harmonicPitch(): number {
-        if (this.harmonicType === HarmonicType.None || !this.isStringed) {
+        const hasHarmonicPitch = this.isStringed || (this.isPiano && this.harmonicType !== HarmonicType.Natural);
+        if (this.harmonicType === HarmonicType.None || !hasHarmonicPitch) {
             return 0;
         }
-        const value: number = this.harmonicValue;
-        // add semitones to reach corresponding harmonic frets
-        if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
-            return 36;
-        }
-        if (ModelUtils.isAlmostEqualTo(value, 2.7)) {
-            // Fret 3 2nd octave + minor seventh
-            return 34;
-        }
-        if (value < 3) {
-            // no natural harmonics below fret 3
-            return 0;
-        }
-        if (value <= 3.5) {
-            // Fret 3 2nd octave + fifth
-            return 31;
-        }
-        if (value <= 4) {
-            return 28;
-        }
-        if (value <= 5) {
-            return 24;
-        }
-        if (value <= 6) {
-            return 34;
-        }
-        if (value <= 7) {
-            return 19;
-        }
-        if (value <= 8.5) {
-            return 36;
-        }
-        if (value <= 9) {
-            return 28;
-        }
-        if (value <= 10) {
-            return 34;
-        }
-        if (value <= 11) {
-            return 0;
-        }
-        if (value <= 12) {
-            return 12;
-        }
-        if (value < 14) {
-            // fret 13,14 stay
-            return 0;
-        }
-        if (value <= 15) {
-            return 34;
-        }
-        if (value <= 16) {
-            return 28;
-        }
-        if (value <= 17) {
-            return 36;
-        }
-        if (value <= 18) {
-            return 0;
-        }
-        if (value <= 19) {
-            return 19;
-        }
-        if (value <= 21) {
-            //  20,21 stay
-            return 0;
-        }
-        if (value <= 22) {
-            return 36;
-        }
-        if (value <= 24) {
-            return 24;
-        }
-        return 0;
+        return ModelUtils.harmonicValueToPitch(this.harmonicValue);
     }
 
     public get initialBendValue(): number {
