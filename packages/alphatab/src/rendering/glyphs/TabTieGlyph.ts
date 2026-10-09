@@ -13,7 +13,10 @@ export class TabTieGlyph extends NoteTieGlyph {
         return TabTieGlyph.getBeamDirectionForNote(this.startNote);
     }
 
-    protected static getBeamDirectionForNote(note: Note): BeamDirection {
+    /**
+     * The side of tab ties and slurs: above the upper three strings, below the lower ones.
+     */
+    public static getBeamDirectionForNote(note: Note): BeamDirection {
         return note.string > 3 ? BeamDirection.Up : BeamDirection.Down;
     }
 }
