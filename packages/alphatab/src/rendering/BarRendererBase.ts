@@ -259,6 +259,16 @@ export class BarRendererBase {
         return this._contentTopOverflow + this.topEffects.height;
     }
 
+    /** The overflow of the bar content above the staff, without the effect bands. */
+    public get contentTopOverflow() {
+        return this._contentTopOverflow;
+    }
+
+    /** The overflow of the bar content below the staff, without the effect bands. */
+    public get contentBottomOverflow() {
+        return this._contentBottomOverflow;
+    }
+
     public get bottomOverflow() {
         return this._contentBottomOverflow + this.bottomEffects.height;
     }

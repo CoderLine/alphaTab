@@ -14,8 +14,6 @@ export class EffectSystemPlacement {
     // Reusable scratch buffers; rebuilt every finalize cycle.
     private readonly _top: EffectBand[] = [];
     private readonly _bottom: EffectBand[] = [];
-    private readonly _contentTop: number[] = [];
-    private readonly _contentBottom: number[] = [];
     private readonly _groupBands: EffectBand[] = [];
     private readonly _groupXStarts: number[] = [];
     private readonly _groupXEnds: number[] = [];
@@ -32,22 +30,14 @@ export class EffectSystemPlacement {
 
         const top = this._top;
         const bottom = this._bottom;
-        const contentTop = this._contentTop;
-        const contentBottom = this._contentBottom;
         // splice() instead of `.length = 0`: transpile-safe array clear.
         top.splice(0, top.length);
         bottom.splice(0, bottom.length);
-        contentTop.splice(0, contentTop.length);
-        contentBottom.splice(0, contentBottom.length);
 
-        // container.height = post-placement max - pre-placement max.
-        // Snapshot pre-placement skyline, filter non-empty bands, and run
-        // `finalizeBand` (settles dynamic-height effects like TabWhammy) in
-        // one walk.
+        // Filter non-empty bands and run `finalizeBand` (settles dynamic-height
+        // effects like TabWhammy) in one walk.
         for (let i = 0; i < staff.barRenderers.length; i++) {
             const r = staff.barRenderers[i];
-            contentTop.push(sky.upSky.maxHeightInRange(r.x, r.x + r.width));
-            contentBottom.push(sky.downSky.maxHeightInRange(r.x, r.x + r.width));
             for (const b of r.topEffects.bands) {
                 if (!b.isEmpty) {
                     // Reset; `_placeSide` only writes it when computeLocalXRange succeeds,
@@ -76,13 +66,17 @@ export class EffectSystemPlacement {
         this._placeSide(top, sky.upSky, contentSky ? contentSky.upSky : null, pad, /* isTop */ true);
         this._placeSide(bottom, sky.downSky, contentSky ? contentSky.downSky : null, pad, /* isTop */ false);
 
+        // A bar reserves its own content and the bands placed on it. Bands know their final
+        // position (magnitude + height), so the reserved height does not depend on the skyline before
+        // placement, which also contains content of other bars reaching into this bar (ties, brackets)
+        // and misses content registered as overflow without a skyline entry.
         for (let i = 0; i < staff.barRenderers.length; i++) {
             const r = staff.barRenderers[i];
-            const topMax = sky.upSky.maxHeightInRange(r.x, r.x + r.width);
-            r.topEffects.height = Math.max(0, Math.ceil(topMax - contentTop[i]));
-
-            const bottomMax = sky.downSky.maxHeightInRange(r.x, r.x + r.width);
-            r.bottomEffects.height = Math.max(0, Math.ceil(bottomMax - contentBottom[i]));
+            r.topEffects.height = EffectSystemPlacement._effectsHeight(r.topEffects.bands, r.contentTopOverflow);
+            r.bottomEffects.height = EffectSystemPlacement._effectsHeight(
+                r.bottomEffects.bands,
+                r.contentBottomOverflow
+            );
 
             r.registerStaffOverflows();
         }
@@ -95,6 +89,20 @@ export class EffectSystemPlacement {
         for (const band of bottom) {
             band.y = band.placedMagnitude + band.renderer.bottomEffects.height - staffBottomOverflow;
         }
+    }
+
+    /** The height the placed bands add on top of the given content overflow. */
+    private static _effectsHeight(bands: EffectBand[], contentOverflow: number): number {
+        let max = 0;
+        for (const b of bands) {
+            if (!b.isEmpty) {
+                const outer = b.placedMagnitude + b.height;
+                if (outer > max) {
+                    max = outer;
+                }
+            }
+        }
+        return Math.max(0, Math.ceil(max - contentOverflow));
     }
 
     /** Sort by precomputed {@link EffectBand.sortKey} (placementCategory, order desc, voice, renderer). */
