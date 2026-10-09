@@ -8,6 +8,7 @@ import { BendType } from '@coderline/alphatab/model/BendType';
 import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
@@ -593,6 +594,100 @@ describe('MusicXmlImporterTests', () => {
         expect(notes[0].hammerPullDestination).toBe(notes[1]);
         expect(notes[1].hammerPullDestination).toBe(notes[2]);
         expect(notes[3].isHammerPullDestination).toBe(false);
+    });
+
+    it('harmonics', () => {
+        const harmonic = (type: string, pitch: string) => `<harmonic><${type}/>${pitch}</harmonic>`;
+        const tab = (string: number, fret: number) => `<string>${string}</string><fret>${fret}</fret>`;
+        // chord notes without <staff> (like Guitar Pro 8 writes them) belong to the first staff
+        const note = (chord: string, step: string, octave: number, staff: string, technical: string) =>
+            `<note>${chord}<pitch><step>${step}</step><octave>${octave}</octave></pitch><duration>4</duration>` +
+            `<voice>1</voice><type>whole</type>${staff}<notations><technical>${technical}</technical></notations></note>`;
+        const chord = (step: string, octave: number, type: string, pitch: string) =>
+            note('<chord/>', step, octave, '', harmonic(type, pitch));
+        const tuning = (line: number, step: string, octave: number) =>
+            `<staff-tuning line="${line}"><tuning-step>${step}</tuning-step><tuning-octave>${octave}</tuning-octave></staff-tuning>`;
+        const tabStaff = (staff: string) =>
+            `<clef${staff}><sign>TAB</sign><line>5</line></clef><staff-details${staff}><staff-lines>6</staff-lines>` +
+            `${tuning(1, 'E', 2)}${tuning(2, 'A', 2)}${tuning(3, 'D', 3)}${tuning(4, 'G', 3)}${tuning(5, 'B', 3)}${tuning(6, 'E', 4)}</staff-details>`;
+        const measure = (n: number, attributes: string, notes: string) =>
+            `<measure number="${n}">${attributes ? `<attributes><divisions>1</divisions>${attributes}</attributes>` : ''}${notes}</measure>`;
+
+        const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+  <part-list><score-part id="P1"><part-name>GP8</part-name></score-part><score-part id="P2"><part-name>Guitar</part-name></score-part></part-list>
+  <part id="P1">${measure(
+      1,
+      `<staves>2</staves><clef number="1"><sign>G</sign><line>2</line></clef>${tabStaff(' number="2"')}` +
+          '<transpose number="1"><diatonic>0</diatonic><chromatic>0</chromatic><octave-change>-1</octave-change></transpose>',
+      // Guitar Pro 8 writes the touching and sounding pitch of both staves in the (octave transposed) pitch of the first staff
+      note('', 'C', 5, '<staff>1</staff>', harmonic('artificial', '<base-pitch/>')) +
+          chord('G', 5, 'artificial', '<touching-pitch/>') +
+          chord('G', 6, 'artificial', '<sounding-pitch/>') +
+          '<backup><duration>4</duration></backup>' +
+          note('', 'C', 4, '<staff>2</staff>', harmonic('artificial', '<base-pitch/>') + tab(2, 1)) +
+          chord('G', 5, 'artificial', '<touching-pitch/>') +
+          chord('G', 6, 'artificial', '<sounding-pitch/>')
+  )}</part>
+  <part id="P2">${[
+      // harmonic circle only (Guitar Pro 8 writes pinch, tap and semi harmonics like this)
+      note('', 'G', 4, '', `<harmonic/>${tab(3, 12)}`),
+      note('', 'G', 4, '', harmonic('natural', '') + tab(3, 12)),
+      // no natural harmonic at fret 1
+      note('', 'C', 4, '', harmonic('natural', '<base-pitch/>') + tab(2, 1)),
+      note('', 'D', 4, '', harmonic('natural', '<touching-pitch/>') + tab(3, 7)),
+      // artificial harmonic without touching or sounding pitch
+      note('', 'C', 4, '', harmonic('artificial', '') + tab(2, 1)),
+      note('', 'C', 4, '', harmonic('artificial', '<base-pitch/>') + tab(2, 1)) +
+          chord('F', 4, 'artificial', '<touching-pitch/>'),
+      note('', 'C', 4, '', harmonic('artificial', '<base-pitch/>') + tab(2, 1)) +
+          chord('G', 5, 'artificial', '<sounding-pitch/>'),
+      // natural harmonic on the open string touched at fret 7
+      note('', 'G', 3, '', harmonic('natural', '<base-pitch/>') + tab(3, 0)) +
+          chord('D', 4, 'natural', '<touching-pitch/>') +
+          chord('D', 5, 'natural', '<sounding-pitch/>'),
+      // a base pitch starts a new harmonic in the chord
+      note('', 'C', 4, '', harmonic('artificial', '<base-pitch/>') + tab(2, 1)) +
+          chord('C', 5, 'artificial', '<touching-pitch/>') +
+          note('<chord/>', 'E', 4, '', tab(1, 0)) +
+          note('<chord/>', 'A', 3, '', harmonic('artificial', '<base-pitch/>') + tab(3, 2)) +
+          chord('E', 4, 'artificial', '<touching-pitch/>')
+  ]
+      .map((content, i) => measure(i + 1, i === 0 ? tabStaff('') : '', content))
+      .join('')}</part>
+</score-partwise>`;
+        const score = MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+
+        // notation and tablature staff of Guitar Pro 8 sound the same harmonic
+        for (const staff of score.tracks[0].staves) {
+            const staffNotes = staff.bars[0].voices[0].beats[0].notes;
+            expect(staffNotes.length).toBe(1);
+            expect(staffNotes[0].harmonicType).toBe(HarmonicType.Artificial);
+            expect(staffNotes[0].harmonicValue).toBe(7);
+            expect(staffNotes[0].realValue).toBe(79);
+        }
+
+        const notes: Note[] = [];
+        for (const bar of score.tracks[1].staves[0].bars) {
+            for (const n of bar.voices[0].beats[0].notes) {
+                notes.push(n);
+            }
+        }
+        expect(notes.map(n => n.harmonicType)).toEqual([
+            HarmonicType.None,
+            HarmonicType.Natural,
+            HarmonicType.None,
+            HarmonicType.Natural,
+            HarmonicType.None,
+            HarmonicType.Artificial,
+            HarmonicType.Artificial,
+            HarmonicType.Natural,
+            HarmonicType.Artificial,
+            HarmonicType.None,
+            HarmonicType.Artificial
+        ]);
+        expect(notes.map(n => n.harmonicValue)).toEqual([0, 12, 0, 7, 0, 5, 7, 7, 12, 0, 7]);
+        expect(notes.map(n => n.realValue)).toEqual([67, 67, 60, 74, 60, 84, 79, 74, 72, 64, 76]);
     });
 
     describe('barnumberdisplay', async () => {
