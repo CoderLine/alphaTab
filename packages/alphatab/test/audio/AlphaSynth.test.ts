@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { FormatError } from '@coderline/alphatab/FormatError';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
@@ -162,6 +163,47 @@ describe('AlphaSynthTests', () => {
             offset += part.length;
         }
         await expectLibVorbisOutput(all, 'default-sf3');
+    });
+
+    it('vorbis-packets-spanning-pages', async () => {
+        // the same stream with every packet split across pages
+        const data = await TestPlatform.loadFile('test-data/audio/Short.ogg');
+        const paged = await TestPlatform.loadFile('test-data/audio/Short-paged.ogg');
+        const expected = new VorbisDecoder().decode(data, 0, data.length).samples;
+        const actual = new VorbisDecoder().decode(paged, 0, paged.length).samples;
+        expect(actual.length).toBe(expected.length);
+        for (let i = 0; i < actual.length; i++) {
+            expect(actual[i], `Difference at index ${i}`).toBe(expected[i]);
+        }
+    });
+
+    it('vorbis-corrupt-input', async () => {
+        // mutated and truncated streams either decode or fail with a FormatError
+        const data = await TestPlatform.loadFile('test-data/audio/Short.ogg');
+        const decoder = new VorbisDecoder();
+        let seed = 1;
+        let formatErrors = 0;
+        for (let i = 0; i < 300; i++) {
+            const corrupt = new Uint8Array(data.length);
+            corrupt.set(data, 0);
+            seed = (seed * 75 + 74) % 65537;
+            let length = data.length;
+            if (i % 4 === 3) {
+                length = seed % data.length;
+            } else {
+                for (let j = 0; j <= i % 3; j++) {
+                    const position = (seed * (j + 1)) % data.length;
+                    corrupt[position] = (corrupt[position] + 1 + (seed % 255)) % 256;
+                }
+            }
+            try {
+                decoder.decode(corrupt, 0, length);
+            } catch (e) {
+                expect(e instanceof FormatError, `Mutation ${i}: ${e}`).toBe(true);
+                formatErrors++;
+            }
+        }
+        expect(formatErrors).toBeGreaterThan(0);
     });
 
     it('vorbis-imdct', () => {
