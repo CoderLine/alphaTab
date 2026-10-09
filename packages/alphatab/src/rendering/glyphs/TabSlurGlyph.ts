@@ -56,7 +56,10 @@ export class TabSlurGlyph extends TabTieGlyph {
                 endNote = destination;
             }
         }
-        return startNote && endNote ? { startNote, endNote } : null;
+        if (!startNote || !endNote) {
+            return null;
+        }
+        return { startNote: startNote!, endNote: endNote! };
     }
 
     protected invalidateLabels(): void {
