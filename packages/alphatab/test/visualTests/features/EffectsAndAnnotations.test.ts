@@ -648,6 +648,21 @@ describe('EffectsAndAnnotationsTests', () => {
                 '\\voice :8 5.1{h} 7.1 5.1{h} 7.1 r.2 | \\voice :8 5.4{h} 7.4 5.4{h} 7.4 r.2 |'
             ));
 
+        // Labels sit above the staff, centered between the beats of their segment.
+        // across a bar line: centered between the beats in both bars
+        it('labels-across-bar', async () => await test('labels-across-bar', ':2 r 5.3{h} | 7.3{h} 5.3'));
+        // across a system break: on the first system, centered up to the system end; nothing on the continuation.
+        // The pull-off crosses the break, the hammer-on stays on the first system; mixed kinds stack.
+        it('labels-system-break', async () => {
+            const settings = new Settings();
+            settings.display.layoutMode = LayoutMode.Parchment;
+            await VisualTestHelper.runVisualTestTex(
+                '\\track { defaultSystemsLayout 1 } :4 r r 5.3{h} 7.3{h} | 5.3 r r (5.1{h} 5.2{sl}) | (7.1 9.2) r r r',
+                'test-data/visual-tests/effects-and-annotations/hopo-arcs-labels-system-break.png',
+                settings
+            );
+        });
+
         // Score-only — confirms ScoreSlurGlyph paints labels even
         // without the tab staff present.
         it('score-only', async () =>

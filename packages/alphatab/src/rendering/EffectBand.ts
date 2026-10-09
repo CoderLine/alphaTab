@@ -2,9 +2,10 @@ import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
@@ -116,6 +117,14 @@ export class EffectBand extends Glyph {
             this._xRangeMax = xEnd;
             this._xRangeFound = true;
         }
+    }
+
+    /**
+     * Marks the x-range as stale after glyph extents changed outside {@link alignGlyphs}
+     * (e.g. resolved in {@link EffectInfo.finalizeBand}).
+     */
+    public invalidateXRange(): void {
+        this._xRangeBaseDirty = true;
     }
 
     public clearPublishedSpans(): void {
@@ -420,6 +429,75 @@ export class EffectBand extends Glyph {
         }
         out.xStart = this._xRangeMin;
         out.xEnd = this._xRangeMax;
+        return true;
+    }
+
+    private readonly _placementRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
+    /**
+     * Collects the renderer-local x-ranges of this band for the vertical placement: the ranges which must be
+     * clear of other content (`clearStarts`/`clearEnds`) and the ranges the band occupies (`xStarts`/`xEnds`).
+     * @remarks
+     * Note-attached bands (markers like tap or the hammer-on/pull-off labels) place each glyph on its own
+     * ({@link EffectGlyph.getPlacementClearanceLeft}), so other markers can share the row in the gaps
+     * between them. Markers attached to a beat keep the noteheads and stems of their beat clear, even where
+     * the marker is narrower (e.g. a pick stroke above the stem of its note). All other bands (lines, spans,
+     * system markers) and bands with cross-bar spans keep and occupy their whole range
+     * ({@link computeLocalXRange}).
+     * @returns `false` when the band has no usable range.
+     */
+    public collectPlacementRanges(
+        clearStarts: number[],
+        clearEnds: number[],
+        xStarts: number[],
+        xEnds: number[]
+    ): boolean {
+        if (this.isEmpty) {
+            return false;
+        }
+        if (
+            this.info.placementCategory === EffectBandPlacementCategory.NoteAttached &&
+            this.info.sizingMode !== EffectBarGlyphSizing.FullBar &&
+            this._chainHeads.length === 0
+        ) {
+            const sizing = this.info.sizingMode;
+            const beatAttached =
+                sizing === EffectBarGlyphSizing.SingleOnBeat ||
+                sizing === EffectBarGlyphSizing.SingleOnBeatToEnd ||
+                sizing === EffectBarGlyphSizing.GroupedOnBeat ||
+                sizing === EffectBarGlyphSizing.GroupedOnBeatToEnd;
+            let found = false;
+            for (const v of this._uniqueEffectGlyphs) {
+                for (const g of v) {
+                    const left = g.getBoundingBoxLeft();
+                    const right = g.getBoundingBoxRight();
+                    if (Number.isNaN(left) || Number.isNaN(right)) {
+                        continue;
+                    }
+                    let clearStart = Math.min(left, g.getPlacementClearanceLeft());
+                    let clearEnd = Math.max(right, g.getPlacementClearanceRight());
+                    if (beatAttached && g.beat) {
+                        clearStart = Math.min(clearStart, this.renderer.getBeatX(g.beat, BeatXPosition.OnNotes));
+                        clearEnd = Math.max(clearEnd, this.renderer.getBeatX(g.beat, BeatXPosition.PostNotes));
+                    }
+                    clearStarts.push(clearStart);
+                    clearEnds.push(clearEnd);
+                    xStarts.push(left);
+                    xEnds.push(right);
+                    found = true;
+                }
+            }
+            return found;
+        }
+
+        const range = this._placementRangeScratch;
+        if (!this.computeLocalXRange(range)) {
+            return false;
+        }
+        clearStarts.push(range.xStart);
+        clearEnds.push(range.xEnd);
+        xStarts.push(range.xStart);
+        xEnds.push(range.xEnd);
         return true;
     }
 

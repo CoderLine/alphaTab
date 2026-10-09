@@ -12,6 +12,7 @@ import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Slur } from '@coderline/alphatab/model/Slur';
+import type { SlurSegment } from '@coderline/alphatab/model/SlurSegment';
 import { SlurSegmentKind } from '@coderline/alphatab/model/SlurSegmentKind';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
@@ -621,6 +622,15 @@ export class Note {
     public effectSlur: Slur | null = null;
 
     /**
+     * The {@link SlurSegment} of the effect slur chain starting at this note
+     * (hammer-on, pull-off or legato slide to the next note). Populated by `finish()`.
+     * @clone_ignore
+     * @json_ignore
+     * @internal
+     */
+    public effectSlurSegment: SlurSegment | null = null;
+
+    /**
      * The ornament applied on the note.
      */
     public ornament: NoteOrnament = NoteOrnament.None;
@@ -936,6 +946,7 @@ export class Note {
                 }
                 break;
         }
+        this.effectSlurSegment = null;
         let effectSlurDestination: Note | null = null;
         let effectSlurSegmentKind: SlurSegmentKind | null = null;
         if (this.isHammerPullOrigin && this.hammerPullDestination) {
@@ -955,12 +966,14 @@ export class Note {
 
                 if (effectSlurSegmentKind !== null && chainOrigin.effectSlur !== null) {
                     chainOrigin.effectSlur.destinationNote = effectSlurDestination;
-                    chainOrigin.effectSlur.segments.push({
+                    const segment: SlurSegment = {
                         fromNote: this,
                         toNote: effectSlurDestination,
                         kind: effectSlurSegmentKind,
                         text: null
-                    });
+                    };
+                    chainOrigin.effectSlur.segments.push(segment);
+                    this.effectSlurSegment = segment;
                 }
             } else {
                 this.isEffectSlurOrigin = true;
@@ -973,12 +986,14 @@ export class Note {
                 slur.originNote = this;
                 slur.destinationNote = effectSlurDestination;
                 if (effectSlurSegmentKind !== null) {
-                    slur.segments.push({
+                    const segment: SlurSegment = {
                         fromNote: this,
                         toNote: effectSlurDestination,
                         kind: effectSlurSegmentKind,
                         text: null
-                    });
+                    };
+                    slur.segments.push(segment);
+                    this.effectSlurSegment = segment;
                 }
                 this.effectSlur = slur;
             }

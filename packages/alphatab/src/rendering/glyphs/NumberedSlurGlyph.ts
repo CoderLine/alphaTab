@@ -43,7 +43,6 @@ export class NumberedSlurGlyph extends TabSlurGlyph {
             case BeamDirection.Up:
                 if (startNote.realValue > this.startNote.realValue) {
                     this.startNote = startNote;
-                    this.invalidateLabels(); // labels live on startNote
                 }
                 if (endNote.realValue > this.endNote.realValue) {
                     this.endNote = endNote;
@@ -52,7 +51,6 @@ export class NumberedSlurGlyph extends TabSlurGlyph {
             case BeamDirection.Down:
                 if (startNote.realValue < this.startNote.realValue) {
                     this.startNote = startNote;
-                    this.invalidateLabels();
                 }
                 if (endNote.realValue < this.endNote.realValue) {
                     this.endNote = endNote;
