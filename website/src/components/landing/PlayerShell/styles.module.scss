@@ -1,0 +1,400 @@
+@use '../breakpoints' as *;
+
+.stage {
+  position: relative;
+}
+
+.desktopLayout,
+.mobileLayout {
+  position: relative;
+}
+
+// Geometry is animated from the in-page box by use-maximize.ts; these are the resting values.
+.stageMaximized {
+  position: fixed;
+  top: 0;
+  left: 0;
+  // Spans the scrollbar gutter that use-maximize.ts keeps reserved while page scroll is locked.
+  width: 100vw;
+  height: 100%;
+  z-index: calc(var(--ifm-z-index-fixed) + 1);
+  padding: 20px;
+  background: var(--at-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include mobile { padding: 8px; }
+
+  .desktopLayout,
+  .mobileLayout,
+  .mobileCardWrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .frame,
+  .mobileCard {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .sidebar { overflow-y: auto; }
+
+  .notationArea { min-height: 0; }
+
+  .mobileCard {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobileNotation {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+  }
+
+  .mobileFooter { display: none; }
+}
+
+// ─── Tabs ───────────────────────────────────────────────────────────
+.tabRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 1;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.tab {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid var(--at-line);
+  border-bottom-color: var(--at-line);
+  border-radius: 10px 10px 0 0;
+  font-family: var(--at-font-mono);
+  font-size: 11.5px;
+  color: var(--at-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  top: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+
+  @include tablet {
+    padding: 7px 11px;
+    font-size: 11px;
+  }
+}
+
+.tabActive {
+  background: var(--at-surface);
+  border-bottom-color: var(--at-surface);
+  color: var(--at-ink);
+}
+
+.tabDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--tab-color, var(--at-muted));
+  opacity: 0.5;
+
+  .tabActive & { opacity: 1; }
+}
+
+// ─── Frame: sidebar + viewport ──────────────────────────────────────
+.frame {
+  // Contains alphaTab's cursor z-index so the settings flyout stays on top.
+  isolation: isolate;
+  background: var(--at-surface);
+  border: 1px solid var(--at-line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--at-shadow-lg);
+  display: flex;
+  align-items: stretch;
+}
+
+.frameWithTabs {
+  border-top-left-radius: 0;
+}
+
+// Width comes from the consumer's `sidebarClassName` via `flex-basis`.
+.sidebar {
+  position: relative;
+  flex-grow: 0;
+  flex-shrink: 0;
+  min-width: 0;
+  border-right: 1px solid var(--at-line);
+}
+
+.viewport {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.notationArea {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 420px;
+
+  @include tablet {
+    min-height: 380px;
+  }
+}
+
+.notationDimmed {
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+
+.notationCanvas {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+
+  // CSS standard for "scrollbar steals content width": gutter is reserved
+  // up-front, scrollbar appears in it when needed, clientWidth stays stable.
+  // Chrome 94+, Firefox 97+, Safari 16+.
+  scrollbar-gutter: stable;
+}
+
+.notationMessage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--at-font-mono);
+  font-size: 12px;
+  color: var(--at-muted);
+}
+
+.timeline {
+  margin-top: auto;
+  position: relative;
+  border-top: 1px solid var(--at-line);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--at-surface-alt);
+
+  @include tablet {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+}
+
+.playBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--at-accent);
+  color: var(--at-accent-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.timeLabel {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  flex-shrink: 0;
+}
+
+.scrubber {
+  flex: 1;
+  min-width: 0;
+}
+
+.timelineDivider {
+  width: 1px;
+  height: 18px;
+  background: var(--at-line);
+
+  @include tablet { display: none; }
+}
+
+.volumeLabel {
+  color: var(--at-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-family: var(--at-font-mono);
+
+  @include tablet { display: none; }
+}
+
+.gearBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--at-muted);
+  cursor: pointer;
+
+  &:hover { color: var(--at-ink); }
+}
+
+.gearBtnOpen {
+  border-color: var(--at-accent);
+  background: var(--at-accent-soft);
+  color: var(--at-accent);
+
+  &:hover { color: var(--at-accent); }
+}
+
+.flyoutWrap {
+  position: absolute;
+  bottom: 46px;
+  right: 18px;
+  z-index: 50;
+}
+
+// ─── Phone ──────────────────────────────────────────────────────────
+.mobileCardWrap {
+  position: relative;
+}
+
+.mobileCard {
+  isolation: isolate;
+  background: var(--at-surface);
+  border: 1px solid var(--at-line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--at-shadow-md);
+}
+
+.mobileNotation {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 360px;
+}
+
+.mobilePlayBar {
+  border-top: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobilePlayBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--at-accent);
+  color: var(--at-accent-ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mobileScrubber {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mobileGearBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface);
+  color: var(--at-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &.gearBtnOpen {
+    border-color: var(--at-accent);
+    background: var(--at-accent-soft);
+    color: var(--at-accent);
+  }
+}
+
+// Opens upward from the play bar at the bottom of the card.
+.mobileFlyoutWrap {
+  position: absolute;
+  bottom: 64px;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+}
+
+.mobileFooter {
+  margin-top: 12px;
+}
+
+// ─── Playback preparation ───────────────────────────────────────────
+.playBtnPreparing {
+  position: relative;
+  opacity: 0.55;
+  cursor: progress;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 2px solid transparent;
+    border-top-color: var(--at-accent);
+    border-radius: 50%;
+    animation: play-preparing 900ms linear infinite;
+  }
+}
+
+@keyframes play-preparing {
+  to { transform: rotate(360deg); }
+}
+
+.statusRow {
+  padding: 0 20px 10px;
+  background: var(--at-surface-alt);
+
+  @include tablet {
+    padding: 0 14px 8px;
+  }
+}
+
+.mobileStatusRow {
+  padding: 0 12px 10px;
+  background: var(--at-surface-alt);
+}
