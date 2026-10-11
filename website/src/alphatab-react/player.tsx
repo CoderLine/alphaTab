@@ -13,20 +13,21 @@ import React, {
 import type * as alphaTab from '@coderline/alphatab';
 import { useColorMode } from '@docusaurus/theme-common';
 import { useAlphaTabModule } from './module';
-import { applyAlphaTabSettings, type AlphaTabPreset } from './settings';
+import { applyAlphaTabSettings, applyPlayerDefaults, type AlphaTabPreset } from './settings';
 import { AlphaTabStore, initialAlphaTabState, type AlphaTabState } from './store';
 import { SelectionHandles } from './selection-handles';
 import { registerForSpacebar } from './spacebar-playback';
 
 interface AlphaTabContextValue {
-    state: AlphaTabState;
     store: AlphaTabStore | null;
     api: alphaTab.AlphaTabApi | null;
     setMountElement: (node: HTMLDivElement | null) => void;
     setScrollElement: (node: HTMLDivElement | null) => void;
 }
 
+// Split so that components using only the store or api do not re-render on every state change.
 const AlphaTabContext = createContext<AlphaTabContextValue | null>(null);
+const AlphaTabStateContext = createContext<AlphaTabState | null>(null);
 
 function useAlphaTabContext(): AlphaTabContextValue {
     const ctx = useContext(AlphaTabContext);
@@ -114,12 +115,7 @@ export function AlphaTabPlayer({
             preset: settingsPreset,
         });
         constructed.player.scrollElement = scrollNode;
-        // Without an author-set mode the PlaybackController picks and enables the source.
-        constructed.player.playerMode = module.PlayerMode.Disabled;
-        constructed.display.layoutMode = module.LayoutMode.Page;
-        constructed.player.scrollMode = module.ScrollMode.Off;
-        constructed.player.enableCursor = true;
-        constructed.player.enableElementHighlighting = true;
+        applyPlayerDefaults(module, constructed);
 
         if (file) constructed.core.file = file;
         if (tex) constructed.core.tex = true;
@@ -206,11 +202,15 @@ export function AlphaTabPlayer({
     );
 
     const contextValue = useMemo(
-        () => ({ state, store, api, setMountElement, setScrollElement }),
-        [state, store, api, setMountElement, setScrollElement],
+        () => ({ store, api, setMountElement, setScrollElement }),
+        [store, api, setMountElement, setScrollElement],
     );
 
-    return <AlphaTabContext.Provider value={contextValue}>{children}</AlphaTabContext.Provider>;
+    return (
+        <AlphaTabContext.Provider value={contextValue}>
+            <AlphaTabStateContext.Provider value={state}>{children}</AlphaTabStateContext.Provider>
+        </AlphaTabContext.Provider>
+    );
 }
 
 interface AlphaTabCanvasProps {
@@ -259,8 +259,25 @@ export function AlphaTabScore({ className, withSelectionHandles, ...playerProps 
     );
 }
 
+/** The full player state; the component re-renders on every change, including playback position updates. */
 export function useAlphaTabState(): AlphaTabState {
-    return useAlphaTabContext().state;
+    useAlphaTabContext();
+    return useContext(AlphaTabStateContext)!;
+}
+
+/**
+ * A slice of the player state; the component re-renders only when the selected value changes
+ * (compared with `Object.is`). The selector must return stable references, e.g. `(s) => s.view`.
+ */
+export function useAlphaTabSelector<T>(selector: (state: AlphaTabState) => T): T {
+    const { store } = useAlphaTabContext();
+    const selectorRef = useRef(selector);
+    selectorRef.current = selector;
+    const getSnapshot = useCallback(
+        () => selectorRef.current(store ? store.getSnapshot() : initialAlphaTabState),
+        [store],
+    );
+    return useSyncExternalStore(store ? store.subscribe : noopSubscribe, getSnapshot, getSnapshot);
 }
 
 export function useAlphaTabControls(): AlphaTabStore | null {

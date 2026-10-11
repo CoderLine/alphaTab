@@ -4,8 +4,6 @@ import {
     AlphaTabCanvas,
     useAlphaTabState,
     useAlphaTabControls,
-    type LayoutModeKey,
-    type StaveProfileKey,
 } from '@site/src/alphatab-react';
 import { PlaybackStatusLine } from '@site/src/components/PlaybackSettings';
 import {
@@ -67,17 +65,6 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     const isPhone = useMediaQuery(PHONE_QUERY);
     const [settingsOpen, setSettingsOpen] = React.useState(false);
 
-    const [layoutMode, setLayoutModeLocal] = React.useState<LayoutModeKey>('page');
-    const [staveProfile, setStaveProfileLocal] = React.useState<StaveProfileKey>('scoreTab');
-    const [zoomPct, setZoomPctLocal] = React.useState(100);
-    const [masterVolumePct, setMasterVolumePctLocal] = React.useState(DEFAULT_VOLUME_PCT);
-    const [tempoPct, setTempoPctLocal] = React.useState(100);
-    const [transposeSt, setTransposeStLocal] = React.useState(0);
-    const [countIn, setCountInLocal] = React.useState(false);
-    const [metronome, setMetronomeLocal] = React.useState(false);
-    const [highlightCursor, setHighlightCursorLocal] = React.useState(true);
-    const [loop, setLoopLocal] = React.useState(false);
-
     const gearRef = React.useRef<HTMLButtonElement>(null);
     const flyoutRef = React.useRef<HTMLDivElement>(null);
     const slotRef = React.useRef<HTMLDivElement>(null);
@@ -103,14 +90,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         controls.setMasterVolume(DEFAULT_VOLUME_PCT / 100);
     }, [controls]);
 
-    // Channel transposition lives in the synthesizer instance and is lost when the player is rebuilt.
-    const { playback } = state;
-    React.useEffect(() => {
-        if (playback.effective === 'synthesizer' && playback.isReadyForPlayback && transposeSt !== 0) {
-            controls?.setTransposeAllTracks(transposeSt);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [controls, playback.effective, playback.isReadyForPlayback]);
+    const { playback, view } = state;
 
     React.useEffect(() => {
         if (!settingsOpen) return;
@@ -136,43 +116,37 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     }, [settingsOpen]);
 
     const flyoutState: SettingsFlyoutState = {
-        layoutMode, staveProfile, zoomPct, masterVolumePct, tempoPct,
-        transposeSt, countIn, metronome, highlightCursor, loop,
+        layoutMode: view.layoutMode,
+        staveProfile: view.staveProfile,
+        zoomPct: Math.round(view.scale * 100),
+        masterVolumePct: Math.round(view.masterVolume * 100),
+        tempoPct: Math.round(view.playbackSpeed * 100),
+        transposeSt: view.transpose,
+        countIn: view.countIn,
+        metronome: view.metronome,
+        highlightCursor: view.highlight,
+        loop: view.looping,
         // `to` is exclusive (alphaTab's endTick = start-of-next-bar), so display it as the last-inclusive musical bar without a +1.
         loopHint: state.loopRangeBars ? `m.${state.loopRangeBars.from + 1}–${state.loopRangeBars.to}` : null,
         playback,
     };
 
     const flyoutHandlers: SettingsFlyoutHandlers = {
-        setLayoutMode: (m) => { setLayoutModeLocal(m); controls?.setLayoutMode(m); },
-        setStaveProfile: (p) => { setStaveProfileLocal(p); controls?.setStaveProfile(p); },
-        setZoomPct: (v) => { setZoomPctLocal(v); controls?.setScale(v / 100); },
-        setMasterVolumePct: (v) => { setMasterVolumePctLocal(v); controls?.setMasterVolume(v / 100); },
-        setTempoPct: (v) => { setTempoPctLocal(v); controls?.setPlaybackSpeed(v / 100); },
-        setTransposeSt: (v) => { setTransposeStLocal(v); controls?.setTransposeAllTracks(v); },
-        setCountIn: (b) => { setCountInLocal(b); controls?.setCountInVolume(b ? 1 : 0); },
-        setMetronome: (b) => { setMetronomeLocal(b); controls?.setMetronomeVolume(b ? 1 : 0); },
-        setHighlightCursor: (b) => { setHighlightCursorLocal(b); controls?.setEnableHighlight(b); },
-        setLoop: (b) => {
-            setLoopLocal(b);
-            controls?.setLoopPlayback(b);
-            // Range comes from user drag-select on the score, not this toggle.
-        },
+        setLayoutMode: (m) => controls?.setLayoutMode(m),
+        setStaveProfile: (p) => controls?.setStaveProfile(p),
+        setZoomPct: (v) => controls?.setScale(v / 100),
+        setMasterVolumePct: (v) => controls?.setMasterVolume(v / 100),
+        setTempoPct: (v) => controls?.setPlaybackSpeed(v / 100),
+        setTransposeSt: (v) => controls?.setTransposeAllTracks(v),
+        setCountIn: (b) => controls?.setCountInVolume(b ? 1 : 0),
+        setMetronome: (b) => controls?.setMetronomeVolume(b ? 1 : 0),
+        setHighlightCursor: (b) => controls?.setEnableHighlight(b),
+        // The range itself comes from drag-selecting on the score, not from this toggle.
+        setLoop: (b) => controls?.setLoopPlayback(b),
         onReset: () => {
             if (!controls) return;
             controls.resetSettings();
-            setLayoutModeLocal('page');
-            setStaveProfileLocal('scoreTab');
-            setZoomPctLocal(100);
-            setMasterVolumePctLocal(DEFAULT_VOLUME_PCT);
             controls.setMasterVolume(DEFAULT_VOLUME_PCT / 100);
-            setTempoPctLocal(100);
-            setTransposeStLocal(0);
-            setCountInLocal(false);
-            setMetronomeLocal(false);
-            setHighlightCursorLocal(true);
-            controls.setEnableHighlight(true);
-            setLoopLocal(false);
         },
     };
 
@@ -303,7 +277,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
                                     <span className={styles.timeLabel}>{formatTime(state.endTime)}</span>
                                     <span className={styles.timelineDivider} />
                                     <span className={styles.volumeLabel}>
-                                        <IconVolume size={11} aria-hidden="true" /> {masterVolumePct}
+                                        <IconVolume size={11} aria-hidden="true" /> {flyoutState.masterVolumePct}
                                     </span>
                                     {toolButtons}
                                 </div>

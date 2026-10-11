@@ -43,6 +43,16 @@ export function applyAlphaTabSettings(
     }
 }
 
+/** Player-level defaults every `<AlphaTabPlayer>` starts from, on top of `applyAlphaTabSettings`. */
+export function applyPlayerDefaults(module: AlphaTabModule, settings: Settings): void {
+    // Without an author-set mode the PlaybackController picks and enables the source.
+    settings.player.playerMode = module.PlayerMode.Disabled;
+    settings.display.layoutMode = module.LayoutMode.Page;
+    settings.player.scrollMode = module.ScrollMode.Off;
+    settings.player.enableCursor = true;
+    settings.player.enableElementHighlighting = true;
+}
+
 export function applyTheme(module: AlphaTabModule, settings: Settings, colorMode: ColorMode): void {
     applyThemeColors(module, settings, colorMode);
 }

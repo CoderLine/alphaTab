@@ -6,7 +6,7 @@ import type { ScoreSource, SyncPointSource } from './score-source';
 import { soundFontLibrary } from './soundfont-library';
 import type { SoundFontId } from './soundfont-registry';
 
-export type PlaybackSourceKind = 'synthesizer' | 'backingTrack';
+export type PlaybackSourceKind = 'synthesizer' | 'backingTrack' | 'externalMedia';
 
 export interface PlaybackPreparation {
     kind: 'soundFont' | 'backingTrack';
@@ -113,6 +113,7 @@ export class PlaybackController {
     private loadedFontId: SoundFontId | null = null;
     private pendingTick: number | null = null;
     private playerSubscribed = false;
+    private sourceOverride: PlaybackSourceKind | null = null;
 
     constructor(
         private readonly api: AlphaTabApi,
@@ -144,6 +145,52 @@ export class PlaybackController {
     /** Describes the score that is loaded next. `null` for scores without author configuration. */
     setSource(source: ScoreSource | null): void {
         this.source = source;
+    }
+
+    /**
+     * Forces a source for this instance regardless of the site-wide preference; `null` returns to the
+     * preference. Stays in effect across score loads. Ignored for instances with a fixed source.
+     * `'backingTrack'` falls back to the synthesizer while the score has no backing track.
+     */
+    setSourceOverride(kind: PlaybackSourceKind | null): void {
+        if (this.sourceOverride === kind) return;
+        this.sourceOverride = kind;
+        this.backingTrackFailed = false;
+        this.patch({ notice: null });
+        this.reconcile();
+    }
+
+    /**
+     * Attaches user-provided audio as the backing track of the current score, replacing any existing
+     * one. Sync points are left as they are; without any, alphaTab maps the audio 1:1 to the score tempo.
+     */
+    attachBackingTrack(audio: Uint8Array): void {
+        const score = this.score;
+        if (!score) return;
+        score.backingTrack = new this.module.model.BackingTrack();
+        score.backingTrack.rawAudioFile = audio;
+        this.backingTrackFailed = false;
+        this.patch({ notice: null });
+        if (this.api.actualPlayerMode === this.module.PlayerMode.EnabledBackingTrack) {
+            this.api.loadMidiForScore();
+        }
+        this.reconcile();
+    }
+
+    /** Destroys and recreates the player in its current mode, keeping the position. */
+    rebuildPlayer(): void {
+        const { PlayerMode } = this.module;
+        const mode = this.api.actualPlayerMode;
+        if (mode === PlayerMode.Disabled) return;
+        this.pendingTick = this.api.tickPosition;
+        this.api.pause();
+        this.api.settings.player.playerMode = PlayerMode.Disabled;
+        this.api.updateSettings();
+        this.api.settings.player.playerMode = mode;
+        this.loadedFontId = null;
+        this.api.updateSettings();
+        this.ensurePlayerSubscription();
+        this.refresh();
     }
 
     /** Clears a backing-track failure and tries the preferred source again. */
@@ -217,6 +264,12 @@ export class PlaybackController {
     private resolveTarget(): PlaybackSourceKind | null {
         if (this.options.fixedSource) return this.effectiveSource();
         if (!this.score) return null;
+        if (this.sourceOverride === 'externalMedia' || this.sourceOverride === 'synthesizer') {
+            return this.sourceOverride;
+        }
+        if (this.sourceOverride === 'backingTrack') {
+            return this.hasBackingTrack() && !this.backingTrackFailed ? 'backingTrack' : 'synthesizer';
+        }
         const preference = playbackPreferences.getSnapshot().source;
         if (preference === 'synthesizer' || !this.hasBackingTrack() || this.backingTrackFailed) {
             return 'synthesizer';
@@ -231,6 +284,8 @@ export class PlaybackController {
                 return 'synthesizer';
             case PlayerMode.EnabledBackingTrack:
                 return 'backingTrack';
+            case PlayerMode.EnabledExternalMedia:
+                return 'externalMedia';
             default:
                 return null;
         }
@@ -240,6 +295,9 @@ export class PlaybackController {
     private initialModeFor(score: model.Score): number {
         const { PlayerMode } = this.module;
         const target = this.resolveTarget();
+        if (target === 'externalMedia') {
+            return PlayerMode.EnabledExternalMedia;
+        }
         if (target === 'backingTrack' && score.backingTrack?.rawAudioFile) {
             return PlayerMode.EnabledBackingTrack;
         }
@@ -265,6 +323,8 @@ export class PlaybackController {
             void this.applySynthesizer(generation);
         } else if (target === 'backingTrack') {
             void this.applyBackingTrack(generation);
+        } else if (target === 'externalMedia') {
+            this.applyExternalMedia();
         } else {
             this.patch({ preparing: null });
             this.refresh();
@@ -331,6 +391,15 @@ export class PlaybackController {
         this.refresh();
     }
 
+    private applyExternalMedia(): void {
+        this.patch({ preparing: null });
+        if (!this.options.fixedSource) {
+            this.switchMode('externalMedia');
+        }
+        this.scorePrepared = true;
+        this.refresh();
+    }
+
     /** Fetches audio and sync points, applies the sync points, then attaches the audio. */
     private async attachExternalBackingTrack(score: model.Score): Promise<void> {
         const backingTrack = this.source?.backingTrack;
@@ -361,7 +430,10 @@ export class PlaybackController {
     /** Switches alphaTab to the given source, keeping the position. Returns whether a new player was requested. */
     private switchMode(kind: PlaybackSourceKind): boolean {
         const { PlayerMode } = this.module;
-        const mode = kind === 'synthesizer' ? PlayerMode.EnabledSynthesizer : PlayerMode.EnabledBackingTrack;
+        const mode =
+            kind === 'synthesizer' ? PlayerMode.EnabledSynthesizer :
+            kind === 'backingTrack' ? PlayerMode.EnabledBackingTrack :
+                                      PlayerMode.EnabledExternalMedia;
         if (this.api.actualPlayerMode === mode) {
             this.api.settings.player.playerMode = mode;
             return false;
@@ -391,7 +463,7 @@ export class PlaybackController {
         this.patch({
             effective: this.effectiveSource(),
             hasBackingTrack,
-            canSwitchSource: hasBackingTrack && !this.options.fixedSource,
+            canSwitchSource: hasBackingTrack && !this.options.fixedSource && this.sourceOverride === null,
             isReadyForPlayback:
                 this.api.isReadyForPlayback && (this.options.fixedSource || this.scorePrepared),
         });

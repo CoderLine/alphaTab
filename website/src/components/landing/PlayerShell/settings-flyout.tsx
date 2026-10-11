@@ -46,7 +46,7 @@ interface SettingsFlyoutProps {
 export const SettingsFlyout = React.forwardRef<HTMLDivElement, SettingsFlyoutProps>(
     ({ onClose, state, handlers }, ref) => {
         const { playback } = state;
-        const onBackingTrack = playback.effective === 'backingTrack';
+        const onBackingTrack = playback.effective === 'backingTrack' || playback.effective === 'externalMedia';
         const synthOnly = onBackingTrack ? NOT_WITH_BACKING_TRACK : null;
         return (
         <div ref={ref} className={styles.flyout} role="dialog" aria-label="Player settings">

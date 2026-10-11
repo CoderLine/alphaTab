@@ -21,5 +21,9 @@ export type BackingTrackSource =
 export interface ScoreSource {
     url?: string;
     tex?: string;
+    /** File contents in any format alphaTab imports, e.g. a file the user dropped. */
+    bytes?: Uint8Array;
+    /** Display name of `bytes`, typically the file name. */
+    name?: string;
     backingTrack?: BackingTrackSource;
 }
