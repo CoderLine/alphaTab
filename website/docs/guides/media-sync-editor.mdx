@@ -9,7 +9,7 @@ import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="1.6.0" />
 
-This guide is about the Media Sync Editor we provide as part of our [Playground](/docs/playground/playground.mdx).
+This guide is about the Media Sync Editor we provide as part of our [Playground](/playground).
 
 To use alphaTab together with external media like audio or video backing tracks, it is often needed to somehow synchronize the two parties due to inconsistencies. 
 It is rather rare that the music sheet and the used backing track 100% align in timing. There might be intros, outros slight time differences which need to be accommodated for. 
@@ -17,101 +17,51 @@ It is rather rare that the music sheet and the used backing track 100% align in 
 The Media Sync Editor provides an online editor for exactly this task. You can load your music sheet and your backing track. The editor then offers features to eliminate potential
 differences of the two. 
 
-Before we go into the details, first an overview on the general features and recommendations.
+<img src="/img/guides/media-sync-editor/overview.png" alt="The Playground with the Media Sync Editor open below the notation: the toolbar, the audio waveform and the sync point markers" />
 
-<img src="/img/guides/media-sync-editor/overview.png" alt="Overview" />
+## The editor
 
+Open the Playground, load your file (via **Open file** or by dropping it onto the page) and click **Media sync** in the header. The editor opens as a drawer below the notation; drag its top edge to resize it. Closing and reopening the drawer keeps your sync points, undo history and zoom until you open a different file.
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+### Source
 
-<Tabs
-  defaultValue="1"
-  values={[
-    { label: '(1)', value: '1', },
-    { label: '(2)', value: '2', },
-    { label: '(3)', value: '3', },
-    { label: '(4)', value: '4', },
-    { label: '(5)', value: '5', },
-    { label: '(6)', value: '6', },
-    { label: '(7)', value: '7', },
-    { label: '(8)', value: '8', },
-    { label: '(9)', value: '9', },
-  ]
-}>
-<TabItem value="1">
-**(1) Media Sync Editor**
+The **Synth / Audio / YouTube** switch selects what the notation plays with and is synchronized to:
 
-The Media Sync Editor can be accessed on the bottom right side of the playground. When clicking on the button the editor toggles.
-Closing the editor will reset the editor but most relevant information is generally remembered within the playground. Re-Opening
-the editor after closing should show again the correct details, but aspects like zoom or undo/redo are reset. 
-</TabItem>
-<TabItem value="2">
-**(2) Player Mode**
+* **Synth** plays the notation with the built-in synthesizer. There is nothing to synchronize.
+* **Audio** plays the file's backing track. Files that bring their own audio (Guitar Pro 8 files with an audio track) use it directly; for any other file, load a local audio file with the upload button next to the switch.
+* **YouTube** plays a YouTube video next to the notation. Paste the link of the video; it plays in YouTube's privacy-enhanced embed.
 
-This area allows to change the player mode within the playground to synchronize the song. 
+If the file has no sync points yet, the editor creates an initial set as soon as the media is ready (see [Synchronizing Songs](#synchronizing-songs)).
 
-* **Synthesizer** enables again the use of the built-in synthesizer for playback. 
-* **Audio Track** enables loading of a local audio (or video) file from which the raw audio will be used. 
-* **YouTube Video** enables loading a YouTube Video. 
+### Timeline
 
-You can switch between the modes and any sync points are remembered in the playground.
-</TabItem>
-<TabItem value="3">
-**(3) Sync Point Actions**
+The timeline shows the media's time axis with the playback position as a red line. For audio it also shows the waveform, which makes it easy to spot where bars start. YouTube does not give access to the raw audio, so there is no waveform for videos.
 
-This menu provides some handy actions for sync points. 
+The markers on the timeline are the positions alphaTab can synchronize:
 
-</TabItem>
-<TabItem value="4">
-**(4) Zoom**
+* **Bar markers** (taller ticks, labelled with the bar number) sit at the start of every played bar. With repeats, every repetition of a bar has its own marker.
+* **Beat markers** (short ticks) sit on every beat of the time signature. They are hidden when you zoom out far.
+* **Sync points** are markers that are pinned to a media time. They are drawn as full-height lines with their bar number. All other markers are placed automatically between the sync points, following the tempo of the notation.
 
-To align the song precisely it is often required to zoom deeper into the audio. With this zoom level the time axis
-of the editor is stretched or condensed for more precise sync point editing. 
+The first and last marker are always sync points.
 
-</TabItem>
-<TabItem value="5">
-**(5) Undo**
+### Editing sync points
 
-The editor will remember individual edits done to the sync points. You can undo/redo those changes in case you made a mistake. 
+* **Drag** a marker to the spot in the media where it is played. Dragging any marker turns it into a sync point. A sync point cannot be moved past its neighbouring sync points.
+* **Double-click** a marker (or press <kbd>Enter</kbd>) to add or remove a sync point.
+* **Click** the timeline or a marker to seek the media there.
+* With a marker focused, <kbd>←</kbd>/<kbd>→</kbd> select the previous or next marker, <kbd>Shift</kbd>+<kbd>←</kbd>/<kbd>→</kbd> jump between sync points, and <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd> move the selected marker by 10 ms (100 ms with <kbd>Shift</kbd>).
+* **Undo/redo** (<kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>) step through your edits.
+* **Auto sync** replaces all sync points with the initial set again; the reset button removes all of them, so the media plays 1:1 with the tempo of the notation.
+* Zoom with the zoom buttons, fit the whole media into view, or hold <kbd>Ctrl</kbd> while using the mouse wheel.
 
-</TabItem>
-<TabItem value="6">
-**(6) Export**
+### Export
 
-Once you have synced the file, you can use these export actions to download your synced file. You can either export
-a Guitar Pro 8 file or generate some custom source code to add to your project for enabling the synchronization as configured. 
+The **Export** menu of the editor offers:
 
-</TabItem>
-<TabItem value="7">
-**(7) Waveform**
-
-When you load a local audio or video file, the editor will show a visual waveform in the central space. This is very useful to identify 
-spots in the audio where sync points should be placed. Unfortunately YouTube doesn't allow access to the raw media. That's why the waveform will be empty in this case. 
-
-</TabItem>
-<TabItem value="8">
-**(8) Masterbar / Measure Sync Points**
-
-These are the main sync points for masterbars (aka. measures). The main synchronization happens on a bar level. Sync points can be active or inactive. 
-
-If they are active they have a dark blue arrow-head and show a BPM value beside it. Active sync points can be dragged to the right spot in the audio where the related bar is expected to be played.
-To activate or deactivate any sync point doubleclick it and it will be toggled. 
-
-Inactive markers are placed automatically according to the time axis and BPM of the song. They are having light blue arrow heads.
-
-If there are repeats or jumps in the song the repeat counter is shown in parenthesis behind the bar number above the arrow head. For the first occurence no repeat number is shown. 
-
-</TabItem>
-<TabItem value="9">
-**(9) Time Signature Sync Points**
-
-While the internals of alphaTab support any dynamic placement of sync points, the editor provides only the option to add additional sync points following the time signature. 
-
-e.g. on a 4/4 time signature, you will notice additional three dashed lines marking the individual metronome ticks of the bar. These sync point markers can be activated with a doubleclick like masterbar sync points.
-</TabItem>
-</Tabs>
-
+* **Synced Guitar Pro file** (audio only): a Guitar Pro file with the audio and the sync points embedded. alphaTab plays it with the backing track without any further code.
+* **Sync point code**: the sync points as TypeScript, C#, Kotlin or alphaTex, with an example of how to apply them in your app (see [Sync points at runtime](/docs/features/play-sync/sync-points-at-runtime)).
+* **Write into alphaTex** (alphaTex files only): replaces the `\sync` lines of the alphaTex in the editor with the current sync points, so they are part of the source and of shared Playground links.
 
 ## Synchronizing Songs
 
@@ -167,4 +117,4 @@ The general recommendation to place markers correctly is:
 Repeat this for all markers until things match up. Then continue with any fine-tuning on time signature marker level if required. 
 
 > [!TIP]
-> You can change the playback speed in the **Settings** panel if songs are too fast.
+> You can lower the playback speed with **Tempo** in the **Settings** panel if songs are too fast.
