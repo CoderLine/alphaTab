@@ -2,6 +2,8 @@ import * as Riffs from '@site/src/tex-riffs';
 import type { ScoreSource } from '@site/src/alphatab-react';
 
 export interface DemoFile {
+    /** Stable identifier, used in Playground links (`/playground?file=<id>`). */
+    id: string;
     label: string;
     ext: string;
     trackColor: string;
@@ -10,12 +12,14 @@ export interface DemoFile {
 
 export const DEMO_FILES: DemoFile[] = [
     {
+        id: 'canon-ensemble',
         label: 'canon-ensemble.gp',
         ext: 'gp',
         trackColor: 'var(--at-accent)',
         source: { url: '/files/pachelbel-canon-ensemble.gp' },
     },
     {
+        id: 'bach-prelude-recording',
         label: 'prelude-recording.alphatex',
         ext: 'tex',
         trackColor: 'var(--at-track-indigo)',
@@ -30,6 +34,7 @@ export const DEMO_FILES: DemoFile[] = [
         },
     },
     {
+        id: 'bach-prelude',
         label: 'prelude.musicxml',
         ext: 'mxl',
         trackColor: 'var(--at-track-purple)',
@@ -37,12 +42,14 @@ export const DEMO_FILES: DemoFile[] = [
         source: { url: '/files/Bach_Prelude_BWV999.gp' },
     },
     {
+        id: 'bach-prelude-c',
         label: 'prelude.alphatex',
         ext: 'tex',
         trackColor: 'var(--at-track-green)',
         source: { tex: Riffs.BACH_PRELUDE_C_LONG },
     },
     {
+        id: 'drums',
         label: 'etude.capx',
         ext: 'capx',
         trackColor: 'var(--at-track-orange)',

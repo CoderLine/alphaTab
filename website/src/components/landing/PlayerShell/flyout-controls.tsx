@@ -38,6 +38,14 @@ interface SliderProps {
   label?: string;
   /** Reason the control currently has no effect; disables it and is shown as tooltip. */
   disabledReason?: string | null;
+  /** Formats the value label; defaults to the value with `unit`. */
+  format?: (v: number) => string;
+}
+
+function decimalsOf(step: number): number {
+  const text = String(step);
+  const dot = text.indexOf('.');
+  return dot < 0 ? 0 : text.length - dot - 1;
 }
 
 export const Slider: React.FC<SliderProps> = ({
@@ -50,12 +58,21 @@ export const Slider: React.FC<SliderProps> = ({
   bipolar = false,
   label,
   disabledReason,
+  format,
 }) => {
   const disabled = !!disabledReason;
   const trackRef = React.useRef<HTMLDivElement>(null);
   const [drag, setDrag] = React.useState(false);
   const range = max - min;
-  const pct = ((value - min) / range) * 100;
+  const pct = Math.min(Math.max(((value - min) / range) * 100, 0), 100);
+  const decimals = decimalsOf(step);
+  const commit = React.useCallback(
+    (raw: number) => {
+      const stepped = Number((Math.round((raw - min) / step) * step + min).toFixed(decimals));
+      onChange(Math.min(Math.max(stepped, min), max));
+    },
+    [min, max, step, decimals, onChange],
+  );
 
   const seek = React.useCallback(
     (clientX: number) => {
@@ -63,12 +80,26 @@ export const Slider: React.FC<SliderProps> = ({
       if (!node) return;
       const r = node.getBoundingClientRect();
       const x = Math.min(Math.max(clientX - r.left, 0), r.width);
-      const raw = min + (x / r.width) * range;
-      const stepped = Math.round(raw / step) * step;
-      onChange(Math.min(Math.max(stepped, min), max));
+      commit(min + (x / r.width) * range);
     },
-    [min, max, range, step, onChange],
+    [min, range, commit],
   );
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+    const big = Math.max(step, range / 10);
+    const next =
+      e.key === 'ArrowRight' || e.key === 'ArrowUp' ? value + step :
+      e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? value - step :
+      e.key === 'PageUp' ? value + big :
+      e.key === 'PageDown' ? value - big :
+      e.key === 'Home' ? min :
+      e.key === 'End' ? max :
+      null;
+    if (next === null) return;
+    e.preventDefault();
+    commit(next);
+  };
 
   React.useEffect(() => {
     if (!drag || disabled) return;
@@ -82,7 +113,8 @@ export const Slider: React.FC<SliderProps> = ({
     };
   }, [drag, disabled, seek]);
 
-  const labelVal = bipolar && value > 0 ? `+${value}${unit}` : `${value}${unit}`;
+  const shown = value.toFixed(decimals);
+  const labelVal = format ? format(value) : bipolar && value > 0 ? `+${shown}${unit}` : `${shown}${unit}`;
 
   return (
     <div className={clsx(styles.slider, disabled && styles.disabled)} title={disabledReason ?? undefined}>
@@ -93,11 +125,15 @@ export const Slider: React.FC<SliderProps> = ({
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
+        aria-valuetext={labelVal}
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : 0}
         className={styles.sliderTrack}
+        onKeyDown={onKeyDown}
         onPointerDown={(e) => {
           if (disabled) return;
+          e.preventDefault();
+          (e.currentTarget as HTMLElement).focus();
           setDrag(true);
           seek(e.clientX);
         }}

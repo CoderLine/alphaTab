@@ -25,21 +25,9 @@ export function openInputFile(api: alphaTab.AlphaTabApi) {
 };
 
 
-export function downloadFile(api: alphaTab.AlphaTabApi) {
-  const exporter = new alphaTab.exporter.Gp7Exporter();
-  const score = api.score!;
-  const data = exporter.export(score, api.settings);
-  const a = document.createElement('a');
-  a.download = score.title.length > 0 ? `${score.title.trim()}.gp` : 'Untitled.gp';
-  a.href = URL.createObjectURL(new Blob([data], { type: 'application/gp' }));
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-
 const iOSPlatforms = new Set(['iPhone', 'iPad', 'iPod']);
-function isIOS() {
+/** iOS file pickers grey out files whose type they do not know, so `accept` filters must be skipped there. */
+export function isIOS() {
   // Tested: 
   // - iPad Pro 12.9 - iOS 12 (navigator.platform = "iPad")
   // - iPad Pro 11 2020 - iOS 13 (navigator.platform = "iPad")

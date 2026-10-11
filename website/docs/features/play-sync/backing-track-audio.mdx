@@ -23,7 +23,7 @@ A student learning a song wants to play along with the studio recording — not 
 The backing-track pipeline expects three things on the score:
 
 - **`score.backingTrack.rawAudioFile`** — the audio bytes as a `Uint8Array`. OGG Vorbis and MP3 are the safe formats across browsers.
-- **Sync points on `MasterBar.syncPoints`** — automations of type `SyncPoint` that anchor bar positions to audio timestamps. Guitar Pro 8 files ship these; for other formats generate them with the [Media Sync Editor](/docs/playground/playground) or [set them at runtime](sync-points-at-runtime).
+- **Sync points on `MasterBar.syncPoints`** — automations of type `SyncPoint` that anchor bar positions to audio timestamps. Guitar Pro 8 files ship these; for other formats generate them with the [Media Sync Editor](/playground) or [set them at runtime](sync-points-at-runtime).
 - **`player.playerMode` set to `EnabledBackingTrack` or `EnabledAutomatic`** — `Automatic` picks the backing track when one is present and falls back to the synth otherwise.
 
 On the web, playback is driven by `AudioElementBackingTrackSynthOutput`, which owns a hidden `<audio>` element sourced from a blob URL of the raw audio.
@@ -67,5 +67,5 @@ api.scoreLoaded.on((score) => {
 - [Video sync](video-sync) — the same pattern with an HTML5 video element or a YouTube iframe.
 - [Sync points at runtime](sync-points-at-runtime) — building and updating the sync-point list programmatically.
 - [The MIDI event stream](midi-event-stream) — even in backing-track mode, alphaTab still emits the score's MIDI events for tracking.
-- [Media Sync Editor](/docs/playground/playground) — the interactive tool for creating sync points against a waveform.
+- [Media Sync Editor](/playground) — the interactive tool for creating sync points against a waveform.
 - [`PlayerMode`](/docs/reference/settings/player/playermode) and [`BackingTrack`](/docs/reference/types/model/backingtrack) in the reference.

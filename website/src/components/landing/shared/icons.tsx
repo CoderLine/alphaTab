@@ -164,3 +164,160 @@ export const IconWaveform: React.FC<IconProps> = (p) => (
     <path d="M3 10v4M7 6v12M11 3v18M15 7v10M19 10v4" />
   </svg>
 );
+
+export const IconStop: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'currentColor', false, p)}>
+    <rect x="6" y="6" width="12" height="12" rx="1.5" />
+  </svg>
+);
+
+export const IconUpload: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+  </svg>
+);
+
+export const IconDownload: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+  </svg>
+);
+
+export const IconLink: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+
+export const IconUndo: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M3 7v6h6" />
+    <path d="M21 17a9 9 0 0 0-15-6.7L3 13" />
+  </svg>
+);
+
+export const IconRedo: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M21 7v6h-6" />
+    <path d="M3 17a9 9 0 0 1 15-6.7L21 13" />
+  </svg>
+);
+
+export const IconZoomIn: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3M11 8v6M8 11h6" />
+  </svg>
+);
+
+export const IconZoomOut: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3M8 11h6" />
+  </svg>
+);
+
+export const IconFit: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M3 12h18M7 8l-4 4 4 4M17 8l4 4-4 4" />
+  </svg>
+);
+
+export const IconTracks: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M4 6h10M4 12h16M4 18h7" />
+    <circle cx="18" cy="6" r="2" />
+    <circle cx="15" cy="18" r="2" />
+  </svg>
+);
+
+export const IconSliders: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" />
+  </svg>
+);
+
+export const IconPanelLeft: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M9 3v18" />
+  </svg>
+);
+
+export const IconRepeat: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="m17 2 4 4-4 4" />
+    <path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4" />
+    <path d="M21 13v1a4 4 0 0 1-4 4H3" />
+  </svg>
+);
+
+export const IconMetronome: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M9 3h6l4 18H5z" />
+    <path d="M12 15 17 6M8 15h8" />
+  </svg>
+);
+
+export const IconCountIn: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <circle cx="12" cy="13" r="8" />
+    <path d="M12 9v4l2 2M10 2h4" />
+  </svg>
+);
+
+export const IconVolumeMute: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M11 5 6 9H3v6h3l5 4z" />
+    <path d="m22 9-6 6M16 9l6 6" />
+  </svg>
+);
+
+export const IconEye: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+export const IconEyeOff: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22" />
+    <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24" />
+  </svg>
+);
+
+export const IconYoutube: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <rect x="2" y="5" width="20" height="14" rx="4" />
+    <path d="m10 9 5 3-5 3z" />
+  </svg>
+);
+
+export const IconWand: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="m15 4-11 11 5 5 11-11zM14 5l5 5" />
+    <path d="M19 2v2M21 3h-2M5 3v2M6 4H4" />
+  </svg>
+);
+
+export const IconReset: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+    <path d="M3 3v5h5" />
+  </svg>
+);
+
+export const IconChevronDown: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(12, 'none', true, p)}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+export const IconPrinter: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+    <rect x="6" y="14" width="12" height="8" />
+  </svg>
+);

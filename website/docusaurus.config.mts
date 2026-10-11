@@ -433,8 +433,7 @@ async function createConfig(): Promise<Config> {
           className: "navbar-link-secondary",
         },
         {
-          type: "doc",
-          docId: "playground/playground",
+          to: "/playground",
           position: "left",
           label: "Playground",
         },
@@ -495,7 +494,7 @@ async function createConfig(): Promise<Config> {
             { label: "Tutorial", to: "/docs/tutorials" },
             { label: "alphaTex", to: "/docs/alphatex/introduction" },
             { label: "Features", to: "/docs/features/" },
-            { label: "Playground", to: "/docs/playground/playground" },
+            { label: "Playground", to: "/playground" },
           ],
         },
         {
@@ -551,6 +550,7 @@ async function createConfig(): Promise<Config> {
         // each old slug to the closest new page. See docs/features/render/
         // for the destinations.
         redirects: [
+          { from: ["/docs/playground/playground", "/docs/playground"], to: "/playground" },
           { from: "/docs/showcase/introduction", to: "/docs/features/" },
           {
             from: "/docs/showcase/general",
