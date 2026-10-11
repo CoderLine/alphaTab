@@ -2,6 +2,24 @@
 // existing markup. Hybrid approach: pure CSS overrides, no swizzles unless
 // CSS can't reach the bit we need.
 
+// Square icon-only search trigger, sized to match the neighbouring icon buttons.
+@mixin search-icon-only {
+  .DocSearch-Button {
+    min-width: 0;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+
+    .DocSearch-Button-Container { height: auto; }
+
+    .DocSearch-Button-Placeholder,
+    .DocSearch-Button-Keys {
+      display: none;
+    }
+  }
+}
+
 // ─── Navbar ──────────────────────────────────────────────────────────
 .navbar {
   --ifm-navbar-background-color: var(--at-surface);
@@ -124,17 +142,22 @@
 
     .navbar__items--right {
       gap: 6px;
+      @include search-icon-only;
+    }
+  }
 
-      // Shrink the search button to an icon-only pill
-      .DocSearch-Button {
-        min-width: 0;
-        padding: 6px 8px;
+  @media (max-width: 996px) {
+    .navbar__items--right {
+      gap: 4px;
+      @include search-icon-only;
 
-        .DocSearch-Button-Placeholder,
-        .DocSearch-Button-Keys {
-          display: none;
-        }
-      }
+      // Infima moves .navbar__item entries into the drawer at this width; the
+      // right-group `display: flex` above would otherwise keep them in the bar.
+      .navbar__item { display: none; }
+
+      // Docusaurus pins the search container absolutely here, which overlaps
+      // the custom items that stay in the bar.
+      > :has(> .DocSearch-Button) { position: static; }
     }
   }
 }
