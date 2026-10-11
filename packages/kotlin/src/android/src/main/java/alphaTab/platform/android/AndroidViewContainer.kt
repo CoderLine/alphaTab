@@ -74,7 +74,7 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
     }
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-        when (event.action) {
+        when (event.actionMasked) {
             MotionEvent.ACTION_MOVE -> {
                 if (_isLongDown) {
                     val args = AndroidMouseEventArgs(event)
@@ -82,7 +82,7 @@ internal class AndroidViewContainer : GestureDetector.SimpleOnGestureListener, I
                 }
             }
 
-            MotionEvent.ACTION_UP -> {
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 _horizontalScrollView!!.isUserScrollingEnabled = true
                 _verticalScrollView!!.isUserScrollingEnabled = true
 

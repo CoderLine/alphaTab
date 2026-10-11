@@ -75,11 +75,18 @@ export interface IContainer {
 
     /**
      * This event occurs when a mouse/finger moves on top of the control.
+     *
+     * @remarks
+     * While a press started on this control is active, moves are reported even if they happen outside the control.
      */
     mouseMove: IEventEmitterOfT<IMouseEventArgs>;
 
     /**
      * This event occurs when a mouse/finger is released from the control.
+     *
+     * @remarks
+     * Every press started on this control ends with exactly one mouseUp, also when the release happens
+     * outside the control or the gesture is cancelled by the system.
      */
     mouseUp: IEventEmitterOfT<IMouseEventArgs>;
 }
