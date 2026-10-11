@@ -1,7 +1,6 @@
-import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { OverflowError, type IReadable } from '@coderline/alphatab/io/IReadable';
-import { Inflate } from '@coderline/alphatab/zip/Inflate';
+import { Inflater } from '@coderline/alphatab/zip/Inflater';
 import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 
 /**
@@ -10,10 +9,12 @@ import { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 export class ZipReader {
     private _readable: IReadable;
     private _maxDecodingBufferSize: number;
+    private _inflater: Inflater;
 
     public constructor(readable: IReadable, maxDecodingBufferSize: number) {
         this._readable = readable;
         this._maxDecodingBufferSize = maxDecodingBufferSize;
+        this._inflater = new Inflater(readable);
     }
 
     public read(): ZipEntry[] {
@@ -66,22 +67,13 @@ export class ZipReader {
         // 4.3.8 File Data
         let data: Uint8Array;
         if (compressed) {
-            const target: ByteBuffer = ByteBuffer.empty();
-            const z: Inflate = new Inflate(this._readable);
-            const buffer: Uint8Array = new Uint8Array(65536);
-            while (true) {
-                const bytes: number = z.readBytes(buffer, 0, buffer.length);
-                target.write(buffer, 0, bytes);
-                if (target.length > this._maxDecodingBufferSize) {
-                    throw new OverflowError(
-                        `Zip entry "${fname}" contains data exceeding the configured maxDecodingBufferSize`
-                    );
-                }
-                if (bytes < buffer.length) {
-                    break;
-                }
+            const inflated = this._inflater.inflate(uncompressedSize, this._maxDecodingBufferSize);
+            if (!inflated) {
+                throw new OverflowError(
+                    `Zip entry "${fname}" contains data exceeding the configured maxDecodingBufferSize`
+                );
             }
-            data = target.toArray();
+            data = inflated;
         } else {
             data = IOHelper.readByteArray(this._readable, uncompressedSize);
         }

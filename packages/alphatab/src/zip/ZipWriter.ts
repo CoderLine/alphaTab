@@ -1,4 +1,3 @@
-import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
 import { Crc32 } from '@coderline/alphatab/zip/Crc32';
@@ -46,15 +45,16 @@ export class ZipWriter {
         // 4.3.7 local file header
         const compressionMode = ZipEntry.CompressionMethodDeflate;
 
-        const compressedData = ByteBuffer.empty();
-        const crc32 = this._compress(compressedData, entry.data, compressionMode);
-        const compressedDataArray = compressedData.toArray();
+        const crc = new Crc32();
+        crc.update(entry.data, 0, entry.data.length);
+        const crc32 = crc.value;
+        const compressedDataArray = this._deflater.deflate(entry.data);
         const directoryHeader = new ZipCentralDirectoryHeader(
             entry,
             crc32,
             this._data.bytesWritten,
             compressionMode,
-            compressedData.length
+            compressedDataArray.length
         );
         this._centralDirectoryHeaders.push(directoryHeader);
 
@@ -88,43 +88,6 @@ export class ZipWriter {
 
         // 4.3.8 File Data
         this._data.write(compressedDataArray, 0, compressedDataArray.length);
-    }
-
-    private _compress(output: IWriteable, data: Uint8Array, compressionMode: number): number {
-        if (compressionMode !== ZipEntry.CompressionMethodDeflate) {
-            const crc = new Crc32();
-            crc.update(data, 0, data.length);
-            output.write(data, 0, data.length);
-            return crc.value;
-        }
-        const buffer: Uint8Array = new Uint8Array(512);
-
-        // init deflater
-        this._deflater.reset();
-
-        // write data
-        this._deflater.setInput(data, 0, data.length);
-        while (!this._deflater.isNeedingInput) {
-            const len = this._deflater.deflate(buffer, 0, buffer.length);
-            if (len <= 0) {
-                break;
-            }
-
-            output.write(buffer, 0, len);
-        }
-
-        // let deflater finish up
-        this._deflater.finish();
-        while (!this._deflater.isFinished) {
-            const len = this._deflater.deflate(buffer, 0, buffer.length);
-            if (len <= 0) {
-                break;
-            }
-
-            output.write(buffer, 0, len);
-        }
-
-        return this._deflater.inputCrc;
     }
 
     public end() {

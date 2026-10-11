@@ -10,8 +10,7 @@ import type { IReadable } from '@coderline/alphatab/io/IReadable';
 import { TypeConversions } from '@coderline/alphatab/io/TypeConversions';
 
 import { FormatError } from '@coderline/alphatab/FormatError';
-import { VorbisFile } from '@coderline/alphatab/synth/vorbis/VorbisFile';
-import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { VorbisDecoder } from '@coderline/alphatab/synth/vorbis/VorbisDecoder';
 
 /**
  * @internal
@@ -30,24 +29,25 @@ export class Hydra {
     public sampleData: Uint8Array = new Uint8Array(0);
 
     private _sampleCache: Map<string, Float32Array> = new Map<string, Float32Array>();
+    private _vorbis: VorbisDecoder = new VorbisDecoder();
 
     public decodeSamples(startByte: number, endByte: number, decompressVorbis: boolean): Float32Array {
         const key = `${startByte}_${endByte}_${decompressVorbis}`;
         if (!this._sampleCache.has(key)) {
             let samples: Float32Array;
-            const sampleBytes = this.sampleData.slice(
-                // The DWORD dwStart contains the index, in sample data points, from the beginning of the sample data
-                // field to the first data point of this sample
-                startByte,
-                // The DWORD dwEnd contains the index, in sample data points, from the beginning of the sample data
-                // field to the first of the set of 46 zero valued data points following this sample.
-                endByte
-            );
-
             if (decompressVorbis) {
-                const vorbis = new VorbisFile(ByteBuffer.fromBuffer(sampleBytes));
-                samples = vorbis.streams[0].samples;
+                // SF3: the sample header holds the byte range of the Ogg Vorbis stream
+                samples = this._vorbis.decode(this.sampleData, startByte, endByte - startByte).samples;
             } else {
+                const sampleBytes = this.sampleData.slice(
+                    // The DWORD dwStart contains the index, in sample data points, from the beginning of the sample data
+                    // field to the first data point of this sample
+                    startByte,
+                    // The DWORD dwEnd contains the index, in sample data points, from the beginning of the sample data
+                    // field to the first of the set of 46 zero valued data points following this sample.
+                    endByte
+                );
+
                 // 6.1 Sample Data Format in the smpl Sub-chunk
                 // The smpl sub-chunk, if present, contains one or more "samples" of digital audio information in the form
                 // of linearly coded sixteen bit, signed, little endian (least significant byte first) words.
