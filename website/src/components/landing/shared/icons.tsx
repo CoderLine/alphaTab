@@ -133,6 +133,18 @@ export const IconClose: React.FC<IconProps> = (p) => (
   </svg>
 );
 
+export const IconMaximize: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, p)}>
+    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+  </svg>
+);
+
+export const IconMinimize: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(14, 'none', true, p)}>
+    <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" />
+  </svg>
+);
+
 export const IconInfo: React.FC<IconProps> = (p) => (
   <svg {...iconBase(16, 'none', true, p)}>
     <circle cx="12" cy="12" r="10" />

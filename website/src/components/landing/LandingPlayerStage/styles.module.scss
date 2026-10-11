@@ -9,6 +9,57 @@
   @include mobile { display: none; }
 }
 
+// Geometry is animated from the in-page box by use-maximize.ts; these are the resting values.
+.stageMaximized {
+  position: fixed;
+  top: 0;
+  left: 0;
+  // Spans the scrollbar gutter that use-maximize.ts keeps reserved while page scroll is locked.
+  width: 100vw;
+  height: 100%;
+  z-index: calc(var(--ifm-z-index-fixed) + 1);
+  padding: 20px;
+  background: var(--at-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  @include mobile { padding: 8px; }
+
+  .desktopOnly,
+  .mobileOnly {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .frame,
+  .mobileCard {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .sidebar { overflow-y: auto; }
+
+  .notationArea { min-height: 0; }
+
+  .mobileCard {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mobileNotation {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+  }
+
+  .mobileScoreCard { display: none; }
+
+  .mobileFlyoutWrap { bottom: 72px; }
+}
+
 .mobileOnly {
   position: relative;
   display: none;

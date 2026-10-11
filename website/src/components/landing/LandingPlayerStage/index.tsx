@@ -21,10 +21,13 @@ import {
     IconCaret,
     IconExternalLink,
     IconWaveform,
+    IconMaximize,
+    IconMinimize,
 } from '../shared/icons';
 import { Scrubber } from './scrubber';
 import { SettingsFlyout, type SettingsFlyoutState, type SettingsFlyoutHandlers } from './settings-flyout';
 import { DEMO_FILES } from './demo-files';
+import { useMaximize } from './use-maximize';
 import styles from './styles.module.scss';
 
 const DEFAULT_VOLUME_PCT = 80;
@@ -124,6 +127,23 @@ const LandingPlayerStageInner: React.FC = () => {
     const flyoutRef = React.useRef<HTMLDivElement>(null);
     const mobileGearRef = React.useRef<HTMLButtonElement>(null);
     const mobileFlyoutRef = React.useRef<HTMLDivElement>(null);
+    const slotRef = React.useRef<HTMLDivElement>(null);
+    const stageRef = React.useRef<HTMLDivElement>(null);
+
+    const maximize = useMaximize({
+        slotRef,
+        stageRef,
+        getCanvas: () => stageRef.current?.querySelector<HTMLElement>(`.${styles.notationCanvas}`) ?? null,
+    });
+
+    React.useEffect(() => {
+        if (!maximize.isMaximized || settingsOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') maximize.collapse();
+        };
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [maximize.isMaximized, maximize.collapse, settingsOpen]);
 
     React.useEffect(() => {
         if (!controls) return;
@@ -242,8 +262,14 @@ const LandingPlayerStageInner: React.FC = () => {
     const endTimeLabel = formatTime(state.endTime);
     const totalBarsForScrubber = state.totalBars > 0 ? state.totalBars : 64;
 
+    const maximizeLabel = maximize.isMaximized ? 'Exit full page' : 'Maximize player';
+    const maximizeIcon = maximize.isMaximized
+        ? <IconMinimize size={14} aria-hidden="true" />
+        : <IconMaximize size={14} aria-hidden="true" />;
+
     return (
-        <div className={styles.stage}>
+        <div ref={slotRef}>
+        <div ref={stageRef} className={clsx(styles.stage, maximize.isMaximized && styles.stageMaximized)}>
             {!isMobile && (
             <div className={styles.desktopOnly}>
                 <div className={styles.fileTabRow}>
@@ -394,6 +420,15 @@ const LandingPlayerStageInner: React.FC = () => {
                             >
                                 <IconSettings size={14} aria-hidden="true" />
                             </button>
+                            <button
+                                type="button"
+                                onClick={maximize.toggle}
+                                className={styles.gearBtn}
+                                aria-label={maximizeLabel}
+                                title={maximizeLabel}
+                            >
+                                {maximizeIcon}
+                            </button>
                         </div>
                         <PlaybackStatusLine
                             playback={playback}
@@ -496,6 +531,15 @@ const LandingPlayerStageInner: React.FC = () => {
                         >
                             <IconSettings size={14} aria-hidden="true" />
                         </button>
+                        <button
+                            type="button"
+                            onClick={maximize.toggle}
+                            className={styles.mobileGearBtn}
+                            aria-label={maximizeLabel}
+                            title={maximizeLabel}
+                        >
+                            {maximizeIcon}
+                        </button>
                     </div>
                     <PlaybackStatusLine
                         playback={playback}
@@ -537,6 +581,7 @@ const LandingPlayerStageInner: React.FC = () => {
                 )}
             </div>
             )}
+        </div>
         </div>
     );
 };
