@@ -1,6 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
-import type { model } from '@coderline/alphatab';
 import {
   AlphaTabPlayer,
   useAlphaTabState,
@@ -9,11 +7,13 @@ import {
   type TexLoadResult,
 } from '@site/src/alphatab-react';
 import { AlphaTexEditor, useNearViewport, type AlphaTexEditorHandle } from '@site/src/components/AlphaTexEditor';
+import { RenderStatus, describeScore } from '@site/src/components/AlphaTexEditor/render-status';
 import { SectionHeader } from '../section-header';
 import { Btn } from '../shared/btn';
 import { IconExternalLink, IconFileMusic } from '../shared/icons';
 import { NOT_DESKTOP_QUERY, useMediaQuery } from '../shared/use-media-query';
 import { PlayerShell, PlayerTab } from '../PlayerShell';
+import { usePlaygroundLink } from '@site/src/components/Playground/open-in-playground';
 import { PRESETS, type AlphaTexPreset } from './presets';
 import styles from './styles.module.scss';
 
@@ -21,6 +21,27 @@ const RENDER_DELAY_MS = 250;
 
 export const LandingPlayground: React.FC = () => {
   const [frameRef, nearViewport] = useNearViewport<HTMLDivElement>();
+  const [preset, setPreset] = useState<AlphaTexPreset>(PRESETS[0]);
+  const [text, setText] = useState(preset.tex);
+  const selectPreset = (next: AlphaTexPreset) => {
+    setPreset(next);
+    setText(next.tex);
+  };
+  // Unedited presets get a short link; edited text travels compressed in the URL.
+  const playgroundTarget = text === preset.tex ? { sample: `tex-${preset.id}` } : { tex: text };
+  const playgroundLink = usePlaygroundLink(playgroundTarget, { sample: `tex-${preset.id}` });
+  const openPlayground = (fullWidth: boolean, small: boolean) => (
+    <Btn
+      to={playgroundLink.href}
+      onClick={playgroundLink.onClick}
+      variant="secondary"
+      size={small ? 'sm' : undefined}
+      fullWidth={fullWidth}
+      iconRight={<IconExternalLink size={11} />}
+    >
+      Open in Playground
+    </Btn>
+  );
 
   return (
     <section className={styles.section}>
@@ -30,25 +51,17 @@ export const LandingPlayground: React.FC = () => {
           title="Type music. Hear it. Ship it."
           paragraph="alphaTex is a human-readable text format for music notation. Write it in the browser with completions, inline docs and live diagnostics, then paste it into your CMS or version it in git."
           action={
-            <span className={styles.headAction}>
-              <Btn to="/docs/playground/playground" variant="secondary" size="sm" iconRight={<IconExternalLink size={11} />}>
-                Open full Playground
-              </Btn>
-            </span>
+            <span className={styles.headAction}>{openPlayground(false, true)}</span>
           }
         />
 
         <div ref={frameRef}>
           <AlphaTabPlayer settingsPreset="landing">
-            <PlaygroundPlayer active={nearViewport} />
+            <PlaygroundPlayer active={nearViewport} preset={preset} onSelectPreset={selectPreset} text={text} onTextChange={setText} />
           </AlphaTabPlayer>
         </div>
 
-        <div className={styles.mobileCta}>
-          <Btn to="/docs/playground/playground" variant="secondary" fullWidth iconRight={<IconExternalLink size={11} />}>
-            Open full Playground
-          </Btn>
-        </div>
+        <div className={styles.mobileCta}>{openPlayground(true, false)}</div>
       </div>
     </section>
   );
@@ -58,15 +71,21 @@ interface LoadedTex extends TexLoadResult {
   tex: string;
 }
 
+interface PlaygroundPlayerProps {
+  active: boolean;
+  preset: AlphaTexPreset;
+  onSelectPreset: (preset: AlphaTexPreset) => void;
+  text: string;
+  onTextChange: (text: string) => void;
+}
+
 /** Mounts the editor and the renderer only once `active`, so neither costs anything before the section is near. */
-const PlaygroundPlayer: React.FC<{ active: boolean }> = ({ active }) => {
+const PlaygroundPlayer: React.FC<PlaygroundPlayerProps> = ({ active, preset, onSelectPreset: selectPreset, text, onTextChange: setText }) => {
   const state = useAlphaTabState();
   const controls = useAlphaTabControls();
   const compact = useMediaQuery(NOT_DESKTOP_QUERY);
   const editorRef = useRef<AlphaTexEditorHandle>(null);
 
-  const [preset, setPreset] = useState<AlphaTexPreset>(PRESETS[0]);
-  const [text, setText] = useState(preset.tex);
   const [loaded, setLoaded] = useState<LoadedTex | null>(null);
 
   useEffect(() => {
@@ -74,11 +93,6 @@ const PlaygroundPlayer: React.FC<{ active: boolean }> = ({ active }) => {
     const timer = setTimeout(() => setLoaded({ tex: text, ...controls.loadTex(text) }), RENDER_DELAY_MS);
     return () => clearTimeout(timer);
   }, [controls, text]);
-
-  const selectPreset = (next: AlphaTexPreset) => {
-    setPreset(next);
-    setText(next.tex);
-  };
 
   const diagnostics = loaded?.diagnostics ?? [];
   const errors = diagnostics.filter((d) => d.severity === 'error');
@@ -170,68 +184,3 @@ const PlaygroundPlayer: React.FC<{ active: boolean }> = ({ active }) => {
     />
   );
 };
-
-interface RenderStatusProps {
-  updating: boolean;
-  errors: TexDiagnostic[];
-  warnings: TexDiagnostic[];
-  hasScore: boolean;
-  onReveal: (d: TexDiagnostic | undefined) => void;
-}
-
-const RenderStatus: React.FC<RenderStatusProps> = ({ updating, errors, warnings, hasScore, onReveal }) => {
-  if (errors.length > 0) {
-    const first = errors[0];
-    return (
-      <button
-        type="button"
-        className={clsx(styles.status, styles.statusError)}
-        onClick={() => onReveal(first)}
-        title={formatDiagnostic(first)}
-        aria-live="polite"
-      >
-        <span className={styles.statusCount}>{plural(errors.length, 'error')}</span>
-        <span className={styles.statusDetail}>{formatDiagnostic(first)}</span>
-        <span className={styles.statusNote}>{hasScore ? '· showing last valid render' : '· nothing to render'}</span>
-      </button>
-    );
-  }
-  if (updating) {
-    return <span className={styles.status} aria-live="polite">Rendering…</span>;
-  }
-  if (warnings.length > 0) {
-    return (
-      <button
-        type="button"
-        className={clsx(styles.status, styles.statusWarning)}
-        onClick={() => onReveal(warnings[0])}
-        title={formatDiagnostic(warnings[0])}
-        aria-live="polite"
-      >
-        <span className={styles.statusCount}>✓ Rendered · {plural(warnings.length, 'warning')}</span>
-      </button>
-    );
-  }
-  return <span className={clsx(styles.status, styles.statusOk)} aria-live="polite">✓ Rendered</span>;
-};
-
-function formatDiagnostic(d: TexDiagnostic): string {
-  const at = d.start ? `${d.start.line}:${d.start.col} ` : '';
-  return `${at}${d.message}`;
-}
-
-function plural(count: number, noun: string): string {
-  return `${count} ${noun}${count === 1 ? '' : 's'}`;
-}
-
-function describeScore(score: model.Score | null, totalBars: number): string {
-  if (!score) return '';
-  const staves = score.tracks.flatMap((t) => t.staves);
-  const standard = staves.some((s) => s.showStandardNotation);
-  const tab = staves.some((s) => s.showTablature);
-  const notation = standard && tab ? 'standard + tab' : tab ? 'tab' : 'standard';
-  const parts = [`♩=${score.tempo}`, plural(totalBars, 'bar')];
-  if (score.tracks.length > 1) parts.push(plural(score.tracks.length, 'track'));
-  parts.push(notation);
-  return parts.join(' · ');
-}
