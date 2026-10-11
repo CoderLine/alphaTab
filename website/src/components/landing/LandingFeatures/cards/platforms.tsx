@@ -4,8 +4,7 @@ import styles from './platforms.module.scss';
 const PLATFORMS = [
   { p: 'JavaScript', v: 'npm i @coderline/alphatab', stable: true },
   { p: '.NET', v: 'dotnet add AlphaTab', stable: true },
-  { p: 'Kotlin', v: 'implementation alphaTab', stable: true },
-  { p: 'iOS', v: 'in progress', stable: false },
+  { p: 'Kotlin', v: 'implementation alphaTab', stable: true }
 ];
 
 export const Platforms: React.FC = () => (
