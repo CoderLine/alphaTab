@@ -2,6 +2,13 @@ import type { AlphaTabApi, model, Settings } from '@coderline/alphatab';
 import type { ColorMode } from '@docusaurus/theme-common';
 import type { AlphaTabModule } from './module';
 import { applyAlphaTabSettings, applyTheme, type AlphaTabPreset } from './settings';
+import {
+    PlaybackController,
+    initialPlaybackState,
+    type PlaybackControllerOptions,
+    type PlaybackState,
+} from './playback/playback-controller';
+import type { ScoreSource } from './playback/score-source';
 
 export interface TempoMarker {
     atBar: number;
@@ -30,6 +37,7 @@ export interface AlphaTabState {
     currentBar: number;
     tempoMarkers: TempoMarker[];
     loopRangeBars: LoopRangeBars | null;
+    playback: PlaybackState;
 }
 
 export const initialAlphaTabState: AlphaTabState = {
@@ -48,6 +56,7 @@ export const initialAlphaTabState: AlphaTabState = {
     currentBar: 0,
     tempoMarkers: [],
     loopRangeBars: null,
+    playback: initialPlaybackState,
 };
 
 export type StaveProfileKey = 'scoreTab' | 'score' | 'tab';
@@ -60,17 +69,22 @@ export class AlphaTabStore {
     private rafHandle = 0;
     private colorMode: ColorMode;
     private preset: AlphaTabPreset;
+    private readonly playback: PlaybackController;
+    private loadToken = 0;
 
     constructor(
         private readonly api: AlphaTabApi,
         private readonly module: AlphaTabModule,
         colorMode: ColorMode,
         preset: AlphaTabPreset = 'docs',
+        playbackOptions: PlaybackControllerOptions = { fixedSource: false, ownSoundFont: false },
     ) {
         this.colorMode = colorMode;
         this.preset = preset;
+        this.playback = new PlaybackController(api, module, playbackOptions);
+        this.playback.subscribe(() => this.update({ playback: this.playback.getSnapshot() }));
         this.wireEvents();
-        this.snapshot = { ...this.snapshot, isReady: true };
+        this.snapshot = { ...this.snapshot, isReady: true, playback: this.playback.getSnapshot() };
     }
 
     readonly subscribe = (callback: () => void): (() => void) => {
@@ -148,10 +162,14 @@ export class AlphaTabStore {
     }
 
     resetSettings(): void {
+        // Player mode and SoundFont belong to the playback controller, not to the visual defaults.
+        const { playerMode, soundFont } = this.api.settings.player;
         applyAlphaTabSettings(this.module, this.api.settings, {
             colorMode: this.colorMode,
             preset: this.preset,
         });
+        this.api.settings.player.playerMode = playerMode;
+        this.api.settings.player.soundFont = soundFont;
         this.scheduleApply();
         this.setMasterVolume(1);
         this.setPlaybackSpeed(1);
@@ -205,25 +223,47 @@ export class AlphaTabStore {
         this.update({ loopRangeBars: { from: lo, to: hi } });
     }
 
-    async loadScoreFromUrl(url: string): Promise<void> {
-        if (this.snapshot.isPlaying) this.api.stop();
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`[alphaTab-react] Failed to fetch ${url}: ${response.status}`);
-        }
-        const buffer = new Uint8Array(await response.arrayBuffer());
-        const score = this.module.importer.ScoreLoader.loadScoreFromBytes(buffer, this.api.settings);
-        this.api.renderScore(score);
+    loadScoreFromUrl(url: string): Promise<void> {
+        return this.loadSource({ url });
     }
 
     loadScoreFromTex(tex: string): void {
+        void this.loadSource({ tex });
+    }
+
+    /**
+     * Loads and renders the notation of `source` right away; any backing track
+     * it declares is fetched only once playback actually needs it. A newer
+     * call supersedes a pending one.
+     */
+    async loadSource(source: ScoreSource): Promise<void> {
+        const token = ++this.loadToken;
         if (this.snapshot.isPlaying) this.api.stop();
-        this.api.tex(tex);
+        if (source.url) {
+            const response = await fetch(source.url);
+            if (!response.ok) {
+                throw new Error(`[alphaTab-react] Failed to fetch ${source.url}: ${response.status}`);
+            }
+            const buffer = new Uint8Array(await response.arrayBuffer());
+            if (token !== this.loadToken) return;
+            const score = this.module.importer.ScoreLoader.loadScoreFromBytes(buffer, this.api.settings);
+            this.playback.setSource(source);
+            this.api.renderScore(score);
+        } else if (source.tex) {
+            this.playback.setSource(source);
+            this.api.tex(source.tex);
+        }
+    }
+
+    /** Retries the preferred playback source after a backing-track failure. */
+    retryPlayback(): void {
+        this.playback.retry();
     }
 
     getApi(): AlphaTabApi { return this.api; }
     destroy(): void {
         if (this.rafHandle) cancelAnimationFrame(this.rafHandle);
+        this.playback.destroy();
         this.api.destroy();
     }
 

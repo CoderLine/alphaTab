@@ -1,6 +1,7 @@
 import React, { type DependencyList, type EffectCallback, useEffect, useRef, useState } from "react";
 import * as alphaTab from "@coderline/alphatab";
 import environment from "./environment";
+import { PlaybackController } from "./alphatab-react/playback/playback-controller";
 import {useColorMode} from '@docusaurus/theme-common';
 
 export function useAlphaTab(
@@ -45,9 +46,15 @@ export function useAlphaTab(
       settingsInit(settings);
 
       const newApi = new alphaTab.AlphaTabApi(container, settings);
+      // Components on this hook set their player mode themselves, so only the SoundFont is managed.
+      const playback = new PlaybackController(newApi, alphaTab, {
+        fixedSource: true,
+        ownSoundFont: settings.player.soundFont != null,
+      });
       setApi(newApi);
 
       return () => {
+        playback.destroy();
         newApi.destroy();
       };
     },

@@ -19,3 +19,4 @@ export type {
 export type { AlphaTabPreset } from './settings';
 export { registerAlphaTabLoader, initAlphaTab, useAlphaTabModule } from './module';
 export type { AlphaTabModule } from './module';
+export * from './playback';

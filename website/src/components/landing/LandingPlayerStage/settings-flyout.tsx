@@ -1,7 +1,9 @@
 import React from 'react';
-import type { LayoutModeKey, StaveProfileKey } from '@site/src/alphatab-react';
+import type { LayoutModeKey, PlaybackState, StaveProfileKey } from '@site/src/alphatab-react';
+import { PlaybackSettingsPanel } from '@site/src/components/PlaybackSettings';
 import { IconSettings, IconClose } from '../shared/icons';
-import { FlyoutGroup, FlyoutRow, Segmented, Slider, Toggle } from './flyout-controls';
+import { Segmented } from '../shared/segmented';
+import { FlyoutGroup, FlyoutRow, Slider, Toggle } from './flyout-controls';
 import styles from './settings-flyout.module.scss';
 
 export interface SettingsFlyoutState {
@@ -16,6 +18,7 @@ export interface SettingsFlyoutState {
     highlightCursor: boolean;
     loop: boolean;
     loopHint: string | null;
+    playback: PlaybackState;
 }
 
 export interface SettingsFlyoutHandlers {
@@ -32,6 +35,8 @@ export interface SettingsFlyoutHandlers {
     onReset: () => void;
 }
 
+const NOT_WITH_BACKING_TRACK = 'Not available with backing track';
+
 interface SettingsFlyoutProps {
     onClose: () => void;
     state: SettingsFlyoutState;
@@ -39,7 +44,11 @@ interface SettingsFlyoutProps {
 }
 
 export const SettingsFlyout = React.forwardRef<HTMLDivElement, SettingsFlyoutProps>(
-    ({ onClose, state, handlers }, ref) => (
+    ({ onClose, state, handlers }, ref) => {
+        const { playback } = state;
+        const onBackingTrack = playback.effective === 'backingTrack';
+        const synthOnly = onBackingTrack ? NOT_WITH_BACKING_TRACK : null;
+        return (
         <div ref={ref} className={styles.flyout} role="dialog" aria-label="Player settings">
             <div className={styles.header}>
                 <IconSettings size={13} className={styles.headerIcon} aria-hidden="true" />
@@ -51,6 +60,10 @@ export const SettingsFlyout = React.forwardRef<HTMLDivElement, SettingsFlyoutPro
             </div>
 
             <div className={styles.body}>
+                <FlyoutGroup>
+                    <PlaybackSettingsPanel showRemoveDownloads={false} />
+                </FlyoutGroup>
+
                 <FlyoutGroup title="Display">
                     <FlyoutRow label="Layout">
                         <Segmented<LayoutModeKey>
@@ -119,13 +132,19 @@ export const SettingsFlyout = React.forwardRef<HTMLDivElement, SettingsFlyoutPro
                             onChange={handlers.setTransposeSt}
                             bipolar
                             label="Transpose"
+                            disabledReason={synthOnly}
                         />
                     </FlyoutRow>
                 </FlyoutGroup>
 
                 <FlyoutGroup title="Playback" last>
-                    <Toggle label="Count-in" value={state.countIn} onChange={handlers.setCountIn} />
-                    <Toggle label="Metronome" value={state.metronome} onChange={handlers.setMetronome} />
+                    {onBackingTrack && (
+                        <span className={styles.groupNote}>
+                            Transpose, count-in and metronome need the synthesizer.
+                        </span>
+                    )}
+                    <Toggle label="Count-in" value={state.countIn} onChange={handlers.setCountIn} disabledReason={synthOnly} />
+                    <Toggle label="Metronome" value={state.metronome} onChange={handlers.setMetronome} disabledReason={synthOnly} />
                     <Toggle label="Highlight cursor" value={state.highlightCursor} onChange={handlers.setHighlightCursor} />
                     <Toggle
                         label="Loop range"
@@ -146,7 +165,8 @@ export const SettingsFlyout = React.forwardRef<HTMLDivElement, SettingsFlyoutPro
 
             <span className={styles.pointer} aria-hidden="true" />
         </div>
-    ),
+        );
+    },
 );
 
 SettingsFlyout.displayName = 'SettingsFlyout';

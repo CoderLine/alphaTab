@@ -1,0 +1,71 @@
+.root {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--at-muted);
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    background: var(--at-surface-alt);
+    color: var(--at-ink);
+  }
+}
+
+.triggerOpen {
+  background: var(--at-surface-alt);
+  color: var(--at-ink);
+}
+
+.activityDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--at-accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.35; }
+}
+
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: var(--ifm-z-index-dropdown, 100);
+  width: min(340px, calc(100vw - 32px));
+  padding: 14px;
+  border: 1px solid var(--at-line);
+  border-radius: var(--at-radius);
+  background: var(--at-surface);
+  box-shadow: var(--at-shadow-lg);
+}
+
+.mobileItem {
+  margin-top: 8px;
+  padding: 12px var(--ifm-menu-link-padding-horizontal, 12px);
+  border-top: 1px solid var(--at-line-soft);
+}
+
+.mobileTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--at-ink);
+}

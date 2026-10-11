@@ -1,50 +1,52 @@
 import * as Riffs from '@site/src/tex-riffs';
+import type { ScoreSource } from '@site/src/alphatab-react';
 
-export type DemoFile =
-    | {
-          kind: 'url';
-          label: string;
-          ext: string;
-          trackColor: string;
-          url: string;
-      }
-    | {
-          kind: 'tex';
-          label: string;
-          ext: string;
-          trackColor: string;
-          tex: string;
-      };
+export interface DemoFile {
+    label: string;
+    ext: string;
+    trackColor: string;
+    source: ScoreSource;
+}
 
 export const DEMO_FILES: DemoFile[] = [
     {
-        kind: 'url',
         label: 'canon-ensemble.gp',
         ext: 'gp',
         trackColor: 'var(--at-accent)',
-        url: '/files/pachelbel-canon-ensemble.gp',
+        source: { url: '/files/pachelbel-canon-ensemble.gp' },
     },
     {
-        kind: 'url',
+        label: 'prelude-recording.alphatex',
+        ext: 'tex',
+        trackColor: 'var(--at-track-indigo)',
+        // TODO: swap with the dedicated backing-track demo file when staged.
+        source: {
+            tex: Riffs.BACH_PRELUDE_BWV999_SYNCED,
+            backingTrack: {
+                kind: 'external',
+                audioUrl: '/files/Bach_Prelude_BWV999.ogg',
+                syncPoints: { from: 'score' },
+            },
+        },
+    },
+    {
         label: 'prelude.musicxml',
         ext: 'mxl',
         trackColor: 'var(--at-track-purple)',
         // TODO: swap with a real /files/landing/prelude.musicxml when staged.
-        url: '/files/Bach_Prelude_BWV999.gp',
+        source: { url: '/files/Bach_Prelude_BWV999.gp' },
     },
     {
-        kind: 'tex',
         label: 'prelude.alphatex',
         ext: 'tex',
         trackColor: 'var(--at-track-green)',
-        tex: Riffs.BACH_PRELUDE_C_LONG,
+        source: { tex: Riffs.BACH_PRELUDE_C_LONG },
     },
     {
-        kind: 'url',
         label: 'etude.capx',
         ext: 'capx',
         trackColor: 'var(--at-track-orange)',
         // TODO: swap with a real /files/landing/etude.capx when staged.
-        url: '/files/features/Drums.gp5',
+        source: { url: '/files/features/Drums.gp5' },
     },
 ];

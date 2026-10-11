@@ -23,7 +23,8 @@ function setAlphaTabColors(settings: alphaTab.Settings, colorMode: ColorMode) {
 
  function setAlphaTabDefaults(settings: alphaTab.Settings, colorMode: ColorMode) {
     settings.core.fontDirectory = "/font/";
-    settings.player.soundFont = "/soundfont/sonivox.sf3";
+    // Supplied as bytes by the PlaybackController from the site-wide SoundFont preference.
+    settings.player.soundFont = null;
     settings.player.scrollMode = alphaTab.ScrollMode.Off;
     settings.player.playerMode = alphaTab.PlayerMode.Disabled;
 

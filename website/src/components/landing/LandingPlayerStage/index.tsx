@@ -12,7 +12,16 @@ import {
     type LayoutModeKey,
     type StaveProfileKey,
 } from '@site/src/alphatab-react';
-import { IconPlay, IconPause, IconVolume, IconSettings, IconCaret, IconExternalLink } from '../shared/icons';
+import { PlaybackStatusLine } from '@site/src/components/PlaybackSettings';
+import {
+    IconPlay,
+    IconPause,
+    IconVolume,
+    IconSettings,
+    IconCaret,
+    IconExternalLink,
+    IconWaveform,
+} from '../shared/icons';
 import { Scrubber } from './scrubber';
 import { SettingsFlyout, type SettingsFlyoutState, type SettingsFlyoutHandlers } from './settings-flyout';
 import { DEMO_FILES } from './demo-files';
@@ -124,17 +133,26 @@ const LandingPlayerStageInner: React.FC = () => {
     const activeFile = DEMO_FILES[activeFileIndex];
     React.useEffect(() => {
         if (!controls) return;
-        if (activeFile.kind === 'url') {
-            controls.loadScoreFromUrl(activeFile.url).catch((err) => {
-                console.error('[LandingPlayerStage] Failed to load score', err);
-            });
-        } else {
-            controls.loadScoreFromTex(activeFile.tex);
-        }
+        controls.loadSource(activeFile.source).catch((err) => {
+            console.error('[LandingPlayerStage] Failed to load score', err);
+        });
     }, [controls, activeFile]);
+
+    // Channel transposition lives in the synthesizer instance and is lost when the player is rebuilt.
+    const { playback } = state;
+    React.useEffect(() => {
+        if (playback.effective === 'synthesizer' && playback.isReadyForPlayback && transposeSt !== 0) {
+            controls?.setTransposeAllTracks(transposeSt);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [controls, playback.effective, playback.isReadyForPlayback]);
 
     React.useEffect(() => {
         if (!settingsOpen) return;
+        // The flyout opens upward from the transport bar and can start above the viewport.
+        const frame = requestAnimationFrame(() => {
+            (flyoutRef.current ?? mobileFlyoutRef.current)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        });
         const onDown = (e: MouseEvent) => {
             const t = e.target as Node;
             if (flyoutRef.current?.contains(t) || mobileFlyoutRef.current?.contains(t)) return;
@@ -147,6 +165,7 @@ const LandingPlayerStageInner: React.FC = () => {
         document.addEventListener('mousedown', onDown);
         document.addEventListener('keydown', onKey);
         return () => {
+            cancelAnimationFrame(frame);
             document.removeEventListener('mousedown', onDown);
             document.removeEventListener('keydown', onKey);
         };
@@ -157,6 +176,7 @@ const LandingPlayerStageInner: React.FC = () => {
         transposeSt, countIn, metronome, highlightCursor, loop,
         // `to` is exclusive (alphaTab's endTick = start-of-next-bar), so display it as the last-inclusive musical bar without a +1.
         loopHint: state.loopRangeBars ? `m.${state.loopRangeBars.from + 1}–${state.loopRangeBars.to}` : null,
+        playback,
     };
 
     const flyoutHandlers: SettingsFlyoutHandlers = {
@@ -215,6 +235,9 @@ const LandingPlayerStageInner: React.FC = () => {
         if (i !== activeFileIndex) setActiveFileIndex(i);
     };
 
+    const playDisabled = !playback.isReadyForPlayback;
+    const playLabel = playDisabled ? 'Preparing playback' : state.isPlaying ? 'Pause' : 'Play';
+
     const currentTimeLabel = formatTime(state.currentTime);
     const endTimeLabel = formatTime(state.endTime);
     const totalBarsForScrubber = state.totalBars > 0 ? state.totalBars : 64;
@@ -238,6 +261,9 @@ const LandingPlayerStageInner: React.FC = () => {
                         >
                             <span className={styles.fileTabDot} />
                             <span className={styles.fileTabName}>{f.label}</span>
+                            {f.source.backingTrack && (
+                                <IconWaveform size={11} className={styles.fileTabBadge} aria-label="Has a backing track" />
+                            )}
                             {i === activeFileIndex && <span className={styles.fileTabClose}>×</span>}
                         </button>
                     ))}
@@ -333,9 +359,11 @@ const LandingPlayerStageInner: React.FC = () => {
                         <div className={styles.timeline}>
                             <button
                                 type="button"
-                                className={styles.playBtn}
+                                className={clsx(styles.playBtn, playDisabled && styles.playBtnPreparing)}
                                 onClick={() => controls?.playPause()}
-                                aria-label={state.isPlaying ? 'Pause' : 'Play'}
+                                disabled={playDisabled}
+                                aria-busy={playDisabled}
+                                aria-label={playLabel}
                             >
                                 {state.isPlaying
                                     ? <IconPause size={13} aria-hidden="true" />
@@ -367,6 +395,11 @@ const LandingPlayerStageInner: React.FC = () => {
                                 <IconSettings size={14} aria-hidden="true" />
                             </button>
                         </div>
+                        <PlaybackStatusLine
+                            playback={playback}
+                            onRetry={() => controls?.retryPlayback()}
+                            className={styles.statusRow}
+                        />
                     </div>
                 </div>
 
@@ -390,6 +423,9 @@ const LandingPlayerStageInner: React.FC = () => {
                     <div className={styles.mobileFileBar}>
                         <span className={styles.mobileFileDot} style={{ background: activeFile.trackColor }} />
                         <span className={styles.mobileFileName}>{activeFile.label}</span>
+                        {activeFile.source.backingTrack && (
+                            <IconWaveform size={11} className={styles.fileTabBadge} aria-label="Has a backing track" />
+                        )}
                         <IconCaret size={10} aria-hidden="true" />
                         <span className={styles.mobileFileSpacer} />
                         <span className={styles.mobileFileCount}>
@@ -428,9 +464,11 @@ const LandingPlayerStageInner: React.FC = () => {
                     <div className={styles.mobilePlayBar}>
                         <button
                             type="button"
-                            className={styles.mobilePlayBtn}
+                            className={clsx(styles.mobilePlayBtn, playDisabled && styles.playBtnPreparing)}
                             onClick={() => controls?.playPause()}
-                            aria-label={state.isPlaying ? 'Pause' : 'Play'}
+                            disabled={playDisabled}
+                            aria-busy={playDisabled}
+                            aria-label={playLabel}
                         >
                             {state.isPlaying
                                 ? <IconPause size={13} aria-hidden="true" />
@@ -459,6 +497,11 @@ const LandingPlayerStageInner: React.FC = () => {
                             <IconSettings size={14} aria-hidden="true" />
                         </button>
                     </div>
+                    <PlaybackStatusLine
+                        playback={playback}
+                        onRetry={() => controls?.retryPlayback()}
+                        className={styles.mobileStatusRow}
+                    />
                 </div>
 
                 <div className={styles.mobileScoreCard}>

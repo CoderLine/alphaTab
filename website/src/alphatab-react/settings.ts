@@ -23,7 +23,8 @@ export function applyAlphaTabSettings(
     const preset = options.preset ?? 'docs';
 
     settings.core.fontDirectory = '/font/';
-    settings.player.soundFont = '/soundfont/sonivox.sf3';
+    // Supplied as bytes by the PlaybackController from the site-wide SoundFont preference.
+    settings.player.soundFont = null;
     settings.player.scrollMode = module.ScrollMode.Off;
     settings.player.playerMode = module.PlayerMode.Disabled;
 

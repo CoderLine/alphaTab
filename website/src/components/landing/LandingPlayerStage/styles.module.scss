@@ -665,3 +665,44 @@
   display: flex;
   justify-content: center;
 }
+
+// ─── Playback source / preparation ──────────────────────────────────
+.fileTabBadge {
+  margin-left: 6px;
+  color: var(--tab-color, var(--at-accent));
+  flex-shrink: 0;
+}
+
+.playBtnPreparing {
+  position: relative;
+  opacity: 0.55;
+  cursor: progress;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border: 2px solid transparent;
+    border-top-color: var(--at-accent);
+    border-radius: 50%;
+    animation: play-preparing 900ms linear infinite;
+  }
+}
+
+@keyframes play-preparing {
+  to { transform: rotate(360deg); }
+}
+
+.statusRow {
+  padding: 0 20px 10px;
+  background: var(--at-surface-alt);
+
+  @include tablet {
+    padding: 0 14px 8px;
+  }
+}
+
+.mobileStatusRow {
+  padding: 0 12px 10px;
+  background: var(--at-surface-alt);
+}

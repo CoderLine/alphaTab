@@ -136,6 +136,19 @@ export const IconClose: React.FC<IconProps> = (p) => (
 export const IconInfo: React.FC<IconProps> = (p) => (
   <svg {...iconBase(16, 'none', true, p)}>
     <circle cx="12" cy="12" r="10" />
-    <path d="M12 8v5M12 17h.01" />
+    <path d="M12 16v-5M12 8h.01" />
+  </svg>
+);
+
+export const IconHeadphones: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(16, 'none', true, { strokeWidth: 1.8, ...p })}>
+    <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+  </svg>
+);
+
+export const IconWaveform: React.FC<IconProps> = (p) => (
+  <svg {...iconBase(12, 'none', true, { strokeWidth: 2, ...p })}>
+    <path d="M3 10v4M7 6v12M11 3v18M15 7v10M19 10v4" />
   </svg>
 );

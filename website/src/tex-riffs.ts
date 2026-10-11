@@ -316,3 +316,27 @@ export const MULTI_TRACK_ENSEMBLE = `\\title "Canon in D — ensemble"
 (G3 B3 D4).1  | (D4 F#4 A4).1 | (G3 B3 D4).1  | (C#4 E4 A4).1 |
 \\staff{score} \\tuning piano \\clef F4
 D2.1 | A2.1 | B2.1 | F#2.1 | G2.1 | D2.1 | G2.1 | A2.1 |`;
+
+/**
+ * Bach — Prelude BWV 999, bars 1–4, with `\sync` points aligned to the
+ * recording in `/files/Bach_Prelude_BWV999.ogg`. Pair the two whenever a demo
+ * needs a backing track whose sync points live in the score.
+ */
+export const BACH_PRELUDE_BWV999_SYNCED = `
+    \\title "Prelude in D Minor"
+    \\artist "J.S. Bach (1685-1750)"
+    \\copyright "Public Domain"
+    \\tempo 80
+    .
+    \\ts 3 4
+    0.4.16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) |
+    (3.2 0.4).16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) |
+    (3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) |
+    (3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) |
+    .
+    \\sync 0 0 0
+    \\sync 0 0 1500 0.666
+    \\sync 1 0 4075 0.666
+    \\sync 2 0 6475 0.333
+    \\sync 3 0 10223 1
+    `.trim().split('\n').map(l => l.trimStart()).join('\n');

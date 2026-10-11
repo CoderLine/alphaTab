@@ -40,6 +40,9 @@ export interface SoundFontSwitcherProps {
 
 const DEFAULT_OPTIONS: SoundFontOption[] = [{ label: 'Sonivox (bundled)' }];
 
+const BUNDLED_SOUNDFONT_URL = '/soundfont/sonivox.sf3';
+const PLAYER_SETTINGS = { player: { soundFont: BUNDLED_SOUNDFONT_URL } };
+
 const SoundFontControls: React.FC<{
   options: SoundFontOption[];
   allowCustomUrl: boolean;
@@ -77,8 +80,9 @@ const SoundFontControls: React.FC<{
     const opt = options[index];
     if (!api) return;
     if (!opt.url) {
-      api.resetSoundFonts();
-      setStatus('bundled Sonivox active');
+      setLoading(true);
+      setStatus('loading bundled Sonivox…');
+      api.loadSoundFont(BUNDLED_SOUNDFONT_URL, false);
       return;
     }
     void loadFromUrl(opt.url, opt.label);
@@ -151,7 +155,7 @@ export const SoundFontSwitcher: React.FC<SoundFontSwitcherProps> = ({
   showCode = true,
 }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <AlphaTabPlayer file={file} tex={tex} settings={PLAYER_SETTINGS}>
       <TransportBar />
       <SoundFontControls
         options={options}

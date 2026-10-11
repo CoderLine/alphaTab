@@ -63,6 +63,12 @@ export interface AlphaTabPlayerProps {
      * baseline for the docs site; `landing` layers the marketing chrome on.
      */
     settingsPreset?: AlphaTabPreset;
+    /**
+     * The page loads SoundFonts itself (e.g. SoundFont API demos), so the
+     * site-wide SoundFont preference is not applied. Implied when `settings`
+     * sets `player.soundFont`.
+     */
+    ownSoundFont?: boolean;
     children: ReactNode;
 }
 
@@ -73,6 +79,7 @@ export function AlphaTabPlayer({
     settings,
     player = true,
     settingsPreset = 'docs',
+    ownSoundFont = false,
     children,
 }: AlphaTabPlayerProps) {
     const module = useAlphaTabModule();
@@ -107,9 +114,8 @@ export function AlphaTabPlayer({
             preset: settingsPreset,
         });
         constructed.player.scrollElement = scrollNode;
-        constructed.player.playerMode = player
-            ? module.PlayerMode.EnabledAutomatic
-            : module.PlayerMode.Disabled;
+        // Without an author-set mode the PlaybackController picks and enables the source.
+        constructed.player.playerMode = module.PlayerMode.Disabled;
         constructed.display.layoutMode = module.LayoutMode.Page;
         constructed.player.scrollMode = module.ScrollMode.Off;
         constructed.player.enableCursor = true;
@@ -130,8 +136,12 @@ export function AlphaTabPlayer({
             mountNode.textContent = tex;
         }
 
+        const playerSettings = initialSettingsRef.current?.player;
         const created = new module.AlphaTabApi(mountNode, constructed);
-        const s = new AlphaTabStore(created, module, colorModeRef.current, settingsPreset);
+        const s = new AlphaTabStore(created, module, colorModeRef.current, settingsPreset, {
+            fixedSource: !player || playerSettings?.playerMode !== undefined,
+            ownSoundFont: ownSoundFont || !!playerSettings?.soundFont,
+        });
         setStore(s);
         setApi(created);
 
@@ -141,7 +151,7 @@ export function AlphaTabPlayer({
             setApi(null);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [module, mountNode, scrollNode, player, settingsPreset]);
+    }, [module, mountNode, scrollNode, player, settingsPreset, ownSoundFont]);
 
     // Color mode sync.
     useEffect(() => {

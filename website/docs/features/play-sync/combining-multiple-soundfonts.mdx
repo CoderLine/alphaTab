@@ -18,7 +18,7 @@ Pair a rock drum kit with an acoustic guitar pack. Layer a percussion library ov
 <SoundFontSwitcher
   tex={Riffs.AM_VERSE_CHORUS}
   options={[
-    { label: 'Append GeneralUser GS', url: '/files/GeneralUser-GS.sf2' },
+    { label: 'Append GeneralUser GS', url: '/files/soundfonts/GeneralUser-GS.v2.0.3.sf3' },
   ]}
   append={true}
   showCode={false}
@@ -26,7 +26,7 @@ Pair a rock drum kit with an acoustic guitar pack. Layer a percussion library ov
 
 Start playback, then click **Append** — the second SoundFont merges its presets on top without dropping the first. `loadSoundFont(url, /* append */ true)` always layers instead of replacing.
 
-The in-repo demo layers [GeneralUser GS](https://schristiancollins.com/generaluser.php) (30 MB, richer piano and guitar samples) on top of the bundled Sonivox. Because both banks define the same GM programs, the later file wins the collision on every program and you hear the whole score re-voiced with GeneralUser's presets. That is the point of the mechanism, not a limitation of it — a real app would layer *disjoint* SoundFonts (guitars-only atop drums-only) so appending genuinely widens the palette instead of overriding existing presets.
+The in-repo demo layers [GeneralUser GS](https://schristiancollins.com/generaluser.php) (about 9 MB as compressed SF3, richer piano and guitar samples) on top of the bundled Sonivox. Because both banks define the same GM programs, the later file wins the collision on every program and you hear the whole score re-voiced with GeneralUser's presets. That is the point of the mechanism, not a limitation of it — a real app would layer *disjoint* SoundFonts (guitars-only atop drums-only) so appending genuinely widens the palette instead of overriding existing presets.
 
 <CodeBlock language="js">{`import * as alphaTab from '@coderline/alphatab';
 

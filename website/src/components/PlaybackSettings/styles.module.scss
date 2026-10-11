@@ -1,0 +1,227 @@
+// SoundFont list ------------------------------------------------------------
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--at-line-soft);
+  border-radius: var(--at-radius-sm);
+  background: var(--at-surface);
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover {
+    background: var(--at-surface-alt);
+  }
+}
+
+.rowSelected {
+  border-color: var(--at-accent);
+  background: var(--at-accent-soft);
+
+  &:hover {
+    background: var(--at-accent-soft);
+  }
+
+  .radio::after {
+    transform: scale(1);
+  }
+}
+
+.rowMain {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px 8px 10px;
+  border: none;
+  border-radius: var(--at-radius-sm);
+  background: transparent;
+  color: var(--at-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: -2px;
+  }
+}
+
+.radio {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--at-muted);
+  border-radius: 50%;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 50%;
+    background: var(--at-accent);
+    transform: scale(0);
+    transition: transform 120ms ease;
+  }
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rowLabel {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rowDescription {
+  font-size: 11.5px;
+  color: var(--at-muted);
+}
+
+.status {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  white-space: nowrap;
+}
+
+.status_stored {
+  color: var(--at-success);
+
+  &::before {
+    content: '✓ ';
+  }
+}
+
+.status_downloading {
+  color: var(--at-accent);
+}
+
+.status_error {
+  color: var(--ifm-color-danger);
+}
+
+.rowProgress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 0 0 var(--at-radius-sm) var(--at-radius-sm);
+  background: var(--at-accent);
+  transform-origin: left center;
+  transition: transform 120ms linear;
+}
+
+// Attribution info --------------------------------------------------------------
+
+.info {
+  position: relative;
+  flex-shrink: 0;
+  padding-right: 6px;
+}
+
+.infoButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--at-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--at-ink);
+    background: var(--at-surface-alt);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 1px;
+  }
+}
+
+.infoButtonOpen {
+  color: var(--at-accent);
+}
+
+.infoPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 240px;
+  padding: 10px 12px;
+  border: 1px solid var(--at-line);
+  border-radius: var(--at-radius-sm);
+  background: var(--at-surface);
+  box-shadow: var(--at-shadow-md);
+  color: var(--at-ink-soft);
+  font-size: 11.5px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.infoTitle {
+  font-weight: 600;
+  color: var(--at-ink);
+}
+
+.infoLicense {
+  color: var(--at-muted);
+}
+
+.infoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  color: var(--at-accent);
+}
+
+// Status line -----------------------------------------------------------------
+
+.statusLine {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+}
+
+.statusNotice {
+  color: var(--ifm-color-warning-darkest, var(--at-ink-soft));
+}
+
+.retry {
+  padding: 1px 8px;
+  border: 1px solid var(--at-line);
+  border-radius: var(--at-radius-sm);
+  background: var(--at-surface);
+  color: var(--at-ink);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--at-surface-alt);
+  }
+}

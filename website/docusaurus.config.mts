@@ -458,6 +458,12 @@ async function createConfig(): Promise<Config> {
             },
           ],
         },
+        // Site-wide playback source + SoundFont preferences (src/theme/NavbarItem/PlaybackSettingsNavbarItem.tsx).
+        {
+          type: "custom-playbackSettings",
+          position: "right",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any,
         // Custom navbar item type — see src/theme/NavbarItem/ComponentTypes.ts.
         // Renders the GitHub icon + live star count from shields.io, falling
         // back to the build-time fetched value in `customFields.githubStarsInitial`.
