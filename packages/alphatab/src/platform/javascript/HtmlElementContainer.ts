@@ -1,4 +1,4 @@
-import type { IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import { EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import type { IContainer } from '@coderline/alphatab/platform/IContainer';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
 import { BrowserMouseEventArgs } from '@coderline/alphatab/platform/javascript/BrowserMouseEventArgs';
@@ -81,53 +81,9 @@ export class HtmlElementContainer implements IHtmlElementContainer {
     public constructor(element: HTMLElement) {
         this.element = element;
 
-        this.mouseDown = {
-            on: (value: any) => {
-                const nativeListener: (e: MouseEvent) => void = e => {
-                    value(new BrowserMouseEventArgs(e));
-                };
-                this.element.addEventListener('mousedown', nativeListener, true);
-                return () => {
-                    this.element.removeEventListener('mousedown', nativeListener, true);
-                };
-            },
-            off: (_value: any) => {
-                // not supported due to wrapping
-            }
-        };
-
-        this.mouseUp = {
-            on: (value: any) => {
-                const nativeListener: (e: MouseEvent) => void = e => {
-                    value(new BrowserMouseEventArgs(e));
-                };
-
-                this.element.addEventListener('mouseup', nativeListener, true);
-
-                return () => {
-                    this.element.removeEventListener('mouseup', nativeListener, true);
-                };
-            },
-            off: (_value: any) => {
-                // not supported due to wrapping
-            }
-        };
-
-        this.mouseMove = {
-            on: (value: any) => {
-                const nativeListener: (e: MouseEvent) => void = e => {
-                    value(new BrowserMouseEventArgs(e));
-                };
-                this.element.addEventListener('mousemove', nativeListener, true);
-
-                return () => {
-                    this.element.removeEventListener('mousemove', nativeListener, true);
-                };
-            },
-            off: (_: any) => {
-                // not supported due to wrapping
-            }
-        };
+        this.mouseDown = this._createMouseEmitter(this._mouseDown);
+        this.mouseMove = this._createMouseEmitter(this._mouseMove);
+        this.mouseUp = this._createMouseEmitter(this._mouseUp);
 
         const container = this;
         this.resize = {
@@ -149,6 +105,100 @@ export class HtmlElementContainer implements IHtmlElementContainer {
                 }
             }
         };
+    }
+
+    private readonly _mouseDown = new EventEmitterOfT<IMouseEventArgs>();
+    private readonly _mouseMove = new EventEmitterOfT<IMouseEventArgs>();
+    private readonly _mouseUp = new EventEmitterOfT<IMouseEventArgs>();
+    private _mouseListenersAttached = false;
+    /**
+     * The document receiving the move and release events of the active left button press, if any.
+     */
+    private _pressDocument: Document | null = null;
+    /**
+     * The last event handled by the document listeners. The same event reaches the element listeners afterwards
+     * and must not be reported twice.
+     */
+    private _pressHandledEvent: MouseEvent | null = null;
+
+    private _createMouseEmitter(emitter: EventEmitterOfT<IMouseEventArgs>): IEventEmitterOfT<IMouseEventArgs> {
+        return {
+            on: (value: (e: IMouseEventArgs) => void) => {
+                this._attachMouseListeners();
+                return emitter.on(value);
+            },
+            off: (value: (e: IMouseEventArgs) => void) => {
+                emitter.off(value);
+            }
+        };
+    }
+
+    private _attachMouseListeners() {
+        if (this._mouseListenersAttached) {
+            return;
+        }
+        this._mouseListenersAttached = true;
+        this.element.addEventListener('mousedown', this._onElementMouseDown, true);
+        this.element.addEventListener('mousemove', this._onElementMouseMove, true);
+        this.element.addEventListener('mouseup', this._onElementMouseUp, true);
+    }
+
+    private _onElementMouseDown = (e: MouseEvent) => {
+        if (e.button === 0) {
+            this._beginPress();
+        }
+        this._mouseDown.trigger(new BrowserMouseEventArgs(e));
+    };
+
+    private _onElementMouseMove = (e: MouseEvent) => {
+        if (!this._pressDocument && e !== this._pressHandledEvent) {
+            this._mouseMove.trigger(new BrowserMouseEventArgs(e));
+        }
+    };
+
+    private _onElementMouseUp = (e: MouseEvent) => {
+        if (!this._pressDocument && e !== this._pressHandledEvent) {
+            this._mouseUp.trigger(new BrowserMouseEventArgs(e));
+        }
+    };
+
+    private _onPressMouseMove = (e: MouseEvent) => {
+        this._pressHandledEvent = e;
+        if ((e.buttons & 1) === 0) {
+            // the release happened where this document could not observe it (e.g. outside the browser window)
+            this._endPress();
+            this._mouseUp.trigger(new BrowserMouseEventArgs(e));
+            return;
+        }
+        this._mouseMove.trigger(new BrowserMouseEventArgs(e));
+    };
+
+    private _onPressMouseUp = (e: MouseEvent) => {
+        this._pressHandledEvent = e;
+        if (e.button === 0) {
+            this._endPress();
+        }
+        this._mouseUp.trigger(new BrowserMouseEventArgs(e));
+    };
+
+    private _beginPress() {
+        if (this._pressDocument) {
+            return;
+        }
+        const doc = this.element.ownerDocument;
+        this._pressDocument = doc;
+        doc.addEventListener('mousemove', this._onPressMouseMove, true);
+        doc.addEventListener('mouseup', this._onPressMouseUp, true);
+    }
+
+    private _endPress() {
+        const doc = this._pressDocument;
+        if (!doc) {
+            return;
+        }
+        this._pressDocument = null;
+        doc.removeEventListener('mousemove', this._onPressMouseMove, true);
+        doc.removeEventListener('mouseup', this._onPressMouseUp, true);
     }
 
     public stopAnimation(): void {
@@ -194,12 +244,14 @@ export class HtmlElementContainer implements IHtmlElementContainer {
     public mouseDown: IEventEmitterOfT<IMouseEventArgs>;
 
     /**
-     * This event occurs when a mouse/finger moves on top of the control.
+     * This event occurs when a mouse/finger moves on top of the control,
+     * or anywhere in the document while a left button press started on the control is active.
      */
     public mouseMove: IEventEmitterOfT<IMouseEventArgs>;
 
     /**
      * This event occurs when a mouse/finger is released from the control.
+     * A left button press started on the control always ends with a mouseUp, wherever the release happens.
      */
     public mouseUp: IEventEmitterOfT<IMouseEventArgs>;
 

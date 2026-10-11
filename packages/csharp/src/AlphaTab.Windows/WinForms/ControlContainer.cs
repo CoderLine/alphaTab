@@ -21,26 +21,91 @@ namespace AlphaTab.WinForms
             MouseDown = new DelegatedEventEmitter<IMouseEventArgs>(
                 value =>
                 {
-                    Control.MouseDown += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                    AttachMouseHandlers();
+                    _mouseDown += value;
                 },
-                value => { }
+                value => { _mouseDown -= value; }
             );
 
             MouseMove = new DelegatedEventEmitter<IMouseEventArgs>(
                 value =>
                 {
-                    Control.MouseMove += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                    AttachMouseHandlers();
+                    _mouseMove += value;
                 },
-                value => { }
+                value => { _mouseMove -= value; }
             );
 
             MouseUp = new DelegatedEventEmitter<IMouseEventArgs>(
                 value =>
                 {
-                    Control.MouseUp += (sender, args) => value(new WinFormsMouseEventArgs(Control, args));
+                    AttachMouseHandlers();
+                    _mouseUp += value;
                 },
-                value => { }
+                value => { _mouseUp -= value; }
             );
+        }
+
+        private Action<IMouseEventArgs>? _mouseDown;
+        private Action<IMouseEventArgs>? _mouseMove;
+        private Action<IMouseEventArgs>? _mouseUp;
+        private bool _mouseHandlersAttached;
+        private bool _isPressed;
+
+        private void AttachMouseHandlers()
+        {
+            if (_mouseHandlersAttached)
+            {
+                return;
+            }
+
+            _mouseHandlersAttached = true;
+
+            // WinForms captures the mouse on press, so releases outside the control are delivered here.
+            // Losing that capture (e.g. alt-tab, a modal dialog) ends the press without a MouseUp.
+            Control.MouseDown += (sender, args) =>
+            {
+                if (args.Button == MouseButtons.Left)
+                {
+                    _isPressed = true;
+                }
+
+                _mouseDown?.Invoke(new WinFormsMouseEventArgs(Control, args));
+            };
+
+            Control.MouseMove += (sender, args) => _mouseMove?.Invoke(new WinFormsMouseEventArgs(Control, args));
+
+            Control.MouseUp += (sender, args) =>
+            {
+                if (args.Button == MouseButtons.Left)
+                {
+                    _isPressed = false;
+                }
+
+                _mouseUp?.Invoke(new WinFormsMouseEventArgs(Control, args));
+            };
+
+            Control.MouseCaptureChanged += (sender, args) =>
+            {
+                if (!_isPressed || Control.Capture)
+                {
+                    return;
+                }
+
+                // deferred: a regular release may drop the capture before its MouseUp is raised
+                Control.BeginInvoke(() =>
+                {
+                    if (!_isPressed)
+                    {
+                        return;
+                    }
+
+                    _isPressed = false;
+                    var location = Control.PointToClient(Cursor.Position);
+                    _mouseUp?.Invoke(new WinFormsMouseEventArgs(Control,
+                        new MouseEventArgs(MouseButtons.Left, 0, location.X, location.Y, 0)));
+                });
+            };
         }
 
         public double Width
