@@ -58,6 +58,7 @@
   --at-accent-soft: rgba(59, 109, 184, .10);
   --at-accent-soft-strong: rgba(59, 109, 184, .18);
   --at-success: #2f8f6c;
+  --at-danger: #c0392b;
   --at-code: #0d1626;
   --at-code-bg: #eef2f8;
   --at-code-surface: #0d1626;
@@ -87,6 +88,17 @@
   --at-cta-accent-ink: #0a1020;
 
   --at-font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Syntax palette for code on --at-code-surface, which is dark in both color modes. */
+  --at-syntax-plain: #e3eaf3;
+  --at-syntax-comment: #7a869a;
+  --at-syntax-string: #a4cba0;
+  --at-syntax-keyword: #9bb7e6;
+  --at-syntax-number: #dba78a;
+  --at-syntax-type: #e3c995;
+  --at-syntax-function: #9bcfd2;
+  --at-syntax-punctuation: #7e8aa0;
+  --at-syntax-invalid: #f28b82;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -113,6 +125,7 @@
   --at-accent-soft: rgba(106, 152, 227, .16);
   --at-accent-soft-strong: rgba(106, 152, 227, .28);
   --at-success: #5cc398;
+  --at-danger: #f28b82;
   --at-code: #eef2f8;
   --at-code-bg: #0c1424;
   --at-code-surface: #0a1226;

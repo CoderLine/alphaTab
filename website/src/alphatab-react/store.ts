@@ -1,4 +1,4 @@
-import type { AlphaTabApi, model, Settings } from '@coderline/alphatab';
+import type { AlphaTabApi, importer, model, Settings } from '@coderline/alphatab';
 import type { ColorMode } from '@docusaurus/theme-common';
 import type { AlphaTabModule } from './module';
 import { applyAlphaTabSettings, applyTheme, type AlphaTabPreset } from './settings';
@@ -58,6 +58,24 @@ export const initialAlphaTabState: AlphaTabState = {
     loopRangeBars: null,
     playback: initialPlaybackState,
 };
+
+export type TexDiagnosticSeverity = 'error' | 'warning' | 'hint';
+
+/** An alphaTex diagnostic with 1-based line/column positions. */
+export interface TexDiagnostic {
+    severity: TexDiagnosticSeverity;
+    /** e.g. `AT204`; empty for failures without a diagnostic code. */
+    code: string;
+    message: string;
+    start?: { line: number; col: number };
+    end?: { line: number; col: number };
+}
+
+export interface TexLoadResult {
+    /** Whether the source was free of errors and handed to the renderer. */
+    rendered: boolean;
+    diagnostics: TexDiagnostic[];
+}
 
 export type StaveProfileKey = 'scoreTab' | 'score' | 'tab';
 export type LayoutModeKey = 'page' | 'scroll';
@@ -255,6 +273,42 @@ export class AlphaTabStore {
         }
     }
 
+    /**
+     * Parses `tex` and renders it when it has no errors; otherwise the
+     * previously rendered score stays. Supersedes any pending load.
+     */
+    loadTex(tex: string): TexLoadResult {
+        ++this.loadToken;
+        const importer = new this.module.importer.AlphaTexImporter();
+        importer.logErrors = false;
+        importer.initFromString(tex, this.api.settings);
+        let score: model.Score | null = null;
+        let failure: unknown = null;
+        try {
+            score = importer.readScore();
+        } catch (e) {
+            failure = e;
+        }
+
+        const diagnostics = [
+            ...importer.lexerDiagnostics,
+            ...importer.parserDiagnostics,
+            ...importer.semanticDiagnostics,
+        ].map((d) => this.toTexDiagnostic(d));
+
+        if (!score) {
+            if (!diagnostics.some((d) => d.severity === 'error')) {
+                diagnostics.push({ severity: 'error', code: '', message: describeFailure(failure) });
+            }
+            return { rendered: false, diagnostics };
+        }
+
+        if (this.snapshot.isPlaying) this.api.stop();
+        this.playback.setSource({ tex });
+        this.api.renderScore(score);
+        return { rendered: true, diagnostics };
+    }
+
     /** Retries the preferred playback source after a backing-track failure. */
     retryPlayback(): void {
         this.playback.retry();
@@ -371,6 +425,21 @@ export class AlphaTabStore {
         }
     }
 
+    private toTexDiagnostic(d: importer.alphaTex.AlphaTexDiagnostic): TexDiagnostic {
+        const { AlphaTexDiagnosticsSeverity } = this.module.importer.alphaTex;
+        const severity: TexDiagnosticSeverity =
+            d.severity === AlphaTexDiagnosticsSeverity.Error ? 'error' :
+            d.severity === AlphaTexDiagnosticsSeverity.Warning ? 'warning' :
+                                                                 'hint';
+        return {
+            severity,
+            code: `AT${String(d.code).padStart(3, '0')}`,
+            message: d.message,
+            start: d.start ? { line: d.start.line, col: d.start.col } : undefined,
+            end: d.end ? { line: d.end.line, col: d.end.col } : undefined,
+        };
+    }
+
     private findBarForTick(tick: number): number {
         const ticks = this.snapshot.barStartTicks;
         if (ticks.length === 0) return 0;
@@ -383,4 +452,12 @@ export class AlphaTabStore {
         }
         return lo;
     }
+}
+
+function describeFailure(failure: unknown): string {
+    if (failure instanceof Error) {
+        const cause = (failure as Error & { cause?: unknown }).cause;
+        return cause instanceof Error ? cause.message : failure.message;
+    }
+    return String(failure);
 }

@@ -32,6 +32,8 @@ function isTypingContext(target: EventTarget | null): boolean {
     const tag = target.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
     if (target.isContentEditable) return true;
+    // Editors built on the EditContext API (e.g. Monaco) receive text input on a plain element.
+    if ((target as HTMLElement & { editContext?: unknown }).editContext) return true;
     return false;
 }
 

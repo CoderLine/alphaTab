@@ -37,7 +37,7 @@ We use two packages from Microsoft bridge this gap:
 // Monaco editor worker (see Monaco docs)
 
 // @ts-expect-error
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import editorWorker from 'monaco-editor/editor/editor.worker?worker';
 self.MonacoEnvironment = {
     getWorker: () => {
         return new editorWorker();
@@ -46,12 +46,11 @@ self.MonacoEnvironment = {
 
 // 
 // alphaTex Grammar Support
+import { addTextMateGrammarSupport, registerAlphaTexGrammar } from '@coderline/alphatab-monaco';
 
 // load the WebAssembly file (e.g. via ajax or other mechanisms)
 // it is shipped together with the vscode-oniguruma NPM package
-const onigurumaWasm:ArrayBuffer = await load(new URL('vscode-oniguruma/release/onig.wasm', import.meta.url));
-
-import { addTextMateGrammarSupport } from '@coderline/alphatab-monaco/textmate';
+const onigurumaWasm: ArrayBuffer = await load(new URL('vscode-oniguruma/release/onig.wasm', import.meta.url));
 
 // Setup general textmate grammar support (also other grammars beside alphaTex could be used)
 const textMateSupport = addTextMateGrammarSupport(onigurumaWasm);
@@ -79,16 +78,16 @@ To get the remaining capabilites into Monaco, we first have to launch the alphaT
 The NPM package provides a module which can be spawned as web worker:
 
 ```ts
-const lspWorker = new Worker(new URL('@coderline/alphatab-monaco/worker', import.meta.url));
+const lspWorker = new Worker(new URL('@coderline/alphatab-monaco/dist/worker.mjs', import.meta.url));
 ```
 
 Alternatively you can also create an own worker file in your project and start the language server: 
 
 ```ts title="lsp.worker.ts"
 // Variant 1
-import '@coderline/alphatab-monaco/worker';
+import '@coderline/alphatab-monaco/dist/worker.mjs';
 // Variant 2: 
-import { startWebWorkerLanguageServer } from '@coderline/alphatab-language-server';
+import { startWebWorkerLanguageServer } from '@coderline/alphatab-language-server/server/browser';
 
 const workerGlobalThis = globalThis as unknown as DedicatedWorkerGlobalScope;
 startWebWorkerLanguageServer(workerGlobalThis, workerGlobalThis);
@@ -100,50 +99,17 @@ const lspWorker = new Worker(new URL('./lsp.worker.ts', import.meta.url));
 
 ## Setup the Monaco LSP Integration
 
-Integrating with this LSP worker is quite simple. Simply call `setupLspAlphaTexLanguageSupport`.
+With the grammar registered and the editor created as shown above, connect the editor to the language server worker 
+by calling `basicEditorLspIntegration`. It provides diagnostics, completions, hovers and signature help for the editor's model.
 
 ```ts
-//
-// Monaco editor worker (see Monaco docs)
+import { basicEditorLspIntegration } from '@coderline/alphatab-monaco/dist/lsp';
 
-// @ts-expect-error
-import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-self.MonacoEnvironment = {
-    getWorker: () => {
-        return new editorWorker();
-    }
-};
-
-// 
-// alphaTex Grammar Support
-
-// load the WebAssembly file (e.g. via ajax or other mechanisms)
-// it is shipped together with the vscode-oniguruma NPM package
-const onigurumaWasm:ArrayBuffer = await load(new URL('vscode-oniguruma/release/onig.wasm', import.meta.url));
-
-import { addTextMateGrammarSupport } from '@coderline/alphatab-monaco/textmate';
-
-// Setup general textmate grammar support (also other grammars beside alphaTex could be used)
-const textMateSupport = addTextMateGrammarSupport(onigurumaWasm);
-
-// Register the alphaTex grammar
-await registerAlphaTexGrammar(textMateSupport);
-
-//
-// Setup editor
-import * as monaco from 'monaco-editor';
-const element = document.querySelector<HTMLElement>('#editor');
-const editor = monaco.editor.create(element!, {
-    value: '\\title "Hello World"',
-    language: 'alphatex',
-    automaticLayout: true
-});
-
-//
-// Setup the LSP support
-import { addTextMateGrammarSupport } from '@coderline/alphatab-monaco/textmate';
-await setupLspAlphaTexLanguageSupport(editor);
+const lspWorker = new Worker(new URL('./lsp.worker.ts', import.meta.url));
+await basicEditorLspIntegration(editor, lspWorker, { languageId: 'alphatex' });
 ```
+
+The alphaTex editor on the [alphaTab landing page](/) is built on this stack.
 
 > [!WARNING]
 > We noticed some strange Vite behaviors when spawning workers in our [development playground](https://github.com/CoderLine/alphaTab/blob/develop/packages/playground/alphatex-editor.ts).

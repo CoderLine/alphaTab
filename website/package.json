@@ -17,7 +17,8 @@
     "generate-alphatabdoc-empty": "tsx scripts/generate-alphatabdoc.mts --empty"
   },
   "dependencies": {
-    "@coderline/alphatab": "^1.9.0-alpha.1861",
+    "@coderline/alphatab": "^1.9.0-alpha.1891",
+    "@coderline/alphatab-monaco": "^1.9.0-alpha.1891",
     "@docusaurus/core": "^3.9.2",
     "@docusaurus/plugin-client-redirects": "3.9.2",
     "@docusaurus/preset-classic": "^3.9.2",
@@ -35,14 +36,18 @@
     "@uiw/react-color": "^2.5.5",
     "@uiw/react-color-chrome": "^2.5.5",
     "clsx": "^2.1.1",
+    "monaco-editor": "^0.56.0",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-tooltip": "^5.28.1",
+    "vscode-languageserver-protocol": "^3.18.4",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.3.2",
     "webpack": "^5.98.0"
   },
   "devDependencies": {
-    "@coderline/alphatab-language-server": "^1.9.0-alpha.1853",
+    "@coderline/alphatab-language-server": "^1.9.0-alpha.1891",
     "@coderline/alphatab-webpack": "^1.9.0-alpha.1785",
     "@docusaurus/module-type-aliases": "^3.9.2",
     "@docusaurus/tsconfig": "^3.9.2",

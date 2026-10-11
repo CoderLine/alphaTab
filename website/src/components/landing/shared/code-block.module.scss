@@ -37,18 +37,18 @@
   font-family: var(--at-font-mono);
   font-size: 12.5px;
   line-height: 1.65;
-  color: #e3eaf3;
+  color: var(--at-syntax-plain);
   overflow: auto;
   white-space: pre;
   background: transparent;
 }
 
 // Light-theme token palette
-.tok-plain { color: #e3eaf3; }
-.tok-comment { color: #7a869a; }
-.tok-string { color: #a4cba0; }
-.tok-kw { color: #9bb7e6; }
-.tok-num { color: #dba78a; }
-.tok-cls { color: #e3c995; }
-.tok-fn { color: #9bcfd2; }
-.tok-punc { color: #7e8aa0; }
+.tok-plain { color: var(--at-syntax-plain); }
+.tok-comment { color: var(--at-syntax-comment); }
+.tok-string { color: var(--at-syntax-string); }
+.tok-kw { color: var(--at-syntax-keyword); }
+.tok-num { color: var(--at-syntax-number); }
+.tok-cls { color: var(--at-syntax-type); }
+.tok-fn { color: var(--at-syntax-function); }
+.tok-punc { color: var(--at-syntax-punctuation); }

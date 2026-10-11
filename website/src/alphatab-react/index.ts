@@ -15,6 +15,9 @@ export type {
     LoopRangeBars,
     StaveProfileKey,
     LayoutModeKey,
+    TexDiagnostic,
+    TexDiagnosticSeverity,
+    TexLoadResult,
 } from './store';
 export type { AlphaTabPreset } from './settings';
 export { registerAlphaTabLoader, initAlphaTab, useAlphaTabModule } from './module';
