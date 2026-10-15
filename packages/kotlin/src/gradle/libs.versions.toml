@@ -1,6 +1,6 @@
 [versions]
 agp = "9.4.1"
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 
 kotlinx-coroutines = "1.11.0"
 dokka = "2.2.0"
