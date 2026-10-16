@@ -168,45 +168,222 @@
 // padding/hover rules above (.navbar { ... .header-github-link {...} }).
 
 // ─── Docs: sidebar ──────────────────────────────────────────────────
+$sidebar-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E");
+$sidebar-panel-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='M9 3v18'/%3E%3C/svg%3E");
+
 .theme-doc-sidebar-container {
+  --doc-sidebar-hidden-width: 44px;
   border-right-color: var(--at-line);
+
+  nav.menu {
+    padding: 16px 4px 16px 10px;
+  }
 }
 
 .theme-doc-sidebar-menu {
-  padding: 8px 0;
+  // Each guided level costs indent + padding; sized so the longest setting
+  // names (e.g. lastNotationStaffPaddingBottom) fit on one line at 300px.
+  --sidebar-guide-indent: 11px;
+  --sidebar-guide-padding: 6px;
 
-  .menu__list {
-    .menu__list { padding-left: 8px; }
+  .menu__list-item:not(:first-child) {
+    margin-top: 1px;
   }
 
   .menu__list-item-collapsible {
-    margin: 2px 0;
+    border-radius: 6px;
+    transition: background-color 120ms ease;
+
+    &:hover {
+      background: var(--at-surface-alt);
+    }
   }
 
   .menu__link {
+    position: relative;
     font-size: 13.5px;
+    font-weight: 450;
+    line-height: 1.35;
     color: var(--at-ink-soft);
-    padding: 7px 10px 7px 12px;
+    padding: 6px 10px;
     border-radius: 6px;
-    border-left: 2px solid transparent;
-    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
-    font-weight: 500;
+    transition: background-color 120ms ease, color 120ms ease;
 
     &:hover {
       background: var(--at-surface-alt);
       color: var(--at-ink);
     }
 
-    &--active {
-      color: var(--at-accent);
-      background: var(--at-accent-soft);
-      border-left-color: var(--at-accent);
+    &--sublist {
+      font-weight: 500;
+    }
+
+    // Ancestors of the current page
+    &--sublist.menu__link--active {
+      color: var(--at-ink);
       font-weight: 600;
     }
 
-    &--sublist {
+    &--active:not(.menu__link--sublist) {
+      background: var(--at-accent-soft);
+      color: var(--at-accent);
       font-weight: 600;
+    }
+  }
+
+  // A category whose own index page is open. Infima forces the link inside a
+  // collapsible row transparent, so the fill goes on the row.
+  .menu__list-item-collapsible--active {
+    &,
+    &:hover {
+      background: var(--at-accent-soft);
+    }
+
+    > .menu__link {
+      color: var(--at-accent);
+      font-weight: 600;
+    }
+  }
+
+  .theme-doc-sidebar-item-category-level-1 {
+    > .menu__list-item-collapsible > .menu__link {
+      font-weight: 600;
+    }
+
+    > .menu__list-item-collapsible:not(.menu__list-item-collapsible--active) > .menu__link {
       color: var(--at-ink);
+    }
+
+    &:not(.menu__list-item--collapsed) {
+      margin-bottom: 10px;
+    }
+  }
+
+  .menu__list .menu__list {
+    margin: 1px 0 0 var(--sidebar-guide-indent);
+    padding-left: var(--sidebar-guide-padding);
+    border-left: 1px solid var(--at-line);
+
+    .menu__link {
+      padding-left: 8px;
+      padding-right: 6px;
+    }
+
+    .menu__link--active:not(.menu__link--sublist)::before {
+      content: '';
+      position: absolute;
+      left: calc(-1 * var(--sidebar-guide-padding) - 1.5px);
+      top: 5px;
+      bottom: 5px;
+      width: 2px;
+      border-radius: 2px;
+      background: var(--at-accent);
+    }
+  }
+
+  .menu__link--sublist-caret::after,
+  .menu__caret::before {
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
+    background: currentColor;
+    mask: $sidebar-chevron center / 14px 14px no-repeat;
+    filter: none;
+    transform: rotate(90deg);
+    transition: transform 160ms ease;
+  }
+
+  .menu__list-item--collapsed > .menu__list-item-collapsible > .menu__link--sublist-caret::after,
+  .menu__list-item--collapsed > .menu__list-item-collapsible > .menu__caret::before {
+    transform: rotate(0deg);
+  }
+
+  .menu__link--sublist-caret::after {
+    color: var(--at-muted);
+  }
+
+  .menu__list-item-collapsible:hover .menu__link--sublist-caret::after {
+    color: var(--at-ink-soft);
+  }
+
+  .menu__caret {
+    margin: 2px;
+    padding: 0 6px;
+    border-radius: 6px;
+    color: var(--at-muted);
+
+    &:hover {
+      background: var(--at-line-soft);
+      color: var(--at-ink);
+    }
+  }
+}
+
+// Collapse / expand controls. Both only carry hashed CSS-module classes;
+// category links also have role="button", hence the `div` qualifier.
+@media (min-width: 997px) {
+  .theme-doc-sidebar-container {
+    .button.button--secondary {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      height: auto;
+      margin: 0;
+      padding: 10px 20px;
+      border: 0;
+      border-top: 1px solid var(--at-line-soft);
+      border-radius: 0;
+      background: var(--at-surface);
+      color: var(--at-muted);
+      font: 500 12.5px/1 var(--ifm-font-family-base);
+      transition: color 120ms ease;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--at-surface);
+        color: var(--at-ink);
+      }
+
+      svg {
+        display: none;
+      }
+
+      &::before {
+        content: '';
+        width: 16px;
+        height: 16px;
+        background: currentColor;
+        mask: $sidebar-panel-icon center / 16px 16px no-repeat;
+      }
+
+      &::after {
+        content: 'Collapse sidebar';
+      }
+    }
+
+    div[role='button'] {
+      align-items: flex-end;
+      padding-bottom: 10px;
+      background: var(--at-surface);
+      color: var(--at-muted);
+
+      &:hover,
+      &:focus {
+        background: var(--at-surface);
+        color: var(--at-ink);
+      }
+
+      svg {
+        display: none;
+      }
+
+      &::after {
+        content: '';
+        width: 32px;
+        height: 32px;
+        background: currentColor;
+        mask: $sidebar-panel-icon center / 16px 16px no-repeat;
+      }
     }
   }
 }

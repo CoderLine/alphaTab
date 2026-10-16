@@ -165,6 +165,7 @@ async function createConfig(): Promise<Config> {
     }
   },
   themes: ["@docusaurus/theme-mermaid"],
+  clientModules: ["./src/clientModules/revealActiveSidebarLink.ts"],
 
   presets: [
     [
