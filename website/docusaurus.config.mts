@@ -486,7 +486,7 @@ async function createConfig(): Promise<Config> {
             { label: "Web", to: "/docs/getting-started/installation-web" },
             { label: ".NET", to: "/docs/getting-started/installation-net" },
             { label: "Android", to: "/docs/getting-started/installation-android" },
-            { label: "Migration", to: "/docs/migration/breaking-changes-097-098" },
+            { label: "API reference", to: "/docs/reference/api" },
           ],
         },
         {
@@ -553,6 +553,13 @@ async function createConfig(): Promise<Config> {
         redirects: [
           { from: ["/docs/playground/playground", "/docs/playground"], to: "/playground" },
           { from: "/docs/showcase/introduction", to: "/docs/features/" },
+          {
+            from: ["/docs/migration/breaking-changes-095-096", "/docs/migration/breaking-changes-097-098"],
+            to: latestReleaseNotesPath,
+          },
+          { from: "/docs/migration/data-attributes", to: "/docs/getting-started/configuration-web" },
+          { from: "/docs/migration/dom-events", to: "/docs/getting-started/configuration-web" },
+          { from: "/docs/migration/jquery", to: "/docs/getting-started/installation-web" },
           {
             from: "/docs/showcase/general",
             to: "/docs/features/render/coverage-repeats",
