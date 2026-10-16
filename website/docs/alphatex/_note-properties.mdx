@@ -587,15 +587,35 @@ lmordent ()
 ## `string`
 
 ```plain title="Syntax"
+// [1]: Show the string number of a fretted note
 string ()
+// [2]: Show the given string number on a pitched note
+string string
 ```
 
 **Description:** Adds an annotation showing the string number of the note above the staff.
+
+For fretted notes the string is taken from the note value (`fret.string`).
+For pitched notes the string number can be specified explicitly (e.g. string indications in classical guitar music).
+It is only shown as annotation and has no effect on the playback.
+
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `string` | The string number to show. Like for fretted notes 1 is the highest string. On staves without tuning a standard 6 string instrument is assumed. Only allowed on pitched notes. | `Number` | yes  |
 
 **Example:**
 
 <AlphaTexSample tracks="all" player={true} >{`
 3.3{string} 3.4{string} 3.5{string}
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} >{`
+\\tuning piano
+.
+a4{string 1} c4{string 2} g3{string 3} e3{string 4}
 
 `}</AlphaTexSample>
 

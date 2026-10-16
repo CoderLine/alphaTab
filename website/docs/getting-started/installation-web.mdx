@@ -122,7 +122,7 @@ const alphaTab = require("@coderline/alphatab");
 import * as alphaTab from '@coderline/alphatab';
 ```
 
-Only the low-level APIs are exposed on Node.js today. Headless rendering to images through [alphaSkia](https://github.com/CoderLine/alphaSkia) is on the roadmap. See the [Node.js guide](/docs/guides/nodejs) for the full setup.
+`AlphaTabApi` expects a DOM host, so Node.js uses the low-level APIs (`ScoreLoader`, `ScoreRenderer`, `MidiFileGenerator`) directly. They render to SVG out of the box, and to PNG once [alphaSkia](https://github.com/CoderLine/alphaSkia) is wired in. See [Node.js headless rendering](/docs/features/render/nodejs-headless-rendering) for the pipeline and the [Node.js guide](/docs/guides/nodejs) for a complete walkthrough.
 
 ## Dependencies {#dependencies}
 

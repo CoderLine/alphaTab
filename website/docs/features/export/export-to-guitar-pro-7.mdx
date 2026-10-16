@@ -63,6 +63,16 @@ api.scoreLoaded.on(() => {
 
 Guitar Pro 7 and Guitar Pro 8 both open the resulting file. Any GP8-only additions the source score used are downgraded to their GP7 equivalent where possible.
 
+Since 1.9.0 the exporter also handles the following:
+
+- The system layout (bars per system) is written in the form Guitar Pro expects, so the multi-track view in Guitar Pro 8 opens the file.
+- Every note gets a string and fret, also on staves without a tuning such as piano parts or MusicXML imports. Guitar Pro requires both on every note.
+- Guitar Pro supports four voices per bar. Voices with a higher index move into unused slots. When all four slots are taken, the remaining voices are dropped and a warning is logged.
+- Notes keep their spelling in every key, for example a B♭ in F major stays a B♭.
+- The tuning display mode of the stylesheet (tuning above the score or on the staff lines) is written to the binary stylesheet. See [Tuning display](/docs/features/render/tuning-display).
+- Percussion notes keep their string, so drum tablature survives the round trip. See [Drum and percussion notation](/docs/features/render/drum-tabs).
+- The exporter works on a copy of the score. `api.score` stays unchanged.
+
 ## Where to look next
 
 - [Export to alphaTex](export-to-alphatex) — write the score as text instead of a binary container.

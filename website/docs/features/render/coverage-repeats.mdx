@@ -1,6 +1,6 @@
 ---
 title: "Repeats and structural elements"
-description: "Repeats, alternate endings, D.C./D.S., segno, coda, markers."
+description: "Repeats, alternate endings, D.C./D.S., segno, coda, markers, and the order in which the player follows them."
 sidebar_custom_props:
   feature_chapter: notation-coverage
   feature_order: 50
@@ -8,9 +8,14 @@ keywords:
   - alphaTab
   - repeats
   - structural
+  - playback order
+  - alternate endings
+  - da capo
+  - dal segno
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 Repeats, jumps, and section markers drive how a score reads across systems. alphaTab picks them up from the source file and renders each with its standard engraving convention.
 
@@ -43,6 +48,41 @@ Segno and coda are the target glyphs the `D.S.` and `al Coda` directions jump to
 Section markers are the labeled text tags above a bar that name a formal section — `Intro`, `Verse`, `Chorus`, `Bridge`. alphaTab renders them above the staff at the marked bar, drawn from the marker text in the source file.
 
 <AlphaTab file="/files/features/Markers.gp5" />
+
+## Playback order *(new in 1.9)* {#playback-order}
+
+The player, the cursor and MIDI export follow repeats, alternate endings and jumps in the same order. Since 1.9.0 these rules apply:
+
+- Each D.C. and D.S. direction is taken once. When playback reaches it a second time, it continues with the next bar.
+- After a jump, repeats play as their final pass: the passage plays once, and of its alternate endings only the last one, the same way MuseScore plays it.
+- Repeat passes are counted per repeat group. A repeat sign in several alternate endings plays every ending once, as in Guitar Pro 8.
+- A jump inside a repeat, or on its closing bar, is taken on the final pass, after all repeats have played, as in Guitar Pro 8 and MuseScore.
+- A jump on an alternate ending that playback skips is not taken.
+- MusicXML files that write D.C., D.S., To Coda, Coda, Segno and Fine as attributes of a `<sound>` element inside a `<direction>` (the way MuseScore exports them) play these jumps instead of only showing the text.
+
+Press play in the next demo and follow the cursor. Bar 1 opens a repeat, bars 2 and 3 are the first and second ending, bar 3 carries `Fine`, and bar 4 ends with `D.C. al Fine`. The playback order is bars 1 2 1 3 4 1 3: after the D.C. the repeat plays as its final pass, so bar 1 continues straight into the second ending, where `Fine` ends the piece.
+
+<AlphaTexSample player={true}>{`
+\\track "Guitar"
+\\staff {score}
+\\ro :4 C4 D4 E4 F4 |
+\\ae 1 \\rc 2 G4 F4 E4 D4 |
+\\ae 2 \\jump fine G4 E4 :2 C4 |
+\\jump daCapoAlFine :4 A4 G4 F4 E4
+`}</AlphaTexSample>
+
+In the next demo `D.C. al Coda` sits on the closing bar of a repeat. It is taken after the repeat has played, and the second time through `To Coda` jumps to the coda. The playback order is bars 1 2 3 1 2 3 1 2 4.
+
+<AlphaTexSample player={true} settings={{display:{systemsLayoutMode:"UseModelLayout"}}}>{`
+\\track "Guitar" { defaultSystemsLayout 3 }
+\\staff {score}
+\\ro :4 C4 D4 E4 F4 |
+\\jump daCoda G4 A4 B4 C5 |
+\\rc 2 \\jump daCapoAlCoda C5 B4 A4 G4 |
+\\jump coda :2 C4 C4
+`}</AlphaTexSample>
+
+In alphaTex, repeats and jumps are written with the bar metadata [`\ro`](/docs/alphatex/bar-metadata#ro), [`\rc`](/docs/alphatex/bar-metadata#rc), [`\ae`](/docs/alphatex/bar-metadata#ae) and [`\jump`](/docs/alphatex/bar-metadata#jump).
 
 ## Show it in code
 

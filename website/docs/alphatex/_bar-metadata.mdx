@@ -887,3 +887,417 @@ C4.8 * 8
 
 `}</AlphaTexSample>
 
+## `\barNumber`
+
+```plain title="Syntax"
+// [1]: 
+\barNumber text
+// [2]: 
+\barNumber number
+```
+
+**Description:** Sets the bar number display.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[1]` |  `text` | THe custom text shown instead of the number | `String` | yes  |
+| `[2]` |  `number` | The new number (affects subsequent counting) | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+// anacrusis (no number)
+\\ac 
+    C4.1 
+| 
+// standard bar number 1
+    C4 
+| 
+// custom text instead of bar number 2
+\\barNumber "Hello" 
+    C4
+|
+// a jump to 10 
+\\barNumber 10
+    C4
+|
+// now becomes 11 after the customization before
+    C4
+
+`}</AlphaTexSample>
+
+## `\barDisplay`
+
+```plain title="Syntax"
+\barDisplay (staffTypes)
+```
+
+**Description:** Defines the display of elements like clefs, key signatures, time signatures and bar numbers for the current bar.
+
+The arguments select the staff types to which the properties apply. If no staff types are specified, every property applies to all staff types supporting the related element.
+
+All properties are optional. Properties which are not specified are inherited from [`\staffDisplay`](/docs/alphatex/staff-metadata#staffdisplay) and [`\defaultStaffDisplay`](/docs/alphatex/score-metadata#defaultstaffdisplay). The values only apply to the bar they are specified on.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `staffTypes` | The staff types to which the properties apply. If omitted, every property applies to all staff types supporting it. | `score\|tabs\|slash\|numbered[]` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `staffTypes` | <ParameterValuesTable values={[["score","Standard notation"],["tabs","Guitar tablature"],["slash","Slash notation"],["numbered","Numbered notation (Jianpu)"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\track
+    \\staff {score tabs}
+    \\ks D 3.3.4 3.3 3.3 3.3 |
+    \\barDisplay score { ksVisibility false } \\ks A 3.3 3.3 3.3 3.3 |
+    3.3 3.3 3.3 3.3
+
+`}</AlphaTexSample>
+
+**Properties:**
+
+### `clefVisibility`
+
+```plain title="Syntax"
+// [1]: 
+clefVisibility ()
+// [2]: 
+clefVisibility visibility
+// [3]: 
+clefVisibility visibility
+// [4]: 
+clefVisibility visibility
+```
+
+**Description:** Show or hide the clef. Supported staff types: `score`, `tabs`.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | Whether the clef is shown | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | Whether the clef is shown | `true\|false` | yes  |
+| `[4]` |  `visibility` | Whether the clef is shown | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the clef"],["\"false\"","Hide the clef"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the clef"],["false","Hide the clef"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the clef"],["0","Hide the clef"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { clefVisibility false } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `clefPlacement`
+
+```plain title="Syntax"
+clefPlacement placement
+```
+
+**Description:** Show the clef on all staves or only on the primary (topmost) staff. Supported staff types: `score`, `tabs`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `placement` | On which staves the clef is shown | `allStaves\|primary` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `placement` | <ParameterValuesTable values={[["allStaves","All staves"],["primary","Only the primary (topmost) staff"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { clefPlacement primary } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `clefSystems`
+
+```plain title="Syntax"
+clefSystems systems
+```
+
+**Description:** Show the clef on all systems or only on the first system. Supported staff types: `score`, `tabs`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `systems` | On which systems the clef is shown | `allSystems\|firstSystemOnly` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `systems` | <ParameterValuesTable values={[["allSystems","All systems"],["firstSystemOnly","Only the first system"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { clefSystems firstSystemOnly } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `ksVisibility`
+
+```plain title="Syntax"
+// [1]: 
+ksVisibility ()
+// [2]: 
+ksVisibility visibility
+// [3]: 
+ksVisibility visibility
+// [4]: 
+ksVisibility visibility
+```
+
+**Description:** Show or hide the key signature. Supported staff types: `score`, `slash`.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | Whether the key signature is shown | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | Whether the key signature is shown | `true\|false` | yes  |
+| `[4]` |  `visibility` | Whether the key signature is shown | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the key signature"],["\"false\"","Hide the key signature"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the key signature"],["false","Hide the key signature"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the key signature"],["0","Hide the key signature"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { ksVisibility false } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `ksPlacement`
+
+```plain title="Syntax"
+ksPlacement placement
+```
+
+**Description:** Show the key signature on all staves or only on the primary (topmost) staff. Supported staff types: `score`, `slash`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `placement` | On which staves the key signature is shown | `allStaves\|primary` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `placement` | <ParameterValuesTable values={[["allStaves","All staves"],["primary","Only the primary (topmost) staff"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { ksPlacement primary } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `ksSystems`
+
+```plain title="Syntax"
+ksSystems systems
+```
+
+**Description:** Show the key signature on all systems or only on the first system. Supported staff types: `score`, `slash`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `systems` | On which systems the key signature is shown | `allSystems\|firstSystemOnly` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `systems` | <ParameterValuesTable values={[["allSystems","All systems"],["firstSystemOnly","Only the first system"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { ksSystems firstSystemOnly } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `tsVisibility`
+
+```plain title="Syntax"
+// [1]: 
+tsVisibility ()
+// [2]: 
+tsVisibility visibility
+// [3]: 
+tsVisibility visibility
+// [4]: 
+tsVisibility visibility
+```
+
+**Description:** Show or hide the time signature. Supported staff types: `score`, `tabs`, `slash`, `numbered`.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | Whether the time signature is shown | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | Whether the time signature is shown | `true\|false` | yes  |
+| `[4]` |  `visibility` | Whether the time signature is shown | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the time signature"],["\"false\"","Hide the time signature"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the time signature"],["false","Hide the time signature"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the time signature"],["0","Hide the time signature"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { tsVisibility false } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `tsPlacement`
+
+```plain title="Syntax"
+tsPlacement placement
+```
+
+**Description:** Show the time signature on all staves or only on the primary (topmost) staff. Supported staff types: `score`, `tabs`, `slash`, `numbered`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `placement` | On which staves the time signature is shown | `allStaves\|primary` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `placement` | <ParameterValuesTable values={[["allStaves","All staves"],["primary","Only the primary (topmost) staff"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { tsPlacement primary } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `tsSystems`
+
+```plain title="Syntax"
+tsSystems systems
+```
+
+**Description:** Show the time signature on all systems or only on the first system. Supported staff types: `score`, `tabs`, `slash`, `numbered`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `systems` | On which systems the time signature is shown | `allSystems\|firstSystemOnly` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `systems` | <ParameterValuesTable values={[["allSystems","All systems"],["firstSystemOnly","Only the first system"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { tsSystems firstSystemOnly } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `barNumber`
+
+```plain title="Syntax"
+barNumber mode
+```
+
+**Description:** Set how bar numbers are shown. Supported staff types: all.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `allBars\|firstOfSystem\|hide` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["allBars","All bars"],["firstOfSystem","First bar of every system"],["hide","Hide"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\barDisplay { barNumber allBars } \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+

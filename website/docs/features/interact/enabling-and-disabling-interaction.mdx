@@ -1,6 +1,6 @@
 ---
 title: "Enabling and disabling interaction"
-description: "Two granular toggles — `player.enableSeekToClick` and `player.enablePlaybackRangeSelection` — that gate the built-in seek and range-select behavior."
+description: "Three toggles — `player.enableSeekToClick`, `player.enablePlaybackRangeSelection`, and `player.resetPlaybackRangeOnClick` — that gate the built-in seek, range-select, and range-reset behavior."
 sidebar_custom_props:
   feature_chapter: mouse
   feature_order: 20
@@ -9,23 +9,39 @@ keywords:
   - interaction
   - enableSeekToClick
   - enablePlaybackRangeSelection
+  - resetPlaybackRangeOnClick
 ---
 
 import { ClickLogDemo } from '@site/src/components/ClickLogDemo';
 import * as Riffs from '@site/src/tex-riffs';
 
 
-A read-only thumbnail preview does not want random clicks moving its playhead. A practice UI with a fixed loop should not let a stray drag repaint the range. Two flags cover both scenarios: `player.enableSeekToClick` gates the click-to-seek behavior, and `player.enablePlaybackRangeSelection` gates the drag-select. Both default to `true` when the player is active. Flip either off in the demo below and watch the events keep firing while the corresponding built-in side effect stops.
+A read-only thumbnail preview does not want random clicks moving its playhead. A practice UI with a fixed loop should not let a stray drag repaint the range. A looping exercise should let the reader jump around inside the loop without losing it. Three flags cover these scenarios: `player.enableSeekToClick` gates the click-to-seek behavior, `player.enablePlaybackRangeSelection` gates the drag-select, and `player.resetPlaybackRangeOnClick` decides whether a plain click clears the current range. All three default to `true` when the player is active. Toggle them in the demo below: the events keep firing while the corresponding built-in behavior stops.
 
 <ClickLogDemo showInteractionToggle showCode={false} tex={Riffs.ORNAMENTS_MELODY} />
 
 ## What the flags gate
 
-With both `enableSeekToClick` and `enablePlaybackRangeSelection` on (the default), alphaTab calls `preventDefault()` on left-button mouse events over the score, moves the transport on beat-down, and drives selection highlights on beat-move / beat-up.
+With both `enableSeekToClick` and `enablePlaybackRangeSelection` on (the default), alphaTab calls `preventDefault()` on left-button mouse events over the score, paints the selection highlight on beat-move, and seeks or commits the selection on beat-up.
 
 Turn `enableSeekToClick` off and the transport stays put on click while every `beatMouseDown` / `Move` / `Up` and `noteMouseDown` / `Move` / `Up` event still fires. Turn `enablePlaybackRangeSelection` off and drag stops painting a range. In both cases your own handlers become the source of behavior.
 
-Both flags replace the legacy `enableUserInteraction` master toggle, which was deprecated in 1.9. Setting the old flag still forwards to both new ones, so migrations do not break — but new integrations should target the granular flags.
+A drag only becomes a selection once the pointer reaches a beat other than the one it was pressed on, so a range always spans at least two beats. A press and release on the same beat counts as a click, even if the mouse moved a little in between. Releasing a drag sets the playback range and moves the playhead to its start.
+
+All three flags are available since 1.9.0.
+
+## Keep the range on click *(new in 1.9)* {#keep-the-range-on-click}
+
+`player.resetPlaybackRangeOnClick` controls what a plain click does to an active playback range. It only applies while `enablePlaybackRangeSelection` is on.
+
+- `true` (default): a click clears the playback range and its highlight. With `enableSeekToClick` on, the playhead then moves to the clicked beat.
+- `false`: a click keeps the range. With `enableSeekToClick` on, the playhead moves to the clicked beat, clamped to the range: a click before the range seeks to its start, a click after it seeks to its end. A new drag still replaces the range.
+
+The same clamping applies whenever a click seeks while a range stays active, for example a range set through `api.playbackRange` with `enablePlaybackRangeSelection` off.
+
+## Migrating from `enableUserInteraction`
+
+The three flags replace the `player.enableUserInteraction` master toggle, which is deprecated since 1.9.0 and still works. Setting it, in code or in JSON settings, writes the same value to `enableSeekToClick`, `enablePlaybackRangeSelection`, and `resetPlaybackRangeOnClick`. Reading it returns `true` when seek-to-click or range selection is on.
 
 ## When to turn it off
 
@@ -33,6 +49,7 @@ Both flags replace the legacy `enableUserInteraction` master toggle, which was d
 - **Host editors with their own routing.** An editor that treats clicks as note selection, drag as reordering, right-click as a menu. Take the raw events, route them yourself, keep the built-in seek out of the way.
 - **Custom transport UX.** A tutor UI where the transport advances beat-by-beat under teacher control. Bind `beatMouseDown` to your own state machine instead of jumping the tick position.
 - **Fixed loops.** A practice UI that owns the playback range: turn off `enablePlaybackRangeSelection` so the user cannot accidentally repaint it by dragging.
+- **Seeking inside a loop.** A practice UI where the reader drags a loop once and then clicks around inside it: turn off `resetPlaybackRangeOnClick`.
 
 ## Show it in code
 
@@ -54,10 +71,32 @@ api.beatMouseDown.on((beat) => {
 });
 ```
 
+To keep drag-select and seek-to-click but stop a click from clearing the selected loop:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableSeekToClick: true,
+    enablePlaybackRangeSelection: true,
+    resetPlaybackRangeOnClick: false,
+  },
+});
+
+api.playbackRangeChanged.on((e) => {
+  api.isLooping = e.playbackRange !== null;
+});
+```
+
 `getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. Every other line runs unchanged on all three runtimes.
 
 ## Where to look next
 
 - [Reacting to beat and note clicks](./reacting-to-beat-and-note-clicks) — the events that keep firing after the built-in behavior is disabled.
 - [Range selection](./range-selection) — the selection API you drive manually when the built-in drag-select is off.
-- [`enableSeekToClick`](/docs/reference/settings/player/enableseektoclick) and [`enablePlaybackRangeSelection`](/docs/reference/settings/player/enableplaybackrangeselection) in the settings reference.
+- [Looping a section](/docs/features/play-sync/looping-a-section) — the `playbackRange` a drag-selection writes into, and the `isLooping` flag that repeats it.
+- [`enableSeekToClick`](/docs/reference/settings/player/enableseektoclick), [`enablePlaybackRangeSelection`](/docs/reference/settings/player/enableplaybackrangeselection), [`resetPlaybackRangeOnClick`](/docs/reference/settings/player/resetplaybackrangeonclick), and the deprecated [`enableUserInteraction`](/docs/reference/settings/player/enableuserinteraction) in the settings reference.

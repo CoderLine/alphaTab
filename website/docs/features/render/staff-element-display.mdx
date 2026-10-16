@@ -1,0 +1,163 @@
+---
+title: "Staff element display"
+description: "Show, hide or restrict clefs, key signatures, time signatures, bar numbers and tab rests per staff type, on the score, staff or bar level."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 80
+  since: "1.9"
+keywords:
+  - alphaTab
+  - clef
+  - key signature
+  - time signature
+  - bar numbers
+  - tablature
+  - stylesheet
+  - alphaTex
+---
+
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+Decide per staff type where alphaTab draws clefs, key signatures, time signatures, bar numbers and the rests on a tablature staff. Write the time signature on the tab staff below standard notation, drop the TAB clef from a combined score-and-tab system, or print the clef only on the first system of a tab-only chart. Each setting exists on three levels: score-wide on the stylesheet, per staff, and per bar. alphaTex covers all three with `\defaultStaffDisplay`, `\staffDisplay` and `\barDisplay`.
+
+<AlphaTexSample player={true} settings={{ display: { layoutMode: "parchment" } }}>{`
+\\track { defaultSystemsLayout 2 }
+\\staff {score tabs}
+\\staffDisplay tabs { clefVisibility false tsPlacement allStaves restsPlacement allStaves }
+:4 3.3 r 0.2 1.2 | 3.2 1.2 r 0.2 | \\ts (3 4) 3.3 0.2 r | 1.2 r 0.2
+`}</AlphaTexSample>
+
+The tab staff in this example has no TAB clef, and it repeats the time signature and the rests that alphaTab otherwise draws only on the standard-notation staff above it.
+
+## Staff types and elements
+
+One model staff can render as up to four staff types: standard notation (`score`), tablature (`tabs`), slash notation (`slash`) and numbered notation (`numbered`). Each type has its own configuration with the elements that type can draw:
+
+- Standard notation: clef, key signature, time signature, bar numbers.
+- Tablature: clef, time signature, bar numbers, rests.
+- Slash notation: key signature, time signature, bar numbers.
+- Numbered notation: time signature, bar numbers. The "1=X" key designation is part of the effect bands, not of this configuration.
+
+## Controlling one element
+
+Clef, key signature, time signature and tab rests take an [`ElementDisplay`](/docs/reference/types/model/elementdisplay) with three independent fields:
+
+- `isVisible` — `false` hides the element.
+- `staffPlacement` — a [`StaffPlacement`](/docs/reference/types/model/staffplacement). `AllStaves` draws the element on every staff type showing it. `Primary` draws it only on the topmost staff type of the staff, in the order score, tabs, slash, numbered.
+- `systemDisplay` — a [`SystemDisplay`](/docs/reference/types/model/systemdisplay). `AllSystems` restates the element on every system. `FirstSystemOnly` draws it only within the first system, which also hides later changes of that element.
+
+Bar numbers take a [`BarNumberDisplay`](/docs/reference/types/model/barnumberdisplay) value instead: `AllBars`, `FirstOfSystem` or `Hide`. alphaTab draws bar numbers once per system, above the topmost visible staff, so the value of that staff decides. [Bar numbers](./bar-numbers) covers numbering and display in detail.
+
+## Defaults
+
+Without any configuration alphaTab renders:
+
+- Standard notation: clef, key signature and time signature on every staff and system.
+- Tablature: the clef on every staff and system. The time signature and the rests appear only when the tab staff is the topmost staff type (`Primary`), so a tab staff under standard notation shows neither.
+- Slash notation: no key signature. The time signature appears only when the slash staff is the topmost staff type.
+- Numbered notation: the time signature appears only when the numbered staff is the topmost staff type.
+- Bar numbers on the first bar of every system (`FirstOfSystem`) for all staff types.
+
+## Score, staff and bar level
+
+Each field resolves on its own, from the most specific level to the most general one:
+
+1. The bar: [`Bar.scoreDisplay`](/docs/reference/types/model/bar/#scoredisplay), `tabDisplay`, `slashDisplay`, `numberedDisplay`.
+2. The staff: [`Staff.scoreConfig`](/docs/reference/types/model/staff/#scoreconfig), `tabConfig`, `slashConfig`, `numberedConfig`.
+3. The score: [`RenderStylesheet.scoreConfig`](/docs/reference/types/model/renderstylesheet/#scoreconfig), [`tabConfig`](/docs/reference/types/model/renderstylesheet/#tabconfig), [`slashConfig`](/docs/reference/types/model/renderstylesheet/#slashconfig), [`numberedConfig`](/docs/reference/types/model/renderstylesheet/#numberedconfig).
+
+A field left `undefined` falls through to the next level. A bar override that only sets `isVisible` keeps the placement and system rules of the staff or score.
+
+The bar level has no rests entry. Rests are configured per staff or score-wide.
+
+## alphaTex
+
+The three alphaTex tags share one syntax and map to the three levels:
+
+```plain
+\defaultStaffDisplay staffTypes { properties }   // score-wide
+\staffDisplay staffTypes { properties }          // current staff
+\barDisplay staffTypes { properties }            // current bar
+```
+
+- Staff types are `score`, `tabs`, `slash` and `numbered`. Wrap several in parentheses: `(score tabs)`. Without staff types, each property applies to every staff type that supports it.
+- `clefVisibility`, `ksVisibility`, `tsVisibility` and `restsVisibility` take `true` or `false`.
+- `clefPlacement`, `ksPlacement`, `tsPlacement` and `restsPlacement` take `allStaves` or `primary`.
+- `clefSystems`, `ksSystems`, `tsSystems` and `restsSystems` take `allSystems` or `firstSystemOnly`.
+- `barNumber` takes `allBars`, `firstOfSystem` or `hide`.
+- The `rests*` properties are not available on `\barDisplay`.
+
+A property on a staff type that cannot draw the element, such as `ksVisibility` on `tabs`, produces warning AT307. `\defaultStaffDisplay` and `\staffDisplay` also accept `rhythm` for tabs. alphaTab stores that value and writes it back on export, but it has no effect on the rendering yet; use [`notation.rhythmMode`](/docs/reference/settings/notation/rhythmmode) to control tab rhythm.
+
+`\defaultBarNumberDisplay` and `\barNumberDisplay` remain available as shorthands that set the bar number display for all staff types at once. The alphaTex exporter writes all staff display settings, so they survive a round trip.
+
+### Score-wide: clef on the first system only
+
+`\defaultStaffDisplay` changes the default for the whole score. Here the TAB clef appears only on the first system. The tab staff is the only staff type, so it is the primary one and shows its rests and time signature.
+
+<AlphaTexSample player={true} settings={{ display: { layoutMode: "parchment" } }}>{`
+\\defaultStaffDisplay tabs { clefSystems firstSystemOnly }
+\\track { defaultSystemsLayout 2 }
+\\staff {tabs}
+:4 3.3 r 0.2 1.2 | 3.2 1.2 r 0.2 | 3.3 0.2 r 1.2 | 1.2 r 0.2 3.3
+`}</AlphaTexSample>
+
+### Per bar: one time signature on the tab staff
+
+`\barDisplay` applies to the bar it is written in. Here only the change to 3/4 is restated on the tab staff.
+
+<AlphaTexSample player={true} settings={{ display: { layoutMode: "parchment" } }}>{`
+\\track { defaultSystemsLayout 2 }
+\\staff {score tabs}
+:4 3.3 r 0.2 1.2 | 3.2 1.2 r 0.2 |
+\\barDisplay tabs { tsPlacement allStaves } \\ts (3 4) 3.3 0.2 r | 1.2 r 0.2
+`}</AlphaTexSample>
+
+## Deprecated bar number fields
+
+[`RenderStylesheet.barNumberDisplay`](/docs/reference/types/model/renderstylesheet/#barnumberdisplay) and [`Bar.barNumberDisplay`](/docs/reference/types/model/bar/#barnumberdisplay) are deprecated and still work. Setting them writes the value to the `barNumber` field of all four staff types. Use the `barNumber` field of the staff configurations and bar overrides for new code.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  const { StaffPlacement, SystemDisplay } = alphaTab.model;
+  const stylesheet = score.stylesheet;
+
+  // Score-wide: time signature on every tab staff, key signature only in the first system.
+  stylesheet.tabConfig.timeSignature = {
+    isVisible: true,
+    staffPlacement: StaffPlacement.AllStaves,
+  };
+  stylesheet.scoreConfig.keySignature = {
+    isVisible: true,
+    systemDisplay: SystemDisplay.FirstSystemOnly,
+  };
+
+  // Per staff: no TAB clef on the first staff of the first track.
+  const staff = score.tracks[0].staves[0];
+  staff.tabConfig = { clef: { isVisible: false } };
+
+  // Per bar: no time signature on the tab staff of the third bar.
+  staff.bars[2].tabDisplay = { timeSignature: { isVisible: false } };
+
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Bar numbers](./bar-numbers) — counting, custom numbers and texts, display modes.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide an element category everywhere through `notation.elements`.
+- [Guitar tablature](./guitar-tablature), [Slash notation](./slash-notation) and [Numbered notation](./numbered-notation) — the staff types these settings apply to.
+- [`\defaultStaffDisplay`](/docs/alphatex/score-metadata#defaultstaffdisplay), [`\staffDisplay`](/docs/alphatex/staff-metadata#staffdisplay) and [`\barDisplay`](/docs/alphatex/bar-metadata#bardisplay) in the alphaTex reference.
+- [`ScoreStaffConfig`](/docs/reference/types/model/scorestaffconfig), [`TabStaffConfig`](/docs/reference/types/model/tabstaffconfig), [`SlashStaffConfig`](/docs/reference/types/model/slashstaffconfig), [`NumberedStaffConfig`](/docs/reference/types/model/numberedstaffconfig) and the matching bar overrides such as [`ScoreBarOverride`](/docs/reference/types/model/scorebaroverride) in the model reference.

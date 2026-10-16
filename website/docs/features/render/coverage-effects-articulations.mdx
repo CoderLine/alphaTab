@@ -15,6 +15,7 @@ keywords:
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 Guitar and bass articulations carry as much of the performance as the pitches do. alphaTab reads each articulation from the source file and renders it with the notation convention its instrument expects.
 
@@ -66,6 +67,25 @@ Slides move the fretting finger to a new position while the note rings; hammer-o
 
 <AlphaTab file="/files/features/Slides.gp5" />
 
+### Labels and slurs on chords *(new in 1.9)* {#slide-labels}
+
+alphaTab labels hammer-ons and pull-offs with `H` and `P` and legato slides with `sl.` (available since 1.8.3). A chain such as `5.3{h} 7.3{h} 5.3` gets an `H` on the way up and a `P` on the way down. Since 1.9.0 the labels are drawn above the staff as their own annotation row on standard notation, tablature and numbered notation:
+
+- One label per beat for all notes of a chord, centered on the slur segment.
+- Different labels on one beat stack, like `sl.` above `H` on the last beat of the second bar below.
+- A segment that crosses a bar line gets its label centered across the bar line. A segment that crosses a system break is labeled on the first system only.
+- Regular slurs carry no labels.
+
+Slurs between chords follow Behind Bars and Guitar Pro. On standard notation all notes on one stem take a single slur outside the chord that joins the outer noteheads; in bars with several voices the slur goes to the stem end of its voice. On tablature each beat gets at most one arc above the upper strings and one below the lower strings.
+
+<AlphaTexSample player={true} settings={{display:{layoutMode:"Parchment"}}}>{`
+\\track { defaultSystemsLayout 2 }
+\\staff {score tabs}
+:4 r r 5.3{h} 7.3{h} | 5.3 r r (5.1{h} 5.2{sl}) | (7.1 9.2) r (5.1{h} 3.5{h}) (7.1 5.5) | r.1
+`}</AlphaTexSample>
+
+The labels belong to the notation elements [`EffectHammerOnPullOffText`](/docs/reference/types/notationelement#effecthammeronpullofftext) and [`EffectSlideText`](/docs/reference/types/notationelement#effectslidetext). Both are visible by default; turn them off through `notation.elements` as shown in [Show it in code](#show-it-in-code). Their font comes from `display.resources.elementFonts` for the same keys. The labels take part in the [effect placement](./effect-placement) and keep their whole slur segment clear of noteheads and fret numbers.
+
 ## Trills {#trills}
 
 Trills — the fast alternation between the written note and the pitch above it, a staple ornament from Baroque violin to modern lead guitar — render with a `tr` glyph above the notation staff and a wavy line indicating the duration.
@@ -86,7 +106,7 @@ Fade-in and volume-swell markers — the volume-pedal or pinkie-wheel swell used
 
 ## Show it in code
 
-Every articulation above is on by default. To hide one category — for example, palm-mute brackets in a printout — flip its `notation.elements` entry:
+Every articulation above is on by default. To hide one category — for example, palm-mute brackets or hammer-on and slide labels in a printout — flip its `notation.elements` entry:
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
@@ -98,6 +118,8 @@ const api = new alphaTab.AlphaTabApi(container, {
     elements: new Map([
       [alphaTab.NotationElement.EffectPalmMute, false],
       [alphaTab.NotationElement.EffectLetRing, false],
+      [alphaTab.NotationElement.EffectHammerOnPullOffText, false],
+      [alphaTab.NotationElement.EffectSlideText, false],
     ]),
   },
 });
@@ -108,6 +130,7 @@ const api = new alphaTab.AlphaTabApi(container, {
 ## Where to look next
 
 - [Toggling notation elements off](./coverage-toggle-elements) — hide any effect category globally.
+- [Effect placement](./effect-placement) — how these annotations are placed against the notation and which settings control their spacing.
 - [Special notes](./coverage-special-notes) — the sibling coverage page for harmonics, ghost notes, and tied notes.
 - [Grace notes, tuplets, and ornaments](./coverage-grace-tuplets-ornaments) — trills, mordents, and turns share the ornament territory with articulations here.
 - [`notation.elements`](/docs/reference/settings/notation/elements) — the full element map.

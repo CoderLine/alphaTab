@@ -1,6 +1,6 @@
 ---
 title: "Density and spacing"
-description: "One page for spacing controls. In 1.9 the classical Gourlay stretchForce was replaced by a power-law model, new stretching / spacing options exist, and fillLastSystem now takes a fill-factor."
+description: "Control horizontal note spacing with spacingRatio and stretchForce, and decide with lastSystemFillThreshold when the last system of a page is justified."
 sidebar_custom_props:
   feature_chapter: layout
   feature_order: 40
@@ -34,7 +34,7 @@ Values are clamped to `[1.2, 2.0]`.
 - **`spacingRatio` shapes** the proportions between long and short notes.
 - **`stretchForce` scales** the whole row up or down without changing those proportions.
 
-## Last-system fill: `lastSystemFillThreshold` *(1.9)*
+## Last-system fill: `lastSystemFillThreshold` *(new in 1.9)*
 
 `display.lastSystemFillThreshold` decides when the final row of a page justifies to the full container width. The threshold compares the natural width of the last row to the container width:
 
@@ -42,7 +42,9 @@ Values are clamped to `[1.2, 2.0]`.
 - `0` — always justify.
 - `0.4`–`0.7` — Dorico/MuseScore behavior: justify when the row is reasonably full, leave sparse tails compact.
 
-The legacy boolean `display.justifyLastSystem` still exists as a thin wrapper: `true` maps to `0`, `false` maps to `1`. Prefer `lastSystemFillThreshold` for anything more nuanced.
+Values are clamped to `[0, 1]`. A last row that is wider than the container still compresses to fit, whatever the threshold.
+
+The boolean [`display.justifyLastSystem`](/docs/reference/settings/display/justifylastsystem) is deprecated in favor of `lastSystemFillThreshold`. It still works: `true` sets the threshold to `0`, `false` sets it to `1`.
 
 ## Show it in code
 
@@ -65,4 +67,5 @@ const api = new alphaTab.AlphaTabApi(container, {
 ## Where to look next
 
 - [Page layout](./page-layout) — where these knobs apply.
+- [Effect placement](./effect-placement) — how annotations are placed once the notes have their horizontal positions.
 - [`display.spacingRatio`](/docs/reference/settings/display/spacingratio), [`display.stretchForce`](/docs/reference/settings/display/stretchforce), and [`display.lastSystemFillThreshold`](/docs/reference/settings/display/lastsystemfillthreshold) reference entries.

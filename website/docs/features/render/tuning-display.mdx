@@ -11,6 +11,7 @@ keywords:
 ---
 
 import { TuningModeSwitch } from '@site/src/components/TuningModeSwitch';
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 Show the string tuning at the top of the score, hide it entirely, or move it beside each tab-staff line. Three stylesheet fields — one score-wide toggle, one per-track override, and a placement enum — cover every combination. Use them to hide the tuning on repeated systems where the header wastes space, or to show per-staff tuning in a multi-guitar chart where each track sits in a different tuning.
 
@@ -24,9 +25,29 @@ Three fields on `score.stylesheet` control tuning display:
 - [`perTrackDisplayTuning`](/docs/reference/types/model/renderstylesheet/#pertrackdisplaytuning) — a `Map<number, boolean>` keyed by track index. Add an entry to override the global flag for that specific track. Leave the map `null` (default) to apply the global flag uniformly.
 - [`tuningDisplayMode`](/docs/reference/types/model/renderstylesheet/#tuningdisplaymode) — a [`TuningDisplayMode`](/docs/reference/types/model/tuningdisplaymode) enum controlling where the tuning is placed:
   - `Score` — the tuning block sits above the first system, alongside title and artist info (default).
-  - `Staff` — each open-string pitch is written next to its tab-staff line, replacing the block header.
+  - `Staff` — each open-string pitch is written next to its tab-staff line, replacing the block header. See [Tuning on the staff lines](#tuning-on-staff).
 
 `Staff` mode reads best when a score contains multiple string instruments with different tunings; each label appears next to its own staff instead of one combined block. `Score` mode is cleaner for single-instrument charts.
+
+## Tuning on the staff lines *(new in 1.9)* {#tuning-on-staff}
+
+With `TuningDisplayMode.Staff`, alphaTab writes the note name of each open string at the left end of its tab line on the first system. This matches the "tuning before staff" option in Guitar Pro. Every tab staff shows its own tuning, and tracks hidden through `perTrackDisplayTuning` stay hidden.
+
+<AlphaTexSample tracks="all" player={true}>{`
+\\tuningDisplayMode staff
+\\track "Guitar"
+\\staff { tabs }
+\\tuning (E4 B3 G3 D3 A2 D2)
+:8 0.6 2.4 0.3 2.2 0.1 2.2 0.3 2.4 | :8 0.6 2.4 0.3 2.2 0.1 2.2 0.3 2.4
+\\track "Bass"
+\\staff { tabs }
+\\tuning (G2 D2 A1 D1)
+:4 0.4 0.4 0.4 0.4 | 0.4 0.4 0.4 0.4
+`}</AlphaTexSample>
+
+- [`display.inlineTuningPaddingRight`](/docs/reference/settings/display/inlinetuningpaddingright) sets the gap between the labels and the start of the tab staff. The default is `5`.
+- In alphaTex, [`\tuningDisplayMode`](/docs/alphatex/score-metadata#tuningdisplaymode) takes `score` or `staff`. The alphaTex exporter writes the tag when the mode is not `score`.
+- Guitar Pro 7 and 8 files store the mode in their stylesheet. alphaTab reads it on import and writes it back in the [Guitar Pro 7 exporter](/docs/features/export/export-to-guitar-pro-7).
 
 ## Show it in code
 
@@ -36,6 +57,7 @@ import * as alphaTab from '@coderline/alphatab';
 const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/song.gp' },
+  display: { inlineTuningPaddingRight: 8 },
 });
 
 api.scoreLoaded.on((score) => {
@@ -64,4 +86,5 @@ api.scoreLoaded.on((score) => {
 - [Toggling notation elements off](/docs/features/render/coverage-toggle-elements) — hide the `GuitarTuning` element globally through `notation.elements`.
 - [`globalDisplayTuning`](/docs/reference/types/model/renderstylesheet/#globaldisplaytuning), [`perTrackDisplayTuning`](/docs/reference/types/model/renderstylesheet/#pertrackdisplaytuning), and [`tuningDisplayMode`](/docs/reference/types/model/renderstylesheet/#tuningdisplaymode) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
 - [`TuningDisplayMode`](/docs/reference/types/model/tuningdisplaymode) — the enum reference.
+- [`display.inlineTuningPaddingRight`](/docs/reference/settings/display/inlinetuningpaddingright) and [`\tuningDisplayMode`](/docs/alphatex/score-metadata#tuningdisplaymode) — the padding setting and the alphaTex tag.
 - [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

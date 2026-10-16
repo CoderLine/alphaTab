@@ -26,6 +26,8 @@ MusicXML lets any tool encode the same music in multiple ways, so the importer i
 - **Chord diagrams** — the fretboard grids under chord symbols, read from `harmony` and `frame` elements. Coverage arrived in 1.3.
 - **Track volume, pan, and program** — per-instrument mixer settings from the `score-instrument` and `midi-instrument` blocks feed straight into the alphaTab mixer.
 - **Tempo and tempo changes** — read from `sound` and `metronome` markers so the score plays back at the intended feel.
+- **Guitar techniques** — string and fret from `technical`, string numbers on standard notation staves, dead notes, harmonics, fingering, and let ring or palm mute lines. Coverage extended in 1.9.
+- **Jumps and measure numbers** — D.C., D.S., coda, segno, and fine from `sound` elements play back. Since 1.9 this includes a `sound` inside a `direction`, as MuseScore writes it, and the measure numbers from the file are shown as bar numbers.
 - **Lyrics** — multiple verses attached to notes via `lyric` elements are aligned to beats on import.
 - **Part groups** — braces and brackets grouping multiple parts. By default each part becomes a track. Set `importer.mergePartGroupsInMusicXml` to `true` to merge grouped parts into a single track with multiple staves (piano-style grand staff, for example).
 

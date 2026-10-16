@@ -34,6 +34,10 @@ Drag-select a phrase to loop it. Extend the range with keyboard arrows. Wire a "
 
 Split like this so a selection UI stays responsive during the drag (`highlightPlaybackRange` on every move), commits the loop only when the user releases (`applyPlaybackRangeFromHighlight` on drag-end), and clears cleanly (`clearPlaybackRangeHighlight` on escape or click-outside).
 
+## The built-in drag-select
+
+With `player.enablePlaybackRangeSelection` on, alphaTab drives the same overlay from mouse drags. A drag becomes a range once it reaches a second beat; a press and release on one beat stays a click. By default that click clears the range. Set `player.resetPlaybackRangeOnClick` to `false` to keep the range and seek inside it instead. The two-beat threshold and `resetPlaybackRangeOnClick` are available since 1.9.0. [Enabling and disabling interaction](./enabling-and-disabling-interaction#keep-the-range-on-click) covers the details.
+
 ## The editor pattern
 
 Wire your drag gesture to the three methods. During the drag, keep painting the range. On release, commit it to a playback loop.

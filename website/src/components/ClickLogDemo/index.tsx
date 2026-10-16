@@ -53,21 +53,20 @@ function formatNote(note: alphaTab.model.Note | null | undefined): string {
 function ApplyInteractionSettings({
     seekToClick,
     playbackRangeSelection,
+    resetPlaybackRangeOnClick,
 }: {
     seekToClick: boolean;
     playbackRangeSelection: boolean;
+    resetPlaybackRangeOnClick: boolean;
 }) {
     const api = useAlphaTabApi();
     useEffect(() => {
         if (!api) return;
         api.settings.player.enableSeekToClick = seekToClick;
-        api.updateSettings();
-    }, [api, seekToClick]);
-    useEffect(() => {
-        if (!api) return;
         api.settings.player.enablePlaybackRangeSelection = playbackRangeSelection;
+        api.settings.player.resetPlaybackRangeOnClick = resetPlaybackRangeOnClick;
         api.updateSettings();
-    }, [api, playbackRangeSelection]);
+    }, [api, seekToClick, playbackRangeSelection, resetPlaybackRangeOnClick]);
     return null;
 }
 
@@ -81,6 +80,7 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
     const [entries, setEntries] = useState<LogEntry[]>([]);
     const [seekToClick, setSeekToClick] = useState(true);
     const [playbackRangeSelection, setPlaybackRangeSelection] = useState(true);
+    const [resetPlaybackRangeOnClick, setResetPlaybackRangeOnClick] = useState(true);
     const idRef = useRef(0);
 
     const pushEntry = (entry: Omit<LogEntry, "id">) => {
@@ -180,6 +180,16 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
                             />
                             <span>player.enablePlaybackRangeSelection</span>
                         </label>
+                        <label className={styles.checkbox}>
+                            <input
+                                type="checkbox"
+                                checked={resetPlaybackRangeOnClick}
+                                onChange={(e) =>
+                                    setResetPlaybackRangeOnClick(e.target.checked)
+                                }
+                            />
+                            <span>player.resetPlaybackRangeOnClick</span>
+                        </label>
                     </>
                 )}
                 <button
@@ -193,6 +203,7 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
                 <ApplyInteractionSettings
                     seekToClick={seekToClick}
                     playbackRangeSelection={playbackRangeSelection}
+                    resetPlaybackRangeOnClick={resetPlaybackRangeOnClick}
                 />
             )}
             <div className={styles.grid}>
@@ -231,6 +242,7 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
             scrollMode: "Off",
             enableSeekToClick: true,
             enablePlaybackRangeSelection: true,
+            resetPlaybackRangeOnClick: true,
         },
     };
 
