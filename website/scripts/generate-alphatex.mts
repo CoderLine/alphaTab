@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { AlphaTexExample, documentation, MetadataTagDefinition, ParameterDefinition, PropertyDefinition, SignatureDefinition, WithSignatures } from '@coderline/alphatab-language-server'
 import * as alphaTab from '@coderline/alphatab'
-import { FileStream, openFileStream } from './util.mjs';
+import { FileStream, openFileStream, rewriteLegacyDocLinks } from './util.mjs';
 
 export async function generateAlphaTexDocs() {
     const outPath = path.resolve(import.meta.dirname, '../docs/alphatex');
@@ -302,7 +302,7 @@ function isListType(parameter: ParameterDefinition) {
 }
 
 function replaceLinks(s: string | undefined) {
-    return s?.replaceAll('https://next.alphatab.net/', '/')
-        .replaceAll('https://alphatab.net/', '/') ?? '';
+    return rewriteLegacyDocLinks(s?.replaceAll('https://next.alphatab.net/', '/')
+        .replaceAll('https://alphatab.net/', '/') ?? '');
 }
 

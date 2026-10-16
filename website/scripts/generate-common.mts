@@ -8,7 +8,7 @@ import {
   valueOrFirstDeclarationInDts,
 } from "./typeschema.mjs";
 import { styleText } from "util";
-import { FileStream, openFileStream, toPascalCase } from "./util.mjs";
+import { FileStream, openFileStream, rewriteLegacyDocLinks, toPascalCase } from "./util.mjs";
 
 function toExampleKey(title: string) {
   return title
@@ -413,9 +413,9 @@ export function getFullDescription(context: GenerateContext, node: ts.Node) {
 }
 
 function rewriteJsDocText(s: string): string {
-  return s
-    .replaceAll("https://alphatab.net/", "/")
-    .replaceAll("https://www.alphatab.net/", "/")
+  return rewriteLegacyDocLinks(
+    s.replaceAll("https://alphatab.net/", "/").replaceAll("https://www.alphatab.net/", "/")
+  )
     .replaceAll(/\{@since ([^}]+)\}/g, (_, since) => {
       return `<SinceBadge inline={true} since={${JSON.stringify(since)}} />`;
     })
