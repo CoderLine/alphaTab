@@ -1,10 +1,10 @@
 import React from 'react';
 import { SectionHeader } from '../section-header';
-import { TabNotation } from '../shared/tab-notation';
 import { FourNotations } from './cards/four-notations';
 import { SyncVisual } from './cards/sync-visual';
 import { Reflow } from './cards/reflow';
 import { Mixer } from './cards/mixer';
+import { CursorSelection } from './cards/cursor-selection';
 import { Platforms } from './cards/platforms';
 import styles from './styles.module.scss';
 
@@ -32,7 +32,7 @@ const CARDS: FeatureCard[] = [
     n: '03',
     t: 'Live cursor & selection',
     d: 'Beat-accurate playback cursor, range looping, transposition, tempo control — all wired to events you subscribe to.',
-    v: <TabNotation width={380} height={120} measures={3} showStandard={false} cursor={0.55} decorative />,
+    v: <CursorSelection />,
   },
   {
     n: '04',
