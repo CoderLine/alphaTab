@@ -5,6 +5,150 @@ title: v1.8
 import { AlphaTab } from '@site/src/components/AlphaTab';
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
+## 1.8.4
+
+This release fixes problems in audio output, Audio Worklet playback, triplet feel and rendering on .NET.
+
+### Player
+
+* player: on Android, the audio output no longer spins the CPU at the end of playback, and the C# and Kotlin outputs no longer allocate buffers while playing ([#2715](https://github.com/CoderLine/alphaTab/pull/2715), thanks [@xyfu66](https://github.com/xyfu66))
+* player: a second playback with the Audio Worklet output no longer replays events buffered for the previous worklet ([#2764](https://github.com/CoderLine/alphaTab/pull/2764), thanks [@gisenberg](https://github.com/gisenberg))
+* player: triplet feel pairs the right beats again, which removes odd note durations and a flickering cursor ([#2765](https://github.com/CoderLine/alphaTab/pull/2765))
+
+### Improvements & Bugfixes
+
+* render: .NET on Mono no longer fails with "Collection was modified" during rendering ([#2766](https://github.com/CoderLine/alphaTab/pull/2766), thanks [@dawidprosba](https://github.com/dawidprosba))
+
+## 1.8.3
+
+This release adds labels for hammer-ons, pull-offs and slides, incremental re-rendering for apps that change the score while it is displayed, and limits that protect against corrupt or crafted input files.
+
+### Music Notation
+
+#### notation: hammer-on, pull-off and slide labels
+https://github.com/CoderLine/alphaTab/pull/2609
+
+alphaTab writes "H" on hammer-on arcs, "P" on pull-off arcs and "sl." on legato slides, in standard notation and tablature. A chain like `5{h} 7{h} 5` is drawn as an H arc followed by a P arc.
+
+<AlphaTexSample>{`
+\\staff {score tabs}
+:8 5.3{h} 7.3{h} 5.3 7.3{sl} 9.3 r r r
+`}</AlphaTexSample>
+
+The labels are shown by default. Hide them by turning off [`NotationElement.EffectHammerOnPullOffText`](/docs/reference/types/notationelement#effecthammeronpullofftext) or [`NotationElement.EffectSlideText`](/docs/reference/types/notationelement#effectslidetext) in [`notation.elements`](/docs/reference/settings/notation/elements). Their font is set through `display.resources.elementFonts`.
+
+Since 1.9, the labels sit above the staff, which is how the sample above renders on this site. See [Slides, hammer-ons, and pull-offs](/docs/features/render/coverage-effects-articulations#slides).
+
+Thanks to [@rafaelsales](https://github.com/rafaelsales) for contributing this improvement.
+
+#### render: incremental re-rendering for live editing and recording apps
+https://github.com/CoderLine/alphaTab/pull/2585
+
+Recording apps and live editors change one bar at a time, often while the player drives the cursor. A full render lays out the whole score again for each change. Pass the index of the first changed master bar as [`firstChangedMasterBar`](/docs/reference/types/rendering/renderhints#firstchangedmasterbar) in the render hints, and alphaTab keeps the systems before that bar and lays out only the rest.
+
+The render hints are accepted by [`api.render(renderHints)`](/docs/reference/api/render), [`api.renderScore(score, trackIndexes, renderHints)`](/docs/reference/api/renderscore) and [`api.renderTracks(tracks, renderHints)`](/docs/reference/api/rendertracks). They affect rendering only: call [`api.loadMidiForScore()`](/docs/reference/api/loadmidiforscore) to update playback. The incremental path applies to the page and parchment layouts while `core.enableLazyLoading` is on (the default). The horizontal layout, and a bar index outside the rendered systems, fall back to a full render. When you append bars, pass the index of the last bar that was already rendered.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'));
+api.tex(':4 5.3 7.3 5.3 7.3 | 5.3 7.3 5.3 7.3 | 5.3 7.3 5.3 7.3 | 5.3 7.3 5.3 7.3');
+
+// Move every note of the third bar to fret 9 and redraw from that bar on.
+document.getElementById('edit-bar').addEventListener('click', () => {
+  const barIndex = 2;
+  const bar = api.score.tracks[0].staves[0].bars[barIndex];
+  for (const voice of bar.voices) {
+    for (const beat of voice.beats) {
+      for (const note of beat.notes) {
+        note.fret = 9;
+      }
+    }
+  }
+  bar.finish(api.settings);
+
+  api.render({ firstChangedMasterBar: barIndex, reuseViewport: true });
+  api.loadMidiForScore();
+});
+```
+
+The same change makes the rhythmic spacing within a staff more consistent, allows seeking to empty beats, and updates the cursor when a bar changes its height. See [Re-render only what changed](/docs/features/extend/traversing-and-mutating-the-model#rerender-changed-bars).
+
+Thanks to [@roscopeeco](https://github.com/roscopeeco) for describing this use case in [#2560](https://github.com/CoderLine/alphaTab/issues/2560).
+
+### Player
+
+* player: swing and shuffle feel no longer break playback ranges, seeking, hit testing and cursor placement ([#2702](https://github.com/CoderLine/alphaTab/pull/2702), thanks [@AvaTheArchitect](https://github.com/AvaTheArchitect))
+* player: `api.playBeat()` and `api.playNote()` are audible once `api.isReadyForPlayback` is true ([#2708](https://github.com/CoderLine/alphaTab/pull/2708), thanks [@Buronn](https://github.com/Buronn))
+
+### MusicXML Extensions
+
+* importer: pitched percussion notes keep their articulation when `<instrument>` is omitted ([#2701](https://github.com/CoderLine/alphaTab/pull/2701), thanks [@alustrement](https://github.com/alustrement) for this first contribution)
+
+### Guitar Pro Extensions
+
+* importer: Guitar Pro 7 and 8 files with tempo automations on missing bars load instead of crashing ([#2668](https://github.com/CoderLine/alphaTab/pull/2668), thanks [@kaizenman](https://github.com/kaizenman) for contributing this fix)
+* importer: artificial harmonics in Guitar Pro 3–5 files are imported with their harmonic values ([#2707](https://github.com/CoderLine/alphaTab/pull/2707))
+
+#### importer: hardened file loading
+https://github.com/CoderLine/alphaTab/pull/2703
+https://github.com/CoderLine/alphaTab/pull/2669
+
+Corrupt or crafted files could make alphaTab run out of memory or read endlessly: unbounded counts in Guitar Pro bend and tremolo bar data, oversized strings, chord names longer than their field in Guitar Pro 3–5 files, and zip bombs. alphaTab now caps buffer sizes when it decodes strings and inflates zip archives. It also bounds the count-driven loops of the Guitar Pro 3–5 parser, reads chord names at their fixed field width, and stops when the data ends.
+
+The cap is set by [`importer.maxDecodingBufferSize`](/docs/reference/settings/importer/maxdecodingbuffersize), 128000000 bytes by default. Raise it if you load very large files. Files that exceed a limit fail with an [`OverflowError`](/docs/reference/types/io/overflowerror), files that end early with an [`EndOfReaderError`](/docs/reference/types/io/endofreadererror). Both are `AlphaTabError`s of type `Format`. See [Tuning importer behavior](/docs/features/import-load/tuning-importer-behavior).
+
+Thanks to [@kaizenman](https://github.com/kaizenman) for reporting these problems and contributing the chord name fix.
+
+### Improvements & Bugfixes
+
+* vite: `@coderline/alphatab-vite` supports Vite 8 ([#2710](https://github.com/CoderLine/alphaTab/pull/2710))
+* vscode: the VS Code extension, a small demo, moved to its own repository at https://github.com/CoderLine/alphaTab-vscode ([#2709](https://github.com/CoderLine/alphaTab/pull/2709))
+
+## 1.8.2
+
+This release moves .NET and Android to the threading model of the web version and fixes playback at the end of songs and loops.
+
+### Player
+
+* player: the cursor lines up with the notes again; since 1.8.1 it could drift because it used a time-relative position ([#2573](https://github.com/CoderLine/alphaTab/pull/2573), thanks [@louislam](https://github.com/louislam))
+* player: Audio Worklet playback no longer freezes when samples arrive before the worklet is created ([#2645](https://github.com/CoderLine/alphaTab/pull/2645), thanks [@gisenberg](https://github.com/gisenberg))
+* player: a track on MIDI channel 16 keeps its audio when the metronome is on; the metronome uses its own channel ([#2651](https://github.com/CoderLine/alphaTab/pull/2651), thanks [@reifocS](https://github.com/reifocS))
+
+#### player: faster stop at the end of songs and loops
+https://github.com/CoderLine/alphaTab/pull/2647
+
+Playback could hang or hiccup at the end of a song or loop. Voices that were no longer audible kept generating samples, and the end was detected only after the output had played its buffered audio. alphaTab now ends voices once they become inaudible, and stops all voices quickly as soon as sample generation reaches the end.
+
+Thanks to [@AvaTheArchitect](https://github.com/AvaTheArchitect) for reporting this problem.
+
+### MusicXML Extensions
+
+* render: on Android, MusicXML files that rendered only partly and broke the cursor render completely; the fix covers an empty initial render, dots on hidden notes and tuplet numbers above 19 ([#2650](https://github.com/CoderLine/alphaTab/pull/2650), thanks [@AndreiGorelov](https://github.com/AndreiGorelov))
+
+### Guitar Pro Extensions
+
+* importer: harmonic types are parsed case-insensitively, so harmonics in files written by third-party apps such as Songsterr load ([#2648](https://github.com/CoderLine/alphaTab/pull/2648), thanks [@sandrojologua](https://github.com/sandrojologua))
+
+### Improvements & Bugfixes
+
+* web: several alphaTab instances on one page no longer fail with `TypeError: Cannot read properties of undefined (reading 'length')` ([#2574](https://github.com/CoderLine/alphaTab/pull/2574), thanks [@tbreuss](https://github.com/tbreuss))
+* integration: the selection highlight is recreated after a resize or re-render instead of keeping stale bounds ([#2646](https://github.com/CoderLine/alphaTab/pull/2646), thanks [@gisenberg](https://github.com/gisenberg))
+
+#### platform: one threading model on all platforms
+https://github.com/CoderLine/alphaTab/pull/2644
+https://github.com/CoderLine/alphaTab/pull/2649
+https://github.com/CoderLine/alphaTab/pull/2652
+
+On .NET and Android, alphaTab used a threading model that differed from the web version. This caused race conditions: a null reference in the cursor update, "Animation duration cannot be negative", a `ConcurrentModificationException` during layout, a memory leak in the synthesizer worker and an `InterruptedException` in the audio worker. All platforms now use one UI thread plus one thread per worker, sharing the web code. Rendering with Skia runs off the UI thread; it was wrongly marked as incompatible with workers. On Android, the audio worker handles interrupts correctly and workers no longer leak when the activity changes.
+
+Two extension points change with this:
+
+* Custom UI facades implement the new member [`IUiFacade.throttle(action, delay)`](/docs/reference/types/platform/iuifacade#throttle). It takes over from `Environment.throttle`.
+* Custom bundler integrations: the worker factory passed to [`Environment.initializeMain`](/docs/features/extend/worker-and-worklet-initialization) receives a second argument, `nameHint` (`"alphaTab Renderer"` or `"alphaSynth Worker"`), which you can use as the worker name.
+
+Thanks to [@AndreiGorelov](https://github.com/AndreiGorelov) for reporting these problems.
+
 ## 1.8.1
 
 This hotfix release brings following improvements
@@ -118,7 +262,7 @@ the option can be set via alphaTex or on the stylesheet object after loading the
 
 This feature can be configured via: 
 
-* [`\\extendBarLine`](/docs/alphatex/score-metadata#extendbarlines) in alphaTex
+* [`\extendBarLines`](/docs/alphatex/score-metadata#extendbarlines) in alphaTex
 * File / StyleSheet / Systems & Staves in Guitar Pro 
 * [`score.stylesheet.extendBarLines`](/docs/reference/types/model/renderstylesheet/#extendbarlines) on the data model.
 
@@ -322,7 +466,7 @@ C4.1 | C4.1 | C4.1
 
 This feature can be used via: 
 
-* [`\defaultBarNumberDisplay`](/docs/alphatex/score-metadata#defaultbarnumberdisplay) and [`\barNumberDisplay`] (/docs/alphatex/bar-metadata#barnumberdisplay) in alphaTex
+* [`\defaultBarNumberDisplay`](/docs/alphatex/score-metadata#defaultbarnumberdisplay) and [`\barNumberDisplay`](/docs/alphatex/bar-metadata#barnumberdisplay) in alphaTex
 * [`score.stylesheet.barNumberDisplay`](/docs/reference/types/model/renderstylesheet/#barnumberdisplay) and [`score.tracks[].staves[].bars[].barNumberDisplay`](/docs/reference/types/model/bar/#barnumberdisplay) in the data model.
 * File / Stylesheet > Texts & Styles > Bar numbers in Guitar Pro
 * [`measure-numbering`](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/measure-numbering/) in MusicXML
@@ -526,7 +670,7 @@ A simple demo of the usage is also part of the [development playground](https://
 https://github.com/CoderLine/alphaTab/pull/2456
 https://github.com/CoderLine/alphaTab/pull/2477
 
-Thanks [@L-Sun](https://github.com/CoderLine/alphaTab/pull/2456) for your contributions around this topic. 
+Thanks [@L-Sun](https://github.com/L-Sun) for your contributions around this topic. 
 
 With these improvements alphaTab does now write extended RSE information into the exported Guitar Pro files.
 This way the playback mode in Guitar Pro can be changed to RSE resulting in proper playback. 
@@ -553,7 +697,7 @@ the notation voice-by-voice does not feel very natural.
 By default in alphaTex, to write multiple voices, you first write the whole notation for the first voice,
 then you start a new voice with `\voice` and begin again writing the second voice at bar 1. 
 
-With this new mode, we stay in the metal model of writing notation "bar-by-bar". The `\voice` tag starts a new
+With this new mode, we stay in the mental model of writing notation "bar-by-bar". The `\voice` tag starts a new
 voice on the current bar until we reach the end of the bar. Thanks to this you can only add a second voice to the
 bars which actually have a second voice and keep the other bars simple as single voice bars. 
 
