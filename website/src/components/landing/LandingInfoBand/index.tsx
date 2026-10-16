@@ -22,10 +22,10 @@ const READS: FormatItem[] = [
 ];
 
 const EXPORTS: FormatItem[] = [
-  { name: 'MIDI', meta: 'binary export', color: 'var(--at-muted)' },
-  { name: 'PDF', meta: 'print-ready', color: 'var(--at-muted)' },
-  { name: 'SVG', meta: 'live + static', color: 'var(--at-muted)' },
-  { name: 'Canvas', meta: 'live runtime', color: 'var(--at-muted)' },
+  { name: 'Guitar Pro', meta: '.gp (GP7+)', color: 'var(--at-muted)' },
+  { name: 'alphaTex', meta: 'plain text', color: 'var(--at-muted)' },
+  { name: 'MIDI', meta: 'SMF 1.0', color: 'var(--at-muted)' },
+  { name: 'Audio', meta: 'PCM / WAV', color: 'var(--at-muted)' },
 ];
 
 const PROJECT_START_YEAR = 2010;
