@@ -2241,6 +2241,31 @@ describe('AlphaTexImporterTest', () => {
         testExportRoundtrip(score);
     });
 
+    it('sync-float-millisecond-offset', () => {
+        const score = parseTex(`
+            \\tempo 148
+            .
+            3.3.4*4 | 3.3.4*4 | 3.3.4*4 | 3.3.4*4
+            .
+            \\sync 0 0 0
+            \\sync 1 0 1621.6216216216217
+            \\sync 2 0 3243.25 0.5
+            \\sync (3 0 4864.865)
+        `);
+
+        expect(score.masterBars.length).toBe(4);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats.length).toBe(4);
+        const syncPoints = score.exportFlatSyncPoints();
+        expect(syncPoints.map(p => `${p.barIndex},${p.barOccurence},${p.barPosition},${p.millisecondOffset}`)).toEqual([
+            '0,0,0,0',
+            '1,0,0,1621.6216216216217',
+            '2,0,0.5,3243.25',
+            '3,0,0,4864.865'
+        ]);
+
+        testExportRoundtrip(score);
+    });
+
     it('tuning-name', () => {
         const score = parseTex(`
             \\tuning E4 B3 G3 D3 A2 E2 "Default"

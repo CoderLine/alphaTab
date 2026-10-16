@@ -34,7 +34,7 @@ export const sync: MetadataTagDefinition = {
                 {
                     name: 'millisecondOffset',
                     shortDescription: 'The absolute millisecond offset within the external media',
-                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.Required,
+                    parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.RequiredAsFloat,
                     type: alphaTab.importer.alphaTex.AlphaTexNodeType.Number
                 },
                 {

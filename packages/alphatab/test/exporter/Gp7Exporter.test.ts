@@ -184,6 +184,20 @@ describe('Gp7ExporterTest', () => {
         expect(gpif).toContain('<MultiVoice>1></MultiVoice>');
     });
 
+    it('beat-timer-as-integer', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            C4.4 { timer } C4.4 { timer }
+        `);
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        beats[0].timer = 1621.4;
+        beats[1].timer = 3243.6;
+
+        const gpif = readExportedGpif(exportGp7(score));
+
+        expect(gpif).toContain('<Timer>1621</Timer>');
+        expect(gpif).toContain('<Timer>3244</Timer>');
+    });
+
     it('alphatex-drums-to-gp7', () => {
         const tex = `\\track "Drums" { instrument percussion }
         \\clef neutral
