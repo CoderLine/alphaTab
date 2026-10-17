@@ -6,6 +6,7 @@ import type { AlphaTabMetronomeEvent } from '@coderline/alphatab/midi/MidiEvent'
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import {
@@ -13,6 +14,7 @@ import {
     type IExternalMediaHandler,
     type IExternalMediaSynthOutput
 } from '@coderline/alphatab/synth/ExternalMediaPlayer';
+import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
 import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
 import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 import { MidiFileSequencer } from '@coderline/alphatab/synth/MidiFileSequencer';
@@ -356,6 +358,89 @@ describe('SyncPointTests', () => {
 
         expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
         expect(testOutput.seekTimes).toMatchSnapshot();
+    });
+
+    /**
+     * See #2952
+     */
+    describe('non-integer-bar-duration', () => {
+        // a 4/4 bar at 148 BPM lasts 1621.6216...ms
+        const tempo = 148;
+        const barCount = 201;
+        const ticksPerBar = 3840;
+        const barMillis = (4 * 60000) / tempo;
+        const lastSyncTime = (barCount - 1) * barMillis;
+
+        function createScore(): Score {
+            const barTex: string[] = [];
+            for (let i = 0; i < barCount; i++) {
+                barTex.push('C4.4 * 4');
+            }
+            return ScoreLoader.loadAlphaTex(`
+                \\tempo ${tempo}
+                .
+                ${barTex.join(' | ')}
+                .
+                \\sync 0 0 0
+                \\sync ${barCount - 1} 0 ${lastSyncTime}
+            `);
+        }
+
+        function createGenerator(score: Score, midi: MidiFile): MidiFileGenerator {
+            const generator = new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midi));
+            generator.generate();
+            return generator;
+        }
+
+        function expectPlayerInSync(player: IAlphaSynth, seek: (time: number) => void) {
+            const score = createScore();
+            const midi = new MidiFile();
+            const generator = createGenerator(score, midi);
+
+            player.loadMidiFile(midi);
+            player.loadBackingTrack(score);
+            player.updateSyncPoints(generator.syncPoints);
+
+            let tick = -1;
+            player.positionChanged.on(e => {
+                tick = e.currentTick;
+            });
+            player.play();
+
+            for (let bar = 0; bar < barCount; bar++) {
+                seek(bar * barMillis);
+                const expectedTick = bar * ticksPerBar;
+                expect(Math.abs(tick - expectedTick), `bar ${bar}: tick ${tick}`).toBeLessThanOrEqual(1);
+            }
+        }
+
+        it('sync-point-times', () => {
+            const generator = createGenerator(createScore(), new MidiFile());
+
+            const syncPoints = generator.syncPoints;
+            expect(syncPoints[1].synthTick).toBe((barCount - 1) * ticksPerBar);
+            expect(syncPoints[1].syncTime).toBe(lastSyncTime);
+            expect(syncPoints[1].synthTime).toBeCloseTo(lastSyncTime, 6);
+            expect(syncPoints[0].syncBpm).toBeCloseTo(tempo, 6);
+        });
+
+        it('external-media-position', () => {
+            const player = new ExternalMediaPlayer(500);
+            const output = player.output as IExternalMediaSynthOutput;
+            const mediaHandler = new TestExternalMediaHandler(output);
+            mediaHandler.backingTrackDuration = lastSyncTime + barMillis;
+            output.handler = mediaHandler;
+
+            expectPlayerInSync(player, time => mediaHandler.simulateSeek(time));
+        });
+
+        it('backing-track-position', () => {
+            const output = new TestBackingTrackOutput();
+            output.backingTrackDuration = lastSyncTime + barMillis;
+            const player = new BackingTrackPlayer(output, 500);
+
+            expectPlayerInSync(player, time => output.simulateSeek(time));
+        });
     });
 });
 

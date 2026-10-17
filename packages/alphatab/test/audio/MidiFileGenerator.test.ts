@@ -1933,6 +1933,32 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualTimers.join(',')).toBe(expectedTimers.join(','));
     });
 
+    /**
+     * See #2952
+     */
+    it('beat-timer-non-integer-bar-duration', () => {
+        // a 4/4 bar at 148 BPM lasts 1621.6216...ms
+        const barCount = 200;
+        const barTex: string[] = [];
+        for (let i = 0; i < barCount; i++) {
+            barTex.push('C4.4 { timer } C4.4 * 3');
+        }
+        const score: Score = parseTex(`
+            \\tempo 148
+            .
+            ${barTex.join(' | ')}
+        `);
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const bars = score.tracks[0].staves[0].bars;
+        for (let i = 0; i < barCount; i++) {
+            expect(bars[i].voices[0].beats[0].timer, `bar ${i}`).toBeCloseTo((i * 4 * 60000) / 148, 6);
+        }
+    });
+
     describe('metronome', () => {
         function testMetronome(tex: string, expectedClicks: string) {
             const score: Score = parseTex(tex);

@@ -472,7 +472,7 @@ export class AlphaTex1LanguageDefinitions {
                 [
                     [[106], 0],
                     [[106], 0],
-                    [[106], 0],
+                    [[106], 2],
                     [[106], 3]
                 ]
             ]

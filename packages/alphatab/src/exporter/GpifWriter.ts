@@ -664,7 +664,7 @@ export class GpifWriter {
         }
 
         if (beat.showTimer) {
-            beatNode.addElement('Timer').innerText = (beat.timer ?? 0).toString();
+            beatNode.addElement('Timer').innerText = Math.round(beat.timer ?? 0).toString();
         }
 
         this._writeBeatProperties(beatNode, beat);
