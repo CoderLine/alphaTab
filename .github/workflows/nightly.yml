@@ -1,0 +1,39 @@
+name: Nightly
+
+on:
+  schedule:
+    - cron: "10 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 100
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+
+      - run: npm run nightly-check -- --platform web --force false
+        id: web
+      - run: npm run nightly-check -- --platform dotnet --force false
+        id: dotnet
+      - run: npm run nightly-check -- --platform kotlin --force false
+        id: kotlin
+
+      # Runs dispatched via GITHUB_TOKEN are an exception to the no-recursive-runs rule, so no PAT is needed.
+      - if: steps.web.outputs.has_changes == 'true' || steps.dotnet.outputs.has_changes == 'true' || steps.kotlin.outputs.has_changes == 'true'
+        run: >
+          gh workflow run publish.yml
+          --ref ${{ github.ref_name }}
+          -f web=${{ steps.web.outputs.has_changes }}
+          -f dotnet=${{ steps.dotnet.outputs.has_changes }}
+          -f kotlin=${{ steps.kotlin.outputs.has_changes }}
+        env:
+          GH_TOKEN: ${{ github.token }}

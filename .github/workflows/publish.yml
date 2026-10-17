@@ -1,10 +1,24 @@
 name: Publish
 
 on:
-  schedule:
-    - cron: "10 0 * * *"
   workflow_dispatch:
     inputs:
+      web:
+        type: boolean
+        description: Publish web packages
+        default: true
+      dotnet:
+        type: boolean
+        description: Publish .NET packages
+        default: true
+      kotlin:
+        type: boolean
+        description: Publish Kotlin packages
+        default: true
+      force:
+        type: boolean
+        description: Publish all web packages, not only the ones changed in the last 26 hours
+        default: false
       dry_run:
         type: boolean
         description: Build and verify all packages without publishing them
@@ -12,29 +26,32 @@ on:
 
 jobs:
   web:
+    if: inputs.web
     uses: ./.github/workflows/~publish_web.yml
     permissions:
       contents: read
       id-token: write
     secrets: inherit
-    with: 
+    with:
       version: alpha ${{github.run_number}}
       npm_tag: alpha
-      force: ${{ inputs.dry_run == true }}
-      dry_run: ${{ inputs.dry_run == true }}
+      force: ${{ inputs.force || inputs.dry_run }}
+      dry_run: ${{ inputs.dry_run }}
 
   dotnet:
+    if: inputs.dotnet
     uses: ./.github/workflows/~publish_dotnet.yml
     secrets: inherit
-    with: 
+    with:
       version: alpha ${{github.run_number}}
-      force: ${{ inputs.dry_run == true }}
-      dry_run: ${{ inputs.dry_run == true }}
+      force: ${{ inputs.force || inputs.dry_run }}
+      dry_run: ${{ inputs.dry_run }}
 
   kotlin:
+    if: inputs.kotlin
     uses: ./.github/workflows/~publish_kotlin.yml
     secrets: inherit
-    with: 
+    with:
       version: alpha ${{github.run_number}}
-      force: ${{ inputs.dry_run == true }}
-      dry_run: ${{ inputs.dry_run == true }}
+      force: ${{ inputs.force || inputs.dry_run }}
+      dry_run: ${{ inputs.dry_run }}
