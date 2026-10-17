@@ -11,7 +11,7 @@ alphaTab renders interactive sheet music and guitar tablature from Guitar Pro, M
 [![Maven Central](https://img.shields.io/maven-central/v/net.alphatab/alphaTab?label=Maven%20Central)](https://central.sonatype.com/artifact/net.alphatab/alphaTab)
 [![Build](https://github.com/CoderLine/alphaTab/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/CoderLine/alphaTab/actions/workflows/build.yml)
 
-[Website](https://alphatab.net) · [Documentation](https://alphatab.net/docs/introduction) · [Playground](https://alphatab.net/playground) · [Features](https://alphatab.net/docs/features/) · [Release notes](https://alphatab.net/docs/releases/release1_9) · [Discussions](https://github.com/CoderLine/alphaTab/discussions)
+[Website](https://alphatab.net) · [Documentation](https://alphatab.net/docs/introduction) · [Playground](https://alphatab.net/playground) · [Features](https://alphatab.net/docs/features/) · [Release notes](https://alphatab.net/docs/releases) · [Discussions](https://github.com/CoderLine/alphaTab/discussions)
 
 [![Iron Waltz rendered by alphaTab: lead guitar in standard notation and tablature with bends, slides and vibrato, a looped range, the playback cursor and a synced backing track](https://raw.githubusercontent.com/CoderLine/alphaTab/develop/img/hero.svg)](https://alphatab.net/playground)
 
