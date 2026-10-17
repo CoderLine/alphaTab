@@ -19,7 +19,7 @@ on:
         default: true
       dry_run:
         type: boolean
-        description: Run npm stage publish with --dry-run for all web packages, skip dotnet and kotlin
+        description: Build and verify all selected packages without publishing them
         default: false
 
 jobs:
@@ -40,15 +40,17 @@ jobs:
   dotnet:
     uses: ./.github/workflows/~publish_dotnet.yml
     secrets: inherit
-    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_csharp == 'true' && !inputs.dry_run)
+    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_csharp == 'true')
     with: 
       version: ${{github.run_number}}
       force: true
+      dry_run: ${{ inputs.dry_run == true }}
 
   kotlin:
     uses: ./.github/workflows/~publish_kotlin.yml
     secrets: inherit
-    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_kotlin_android == 'true' && !inputs.dry_run)
+    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_kotlin_android == 'true')
     with: 
       version: ${{github.run_number}}
       force: true
+      dry_run: ${{ inputs.dry_run == true }}
