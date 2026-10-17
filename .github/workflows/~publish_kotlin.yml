@@ -12,24 +12,7 @@ on:
         default: false
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    outputs:
-      has_changes: ${{ steps.check.outputs.has_changes }}
-    steps:
-      - uses: actions/checkout@v7
-        with: 
-          fetch-depth: 100
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-      - run: npm run nightly-check -- --platform kotlin --force ${{ inputs.force }}
-        id: check    
-
   build:
-    needs: check
-    if: needs.check.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
