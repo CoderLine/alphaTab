@@ -87,11 +87,12 @@ export class TabBarRenderer extends LineBarRenderer {
      * `_gapBucketEnd[i]` is the exclusive end-offset into the parallel
      * `_gapRelXAndWidth` / `_gapBeatRefs` arrays for line `i`. Stores the
      * width-invariant payload; absolute x is projected at paint time via
-     * `beatGlyphsStart + bg.x + relativeX`.
+     * `beatGlyphsStart + bg.x + bg.onNotes.x + relativeX` (`onNotes.x` is not width-invariant:
+     * centered full-bar beats shift it on every scale pass).
      */
     private _gapBucketEnd: Uint32Array | null = null;
     private _gapRelXAndWidth: Float32Array | null = null;
-    private _gapBeatRefs: BeatContainerGlyphBase[] | null = null;
+    private _gapBeatRefs: TabBeatContainerGlyph[] | null = null;
     private _gapCount: number = 0;
 
     public override get showMultiBarRest(): boolean {
@@ -166,7 +167,7 @@ export class TabBarRenderer extends LineBarRenderer {
             while (i >= bucketEnd[line]) {
                 line++;
             }
-            const absX = base + beatRefs[i].x + relXAndWidth[i * 2];
+            const absX = base + beatRefs[i].x + beatRefs[i].onNotes.x + relXAndWidth[i * 2];
             spaces[line].push(new Float32Array([absX, relXAndWidth[i * 2 + 1]]));
         }
     }
@@ -218,9 +219,9 @@ export class TabBarRenderer extends LineBarRenderer {
             let lineX = 0;
             if (end > cursor + 1) {
                 let inverted = false;
-                let prevX = base + beatRefs[cursor].x + relXAndWidth[cursor * 2];
+                let prevX = base + beatRefs[cursor].x + beatRefs[cursor].onNotes.x + relXAndWidth[cursor * 2];
                 for (let k = cursor + 1; k < end; k++) {
-                    const xk = base + beatRefs[k].x + relXAndWidth[k * 2];
+                    const xk = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
                     if (xk < prevX) {
                         inverted = true;
                         break;
@@ -233,7 +234,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     const ws = new Float32Array(segCount);
                     for (let k = 0; k < segCount; k++) {
                         const ki = cursor + k;
-                        xs[k] = base + beatRefs[ki].x + relXAndWidth[ki * 2];
+                        xs[k] = base + beatRefs[ki].x + beatRefs[ki].onNotes.x + relXAndWidth[ki * 2];
                         ws[k] = relXAndWidth[ki * 2 + 1];
                     }
                     const order = new Uint32Array(segCount);
@@ -264,7 +265,7 @@ export class TabBarRenderer extends LineBarRenderer {
             }
 
             for (let k = cursor; k < end; k++) {
-                const gx = base + beatRefs[k].x + relXAndWidth[k * 2];
+                const gx = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
                 const gw = relXAndWidth[k * 2 + 1];
                 canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
                 lineX = gx + gw;
@@ -319,7 +320,7 @@ export class TabBarRenderer extends LineBarRenderer {
         }
 
         const relXAndWidth = new Float32Array(total * 2);
-        const beatRefs: BeatContainerGlyphBase[] = new Array(total);
+        const beatRefs: TabBeatContainerGlyph[] = new Array(total);
         const padding: number = this.smuflMetrics.staffLineThickness;
 
         for (const voice of this.voiceContainer.beatGlyphs.values()) {
@@ -327,7 +328,7 @@ export class TabBarRenderer extends LineBarRenderer {
                 const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
                 const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                 if (noteNumbers) {
-                    const relativeXBase = notes.x + noteNumbers.x - padding;
+                    const relativeXBase = noteNumbers.x - padding;
                     const fullWidth = noteNumbers.width + padding * 2;
                     for (const [str, noteNumber] of noteNumbers.notesPerString) {
                         if (!noteNumber.isEmpty) {
@@ -336,7 +337,7 @@ export class TabBarRenderer extends LineBarRenderer {
                                 const idx = fwdCursor[lineIdx]++;
                                 relXAndWidth[idx * 2] = relativeXBase;
                                 relXAndWidth[idx * 2 + 1] = fullWidth;
-                                beatRefs[idx] = bg;
+                                beatRefs[idx] = bg as TabBeatContainerGlyph;
                             }
                         }
                     }

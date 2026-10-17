@@ -1,4 +1,4 @@
-import { type ExecSyncOptionsWithBufferEncoding, execSync } from 'node:child_process';
+import { execSync } from 'node:child_process';
 import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { exit } from 'node:process';
@@ -15,6 +15,12 @@ const options: ParseArgsOptionsConfig = {
         type: 'string'
     },
     tag: {
+        type: 'string'
+    },
+    stage: {
+        type: 'string'
+    },
+    'dry-run': {
         type: 'string'
     }
 };
@@ -80,44 +86,50 @@ function getChangedPackages(force: boolean) {
     return packages;
 }
 
-const DRY_RUN = process.env.DRY_RUN;
-function execDryRun(command: string, options: ExecSyncOptionsWithBufferEncoding) {
-    console.info(`executing command ${command} in ${options.cwd}`);
-    if (DRY_RUN) {
-        console.warn('nothing executed, dry run active');
-    } else {
-        execSync(command, options);
-    }
+function exec(command: string, cwd: string) {
+    console.info(`executing command ${command} in ${cwd}`);
+    execSync(command, { stdio: 'inherit', cwd });
 }
 
-function publish(platform: string, packages: Set<string>) {
+function publish(platform: string, packages: Set<string>, dryRun: boolean) {
     switch (platform) {
-        case 'web':
+        case 'web': {
+            const publishCommand = args.stage === 'true' ? 'npm stage publish' : 'npm publish';
+            // verbose logging surfaces the outcome of the OIDC token exchange
+            const dryRunArgs = dryRun ? ' --dry-run --loglevel verbose' : '';
             for (const packageName of packages) {
-                execDryRun(`npm publish --access public --tag ${args.tag}`, {
-                    stdio: 'inherit',
-                    cwd: resolve(import.meta.dirname, '../packages', packageName)
-                });
-            }
-            break;
-        case 'dotnet':
-            const dotnetPackages = ['AlphaTab', 'AlphaTab.Windows'];
-            for (const pkg of dotnetPackages) {
-                execDryRun(
-                    `dotnet nuget push ${pkg}/bin/Release/*.nupkg -k ${process.env.NUGET_API_KEY} -s https://api.nuget.org/v3/index.json`,
-                    {
-                        stdio: 'inherit',
-                        cwd: resolve(import.meta.dirname, '../packages/csharp/src')
-                    }
+                exec(
+                    `${publishCommand} --access public --tag ${args.tag}${dryRunArgs}`,
+                    resolve(import.meta.dirname, '../packages', packageName)
                 );
             }
             break;
-        case 'kotlin':
-            execDryRun(`./gradlew publishToMavenCentral`, {
-                stdio: 'inherit',
-                cwd: resolve(import.meta.dirname, '../packages/kotlin/src/')
-            });
+        }
+        case 'dotnet': {
+            const cwd = resolve(import.meta.dirname, '../packages/csharp/src');
+            for (const pkg of ['AlphaTab', 'AlphaTab.Windows']) {
+                if (dryRun) {
+                    // dotnet nuget push has no dry-run mode
+                    const nupkgs = readdirSync(resolve(cwd, pkg, 'bin/Release')).filter(f => f.endsWith('.nupkg'));
+                    if (nupkgs.length === 0) {
+                        throw new Error(`No nupkg found for ${pkg}`);
+                    }
+                    console.info(`dry run, skipping push of ${pkg}:`, nupkgs);
+                } else {
+                    exec(
+                        `dotnet nuget push ${pkg}/bin/Release/*.nupkg -k ${process.env.NUGET_API_KEY} -s https://api.nuget.org/v3/index.json`,
+                        cwd
+                    );
+                }
+            }
             break;
+        }
+        case 'kotlin': {
+            // DistPath is a local maven repository: builds and signs the publications without uploading them
+            const task = dryRun ? 'publishAllPublicationsToDistPathRepository' : 'publishToMavenCentral';
+            exec(`./gradlew ${task}`, resolve(import.meta.dirname, '../packages/kotlin/src/'));
+            break;
+        }
     }
 }
 
@@ -180,7 +192,7 @@ switch (args.mode) {
         pack(args.platform as string, packages);
         break;
     case 'publish':
-        publish(args.platform as string, packages);
+        publish(args.platform as string, packages, args['dry-run'] === 'true');
         break;
     case 'check':
         check(args.platform as string, packages);

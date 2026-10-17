@@ -6,6 +6,25 @@ import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { type ILogger, Logger } from '@coderline/alphatab/Logger';
+import { LogLevel } from '@coderline/alphatab/LogLevel';
+
+/**
+ * @internal
+ */
+class WarningCollectingLogger implements ILogger {
+    public warnings: string[] = [];
+
+    public debug(_category: string, _msg: string, ..._details: unknown[]): void {}
+
+    public warning(_category: string, msg: string, ..._details: unknown[]): void {
+        this.warnings.push(msg);
+    }
+
+    public info(_category: string, _msg: string, ..._details: unknown[]): void {}
+
+    public error(_category: string, _msg: string, ..._details: unknown[]): void {}
+}
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {
@@ -86,6 +105,72 @@ describe('BrokenRendersTests', () => {
                 expect(xml.firstElement).toBeTruthy();
                 expect(xml.firstElement!.localName).toBe('svg');
             }
+        }
+    });
+
+    // https://github.com/CoderLine/alphaTab/issues/2904
+    const squeezedLegatoTex = `
+        \\staff {score tabs}
+        \\tuning e4 b3 g3 d3 a2 e2
+        \\ts 4 4
+        (14.1{sl} 11.3{sl}).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+        (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+        (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16
+        (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 |
+    `;
+
+    it('squeezed-legato-slur', () => {
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
+
+        const score = ScoreLoader.loadAlphaTex(squeezedLegatoTex);
+
+        for (const width of [400, 300]) {
+            const api = new ScoreRenderer(settings);
+            const results: string[] = [];
+            api.partialRenderFinished.on(e => {
+                if (e.renderResult !== null) {
+                    results.push(e.renderResult as string);
+                }
+            });
+            api.width = width;
+            api.renderScore(score, [0]);
+
+            expect(results.length).toBeGreaterThan(0);
+            for (const r of results) {
+                expect(r.includes('NaN'), `NaN in SVG at width ${width}`).toBe(false);
+            }
+        }
+    });
+
+    it('squeezed-bar-warning', () => {
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
+        const score = ScoreLoader.loadAlphaTex(squeezedLegatoTex);
+
+        const originalLogger = Logger.log;
+        const originalLogLevel = Logger.logLevel;
+        Logger.logLevel = LogLevel.Warning;
+        try {
+            const render = (width: number) => {
+                const logger = new WarningCollectingLogger();
+                Logger.log = logger;
+                const api = new ScoreRenderer(settings);
+                api.width = width;
+                api.renderScore(score, [0]);
+                return logger.warnings.filter(w => w.includes('not fit into the available width'));
+            };
+
+            const narrow = render(400);
+            expect(narrow.length).toBe(1);
+            expect(narrow[0]).toContain('Bar 1 does not fit');
+
+            expect(render(1200).length).toBe(0);
+        } finally {
+            Logger.log = originalLogger;
+            Logger.logLevel = originalLogLevel;
         }
     });
 

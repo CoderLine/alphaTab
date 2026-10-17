@@ -411,6 +411,18 @@ export class MasterBar {
     public isAnacrusis: boolean = false;
 
     /**
+     * The position in the nominal meter (unit: midi ticks) at which the first tick of this bar sits.
+     * @remarks
+     * The beats of a pick-up bar are stored starting at tick 0 and the bar only plays for the duration of its content.
+     * Musically the content forms the end of a full bar: for a 3/8 pick-up in a 2/4 time signature, tick 0 is the
+     * offbeat of beat 1. Any metric interpretation of bar relative ticks (beaming, triplet feel, metronome) has to add
+     * this offset. For all other bars it is 0. Only available after data model finish.
+     * @json_ignore
+     * @internal
+     */
+    public anacrusisOffset: number = 0;
+
+    /**
      * Gets a percentual scale for the size of the bars when displayed in a multi-track layout.
      */
     public displayScale: number = 1;
@@ -529,5 +541,10 @@ export class MasterBar {
         if (this.beamingRules) {
             sharedDataBag.set('beamingRules', beamingRules);
         }
+
+        // nominal duration is a plain calculation, the actual pick-up duration needs one pass over all staves.
+        this.anacrusisOffset = this.isAnacrusis
+            ? Math.max(0, this.calculateDuration(false) - this.calculateDuration())
+            : 0;
     }
 }

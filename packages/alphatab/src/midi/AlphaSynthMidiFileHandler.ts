@@ -1,4 +1,5 @@
 import {
+    AlphaTabMetronomeEvent,
     AlphaTabRestEvent,
     ControlChangeEvent,
     EndOfTrackEvent,
@@ -67,6 +68,14 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         tick += this.tickShift;
         if (!this._smf1Mode) {
             this._midiFile.addEvent(new AlphaTabRestEvent(track, tick, channel));
+        }
+    }
+
+    public addMetronome(tick: number, counter: number, durationInTicks: number): void {
+        tick += this.tickShift;
+        if (!this._smf1Mode) {
+            // the duration in milliseconds is filled by the sequencer according to the tempo at this point
+            this._midiFile.addEvent(new AlphaTabMetronomeEvent(0, tick, counter, durationInTicks, 0));
         }
     }
 

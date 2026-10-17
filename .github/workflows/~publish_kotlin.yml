@@ -7,6 +7,9 @@ on:
       force:
         type: boolean
         default: false
+      dry_run:
+        type: boolean
+        default: false
 
 jobs:
   check:
@@ -46,7 +49,7 @@ jobs:
       - run: npm run build-kotlin
 
       - run: npm run nightly-pack -- --platform kotlin --force ${{ inputs.force }}
-      - run: npm run nightly-publish -- --platform kotlin --force ${{ inputs.force }}
+      - run: npm run nightly-publish -- --platform kotlin --force ${{ inputs.force }} --dry-run ${{ inputs.dry_run }}
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}

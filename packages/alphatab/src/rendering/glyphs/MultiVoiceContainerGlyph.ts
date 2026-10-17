@@ -151,9 +151,21 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
                             if (i > 0) {
                                 if (currentBeatGlyph.graceIndex === 0) {
-                                    // we place the grace beat directly after the previous one
-                                    // otherwise this causes flickers on resizing
-                                    currentBeatGlyph.x = beatGlyphs[i - 1].x + beatGlyphs[i - 1].width;
+                                    // we place the grace beat directly after the content of the previous one
+                                    // (its on-time position plus the post-beat size the spacing reserves for it).
+                                    // the previous beat width is not used as it is resized to this gap below
+                                    // which would cause flickers on resizing
+                                    const previous = beatGlyphs[i - 1];
+                                    const previousSpring = this.renderer.layoutingInfo.springs.get(
+                                        previous.absoluteDisplayStart
+                                    );
+                                    currentBeatGlyph.x =
+                                        previous.graceType === GraceType.None && previousSpring
+                                            ? previous.x +
+                                              previous.onTimeX +
+                                              previousSpring.postSpringWidth +
+                                              this.renderer.layoutingInfo.beatContentPadding
+                                            : previous.x + previous.width;
                                 } else {
                                     // for the multiple grace glyphs we take the width of the grace rod
                                     // this width setting is aligned with the positioning logic below

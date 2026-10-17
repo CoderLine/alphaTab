@@ -90,6 +90,7 @@ export enum NoteXPosition {
  * @internal
  */
 export class BarRendererBase {
+    private static readonly _compressionTolerance: number = 1;
     private _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
     protected readonly voiceContainer = new MultiVoiceContainerGlyph();
     private readonly _postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
@@ -258,6 +259,16 @@ export class BarRendererBase {
         return this._contentTopOverflow + this.topEffects.height;
     }
 
+    /** The overflow of the bar content above the staff, without the effect bands. */
+    public get contentTopOverflow() {
+        return this._contentTopOverflow;
+    }
+
+    /** The overflow of the bar content below the staff, without the effect bands. */
+    public get contentBottomOverflow() {
+        return this._contentBottomOverflow;
+    }
+
     public get bottomOverflow() {
         return this._contentBottomOverflow + this.bottomEffects.height;
     }
@@ -374,6 +385,22 @@ export class BarRendererBase {
         return this._preBeatGlyphs.width + this._postBeatGlyphs.width;
     }
 
+    /**
+     * Reports this bar to the layout if the available width is below the minimum width
+     * its content needs without overlaps.
+     */
+    private _reportCompression(containerWidth: number): void {
+        const info = this.layoutingInfo;
+        if (info.totalSpringConstant === -1) {
+            return;
+        }
+        // small tolerance for rounding differences in the system width distribution
+        const missingWidth = info.calculateVoiceWidth(info.minStretchForce) - containerWidth;
+        if (missingWidth > BarRendererBase._compressionTolerance) {
+            this.scoreRenderer.layout!.reportCompressedBar(this.bar.masterBar.index, missingWidth);
+        }
+    }
+
     public scaleToWidth(width: number): void {
         // preBeat and postBeat glyphs do not get resized
         const containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;
@@ -390,6 +417,7 @@ export class BarRendererBase {
         }
 
         this.voiceContainer.scaleToWidth(containerWidth);
+        this._reportCompression(containerWidth);
 
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {

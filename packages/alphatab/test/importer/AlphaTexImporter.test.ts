@@ -15,6 +15,7 @@ import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { FermataType } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
@@ -50,6 +51,7 @@ import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { harmonicToString } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
@@ -310,6 +312,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).toBe(HarmonicType.Semi);
     });
 
+    it('harmonics-pitched', () => {
+        // without string the interval of the non-natural harmonics applies to the pitch, natural ones need the open string
+        const notes = parseTex('C4{ah 12} C4{ah 7} C4{nh}').tracks[0].staves[0].bars[0].voices[0].beats.map(
+            b => b.notes[0]
+        );
+        expect(notes.map(n => n.realValue)).toEqual([72, 79, 60]);
+        expect(notes.map(n => n.displayValue)).toEqual([60, 60, 60]);
+    });
+
     it('hamonics-rendering-text-issue79', async () => {
         const tex: string = ':8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}';
         const score = parseTex(tex);
@@ -327,25 +338,13 @@ describe('AlphaTexImporterTest', () => {
         });
         renderer.renderScore(score, [0]);
         const regexTemplate: string = '<text[^>]+>\\s*{0}\\s*</text>';
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Natural))).exec(svg)).toBeTruthy();
         expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Natural))).exec(
-                svg
-            )
+            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Artificial))).exec(svg)
         ).toBeTruthy();
-        expect(
-            new RegExp(
-                regexTemplate.replace('{0}', harmonicToString(HarmonicType.Artificial))
-            ).exec(svg)
-        ).toBeTruthy();
-        expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Tap))).exec(svg)
-        ).toBeTruthy();
-        expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Pinch))).exec(svg)
-        ).toBeTruthy();
-        expect(
-            new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Semi))).exec(svg)
-        ).toBeTruthy();
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Tap))).exec(svg)).toBeTruthy();
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Pinch))).exec(svg)).toBeTruthy();
+        expect(new RegExp(regexTemplate.replace('{0}', harmonicToString(HarmonicType.Semi))).exec(svg)).toBeTruthy();
     });
 
     it('grace-issue79', () => {
@@ -1002,6 +1001,13 @@ describe('AlphaTexImporterTest', () => {
             b = b.nextBeat;
             i++;
         }
+        testExportRoundtrip(score);
+    });
+
+    it('anacrusis-sustain-pedal', () => {
+        // automation positions are relative to the full time signature (like in Guitar Pro)
+        const score = parseTex('\\ts 2 4 \\ac C4.8 D4.8 E4.8 {spd} | F4.4 {spu} G4.4');
+        expect(score.tracks[0].staves[0].bars[0].sustainPedals.map(p => p.ratioPosition).join(',')).toBe('0.5');
         testExportRoundtrip(score);
     });
 
@@ -1768,6 +1774,24 @@ describe('AlphaTexImporterTest', () => {
         testExportRoundtrip(score);
     });
 
+    it('harmonic-values-fractional', () => {
+        const score = parseTex(`
+        2.3{ah 2.4} 2.3{th 2.7} 2.3{ph 3.5} 2.3{sh 8.5} 2.3{fh 2.4}
+        `);
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        expect(beats[0].notes[0].harmonicType).toBe(HarmonicType.Artificial);
+        expect(beats[0].notes[0].harmonicValue).toBe(2.4);
+        expect(beats[1].notes[0].harmonicType).toBe(HarmonicType.Tap);
+        expect(beats[1].notes[0].harmonicValue).toBe(2.7);
+        expect(beats[2].notes[0].harmonicType).toBe(HarmonicType.Pinch);
+        expect(beats[2].notes[0].harmonicValue).toBe(3.5);
+        expect(beats[3].notes[0].harmonicType).toBe(HarmonicType.Semi);
+        expect(beats[3].notes[0].harmonicValue).toBe(8.5);
+        expect(beats[4].notes[0].harmonicType).toBe(HarmonicType.Feedback);
+        expect(beats[4].notes[0].harmonicValue).toBe(2.4);
+        testExportRoundtrip(score);
+    });
+
     it('time-signature-commons', () => {
         const score = parseTex(`
         \\ts common
@@ -2217,6 +2241,31 @@ describe('AlphaTexImporterTest', () => {
         testExportRoundtrip(score);
     });
 
+    it('sync-float-millisecond-offset', () => {
+        const score = parseTex(`
+            \\tempo 148
+            .
+            3.3.4*4 | 3.3.4*4 | 3.3.4*4 | 3.3.4*4
+            .
+            \\sync 0 0 0
+            \\sync 1 0 1621.6216216216217
+            \\sync 2 0 3243.25 0.5
+            \\sync (3 0 4864.865)
+        `);
+
+        expect(score.masterBars.length).toBe(4);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats.length).toBe(4);
+        const syncPoints = score.exportFlatSyncPoints();
+        expect(syncPoints.map(p => `${p.barIndex},${p.barOccurence},${p.barPosition},${p.millisecondOffset}`)).toEqual([
+            '0,0,0,0',
+            '1,0,0,1621.6216216216217',
+            '2,0,0.5,3243.25',
+            '3,0,0,4864.865'
+        ]);
+
+        testExportRoundtrip(score);
+    });
+
     it('tuning-name', () => {
         const score = parseTex(`
             \\tuning E4 B3 G3 D3 A2 E2 "Default"
@@ -2663,6 +2712,89 @@ describe('AlphaTexImporterTest', () => {
             ));
         it('hide', () =>
             test('\\defaultBarNumberDisplay allBars C4 | \\barNumberDisplay hide C4 ', BarNumberDisplay.Hide));
+    });
+
+    describe('staffDisplay', () => {
+        it('levels', () => {
+            const score = parseTex(`
+                \\defaultStaffDisplay tabs { tsVisibility false tsPlacement allStaves rhythm showWithBeams }
+                \\staff {score tabs}
+                \\staffDisplay { ksVisibility false barNumber hide }
+                C4 | \\barDisplay (score tabs) { clefVisibility false tsSystems firstSystemOnly } C4 | C4
+            `);
+            const tabs = score.stylesheet.tabConfig;
+            expect(tabs.timeSignature!.isVisible).toBe(false);
+            expect(tabs.timeSignature!.staffPlacement).toBe(StaffPlacement.AllStaves);
+            expect(tabs.timeSignature!.systemDisplay).toBe(SystemDisplay.AllSystems);
+            expect(tabs.rhythm).toBe(TabRhythmMode.ShowWithBeams);
+            expect(score.stylesheet.scoreConfig.timeSignature!.isVisible).toBe(true);
+
+            const staff = score.tracks[0].staves[0];
+            expect(staff.scoreConfig!.keySignature!.isVisible).toBe(false);
+            expect(staff.slashConfig!.keySignature!.isVisible).toBe(false);
+            expect(staff.scoreConfig!.clef).toBeUndefined();
+            expect(staff.tabConfig!.barNumber).toBe(BarNumberDisplay.Hide);
+            expect(staff.numberedConfig!.barNumber).toBe(BarNumberDisplay.Hide);
+
+            const bars = staff.bars;
+            expect(bars[0].scoreDisplay).toBeUndefined();
+            expect(bars[1].scoreDisplay!.clef!.isVisible).toBe(false);
+            expect(bars[1].tabDisplay!.clef!.isVisible).toBe(false);
+            expect(bars[1].tabDisplay!.timeSignature!.systemDisplay).toBe(SystemDisplay.FirstSystemOnly);
+            expect(bars[1].slashDisplay).toBeUndefined();
+            expect(bars[2].scoreDisplay).toBeUndefined();
+
+            testExportRoundtrip(score);
+        });
+
+        it('later-tags-win', () => {
+            const score = parseTex(
+                '\\defaultStaffDisplay { tsVisibility false } \\defaultStaffDisplay tabs { tsVisibility true tsSystems firstSystemOnly } C4'
+            );
+            expect(score.stylesheet.scoreConfig.timeSignature!.isVisible).toBe(false);
+            expect(score.stylesheet.tabConfig.timeSignature!.isVisible).toBe(true);
+            expect(score.stylesheet.tabConfig.timeSignature!.systemDisplay).toBe(SystemDisplay.FirstSystemOnly);
+            expect(score.stylesheet.tabConfig.timeSignature!.staffPlacement).toBe(StaffPlacement.Primary);
+
+            testExportRoundtrip(score);
+        });
+
+        it('visibility-values', () => {
+            const values = ['', 'true', 'false', '"false"', '1', '0'];
+            const expected = [true, true, false, false, true, false];
+            for (let i = 0; i < values.length; i++) {
+                const score = parseTex(`\\staffDisplay score { tsVisibility ${values[i]} } C4`);
+                expect(score.tracks[0].staves[0].scoreConfig!.timeSignature!.isVisible).toBe(expected[i]);
+            }
+        });
+
+        it('diagnostics', () => {
+            const importer = (tex: string) => {
+                const i = new AlphaTexImporter();
+                i.initFromString(tex, new Settings());
+                try {
+                    i.readScore();
+                } catch {
+                    // checked below
+                }
+                return i;
+            };
+            const unsupported = importer('\\staffDisplay tabs { ksVisibility false } C4');
+            expect(unsupported.semanticDiagnostics.items.map(d => d.code)).toContain(AlphaTexDiagnosticCode.AT307);
+            const barLevel = importer('C4 | \\barDisplay { restsVisibility false } C4');
+            expect(barLevel.parserDiagnostics.items.map(d => d.code)).toContain(AlphaTexDiagnosticCode.AT205);
+            expect(parseTex('\\staffDisplay tabs { ksVisibility false } C4').tracks[0].staves[0].tabConfig).toBe(
+                undefined
+            );
+        });
+
+        it('legacy-shorthands', () => {
+            const score = parseTex('\\defaultBarNumberDisplay hide C4 | \\barNumberDisplay allBars C4');
+            expect(score.stylesheet.tabConfig.barNumber).toBe(BarNumberDisplay.Hide);
+            expect(score.tracks[0].staves[0].bars[1].tabDisplay!.barNumber).toBe(BarNumberDisplay.AllBars);
+
+            testExportRoundtrip(score);
+        });
     });
 
     it('custom-beaming', () => {

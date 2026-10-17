@@ -198,6 +198,25 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
         expect(phi).toBeCloseTo(Math.pow(0.5, Math.log2(1.5)), 6);
     });
 
+    it('minimum stretch force covers post + beat padding + next pre, but not the first pre', () => {
+        // the first spring's pre-beat width is a fixed offset in front of the springs and
+        // must not be stretched in; adjacent beats keep the beat content padding apart.
+        const info = new BarLayoutingInfo(Math.SQRT2, 5);
+        info.addSpring(0, 960, 0, 3, 4);
+        info.addSpring(960, 960, 0, 6, 2);
+        info.finish();
+        const k = info.springs.get(0)!.springConstant;
+        expect(info.minStretchForce).toBeCloseTo((4 + 5 + 6) * k, 10);
+    });
+
+    it('minimum stretch force covers post + barline padding for the last beat', () => {
+        const info = new BarLayoutingInfo(Math.SQRT2, 5, 7);
+        info.addSpring(0, 960, 0, 3, 4);
+        info.finish();
+        const k = info.springs.get(0)!.springConstant;
+        expect(info.minStretchForce).toBeCloseTo((4 + 7) * k, 10);
+    });
+
     describe('spacingExponentFromRatio clamps to documented range', () => {
         it('returns log2(r) for r in range', () => {
             expect(BarLayoutingInfo.spacingExponentFromRatio(1.5)).toBeCloseTo(Math.log2(1.5), 10);

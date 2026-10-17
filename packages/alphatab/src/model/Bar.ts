@@ -571,9 +571,10 @@ export class Bar {
                 }
             }
 
-            const isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
-
             for (const marker of sustainPedals) {
+                // a press while the pedal is already down continues the pedal
+                const isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
+
                 if (previousMarker && previousMarker.pedalType !== SustainPedalMarkerType.Up) {
                     //duplicate or out-of-order markers
                     if (previousMarker.bar === this && marker.ratioPosition <= previousMarker.ratioPosition) {

@@ -129,6 +129,15 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
 
     public override applyLayoutingInfo(_info: BarLayoutingInfo): void {}
 
+    public override scaleToWidth(beatWidth: number): void {
+        super.scaleToWidth(beatWidth);
+        // Behind Bars: the multiple-rest bar is centred within the bar
+        const g = this._glyph;
+        if (g) {
+            g.x = Math.max(0, (beatWidth - g.width) / 2);
+        }
+    }
+
     public override buildBoundingsLookup(_barBounds: BarBounds, _cx: number, _cy: number): void {}
 
     public override doLayout(): void {

@@ -79,6 +79,24 @@ export class ModelUtils {
         return ModelUtils._durationIndices.get(duration)!;
     }
 
+    /**
+     * Converts a {@link Automation.ratioPosition} within the given bar into a midi tick offset relative to the bar start.
+     * @remarks
+     * The ratio is relative to the full duration of the time signature, also in pick-up bars which are shorter.
+     * This matches Guitar Pro which stores e.g. 0.5 for an automation on the 3rd eighth note of a 3/8 pick-up in 2/4.
+     */
+    public static ratioPositionToTick(masterBar: MasterBar, ratioPosition: number): number {
+        return masterBar.calculateDuration(false) * ratioPosition;
+    }
+
+    /**
+     * Converts a midi tick offset relative to the bar start into a {@link Automation.ratioPosition}.
+     * See {@link ratioPositionToTick} for the convention.
+     */
+    public static tickToRatioPosition(masterBar: MasterBar, tick: number): number {
+        return tick / masterBar.calculateDuration(false);
+    }
+
     public static keySignatureIsFlat(ks: number): boolean {
         return ks < 0;
     }
@@ -375,6 +393,87 @@ export class ModelUtils {
             default:
                 return 12;
         }
+    }
+
+    /**
+     * Gets the interval in semitones a harmonic sounds above the played pitch when touching the string
+     * at the given harmonic value (the fret position of the node).
+     * @param value The harmonic value.
+     */
+    public static harmonicValueToPitch(value: number): number {
+        // add semitones to reach corresponding harmonic frets
+        if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
+            return 36;
+        }
+        if (ModelUtils.isAlmostEqualTo(value, 2.7)) {
+            // Fret 3 2nd octave + minor seventh
+            return 34;
+        }
+        if (value < 3) {
+            // no natural harmonics below fret 3
+            return 0;
+        }
+        if (value <= 3.5) {
+            // Fret 3 2nd octave + fifth
+            return 31;
+        }
+        if (value <= 4) {
+            return 28;
+        }
+        if (value <= 5) {
+            return 24;
+        }
+        if (value <= 6) {
+            return 34;
+        }
+        if (value <= 7) {
+            return 19;
+        }
+        if (value <= 8.5) {
+            return 36;
+        }
+        if (value <= 9) {
+            return 28;
+        }
+        if (value <= 10) {
+            return 34;
+        }
+        if (value <= 11) {
+            return 0;
+        }
+        if (value <= 12) {
+            return 12;
+        }
+        if (value < 14) {
+            // fret 13,14 stay
+            return 0;
+        }
+        if (value <= 15) {
+            return 34;
+        }
+        if (value <= 16) {
+            return 28;
+        }
+        if (value <= 17) {
+            return 36;
+        }
+        if (value <= 18) {
+            return 0;
+        }
+        if (value <= 19) {
+            return 19;
+        }
+        if (value <= 21) {
+            //  20,21 stay
+            return 0;
+        }
+        if (value <= 22) {
+            return 36;
+        }
+        if (value <= 24) {
+            return 24;
+        }
+        return 0;
     }
 
     public static clamp(value: number, min: number, max: number): number {

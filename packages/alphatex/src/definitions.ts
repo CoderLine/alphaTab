@@ -161,6 +161,9 @@ import { barNumberDisplay } from '@coderline/alphatab-alphatex/metadata/bar/barn
 import { beaming } from '@coderline/alphatab-alphatex/metadata/bar/beamingRule';
 import { restDisplayPitch } from '@coderline/alphatab-alphatex/properties/beat/restDisplayPitch';
 import { barNumber } from '@coderline/alphatab-alphatex/metadata/bar/barNumber';
+import { defaultStaffDisplay } from '@coderline/alphatab-alphatex/metadata/score/defaultStaffDisplay';
+import { staffDisplay } from '@coderline/alphatab-alphatex/metadata/staff/staffDisplay';
+import { barDisplay } from '@coderline/alphatab-alphatex/metadata/bar/barDisplay';
 
 export const structuralMetaData = metadata(track, staff, voice);
 export const scoreMetaData = metadata(
@@ -195,7 +198,8 @@ export const scoreMetaData = metadata(
     hideEmptyStaves,
     hideEmptyStavesInFirstSystem,
     showSingleStaffBrackets,
-    defaultBarNumberDisplay
+    defaultBarNumberDisplay,
+    defaultStaffDisplay
 );
 
 export const staffMetaData = metadata(
@@ -206,7 +210,8 @@ export const staffMetaData = metadata(
     articulation,
     displayTranspose,
     transpose,
-    instrumentMeta
+    instrumentMeta,
+    staffDisplay
 );
 
 export const barMetaData = metadata(
@@ -237,7 +242,8 @@ export const barMetaData = metadata(
     voiceMode,
     barNumberDisplay,
     beaming,
-    barNumber
+    barNumber,
+    barDisplay
 );
 
 export const allMetadata = new Map([

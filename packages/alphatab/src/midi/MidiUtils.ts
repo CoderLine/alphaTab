@@ -16,7 +16,7 @@ export class MidiUtils {
      * @returns The converted duration in milliseconds.
      */
     public static ticksToMillis(ticks: number, tempo: number): number {
-        return (ticks * (60000.0 / (tempo * MidiUtils.QuarterTime))) | 0;
+        return (ticks * 60000.0) / (tempo * MidiUtils.QuarterTime);
     }
 
     /**

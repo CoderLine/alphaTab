@@ -2931,7 +2931,6 @@ export class AlphaTabApiBase<TSettings> {
 
         (this.beatMouseUp as EventEmitterOfT<Beat | null>).trigger(beat);
         this.uiFacade.triggerEvent(this.container, 'beatMouseUp', beat, originalEvent);
-        this._isBeatMouseDown = false;
     }
 
     private _seekToBeat(beat: Beat) {
@@ -2969,7 +2968,6 @@ export class AlphaTabApiBase<TSettings> {
 
         (this.noteMouseUp as EventEmitterOfT<Note | null>).trigger(note);
         this.uiFacade.triggerEvent(this.container, 'noteMouseUp', note, originalEvent);
-        this._isNoteMouseDown = false;
     }
 
     private _updateSelectionCursor(range: PlaybackRange | null) {
@@ -2997,6 +2995,8 @@ export class AlphaTabApiBase<TSettings> {
             if (this.settings.player.enablePlaybackRangeSelection || this.settings.player.enableSeekToClick) {
                 e.preventDefault();
             }
+            this._isBeatMouseDown = false;
+            this._isNoteMouseDown = false;
             const relX: number = e.getX(this.canvasElement);
             const relY: number = e.getY(this.canvasElement);
             const beat: Beat | null = this._renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
@@ -3039,23 +3039,36 @@ export class AlphaTabApiBase<TSettings> {
             const relX: number = e.getX(this.canvasElement);
             const relY: number = e.getY(this.canvasElement);
             const beat: Beat | null = this._renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
-            this._onBeatMouseUp(e, beat);
+            try {
+                this._onBeatMouseUp(e, beat);
 
-            if (this._isNoteMouseDown) {
-                if (beat) {
-                    const note = this._renderer.boundsLookup?.getNoteAtPos(beat, relX, relY) ?? null;
-                    this._onNoteMouseUp(e, note);
-                } else {
-                    this._onNoteMouseUp(e, null);
+                if (this._isNoteMouseDown) {
+                    if (beat) {
+                        const note = this._renderer.boundsLookup?.getNoteAtPos(beat, relX, relY) ?? null;
+                        this._onNoteMouseUp(e, note);
+                    } else {
+                        this._onNoteMouseUp(e, null);
+                    }
                 }
+            } finally {
+                this._isBeatMouseDown = false;
+                this._isNoteMouseDown = false;
             }
         });
-        this._renderer.postRenderFinished.on(() => {
-            if (!this._selectionStart || !this._hasCursor || !this.settings.player.enablePlaybackRangeSelection) {
-                return;
-            }
-            this._cursorSelectRange(this._selectionStart, this._selectionEnd);
-        });
+    }
+
+    /**
+     * Rebuilds the selection highlight against the current layout. A selection without an end beat yields an empty highlight.
+     */
+    private _refreshSelectionHighlight() {
+        if (!this._selectionStart) {
+            return;
+        }
+        this._selectionStart.bounds = undefined;
+        if (this._selectionEnd) {
+            this._selectionEnd.bounds = undefined;
+        }
+        this._cursorSelectRange(this._selectionStart, this._selectionEnd);
     }
 
     /**
@@ -3681,9 +3694,7 @@ export class AlphaTabApiBase<TSettings> {
 
         this._currentBeat = null;
         this._cursorUpdateTick(this._previousTick, false, 1, true, true);
-        if (this._selectionStart) {
-            this.highlightPlaybackRange(this._selectionStart.beat, this._selectionEnd!.beat);
-        }
+        this._refreshSelectionHighlight();
 
         (this.postRenderFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'postRenderFinished', null);

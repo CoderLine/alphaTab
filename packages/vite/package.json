@@ -19,7 +19,7 @@
     "license": "MPL-2.0",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/coderline/alphaTab.git"
+        "url": "git+https://github.com/CoderLine/alphaTab.git"
     },
     "type": "module",
     "exports": {
@@ -44,7 +44,7 @@
         "test-web": "npm run test"
     },
     "dependencies": {
-        "magic-string": "^1.4.2"
+        "magic-string": "^1.4.3"
     },
     "peerDependencies": {
         "vite": "^8.3.0"

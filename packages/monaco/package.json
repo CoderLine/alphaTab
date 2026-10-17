@@ -20,7 +20,7 @@
     "license": "MPL-2.0",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/coderline/alphaTab.git"
+        "url": "git+https://github.com/CoderLine/alphaTab.git"
     },
     "scripts": {
         "clean": "rimraf dist",

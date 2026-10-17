@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT, EventEmitter } from '@coderline/alphatab/EventEmitter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
+import type { AlphaTabMetronomeEvent } from '@coderline/alphatab/midi/MidiEvent';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
+import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
@@ -13,6 +15,7 @@ import {
     type IExternalMediaHandler,
     type IExternalMediaSynthOutput
 } from '@coderline/alphatab/synth/ExternalMediaPlayer';
+import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
 import type { IAudioSampleSynthesizer } from '@coderline/alphatab/synth/IAudioSampleSynthesizer';
 import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 import { MidiFileSequencer } from '@coderline/alphatab/synth/MidiFileSequencer';
@@ -441,6 +444,128 @@ describe('SyncPointTests', () => {
         // the count-in plays from its own start, the song continues at 1000ms after it
         expect(synth.timePosition).toBe(0);
     });
+
+    /**
+     * See #2952
+     */
+    describe('non-integer-bar-duration', () => {
+        // a 4/4 bar at 148 BPM lasts 1621.6216...ms
+        const tempo = 148;
+        const barCount = 201;
+        const ticksPerBar = 3840;
+        const barMillis = (4 * 60000) / tempo;
+        const lastSyncTime = (barCount - 1) * barMillis;
+
+        function createScore(): Score {
+            const barTex: string[] = [];
+            for (let i = 0; i < barCount; i++) {
+                barTex.push('C4.4 * 4');
+            }
+            return ScoreLoader.loadAlphaTex(`
+                \\tempo ${tempo}
+                .
+                ${barTex.join(' | ')}
+                .
+                \\sync 0 0 0
+                \\sync ${barCount - 1} 0 ${lastSyncTime}
+            `);
+        }
+
+        function createGenerator(score: Score, midi: MidiFile): MidiFileGenerator {
+            const generator = new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midi));
+            generator.generate();
+            return generator;
+        }
+
+        function expectPlayerInSync(player: IAlphaSynth, seek: (time: number) => void) {
+            const score = createScore();
+            const midi = new MidiFile();
+            const generator = createGenerator(score, midi);
+
+            player.loadMidiFile(midi);
+            player.loadBackingTrack(score);
+            player.updateSyncPoints(generator.syncPoints);
+
+            let tick = -1;
+            player.positionChanged.on(e => {
+                tick = e.currentTick;
+            });
+            player.play();
+
+            for (let bar = 0; bar < barCount; bar++) {
+                seek(bar * barMillis);
+                const expectedTick = bar * ticksPerBar;
+                expect(Math.abs(tick - expectedTick), `bar ${bar}: tick ${tick}`).toBeLessThanOrEqual(1);
+            }
+        }
+
+        it('sync-point-times', () => {
+            const generator = createGenerator(createScore(), new MidiFile());
+
+            const syncPoints = generator.syncPoints;
+            expect(syncPoints[1].synthTick).toBe((barCount - 1) * ticksPerBar);
+            expect(syncPoints[1].syncTime).toBe(lastSyncTime);
+            expect(syncPoints[1].synthTime).toBeCloseTo(lastSyncTime, 6);
+            expect(syncPoints[0].syncBpm).toBeCloseTo(tempo, 6);
+        });
+
+        it('external-media-position', () => {
+            const player = new ExternalMediaPlayer(500);
+            const output = player.output as IExternalMediaSynthOutput;
+            const mediaHandler = new TestExternalMediaHandler(output);
+            mediaHandler.backingTrackDuration = lastSyncTime + barMillis;
+            output.handler = mediaHandler;
+
+            expectPlayerInSync(player, time => mediaHandler.simulateSeek(time));
+        });
+
+        it('backing-track-position', () => {
+            const output = new TestBackingTrackOutput();
+            output.backingTrackDuration = lastSyncTime + barMillis;
+            const player = new BackingTrackPlayer(output, 500);
+
+            expectPlayerInSync(player, time => output.simulateSeek(time));
+        });
+    });
+});
+
+describe('MidiFileSequencerCountInTests', () => {
+    function testCountIn(tex: string, startTime: number, expectedClicks: string, expectedEndTime: number) {
+        const score = ScoreLoader.loadAlphaTex(tex);
+        const midi = new MidiFile();
+        new MidiFileGenerator(score, new Settings(), new AlphaSynthMidiFileHandler(midi)).generate();
+
+        const synthesizer = new RecordingAudioSynthesizer();
+        const sequencer = new MidiFileSequencer(synthesizer);
+        sequencer.loadMidi(midi);
+        sequencer.mainSeek(startTime);
+
+        synthesizer.events = [];
+        sequencer.startCountIn();
+        while (!sequencer.isFinished) {
+            sequencer.fillMidiEventQueue();
+        }
+
+        const actualClicks = synthesizer.events
+            .filter(e => e.isMetronome)
+            .map(e => `${Math.round(e.time)}:${(e.event as AlphaTabMetronomeEvent).metronomeNumerator}`);
+        expect(actualClicks.join(' ')).toBe(expectedClicks);
+        expect(Math.round(sequencer.currentEndTime)).toBe(expectedEndTime);
+    }
+
+    it('bar-start', () => {
+        testCountIn('\\tempo 120 . \\ts 4 4 C4.4*4 | C4.1', 0, '0:0 500:1 1000:2 1500:3', 2000);
+    });
+
+    it('anacrusis', () => {
+        // one full bar, then the counting continues until the pick-up enters on the offbeat of beat 1
+        testCountIn('\\tempo 120 . \\ts 2 4 \\ac C4.8*3 | C4.2', 0, '0:0 500:1 1000:0', 1250);
+    });
+
+    it('mid-bar', () => {
+        // start on beat 3: one full bar, then beats 1 and 2
+        testCountIn('\\tempo 120 . \\ts 4 4 C4.4*4 | C4.1', 1000, '0:0 500:1 1000:2 1500:3 2000:0 2500:1', 3000);
+    });
 });
 
 /**
@@ -574,5 +699,15 @@ class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
     }
     public hasSamplesForPercussion(_key: number): boolean {
         return true;
+    }
+}
+
+/**
+ * @internal
+ */
+class RecordingAudioSynthesizer extends EmptyAudioSynthesizer {
+    public events: SynthEvent[] = [];
+    public override dispatchEvent(synthEvent: SynthEvent): void {
+        this.events.push(synthEvent);
     }
 }

@@ -94,4 +94,15 @@ export interface IMidiFileHandler {
      */
     addTickShift(tickShift: number): void;
 
+    /**
+     * Adds a metronome click to the generated midi file.
+     * @param tick The midi ticks when the click should be happening.
+     * @param counter The index of the beat within the bar as per time signature (0 = first beat of the bar).
+     * @param durationInTicks The duration of one metronome beat in midi ticks.
+     * @remarks
+     * The clicks are generated bar by bar respecting repeats, the time signature and pick-up bars. Handlers
+     * which do not need a metronome (e.g. when writing standard midi files) can ignore this call.
+     */
+    addMetronome(tick: number, counter: number, durationInTicks: number): void;
+
 }

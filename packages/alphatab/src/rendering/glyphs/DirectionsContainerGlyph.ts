@@ -63,10 +63,12 @@ class JumpDirectionGlyph extends Glyph {
         const align = canvas.textAlign;
 
         canvas.font = this.renderer.resources.elementFonts.get(NotationElement.EffectDirections)!;
-        canvas.textBaseline = TextBaseline.Middle;
+        // like other text effects (TextGlyph) drawn from the top: the measured height is the ink height,
+        // centering it on the font's middle line paints text without descenders above the glyph
+        canvas.textBaseline = TextBaseline.Top;
         canvas.textAlign = TextAlign.Right;
 
-        canvas.fillText(this._text, cx + this.x, cy + this.y + this.height / 2);
+        canvas.fillText(this._text, cx + this.x, cy + this.y);
 
         canvas.font = font;
         canvas.textBaseline = baseline;

@@ -1,61 +1,59 @@
 /**
- * CRC-32 with reversed data and unreversed output
+ * CRC-32 (ISO-HDLC, the variant used by ZIP): reflected polynomial 0xEDB88320, initial value and final xor 0xFFFFFFFF.
+ *
+ * The checksum is kept as signed 32-bit integer: values at or above 2^31 would not survive the
+ * integer conversions in the C# and Kotlin builds (see the rules in DeflateFormat).
  * @internal
  */
 export class Crc32 {
-    private static readonly _crc32Lookup: Uint32Array = Crc32._buildCrc32Lookup();
-    private static _buildCrc32Lookup(): Uint32Array {
-        const poly = 0xedb88320;
-        const lookup = new Uint32Array(256);
-        for (let i = 0; i < lookup.length; i++) {
-            let crc = i;
-            for (let bit = 0; bit < 8; bit++) {
-                crc = (crc & 1) === 1 ? (crc >>> 1) ^ poly : crc >>> 1;
+    private static _table: Int32Array | null = null;
+
+    private static _buildTable(): Int32Array {
+        const table = new Int32Array(256);
+        for (let n = 0; n < 256; n++) {
+            let c = n;
+            for (let k = 0; k < 8; k++) {
+                // -306674912 is 0xEDB88320, the mask turns the signed shift into a logical one
+                c = (c & 1) !== 0 ? -306674912 ^ ((c >> 1) & 0x7fffffff) : (c >> 1) & 0x7fffffff;
             }
-            lookup[i] = crc;
+            table[n] = c;
         }
-
-        return lookup;
+        return table;
     }
 
-    private static readonly _crcInit: number = 0xffffffff;
+    private _crc: number = -1;
 
     /**
-     * The CRC data checksum so far.
+     * The checksum of the data added so far (signed 32-bit integer).
      */
-    private _checkValue: number = Crc32._crcInit;
-
-    /**
-     * Returns the CRC data checksum computed so far.
-     */
-    public get value() {
-        return ~this._checkValue;
+    public get value(): number {
+        return ~this._crc;
     }
 
     /**
-     * Initialise a default instance of Crc32.
-     */
-    public constructor() {
-        this.reset();
-    }
-
-    /**
-     * Update CRC data checksum based on a portion of a block of data
+     * Adds a portion of the given data to the checksum.
      * @param data The array containing the data to add
      * @param offset Range start for data (inclusive)
-     * @param count The number of bytes to checksum starting from offset
+     * @param count The number of bytes to add starting from offset
      */
     public update(data: Uint8Array, offset: number, count: number) {
-        for (let i = 0; i < count; i++) {
-            this._checkValue =
-                Crc32._crc32Lookup[(this._checkValue ^ data[offset + i]) & 0xff] ^ (this._checkValue >>> 8);
+        let table = Crc32._table;
+        if (!table) {
+            table = Crc32._buildTable();
+            Crc32._table = table;
         }
+        let c = this._crc;
+        const end = offset + count;
+        for (let i = offset; i < end; i++) {
+            c = table[(c ^ data[i]) & 0xff] ^ ((c >> 8) & 0xffffff);
+        }
+        this._crc = c;
     }
 
     /**
-     * Resets the CRC data checksum as if no update was ever called.
+     * Resets the checksum as if no data was added.
      */
     public reset() {
-        this._checkValue = Crc32._crcInit;
+        this._crc = -1;
     }
 }

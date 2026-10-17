@@ -47,6 +47,20 @@ describe('SpecialNotesTests', () => {
         await VisualTestHelper.runVisualTest('special-notes/beaming-mode.gp');
     });
 
+    it('beaming-anacrusis', async () => {
+        // the pick-up forms the end of a full bar: first eighth is the offbeat of beat 1, the others form beat 2
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\ts 2 4
+            \\ac C4.8 D4.8 E4.8 |
+            F4.4 G4.4 |
+            A4.8 B4.8 C5.8 D5.8 |
+            C4.2
+            `,
+            'test-data/visual-tests/special-notes/beaming-anacrusis.png'
+        );
+    });
+
     it('full-bar-notes-rests', async () => {
         await VisualTestHelper.runVisualTestTex(
             `
