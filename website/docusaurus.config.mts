@@ -551,6 +551,8 @@ async function createConfig(): Promise<Config> {
         // each old slug to the closest new page. See docs/features/render/
         // for the destinations.
         redirects: [
+          // Version-independent link to the newest release notes; the alphaTab README links here.
+          { from: "/docs/releases", to: latestReleaseNotesPath },
           { from: ["/docs/playground/playground", "/docs/playground"], to: "/playground" },
           { from: "/docs/showcase/introduction", to: "/docs/features/" },
           {
