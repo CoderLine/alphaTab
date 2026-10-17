@@ -16,6 +16,12 @@ const options: ParseArgsOptionsConfig = {
     },
     tag: {
         type: 'string'
+    },
+    stage: {
+        type: 'string'
+    },
+    'dry-run': {
+        type: 'string'
     }
 };
 
@@ -92,14 +98,18 @@ function execDryRun(command: string, options: ExecSyncOptionsWithBufferEncoding)
 
 function publish(platform: string, packages: Set<string>) {
     switch (platform) {
-        case 'web':
+        case 'web': {
+            const publishCommand = args.stage === 'true' ? 'npm stage publish' : 'npm publish';
+            // verbose logging surfaces the outcome of the OIDC token exchange
+            const dryRunArgs = args['dry-run'] === 'true' ? ' --dry-run --loglevel verbose' : '';
             for (const packageName of packages) {
-                execDryRun(`npm publish --access public --tag ${args.tag}`, {
+                execDryRun(`${publishCommand} --access public --tag ${args.tag}${dryRunArgs}`, {
                     stdio: 'inherit',
                     cwd: resolve(import.meta.dirname, '../packages', packageName)
                 });
             }
             break;
+        }
         case 'dotnet':
             const dotnetPackages = ['AlphaTab', 'AlphaTab.Windows'];
             for (const pkg of dotnetPackages) {

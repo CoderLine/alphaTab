@@ -16,22 +16,31 @@ on:
       release_kotlin_android:
         type: boolean
         description: Release Android packages
-        default: true                
+        default: true
+      dry_run:
+        type: boolean
+        description: Run npm stage publish with --dry-run for all web packages, skip dotnet and kotlin
+        default: false
 
 jobs:
   web:
     uses: ./.github/workflows/~publish_web.yml
+    permissions:
+      contents: read
+      id-token: write
     secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_web == 'true')
     with: 
       version: ${{github.run_number}}
       npm_tag: latest
       force: true
+      stage: true
+      dry_run: ${{ inputs.dry_run == true }}
 
   dotnet:
     uses: ./.github/workflows/~publish_dotnet.yml
     secrets: inherit
-    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_csharp == 'true')
+    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_csharp == 'true' && !inputs.dry_run)
     with: 
       version: ${{github.run_number}}
       force: true
@@ -39,7 +48,7 @@ jobs:
   kotlin:
     uses: ./.github/workflows/~publish_kotlin.yml
     secrets: inherit
-    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_kotlin_android == 'true')
+    if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_kotlin_android == 'true' && !inputs.dry_run)
     with: 
       version: ${{github.run_number}}
       force: true

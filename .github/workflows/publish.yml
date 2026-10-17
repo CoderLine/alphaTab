@@ -4,23 +4,35 @@ on:
   schedule:
     - cron: "10 0 * * *"
   workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        description: Run npm publish with --dry-run for all web packages, skip dotnet and kotlin
+        default: false
 
 jobs:
   web:
     uses: ./.github/workflows/~publish_web.yml
+    permissions:
+      contents: read
+      id-token: write
     secrets: inherit
     with: 
       version: alpha ${{github.run_number}}
       npm_tag: alpha
+      force: ${{ inputs.dry_run == true }}
+      dry_run: ${{ inputs.dry_run == true }}
 
   dotnet:
     uses: ./.github/workflows/~publish_dotnet.yml
     secrets: inherit
+    if: ${{ !inputs.dry_run }}
     with: 
       version: alpha ${{github.run_number}}
 
   kotlin:
     uses: ./.github/workflows/~publish_kotlin.yml
     secrets: inherit
+    if: ${{ !inputs.dry_run }}
     with: 
       version: alpha ${{github.run_number}}
