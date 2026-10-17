@@ -44,9 +44,14 @@
 
         "nightly-check": "node ./scripts/nightly.mts --mode check",
         "nightly-pack": "node ./scripts/nightly.mts --mode pack",
-        "nightly-publish": "node ./scripts/nightly.mts --mode publish"
+        "nightly-publish": "node ./scripts/nightly.mts --mode publish",
+
+        "readme-hero": "node ./scripts/readme-hero/generate.mts"
     },
     "overrides": {
         "dompurify": "^3.4.12"
+    },
+    "devDependencies": {
+        "opentype.js": "^2.0.0"
     }
 }
