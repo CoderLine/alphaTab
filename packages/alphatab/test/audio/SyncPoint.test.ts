@@ -372,10 +372,14 @@ describe('SyncPointTests', () => {
         const lastSyncTime = (barCount - 1) * barMillis;
 
         function createScore(): Score {
+            const barTex: string[] = [];
+            for (let i = 0; i < barCount; i++) {
+                barTex.push('C4.4 * 4');
+            }
             return ScoreLoader.loadAlphaTex(`
                 \\tempo ${tempo}
                 .
-                ${new Array<string>(barCount).fill('C4.4 * 4').join(' | ')}
+                ${barTex.join(' | ')}
                 .
                 \\sync 0 0 0
                 \\sync ${barCount - 1} 0 ${lastSyncTime}

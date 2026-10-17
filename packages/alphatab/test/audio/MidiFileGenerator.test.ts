@@ -1939,10 +1939,14 @@ describe('MidiFileGeneratorTest', () => {
     it('beat-timer-non-integer-bar-duration', () => {
         // a 4/4 bar at 148 BPM lasts 1621.6216...ms
         const barCount = 200;
+        const barTex: string[] = [];
+        for (let i = 0; i < barCount; i++) {
+            barTex.push('C4.4 { timer } C4.4 * 3');
+        }
         const score: Score = parseTex(`
             \\tempo 148
             .
-            ${new Array<string>(barCount).fill('C4.4 { timer } C4.4 * 3').join(' | ')}
+            ${barTex.join(' | ')}
         `);
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
