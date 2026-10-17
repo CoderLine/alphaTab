@@ -1,63 +1,112 @@
-# AlphaTab
+# alphaTab
 
-[![Official Site](https://img.shields.io/badge/site-alphatab.net-blue.svg)](https://www.alphatab.net/)
-[![Documentation](https://img.shields.io/badge/docs-alphatab.net-blue.svg)](https://www.alphatab.net/docs/introduction)
-[![License MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-green.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
+**Music notation, rendered as a first-class SDK.**
+
+alphaTab renders interactive sheet music and guitar tablature from Guitar Pro, MusicXML, Capella and alphaTex files, and plays it back with a built-in synthesizer or in sync with your own audio and video. One TypeScript core ships for the web, .NET and Android, with no runtime dependencies and TypeScript types included. Open source since 2010.
+
+[![npm](https://img.shields.io/npm/v/@coderline/alphatab?label=npm)](https://www.npmjs.com/package/@coderline/alphatab)
+[![npm downloads](https://img.shields.io/npm/dm/@coderline/alphatab?label=downloads)](https://www.npmjs.com/package/@coderline/alphatab)
+[![NuGet](https://img.shields.io/nuget/v/AlphaTab?label=NuGet)](https://www.nuget.org/packages/AlphaTab)
+[![NuGet downloads](https://img.shields.io/nuget/dt/AlphaTab?label=downloads)](https://www.nuget.org/packages/AlphaTab)
+[![Maven Central](https://img.shields.io/maven-central/v/net.alphatab/alphaTab?label=Maven%20Central)](https://central.sonatype.com/artifact/net.alphatab/alphaTab)
 [![Build](https://github.com/CoderLine/alphaTab/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/CoderLine/alphaTab/actions/workflows/build.yml)
 
-alphaTab is a cross platform music notation and guitar tablature rendering library. You can use alphaTab within your own website or application to load and display music sheets from data sources like Guitar Pro or the built in markup language named alphaTex.
+[Website](https://alphatab.net) · [Documentation](https://alphatab.net/docs/introduction) · [Playground](https://alphatab.net/playground) · [Features](https://alphatab.net/docs/features/) · [Release notes](https://alphatab.net/docs/releases/release1_9) · [Discussions](https://github.com/CoderLine/alphaTab/discussions)
 
-![alphaTab](img/banner.png?raw=true "alphaTab")
+[![Iron Waltz rendered by alphaTab: lead guitar in standard notation and tablature with bends, slides and vibrato, a looped range, the playback cursor and a synced backing track](https://raw.githubusercontent.com/CoderLine/alphaTab/develop/img/hero.png)](https://alphatab.net/playground)
 
-## Getting Started
+*alphaTab draws the score, cursor and selection. The player around it is your own UI, built on alphaTab's API and events.*
 
-To get started follow our guides and tutorials at:
+## Highlights
 
-* <https://www.alphatab.net/docs/introduction>
-* <https://www.alphatab.net/docs/tutorials>
+- **One score, every notation.** Standard notation, guitar and bass tablature, drum tabs, slash notation and numbered notation (jianpu), alone or side by side.
+- **Plays what it shows.** A built-in SoundFont2/SoundFont3 synthesizer, or playback synced to a backing track, an audio file or a video.
+- **Interactive by design.** Beat-accurate cursor, click to seek, range selection and looping, tempo control, count-in and metronome, all exposed as events you subscribe to.
+- **Layouts that adapt.** Page, horizontal and parchment layouts that reflow on resize, down to phone widths.
+- **Multi-track control.** Show, hide, mute and solo tracks at runtime, with per-track volume and transposition.
+- **Make it yours.** Colors per notation element, interchangeable SMuFL music fonts and fine-grained control over what is displayed.
+- **Edit and export.** Modify the data model in code and export to Guitar Pro, alphaTex, MIDI or rendered audio.
 
-## Features
+| | Formats |
+|---|---|
+| **Reads** | Guitar Pro 3–8 (`.gp3` `.gp4` `.gp5` `.gpx` `.gp`), MusicXML (`.xml` `.musicxml` `.mxl`), Capella (`.capx`), [alphaTex](https://alphatab.net/docs/alphatex/introduction) |
+| **Writes** | Guitar Pro 7+ (`.gp`), alphaTex, MIDI, audio (PCM samples) |
 
-alphaTab mostly focuses on web based platforms allowing music notation to be embedded into websites and browser based apps but is also designed to be used on various other platforms like .net and Android either as a platform native integration or through runtime specific JavaScript engines.
+## Quick start
 
-alphaTab can load music notation from various sources like Guitar Pro 3-7, AlphaTex and MusicXML and render them into beautiful music sheets right within your browser (or application). Using a built in midi synthesizer named alphaSynth the music sheets can also be played in your browser.
+Install the package:
 
-* Load GuitarPro 3-5, GuitarPro 6, Guitar Pro 7, AlphaTex or MusicXML
-* Render as SVG or Raster Graphics (raster graphics depends on platform: HTML5 canvas, GDI+, SkiaSharp, Android Canvas)...
-* Display single or multiple instruments as standard music notation and guitar tablatures consisting of song information, repeats, alternate endings, guitar tunints, clefs, key signatures, time signatures, notes, rests, accidentals, drum tabs, piano grand staff, tied notes, grace notes, dead notes, ghost notes, markers, tempos, lyrics, chords, vibratos, dynamics, tap/slap/pop, fade-in, let-ring, palm-mute, string bends, whammy bar, tremolo picking, strokes, slides, trills, pick strokes, tuplets, fingering, triplet feels,...
-* Adapt to your responsive design by dynamic resizing
-* Play the music sheet via built-in Midi+SoundFont2 Synthesizer (output depends on platform: HTML5 Web Audio, NAudio, Android AudioTrack)
+```bash
+npm install @coderline/alphatab
+```
 
-## Officially Supported Platforms
+Or skip the install and try it from a CDN. Save this as an HTML file and open it in a browser:
 
- Platform | Support | Availability
-----------|---------|--------------
-Browsers using `script` includes (UMD) | Full experience including low level APIs, Background Workers, Audio Playback, SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.0-latest
-Node.js using `require` (UMD) | Access to all low level APIs and SVG rendering | 1.0-latest
-.net standard 2.0 | Access to all low level APIs and multiple render engines (SVG, GDI+, SkiaSharp) | 1.0-latest
-.netcoreapp3.1 (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.0-1.2.2
-.netcoreapp3.1 (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.0-1.2.2
-Browsers using ES6 Modules (ESM) | Full experience including low level APIs, Background Workers, Audio Playback, SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3
-Node.js using `import` (ESM) | Access to all low level APIs and SVG rendering | 1.3
-.net8.0-windows (WPF) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. | 1.3
-.net8.0-windows (WinForms) | Full experience including low level APIs, Background Workers, Audio Playback (through NAudio), SVG and HTML5 rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3
-Android (Kotlin) | Full experience including low level APIs, Background Workers, Audio Playback, Android Canvas and SVG rendering. UI level integration for user interaction and automatic resizing. Reduced UI level integration related to transparency and animations. | 1.3
+```html
+<div id="alphaTab">
+  \title "Hello alphaTab"
+  .
+  :4 0.6 1.6 3.6 0.5 2.5 3.5 0.4 2.4 |
+     3.4 0.3 2.3 0.2 1.2 3.2 0.1 1.1 |
+     3.1.1
+</div>
+<script type="module">
+  import * as alphaTab from 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.min.mjs';
+  const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'), { tex: true });
+</script>
+```
 
-## Thanks to...
+The music inside the `<div>` is [alphaTex](https://alphatab.net/docs/alphatex/introduction), alphaTab's plain-text notation format. Edit it live in the [Playground](https://alphatab.net/playground), or continue with the [web tutorial](https://alphatab.net/docs/tutorials) to add playback and a player UI.
 
-... our friends of BrowserStack for a free plan. This allows me to test alphaTab on all browsers on all operating systems. Only with this I can ensure that alphaTab is shown to all your visitors as expected.
+Using a bundler? The [Vite](https://alphatab.net/docs/getting-started/installation-vite) and [webpack](https://alphatab.net/docs/getting-started/installation-webpack) plugins set up the web workers, audio worklets, fonts and SoundFont for you.
 
-<p align="center">
-<a href="https://www.browserstack.com" target="_blank"><img src="img/BrowserStack.png?raw=true" width="400" align="center"/></a>
-</p>
+## Platforms
 
-... our friends at JetBrains for a Open Source License of their products. This allows me to develop all the flavors of alphaTab with the latest and greatest coding and debugging assistance.
+The .NET and Kotlin libraries are transpiled from the same TypeScript source, so features and behavior match across platforms.
 
-<p align="center">
-<a href="https://www.jetbrains.com/" target="_blank"><img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" width="150" align="center"/></a><br />
-Copyright © 2000-2022 JetBrains s.r.o. JetBrains and the JetBrains logo are registered trademarks of JetBrains s.r.o.
-</p>
+| Platform | Package | Install | Guide |
+|---|---|---|---|
+| Evergreen browsers and Node.js | [`@coderline/alphatab`](https://www.npmjs.com/package/@coderline/alphatab) | `npm install @coderline/alphatab` | [Web](https://alphatab.net/docs/getting-started/installation-web) |
+| .NET Standard 2.0 | [`AlphaTab`](https://www.nuget.org/packages/AlphaTab) | `dotnet add package AlphaTab` | [.NET](https://alphatab.net/docs/getting-started/installation-net) |
+| WPF and WinForms (.NET 8) | [`AlphaTab.Windows`](https://www.nuget.org/packages/AlphaTab.Windows) | `dotnet add package AlphaTab.Windows` | [.NET](https://alphatab.net/docs/getting-started/installation-net) |
+| Android (Kotlin, API 26+) | [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab) | `implementation("net.alphatab:alphaTab:<version>")` | [Android](https://alphatab.net/docs/getting-started/installation-android) |
 
-... [Bernhard Schelling](https://github.com/schellingb/TinySoundFont) the author of TinySoundFont and [Steve Folta](https://github.com/stevefolta/SFZero) the author of SFZero for providing the core of the synthesis engine.
+## Packages in this repository
 
-... all you people using alphaTab providing new feature ideas and bug reports.
+| Package | Description |
+|---|---|
+| [`@coderline/alphatab`](https://www.npmjs.com/package/@coderline/alphatab) | The rendering and playback library. |
+| [`@coderline/alphatab-vite`](https://www.npmjs.com/package/@coderline/alphatab-vite) | Vite plugin that bundles alphaTab's workers, fonts and SoundFont. |
+| [`@coderline/alphatab-webpack`](https://www.npmjs.com/package/@coderline/alphatab-webpack) | webpack plugin that bundles alphaTab's workers, fonts and SoundFont. |
+| [`@coderline/alphatab-language-server`](https://www.npmjs.com/package/@coderline/alphatab-language-server) | alphaTex language server with completion, hover docs and formatting, plus a TextMate grammar. |
+| [`@coderline/alphatab-monaco`](https://www.npmjs.com/package/@coderline/alphatab-monaco) | alphaTex editing in the Monaco editor (experimental). |
+
+## Documentation
+
+- [Getting started](https://alphatab.net/docs/introduction): installation and configuration for web, .NET and Android.
+- [Feature catalog](https://alphatab.net/docs/features/): every capability with a live example.
+- [alphaTex](https://alphatab.net/docs/alphatex/introduction): the syntax reference for writing music as text.
+- [API reference](https://alphatab.net/docs/reference/api): settings, events, methods and the data model.
+- [Tutorials](https://alphatab.net/docs/tutorials): build a complete player step by step.
+- [llms.txt](https://alphatab.net/llms.txt): an index of the documentation for AI assistants.
+
+## Community
+
+- **Built with alphaTab:** browse community projects, from practice apps to score editors, in [Show and tell](https://github.com/CoderLine/alphaTab/discussions/categories/show-and-tell).
+- **Questions and ideas:** start a thread in [GitHub Discussions](https://github.com/CoderLine/alphaTab/discussions) or ask on [Stack Overflow](https://stackoverflow.com/questions/tagged/alphatab).
+- **Bugs:** open an [issue](https://github.com/CoderLine/alphaTab/issues) using the bug template.
+- **Contributing:** read the [contribution guidelines](https://github.com/CoderLine/alphaTab/blob/develop/CONTRIBUTING.md) and the [code of conduct](https://github.com/CoderLine/alphaTab/blob/develop/code-of-conduct.md). AI-assisted contributions follow [AGENTS.md](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md).
+
+## Supporting alphaTab
+
+Due to tax regulations in Austria, where alphaTab is developed, we unfortunately cannot accept donations. If alphaTab is useful to you, please consider donating to a charity of your choice instead. And share what you built in [Show and tell](https://github.com/CoderLine/alphaTab/discussions/categories/show-and-tell): we love to see alphaTab in the wild. A star on GitHub also helps others discover the project.
+
+## License
+
+alphaTab is licensed under the [Mozilla Public License 2.0](https://github.com/CoderLine/alphaTab/blob/develop/LICENSE). The bundled music fonts Bravura and Petaluma (© Steinberg Media Technologies) and the Noto fonts are licensed under the SIL Open Font License. The bundled SONiVOX SoundFont is licensed under the Apache License 2.0.
+
+## Thanks
+
+- [BrowserStack](https://www.browserstack.com) for a free plan to test alphaTab on all browsers and operating systems.
+- [Bernhard Schelling](https://github.com/schellingb/TinySoundFont), author of TinySoundFont, and [Steve Folta](https://github.com/stevefolta/SFZero), author of SFZero, whose work forms the core of alphaTab's synthesizer.
+- Everyone who [contributes code](https://github.com/CoderLine/alphaTab/graphs/contributors), reports bugs and suggests features.
