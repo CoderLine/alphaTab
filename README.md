@@ -13,7 +13,7 @@ alphaTab renders interactive sheet music and guitar tablature from Guitar Pro, M
 
 [Website](https://alphatab.net) · [Documentation](https://alphatab.net/docs/introduction) · [Playground](https://alphatab.net/playground) · [Features](https://alphatab.net/docs/features/) · [Release notes](https://alphatab.net/docs/releases/release1_9) · [Discussions](https://github.com/CoderLine/alphaTab/discussions)
 
-[![Iron Waltz rendered by alphaTab: lead guitar in standard notation and tablature with bends, slides and vibrato, a looped range, the playback cursor and a synced backing track](https://raw.githubusercontent.com/CoderLine/alphaTab/develop/img/hero.png)](https://alphatab.net/playground)
+[![Iron Waltz rendered by alphaTab: lead guitar in standard notation and tablature with bends, slides and vibrato, a looped range, the playback cursor and a synced backing track](https://raw.githubusercontent.com/CoderLine/alphaTab/develop/img/hero.svg)](https://alphatab.net/playground)
 
 *alphaTab draws the score, cursor and selection. The player around it is your own UI, built on alphaTab's API and events.*
 
