@@ -10,6 +10,12 @@ on:
       npm_tag:
         type: string
         required: true
+      stage:
+        type: boolean
+        default: false
+      dry_run:
+        type: boolean
+        default: false
 
 
 jobs:
@@ -32,6 +38,9 @@ jobs:
     needs: check
     if: needs.check.outputs.has_changes == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v7
         with: 
@@ -49,6 +58,5 @@ jobs:
       - run: npm run build-monaco
 
       - run: npm run nightly-pack -- --platform web --force ${{ inputs.force }}
-      - run: npm run nightly-publish -- --platform web --force ${{ inputs.force }} --tag ${{ inputs.npm_tag }} 
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_AUTH_TOKEN }}
+      - run: npm install -g npm@11
+      - run: npm run nightly-publish -- --platform web --force ${{ inputs.force }} --tag ${{ inputs.npm_tag }} --stage ${{ inputs.stage }} --dry-run ${{ inputs.dry_run }}

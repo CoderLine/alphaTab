@@ -16,17 +16,26 @@ on:
       release_kotlin_android:
         type: boolean
         description: Release Android packages
-        default: true                
+        default: true
+      dry_run:
+        type: boolean
+        description: Build and verify all selected packages without publishing them
+        default: false
 
 jobs:
   web:
     uses: ./.github/workflows/~publish_web.yml
+    permissions:
+      contents: read
+      id-token: write
     secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_web == 'true')
     with: 
       version: ${{github.run_number}}
       npm_tag: latest
       force: true
+      stage: true
+      dry_run: ${{ inputs.dry_run == true }}
 
   dotnet:
     uses: ./.github/workflows/~publish_dotnet.yml
@@ -35,6 +44,7 @@ jobs:
     with: 
       version: ${{github.run_number}}
       force: true
+      dry_run: ${{ inputs.dry_run == true }}
 
   kotlin:
     uses: ./.github/workflows/~publish_kotlin.yml
@@ -43,3 +53,4 @@ jobs:
     with: 
       version: ${{github.run_number}}
       force: true
+      dry_run: ${{ inputs.dry_run == true }}
