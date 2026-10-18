@@ -4,7 +4,8 @@ const sidebars: SidebarsConfig = {
   docs: {
     alphaTab: [
       "introduction",
-      "contributing"
+      "contributing",
+      "attribution"
     ],
     "Release Notes": [
       {
