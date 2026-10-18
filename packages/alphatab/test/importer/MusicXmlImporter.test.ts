@@ -12,6 +12,7 @@ import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -23,28 +24,17 @@ import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHe
 import { describe, expect, it } from 'vitest';
 
 describe('MusicXmlImporterTests', () => {
-    it('track-volume', async () => {
+    it('midi-instrument-volume-pan', async () => {
         const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/track-volume-balance.musicxml'
+            'test-data/musicxml4/part-volume-pan.xml',
+            false
         );
 
-        expect(score.tracks[0].playbackInfo.volume).toBe(16);
-        expect(score.tracks[1].playbackInfo.volume).toBe(12);
-        expect(score.tracks[2].playbackInfo.volume).toBe(8);
-        expect(score.tracks[3].playbackInfo.volume).toBe(4);
-        expect(score.tracks[4].playbackInfo.volume).toBe(0);
-    });
-
-    it('track-balance', async () => {
-        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/track-volume-balance.musicxml'
-        );
-
-        expect(score.tracks[0].playbackInfo.balance).toBe(0);
-        expect(score.tracks[1].playbackInfo.balance).toBe(4);
-        expect(score.tracks[2].playbackInfo.balance).toBe(8);
-        expect(score.tracks[3].playbackInfo.balance).toBe(12);
-        expect(score.tracks[4].playbackInfo.balance).toBe(16);
+        // volume 0-100 and pan -90 (left) to 90 (right) are scaled to 0-16, between the steps rounded down.
+        // only the first instrument of a part defines the track mixer, a part without values keeps the defaults.
+        const defaults = new PlaybackInformation();
+        expect(score.tracks.map(t => t.playbackInfo.volume)).toEqual([16, 10, 4, 0, 5, 8, defaults.volume]);
+        expect(score.tracks.map(t => t.playbackInfo.balance)).toEqual([0, 12, 8, 16, 5, 8, defaults.balance]);
     });
 
     it('full-bar-rest', async () => {
