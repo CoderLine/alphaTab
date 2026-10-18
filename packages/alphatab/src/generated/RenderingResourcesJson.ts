@@ -94,6 +94,22 @@ export interface RenderingResourcesJson {
      */
     fretboardNumberFont?: FontJson;
     /**
+     * Unused, see deprecation note.
+     * @defaultValue `14px Georgia, serif`
+     * @since 0.9.6
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
+     * @json_read_only
+     */
+    fingeringFont?: FontJson;
+    /**
+     * Unused, see deprecation note.
+     * @defaultValue `12px Georgia, serif`
+     * @since 1.4.0
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
+     * @json_read_only
+     */
+    inlineFingeringFont?: FontJson;
+    /**
      * The font to use for section marker labels shown above the music sheet.
      * @defaultValue `bold 14px Georgia, serif`
      * @since 0.9.6
@@ -101,6 +117,14 @@ export interface RenderingResourcesJson {
      * @json_read_only
      */
     markerFont?: FontJson;
+    /**
+     * Ununsed, see deprecation note.
+     * @defaultValue `italic 12px Georgia, serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with the respective
+     * @json_read_only
+     */
+    effectFont?: FontJson;
     /**
      * The font to use for displaying the bar numbers above the music sheet.
      * @defaultValue `11px Arial, sans-serif`

@@ -212,7 +212,7 @@ export class RenderingResources {
      * @defaultValue `14px Georgia, serif`
      * @since 0.9.6
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     * @json_ignore
+     * @json_read_only
      */
     public fingeringFont: Font = RenderingResources._effectFont;
 
@@ -221,7 +221,7 @@ export class RenderingResources {
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     * @json_ignore
+     * @json_read_only
      */
     public inlineFingeringFont: Font = RenderingResources._effectFont;
 
@@ -248,7 +248,7 @@ export class RenderingResources {
      * @defaultValue `italic 12px Georgia, serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with the respective
-     * @json_ignore
+     * @json_read_only
      */
     public effectFont: Font = RenderingResources._effectFont;
 

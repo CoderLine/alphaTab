@@ -71,8 +71,17 @@ export class RenderingResourcesSerializer {
             case "fretboardnumberfont":
                 obj.fretboardNumberFont = Font.fromJson(v)!;
                 return true;
+            case "fingeringfont":
+                obj.fingeringFont = Font.fromJson(v)!;
+                return true;
+            case "inlinefingeringfont":
+                obj.inlineFingeringFont = Font.fromJson(v)!;
+                return true;
             case "markerfont":
                 obj.markerFont = Font.fromJson(v)!;
+                return true;
+            case "effectfont":
+                obj.effectFont = Font.fromJson(v)!;
                 return true;
             case "barnumberfont":
                 obj.barNumberFont = Font.fromJson(v)!;

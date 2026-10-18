@@ -11,6 +11,7 @@ import { Note } from '@coderline/alphatab/model/Note';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
+import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
 import { TestPlatform } from 'test/TestPlatform';
 import { ComparisonHelpers } from './ComparisonHelpers';
 
@@ -220,6 +221,42 @@ describe('JsonConverterTest', () => {
         expect(settings.display.resources.mainGlyphColor.r).toBe(255);
         expect(settings.display.resources.mainGlyphColor.g).toBe(0);
         expect(settings.display.resources.mainGlyphColor.b).toBe(0);
+    });
+
+    it('settings-deprecated-font-keys-are-read-only', () => {
+        const raw = new Map<string, unknown>();
+        raw.set('displayResourcesEffectFont', 'italic 13px Arial');
+        raw.set('displayResourcesFingeringFont', 'italic 13px Arial');
+        raw.set('displayResourcesInlineFingeringFont', 'italic 13px Arial');
+
+        const settings = new Settings();
+        SettingsSerializer.fromJson(settings, raw);
+        expect(settings.display.resources.effectFont.size).toBe(13);
+        expect(settings.display.resources.fingeringFont.size).toBe(13);
+        expect(settings.display.resources.inlineFingeringFont.size).toBe(13);
+
+        const display = JsonConverter.settingsToJsObject(settings)!.get('display') as Map<string, unknown>;
+        const resources = display.get('resources') as Map<string, unknown>;
+        expect(resources.has('effectfont')).toBe(false);
+        expect(resources.has('fingeringfont')).toBe(false);
+        expect(resources.has('inlinefingeringfont')).toBe(false);
+    });
+
+    /*@target web*/
+    it('settings-json-type-keeps-deprecated-font-keys', () => {
+        // type-checked: settings written for 1.8 must still compile against SettingsJson
+        const json: SettingsJson = {
+            display: {
+                resources: {
+                    effectFont: 'italic 13px Arial',
+                    fingeringFont: 'italic 13px Arial',
+                    inlineFingeringFont: 'italic 13px Arial'
+                }
+            }
+        };
+        const settings = new Settings();
+        settings.fillFromJson(json);
+        expect(settings.display.resources.effectFont.size).toBe(13);
     });
 
     const unsetNoteTex = '\\track "P" \\staff {score} C4.4 D4 r r | \\track "G" 3.3.4 5.2 r r';
