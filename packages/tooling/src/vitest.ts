@@ -33,6 +33,7 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
         },
         test: {
             include: ['test/**/*.test.ts'],
+            isolate: false,
             testTimeout: options.testTimeout ?? 30000,
             setupFiles: options.setupFiles,
             passWithNoTests: true,
