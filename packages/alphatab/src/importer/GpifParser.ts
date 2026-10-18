@@ -103,6 +103,14 @@ export class GpifParser {
      */
     private static readonly _bendPointValueFactor: number = 1 / 25.0;
 
+    /**
+     * Positions of the track pan and volume within the RSE channel strip parameters.
+     * GPIF range: 0-1
+     * Internal range: 0-16
+     */
+    private static readonly _channelStripPanIndex: number = 11;
+    private static readonly _channelStripVolumeIndex: number = 12;
+
     // tests have shown that Guitar Pro seem to always work with 44100hz for the frame offsets,
     // they are NOT using the sample rate of the input file.
     // Downsampling a 44100hz ogg to 8000hz and using it in as audio track resulted in the same frame offset when placing sync points.
@@ -1311,34 +1319,29 @@ export class GpifParser {
     }
 
     private _parseRSE(track: Track, node: XmlNode): void {
-        for (const c of node.childElements()) {
-            switch (c.localName) {
-                case 'ChannelStrip':
-                    this._parseChannelStrip(track, c);
-                    break;
-            }
+        const mixer = node.findChildElement('ChannelStrip')?.findChildElement('Parameters');
+        if (!mixer) {
+            return;
+        }
+
+        const values = GpifParser._splitSafe(mixer.innerText);
+        if (values.length > GpifParser._channelStripPanIndex) {
+            track.playbackInfo.balance = GpifParser._parseChannelStripValue(
+                values,
+                GpifParser._channelStripPanIndex,
+                0.5
+            );
+            track.playbackInfo.volume = GpifParser._parseChannelStripValue(
+                values,
+                GpifParser._channelStripVolumeIndex,
+                0.9
+            );
         }
     }
 
-    private _parseChannelStrip(track: Track, node: XmlNode): void {
-        for (const c of node.childElements()) {
-            switch (c.localName) {
-                case 'Parameters':
-                    this._parseChannelStripParameters(track, c);
-                    break;
-            }
-        }
-    }
-
-    private _parseChannelStripParameters(track: Track, node: XmlNode): void {
-        const text = node.innerText;
-        if (text) {
-            const parameters = GpifParser._splitSafe(text);
-            if (parameters.length >= 12) {
-                track.playbackInfo.balance = Math.floor(GpifParser._parseFloatSafe(parameters[11], 0.5) * 16);
-                track.playbackInfo.volume = Math.floor(GpifParser._parseFloatSafe(parameters[12], 0.9) * 16);
-            }
-        }
+    private static _parseChannelStripValue(values: string[], index: number, fallback: number): number {
+        const normalized = index < values.length ? GpifParser._parseFloatSafe(values[index], fallback) : fallback;
+        return Math.floor(normalized * 16);
     }
 
     //
