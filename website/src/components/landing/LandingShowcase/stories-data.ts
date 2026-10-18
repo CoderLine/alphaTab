@@ -57,8 +57,6 @@ export type ShowcaseStory =
       url: string;
       /** Always drawn into the landing selection and listed first on the showcase page. */
       featured?: boolean;
-      /** Listed on the showcase page only. */
-      carousel?: false;
       /** One or two sentences for the showcase page. */
       description: string;
       tags: ShowcaseTag[];
@@ -105,9 +103,9 @@ export type ShowcaseStory =
 
 /** Pool the page draws from on load; the server render uses the first `SHOWCASE_SLOTS` entries of each type. */
 export const SHOWCASE_STORIES: ShowcaseStory[] = [
-  // TODO(outreach): ask Infinite Guitar for a testimonial to replace the summary, and confirm featuring them.
-  // TODO(screenshot): static/img/showcase/infiniteguitar.webp; the tablature view is hidden from
-  // anonymous visitors, so capture it logged in (e.g. lesson 2314, with the alphaTab view visible).
+  // TODO(outreach): ask Infinite Guitar for a testimonial to replace the summary, and confirm featuring them
+  // with the preview: the public "Pentatonic Pathways: Intro to the Scale" lesson page with its header kept,
+  // the video left out and the author's name and photo blurred.
   {
     cardType: 'project',
     id: 'infiniteguitar',
@@ -123,6 +121,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
       'Video guitar lessons with interactive tablature, rendered and played back by alphaTab.',
     tags: ['learning', 'web'],
     meta: 'Lessons with Guitar Pro tabs',
+    screenshot: '/img/showcase/infiniteguitar.webp',
     outreach: 'pending',
   },
   // TODO(outreach): ask Fretello for a testimonial to replace the summary, and for consent to use their
@@ -145,7 +144,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     screenshot: '/img/showcase/fretello.webp',
     outreach: 'pending',
   },
-  // TODO(screenshot): static/img/showcase/smart-beat.webp; desktop app, ask for one in discussion #2930.
+  // TODO(outreach): confirm in discussion #2930 that the app screenshot (our Iron Waltz demo file) may be used.
   {
     cardType: 'project',
     id: 'smart-beat',
@@ -155,7 +154,6 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     glyph: 'S',
     accent: '#5b76d8',
     url: 'https://smart-beat.app',
-    carousel: false,
     quote: 'Special thanks to alphaTab, the heart of Smart Beat: this project would not exist without it.',
     source: { label: 'smart-beat.app', url: 'https://smart-beat.app' },
     description:
@@ -164,7 +162,8 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     sourceCode: 'https://github.com/mbalyi/smart-beat',
     announcement: 'https://github.com/CoderLine/alphaTab/discussions/2930',
     meta: 'Tauri · React · desktop',
-    outreach: 'not-needed',
+    screenshot: '/img/showcase/smart-beat.webp',
+    outreach: 'pending',
   },
   // TODO(outreach): Reddit comment by u/louislamlam; confirm the quote and the use of his real name.
   {
@@ -314,7 +313,6 @@ export function arrangeStories(
 ): ShowcaseStory[] {
   const buckets = new Map<ShowcaseStory['cardType'], ShowcaseStory[]>();
   for (const s of stories) {
-    if (s.cardType === 'project' && s.carousel === false) continue;
     const bucket = buckets.get(s.cardType) ?? [];
     bucket.push(s);
     buckets.set(s.cardType, bucket);
