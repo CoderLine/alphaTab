@@ -170,6 +170,12 @@ The characters read fine, but the shape of your file does not. Missing values, u
 
 **Parser message:** Error parsing arguments: unexpected additional arguments. Signatures: %s
 
+### AT221 — A string number can only be specified on pitched notes, use the 'fret {#at221}
+
+**Severity:** Error (Parser)
+
+**Parser message:** A string number can only be specified on pitched notes, use the 'fret.string' syntax to specify the string of fretted notes.
+
 ## Legacy syntax hints {#legacy-syntax-hints}
 
 Your file parses, but you are using a form that pre-dates alphaTex 1.7 or leaves redundant separators in place. alphaTab still accepts these; upgrading brings your notation in line with the current shape and unlocks better editor tooling.
@@ -215,6 +221,12 @@ Your file parses, but you are using a form that pre-dates alphaTex 1.7 or leaves
 **Severity:** Warning
 
 **Parser message:** This staff metadata tag should be specified as staff property.
+
+### AT307 — The staff display property is not supported by the staff type, the value has no effect {#at307}
+
+**Severity:** Warning
+
+**Parser message:** The staff display property is not supported by the staff type, the value has no effect.
 
 ### AT400 — The dots separating score metadata, score contents and the sync points can be removed {#at400}
 

@@ -582,7 +582,7 @@ Following parameters have value limitations
 \bracketExtendMode mode
 ```
 
-**Description:** Set the mode for [brackets and braces](/docs/showcase/general#brackets-and-braces).
+**Description:** Set the mode for [brackets and braces](/docs/features/render/bracket-extend-mode).
 
 **Parameters:**
 
@@ -634,7 +634,7 @@ Following parameters have value limitations
 \singleTrackTrackNamePolicy mode
 ```
 
-**Description:** Configures on which systems to show the [track names](/docs/showcase/general#track-names) when only a single track is rendered.
+**Description:** Configures on which systems to show the [track names](/docs/features/render/track-name-policies) when only a single track is rendered.
 
 
 **Parameters:**
@@ -668,7 +668,7 @@ Following parameters have value limitations
 \multiTrackTrackNamePolicy mode
 ```
 
-**Description:** Configures on which systems to show the [track names](/docs/showcase/general#track-names) when multiple tracks are rendered.
+**Description:** Configures on which systems to show the [track names](/docs/features/render/track-name-policies) when multiple tracks are rendered.
 
 
 **Parameters:**
@@ -702,7 +702,7 @@ Following parameters have value limitations
 \firstSystemTrackNameMode mode
 ```
 
-**Description:** Configures the text how to show as [track names](/docs/showcase/general#track-names) on the first system.
+**Description:** Configures the text how to show as [track names](/docs/features/render/track-name-policies) on the first system.
 
 
 **Parameters:**
@@ -738,7 +738,7 @@ Following parameters have value limitations
 \otherSystemsTrackNameMode mode
 ```
 
-**Description:** Configures the text how to show as [track names](/docs/showcase/general#track-names) on the second and subsequent systems.
+**Description:** Configures the text how to show as [track names](/docs/features/render/track-name-policies) on the second and subsequent systems.
 
 
 **Parameters:**
@@ -774,7 +774,7 @@ Following parameters have value limitations
 \firstSystemTrackNameOrientation orientation
 ```
 
-**Description:** Configures the orientation of the [track names](/docs/showcase/general#track-names) on the first system.
+**Description:** Configures the orientation of the [track names](/docs/features/render/track-name-policies) on the first system.
 
 
 **Parameters:**
@@ -814,7 +814,7 @@ Following parameters have value limitations
 \otherSystemsTrackNameOrientation orientation
 ```
 
-**Description:** Configures the orientation of the [track names](/docs/showcase/general#track-names) on the second and subsequent systems.
+**Description:** Configures the orientation of the [track names](/docs/features/render/track-name-policies) on the second and subsequent systems.
 
 
 **Parameters:**
@@ -1046,6 +1046,8 @@ Following parameters have value limitations
 
 ## `\defaultStaffDisplay`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 \defaultStaffDisplay (staffTypes)
 ```
@@ -1085,6 +1087,8 @@ Following parameters have value limitations
 **Properties:**
 
 ### `clefVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
 
 ```plain title="Syntax"
 // [1]: 
@@ -1128,6 +1132,8 @@ Following parameters have value limitations
 
 ### `clefPlacement`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 clefPlacement placement
 ```
@@ -1159,6 +1165,8 @@ Following parameters have value limitations
 
 ### `clefSystems`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 clefSystems systems
 ```
@@ -1189,6 +1197,8 @@ Following parameters have value limitations
 `}</AlphaTexSample>
 
 ### `ksVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
 
 ```plain title="Syntax"
 // [1]: 
@@ -1232,6 +1242,8 @@ Following parameters have value limitations
 
 ### `ksPlacement`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 ksPlacement placement
 ```
@@ -1263,6 +1275,8 @@ Following parameters have value limitations
 
 ### `ksSystems`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 ksSystems systems
 ```
@@ -1293,6 +1307,8 @@ Following parameters have value limitations
 `}</AlphaTexSample>
 
 ### `tsVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
 
 ```plain title="Syntax"
 // [1]: 
@@ -1336,6 +1352,8 @@ Following parameters have value limitations
 
 ### `tsPlacement`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 tsPlacement placement
 ```
@@ -1367,6 +1385,8 @@ Following parameters have value limitations
 
 ### `tsSystems`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 tsSystems systems
 ```
@@ -1397,6 +1417,8 @@ Following parameters have value limitations
 `}</AlphaTexSample>
 
 ### `restsVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
 
 ```plain title="Syntax"
 // [1]: 
@@ -1440,6 +1462,8 @@ Following parameters have value limitations
 
 ### `restsPlacement`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 restsPlacement placement
 ```
@@ -1470,6 +1494,8 @@ Following parameters have value limitations
 `}</AlphaTexSample>
 
 ### `restsSystems`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
 
 ```plain title="Syntax"
 restsSystems systems
@@ -1502,6 +1528,8 @@ Following parameters have value limitations
 
 ### `barNumber`
 
+**Scope:** [Score metadata](./syntax#score-metadata)
+
 ```plain title="Syntax"
 barNumber mode
 ```
@@ -1532,6 +1560,8 @@ Following parameters have value limitations
 `}</AlphaTexSample>
 
 ### `rhythm`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
 
 ```plain title="Syntax"
 rhythm mode
