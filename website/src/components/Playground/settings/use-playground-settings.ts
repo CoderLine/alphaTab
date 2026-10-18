@@ -85,6 +85,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
     // Re-applied by the store after it rebuilds base settings (theme switch, reset).
     useEffect(() => {
         if (!store || !module) return;
+        store.setScrollDuringPlayback(false);
         return store.addSettingsLayer((settings) => {
             applyPlaygroundBase(settings, module, smuflMetadata);
             for (const [id, value] of Object.entries(overridesRef.current)) {

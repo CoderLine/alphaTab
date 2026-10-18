@@ -138,6 +138,7 @@ export function AlphaTabPlayer({
             fixedSource: !player || playerSettings?.playerMode !== undefined,
             ownSoundFont: ownSoundFont || !!playerSettings?.soundFont,
         });
+        if (playerSettings?.scrollMode !== undefined) s.setScrollDuringPlayback(false);
         setStore(s);
         setApi(created);
 

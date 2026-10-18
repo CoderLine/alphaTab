@@ -157,6 +157,9 @@ export class AlphaTabStore {
     private readonly playback: PlaybackController;
     private loadToken = 0;
     private readonly settingsLayers = new Set<(settings: Settings) => void>();
+    private scrollDuringPlayback = true;
+    /** The store switched `scrollMode` from `Off` for the current playback and owes the switch back. */
+    private scrollingForPlayback = false;
 
     constructor(
         private readonly api: AlphaTabApi,
@@ -289,13 +292,8 @@ export class AlphaTabStore {
     }
 
     setLayoutMode(mode: LayoutModeKey): void {
-        if (mode === 'page') {
-            this.api.settings.display.layoutMode = this.module.LayoutMode.Page;
-            this.api.settings.player.scrollMode = this.module.ScrollMode.Off;
-        } else {
-            this.api.settings.display.layoutMode = this.module.LayoutMode.Horizontal;
-            this.api.settings.player.scrollMode = this.module.ScrollMode.Continuous;
-        }
+        this.api.settings.display.layoutMode =
+            mode === 'page' ? this.module.LayoutMode.Page : this.module.LayoutMode.Horizontal;
         this.updateView({ layoutMode: mode });
         this.scheduleApply();
     }
@@ -320,6 +318,16 @@ export class AlphaTabStore {
         this.api.settings.player.enableElementHighlighting = enabled;
         this.updateView({ highlight: enabled });
         this.scheduleApply();
+    }
+
+    /**
+     * While enabled (the default), a `scrollMode` of `Off` turns into `Continuous` for as long as
+     * the player plays, so only the player in use follows its cursor. Disable it where the page
+     * owns the scroll mode.
+     */
+    setScrollDuringPlayback(enabled: boolean): void {
+        this.scrollDuringPlayback = enabled;
+        this.syncPlaybackScroll();
     }
 
     /**
@@ -397,6 +405,7 @@ export class AlphaTabStore {
             trackMix: this.initialTrackMix(this.api.score),
         });
         this.applyTrackMix();
+        this.syncPlaybackScroll();
     }
 
     /** Renders `tracks` in score order; ignored if that would leave nothing to render. */
@@ -598,6 +607,23 @@ export class AlphaTabStore {
         });
     }
 
+    private syncPlaybackScroll(): void {
+        const player = this.api.settings.player;
+        const { ScrollMode } = this.module;
+        if (this.scrollDuringPlayback && this.snapshot.isPlaying) {
+            if (player.scrollMode !== ScrollMode.Off) return;
+            player.scrollMode = ScrollMode.Continuous;
+            this.scrollingForPlayback = true;
+        } else {
+            if (!this.scrollingForPlayback) return;
+            this.scrollingForPlayback = false;
+            // Someone picked a different mode during playback; keep theirs.
+            if (player.scrollMode !== ScrollMode.Continuous) return;
+            player.scrollMode = ScrollMode.Off;
+        }
+        this.api.updateSettings();
+    }
+
     private wireEvents(): void {
         const { synth } = this.module;
 
@@ -631,9 +657,11 @@ export class AlphaTabStore {
         });
         this.api.playerStateChanged.on((e) => {
             this.update({ isPlaying: e.state === synth.PlayerState.Playing });
+            this.syncPlaybackScroll();
         });
         this.api.playerFinished.on(() => {
             this.update({ isPlaying: false, currentTime: 0, currentBar: 0 });
+            this.syncPlaybackScroll();
         });
         this.api.playerPositionChanged.on((e) => {
             const currentBar = this.findBarForTick(e.currentTick);

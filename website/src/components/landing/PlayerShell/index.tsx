@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import type * as alphaTab from '@coderline/alphatab';
 import {
     AlphaTabCanvas,
     useAlphaTabState,
@@ -22,6 +23,12 @@ import { useMaximize } from './use-maximize';
 import styles from './styles.module.scss';
 
 const DEFAULT_VOLUME_PCT = 80;
+
+/** Settings for the `<AlphaTabPlayer>` around a `PlayerShell`. */
+export const PLAYER_SHELL_SETTINGS: alphaTab.json.SettingsJson = {
+    // Keeps the end of the previous system in view instead of scrolling the playing one flush to the top edge.
+    player: { scrollOffsetY: -40 },
+};
 
 export interface PlayerShellProps {
     /** Tab row attached to the top of the frame (tablet and desktop). */

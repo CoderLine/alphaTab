@@ -12,7 +12,7 @@ import { SectionHeader } from '../section-header';
 import { Btn } from '../shared/btn';
 import { IconExternalLink, IconFileMusic } from '../shared/icons';
 import { NOT_DESKTOP_QUERY, useMediaQuery } from '../shared/use-media-query';
-import { PlayerShell, PlayerTab } from '../PlayerShell';
+import { PLAYER_SHELL_SETTINGS, PlayerShell, PlayerTab } from '../PlayerShell';
 import { usePlaygroundLink } from '@site/src/components/Playground/open-in-playground';
 import { PRESETS, type AlphaTexPreset } from './presets';
 import styles from './styles.module.scss';
@@ -56,7 +56,7 @@ export const LandingPlayground: React.FC = () => {
         />
 
         <div ref={frameRef}>
-          <AlphaTabPlayer settingsPreset="landing">
+          <AlphaTabPlayer settingsPreset="landing" settings={PLAYER_SHELL_SETTINGS}>
             <PlaygroundPlayer active={nearViewport} preset={preset} onSelectPreset={selectPreset} text={text} onTextChange={setText} />
           </AlphaTabPlayer>
         </div>

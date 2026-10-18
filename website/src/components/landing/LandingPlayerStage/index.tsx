@@ -14,14 +14,14 @@ import {
     IconExternalLink,
     IconWaveform,
 } from '../shared/icons';
-import { PlayerShell, PlayerTab } from '../PlayerShell';
+import { PLAYER_SHELL_SETTINGS, PlayerShell, PlayerTab } from '../PlayerShell';
 import { OpenInPlaygroundLink } from '@site/src/components/Playground/open-in-playground';
 import { DEMO_FILES } from './demo-files';
 import { formatCapo, formatKey, formatTuning, trackColor } from '../shared/score-info';
 import styles from './styles.module.scss';
 
 export const LandingPlayerStage: React.FC = () => (
-    <AlphaTabPlayer>
+    <AlphaTabPlayer settings={PLAYER_SHELL_SETTINGS}>
         <LandingPlayerStageInner />
     </AlphaTabPlayer>
 );
