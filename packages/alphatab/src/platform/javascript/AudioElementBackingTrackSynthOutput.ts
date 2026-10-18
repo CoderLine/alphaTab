@@ -1,4 +1,9 @@
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
+import {
+    EventEmitter,
+    EventEmitterOfT,
+    type IEventEmitter,
+    type IEventEmitterOfT
+} from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { WebAudioHelper } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
@@ -63,7 +68,7 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
 
         const blob = new Blob([backingTrack.rawAudioFile! as Uint8Array<ArrayBuffer>]);
         // https://html.spec.whatwg.org/multipage/media.html#loading-the-media-resource
-        // Step 8. resets the playbackRate, we need to remember and restore it. 
+        // Step 8. resets the playbackRate, we need to remember and restore it.
         const playbackRate = this.audioElement.playbackRate;
         this.audioElement.src = URL.createObjectURL(blob);
         this.audioElement.playbackRate = playbackRate;
@@ -89,7 +94,13 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
     }
 
     public play(): void {
-        this.audioElement.play();
+        this.audioElement.play().catch((e: unknown) => {
+            // a pause() or source change before playback started interrupts the pending play request
+            if ((e as DOMException)?.name === 'AbortError') {
+                return;
+            }
+            Logger.warning('BackingTrack', 'Starting audio playback failed', e);
+        });
         this._updateInterval = window.setInterval(() => {
             this._updatePosition();
         }, 50);
