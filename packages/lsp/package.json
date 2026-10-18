@@ -57,21 +57,22 @@
         ".": {
             "browser": {
                 "types": "./dist/index.browser.d.ts",
-                "import": "./dist/index.browser.mjs"
+                "default": "./dist/index.browser.mjs"
             },
             "default": {
                 "types": "./dist/index.node.d.ts",
-                "import": "./dist/index.node.mjs"
+                "default": "./dist/index.node.mjs"
             }
         },
         "./server/browser": {
             "types": "./dist/server/browser.d.ts",
-            "import": "./dist/server/browser.mjs"
+            "default": "./dist/server/browser.mjs"
         },
         "./server/node": {
             "types": "./dist/server/node.d.ts",
-            "import": "./dist/server/node.mjs"
-        }
+            "default": "./dist/server/node.mjs"
+        },
+        "./package.json": "./package.json"
     },
     "files": [
         "dist/",
