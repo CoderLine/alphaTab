@@ -32,6 +32,18 @@
     "main": "dist/alphaTab.js",
     "module": "dist/alphaTab.mjs",
     "typings": "dist/alphaTab.d.ts",
+    "peerDependencies": {
+        "@coderline/alphatab-vite": "^1.9.0",
+        "@coderline/alphatab-webpack": "^1.9.0"
+    },
+    "peerDependenciesMeta": {
+        "@coderline/alphatab-vite": {
+            "optional": true
+        },
+        "@coderline/alphatab-webpack": {
+            "optional": true
+        }
+    },
     "exports": {
         ".": {
             "types": "./dist/alphaTab.d.ts",

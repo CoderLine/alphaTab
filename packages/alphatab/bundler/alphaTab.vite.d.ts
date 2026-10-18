@@ -1,2 +1,2 @@
-export { alphaTab } from './vite/alphaTab.vite';
-export type { AlphaTabVitePluginOptions } from './vite/AlphaTabVitePluginOptions';
+export { alphaTab } from '@coderline/alphatab-vite';
+export type { AlphaTabVitePluginOptions } from '@coderline/alphatab-vite/AlphaTabVitePluginOptions';
