@@ -93,6 +93,13 @@ async function loadVite(major: 7 | 8): Promise<ViteLike> {
 // Both cases share global state (process.cwd, the dist/ folder), so they
 // must run sequentially — that is what vitest does inside a single describe.
 describe('Vite', () => {
+    it('peer range accepts every tested vite major', () => {
+        const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+        const ranges = (pkg.peerDependencies.vite as string).split('||').map(r => r.trim());
+        expect(ranges).toContain('^7');
+        expect(ranges).toContain('^8');
+    });
+
     it('bundle-correctly (vite 8, rolldown)', { timeout: 30000 }, async () => {
         await runBundleSmokeTest(await loadVite(8));
     });

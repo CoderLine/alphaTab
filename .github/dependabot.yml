@@ -8,6 +8,9 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # Keeps ranges that already allow the new version, such as the
+    # peerDependencies of the published packages.
+    versioning-strategy: increase-if-necessary
     ignore:
       # TypeScript 7 is the Go port and does not expose a compiler API
       # (planned for 7.1+). Our tooling package uses the classic ts.* API,
