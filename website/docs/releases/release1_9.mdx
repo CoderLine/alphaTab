@@ -7,7 +7,28 @@ import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 ## 1.9.0
 
-This release reworks note spacing and the placement of annotations, adds per-staff control over clefs, key and time signatures and bar numbers, plays repeats and jumps in the right order, and imports MusicXML files more faithfully. The [upgrade notes](#upgrade-notes) at the end list the visual changes, changed defaults and deprecations.
+This release gives the alphaTab attribution a smaller, quieter place in the score, reworks note spacing and the placement of annotations, adds per-staff control over clefs, key and time signatures and bar numbers, plays repeats and jumps in the right order, and imports MusicXML files more faithfully. The [upgrade notes](#upgrade-notes) at the end list the visual changes, changed defaults and deprecations.
+
+### Attribution
+
+#### render: a smaller, quieter attribution
+
+The "rendered by alphaTab" line below the score is replaced by a small "♪ alphaTab.net" above the top staff at the end of the first system. It is drawn in the staff line color and adds no extra line. Songs with up to 10 bars and at most 2 tracks show no attribution at all.
+
+<AlphaTab tex={true} player={false}>{`
+:8 C4 D4 E4 F4 G4 A4 B4 C5 | C5 B4 A4 G4 F4 E4 D4 C4 | :4 E4 G4 C5 E5 | :2 (C4 E4 G4) (C5 E5 G5) |
+:8 G5 F5 E5 D5 C5 B4 A4 G4 | :1 C4 |
+:8 C4 D4 E4 F4 G4 A4 B4 C5 | C5 B4 A4 G4 F4 E4 D4 C4 | :4 E4 G4 C5 E5 | :2 (C4 E4 G4) (C5 E5 G5) |
+:8 G5 F5 E5 D5 C5 B4 A4 G4 | :1 C4
+`}</AlphaTab>
+
+Many projects hid the attribution without our consent and without crediting alphaTab elsewhere. The attribution is now part of how the score is drawn and much harder to remove; there is no setting to turn it off. If you have permission for a different credit and the new placement does not fit, [get in touch](/docs/attribution#request).
+
+The new [Attribution](/docs/attribution) page explains [why we ask for credit](/docs/attribution#why), which [alternative credits](/docs/attribution#alternatives) work, and offers [logos and badges](/docs/attribution#logos) to download.
+
+#### license: planned move to CPAL-1.0 or similar
+
+A future release will move from MPL-2.0 to an open-source license with an attribution clause. The choice is not settled yet; [CPAL-1.0](https://opensource.org/license/cpal_1-0) is the best fit we see so far. alphaTab stays open source and free, also for commercial use, and releases under MPL-2.0, including this one, stay under MPL-2.0. See [what changes](/docs/attribution#license-cpal).
 
 ### Music Notation
 
@@ -364,6 +385,7 @@ Thanks to [@chenkigba](https://github.com/chenkigba) for contributing this chang
 
 #### Visual changes
 
+* The "rendered by alphaTab" line below the score is gone, so scores lose a line at the bottom. See [Attribution](#attribution).
 * Horizontal spacing changes in every score with the power-law model ([#2749](https://github.com/CoderLine/alphaTab/pull/2749)). Adjust it with [`display.spacingRatio`](/docs/reference/settings/display/spacingratio) and [`display.stretchForce`](/docs/reference/settings/display/stretchforce); see [Density and spacing](/docs/features/render/density-and-spacing).
 * Annotations sit closer to the notes ([#2750](https://github.com/CoderLine/alphaTab/pull/2750)). The default of [`display.effectBandPaddingBottom`](/docs/reference/settings/display/effectbandpaddingbottom) changes from `2` to `5`; raise or lower it to change the gap. See [Effect placement](/docs/features/render/effect-placement#band-padding).
 * The default of [`display.staffPaddingLeft`](/docs/reference/settings/display/staffpaddingleft) changes from `2` to `6` ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)). Set it to `2` for the previous padding.
