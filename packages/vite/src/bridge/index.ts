@@ -32,10 +32,6 @@
 /**
  * @internal
  */
-export type { Plugin } from 'vite';
-/**
- * @internal
- */
 export { fileToUrl } from './asset';
 /**
  * @internal

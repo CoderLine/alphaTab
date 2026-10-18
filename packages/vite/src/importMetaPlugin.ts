@@ -31,6 +31,7 @@
 
 import path from 'node:path';
 import MagicString from 'magic-string';
+import type { Plugin } from 'vite';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 import {
     AlphaTabWorkerTypes,
@@ -38,7 +39,6 @@ import {
     evalValue,
     fileToUrl,
     injectQuery,
-    type Plugin,
     type ResolvedConfig,
     tryFsResolve,
     tryOptimizedDepResolve,
