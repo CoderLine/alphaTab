@@ -1073,7 +1073,7 @@ export class AlphaTabApiBase<TSettings> {
 
             currentHandler?.onDetach(cursors);
             if (value) {
-                value?.onDetach(cursors);
+                value.onAttach(cursors);
             } else if (this._defaultCursorHandler) {
                 this._defaultCursorHandler!.onAttach(cursors);
             }
