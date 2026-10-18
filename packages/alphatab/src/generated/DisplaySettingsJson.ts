@@ -9,6 +9,10 @@ import { RenderingResourcesJson } from "@coderline/alphatab/generated/RenderingR
 import { SystemsLayoutMode } from "@coderline/alphatab/DisplaySettings";
 /**
  * The display settings control how the general layout and display of alphaTab is done.
+ * @remarks
+ * The "♪ alphaTab.net" attribution in the rendered score is not configurable here. It must stay visible in the
+ * rendered output; removing, hiding, covering or cropping it requires permission from the alphaTab maintainers, see
+ * [Attribution](https://alphatab.net/docs/attribution).
  * @json
  * @json_declaration
  * @public
