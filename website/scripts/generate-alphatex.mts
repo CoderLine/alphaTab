@@ -206,13 +206,14 @@ function formatDiagnosticHeadline(description: string): string {
         .replace(/%s/g, 'value')
         .replace(/\s+/g, ' ')
         .trim();
-    // Cut at the first sentence terminator so the heading stays short.
-    const stop = text.search(/[.!?]/);
+    // Cut at the first sentence end so the heading stays short; dots inside syntax like `fret.string` do not end a sentence.
+    const stop = text.search(/[.!?](?=\s|$)/);
     if (stop >= 0) {
         text = text.slice(0, stop);
     }
     if (text.length > 90) {
-        text = text.slice(0, 87).trimEnd() + '...';
+        const cut = text.lastIndexOf(' ', 87);
+        text = text.slice(0, cut > 0 ? cut : 87).replace(/[\s,;:]+$/, '') + '...';
     }
     return text;
 }
