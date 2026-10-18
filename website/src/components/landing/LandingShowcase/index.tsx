@@ -1,12 +1,13 @@
 import React from 'react';
 import clsx from 'clsx';
+import Link from '@docusaurus/Link';
 import { SectionHeader } from '../section-header';
 import { IconArrow } from '../shared/icons';
 import { ProjectCard } from './project-card';
 import { QuoteCard } from './quote-card';
 import { PressCard } from './press-card';
 import { useRotation } from './use-rotation';
-import { SHOWCASE_STORIES, type ShowcaseStory } from './stories-data';
+import { SHOWCASE_SLOTS, SHOWCASE_STORIES, arrangeStories, type ShowcaseStory } from './stories-data';
 import styles from './styles.module.scss';
 
 function isProject(s: ShowcaseStory): s is Extract<ShowcaseStory, { cardType: 'project' }> {
@@ -14,13 +15,18 @@ function isProject(s: ShowcaseStory): s is Extract<ShowcaseStory, { cardType: 'p
 }
 
 const ROTATION_MS = 6000;
+const POOL_TYPES = new Set(SHOWCASE_STORIES.map((s) => s.cardType));
 
 export const LandingShowcase: React.FC = () => {
   const [paused, setPaused] = React.useState(false);
-  const { idx, setIdx, running, cycle } = useRotation(SHOWCASE_STORIES.length, ROTATION_MS, paused);
-  const story = SHOWCASE_STORIES[idx];
+  // Shuffled only after hydration so the server-rendered markup matches the first client render.
+  const [stories, setStories] = React.useState(() => arrangeStories(SHOWCASE_STORIES, SHOWCASE_SLOTS));
+  React.useEffect(() => setStories(arrangeStories(SHOWCASE_STORIES, SHOWCASE_SLOTS, Math.random)), []);
 
-  const projects = React.useMemo(() => SHOWCASE_STORIES.filter(isProject), []);
+  const { idx, setIdx, running, cycle } = useRotation(stories.length, ROTATION_MS, paused);
+  const story = stories[idx];
+
+  const projects = React.useMemo(() => stories.filter(isProject), [stories]);
   const projectIdx = projects.indexOf(story as Extract<ShowcaseStory, { cardType: 'project' }>);
 
   const renderCard = () => {
@@ -35,7 +41,7 @@ export const LandingShowcase: React.FC = () => {
       );
     }
     if (story.cardType === 'quote') {
-      return <QuoteCard story={story} idx={idx} total={SHOWCASE_STORIES.length} />;
+      return <QuoteCard story={story} idx={idx} total={stories.length} />;
     }
     return <PressCard story={story} />;
   };
@@ -51,16 +57,16 @@ export const LandingShowcase: React.FC = () => {
         <SectionHeader
           eyebrow="§ Showcase"
           title="Built with alphaTab."
-          paragraph="Practice apps, tab archives, music schools and composer tools ship alphaTab in production. Here's what they — and the people writing about them — say."
+          paragraph="Practice apps, tab editors, Obsidian plugins and drum trainers run on alphaTab. Here's what their builders — and the developers recommending it — say."
           action={
-            <a className={styles.seeAll} href="#">
+            <Link className={styles.seeAll} to="/showcase">
               See all <IconArrow size={12} aria-hidden="true" />
-            </a>
+            </Link>
           }
         />
 
         <div
-          key={`card-${idx}`}
+          key={story.id}
           className={styles.cardSlot}
           onMouseEnter={onEnter}
           onMouseLeave={onLeave}
@@ -70,14 +76,17 @@ export const LandingShowcase: React.FC = () => {
           {renderCard()}
         </div>
 
-        <div className={styles.switcher} role="tablist" aria-label="Showcase stories">
-          {SHOWCASE_STORIES.map((s, i) => {
+        <div
+          className={styles.switcher}
+          role="tablist"
+          aria-label="Showcase stories"
+          style={{ '--chip-count': stories.length } as React.CSSProperties}
+        >
+          {stories.map((s, i) => {
             const active = i === idx;
-            const label =
-              s.cardType === 'project' ? s.name : s.cardType === 'press' ? s.publication : s.handle ?? s.person;
             return (
               <button
-                key={i}
+                key={s.id}
                 type="button"
                 role="tab"
                 aria-selected={active}
@@ -90,7 +99,7 @@ export const LandingShowcase: React.FC = () => {
                   {s.cardType === 'press' && '¶'}
                   {s.cardType === 'quote' && '“'}
                 </span>
-                <span className={styles.chipLabel}>{label}</span>
+                <span className={styles.chipLabel}>{s.chip}</span>
                 {active && (
                   <span
                     key={cycle}
@@ -106,13 +115,17 @@ export const LandingShowcase: React.FC = () => {
         </div>
 
         <div className={styles.legend}>
-          <span className={styles.legendItem}>
-            <span className={styles.legendDot} /> Project
-          </span>
-          <span className={styles.legendItem}>
-            <span className={styles.legendQuote}>“</span> Community quote
-          </span>
-          <span className={styles.legendItem}>¶ Press citation</span>
+          {POOL_TYPES.has('project') && (
+            <span className={styles.legendItem}>
+              <span className={styles.legendDot} /> Project
+            </span>
+          )}
+          {POOL_TYPES.has('quote') && (
+            <span className={styles.legendItem}>
+              <span className={styles.legendQuote}>“</span> Community quote
+            </span>
+          )}
+          {POOL_TYPES.has('press') && <span className={styles.legendItem}>¶ Research &amp; press</span>}
         </div>
       </div>
     </section>

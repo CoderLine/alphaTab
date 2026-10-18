@@ -95,6 +95,8 @@
   color: var(--story-accent);
   text-transform: uppercase;
   letter-spacing: 1.5px;
+
+  @include mobile { display: none; }
 }
 
 .quoteWrap {
@@ -138,6 +140,18 @@
   @include mobile { font-size: 18px; }
 }
 
+.summary {
+  margin: 0 0 28px;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--at-ink);
+  text-wrap: pretty;
+  max-width: 560px;
+
+  @include tablet { font-size: 18px; }
+  @include mobile { font-size: 16px; margin-bottom: 20px; }
+}
+
 .attribution {
   display: flex;
   align-items: center;
@@ -160,6 +174,17 @@
 .personRole {
   font-size: 12px;
   color: var(--at-muted);
+}
+
+.sourceLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--at-line);
+  text-underline-offset: 2px;
+
+  &:hover {
+    color: var(--story-accent);
+  }
 }
 
 .divider {
@@ -222,7 +247,7 @@
     grid-column: 1;
     grid-row: 2;
   }
-  @include mobile { display: none; }
+  @include mobile { padding: 16px; }
 }
 
 .preview {
@@ -274,9 +299,14 @@
 
 .previewSpacer { flex: 1; }
 
-.previewTuning {
-  color: var(--at-muted);
-  opacity: 0.7;
+
+.previewShot {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: cover;
+  object-position: top left;
+  display: block;
 }
 
 .previewNotation {
@@ -297,13 +327,3 @@
   color: var(--at-muted);
 }
 
-.previewPlay {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--story-accent);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-}

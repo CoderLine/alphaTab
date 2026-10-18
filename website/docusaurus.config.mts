@@ -438,6 +438,12 @@ async function createConfig(): Promise<Config> {
           position: "left",
           label: "Playground",
         },
+        {
+          to: "/showcase",
+          position: "left",
+          label: "Showcase",
+          className: "navbar-link-secondary",
+        },
         // Right
         {
           type: "search",
@@ -509,6 +515,11 @@ async function createConfig(): Promise<Config> {
         {
           title: "Community",
           items: [
+            { label: "Showcase", to: "/showcase" },
+            {
+              label: "Show and tell",
+              href: "https://github.com/CoderLine/alphaTab/discussions/categories/show-and-tell",
+            },
             {
               label: "Discussions",
               href: "https://github.com/CoderLine/alphaTab/discussions",

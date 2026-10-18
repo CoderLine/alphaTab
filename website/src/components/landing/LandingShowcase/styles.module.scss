@@ -47,12 +47,15 @@
 .switcher {
   margin-top: 18px;
   display: grid;
-  // Match the design literally — 11 equal columns at every viewport. Labels
-  // truncate with ellipsis on narrow screens so the row stays single-line.
-  grid-template-columns: repeat(11, minmax(0, 1fr));
+  // One equal column per card (`--chip-count`, set by the component) keeps the
+  // row single-line; labels truncate with an ellipsis on narrow screens.
+  grid-template-columns: repeat(var(--chip-count), minmax(0, 1fr));
   gap: 8px;
 
-  @include mobile { gap: 4px; }
+  @include mobile {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
 }
 
 .chip {

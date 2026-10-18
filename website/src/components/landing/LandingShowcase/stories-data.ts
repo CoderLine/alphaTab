@@ -1,172 +1,348 @@
-// PLACEHOLDER — replace with real refs.
-// Project names, quotes, publications and statistics are illustrative only.
+/**
+ * `pending`: the author has not yet been asked whether we may feature their words.
+ * `not-needed`: the entry cites the author's own public credit or announcement.
+ */
+export type Outreach = 'pending' | 'not-needed';
+
+export interface ShowcaseLink {
+  label: string;
+  url: string;
+}
+
+/** A project card carries either the builder's own words or, lacking those, our factual summary. */
+export type ProjectVoice =
+  | {
+      /** Verbatim; omissions are marked with an ellipsis. */
+      quote: string;
+      /** Falls back to the project name when the author is anonymous. */
+      person?: string;
+      role?: string;
+      /** Where the quote was published. */
+      source: ShowcaseLink;
+      summary?: never;
+    }
+  | {
+      /** Written by us; rendered without quotation marks so it never reads as the project's words. */
+      summary: string;
+      quote?: never;
+      person?: never;
+      role?: never;
+      source?: never;
+    };
+
+export const SHOWCASE_TAGS = {
+  learning: 'Learning',
+  practice: 'Practice',
+  player: 'Player',
+  editor: 'Editor',
+  plugin: 'Plugin',
+  web: 'Web',
+  mobile: 'Mobile',
+  desktop: 'Desktop',
+  'open-source': 'Open source',
+} as const;
+
+export type ShowcaseTag = keyof typeof SHOWCASE_TAGS;
 
 export type ShowcaseStory =
-  | {
+  | ({
       cardType: 'project';
+      id: string;
+      /** Short label for the switcher chip. */
+      chip: string;
       name: string;
       type: string;
       glyph: string;
       accent: string;
-      quote: string;
-      person: string;
-      role: string;
-      stat: { k: string; l: string };
-      sample: { tuning: string; key: string; tempo: number };
-    }
+      url: string;
+      /** Always drawn into the landing selection and listed first on the showcase page. */
+      featured?: boolean;
+      /** Listed on the showcase page only. */
+      carousel?: false;
+      /** One or two sentences for the showcase page. */
+      description: string;
+      tags: ShowcaseTag[];
+      sourceCode?: string;
+      /** The project's own announcement, e.g. its Show and tell post. */
+      announcement?: string;
+      /** One-line summary shown in the preview frame. */
+      meta: string;
+      stat?: { k: string; l: string };
+      /**
+       * Path below `static/`. Fills the 460×224 CSS px preview with `object-fit: cover` anchored
+       * top-left, so supply 920×448. Without it the preview shows decorative notation.
+       */
+      screenshot?: string;
+      outreach: Outreach;
+    } & ProjectVoice)
   | {
       cardType: 'quote';
+      id: string;
+      chip: string;
       accent: string;
+      /** Verbatim. */
       quote: string;
       person: string;
       handle?: string;
       role: string;
-      source: string;
-      sourceLabel: string;
+      source: ShowcaseLink;
+      outreach: Outreach;
     }
   | {
       cardType: 'press';
+      id: string;
+      chip: string;
+      kind: 'research' | 'press';
       accent: string;
       publication: string;
-      publicationMark: string;
       date: string;
+      /** Verbatim; footnote markers dropped. */
       quote: string;
-      sourceLabel: string;
-      pages: string;
+      byline: string;
+      url: string;
+      outreach: Outreach;
     };
 
+/** Pool the page draws from on load; the server render uses the first `SHOWCASE_SLOTS` entries of each type. */
 export const SHOWCASE_STORIES: ShowcaseStory[] = [
+  // TODO(outreach): ask Infinite Guitar for a testimonial to replace the summary, and confirm featuring them.
+  // TODO(screenshot): static/img/showcase/infiniteguitar.webp; the tablature view is hidden from
+  // anonymous visitors, so capture it logged in (e.g. lesson 2314, with the alphaTab view visible).
   {
     cardType: 'project',
-    name: 'Songbook',
-    type: 'Tab archive',
+    id: 'infiniteguitar',
+    chip: 'Infinite Guitar',
+    name: 'Infinite Guitar',
+    type: 'Video guitar lessons',
+    glyph: 'I',
+    accent: '#c07a3e',
+    url: 'https://www.infiniteguitar.com',
+    featured: true,
+    summary: 'Video lessons paired with interactive tablature, rendered and played back by alphaTab.',
+    description:
+      'Video guitar lessons with interactive tablature, rendered and played back by alphaTab.',
+    tags: ['learning', 'web'],
+    meta: 'Lessons with Guitar Pro tabs',
+    outreach: 'pending',
+  },
+  // TODO(outreach): ask Fretello for a testimonial to replace the summary, and for consent to use their
+  // App Store screenshots (fretello.com/assets/images/screenshots/{listen,learn}.jpg) in the preview.
+  {
+    cardType: 'project',
+    id: 'fretello',
+    chip: 'Fretello',
+    name: 'Fretello',
+    type: 'Guitar learning app',
+    glyph: 'F',
+    accent: '#a64570',
+    url: 'https://fretello.com',
+    featured: true,
+    summary: 'Guitar lessons and play-along exercises on iOS and Android, with tabs rendered by alphaTab.',
+    description:
+      'Guitar learning app for iOS and Android: lessons, exercises and play-alongs with tabs rendered by alphaTab.',
+    tags: ['learning', 'mobile'],
+    meta: 'iOS · Android',
+    screenshot: '/img/showcase/fretello.webp',
+    outreach: 'pending',
+  },
+  // TODO(screenshot): static/img/showcase/smart-beat.webp; desktop app, ask for one in discussion #2930.
+  {
+    cardType: 'project',
+    id: 'smart-beat',
+    chip: 'Smart Beat',
+    name: 'Smart Beat',
+    type: 'Desktop tab editor',
     glyph: 'S',
     accent: '#5b76d8',
-    quote:
-      'We swapped three rendering vendors for a single alphaTab pipeline. Score load times dropped 4× and two engineers now maintain the whole stack.',
-    person: 'Maya Chen',
-    role: 'Engineering Lead',
-    stat: { k: '12M', l: 'scores rendered / month' },
-    sample: { tuning: 'D A D G B E', key: 'D major', tempo: 132 },
+    url: 'https://smart-beat.app',
+    carousel: false,
+    quote: 'Special thanks to alphaTab, the heart of Smart Beat: this project would not exist without it.',
+    source: { label: 'smart-beat.app', url: 'https://smart-beat.app' },
+    description:
+      'Free tablature editor for macOS, Windows and Linux in the spirit of Guitar Pro 5, with optional AI features such as hum to accompaniment.',
+    tags: ['editor', 'desktop', 'open-source'],
+    sourceCode: 'https://github.com/mbalyi/smart-beat',
+    announcement: 'https://github.com/CoderLine/alphaTab/discussions/2930',
+    meta: 'Tauri · React · desktop',
+    outreach: 'not-needed',
   },
+  // TODO(outreach): Reddit comment by u/louislamlam; confirm the quote and the use of his real name.
+  {
+    cardType: 'project',
+    id: 'its-mytabs',
+    chip: "It's MyTabs",
+    name: "It's MyTabs",
+    type: 'Self-hosted tab player',
+    glyph: 'M',
+    accent: '#208a73',
+    url: 'https://its-mytabs.kuma.pet',
+    quote: 'If no one made this engine, my project would not be possible in the first place.',
+    person: 'Louis Lam',
+    role: 'Creator',
+    source: {
+      label: 'reddit.com/r/selfhosted',
+      url: 'https://www.reddit.com/r/selfhosted/comments/1quwa2x/louis_lam_one_of_the_greats/o3gnvmy/',
+    },
+    description:
+      'Open-source, self-hostable guitar and bass tab viewer and player, similar to Songsterr, with audio file and YouTube sync.',
+    tags: ['player', 'web', 'open-source'],
+    sourceCode: 'https://github.com/louislam/its-mytabs',
+    meta: 'Open source · audio & YouTube sync',
+    screenshot: '/img/showcase/its-mytabs.webp',
+    outreach: 'pending',
+  },
+  // TODO(outreach): Hacker News comment; reply on the thread before treating this as final.
   {
     cardType: 'quote',
-    accent: '#208a73',
-    quote:
-      'Wired up alphaTab to our React app in an afternoon. The event API is so clean we threw out 600 lines of custom rendering code.',
-    person: 'Jonas Wilk',
-    handle: '@jonaswilk',
-    role: 'Open-source contributor',
-    source: 'GitHub discussion #842',
-    sourceLabel: 'github.com',
-  },
-  {
-    cardType: 'project',
-    name: 'Loop',
-    type: 'Practice tool',
-    glyph: 'L',
-    accent: '#208a73',
-    quote:
-      'Beat-accurate cursor plus range-looping is what made the product viable. We subscribe to the event stream and the UI just follows.',
-    person: 'Jonas Wilk',
-    role: 'Founder',
-    stat: { k: '180k', l: 'practice sessions logged' },
-    sample: { tuning: 'E A D G B E', key: 'A minor', tempo: 96 },
-  },
-  {
-    cardType: 'press',
-    accent: '#c07a3e',
-    publication: 'Web Audio Weekly',
-    publicationMark: 'WAW',
-    date: 'Issue #312 · March 2025',
-    quote:
-      "The only browser-native music-notation library that's production-ready for guitar tab, score and percussion in the same render pipeline.",
-    sourceLabel: 'webaudioweekly.dev / 312',
-    pages: 'p. 04–07',
-  },
-  {
-    cardType: 'project',
-    name: 'Lyra',
-    type: 'Music academy',
-    glyph: '♪',
-    accent: '#a64570',
-    quote:
-      'Tutors author once in MusicXML — we serve standard, tab and jiǎnpǔ staves to different cohorts. One score, three reading systems.',
-    person: 'Dr. Hana Park',
-    role: 'Curriculum Director',
-    stat: { k: '24', l: 'partner conservatories' },
-    sample: { tuning: 'E A D G B E', key: 'C major', tempo: 80 },
-  },
-  {
-    cardType: 'quote',
-    accent: '#7a5cc0',
-    quote:
-      'Best decision we made this year was dropping our in-house renderer for alphaTab. The Kotlin runtime ships on Android with no JS bridge.',
-    person: 'Aki Romero',
-    handle: '@signalflux',
-    role: 'Mobile engineer',
-    source: 'X · post · Feb 14',
-    sourceLabel: 'twitter.com',
-  },
-  {
-    cardType: 'project',
-    name: 'Cadence',
-    type: 'Composer suite',
-    glyph: 'C',
-    accent: '#3e8eb3',
-    quote:
-      'We ship alphaTab on .NET for the desktop app and the exact same code in the browser for sharing. Single codepath, two surfaces, no porting.',
-    person: 'Elena Voss',
-    role: 'Principal Engineer',
-    stat: { k: '6.4k', l: 'composers on platform' },
-    sample: { tuning: 'E A D G B E', key: 'G minor', tempo: 108 },
-  },
-  {
-    cardType: 'press',
+    id: 'hn-webprofusion',
+    chip: 'Hacker News',
     accent: '#5b76d8',
-    publication: 'Music Software Monthly',
-    publicationMark: 'MSM',
-    date: 'April 2025 · review',
     quote:
-      'A reference implementation for what an open music-notation SDK should look like in 2025. Bundle size and runtime parity are both best-in-class.',
-    sourceLabel: 'msm.review / alphatab-1-8',
-    pages: 'p. 12',
+      'If you ever need to build a piece of software that shows guitar tab then this is basically the library to use (across multiple platforms).',
+    person: 'webprofusion',
+    role: 'Hacker News commenter',
+    source: { label: 'news.ycombinator.com', url: 'https://news.ycombinator.com/item?id=40835858' },
+    outreach: 'pending',
   },
+  // TODO(outreach): courtesy ask on Show and tell #2315 for using the README screenshot of their UI.
   {
     cardType: 'project',
-    name: 'Backbeat',
-    type: 'Drum tutor',
-    glyph: 'B',
+    id: 'tab-flow',
+    chip: 'Tab Flow',
+    name: 'Tab Flow',
+    type: 'Obsidian plugin',
+    glyph: 'T',
+    accent: '#7a5cc0',
+    url: 'https://github.com/LIUBINfighter/Obsidian-Tab-Flow',
+    quote: 'The official Electron/Obsidian support, complete with the sample plugin, is a dream come true.',
+    person: 'Jay Bridge',
+    role: 'Creator',
+    source: {
+      label: 'GitHub discussion #2160',
+      url: 'https://github.com/CoderLine/alphaTab/discussions/2160#discussioncomment-13644424',
+    },
+    description:
+      'Obsidian plugin that renders and plays Guitar Pro and alphaTex files inside your vault.',
+    tags: ['plugin', 'open-source'],
+    sourceCode: 'https://github.com/LIUBINfighter/Obsidian-Tab-Flow',
+    announcement: 'https://github.com/CoderLine/alphaTab/discussions/2315',
+    meta: 'Guitar tabs inside Obsidian notes',
+    // TODO(verify): download count as of 2026-10-17; refresh from the Obsidian plugin stats before release.
+    stat: { k: '1,264', l: 'Obsidian downloads' },
+    screenshot: '/img/showcase/tab-flow.webp',
+    outreach: 'pending',
+  },
+  // TODO(outreach): courtesy note on Show and tell #2694.
+  {
+    cardType: 'project',
+    id: 'drumforge',
+    chip: 'Drumforge',
+    name: 'Drumforge',
+    type: 'Drum exercise generator',
+    glyph: 'D',
     accent: '#c07a3e',
-    quote:
-      'Percussion notation is hard. alphaTab handled it without a single custom glyph — and the synth gives students real audio out of the box.',
-    person: 'Marcus Ade',
-    role: 'Lead Developer',
-    stat: { k: '4.7★', l: 'avg. store rating' },
-    sample: { tuning: 'drum kit', key: '4/4', tempo: 120 },
+    url: 'https://drumforge.app',
+    quote: "Huge thanks to @Danielku15 and everyone contributing to alphaTab — Drumforge wouldn't exist without it.",
+    person: 'Narek Ghevandiani',
+    role: 'Creator',
+    source: { label: 'GitHub Show and tell', url: 'https://github.com/CoderLine/alphaTab/discussions/2694' },
+    description:
+      'Drum practice exercises generated as alphaTex, with playback and a synchronized cursor.',
+    tags: ['practice', 'web', 'open-source'],
+    sourceCode: 'https://github.com/narghev/drumforge',
+    announcement: 'https://github.com/CoderLine/alphaTab/discussions/2694',
+    meta: 'Exercises generated as alphaTex',
+    screenshot: '/img/showcase/drumforge.webp',
+    outreach: 'pending',
   },
   {
     cardType: 'quote',
-    accent: '#3e8eb3',
+    id: 'show-and-tell-2872',
+    chip: 'Show and tell',
+    accent: '#208a73',
     quote:
-      'I expected to spend a weekend evaluating renderers. I picked alphaTab in an hour and never looked back.',
-    person: 'Priya Nair',
-    handle: '@pn_codes',
-    role: 'Freelance dev',
-    source: 'Personal blog · "Picking a tab renderer"',
-    sourceLabel: 'priyanair.dev',
+      'alphaTab is hands down one of the most impressive browser-based music notation and MIDI playback engines out there.',
+    person: 'maxcomperatore',
+    handle: '@maxcomperatore',
+    role: 'Developer',
+    source: { label: 'GitHub Show and tell', url: 'https://github.com/CoderLine/alphaTab/discussions/2872' },
+    outreach: 'not-needed',
   },
+  // TODO(outreach): courtesy ask on Show and tell #1728 for using a screenshot of their UI.
   {
     cardType: 'project',
-    name: 'Sheet',
-    type: 'Score library',
-    glyph: 'Σ',
-    accent: '#7a5cc0',
+    id: 'gonb',
+    chip: 'Gonb',
+    name: 'Gonb',
+    type: 'Melody practice tool',
+    glyph: 'G',
+    accent: '#3e8eb3',
+    url: 'https://bali182.github.io/gonb/',
     quote:
-      'PDF + SVG export means we ship offline packs from the same source our online catalogue uses. Librarians author once and we distribute everywhere.',
-    person: 'Tomas Becker',
-    role: 'CTO',
-    stat: { k: '92k', l: 'works in catalogue' },
-    sample: { tuning: 'E A D G B E', key: 'E minor', tempo: 144 },
+      'AlphaTab is the most important part of it, as without it neither playback nor score rendering would work so nicely and seamlessly…',
+    person: 'Balázs Édes',
+    role: 'Creator',
+    source: { label: 'GitHub Show and tell', url: 'https://github.com/CoderLine/alphaTab/discussions/1728' },
+    description:
+      'Sight-reading practice: generates melodies on demand and plays them back.',
+    tags: ['practice', 'web', 'open-source'],
+    sourceCode: 'https://github.com/bali182/gonb',
+    announcement: 'https://github.com/CoderLine/alphaTab/discussions/1728',
+    meta: 'Generated melodies with playback',
+    screenshot: '/img/showcase/gonb.webp',
+    outreach: 'pending',
   },
 ];
+
+function isFeatured(s: ShowcaseStory): boolean {
+  return s.cardType === 'project' && s.featured === true;
+}
+
+/** Cards shown per page load, by type. */
+export const SHOWCASE_SLOTS: Record<ShowcaseStory['cardType'], number> = { project: 4, press: 2, quote: 2 };
+
+/**
+ * Draws `slots` cards per type, featured projects first (all of them when `random` is omitted, in
+ * authored order), then
+ * interleaves the types so neighbouring cards never share a type while another type remains.
+ * The type with the most cards left goes next, so projects lead.
+ */
+export function arrangeStories(
+  stories: ShowcaseStory[],
+  slots: Record<ShowcaseStory['cardType'], number>,
+  random?: () => number,
+): ShowcaseStory[] {
+  const buckets = new Map<ShowcaseStory['cardType'], ShowcaseStory[]>();
+  for (const s of stories) {
+    if (s.cardType === 'project' && s.carousel === false) continue;
+    const bucket = buckets.get(s.cardType) ?? [];
+    bucket.push(s);
+    buckets.set(s.cardType, bucket);
+  }
+  const pick = random ?? (() => 0);
+  let total = 0;
+  for (const [type, bucket] of buckets) {
+    if (random) {
+      for (let i = bucket.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [bucket[i], bucket[j]] = [bucket[j], bucket[i]];
+      }
+    }
+    bucket.sort((a, b) => Number(isFeatured(b)) - Number(isFeatured(a)));
+    bucket.splice(slots[type]);
+    total += bucket.length;
+  }
+
+  const result: ShowcaseStory[] = [];
+  let last: ShowcaseStory['cardType'] | undefined;
+  while (result.length < total) {
+    const candidates = [...buckets.entries()].filter(([, b]) => b.length > 0);
+    const pool = candidates.some(([t]) => t !== last) ? candidates.filter(([t]) => t !== last) : candidates;
+    const most = Math.max(...pool.map(([, b]) => b.length));
+    const top = pool.filter(([, b]) => b.length === most);
+    const [type, bucket] = top[Math.floor(pick() * top.length)];
+    result.push(bucket.shift()!);
+    last = type;
+  }
+  return result;
+}

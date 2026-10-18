@@ -46,8 +46,8 @@ export const QuoteCard: React.FC<QuoteCardProps> = ({ story, idx, total }) => (
         </div>
       </div>
       <span className={styles.divider} />
-      <a className={styles.sourceChip} href="#">
-        <IconExternalLink size={10} aria-hidden="true" /> {story.source}
+      <a className={styles.sourceChip} href={story.source.url} target="_blank" rel="noopener noreferrer">
+        <IconExternalLink size={10} aria-hidden="true" /> {story.source.label}
       </a>
     </footer>
   </article>
