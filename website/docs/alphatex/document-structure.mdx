@@ -38,7 +38,7 @@ Before alphaTex 1.7 the three sections had to be separated by a `.`. Since 1.7 t
 
 A bar (also called a measure) begins with an optional list of [bar metadata tags](./syntax#bar-metadata) and continues with the beats it contains. See [Bar Metadata](./bar-metadata) for the tags you can apply here.
 
-Close a bar with a pipe `|`.
+A bar ends at a pipe `|` or at the next metadata tag.
 
 <AlphaTexSample>{`
 // bar 1 metadata tags
@@ -50,7 +50,33 @@ Close a bar with a pipe `|`.
 \\ks A
     // bar 2 contents
     C4 
+// bar 3 metadata tags (notice the missing pipe, bar 3 start is indicated by the time signature tag)
+\\ts (3 4)
+    C4
 `}</AlphaTexSample>
+
+Metadata tags need to be at the start of bar followed by the content as a new metadata tag is also a marker for a new bar.
+This can be confusing for tags which control display of elements at the end of the bar. e.g. a repeat end or a `barLineRight` are 
+still declared in the start of a bar. 
+
+
+<AlphaTexSample>{`
+\\barLineLeft lightlight
+  C4 
+|
+\\barLineRight dashed
+  C4
+\\barLineRight dotted
+  C4
+\\barLineRight heavyHeavy
+  C4
+|
+  C4
+`}</AlphaTexSample>
+
+Specifically `\barLineRight dotted` is important in this example, it starts bar 3 and specifies the right barline of it.
+This behavior exists for backwards compatibility. In future alphaTex versions we will make the `|` mandatory setting clear boundaries 
+of what belongs to a bar.
 
 ## Beats
 
@@ -188,7 +214,7 @@ On percussion instruments, write the articulation to play as the note value. Use
 See the [`\\articulation`](./staff-metadata#articulation) metadata tag for details.
 
 <AlphaTexSample>{`
-\\instrument percussion
+\\track { instrument percussion }
 \\articulation defaults
 :4
     (KickHit RideBell) 

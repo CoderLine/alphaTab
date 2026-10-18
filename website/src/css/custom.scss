@@ -42,7 +42,7 @@
   --ifm-z-index-fixed: 2000;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.2);
 
-  --ifm-font-family-base: "Noto Sans";
+  --ifm-font-family-base: "Noto Sans", sans-serif;
 
   --at-bg: #f4f7fb;
   --at-surface: #ffffff;
@@ -99,6 +99,10 @@
   --at-syntax-function: #9bcfd2;
   --at-syntax-punctuation: #7e8aa0;
   --at-syntax-invalid: #f28b82;
+}
+
+button, input {
+    font: var(--ifm-font-size-base) / var(--ifm-line-height-base) var(--ifm-font-family-base);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
