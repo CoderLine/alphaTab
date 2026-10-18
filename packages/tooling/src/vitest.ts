@@ -1,7 +1,7 @@
 import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
-import { buildTsconfigAliases } from './vite';
+import { buildTsconfigAliases } from './tsconfig-aliases';
 import { stripProfilingPlugin } from './vite.plugin.strip-profiling';
 
 class SummaryLabelReporter {

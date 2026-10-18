@@ -1,5 +1,5 @@
 import { defineConfig, type UserConfig } from 'vite';
-import { buildTsconfigAliases } from '../tooling/src/vite';
+import { buildTsconfigAliases } from '../tooling/src/tsconfig-aliases';
 import { stripProfilingPlugin } from '../tooling/src/vite.plugin.strip-profiling';
 import { elementStyleUsingPlugin } from '../tooling/src/vite.plugin.transform';
 import server from './vite.plugin.server';
