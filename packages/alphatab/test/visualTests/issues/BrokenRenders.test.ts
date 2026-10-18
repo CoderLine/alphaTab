@@ -144,6 +144,43 @@ describe('BrokenRendersTests', () => {
         }
     });
 
+    it('numbered-whole-rest', async () => {
+        await VisualTestHelper.prepareAlphaSkia();
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.enableLazyLoading = false;
+
+        for (const tex of [
+            '\\staff {numbered} :1 r',
+            '\\staff {numbered} :4 C4 D4 E4 F4 | :1 r',
+            '\\staff {numbered} \\ts 8 4 :-2 r',
+            '\\staff {numbered} \\ts 3 2 :1 {tu 3} r :1 {tu 3} r :1 {tu 3} r'
+        ]) {
+            const score = ScoreLoader.loadAlphaTex(tex);
+            const api = new ScoreRenderer(settings);
+            const results: string[] = [];
+            let error: Error | null = null;
+            api.partialRenderFinished.on(e => {
+                if (e.renderResult !== null) {
+                    results.push(e.renderResult as string);
+                }
+            });
+            api.error.on(e => {
+                error = e;
+            });
+            api.width = 1300;
+            api.renderScore(score, [0]);
+
+            // https://github.com/microsoft/TypeScript/issues/61313
+            error = error as Error | null;
+            expect(error, tex).toBeNull();
+            expect(results.length, tex).toBeGreaterThan(0);
+            for (const r of results) {
+                expect(r.includes('NaN'), `NaN in SVG for ${tex}`).toBe(false);
+            }
+        }
+    });
+
     it('squeezed-bar-warning', () => {
         const settings = new Settings();
         settings.core.engine = 'svg';

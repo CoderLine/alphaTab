@@ -960,28 +960,35 @@ export abstract class LineBarRenderer extends BarRendererBase {
             this.ensureBeamDrawingInfo(h, direction);
             const drawingInfo = h.getDrawingInfo(direction);
             const tupletDirection = this.getTupletBeamDirection(h);
+            // A painted rest-only helper (numbered notation) has no notes, the rest itself is the anchor.
+            const isRest = h.isRestBeamHelper;
             if (direction === BeamDirection.Up) {
                 topY = Math.min(drawingInfo.startY, drawingInfo.endY);
                 if (h.hasTuplet && tupletDirection === direction) {
                     topY -= this.tupletSize + this.tupletOffset;
                 }
+                const lowestBeat = isRest ? h.beats[0] : h.beatOfLowestNote;
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getLowestNoteY skips content below the notehead.
-                    bottomY =
-                        this.getFlagBottomY(h.beatOfLowestNote, tupletDirection) + this.tupletSize + this.tupletOffset;
+                    bottomY = this.getFlagBottomY(lowestBeat, tupletDirection) + this.tupletSize + this.tupletOffset;
+                } else if (isRest) {
+                    bottomY = this.getRestY(lowestBeat, NoteYPosition.Bottom);
                 } else {
-                    bottomY = this.voiceContainer.getLowestNoteY(h.beatOfLowestNote, NoteYPosition.Bottom);
+                    bottomY = this.voiceContainer.getLowestNoteY(lowestBeat, NoteYPosition.Bottom);
                 }
             } else {
                 bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
                 if (h.hasTuplet && tupletDirection === direction) {
                     bottomY += this.tupletSize + this.tupletOffset;
                 }
+                const highestBeat = isRest ? h.beats[0] : h.beatOfHighestNote;
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getHighestNoteY skips octave dots.
-                    topY = this.getFlagTopY(h.beatOfHighestNote, tupletDirection) - this.tupletSize - this.tupletOffset;
+                    topY = this.getFlagTopY(highestBeat, tupletDirection) - this.tupletSize - this.tupletOffset;
+                } else if (isRest) {
+                    topY = this.getRestY(highestBeat, NoteYPosition.Top);
                 } else {
-                    topY = this.voiceContainer.getHighestNoteY(h.beatOfHighestNote, NoteYPosition.Top);
+                    topY = this.voiceContainer.getHighestNoteY(highestBeat, NoteYPosition.Top);
                 }
             }
         }
