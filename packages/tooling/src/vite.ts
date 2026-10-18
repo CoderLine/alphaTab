@@ -3,6 +3,7 @@ import { isBuiltin } from 'node:module';
 import path from 'node:path';
 import { cwd } from 'node:process';
 import url from 'node:url';
+import MagicString from 'magic-string';
 import type { OutputChunk, OutputOptions, OutputPlugin } from 'rollup';
 import license from 'rollup-plugin-license';
 import { nodeExternals } from 'rollup-plugin-node-externals';
@@ -304,6 +305,26 @@ export function esm(config: UserConfig, projectDir: string, name: string, entry:
             o.plugins ??= [];
             (o.plugins as OutputPlugin[]).push(min(terserOptions));
         }
+    }
+}
+
+/**
+ * Starts the given entry chunks with a `#!/usr/bin/env node` line so they can be run as package `bin` scripts.
+ */
+export function addHashbang(config: UserConfig, entryNames: string[]) {
+    for (const o of config.build!.rollupOptions!.output as OutputOptions[]) {
+        o.plugins ??= [];
+        (o.plugins as OutputPlugin[]).push({
+            name: 'alphatab:hashbang',
+            renderChunk(code, chunk) {
+                if (!chunk.isEntry || !entryNames.includes(chunk.name)) {
+                    return null;
+                }
+                const ms = new MagicString(code);
+                ms.prepend('#!/usr/bin/env node\n');
+                return { code: ms.toString(), map: ms.generateMap({ hires: true }).toString() };
+            }
+        });
     }
 }
 

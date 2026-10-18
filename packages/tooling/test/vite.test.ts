@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { declaredDependenciesPlugin } from '../src/vite';
+import { addHashbang, declaredDependenciesPlugin } from '../src/vite';
 
 describe('declaredDependenciesPlugin', () => {
     let projectDir = '';
@@ -42,5 +42,20 @@ describe('declaredDependenciesPlugin', () => {
         expect(errors).toHaveLength(2);
         expect(errors[0]).toContain("does not declare 'undeclared'");
         expect(errors[1]).toContain("does not declare '@other/pkg'");
+    });
+});
+
+describe('addHashbang', () => {
+    it('prefixes only the listed entry chunks', () => {
+        const config = { build: { rollupOptions: { output: [{}] } } };
+        addHashbang(config as any, ['bin']);
+        const plugin = (config.build.rollupOptions.output[0] as any).plugins[0];
+
+        const bin = plugin.renderChunk('/*! banner */\ncode();', { isEntry: true, name: 'bin' });
+        expect(bin.code).toBe('#!/usr/bin/env node\n/*! banner */\ncode();');
+        expect(JSON.parse(bin.map).mappings.startsWith(';')).toBe(true);
+
+        expect(plugin.renderChunk('code();', { isEntry: true, name: 'lib' })).toBeNull();
+        expect(plugin.renderChunk('code();', { isEntry: false, name: 'bin' })).toBeNull();
     });
 });
