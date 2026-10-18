@@ -233,6 +233,7 @@ const LandingPlayerStageInner: React.FC = () => {
             notationMessage={!score && `Loading ${activeFile.label}…`}
             mobileHeader={mobileHeader}
             mobileFooter={mobileFooter}
+            sourceSwitch
         />
     );
 };

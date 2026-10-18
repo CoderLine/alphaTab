@@ -19,6 +19,7 @@ import { formatTime } from '../shared/format-time';
 import { PHONE_QUERY, useMediaQuery } from '../shared/use-media-query';
 import { Scrubber } from './scrubber';
 import { SettingsFlyout, type SettingsFlyoutState, type SettingsFlyoutHandlers } from './settings-flyout';
+import { SourceSwitch } from './source-switch';
 import { useMaximize } from './use-maximize';
 import styles from './styles.module.scss';
 
@@ -49,6 +50,8 @@ export interface PlayerShellProps {
     mobileFooter?: React.ReactNode;
     /** The notation canvas (and with it the alphaTab API) is mounted only while `true`. */
     active?: boolean;
+    /** Show the backing track / synthesizer switch in the transport bar instead of the volume readout. */
+    sourceSwitch?: boolean;
 }
 
 /**
@@ -66,6 +69,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     mobileHeader,
     mobileFooter,
     active = true,
+    sourceSwitch = false,
 }) => {
     const state = useAlphaTabState();
     const controls = useAlphaTabControls();
@@ -254,6 +258,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
                                         />
                                     </div>
                                     <span className={styles.timeLabel}>{formatTime(state.endTime)}</span>
+                                    {sourceSwitch && <SourceSwitch playback={playback} compact />}
                                     {toolButtons}
                                 </div>
                                 {statusLine}
@@ -282,10 +287,16 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
                                         />
                                     </div>
                                     <span className={styles.timeLabel}>{formatTime(state.endTime)}</span>
-                                    <span className={styles.timelineDivider} />
-                                    <span className={styles.volumeLabel}>
-                                        <IconVolume size={11} aria-hidden="true" /> {flyoutState.masterVolumePct}
-                                    </span>
+                                    {sourceSwitch ? (
+                                        <SourceSwitch playback={playback} />
+                                    ) : (
+                                        <>
+                                            <span className={styles.timelineDivider} />
+                                            <span className={styles.volumeLabel}>
+                                                <IconVolume size={11} aria-hidden="true" /> {flyoutState.masterVolumePct}
+                                            </span>
+                                        </>
+                                    )}
                                     {toolButtons}
                                 </div>
                                 {statusLine}
