@@ -25,7 +25,7 @@ that we will use for all items in the track selector and some place in the sideb
 
 ```html
 <!-- New in head tag -->
-<script src="https://kit.fontawesome.com/b43f0e512e.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 <!-- Changed sidebar -->
 <div class="at-sidebar">
   <div class="at-sidebar-content">
@@ -122,9 +122,9 @@ Let's take a closer look at the new UI element. We have one column for the icon 
 In the details we still only show the name of the track. Other controls for volume and muting will be added later.
 In this tutorial, we use Font Awesome to display some icons.
 
-:::caution
-Do not use this Font Awesome CDN link from this tutorial. Head over to https://fontawesome.com/
-to create your own personal kit for usage on your website. 
+:::note
+The tutorial loads the free Font Awesome icons from cdnjs, which also works when you open the HTML file directly from disk.
+For your own website, consider hosting the icons yourself or creating a kit at https://fontawesome.com/.
 :::
 
 Now the real magic happens as we will hook this up with alphaTab. We will once again listen to some events and fill the UI accordingly.
@@ -202,7 +202,7 @@ tracks as active in the sidebar with a CSS class.
     <meta charset="utf-8" />
     <title>AlphaTab Tutorial</title>
     <script src="https://cdn.jsdelivr.net/npm/@coderline/alphatab@latest/dist/alphaTab.js"></script>
-    <script src="https://kit.fontawesome.com/b43f0e512e.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
     <style type="text/css">
       body {
         font-family: Arial, Helvetica, sans-serif;
