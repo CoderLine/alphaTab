@@ -64,8 +64,12 @@ export class BeatSerializer {
         o.set("text", obj.text);
         o.set("slashed", obj.slashed);
         o.set("deadslapped", obj.deadSlapped);
-        o.set("restdisplaytone", obj.restDisplayTone);
-        o.set("restdisplayoctave", obj.restDisplayOctave);
+        if (!Number.isNaN(obj.restDisplayTone)) {
+            o.set("restdisplaytone", obj.restDisplayTone);
+        }
+        if (!Number.isNaN(obj.restDisplayOctave)) {
+            o.set("restdisplayoctave", obj.restDisplayOctave);
+        }
         o.set("brushtype", obj.brushType as number);
         o.set("brushduration", obj.brushDuration);
         o.set("tupletdenominator", obj.tupletDenominator);
@@ -171,10 +175,10 @@ export class BeatSerializer {
                 obj.deadSlapped = v! as boolean;
                 return true;
             case "restdisplaytone":
-                obj.restDisplayTone = v! as number;
+                obj.restDisplayTone = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "restdisplayoctave":
-                obj.restDisplayOctave = v! as number;
+                obj.restDisplayOctave = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "brushtype":
                 obj.brushType = JsonHelper.parseEnum<BrushType>(v, BrushType)!;

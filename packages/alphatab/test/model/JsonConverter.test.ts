@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { NoteSerializer } from '@coderline/alphatab/generated/model/NoteSerializer';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
@@ -6,6 +7,7 @@ import { LogLevel } from '@coderline/alphatab/LogLevel';
 import { Color } from '@coderline/alphatab/model/Color';
 import { Font, FontStyle } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
+import { Note } from '@coderline/alphatab/model/Note';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -37,6 +39,14 @@ describe('JsonConverterTest', () => {
                 expectedJson,
                 actualJson,
                 `<${name.substr(name.lastIndexOf('/') + 1)}>`,
+                null
+            );
+
+            /*@target web*/
+            ComparisonHelpers.expectJsonEqual(
+                expectedJson,
+                JsonConverter.scoreToJsObject(JsonConverter.jsonToScore(JsonConverter.scoreToJson(expected))),
+                `<${name.substr(name.lastIndexOf('/') + 1)} via JSON>`,
                 null
             );
         } catch (e) {
@@ -210,5 +220,137 @@ describe('JsonConverterTest', () => {
         expect(settings.display.resources.mainGlyphColor.r).toBe(255);
         expect(settings.display.resources.mainGlyphColor.g).toBe(0);
         expect(settings.display.resources.mainGlyphColor.b).toBe(0);
+    });
+
+    const unsetNoteTex = '\\track "P" \\staff {score} C4.4 D4 r r | \\track "G" 3.3.4 5.2 r r';
+
+    function expectUnsetNoteValuesKept(score: Score) {
+        const pianoBeats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        const piano = pianoBeats[0].notes[0];
+        expect(piano.isPiano).toBe(true);
+        expect(piano.isStringed).toBe(false);
+        expect(piano.isPercussion).toBe(false);
+        expect(piano.realValue).toBe(60);
+        expect(Number.isNaN(pianoBeats[2].restDisplayTone)).toBe(true);
+        expect(Number.isNaN(pianoBeats[2].restDisplayOctave)).toBe(true);
+
+        const guitar = score.tracks[1].staves[0].bars[0].voices[0].beats[0].notes[0];
+        expect(guitar.isStringed).toBe(true);
+        expect(guitar.isPiano).toBe(false);
+        expect(guitar.isPercussion).toBe(false);
+        expect(guitar.realValue).toBe(58);
+    }
+
+    it('unset-note-values-are-not-written', () => {
+        const json = NoteSerializer.toJson(new Note())!;
+        expect(json.has('fret')).toBe(false);
+        expect(json.has('string')).toBe(false);
+        expect(json.has('octave')).toBe(false);
+        expect(json.has('tone')).toBe(false);
+        expect(json.has('percussionarticulation')).toBe(false);
+    });
+
+    it('null-note-values-load-as-unset', () => {
+        const raw = new Map<string, unknown>();
+        raw.set('fret', null);
+        raw.set('string', null);
+        raw.set('octave', null);
+        raw.set('tone', null);
+        raw.set('percussionarticulation', null);
+
+        const note = new Note();
+        NoteSerializer.fromJson(note, raw);
+        expect(Number.isNaN(note.fret)).toBe(true);
+        expect(Number.isNaN(note.string)).toBe(true);
+        expect(Number.isNaN(note.octave)).toBe(true);
+        expect(Number.isNaN(note.tone)).toBe(true);
+        expect(Number.isNaN(note.percussionArticulation)).toBe(true);
+    });
+
+    it('legacy-unset-note-values-load-as-unset', () => {
+        const raw = new Map<string, unknown>();
+        raw.set('fret', -1 as number);
+        raw.set('string', -1 as number);
+        raw.set('octave', -1 as number);
+        raw.set('tone', -1 as number);
+        raw.set('percussionarticulation', -1 as number);
+
+        const note = new Note();
+        NoteSerializer.fromJson(note, raw);
+        expect(Number.isNaN(note.fret)).toBe(true);
+        expect(Number.isNaN(note.string)).toBe(true);
+        expect(Number.isNaN(note.octave)).toBe(true);
+        expect(Number.isNaN(note.tone)).toBe(true);
+        expect(Number.isNaN(note.percussionArticulation)).toBe(true);
+    });
+
+    it('stringed-note-keeps-fret-minus-one', () => {
+        const raw = new Map<string, unknown>();
+        raw.set('fret', -1 as number);
+        raw.set('string', 6 as number);
+
+        const note = new Note();
+        NoteSerializer.fromJson(note, raw);
+        expect(note.fret).toBe(-1);
+        expect(note.string).toBe(6);
+        expect(note.isStringed).toBe(true);
+    });
+
+    it('legacy-stringed-note-keeps-fret-minus-one', () => {
+        const raw = new Map<string, unknown>();
+        raw.set('fret', -1 as number);
+        raw.set('string', 5 as number);
+        raw.set('octave', -1 as number);
+        raw.set('tone', -1 as number);
+        raw.set('percussionarticulation', -1 as number);
+
+        const note = new Note();
+        NoteSerializer.fromJson(note, raw);
+        expect(note.fret).toBe(-1);
+        expect(note.string).toBe(5);
+        expect(Number.isNaN(note.octave)).toBe(true);
+        expect(Number.isNaN(note.tone)).toBe(true);
+        expect(Number.isNaN(note.percussionArticulation)).toBe(true);
+    });
+
+    it('minus-one-is-kept-without-legacy-keys', () => {
+        const raw = new Map<string, unknown>();
+        raw.set('string', -1 as number);
+        raw.set('percussionarticulation', 0 as number);
+
+        const note = new Note();
+        NoteSerializer.fromJson(note, raw);
+        expect(note.string).toBe(-1);
+        expect(note.percussionArticulation).toBe(0);
+    });
+
+    it('unset-values-round-trip-through-js-object', () => {
+        const score = ScoreLoader.loadAlphaTex(unsetNoteTex);
+        expectUnsetNoteValuesKept(JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score)));
+    });
+
+    /*@target web*/
+    it('unset-values-round-trip-through-json', () => {
+        const score = ScoreLoader.loadAlphaTex(unsetNoteTex);
+        const json = JsonConverter.scoreToJson(score);
+        expect(json).not.toMatch(
+            /"(fret|string|octave|tone|percussionarticulation|restdisplaytone|restdisplayoctave)":null/
+        );
+        expectUnsetNoteValuesKept(JsonConverter.jsonToScore(json));
+    });
+
+    /*@target web*/
+    it('loads-1.8-json', async () => {
+        // written by alphaTab 1.8.4 from: unsetNoteTex | \track "D" \instrument percussion \articulation defaults \staff {score} "hihatclosed".4 "snarehit" r r
+        const json = await TestPlatform.loadFileAsString('test-data/json/score-1.8.4.json');
+        const score = JsonConverter.jsonToScore(json);
+        expectUnsetNoteValuesKept(score);
+
+        const drum = score.tracks[2].staves[0].bars[0].voices[0].beats[0].notes[0];
+        expect(drum.isPercussion).toBe(true);
+        expect(drum.isStringed).toBe(false);
+        expect(drum.isPiano).toBe(false);
+        expect(drum.percussionArticulation).toBe(0);
+        expect(drum.realValue).toBe(42);
     });
 });

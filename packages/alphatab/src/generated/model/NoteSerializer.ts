@@ -30,6 +30,7 @@ export class NoteSerializer {
             return;
         }
         JsonHelper.forEach(m, (v, k) => NoteSerializer.setProperty(obj, k, v));
+        obj.afterFromJson(m);
     }
     public static toJson(obj: Note | null | undefined): Map<string, unknown> | null {
         if (!obj) {
@@ -44,12 +45,22 @@ export class NoteSerializer {
         if (obj.bendPoints !== null) {
             o.set("bendpoints", obj.bendPoints?.map(i => BendPointSerializer.toJson(i)));
         }
-        o.set("fret", obj.fret);
-        o.set("string", obj.string);
+        if (!Number.isNaN(obj.fret)) {
+            o.set("fret", obj.fret);
+        }
+        if (!Number.isNaN(obj.string)) {
+            o.set("string", obj.string);
+        }
         o.set("showstringnumber", obj.showStringNumber);
-        o.set("octave", obj.octave);
-        o.set("tone", obj.tone);
-        o.set("percussionarticulation", obj.percussionArticulation);
+        if (!Number.isNaN(obj.octave)) {
+            o.set("octave", obj.octave);
+        }
+        if (!Number.isNaN(obj.tone)) {
+            o.set("tone", obj.tone);
+        }
+        if (!Number.isNaN(obj.percussionArticulation)) {
+            o.set("percussionarticulation", obj.percussionArticulation);
+        }
         o.set("isvisible", obj.isVisible);
         o.set("islefthandtapped", obj.isLeftHandTapped);
         o.set("ishammerpullorigin", obj.isHammerPullOrigin);
@@ -107,22 +118,22 @@ export class NoteSerializer {
                 }
                 return true;
             case "fret":
-                obj.fret = v! as number;
+                obj.fret = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "string":
-                obj.string = v! as number;
+                obj.string = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "showstringnumber":
                 obj.showStringNumber = v! as boolean;
                 return true;
             case "octave":
-                obj.octave = v! as number;
+                obj.octave = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "tone":
-                obj.tone = v! as number;
+                obj.tone = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "percussionarticulation":
-                obj.percussionArticulation = v! as number;
+                obj.percussionArticulation = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "isvisible":
                 obj.isVisible = v! as boolean;
