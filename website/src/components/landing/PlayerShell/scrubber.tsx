@@ -28,8 +28,8 @@ export const Scrubber: React.FC<ScrubberProps> = ({
     const cursorX = xOf(Math.max(0, Math.min(currentBar, safeTotal)));
     const labelStops = [0, 16, 32, 48, 64].filter((b) => b > 0 && b < safeTotal);
     // Drop tempo markers whose label would collide with the previously kept one.
-    // Scores like Canon Rock have many close-spaced tempo automations; without
-    // this filter, labels stack into unreadable overlaps.
+    // Scores with many close-spaced tempo automations would otherwise stack
+    // their labels into unreadable overlaps.
     const MIN_TEMPO_LABEL_GAP = 60;
     const tempos: TempoMarker[] = [];
     if (tempoMarkers) {

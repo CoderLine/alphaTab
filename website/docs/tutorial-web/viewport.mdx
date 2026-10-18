@@ -110,7 +110,7 @@ The complete file with all changes applied will be added at the bottom of each t
 Now let's finally bring alphaTab into the game. But before we can initialize alphaTab we need to get some input 
 data ready. In most cases you will have some website backend that will know which input file to load for display. 
 The input can be of any supported format like Guitar Pro files or alphaTex.
-In this tutorial we will use a demo file hosted by alphaTab at `https://www.alphatab.net/files/Bach_Prelude_BWV999.gp`.
+In this tutorial we will use Iron Waltz, the alphaTab demo song, hosted at `https://www.alphatab.net/files/iron-waltz.gp`.
 
 In the script tag below the wrapper element we fill in the following code.
 ```html
@@ -121,7 +121,7 @@ In the script tag below the wrapper element we fill in the following code.
 
     // initialize alphatab
     const settings = {
-      file: "https://www.alphatab.net/files/Bach_Prelude_BWV999.gp",
+      file: "https://www.alphatab.net/files/iron-waltz.gp",
     };
     const api = new alphaTab.AlphaTabApi(main, settings);
 </script>
@@ -345,7 +345,7 @@ It can be found in the [reference docs](/docs/reference/settings).
 
       // initialize alphatab
       const settings = {
-        file: "https://www.alphatab.net/files/Bach_Prelude_BWV999.gp",
+        file: "https://www.alphatab.net/files/iron-waltz.gp",
       };
       const api = new alphaTab.AlphaTabApi(main, settings);
 

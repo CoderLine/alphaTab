@@ -2,7 +2,7 @@ import type { ScoreSource } from '@site/src/alphatab-react';
 import { DEMO_FILES } from '@site/src/components/landing/LandingPlayerStage/demo-files';
 import { PRESETS } from '@site/src/components/landing/LandingPlayground/presets';
 
-/** A score the Playground can open by id, e.g. `/playground?file=canon-ensemble`. */
+/** A score the Playground can open by id, e.g. `/playground?file=iron-waltz`. */
 export interface PlaygroundSample {
     id: string;
     fileName: string;
@@ -28,7 +28,7 @@ export const PLAYGROUND_SAMPLES: PlaygroundSample[] = [
     })),
 ];
 
-export const DEFAULT_SAMPLE_ID = 'canon-ensemble';
+export const DEFAULT_SAMPLE_ID = 'iron-waltz';
 
 export function findSample(id: string | null | undefined): PlaygroundSample | undefined {
     return id ? PLAYGROUND_SAMPLES.find((s) => s.id === id) : undefined;

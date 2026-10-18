@@ -12,26 +12,26 @@ export interface DemoFile {
 
 export const DEMO_FILES: DemoFile[] = [
     {
-        id: 'canon-ensemble',
-        label: 'canon-ensemble.gp',
+        id: 'iron-waltz',
+        label: 'iron-waltz.gp',
         ext: 'gp',
         trackColor: 'var(--at-accent)',
-        source: { url: '/files/pachelbel-canon-ensemble.gp' },
-    },
-    {
-        id: 'bach-prelude-recording',
-        label: 'prelude-recording.alphatex',
-        ext: 'tex',
-        trackColor: 'var(--at-track-indigo)',
-        // TODO: swap with the dedicated backing-track demo file when staged.
+        // The .gp carries the sync points but not the audio, so the score renders without the 2 MB download.
         source: {
-            tex: Riffs.BACH_PRELUDE_BWV999_SYNCED,
+            url: '/files/iron-waltz.gp',
             backingTrack: {
                 kind: 'external',
-                audioUrl: '/files/Bach_Prelude_BWV999.ogg',
+                audioUrl: '/files/iron-waltz.ogg',
                 syncPoints: { from: 'score' },
             },
         },
+    },
+    {
+        id: 'canon-ensemble',
+        label: 'canon-ensemble.gp',
+        ext: 'gp',
+        trackColor: 'var(--at-track-indigo)',
+        source: { url: '/files/pachelbel-canon-ensemble.gp' },
     },
     {
         id: 'bach-prelude',

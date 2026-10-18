@@ -13,6 +13,7 @@ keywords:
 ---
 
 import { ExternalMediaSample } from '@site/src/components/ExternalMediaSample';
+import { TransportControls } from '@site/src/components/PlaySync';
 
 A student learning a song wants to play along with the studio recording — not a MIDI approximation. Set the player to backing-track mode and the cursor on the score follows the real audio file, note for note. Guitar Pro 8 files embed both the audio and the sync points, so a `.gp` file loaded into alphaTab plays the full-band recording out of the box. For other formats, attach the audio bytes on `score.backingTrack` before render. alphaTab plays **either** the synthesized audio or the backing track — the two do not mix.
 
@@ -31,6 +32,10 @@ On the web, playback is driven by `AudioElementBackingTrackSynthOutput`, which o
 ## Guitar Pro 8
 
 If the audio file is embedded in the `.gp` file, alphaTab loads and wires it automatically once you enable the backing-track mode. Nothing else to configure.
+
+The demo below loads [Iron Waltz](pathname:///files/iron-waltz-synced.gp), a Guitar Pro 8 file with the recording and its sync points embedded:
+
+<TransportControls file="/files/iron-waltz-synced.gp" showCode={false} />
 
 ## Show it in code
 
