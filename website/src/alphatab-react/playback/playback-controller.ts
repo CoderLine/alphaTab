@@ -1,4 +1,4 @@
-import type { AlphaTabApi, model } from '@coderline/alphatab';
+import type { AlphaTabApi, ICursorHandler, model, platform, rendering } from '@coderline/alphatab';
 import type { AlphaTabModule } from '../module';
 import { fetchWithProgress, type DownloadProgress } from './fetch-with-progress';
 import { playbackPreferences } from './preferences';
@@ -49,6 +49,58 @@ export const initialPlaybackState: PlaybackState = {
     isReadyForPlayback: false,
     soundFontId: null,
 };
+
+/** How close a reported position must be to the restored one to count as the new player having arrived. */
+const HOLD_TOLERANCE_TICKS = 3840;
+/** Restored positions the new player never reports, e.g. after a failed load, release the hold after this. */
+const HOLD_SETTLE_MS = 1000;
+const HOLD_MAX_MS = 15000;
+
+/**
+ * Ignores alphaTab's placements, so the cursors stay at the held beat. A player switch recreates the
+ * cursor elements; those are placed at `bounds` instead of appearing at the start of the song.
+ */
+class FrozenCursorHandler implements ICursorHandler {
+    private barCursor: platform.IContainer | null = null;
+    private beatCursor: platform.IContainer | null = null;
+
+    constructor(private bounds: rendering.BeatBounds | null) {}
+
+    moveTo(bounds: rendering.BeatBounds | null): void {
+        this.bounds = bounds;
+        this.place();
+    }
+
+    onAttach(cursors: platform.Cursors): void {
+        this.barCursor = cursors.barCursor;
+        this.beatCursor = cursors.beatCursor;
+        this.place();
+    }
+
+    onDetach(): void {}
+    placeBarCursor(): void {}
+    placeBeatCursor(): void {}
+    transitionBeatCursor(): void {}
+
+    private place(): void {
+        const bounds = this.bounds;
+        if (!bounds) return;
+        const bar = bounds.barBounds.masterBarBounds.visualBounds;
+        this.barCursor?.setBounds(bar.x, bar.y, bar.w, bar.h);
+        this.beatCursor?.transitionToX(0, bounds.onNotesX);
+        this.beatCursor?.setBounds(bounds.onNotesX, bar.y, 1, bar.h);
+    }
+}
+
+/** The position the UI keeps showing while a switch replaces the player. */
+interface PositionHold {
+    tick: number;
+    /** The new player was sent to `tick`; the hold ends once it reports a position there. */
+    restored: boolean;
+    frozenCursor: FrozenCursorHandler;
+    cursorHandler: ICursorHandler | undefined;
+    timer: ReturnType<typeof setTimeout>;
+}
 
 // Session-scoped: backing-track audio is small and not worth persisting.
 const audioCache = new Map<string, Promise<Uint8Array>>();
@@ -111,7 +163,12 @@ export class PlaybackController {
     private fontBytes: Uint8Array | null = null;
     /** SoundFont loaded into the current player instance; reset on every player rebuild. */
     private loadedFontId: SoundFontId | null = null;
+    /** Position to restore once the player is ready again after a switch, rebuild or SoundFont change. */
     private pendingTick: number | null = null;
+    /** Playback was running when the pending switch started and resumes once the player is ready. */
+    private resumeAfterReady = false;
+    private restoreTimer: ReturnType<typeof setTimeout> | undefined;
+    private hold: PositionHold | null = null;
     private playerSubscribed = false;
     private sourceOverride: PlaybackSourceKind | null = null;
 
@@ -177,12 +234,12 @@ export class PlaybackController {
         this.reconcile();
     }
 
-    /** Destroys and recreates the player in its current mode, keeping the position. */
+    /** Destroys and recreates the player in its current mode, keeping the position and resuming playback. */
     rebuildPlayer(): void {
         const { PlayerMode } = this.module;
         const mode = this.api.actualPlayerMode;
         if (mode === PlayerMode.Disabled) return;
-        this.pendingTick = this.api.tickPosition;
+        this.holdPosition();
         this.api.pause();
         this.api.settings.player.playerMode = PlayerMode.Disabled;
         this.api.updateSettings();
@@ -191,6 +248,48 @@ export class PlaybackController {
         this.api.updateSettings();
         this.ensurePlayerSubscription();
         this.refresh();
+    }
+
+    /**
+     * Applies a seek requested while a switch is pending to the position restored afterwards.
+     * Returns `false` when no switch is pending and the caller seeks the player itself.
+     */
+    seekWhileSwitching(tick: number): boolean {
+        if (this.pendingTick === null) {
+            this.releaseHold();
+            return false;
+        }
+        this.pendingTick = tick;
+        if (this.hold) {
+            this.hold.tick = tick;
+            this.hold.frozenCursor.moveTo(this.beatBoundsAt(tick));
+        }
+        return true;
+    }
+
+    /** Drops a pending resume, e.g. because the user paused during a switch. Returns whether one was pending. */
+    cancelResume(): boolean {
+        const pending = this.resumeAfterReady;
+        this.resumeAfterReady = false;
+        return pending;
+    }
+
+    /** Playback stopped for a switch and restarts once the new player is ready. */
+    get isResumePending(): boolean {
+        return this.resumeAfterReady;
+    }
+
+    /**
+     * Whether a reported position should reach the UI. While a switch replaces the player, the new
+     * instance reports interim positions (the song start, mostly) before the held one is restored;
+     * those are dropped. The first position near the restored one ends the hold.
+     */
+    acceptPosition(tick: number): boolean {
+        const hold = this.hold;
+        if (!hold) return true;
+        if (!hold.restored || Math.abs(tick - hold.tick) > HOLD_TOLERANCE_TICKS) return false;
+        this.releaseHold();
+        return true;
     }
 
     /** Clears a backing-track failure and tries the preferred source again. */
@@ -203,6 +302,8 @@ export class PlaybackController {
     destroy(): void {
         this.destroyed = true;
         this.generation++;
+        clearTimeout(this.restoreTimer);
+        this.releaseHold();
         for (const unsubscribe of this.unsubscribers) unsubscribe();
         this.listeners.clear();
     }
@@ -222,6 +323,9 @@ export class PlaybackController {
         this.backingTrackFailed = false;
         this.scorePrepared = false;
         this.pendingTick = null;
+        this.resumeAfterReady = false;
+        clearTimeout(this.restoreTimer);
+        this.releaseHold();
         this.patch({ notice: null });
         // alphaTab sets up the player right after this event, from the current
         // settings, so choosing the mode here avoids a throwaway player.
@@ -242,12 +346,83 @@ export class PlaybackController {
     };
 
     private readonly onReadyForPlayback = (): void => {
+        this.refresh();
+        if (this.pendingTick === null && !this.resumeAfterReady) return;
+        // alphaTab reports ready from within its MIDI load and only then attaches the backing-track
+        // audio and sync points, which resets the position and interrupts a play() made right now.
+        clearTimeout(this.restoreTimer);
+        this.restoreTimer = setTimeout(this.restorePosition, 0);
+    };
+
+    private readonly restorePosition = (): void => {
+        if (this.destroyed || !this.api.isReadyForPlayback) return;
         if (this.pendingTick !== null) {
+            if (this.hold) {
+                this.hold.restored = true;
+                this.holdFor(HOLD_SETTLE_MS);
+            }
             this.api.tickPosition = this.pendingTick;
             this.pendingTick = null;
         }
+        if (this.resumeAfterReady) {
+            this.resumeAfterReady = false;
+            this.api.play();
+        }
         this.refresh();
     };
+
+    /**
+     * Remembers the position, and whether playback runs, before the player is replaced. Ticks rather
+     * than milliseconds, because sync points map the same tick to different times per source. While a
+     * restore is already pending the current player has not reached that position yet, so it is kept.
+     */
+    private holdPosition(): void {
+        if (this.pendingTick !== null) return;
+        this.pendingTick = this.api.tickPosition;
+        this.resumeAfterReady = this.isPlaying();
+        const bounds = this.beatBoundsAt(this.pendingTick);
+        if (this.hold) {
+            this.hold.tick = this.pendingTick;
+            this.hold.restored = false;
+            this.hold.frozenCursor.moveTo(bounds);
+        } else {
+            const frozenCursor = new FrozenCursorHandler(bounds);
+            this.hold = {
+                tick: this.pendingTick,
+                restored: false,
+                frozenCursor,
+                cursorHandler: this.api.customCursorHandler,
+                timer: undefined!,
+            };
+            this.api.customCursorHandler = frozenCursor;
+        }
+        this.holdFor(HOLD_MAX_MS);
+    }
+
+    private beatBoundsAt(tick: number): rendering.BeatBounds | null {
+        const beat = this.api.tickCache?.findBeat(new Set(this.api.tracks.map((t) => t.index)), tick)?.beat;
+        return (beat && this.api.boundsLookup?.findBeat(beat)) || null;
+    }
+
+    private holdFor(ms: number): void {
+        const hold = this.hold!;
+        clearTimeout(hold.timer);
+        hold.timer = setTimeout(() => this.releaseHold(), ms);
+    }
+
+    private releaseHold(): void {
+        const hold = this.hold;
+        if (!hold) return;
+        this.hold = null;
+        clearTimeout(hold.timer);
+        // alphaTab draws cursor updates in the next animation frame and reads the handler only then,
+        // so the update for the position that ended the hold is drawn with the real handler.
+        this.api.customCursorHandler = hold.cursorHandler;
+    }
+
+    private isPlaying(): boolean {
+        return this.api.playerState === this.module.synth.PlayerState.Playing;
+    }
 
     private readonly onLibraryChanged = (): void => {
         if (this.state.preparing?.kind !== 'soundFont') return;
@@ -439,7 +614,7 @@ export class PlaybackController {
             return false;
         }
         if (this.scorePrepared && this.api.actualPlayerMode !== PlayerMode.Disabled) {
-            this.pendingTick = this.api.tickPosition;
+            this.holdPosition();
             this.api.pause();
         }
         this.api.settings.player.playerMode = mode;
@@ -453,6 +628,8 @@ export class PlaybackController {
         if (this.options.ownSoundFont || !this.fontBytes || this.loadedFontId === this.fontId) return;
         if (this.api.actualPlayerMode !== this.module.PlayerMode.EnabledSynthesizer) return;
         if (!this.api.player?.isReady) return;
+        // The synthesizer pauses itself to swap SoundFonts and reports ready again once the presets are loaded.
+        this.resumeAfterReady ||= this.isPlaying();
         this.api.loadSoundFont(this.fontBytes, false);
         this.loadedFontId = this.fontId;
         this.patch({ soundFontId: this.fontId });

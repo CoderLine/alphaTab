@@ -191,9 +191,23 @@ export class AlphaTabStore {
     readonly getSnapshot = (): AlphaTabState => this.snapshot;
 
     play(): void { this.api.play(); }
-    pause(): void { this.api.pause(); }
-    playPause(): void { this.api.playPause(); }
-    stop(): void { this.api.stop(); }
+    pause(): void {
+        if (this.playback.cancelResume()) this.update({ isPlaying: false });
+        this.api.pause();
+    }
+    playPause(): void {
+        // During a source switch playback still shows as running, so the toggle means pause.
+        if (this.playback.cancelResume()) {
+            this.update({ isPlaying: false });
+            return;
+        }
+        this.api.playPause();
+    }
+    stop(): void {
+        if (this.playback.cancelResume()) this.update({ isPlaying: false });
+        this.playback.seekWhileSwitching(0);
+        this.api.stop();
+    }
 
     setPlaybackSpeed(value: number): void {
         this.api.playbackSpeed = value;
@@ -416,6 +430,7 @@ export class AlphaTabStore {
     }
 
     seekToTick(tick: number): void {
+        if (this.playback.seekWhileSwitching(tick)) return;
         this.api.tickPosition = tick;
     }
 
@@ -656,7 +671,8 @@ export class AlphaTabStore {
             this.update({ isRendering: false, renderedTracks: [...this.api.tracks] });
         });
         this.api.playerStateChanged.on((e) => {
-            this.update({ isPlaying: e.state === synth.PlayerState.Playing });
+            // A switch pauses the old player and resumes the new one; the UI keeps showing playback.
+            this.update({ isPlaying: e.state === synth.PlayerState.Playing || this.playback.isResumePending });
             this.syncPlaybackScroll();
         });
         this.api.playerFinished.on(() => {
@@ -664,6 +680,7 @@ export class AlphaTabStore {
             this.syncPlaybackScroll();
         });
         this.api.playerPositionChanged.on((e) => {
+            if (!this.playback.acceptPosition(e.currentTick)) return;
             const currentBar = this.findBarForTick(e.currentTick);
             this.update({
                 currentTime: e.currentTime,
