@@ -13,6 +13,7 @@ import {
     type BeatContainerGlyphBase,
     type BeatEffectOverflow
 } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
@@ -169,6 +170,18 @@ export class BarRendererBase {
 
     public beatEffectsMinY = Number.NaN;
     public beatEffectsMaxY = Number.NaN;
+
+    /**
+     * Set by {@link RenderStaff.finalizeStaff} on the renderer that paints the attribution, otherwise `null`.
+     */
+    public attribution: AttributionGlyph | null = null;
+
+    /**
+     * The height above renderer y=0 that marks resting on this staff must clear at minimum.
+     */
+    public get staffTopClearance(): number {
+        return 0;
+    }
 
     private _barLocalSkyline: BarLocalSkyline | null = null;
     private _preBeatLocalSkyline: BarLocalSkyline | null = null;

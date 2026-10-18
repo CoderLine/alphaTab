@@ -9,6 +9,7 @@ import {
     EffectBandMode
 } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSystemPlacement';
+import { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
 import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import { type IStaffDisplayContext, StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
@@ -354,6 +355,42 @@ export class RenderStaff implements IStaffDisplayContext {
         this.bottomPadding = isLast ? settings.lastNotationStaffPaddingBottom : settings.notationStaffPaddingBottom;
     }
 
+    /**
+     * Rests the attribution on the skyline above the barline of the bar chosen by the layout, on the top staff.
+     * Runs before effect band placement so that bands stack above it.
+     */
+    private _placeAttribution(): void {
+        const index = this.isFirstInSystem ? this.system.layout.attributionRendererIndex(this.system) : -1;
+        let last: BarRendererBase | null = null;
+        for (let i = 0; i < this.barRenderers.length; i++) {
+            if (i === index) {
+                last = this.barRenderers[i];
+            } else {
+                this.barRenderers[i].attribution = null;
+            }
+        }
+        if (last === null) {
+            return;
+        }
+
+        const glyph = last.attribution ?? new AttributionGlyph();
+        glyph.renderer = last;
+        last.attribution = glyph;
+
+        const xEnd = last.x + last.width;
+        const xStart = xEnd - glyph.width;
+        const clearance = Math.max(this.systemSkyline.upSky.maxHeightInRange(xStart, xEnd), last.staffTopClearance);
+        const top = clearance + last.smuflMetrics.oneStaffSpace * 0.5 + glyph.height;
+        glyph.x = xStart - last.x;
+        glyph.y = -top;
+
+        this.systemSkyline.upSky.insert(xStart, xEnd, top, 0);
+        if (this.placesAgainstContentOnly) {
+            this.contentSkyline.upSky.insert(xStart, xEnd, top, 0);
+        }
+        this.registerOverflowTop(Math.ceil(top));
+    }
+
     public finalizeStaff(): void {
         Profiler.begin('layout.finalizeStaff');
         this._applyStaffPaddings();
@@ -387,6 +424,7 @@ export class RenderStaff implements IStaffDisplayContext {
             this._unionBarLocalIntoStaffSkyline(renderer);
         }
 
+        this._placeAttribution();
         this.effectPlacement.placeAndApply();
 
         if (this.height > 0) {

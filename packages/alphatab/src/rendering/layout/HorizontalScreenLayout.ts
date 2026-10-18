@@ -30,6 +30,12 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return this._systems;
     }
 
+    private _firstPartialBarCount: number = 0;
+
+    protected override getAttributionRendererIndex(_system: StaffSystem): number {
+        return this._firstPartialBarCount - 1;
+    }
+
     public get name(): string {
         return 'HorizontalScreen';
     }
@@ -116,6 +122,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         if (currentPartial.masterBars.length > 0) {
             this._completePartial(partials, currentPartial);
         }
+        this._firstPartialBarCount = partials.length > 0 ? partials[0].masterBars.length : 0;
         this._finalizeStaffSystem();
 
         this.height = Math.floor(this._system.y + this._system.height);
@@ -170,7 +177,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
 
         this.height = this.layoutAndRenderBottomScoreInfo(this.height);
-        this.height = this._layoutAndRenderAnnotation(this.height);
 
         this.height += this.pagePadding![3];
 
