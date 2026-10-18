@@ -24,7 +24,11 @@ export class EffectSystemPlacement {
         this._staff = staff;
     }
 
-    public placeAndApply(): void {
+    /**
+     * Places all non-empty effect bands of the staff on its skyline and publishes them into it.
+     * Must be followed by {@link apply}.
+     */
+    public place(): void {
         const staff = this._staff;
         const sky = staff.systemSkyline;
         const pad = staff.system.layout.renderer.settings.display.effectBandPaddingBottom;
@@ -66,6 +70,16 @@ export class EffectSystemPlacement {
         const contentSky = staff.placesAgainstContentOnly ? staff.contentSkyline : null;
         this._placeSide(top, sky.upSky, contentSky ? contentSky.upSky : null, pad, /* isTop */ true);
         this._placeSide(bottom, sky.downSky, contentSky ? contentSky.downSky : null, pad, /* isTop */ false);
+    }
+
+    /**
+     * Reserves the placed bands in the renderer and staff overflows and positions them relative to the final
+     * staff overflow. Overflow registered on the staff between {@link place} and this call is respected.
+     */
+    public apply(): void {
+        const staff = this._staff;
+        const top = this._top;
+        const bottom = this._bottom;
 
         // A bar reserves its own content and the bands placed on it. Bands know their final
         // position (magnitude + height), so the reserved height does not depend on the skyline before

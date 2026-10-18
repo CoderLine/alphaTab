@@ -364,19 +364,67 @@ describe('AttributionTests', () => {
         expect(markBottom).toBeGreaterThanOrEqual(repeatCountTop + owner.smuflMetrics.oneStaffSpace * 0.5 - 0.01);
     });
 
-    it('effect-bands-stack-above', async () => {
+    it('rests-above-effect-bands', async () => {
+        // the jump text spans the whole bar, so it lies under the attribution
+        const run = await render(`:4 C4 D4 E4 F4 | \\jump DaCapoAlFine G4 A4 B4 C5 ${filler}`, (s, _score) => {
+            s.display.barsPerRow = 2;
+        });
+        const owner = run.expectSingleMark();
+        let bandTop = 0;
+        for (const b of owner.topEffects.bands) {
+            if (!b.isEmpty) {
+                bandTop = Math.max(bandTop, b.placedMagnitude + b.height);
+            }
+        }
+        expect(bandTop).toBeGreaterThan(0);
+        const markBottom = -(owner.attribution!.y + owner.attribution!.height);
+        expect(markBottom).toBeCloseTo(bandTop + owner.smuflMetrics.oneStaffSpace * 0.5, 5);
+    });
+
+    it('no-extra-height-below-higher-content', async () => {
+        // the tempo at the bar start reaches higher than the attribution needs at the bar end
+        const tex = `:4 C4 D4 E4 F4 | \\tempo 90 C6 D6 E6 F6 | G4 A4 B4 C5 ${filler}`;
+        const threePerRow = (s: Settings, _score: Score) => {
+            s.display.barsPerRow = 3;
+        };
+        const run = await render(tex, threePerRow);
+        const owner = run.expectSingleMark();
+        const staff = owner.staff!;
+        let contentTop = 0;
+        for (const r of staff.barRenderers) {
+            contentTop = Math.max(contentTop, r.topOverflow);
+        }
+        expect(-owner.attribution!.y).toBeLessThan(contentTop);
+        expect(staff.topOverflow).toBe(contentTop);
+    });
+
+    it('notation-unaffected', async () => {
+        // the same first system once in a 10 bar song (no attribution) and once in an 11 bar song
+        const music = ':4 C4 D4 E4 F4 | \\jump DaCapoAlFine \\tempo 90 \\ro \\rc 3 C6 D6 E6 F6';
         const twoPerRow = (s: Settings, _score: Score) => {
             s.display.barsPerRow = 2;
         };
-        const plain = await render(`:4 C4 D4 E4 F4 | G4 A4 B4 C5 ${filler}`, twoPerRow);
-        const withBands = await render(
-            `:4 C4 D4 E4 F4 | \\jump DaCapoAlFine \\tempo 90 G4 A4 B4 C5 ${filler}`,
-            twoPerRow
-        );
-        const plainOwner = plain.expectSingleMark();
-        const owner = withBands.expectSingleMark();
-        expect(owner.attribution!.y).toBe(plainOwner.attribution!.y);
-        expect(owner.staff!.topOverflow).toBeGreaterThan(-owner.attribution!.y);
+        const without = await render(`${music}${' | :4 r r r r'.repeat(8)}`, twoPerRow);
+        const withMark = await render(`${music}${' | :4 r r r r'.repeat(9)}`, twoPerRow);
+        expect(without.owners().length).toBe(0);
+        withMark.expectSingleMark();
+
+        const a = without.renderer.layout!.systems[0].allStaves[0];
+        const b = withMark.renderer.layout!.systems[0].allStaves[0];
+        expect(b.barRenderers.length).toBe(a.barRenderers.length);
+        for (let i = 0; i < a.barRenderers.length; i++) {
+            const ra = a.barRenderers[i];
+            const rb = b.barRenderers[i];
+            expect(rb.x).toBe(ra.x);
+            expect(rb.width).toBe(ra.width);
+            expect(rb.contentTopOverflow).toBe(ra.contentTopOverflow);
+            expect(rb.topEffects.height).toBe(ra.topEffects.height);
+            expect(rb.topEffects.bands.length).toBe(ra.topEffects.bands.length);
+            for (let k = 0; k < ra.topEffects.bands.length; k++) {
+                expect(rb.topEffects.bands[k].placedMagnitude).toBe(ra.topEffects.bands[k].placedMagnitude);
+            }
+        }
+        expect(b.topOverflow).toBeGreaterThanOrEqual(a.topOverflow);
     });
 
     it('narrow-last-bar', async () => {

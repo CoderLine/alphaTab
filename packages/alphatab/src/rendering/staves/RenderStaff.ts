@@ -356,8 +356,8 @@ export class RenderStaff implements IStaffDisplayContext {
     }
 
     /**
-     * Rests the attribution on the skyline above the barline of the bar chosen by the layout, on the top staff.
-     * Runs before effect band placement so that bands stack above it.
+     * Rests the attribution above everything placed on the top staff, ending at the barline of the bar chosen by
+     * the layout. Runs after effect band placement so that it never displaces notation.
      */
     private _placeAttribution(): void {
         const index = this.isFirstInSystem ? this.system.layout.attributionRendererIndex(this.system) : -1;
@@ -385,9 +385,6 @@ export class RenderStaff implements IStaffDisplayContext {
         glyph.y = -top;
 
         this.systemSkyline.upSky.insert(xStart, xEnd, top, 0);
-        if (this.placesAgainstContentOnly) {
-            this.contentSkyline.upSky.insert(xStart, xEnd, top, 0);
-        }
         this.registerOverflowTop(Math.ceil(top));
     }
 
@@ -424,8 +421,9 @@ export class RenderStaff implements IStaffDisplayContext {
             this._unionBarLocalIntoStaffSkyline(renderer);
         }
 
+        this.effectPlacement.place();
         this._placeAttribution();
-        this.effectPlacement.placeAndApply();
+        this.effectPlacement.apply();
 
         if (this.height > 0) {
             this.height += this.topPadding + this.topOverflow + this.bottomOverflow + this.bottomPadding;
