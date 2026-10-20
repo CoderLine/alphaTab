@@ -735,7 +735,7 @@ export class Environment {
      */
     private static _detectWebPlatform(): WebPlatform {
         // There might be polyfills or platforms like Electron which have a global process object defined even in the browser.
-        // We need to differenciate between those platforms and a real nodejs
+        // We need to differentiate between those platforms and a real nodejs
 
         // the webPlatform is currently only relevant on the main process side and not within workers/worklets
         // so it is OK if we wrongly detect node.js inside them.

@@ -145,7 +145,7 @@ export enum NotationElement {
 
     /**
      * Parenthesis that are shown for tied bends
-     * if they are preceeded by bends.
+     * if they are preceded by bends.
      */
     ParenthesisOnTiedBends = 11,
 

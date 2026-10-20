@@ -17,7 +17,7 @@ export interface CoreSettingsJson {
      * The full URL to the alphaTab JavaScript file.
      * @remarks
      * AlphaTab needs to know the full URL to the script file it is contained in to launch the web workers. AlphaTab will do its best to auto-detect
-     * this path but in case it fails, this setting can be used to explicitly define it. Altenatively also a global variable `ALPHATAB_ROOT` can
+     * this path but in case it fails, this setting can be used to explicitly define it. Alternatively also a global variable `ALPHATAB_ROOT` can
      * be defined before initializing. Please be aware that bundling alphaTab together with other scripts might cause errors
      * in case those scripts are not suitable for web workers. e.g. if there is a script bundled together with alphaTab that accesses the DOM,
      * this will cause an error when alphaTab starts this script as worker.
@@ -92,7 +92,7 @@ export interface CoreSettingsJson {
      */
     tex?: boolean;
     /**
-     * The tracks to display for the initally loaded file.
+     * The tracks to display for the initially loaded file.
      * @json_raw
      * @remarks
      * This setting can be used in combinition with the {@link file} or {@link tex} option. It controls which of the tracks

@@ -31,7 +31,7 @@ export interface DisplaySettingsJson {
      * @category Display
      * @defaultValue `1`
      * @remarks
-     * The stretch force is a setting that controls the spacing of the music notation. AlphaTab uses a varaint of the Gourlay algorithm for spacing which has springs and rods for
+     * The stretch force is a setting that controls the spacing of the music notation. AlphaTab uses a variant of the Gourlay algorithm for spacing which has springs and rods for
      * aligning elements. This setting controls the "strength" of the springs. The stronger the springs, the wider the spacing.
      *
      * | Force 1                                                      | Force 0.5                                             |
