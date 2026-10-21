@@ -1,14 +1,22 @@
 {
     "name": "@coderline/alphatab",
     "version": "1.9.0",
-    "description": "alphaTab is a music notation and guitar tablature rendering library",
+    "description": "Render and play interactive sheet music and guitar tablature from Guitar Pro, MusicXML, Capella and alphaTex, in the browser, Node.js, .NET and Android.",
     "keywords": [
-        "guitar",
         "music-notation",
-        "music-sheet",
-        "html5",
+        "sheet-music",
+        "guitar-tablature",
+        "tablature",
+        "guitar",
+        "guitar-pro",
+        "musicxml",
+        "alphatex",
+        "score",
+        "midi",
+        "soundfont",
+        "synthesizer",
         "svg",
-        "guitar-tablature"
+        "canvas"
     ],
     "homepage": "https://alphatab.net",
     "bugs": {
