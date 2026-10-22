@@ -177,6 +177,11 @@ export class BackingTrackPlayer extends AlphaSynthBase {
         // should never be called
     }
 
+    protected override get supportsCountIn(): boolean {
+        // not supported, the media plays as-is and there is no synthesizer for the count-in metronome
+        return false;
+    }
+
     public override loadMidiFile(midi: MidiFile): void {
         if (!this.isSoundFontLoaded) {
             this.isSoundFontLoaded = true;
