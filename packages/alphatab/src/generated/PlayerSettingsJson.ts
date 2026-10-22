@@ -132,7 +132,7 @@ export interface PlayerSettingsJson {
      * @json_read_only
      * @remarks
      * This setting configures whether alphaTab provides the default user interaction features like selection of the playback range and "seek on click".
-     * By default users can select the desired playback range with the mouse and also jump to individual beats by click. This behavior can be contolled with this setting.
+     * By default users can select the desired playback range with the mouse and also jump to individual beats by click. This behavior can be controlled with this setting.
      * @deprecated Use {@link enableSeekToClick} and {@link enablePlaybackRangeSelection} individually
      */
     enableUserInteraction?: boolean;

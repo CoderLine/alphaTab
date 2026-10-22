@@ -1398,7 +1398,7 @@ export class AlphaTabApiBase<TSettings> {
      * The midi events which will trigger the `midiEventsPlayed` event
      * @remarks
      * Gets or sets the midi events which will trigger the `midiEventsPlayed` event. With this filter set you can enable
-     * that alphaTab will signal any midi events as they are played by the synthesizer. This allows reacing on various low level
+     * that alphaTab will signal any midi events as they are played by the synthesizer. This allows reacting on various low level
      * audio playback elements like notes/rests played or metronome ticks.
      *
      * Refer to the [related guide](https://alphatab.net/docs/guides/handling-midi-events) to learn more about this feature.
@@ -3647,7 +3647,7 @@ export class AlphaTabApiBase<TSettings> {
      * @remarks
      * If {@link CoreSettings.enableLazyLoading} is enabled not all partial images of the music sheet might be rendered.
      * In this case the `renderFinished` event rather represents that the whole music sheet has been layouted and arranged
-     * and every partial image can be requested for rendering. If you neeed more fine-grained access
+     * and every partial image can be requested for rendering. If you need more fine-grained access
      * to the actual layouting and rendering progress, you need to look at the low-level apis {@link IScoreRenderer.partialLayoutFinished} and
      * {@link IScoreRenderer.partialRenderFinished} accessible via {@link renderer}.
      *
@@ -4126,7 +4126,7 @@ export class AlphaTabApiBase<TSettings> {
      * This event is fired when the synthesizer played certain midi events.
      *
      * @remarks
-     * This event is fired when the synthesizer played certain midi events. This allows reacing on various low level
+     * This event is fired when the synthesizer played certain midi events. This allows reacting on various low level
      * audio playback elements like notes/rests played or metronome ticks.
      *
      * Refer to the [related guide](https://www.alphatab.net/docs/guides/handling-midi-events) to learn more about this feature.

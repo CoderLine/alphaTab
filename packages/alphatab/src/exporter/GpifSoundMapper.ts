@@ -146,7 +146,7 @@ export class GpifInstrumentArticulation {
  * @internal
  */
 export class GpifSoundMapper {
-    // NOTE: this code is not generated as the midi insturment list is anyhow fixed and should not never change.
+    // NOTE: this code is not generated as the midi instrument list is anyhow fixed and should not never change.
     private static _midiProgramInfoLookup: Map<number, GpifMidiProgramInfo> = new Map([
         [0, new GpifMidiProgramInfo(GpifIconIds.Piano, 'Acoustic Piano')],
         [1, new GpifMidiProgramInfo(GpifIconIds.Piano, 'Acoustic Piano')],

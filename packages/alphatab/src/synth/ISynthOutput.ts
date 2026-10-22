@@ -59,7 +59,7 @@ export interface ISynthOutput {
     addSamples(samples: Float32Array): void;
 
     /**
-     * Called when the samples in the output buffer should be reset. This is neeed for instance when seeking to another position.
+     * Called when the samples in the output buffer should be reset. This is needed for instance when seeking to another position.
      */
     resetSamples(): void;
 
