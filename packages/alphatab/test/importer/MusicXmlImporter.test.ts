@@ -681,17 +681,31 @@ describe('MusicXmlImporterTests', () => {
     });
 
     describe('barnumberdisplay', async () => {
+        // the measure-numbering holds until it is changed
         async function testPartwise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
-            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).toBe(display);
-            expect(score.tracks[1].staves[0].bars[2].barNumberDisplay).toBe(display);
+            expect(score.tracks[0].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
+            expect(score.tracks[1].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([
+                undefined,
+                undefined,
+                display
+            ]);
         }
 
         async function testTimewise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
-            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).toBe(display);
-            expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).toBe(display);
+            expect(score.tracks[0].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
+            expect(score.tracks[1].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
         }
+
+        it('partwise-first-measure-applies-to-all', async () => {
+            const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml-samples/Telemann.xml');
+            for (const track of score.tracks) {
+                for (const bar of track.staves[0].bars) {
+                    expect(bar.barNumberDisplay).toBe(BarNumberDisplay.Hide);
+                }
+            }
+        });
 
         it('partwise-none', async () =>
             await testPartwise('partwise-measure-numbering-none.xml', BarNumberDisplay.Hide));
