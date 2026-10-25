@@ -7,7 +7,7 @@ import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas
  * @internal
  */
 export class StringNumberContainerGlyph extends EffectGlyph {
-    // top to bottom, ordered by the pitch of the notes
+    // top to bottom: highest note first
     private _strings: number[] = [];
     private _pitches: number[] = [];
 
@@ -15,12 +15,19 @@ export class StringNumberContainerGlyph extends EffectGlyph {
         if (this._strings.indexOf(string) >= 0) {
             return;
         }
-        let i = 0;
-        while (i < this._pitches.length && this._pitches[i] >= pitch) {
-            i++;
+        this._strings.push(string);
+        this._pitches.push(pitch);
+        let i = this._strings.length - 1;
+        while (
+            i > 0 &&
+            (this._pitches[i - 1] < pitch || (this._pitches[i - 1] === pitch && this._strings[i - 1] < string))
+        ) {
+            this._strings[i] = this._strings[i - 1];
+            this._pitches[i] = this._pitches[i - 1];
+            i--;
         }
-        this._strings.splice(i, 0, string);
-        this._pitches.splice(i, 0, pitch);
+        this._strings[i] = string;
+        this._pitches[i] = pitch;
     }
 
     public override doLayout(): void {
