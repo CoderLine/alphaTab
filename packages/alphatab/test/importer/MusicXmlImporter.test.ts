@@ -251,6 +251,12 @@ describe('MusicXmlImporterTests', () => {
         expect(score).toMatchSnapshot();
     });
 
+    it('measure-number-zero', async () => {
+        // an explicit (non-implicit) measure 0 starts the counting at 0
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-measure-number-zero.xml');
+        expect(score.masterBars.map(mb => mb.barNumberText)).toEqual(['0', '1', '2']);
+    });
+
     it('timewise-anacrusis', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/timewise-anacrusis.xml');
         expect(score).toMatchSnapshot();

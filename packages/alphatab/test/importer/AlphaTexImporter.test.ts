@@ -2858,4 +2858,10 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[4].customBarNumber).toBeUndefined();
         expect(score.masterBars[4].customBarNumberText).toBeUndefined();
     });
+
+    it('bar-number-zero', () => {
+        const score = parseTex('\\barNumber 0 C4.1 | C4.1 | C4.1');
+        expect(score.masterBars.map(mb => mb.barNumberText)).toEqual(['0', '1', '2']);
+        expect(score.masterBars[0].customBarNumber).toBe(0);
+    });
 });
