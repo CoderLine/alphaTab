@@ -189,6 +189,50 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     public override registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         super.registerLayoutingInfo(layoutings);
         this._registerLedgerLineRods(layoutings);
+        this._registerSlideRods(layoutings);
+    }
+
+    private static _isSlideBetweenNotes(origin: Note): boolean {
+        const target = origin.slideTarget;
+        return (
+            (origin.slideOutType === SlideOutType.Shift || origin.slideOutType === SlideOutType.Legato) &&
+            target !== null &&
+            target.beat.voice.bar === origin.beat.voice.bar &&
+            origin.beat.graceType === GraceType.None &&
+            target.beat.graceType === GraceType.None
+        );
+    }
+
+    /**
+     * Reserves the room for slide lines between notes of this bar: the line between the notes of
+     * the origin beat and the accidentals of the target beat keeps a minimum length.
+     */
+    private _registerSlideRods(layoutings: BarLayoutingInfo): void {
+        const smufl = this.renderer.smuflMetrics;
+        const start = this.beat.absoluteDisplayStart;
+        let isOrigin = false;
+        let originBeatId = -1;
+        for (const n of this.beat.notes) {
+            if (ScoreBeatContainerGlyph._isSlideBetweenNotes(n)) {
+                isOrigin = true;
+            }
+            if (n.slideOrigin && ScoreBeatContainerGlyph._isSlideBetweenNotes(n.slideOrigin)) {
+                originBeatId = n.slideOrigin.beat.id;
+            }
+        }
+        if (isOrigin) {
+            const postNotesExtent = this.onNotes.x + this.onNotes.width - this.onTimeX;
+            layoutings.addOverlayRod(
+                `slide.${this.beat.id}`,
+                start,
+                0,
+                postNotesExtent + smufl.postNoteEffectPadding + smufl.simpleSlideWidth
+            );
+        }
+        if (originBeatId >= 0) {
+            const preNotesExtent = this.onTimeX - this.preNotes.x;
+            layoutings.addOverlayRod(`slide.${originBeatId}`, start, preNotesExtent + smufl.postNoteEffectPadding, 0);
+        }
     }
 
     /**
