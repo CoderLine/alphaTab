@@ -48,7 +48,6 @@ export class ClefGlyph extends MusicFontGlyph {
             bottom = ModelUtils.maxBoundingBox(bottom, ottavaBottom);
         }
 
-
         return bottom;
     }
 
@@ -156,13 +155,20 @@ export class ClefGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationClef, this.renderer.bar);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            BarSubElement.StandardNotationClef,
+            this.renderer.bar
+        );
+        try {
+            super.paint(cx, cy, canvas);
 
-        super.paint(cx, cy, canvas);
-
-        const ottava = this._ottavaGlyph;
-        if (ottava) {
-            ottava.paint(cx + this.x, cy + this.y, canvas);
+            const ottava = this._ottavaGlyph;
+            if (ottava) {
+                ottava.paint(cx + this.x, cy + this.y, canvas);
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

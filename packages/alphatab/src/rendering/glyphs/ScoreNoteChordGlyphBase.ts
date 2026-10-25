@@ -582,9 +582,10 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         cx += noteGroup.multiVoiceShiftX;
 
         const infos: ScoreNoteGlyphInfo[] = this._infos;
-        for (const g of infos) {
-            g.glyph.renderer = this.renderer;
-            g.glyph.paint(cx, cy, canvas);
+        for (let i = 0, j = infos.length; i < j; i++) {
+            const g = infos[i].glyph;
+            g.renderer = this.renderer;
+            g.paint(cx, cy, canvas);
         }
     }
 
@@ -595,40 +596,48 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
-        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            BarSubElement.StandardNotationStaffLine,
+            scoreRenderer.bar,
+            true
+        );
+        try {
+            const scale = this.scale;
+            const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
+            const lineWidth: number = this.width + lineExtension * 2 - this.noteStartX;
 
-        const scale = this.scale;
-        const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
-        const lineWidth: number = this.width + lineExtension * 2 - this.noteStartX;
+            const lineSpacing = scoreRenderer.getLineHeight(1);
+            const firstTopLedgerY = scoreRenderer.getLineY(-1);
+            const firstBottomLedgerY = scoreRenderer.getLineY(scoreRenderer.drawnLineCount);
+            const minNoteLineY = scoreRenderer.getLineY(this.minStepsNote!.steps / 2);
+            const maxNoteLineY = scoreRenderer.getLineY(this.maxStepsNote!.steps / 2);
 
-        const lineSpacing = scoreRenderer.getLineHeight(1);
-        const firstTopLedgerY = scoreRenderer.getLineY(-1);
-        const firstBottomLedgerY = scoreRenderer.getLineY(scoreRenderer.drawnLineCount);
-        const minNoteLineY = scoreRenderer.getLineY(this.minStepsNote!.steps / 2);
-        const maxNoteLineY = scoreRenderer.getLineY(this.maxStepsNote!.steps / 2);
+            const lineYOffset = (this.renderer.smuflMetrics.legerLineThickness * scale) / 2;
 
-        const lineYOffset = (this.renderer.smuflMetrics.legerLineThickness * scale) / 2;
+            let y = firstTopLedgerY;
+            while (y >= minNoteLineY) {
+                canvas.fillRect(
+                    cx - lineExtension + this.noteStartX,
+                    cy + y - lineYOffset,
+                    lineWidth,
+                    this.renderer.smuflMetrics.legerLineThickness * scale
+                );
+                y -= lineSpacing;
+            }
 
-        let y = firstTopLedgerY;
-        while (y >= minNoteLineY) {
-            canvas.fillRect(
-                cx - lineExtension + this.noteStartX,
-                cy + y - lineYOffset,
-                lineWidth,
-                this.renderer.smuflMetrics.legerLineThickness * scale
-            );
-            y -= lineSpacing;
-        }
-
-        y = firstBottomLedgerY;
-        while (y <= maxNoteLineY) {
-            canvas.fillRect(
-                cx - lineExtension + this.noteStartX,
-                cy + y - lineYOffset,
-                lineWidth,
-                this.renderer.smuflMetrics.legerLineThickness * scale
-            );
-            y += lineSpacing;
+            y = firstBottomLedgerY;
+            while (y <= maxNoteLineY) {
+                canvas.fillRect(
+                    cx - lineExtension + this.noteStartX,
+                    cy + y - lineYOffset,
+                    lineWidth,
+                    this.renderer.smuflMetrics.legerLineThickness * scale
+                );
+                y += lineSpacing;
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

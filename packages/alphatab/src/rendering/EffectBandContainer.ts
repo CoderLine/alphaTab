@@ -14,7 +14,7 @@ import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarL
 export class EffectBandContainer {
     private _bands: EffectBand[] = [];
     /** Per-voice (effectId → band) lookup; nested to avoid string-key allocation in `_createOrResizeGlyph`. */
-    private _bandLookup: Map<number, Map<string, EffectBand>> = new Map();
+    private _bandLookup: Map<number, Map<string, EffectBand>> | null = null;
     public height: number = 0;
 
     public infos!: EffectBandInfo[];
@@ -97,10 +97,15 @@ export class EffectBandContainer {
                     band = new EffectBand(voice, info.effect, this, this._renderer, order);
                     band.doLayout();
                     this._bands.push(band);
-                    let perVoice = this._bandLookup.get(voice.index);
+                    let bandLookup = this._bandLookup;
+                    if (!bandLookup) {
+                        bandLookup = new Map<number, Map<string, EffectBand>>();
+                        this._bandLookup = bandLookup;
+                    }
+                    let perVoice = bandLookup.get(voice.index);
                     if (!perVoice) {
                         perVoice = new Map<string, EffectBand>();
-                        this._bandLookup.set(voice.index, perVoice);
+                        bandLookup.set(voice.index, perVoice);
                     }
                     perVoice.set(info.effect.effectId, band);
                 }
@@ -115,7 +120,7 @@ export class EffectBandContainer {
     public doLayout() {
         // splice() instead of `.length = 0`: transpile-safe array clear.
         this._bands.splice(0, this._bands.length);
-        this._bandLookup.clear();
+        this._bandLookup?.clear();
         this.height = 0;
     }
 
@@ -130,7 +135,11 @@ export class EffectBandContainer {
     }
 
     public getBand(voice: Voice, effectId: string): EffectBand | null {
-        const perVoice = this._bandLookup.get(voice.index);
+        const bandLookup = this._bandLookup;
+        if (!bandLookup) {
+            return null;
+        }
+        const perVoice = bandLookup.get(voice.index);
         if (!perVoice) {
             return null;
         }

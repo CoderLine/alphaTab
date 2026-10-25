@@ -57,8 +57,8 @@ export class BeamingHelper {
      */
     public hasTuplet: boolean = false;
 
-    public slashBeats: Beat[] = [];
-    public restBeats: Beat[] = [];
+    public slashBeats: Beat[] | null = null;
+    public restBeats: Beat[] | null = null;
 
     public lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
@@ -101,7 +101,6 @@ export class BeamingHelper {
     public constructor(staff: Staff, renderer: BarRendererBase, beamingRuleLookup: BeamingRuleLookup) {
         this._staff = staff;
         this._renderer = renderer;
-        this.beats = [];
         this._beamingRuleLookup = beamingRuleLookup;
     }
 
@@ -200,10 +199,16 @@ export class BeamingHelper {
             } else if (this.beats.length === 0) {
                 this.beats.push(beat);
             } else {
+                if (!this.restBeats) {
+                    this.restBeats = [];
+                }
                 this.restBeats.push(beat);
             }
 
             if (beat.slashed) {
+                if (!this.slashBeats) {
+                    this.slashBeats = [];
+                }
                 this.slashBeats.push(beat);
             }
         }

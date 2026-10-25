@@ -24,15 +24,34 @@ import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
  * @internal
  */
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
-    private _noteGlyphLookup: Map<number, NoteHeadGlyphBase> = new Map();
     private _notes: Note[] = [];
+    /** The main note head of each entry in {@link _notes} (same index). */
+    private _noteGlyphs: NoteHeadGlyphBase[] = [];
     private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: TremoloPickingGlyph | null = null;
     private _stemLengthExtension = 0;
 
-    public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
-    public belowBeatEffects: Map<string, EffectGlyph> = new Map();
+    private _aboveBeatEffects: Map<string, EffectGlyph> | null = null;
+    private _belowBeatEffects: Map<string, EffectGlyph> | null = null;
     public beat!: Beat;
+
+    public get aboveBeatEffects(): Map<string, EffectGlyph> {
+        let effects = this._aboveBeatEffects;
+        if (!effects) {
+            effects = new Map<string, EffectGlyph>();
+            this._aboveBeatEffects = effects;
+        }
+        return effects;
+    }
+
+    public get belowBeatEffects(): Map<string, EffectGlyph> {
+        let effects = this._belowBeatEffects;
+        if (!effects) {
+            effects = new Map<string, EffectGlyph>();
+            this._belowBeatEffects = effects;
+        }
+        return effects;
+    }
 
     public get direction(): BeamDirection {
         return (this.renderer as ScoreBarRenderer).getBeatDirection(this.beat);
@@ -66,10 +85,19 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return existing;
     }
 
-    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        if (this._noteGlyphLookup.has(note.id)) {
-            const n = this._noteGlyphLookup.get(note.id)!;
+    private _getNoteGlyph(note: Note): NoteHeadGlyphBase | null {
+        const notes = this._notes;
+        for (let i = notes.length - 1; i >= 0; i--) {
+            if (notes[i].id === note.id) {
+                return this._noteGlyphs[i];
+            }
+        }
+        return null;
+    }
 
+    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+        const n = this._getNoteGlyph(note);
+        if (n) {
             let pos = this.x + n.x;
             switch (requestedPosition) {
                 case NoteXPosition.Left:
@@ -87,8 +115,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        if (this._noteGlyphLookup.has(note.id)) {
-            const n = this._noteGlyphLookup.get(note.id)!;
+        const n = this._getNoteGlyph(note);
+        if (n) {
             return this._internalGetNoteY(n, requestedPosition);
         }
         return 0;
@@ -134,8 +162,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public addMainNoteGlyph(noteGlyph: NoteHeadGlyphBase, note: Note, noteLine: number): void {
         super.add(noteGlyph, noteLine);
-        this._noteGlyphLookup.set(note.id, noteGlyph);
         this._notes.push(note);
+        this._noteGlyphs.push(noteGlyph);
     }
 
     public addEffectNoteGlyph(noteGlyph: NoteHeadGlyphBase, noteLine: number): void {
@@ -177,37 +205,43 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         let minEffectY: number | null = null;
         let maxEffectY: number | null = null;
 
-        for (const effect of this.aboveBeatEffects.values()) {
-            effect.renderer = this.renderer;
-            effect.doLayout();
+        const aboveBeatEffects = this._aboveBeatEffects;
+        if (aboveBeatEffects) {
+            for (const effect of aboveBeatEffects.values()) {
+                effect.renderer = this.renderer;
+                effect.doLayout();
 
-            aboveBeatEffectsY -= effect.height;
+                aboveBeatEffectsY -= effect.height;
 
-            effect.y = aboveBeatEffectsY;
-            if (minEffectY === null || minEffectY > aboveBeatEffectsY) {
-                minEffectY = aboveBeatEffectsY;
+                effect.y = aboveBeatEffectsY;
+                if (minEffectY === null || minEffectY > aboveBeatEffectsY) {
+                    minEffectY = aboveBeatEffectsY;
+                }
+                if (maxEffectY === null || maxEffectY < aboveBeatEffectsY) {
+                    maxEffectY = aboveBeatEffectsY;
+                }
+
+                aboveBeatEffectsY -= effectSpacing;
             }
-            if (maxEffectY === null || maxEffectY < aboveBeatEffectsY) {
-                maxEffectY = aboveBeatEffectsY;
-            }
-
-            aboveBeatEffectsY -= effectSpacing;
         }
 
-        for (const effect of this.belowBeatEffects.values()) {
-            effect.renderer = this.renderer;
-            effect.doLayout();
+        const belowBeatEffects = this._belowBeatEffects;
+        if (belowBeatEffects) {
+            for (const effect of belowBeatEffects.values()) {
+                effect.renderer = this.renderer;
+                effect.doLayout();
 
-            effect.y = belowBeatEffectsY;
+                effect.y = belowBeatEffectsY;
 
-            if (minEffectY === null || minEffectY > belowBeatEffectsY) {
-                minEffectY = belowBeatEffectsY;
+                if (minEffectY === null || minEffectY > belowBeatEffectsY) {
+                    minEffectY = belowBeatEffectsY;
+                }
+                if (maxEffectY === null || maxEffectY < belowBeatEffectsY) {
+                    maxEffectY = belowBeatEffectsY;
+                }
+
+                belowBeatEffectsY += effect.height + effectSpacing;
             }
-            if (maxEffectY === null || maxEffectY < belowBeatEffectsY) {
-                maxEffectY = belowBeatEffectsY;
-            }
-
-            belowBeatEffectsY += effect.height + effectSpacing;
         }
 
         if (minEffectY !== null) {
@@ -253,8 +287,8 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         for (const note of this._notes) {
-            if (this._noteGlyphLookup.has(note.id)) {
-                const glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
+            const glyph = this._getNoteGlyph(note);
+            if (glyph) {
                 const noteBounds: NoteBounds = new NoteBounds();
                 noteBounds.note = note;
                 noteBounds.noteHeadBounds = new Bounds();
@@ -274,18 +308,28 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     private _paintEffects(cx: number, cy: number, canvas: ICanvas) {
-        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationEffects, this.beat);
-        for (const g of this.aboveBeatEffects.values()) {
-            g.paint(cx + this.x + this.width / 2, cy + this.y, canvas);
-        }
-        for (const g of this.belowBeatEffects.values()) {
-            g.paint(cx + this.x + this.width / 2, cy + this.y, canvas);
-        }
-        if (this._tremoloPicking) {
-            this._tremoloPicking.paint(cx, cy, canvas);
-        }
-        if (this._deadSlapped) {
-            this._deadSlapped.paint(cx, cy, canvas);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.StandardNotationEffects, this.beat);
+        try {
+            const aboveBeatEffects = this._aboveBeatEffects;
+            if (aboveBeatEffects) {
+                for (const g of aboveBeatEffects.values()) {
+                    g.paint(cx + this.x + this.width / 2, cy + this.y, canvas);
+                }
+            }
+            const belowBeatEffects = this._belowBeatEffects;
+            if (belowBeatEffects) {
+                for (const g of belowBeatEffects.values()) {
+                    g.paint(cx + this.x + this.width / 2, cy + this.y, canvas);
+                }
+            }
+            if (this._tremoloPicking) {
+                this._tremoloPicking.paint(cx, cy, canvas);
+            }
+            if (this._deadSlapped) {
+                this._deadSlapped.paint(cx, cy, canvas);
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

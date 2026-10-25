@@ -176,22 +176,29 @@ export class NumberedKeySignatureGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, BarSubElement.NumberedKeySignature, this.renderer.bar);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            BarSubElement.NumberedKeySignature,
+            this.renderer.bar
+        );
+        try {
+            const res = this.renderer.resources;
+            canvas.font = res.numberedNotationFont;
+            canvas.textBaseline = TextBaseline.Alphabetic;
+            canvas.fillText(this._text, cx + this.x + this._padding, cy + this.y + this.height);
 
-        const res = this.renderer.resources;
-        canvas.font = res.numberedNotationFont;
-        canvas.textBaseline = TextBaseline.Alphabetic;
-        canvas.fillText(this._text, cx + this.x + this._padding, cy + this.y + this.height);
-
-        if (this._accidental !== AccidentalType.None) {
-            CanvasHelper.fillMusicFontSymbolSafe(
-                canvas,
-                cx + this.x + this._padding + this._accidentalOffset,
-                cy + this.y + this.height,
-                1,
-                AccidentalGlyph.getMusicSymbol(this._accidental),
-                false
-            );
+            if (this._accidental !== AccidentalType.None) {
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
+                    cx + this.x + this._padding + this._accidentalOffset,
+                    cy + this.y + this.height,
+                    1,
+                    AccidentalGlyph.getMusicSymbol(this._accidental),
+                    false
+                );
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

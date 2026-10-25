@@ -18,11 +18,7 @@ export class KeySignatureGlyph extends LeftToRightLayoutingGlyphGroup {
             return;
         }
         // left aligned (Behind Bars: key signatures start at the same position across staves)
-        info.addHeaderRod(
-            KeySignatureGlyph.HeaderRank,
-            0,
-            this.width + this.renderer.smuflMetrics.preBeatGlyphSpacing
-        );
+        info.addHeaderRod(KeySignatureGlyph.HeaderRank, 0, this.width + this.renderer.smuflMetrics.preBeatGlyphSpacing);
     }
 
     public override applyHeaderRod(info: BarLayoutingInfo): void {
@@ -33,7 +29,15 @@ export class KeySignatureGlyph extends LeftToRightLayoutingGlyphGroup {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationKeySignature, this.renderer.bar);
-        super.paint(cx, cy, canvas);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            BarSubElement.StandardNotationKeySignature,
+            this.renderer.bar
+        );
+        try {
+            super.paint(cx, cy, canvas);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 }

@@ -28,7 +28,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
     private readonly _beatGlyphLookup = new Map<number, BeatContainerGlyphBase>();
 
     public beatGlyphs = new Map<number, BeatContainerGlyphBase[]>();
-    public tupletGroups = new Map<number, TupletGroup[]>();
+    public tupletGroups: Map<number, TupletGroup[]> | null = null;
 
     public constructor() {
         super(0, 0);
@@ -230,8 +230,8 @@ export class MultiVoiceContainerGlyph extends Glyph {
             }
         }
 
-        const pending = beatContainer.pendingEffectOverflows;
-        if (pending.length > 0) {
+        const pending = beatContainer.pendingEffectOverflowsOrNull;
+        if (pending && pending.length > 0) {
             const pendingXStart = base;
             const pendingXEnd = base + beatContainer.width;
             if (pendingXEnd > pendingXStart) {
@@ -290,12 +290,17 @@ export class MultiVoiceContainerGlyph extends Glyph {
             this.width = newWidth;
         }
         if (bg.isFirstOfTupletGroup) {
+            let tupletGroupsByVoice = this.tupletGroups;
+            if (!tupletGroupsByVoice) {
+                tupletGroupsByVoice = new Map<number, TupletGroup[]>();
+                this.tupletGroups = tupletGroupsByVoice;
+            }
             let tupletGroups: TupletGroup[];
-            if (this.tupletGroups.has(bg.voiceIndex)) {
-                tupletGroups = this.tupletGroups.get(bg.voiceIndex)!;
+            if (tupletGroupsByVoice.has(bg.voiceIndex)) {
+                tupletGroups = tupletGroupsByVoice.get(bg.voiceIndex)!;
             } else {
                 tupletGroups = [];
-                this.tupletGroups.set(bg.voiceIndex, tupletGroups);
+                tupletGroupsByVoice.set(bg.voiceIndex, tupletGroups);
             }
 
             tupletGroups.push(bg.tupletGroup!);
@@ -414,13 +419,18 @@ export class MultiVoiceContainerGlyph extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
+        const x = cx + this.x;
+        const y = cy + this.y;
         for (const v of this.voiceDrawOrder!) {
             const beatGlyphs = this.beatGlyphs.get(v)!;
             const voice = this.renderer.bar.voices[v];
-            using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, voice, true);
-
-            for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
-                beatGlyphs[i].paint(cx + this.x, cy + this.y, canvas);
+            const previousColor = ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, voice, true);
+            try {
+                for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
+                    beatGlyphs[i].paint(x, y, canvas);
+                }
+            } finally {
+                ElementStyleHelper.restore(canvas, previousColor);
             }
         }
     }

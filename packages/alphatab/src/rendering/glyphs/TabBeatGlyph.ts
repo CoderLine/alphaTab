@@ -124,8 +124,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             const isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
 
-            let beatEffects: Map<string, Glyph>;
-
             if (this.container.beat.slashed) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
                 const slashY = tabRenderer.getLineY(line);
@@ -135,7 +133,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 this.slash = slashNoteHead;
                 slashNoteHead.beat = this.container.beat;
                 this.addNormal(slashNoteHead);
-                beatEffects = slashNoteHead.beatEffects;
             } else {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 this.noteNumbers = tabNoteNumbers;
@@ -146,16 +143,20 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
                 this.addNormal(tabNoteNumbers);
-                beatEffects = tabNoteNumbers.beatEffects;
             }
 
             //
             // Tremolo Picking
-            if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
-                const glyph = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloPicking!);
-                glyph.offsetY = this.renderer.smuflMetrics.glyphTop.get(glyph.symbol)!;
-                beatEffects.set('tremolo', glyph);
-                centeredEffectGlyphs.push(glyph);
+            if (this.container.beat.isTremolo) {
+                const beatEffects = this.container.beat.slashed
+                    ? this.slash!.beatEffects
+                    : this.noteNumbers!.beatEffects;
+                if (!beatEffects.has('tremolo')) {
+                    const glyph = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloPicking!);
+                    glyph.offsetY = this.renderer.smuflMetrics.glyphTop.get(glyph.symbol)!;
+                    beatEffects.set('tremolo', glyph);
+                    centeredEffectGlyphs.push(glyph);
+                }
             }
 
             //

@@ -130,6 +130,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.y += this._collisionOffset;
             const existingRests = this.renderer.collisionHelper.restDurationsByDisplayTime;
             if (
+                existingRests !== null &&
                 existingRests.has(this.container.beat.playbackStart) &&
                 existingRests.get(this.container.beat.playbackStart)!.has(this.container.beat.playbackDuration) &&
                 existingRests.get(this.container.beat.playbackStart)!.get(this.container.beat.playbackDuration) !==
@@ -411,26 +412,24 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.noteHeads!.addEffectNoteGlyph(harmonicsGlyph, steps);
         }
 
-        const belowBeatEffects = this.noteHeads!.belowBeatEffects;
-        const aboveBeatEffects = this.noteHeads!.aboveBeatEffects;
-        const outsideBeatEffects: Map<string, EffectGlyph> =
-            sr.getBeatDirection(this.container.beat) === BeamDirection.Up
-                ? this.noteHeads!.belowBeatEffects
-                : this.noteHeads!.aboveBeatEffects;
+        // the effect maps are created on first access, only touch them for notes with effects
+        const noteHeads = this.noteHeads!;
+        const outsideIsBelow = sr.getBeatDirection(this.container.beat) === BeamDirection.Up;
 
-        if (n.isStaccato && !belowBeatEffects.has('Staccato')) {
-            outsideBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
+        if (n.isStaccato && !noteHeads.belowBeatEffects.has('Staccato')) {
+            ScoreBeatGlyph._beatEffects(noteHeads, outsideIsBelow).set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
         }
-        if (n.accentuated === AccentuationType.Normal && !belowBeatEffects.has('Accent')) {
-            outsideBeatEffects.set('Accent', new AccentuationGlyph(0, 0, n));
+        if (n.accentuated === AccentuationType.Normal && !noteHeads.belowBeatEffects.has('Accent')) {
+            ScoreBeatGlyph._beatEffects(noteHeads, outsideIsBelow).set('Accent', new AccentuationGlyph(0, 0, n));
         }
-        if (n.accentuated === AccentuationType.Heavy && !belowBeatEffects.has('HAccent')) {
-            outsideBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, n));
+        if (n.accentuated === AccentuationType.Heavy && !noteHeads.belowBeatEffects.has('HAccent')) {
+            ScoreBeatGlyph._beatEffects(noteHeads, outsideIsBelow).set('HAccent', new AccentuationGlyph(0, 0, n));
         }
-        if (n.accentuated === AccentuationType.Tenuto && !belowBeatEffects.has('Tenuto')) {
-            outsideBeatEffects.set('Tenuto', new AccentuationGlyph(0, 0, n));
+        if (n.accentuated === AccentuationType.Tenuto && !noteHeads.belowBeatEffects.has('Tenuto')) {
+            ScoreBeatGlyph._beatEffects(noteHeads, outsideIsBelow).set('Tenuto', new AccentuationGlyph(0, 0, n));
         }
         if (n.showStringNumber && !Number.isNaN(n.string)) {
+            const aboveBeatEffects = noteHeads.aboveBeatEffects;
             let container: StringNumberContainerGlyph;
             if (!aboveBeatEffects.has('StringNumber')) {
                 container = new StringNumberContainerGlyph(0, 0);
@@ -443,21 +442,22 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation && articulation.techniqueSymbolPlacement !== TechniqueSymbolPlacement.Inside) {
-                let effectContainer: Map<string, EffectGlyph>;
+                let isBelow: boolean;
 
                 switch (articulation.techniqueSymbolPlacement) {
                     case TechniqueSymbolPlacement.Above:
-                        effectContainer = this.noteHeads!.aboveBeatEffects;
+                        isBelow = false;
                         break;
                     case TechniqueSymbolPlacement.Below:
-                        effectContainer = this.noteHeads!.belowBeatEffects;
+                        isBelow = true;
                         break;
                     case TechniqueSymbolPlacement.Outside:
-                        effectContainer = outsideBeatEffects;
+                        isBelow = outsideIsBelow;
                         break;
                     default:
                         return;
                 }
+                const effectContainer = ScoreBeatGlyph._beatEffects(noteHeads, isBelow);
 
                 switch (articulation.techniqueSymbol) {
                     case MusicFontSymbol.PictEdgeOfCymbal:
@@ -478,5 +478,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 }
             }
         }
+    }
+
+    private static _beatEffects(noteHeads: ScoreNoteChordGlyph, below: boolean): Map<string, EffectGlyph> {
+        return below ? noteHeads.belowBeatEffects : noteHeads.aboveBeatEffects;
     }
 }

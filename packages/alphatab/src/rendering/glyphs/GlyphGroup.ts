@@ -69,8 +69,10 @@ export class GlyphGroup extends Glyph {
         if (!glyphs || glyphs.length === 0) {
             return;
         }
-        for (const g of glyphs) {
-            g.paint(cx + this.x, cy + this.y, canvas);
+        const x = cx + this.x;
+        const y = cy + this.y;
+        for (let i = 0, j = glyphs.length; i < j; i++) {
+            glyphs[i].paint(x, y, canvas);
         }
     }
 }

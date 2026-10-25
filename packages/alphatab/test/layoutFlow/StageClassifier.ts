@@ -1,7 +1,6 @@
-/** @target web */
-
 /**
  * A call frame as reported by the V8 inspector (CPU and sampling heap profiles).
+ * @target web
  * @internal
  */
 export interface ProfileCallFrame {
@@ -13,6 +12,7 @@ export interface ProfileCallFrame {
 /**
  * Maps a profiler stack to the layout pipeline stage it belongs to. The innermost matching frame
  * wins, so glyph work inside `doLayout` counts as measure even when `doLayout` runs inside `addBars`.
+ * @target web
  * @internal
  */
 export class StageClassifier {
@@ -104,6 +104,7 @@ export class StageClassifier {
 
 /**
  * Accumulates numbers by key and prints the largest entries.
+ * @target web
  * @internal
  */
 export class Tally {

@@ -20,9 +20,18 @@ export class TabNoteChordGlyph extends Glyph {
     public beat!: Beat;
     public maxStringNote: Note | null = null;
     public minStringNote: Note | null = null;
-    public beatEffects: Map<string, Glyph> = new Map();
+    private _beatEffects: Map<string, Glyph> | null = null;
     public notesPerString: Map<number, NoteNumberGlyph> = new Map();
     public noteStringWidth: number = 0;
+
+    public get beatEffects(): Map<string, Glyph> {
+        let effects = this._beatEffects;
+        if (!effects) {
+            effects = new Map<string, Glyph>();
+            this._beatEffects = effects;
+        }
+        return effects;
+    }
 
     public constructor(x: number, y: number, isGrace: boolean) {
         super(x, y);
@@ -120,19 +129,22 @@ export class TabNoteChordGlyph extends Glyph {
 
             let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
             const effectSpacing: number = this.renderer.smuflMetrics.onNoteEffectPadding;
-            for (const g of this.beatEffects.values()) {
-                g.y += effectY;
-                g.x += this.width / 2;
-                g.renderer = this.renderer;
+            const beatEffects = this._beatEffects;
+            if (beatEffects) {
+                for (const g of beatEffects.values()) {
+                    g.y += effectY;
+                    g.x += this.width / 2;
+                    g.renderer = this.renderer;
 
-                g.doLayout();
-                effectY += g.height + effectSpacing;
+                    g.doLayout();
+                    effectY += g.height + effectSpacing;
 
-                if (Number.isNaN(minEffectY) || minEffectY > effectY) {
-                    minEffectY = effectY;
-                }
-                if (Number.isNaN(maxEffectY) || maxEffectY < effectY) {
-                    maxEffectY = effectY;
+                    if (Number.isNaN(minEffectY) || minEffectY > effectY) {
+                        minEffectY = effectY;
+                    }
+                    if (Number.isNaN(maxEffectY) || maxEffectY < effectY) {
+                        maxEffectY = effectY;
+                    }
                 }
             }
 
@@ -169,16 +181,24 @@ export class TabNoteChordGlyph extends Glyph {
 
             const notes: NoteNumberGlyph[] = this._notes;
             const w: number = this.width;
-            for (const g of notes) {
+            for (let i = 0, j = notes.length; i < j; i++) {
+                const g = notes[i];
                 g.renderer = this.renderer;
                 g.width = w;
                 g.paint(cx, cy, canvas);
             }
             canvas.textBaseline = oldBaseLine;
 
-            using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabEffects, this.beat);
-            for (const g of this.beatEffects.values()) {
-                g.paint(cx, cy, canvas);
+            const beatEffects = this._beatEffects;
+            if (beatEffects) {
+                const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.GuitarTabEffects, this.beat);
+                try {
+                    for (const g of beatEffects.values()) {
+                        g.paint(cx, cy, canvas);
+                    }
+                } finally {
+                    ElementStyleHelper.restore(canvas, previousColor);
+                }
             }
         }
     }

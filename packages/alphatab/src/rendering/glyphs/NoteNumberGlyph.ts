@@ -132,18 +132,29 @@ export class NoteNumberGlyph extends Glyph {
 
         this.paintTrill(x, y, canvas);
 
-        using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
-        canvas.fillText(this._noteString!, x, y);
+        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        try {
+            canvas.fillText(this._noteString!, x, y);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
 
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y - this.height / 2, this.width, this.height);
     }
     paintTrill(x: number, cy: number, canvas: ICanvas) {
-        using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
-        const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
-        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth, cy);
-        this.renderer.scoreRenderer.canvas!.font = prevFont;
+        if (!this._trillNoteString) {
+            return;
+        }
+        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        try {
+            const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
+            this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
+            canvas.fillText(this._trillNoteString!, x + this.noteStringWidth, cy);
+            this.renderer.scoreRenderer.canvas!.font = prevFont;
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {

@@ -10,8 +10,8 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
  * @internal
  */
 export class BeatGlyphBase extends GlyphGroup {
-    private _effectGlyphs: Glyph[] = [];
-    private _normalGlyphs: Glyph[] = [];
+    private _effectGlyphs: Glyph[] | null = null;
+    private _normalGlyphs: Glyph[] | null = null;
 
     public container!: BeatContainerGlyph;
     public computedWidth: number = 0;
@@ -44,11 +44,17 @@ export class BeatGlyphBase extends GlyphGroup {
 
     public addEffect(g: Glyph) {
         super.addGlyph(g);
+        if (!this._effectGlyphs) {
+            this._effectGlyphs = [];
+        }
         this._effectGlyphs.push(g);
     }
 
     public addNormal(g: Glyph) {
         super.addGlyph(g);
+        if (!this._normalGlyphs) {
+            this._normalGlyphs = [];
+        }
         this._normalGlyphs.push(g);
     }
 
@@ -62,17 +68,33 @@ export class BeatGlyphBase extends GlyphGroup {
     }
 
     private _paintNormal(cx: number, cy: number, canvas: ICanvas) {
-        for (const g of this._normalGlyphs) {
-            g.paint(cx + this.x, cy + this.y, canvas);
+        const glyphs = this._normalGlyphs;
+        if (!glyphs) {
+            return;
+        }
+        const x = cx + this.x;
+        const y = cy + this.y;
+        for (let i = 0, j = glyphs.length; i < j; i++) {
+            glyphs[i].paint(x, y, canvas);
         }
     }
 
     private _paintEffects(cx: number, cy: number, canvas: ICanvas) {
-        using _ = this.effectElement
-            ? ElementStyleHelper.beat(canvas, this.effectElement!, this.container.beat)
+        const glyphs = this._effectGlyphs;
+        if (!glyphs || glyphs.length === 0) {
+            return;
+        }
+        const previousColor = this.effectElement
+            ? ElementStyleHelper.applyBeat(canvas, this.effectElement!, this.container.beat)
             : undefined;
-        for (const g of this._effectGlyphs) {
-            g.paint(cx + this.x, cy + this.y, canvas);
+        try {
+            const x = cx + this.x;
+            const y = cy + this.y;
+            for (let i = 0, j = glyphs.length; i < j; i++) {
+                glyphs[i].paint(x, y, canvas);
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

@@ -11,7 +11,10 @@ import {
 import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSystemPlacement';
 import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
-import { type IStaffDisplayContext, StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
+import {
+    type IStaffDisplayContext,
+    StaffDisplayResolver
+} from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
 
@@ -255,13 +258,13 @@ export class RenderStaff implements IStaffDisplayContext {
      */
     public get systemSkyline(): StaffSystemSkyline {
         if (!this._systemSkyline) {
-            const pool = this.system.layout.renderer.layout!.skylinePool;
+            const scratch = this.system.layout.renderer.layout!.skylineScratch;
             this._systemSkyline = new StaffSystemSkyline(
                 this.staffIndex,
                 this.system.index,
                 0,
                 Number.MAX_SAFE_INTEGER,
-                pool
+                scratch
             );
         }
         return this._systemSkyline;
@@ -276,13 +279,13 @@ export class RenderStaff implements IStaffDisplayContext {
      */
     public get contentSkyline(): StaffSystemSkyline {
         if (!this._contentSkyline) {
-            const pool = this.system.layout.renderer.layout!.skylinePool;
+            const scratch = this.system.layout.renderer.layout!.skylineScratch;
             this._contentSkyline = new StaffSystemSkyline(
                 this.staffIndex,
                 this.system.index,
                 0,
                 Number.MAX_SAFE_INTEGER,
-                pool
+                scratch
             );
         }
         return this._contentSkyline;

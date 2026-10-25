@@ -34,12 +34,26 @@ export interface BeatEffectOverflow {
  * @internal
  */
 export abstract class BeatContainerGlyphBase extends Glyph {
-    public pendingEffectOverflows: BeatEffectOverflow[] = [];
+    private _pendingEffectOverflows: BeatEffectOverflow[] | null = null;
+
+    public get pendingEffectOverflows(): BeatEffectOverflow[] {
+        let pending = this._pendingEffectOverflows;
+        if (!pending) {
+            pending = [];
+            this._pendingEffectOverflows = pending;
+        }
+        return pending;
+    }
+
+    /** {@link pendingEffectOverflows} without creating the list; `null` when nothing was registered. */
+    public get pendingEffectOverflowsOrNull(): BeatEffectOverflow[] | null {
+        return this._pendingEffectOverflows;
+    }
 
     /** Drain pending overflows before the next producer pass; consumer may not run. */
     public prepareForOverflowPass(): void {
-        const pending = this.pendingEffectOverflows;
-        if (pending.length > 0) {
+        const pending = this._pendingEffectOverflows;
+        if (pending && pending.length > 0) {
             pending.splice(0, pending.length);
         }
     }
@@ -85,7 +99,7 @@ export abstract class BeatContainerGlyphBase extends Glyph {
  * @internal
  */
 export class BeatContainerGlyph extends BeatContainerGlyphBase {
-    private _ties: ITieGlyph[] = [];
+    private _ties: ITieGlyph[] | null = null;
     private _tieWidth = 0;
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
@@ -146,7 +160,6 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     public constructor(beat: Beat) {
         super(0, 0);
         this.beat = beat;
-        this._ties = [];
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
@@ -164,6 +177,9 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     public addTie(tie: ITieGlyph) {
         const tg = tie as unknown as Glyph;
         tg.renderer = this.renderer;
+        if (!this._ties) {
+            this._ties = [];
+        }
         this._ties.push(tie);
         this.renderer.registerTie(tie);
     }
@@ -200,9 +216,12 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
 
         let postBeatStretch: number = this.postBeatStretch;
 
-        for (const tie of this._ties) {
-            const tg = tie as unknown as Glyph;
-            postBeatStretch += tg.width;
+        const ties = this._ties;
+        if (ties) {
+            for (const tie of ties) {
+                const tg = tie as unknown as Glyph;
+                postBeatStretch += tg.width;
+            }
         }
 
         layoutings.addBeatSpring(this, preBeatStretch, postBeatStretch);
@@ -266,10 +285,13 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     protected updateWidth(): void {
         let width = this.preNotes.width + this.onNotes.width;
         let tieWidth: number = 0;
-        for (const tie of this._ties) {
-            const tg = tie as unknown as Glyph;
-            if (tg.width > tieWidth) {
-                tieWidth = tg.width;
+        const ties = this._ties;
+        if (ties) {
+            for (const tie of ties) {
+                const tg = tie as unknown as Glyph;
+                if (tg.width > tieWidth) {
+                    tieWidth = tg.width;
+                }
             }
         }
         this._tieWidth = tieWidth;
@@ -336,22 +358,27 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         // }
         // canvas.color = c;
 
-        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this._ties.length === 0;
+        const ties = this._ties;
+        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && (!ties || ties.length === 0);
         if (isEmptyGlyph) {
             return;
         }
         canvas.beginGroup(BeatContainerGlyph.getGroupId(this.beat));
 
-        this.preNotes.paint(cx + this.x, cy + this.y, canvas);
-        this.onNotes.paint(cx + this.x, cy + this.y, canvas);
+        const x = cx + this.x;
+        const y = cy + this.y;
+        this.preNotes.paint(x, y, canvas);
+        this.onNotes.paint(x, y, canvas);
 
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
         const staffX: number = cx - this.renderer.beatGlyphsStart - this.renderer.x;
         const staffY: number = cy - this.renderer.y;
-        for (let i: number = 0, j: number = this._ties.length; i < j; i++) {
-            const t = this._ties[i] as unknown as Glyph;
-            t.renderer = this.renderer;
-            t.paint(staffX, staffY, canvas);
+        if (ties) {
+            for (let i: number = 0, j: number = ties.length; i < j; i++) {
+                const t = ties[i] as unknown as Glyph;
+                t.renderer = this.renderer;
+                t.paint(staffX, staffY, canvas);
+            }
         }
         canvas.endGroup();
     }

@@ -449,7 +449,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
-        canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.StandardNotationStem, beat);
+        try {
+            canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 }

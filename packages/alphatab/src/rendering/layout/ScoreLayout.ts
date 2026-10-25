@@ -22,7 +22,7 @@ import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
@@ -57,7 +57,7 @@ export abstract class ScoreLayout {
     public width: number = 0;
     public height: number = 0;
 
-    public readonly skylinePool: SkylineSegmentPool = new SkylineSegmentPool();
+    public readonly skylineScratch: SkylineScratch = new SkylineScratch();
 
     public multiBarRestInfo: Map<number, number[]> | null = null;
 

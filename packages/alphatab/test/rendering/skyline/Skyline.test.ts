@@ -1,5 +1,5 @@
 import { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
-import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -17,8 +17,8 @@ interface SkylineSegmentExpect {
  */
 class SkylineFixtures {
     public static newSkyline(xMin: number, xMax: number): Skyline {
-        const pool: SkylineSegmentPool = new SkylineSegmentPool();
-        return new Skyline(xMin, xMax, pool);
+        const scratch: SkylineScratch = new SkylineScratch();
+        return new Skyline(xMin, xMax, scratch);
     }
 }
 
@@ -283,19 +283,15 @@ describe('Skyline — unionShifted', () => {
 });
 
 describe('Skyline — reset', () => {
-    it('returns segments to the pool and rebuilds the baseline', () => {
-        const pool: SkylineSegmentPool = new SkylineSegmentPool();
-        const sky: Skyline = new Skyline(0, 100, pool);
+    it('rebuilds the baseline and accepts new inserts', () => {
+        const sky: Skyline = SkylineFixtures.newSkyline(0, 100);
         sky.insert(10, 30, 5, 0);
         sky.insert(50, 70, 8, 0);
-        const grownBefore: number = pool.grownCount;
-        expect(grownBefore).toBeGreaterThan(2);
         sky.reset();
         expect(sky.maxHeight()).toBe(0);
         expect(sky.segmentCount).toBe(1);
         sky.insert(20, 80, 6, 0);
         expect(sky.placeAbove(40, 60, 1, 0)).toBe(6);
-        expect(pool.grownCount).toBe(grownBefore);
     });
 
     it('reset is idempotent', () => {
@@ -308,24 +304,57 @@ describe('Skyline — reset', () => {
     });
 });
 
-describe('SkylineSegmentPool class', () => {
-    it('acquires a fresh segment with zeroed fields', () => {
-        const pool: SkylineSegmentPool = new SkylineSegmentPool();
-        const a = pool.acquire();
-        expect(a.xStart).toBe(0);
-        expect(a.height).toBe(0);
+describe('Skyline — storage', () => {
+    it('grows beyond its initial capacity', () => {
+        const sky: Skyline = SkylineFixtures.newSkyline(0, 1000);
+        for (let i: number = 0; i < 50; i++) {
+            sky.insert(i * 10 + 2, i * 10 + 7, i + 1, 0);
+        }
+        expect(sky.segmentCount).toBe(101);
+        for (let i: number = 0; i < 50; i++) {
+            expect(sky.placeAbove(i * 10 + 3, i * 10 + 6, 1, 0)).toBe(i + 1);
+            expect(sky.placeAbove(i * 10 + 7, i * 10 + 12, 1, 0)).toBe(0);
+        }
     });
 
-    it('reuses released segments before growing', () => {
-        const pool: SkylineSegmentPool = new SkylineSegmentPool();
-        const a = pool.acquire();
-        a.xStart = 5;
-        a.height = 7;
-        pool.release(a);
-        const b = pool.acquire();
-        expect(b).toBe(a);
-        expect(b.xStart).toBe(0);
-        expect(b.height).toBe(0);
-        expect(pool.grownCount).toBe(1);
+    it('skylines sharing a scratch keep independent segments across merges', () => {
+        const scratch: SkylineScratch = new SkylineScratch();
+        const a: Skyline = new Skyline(0, 1000, scratch);
+        const b: Skyline = new Skyline(0, 1000, scratch);
+        const src: Skyline = new Skyline(0, 1000, scratch);
+        for (let i: number = 0; i < 20; i++) {
+            src.insert(i * 10, i * 10 + 5, i + 1, 0);
+        }
+        a.unionShifted(src, 0);
+        b.unionShifted3(src, 300, src, 600, src, 900);
+        a.unionShifted(src, 500);
+
+        for (let i: number = 0; i < 20; i++) {
+            expect(a.placeAbove(i * 10 + 1, i * 10 + 4, 1, 0)).toBe(i + 1);
+            expect(a.placeAbove(i * 10 + 501, i * 10 + 504, 1, 0)).toBe(i + 1);
+            expect(b.placeAbove(i * 10 + 301, i * 10 + 304, 1, 0)).toBe(i + 1);
+            expect(b.placeAbove(i * 10 + 601, i * 10 + 604, 1, 0)).toBe(i + 1);
+        }
+        expect(a.placeAbove(200, 500, 1, 0)).toBe(0);
+        expect(b.placeAbove(0, 300, 1, 0)).toBe(0);
+        expect(b.placeAbove(900, 905, 1, 0)).toBe(1);
+        expect(b.placeAbove(910, 1000, 1, 0)).toBe(10);
+        expect(src.segmentCount).toBe(40);
+    });
+});
+
+describe('SkylineScratch class', () => {
+    it('keeps a buffer that is large enough', () => {
+        const buffer: number[] = [1, 2, 3, 4];
+        expect(SkylineScratch.ensureCapacity(buffer, 4, 4)).toBe(buffer);
+    });
+
+    it('grows a buffer by doubling and preserves the used prefix', () => {
+        const buffer: number[] = [1, 2, 3, 4];
+        const grown: number[] = SkylineScratch.ensureCapacity(buffer, 3, 9);
+        expect(grown.length).toBe(16);
+        expect(grown[0]).toBe(1);
+        expect(grown[1]).toBe(2);
+        expect(grown[2]).toBe(3);
     });
 });

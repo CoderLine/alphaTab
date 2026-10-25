@@ -95,13 +95,18 @@ export class BarRendererBase {
     protected readonly voiceContainer = new MultiVoiceContainerGlyph();
     private readonly _postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
 
-    private _ties: ITieGlyph[] = [];
+    private _ties: ITieGlyph[] | null = null;
 
     private _multiSystemSlurs?: ContinuationTieGlyph[];
 
     /** Ties whose start beat lives on this renderer. */
     public get ties(): ITieGlyph[] {
-        return this._ties;
+        let ties = this._ties;
+        if (!ties) {
+            ties = [];
+            this._ties = ties;
+        }
+        return ties;
     }
 
     /** Multi-system slur continuations attached to this renderer. Only populated on renderer 0 of a staff. */
@@ -116,14 +121,14 @@ export class BarRendererBase {
         if (!this.bar || !this.bar.nextBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId,this.bar.nextBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId, this.bar.nextBar);
     }
 
     public get previousRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.previousBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId,this.bar.previousBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId, this.bar.previousBar);
     }
 
     public scoreRenderer: ScoreRenderer;
@@ -184,7 +189,7 @@ export class BarRendererBase {
             this._barLocalSkyline = new BarLocalSkyline(
                 0,
                 Number.MAX_SAFE_INTEGER,
-                this.scoreRenderer.layout!.skylinePool
+                this.scoreRenderer.layout!.skylineScratch
             );
         }
         return this._barLocalSkyline;
@@ -201,7 +206,7 @@ export class BarRendererBase {
             this._preBeatLocalSkyline = new BarLocalSkyline(
                 0,
                 Number.MAX_SAFE_INTEGER,
-                this.scoreRenderer.layout!.skylinePool
+                this.scoreRenderer.layout!.skylineScratch
             );
         }
         return this._preBeatLocalSkyline;
@@ -213,7 +218,7 @@ export class BarRendererBase {
             this._postBeatLocalSkyline = new BarLocalSkyline(
                 0,
                 Number.MAX_SAFE_INTEGER,
-                this.scoreRenderer.layout!.skylinePool
+                this.scoreRenderer.layout!.skylineScratch
             );
         }
         return this._postBeatLocalSkyline;
@@ -228,7 +233,7 @@ export class BarRendererBase {
         this._barLocalSkyline?.reset();
         this._preBeatLocalSkyline?.reset();
         this._postBeatLocalSkyline?.reset();
-        this._ties = [];
+        this._ties = null;
         this.beatEffectsMinY = Number.NaN;
         this.beatEffectsMaxY = Number.NaN;
     }
@@ -293,7 +298,7 @@ export class BarRendererBase {
     }
 
     public registerTie(tie: ITieGlyph) {
-        this._ties.push(tie);
+        this.ties.push(tie);
     }
 
     public get middleYPosition(): number {
@@ -557,7 +562,6 @@ export class BarRendererBase {
         }
     }
 
-
     public afterReverted() {
         this.staff = undefined;
         this.registerMultiSystemSlurs(undefined);
@@ -654,7 +658,9 @@ export class BarRendererBase {
     }
 
     public finalizeOwnedTies(): void {
-        this._emitTies(this._ties);
+        if (this._ties) {
+            this._emitTies(this._ties);
+        }
         if (this._multiSystemSlurs) {
             this._emitTies(this._multiSystemSlurs);
         }
@@ -1024,38 +1030,41 @@ export class BarRendererBase {
     }
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, this.bar.voices[0], true);
+        const previousColor = ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, this.bar.voices[0], true);
+        try {
+            switch (this.bar.simileMark) {
+                case SimileMark.Simple:
+                    canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
+                        cx + this.x + this.width / 2,
+                        cy + this.y + this.height / 2,
+                        1,
+                        MusicFontSymbol.Repeat1Bar,
+                        true
+                    );
+                    canvas.endGroup();
+                    break;
+                case SimileMark.SecondOfDouble:
+                    canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
+                    canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
 
-        switch (this.bar.simileMark) {
-            case SimileMark.Simple:
-                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
-                CanvasHelper.fillMusicFontSymbolSafe(
-                    canvas,
-                    cx + this.x + this.width / 2,
-                    cy + this.y + this.height / 2,
-                    1,
-                    MusicFontSymbol.Repeat1Bar,
-                    true
-                );
-                canvas.endGroup();
-                break;
-            case SimileMark.SecondOfDouble:
-                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
-                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
+                        cx + this.x,
+                        cy + this.y + this.height / 2,
+                        1,
+                        MusicFontSymbol.Repeat2Bars,
+                        true
+                    );
 
-                CanvasHelper.fillMusicFontSymbolSafe(
-                    canvas,
-                    cx + this.x,
-                    cy + this.y + this.height / 2,
-                    1,
-                    MusicFontSymbol.Repeat2Bars,
-                    true
-                );
+                    canvas.endGroup();
+                    canvas.endGroup();
 
-                canvas.endGroup();
-                canvas.endGroup();
-
-                break;
+                    break;
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 

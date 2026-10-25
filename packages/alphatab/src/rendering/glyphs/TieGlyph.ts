@@ -131,10 +131,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             // padding to shift ties clearly before the first note (slight visual tuning)
             const padding = 2 * firstRendererInStaff!.smuflMetrics.oneStaffSpace;
             this._endX = this.calculateEndX();
-            this._startX = Math.min(
-                firstRendererInStaff!.x + firstRendererInStaff!.beatGlyphsStart,
-                this._endX
-            ) - padding;
+            this._startX =
+                Math.min(firstRendererInStaff!.x + firstRendererInStaff!.beatGlyphsStart, this._endX) - padding;
 
             const startGlyph = startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
             if (startGlyph) {
@@ -411,21 +409,30 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         let cp4y = y1 - offset - size;
 
         const angle = Math.atan2(dY, dX);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
 
-        [cp1x, cp1y] = TieGlyph._rotate(cp1x, cp1y, x1, y1, angle);
-        [cp2x, cp2y] = TieGlyph._rotate(cp2x, cp2y, x1, y1, angle);
-        [cp3x, cp3y] = TieGlyph._rotate(cp3x, cp3y, x1, y1, angle);
-        [cp4x, cp4y] = TieGlyph._rotate(cp4x, cp4y, x1, y1, angle);
+        let dx = cp1x - x1;
+        let dy = cp1y - y1;
+        cp1x = x1 + (dx * cos - dy * sin);
+        cp1y = y1 + (dx * sin + dy * cos);
+
+        dx = cp2x - x1;
+        dy = cp2y - y1;
+        cp2x = x1 + (dx * cos - dy * sin);
+        cp2y = y1 + (dx * sin + dy * cos);
+
+        dx = cp3x - x1;
+        dy = cp3y - y1;
+        cp3x = x1 + (dx * cos - dy * sin);
+        cp3y = y1 + (dx * sin + dy * cos);
+
+        dx = cp4x - x1;
+        dy = cp4y - y1;
+        cp4x = x1 + (dx * cos - dy * sin);
+        cp4y = y1 + (dx * sin + dy * cos);
 
         return [x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, cp3x, cp3y, cp4x, cp4y, x1, y1];
-    }
-
-    private static _rotate(x: number, y: number, rotateX: number, rotateY: number, angle: number): [number, number] {
-        const dx = x - rotateX;
-        const dy = y - rotateY;
-        const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
-        const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
-        return [rotateX + rx, rotateY + ry];
     }
 
     public static paintTie(

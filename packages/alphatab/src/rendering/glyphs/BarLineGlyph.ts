@@ -359,28 +359,36 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
         }
 
         const renderer = this.renderer as LineBarRenderer;
-        using _ = ElementStyleHelper.bar(canvas, renderer.barLineBarSubElement, this.renderer.bar, true);
-
-        // extending across systems needs some more dynamic lookup, we do that during drawing
-        // as during layout things are still moving
-        let actualLineHeight = this.height;
-        const thisStaff = renderer.staff!;
-        const allStaves = thisStaff.system.allStaves;
-        let isExtended = false;
-        if (this._extendToNextStaff && thisStaff.index < allStaves.length - 1) {
-            const nextStaff = allStaves[thisStaff.index + 1];
-            const lineTop = thisStaff.y + renderer.y;
-            const lineBottom = nextStaff.y + nextStaff.topOverflow + renderer.smuflMetrics.staffLineThickness;
-            actualLineHeight = lineBottom - lineTop;
-            isExtended = true;
-        }
-
-        for (const line of lines) {
-            if (isExtended) {
-                (line as BarLineGlyphBase).paintExtended(cx, cy, canvas, actualLineHeight);
-            } else {
-                (line as BarLineGlyphBase).paint(cx, cy, canvas);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            renderer.barLineBarSubElement,
+            this.renderer.bar,
+            true
+        );
+        try {
+            // extending across systems needs some more dynamic lookup, we do that during drawing
+            // as during layout things are still moving
+            let actualLineHeight = this.height;
+            const thisStaff = renderer.staff!;
+            const allStaves = thisStaff.system.allStaves;
+            let isExtended = false;
+            if (this._extendToNextStaff && thisStaff.index < allStaves.length - 1) {
+                const nextStaff = allStaves[thisStaff.index + 1];
+                const lineTop = thisStaff.y + renderer.y;
+                const lineBottom = nextStaff.y + nextStaff.topOverflow + renderer.smuflMetrics.staffLineThickness;
+                actualLineHeight = lineBottom - lineTop;
+                isExtended = true;
             }
+
+            for (const line of lines) {
+                if (isExtended) {
+                    (line as BarLineGlyphBase).paintExtended(cx, cy, canvas, actualLineHeight);
+                } else {
+                    (line as BarLineGlyphBase).paint(cx, cy, canvas);
+                }
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

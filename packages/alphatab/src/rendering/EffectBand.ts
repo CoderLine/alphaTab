@@ -387,8 +387,12 @@ export class EffectBand extends Glyph {
             const v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {
                 const g: EffectGlyph = v[k];
-                using _ = ElementStyleHelper.beat(canvas, BeatSubElement.Effects, g.beat!, false);
-                g.paint(cx + this.x, cy + this.y, canvas);
+                const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.Effects, g.beat!, false);
+                try {
+                    g.paint(cx + this.x, cy + this.y, canvas);
+                } finally {
+                    ElementStyleHelper.restore(canvas, previousColor);
+                }
             }
         }
     }

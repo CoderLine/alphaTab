@@ -47,7 +47,11 @@ export class ScoreRestGlyph extends MusicFontGlyph {
     }
 
     protected internalPaint(cx: number, cy: number, canvas: ICanvas, element: BeatSubElement): void {
-        using _ = ElementStyleHelper.beat(canvas, element, this.beat!);
-        super.paint(cx, cy, canvas);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, element, this.beat!);
+        try {
+            super.paint(cx, cy, canvas);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 }

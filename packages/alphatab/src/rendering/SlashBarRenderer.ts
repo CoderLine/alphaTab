@@ -100,7 +100,8 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
-        if (this.voiceContainer.tupletGroups.size > 0) {
+        const tupletGroups = this.voiceContainer.tupletGroups;
+        if (tupletGroups && tupletGroups.size > 0) {
             this.registerOverflowTop(this.tupletSize);
         }
     }
@@ -213,8 +214,12 @@ export class SlashBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
-        canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.SlashStem, beat);
+        try {
+            canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 
     protected override paintBeamHelper(

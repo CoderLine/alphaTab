@@ -127,71 +127,74 @@ export class NumberedBarRenderer extends LineBarRenderer {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             const beat: Beat = h.beats[i];
 
-            using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
+            const previousColor = ElementStyleHelper.applyBeat(canvas, flagsElement, beat);
+            try {
+                const direction: BeamDirection = this.getBeamDirection(h);
+                const isGrace: boolean = h.graceType !== GraceType.None;
+                const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
 
-            const direction: BeamDirection = this.getBeamDirection(h);
-            const isGrace: boolean = h.graceType !== GraceType.None;
-            const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
+                let barSpacing: number = (this.beamSpacing + this.beamThickness) * scaleMod;
+                let barSize = this.beamThickness * scaleMod;
+                if (direction === BeamDirection.Down) {
+                    barSpacing = -barSpacing;
+                    barSize = -barSize;
+                }
 
-            let barSpacing: number = (this.beamSpacing + this.beamThickness) * scaleMod;
-            let barSize = this.beamThickness * scaleMod;
-            if (direction === BeamDirection.Down) {
-                barSpacing = -barSpacing;
-                barSize = -barSize;
-            }
+                let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
+                let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes);
 
-            let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
-            let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes);
+                let barStartX: number = 0;
+                let barEndX: number = 0;
+                if (i === h.beats.length - 1) {
+                    barStartX = beatLineX;
+                    barEndX = this.getBeatX(beat, BeatXPosition.PostNotes);
+                } else {
+                    barStartX = beatLineX;
+                    barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes);
+                }
 
-            let barStartX: number = 0;
-            let barEndX: number = 0;
-            if (i === h.beats.length - 1) {
-                barStartX = beatLineX;
-                barEndX = this.getBeatX(beat, BeatXPosition.PostNotes);
-            } else {
-                barStartX = beatLineX;
-                barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes);
-            }
+                const barStart: number = cy + this.y + this.calculateBeamY(h, beatLineX);
+                for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
+                    const barY: number = barStart + barIndex * barSpacing;
 
-            const barStart: number = cy + this.y + this.calculateBeamY(h, beatLineX);
-            for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
-                const barY: number = barStart + barIndex * barSpacing;
+                    LineBarRenderer.paintSingleBar(
+                        canvas,
+                        cx + this.x + barStartX,
+                        barY,
+                        cx + this.x + barEndX,
+                        barY,
+                        barSize
+                    );
+                }
 
-                LineBarRenderer.paintSingleBar(
-                    canvas,
-                    cx + this.x + barStartX,
-                    barY,
-                    cx + this.x + barEndX,
-                    barY,
-                    barSize
-                );
-            }
-
-            // dashes for additional numbers
-            const container = this.voiceContainer.getBeatContainer(beat) as NumberedBeatContainerGlyph | undefined;
-            if (container && container.hasAdditionalNumbers) {
-                for (const additionalNumber of container.iterateAdditionalNumbers()) {
-                    barCount = additionalNumber.barCount;
-                    beatLineX =
-                        this.beatGlyphsStart +
-                        additionalNumber.x +
-                        additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
-                    for (let barIndex = 0; barIndex < barCount; barIndex++) {
-                        const barY: number = barStart + barIndex * barSpacing;
-                        const additionalBarEndX =
+                // dashes for additional numbers
+                const container = this.voiceContainer.getBeatContainer(beat) as NumberedBeatContainerGlyph | undefined;
+                if (container && container.hasAdditionalNumbers) {
+                    for (const additionalNumber of container.iterateAdditionalNumbers()) {
+                        barCount = additionalNumber.barCount;
+                        beatLineX =
                             this.beatGlyphsStart +
                             additionalNumber.x +
-                            additionalNumber.getBeatX(BeatXPosition.PostNotes, false);
-                        LineBarRenderer.paintSingleBar(
-                            canvas,
-                            cx + this.x + beatLineX,
-                            barY,
-                            cx + this.x + additionalBarEndX,
-                            barY,
-                            barSize
-                        );
+                            additionalNumber.getBeatX(BeatXPosition.PreNotes, false);
+                        for (let barIndex = 0; barIndex < barCount; barIndex++) {
+                            const barY: number = barStart + barIndex * barSpacing;
+                            const additionalBarEndX =
+                                this.beatGlyphsStart +
+                                additionalNumber.x +
+                                additionalNumber.getBeatX(BeatXPosition.PostNotes, false);
+                            LineBarRenderer.paintSingleBar(
+                                canvas,
+                                cx + this.x + beatLineX,
+                                barY,
+                                cx + this.x + additionalBarEndX,
+                                barY,
+                                barSize
+                            );
+                        }
                     }
                 }
+            } finally {
+                ElementStyleHelper.restore(canvas, previousColor);
             }
         }
     }

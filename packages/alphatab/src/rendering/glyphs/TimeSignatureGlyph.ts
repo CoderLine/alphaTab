@@ -48,8 +48,12 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
     protected abstract get numberScale(): number;
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, this.barSubElement, this.renderer.bar);
-        super.paint(cx, cy, canvas);
+        const previousColor = ElementStyleHelper.applyBar(canvas, this.barSubElement, this.renderer.bar);
+        try {
+            super.paint(cx, cy, canvas);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 
     public override registerHeaderRod(info: BarLayoutingInfo): void {
@@ -74,13 +78,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             this.addGlyph(common);
             super.doLayout();
         } else {
-            const numerator: NumberGlyph = new NumberGlyph(
-                0,
-                0,
-                this._numerator,
-                TextBaseline.Top,
-                this.numberScale
-            );
+            const numerator: NumberGlyph = new NumberGlyph(0, 0, this._numerator, TextBaseline.Top, this.numberScale);
             const denominator: NumberGlyph = new NumberGlyph(
                 0,
                 0,
@@ -96,10 +94,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             numerator.x = (glyphSpace - numerator.width) / 2;
             denominator.x = (glyphSpace - denominator.width) / 2;
 
-            this.width = Math.max(
-                numerator.x + numerator.width,
-                denominator.x + denominator.width
-            )
+            this.width = Math.max(numerator.x + numerator.width, denominator.x + denominator.width);
         }
 
         if (this._isFreeTime) {
@@ -110,7 +105,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             openParenthesis.height = numberHeight * 2;
             openParenthesis.doLayout();
 
-            for(const g of this.glyphs!) {
+            for (const g of this.glyphs!) {
                 g.x += openParenthesis.width;
             }
             this.width += openParenthesis.width;

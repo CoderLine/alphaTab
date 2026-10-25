@@ -142,136 +142,109 @@ export class TabBarRenderer extends LineBarRenderer {
     public minString = Number.NaN;
     public maxString = Number.NaN;
 
-    /**
-     * Legacy adapter projecting the gap cache into the base class
-     * `spaces[][]` shape. The real consumer is {@link paintStaffLines}
-     * which reads the cache directly.
-     */
-    protected override collectSpaces(spaces: Float32Array[][]): void {
-        if (this.additionalMultiRestBars) {
-            return;
-        }
-        if (this._gapBucketEnd === null) {
-            this._buildGapCache();
-        }
-        const count = this._gapCount;
-        if (count === 0) {
-            return;
-        }
-        const bucketEnd = this._gapBucketEnd!;
-        const relXAndWidth = this._gapRelXAndWidth!;
-        const beatRefs = this._gapBeatRefs!;
-        const base = this.beatGlyphsStart;
-        let line = 0;
-        for (let i = 0; i < count; i++) {
-            while (i >= bucketEnd[line]) {
-                line++;
-            }
-            const absX = base + beatRefs[i].x + beatRefs[i].onNotes.x + relXAndWidth[i * 2];
-            spaces[line].push(new Float32Array([absX, relXAndWidth[i * 2 + 1]]));
-        }
-    }
-
     protected override paintStaffLines(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, this.staffLineBarSubElement, this.bar, true);
+        const previousColor = ElementStyleHelper.applyBar(canvas, this.staffLineBarSubElement, this.bar, true);
+        try {
+            const lineWidth = this.width;
+            const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
+            const thickness = this.smuflMetrics.staffLineThickness;
+            const drawnLineCount = this.drawnLineCount;
+            const cxLocal = cx + this.x;
+            const cyLocal = cy + this.y;
 
-        const lineWidth = this.width;
-        const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
-        const thickness = this.smuflMetrics.staffLineThickness;
-        const drawnLineCount = this.drawnLineCount;
-        const cxLocal = cx + this.x;
-        const cyLocal = cy + this.y;
-
-        if (this.additionalMultiRestBars) {
-            for (let line = 0; line < drawnLineCount; line++) {
-                const lineY = this.getLineY(line) - lineYOffset;
-                canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
-            }
-            return;
-        }
-
-        if (this._gapBucketEnd === null) {
-            this._buildGapCache();
-        }
-
-        const count = this._gapCount;
-        if (count === 0) {
-            for (let line = 0; line < drawnLineCount; line++) {
-                const lineY = this.getLineY(line) - lineYOffset;
-                canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
-            }
-            return;
-        }
-
-        const bucketEnd = this._gapBucketEnd!;
-        const relXAndWidth = this._gapRelXAndWidth!;
-        const beatRefs = this._gapBeatRefs!;
-        const base = this.beatGlyphsStart;
-
-        let cursor = 0;
-        for (let line = 0; line < drawnLineCount; line++) {
-            const lineY = this.getLineY(line) - lineYOffset;
-            const cyLine = cyLocal + lineY;
-            const end = bucketEnd[line];
-
-            // Gaps were built in beat-iteration order, which is left-to-right
-            // except for grace-note edge cases — sort only on inversion.
-            let lineX = 0;
-            if (end > cursor + 1) {
-                let inverted = false;
-                let prevX = base + beatRefs[cursor].x + beatRefs[cursor].onNotes.x + relXAndWidth[cursor * 2];
-                for (let k = cursor + 1; k < end; k++) {
-                    const xk = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
-                    if (xk < prevX) {
-                        inverted = true;
-                        break;
-                    }
-                    prevX = xk;
+            if (this.additionalMultiRestBars) {
+                for (let line = 0; line < drawnLineCount; line++) {
+                    const lineY = this.getLineY(line) - lineYOffset;
+                    canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
                 }
-                if (inverted) {
-                    const segCount = end - cursor;
-                    const xs = new Float32Array(segCount);
-                    const ws = new Float32Array(segCount);
-                    for (let k = 0; k < segCount; k++) {
-                        const ki = cursor + k;
-                        xs[k] = base + beatRefs[ki].x + beatRefs[ki].onNotes.x + relXAndWidth[ki * 2];
-                        ws[k] = relXAndWidth[ki * 2 + 1];
-                    }
-                    const order = new Uint32Array(segCount);
-                    for (let k = 0; k < segCount; k++) {
-                        order[k] = k;
-                    }
-                    for (let k = 1; k < segCount; k++) {
-                        const cur = order[k];
-                        const curX = xs[cur];
-                        let m = k - 1;
-                        while (m >= 0 && xs[order[m]] > curX) {
-                            order[m + 1] = order[m];
-                            m--;
+                return;
+            }
+
+            if (this._gapBucketEnd === null) {
+                this._buildGapCache();
+            }
+
+            const count = this._gapCount;
+            if (count === 0) {
+                for (let line = 0; line < drawnLineCount; line++) {
+                    const lineY = this.getLineY(line) - lineYOffset;
+                    canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
+                }
+                return;
+            }
+
+            const bucketEnd = this._gapBucketEnd!;
+            const relXAndWidth = this._gapRelXAndWidth!;
+            const beatRefs = this._gapBeatRefs!;
+            const base = this.beatGlyphsStart;
+
+            let cursor = 0;
+            for (let line = 0; line < drawnLineCount; line++) {
+                const lineY = this.getLineY(line) - lineYOffset;
+                const cyLine = cyLocal + lineY;
+                const end = bucketEnd[line];
+
+                // Gaps were built in beat-iteration order, which is left-to-right
+                // except for grace-note edge cases — sort only on inversion.
+                let lineX = 0;
+                if (end > cursor + 1) {
+                    let inverted = false;
+                    let prevX = base + beatRefs[cursor].x + beatRefs[cursor].onNotes.x + relXAndWidth[cursor * 2];
+                    for (let k = cursor + 1; k < end; k++) {
+                        const xk = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
+                        if (xk < prevX) {
+                            inverted = true;
+                            break;
                         }
-                        order[m + 1] = cur;
+                        prevX = xk;
                     }
-                    for (let k = 0; k < segCount; k++) {
-                        const oi = order[k];
-                        const gx = xs[oi];
-                        const gw = ws[oi];
-                        canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
-                        lineX = gx + gw;
+                    if (inverted) {
+                        const segCount = end - cursor;
+                        const xs = new Float32Array(segCount);
+                        const ws = new Float32Array(segCount);
+                        for (let k = 0; k < segCount; k++) {
+                            const ki = cursor + k;
+                            xs[k] = base + beatRefs[ki].x + beatRefs[ki].onNotes.x + relXAndWidth[ki * 2];
+                            ws[k] = relXAndWidth[ki * 2 + 1];
+                        }
+                        const order = new Uint32Array(segCount);
+                        for (let k = 0; k < segCount; k++) {
+                            order[k] = k;
+                        }
+                        for (let k = 1; k < segCount; k++) {
+                            const cur = order[k];
+                            const curX = xs[cur];
+                            let m = k - 1;
+                            while (m >= 0 && xs[order[m]] > curX) {
+                                order[m + 1] = order[m];
+                                m--;
+                            }
+                            order[m + 1] = cur;
+                        }
+                        for (let k = 0; k < segCount; k++) {
+                            const oi = order[k];
+                            const gx = xs[oi];
+                            const gw = ws[oi];
+                            canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
+                            lineX = gx + gw;
+                        }
+                        canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
+                        cursor = end;
+                        continue;
                     }
-                    canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
-                    cursor = end;
-                    continue;
                 }
-            }
 
-            for (let k = cursor; k < end; k++) {
-                const gx = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
-                const gw = relXAndWidth[k * 2 + 1];
-                canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
-                lineX = gx + gw;
+                for (let k = cursor; k < end; k++) {
+                    const gx = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
+                    const gw = relXAndWidth[k * 2 + 1];
+                    canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
+                    lineX = gx + gw;
+                }
+                canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
+                cursor = end;
             }
-            canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
-            cursor = end;
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 
@@ -288,8 +261,8 @@ export class TabBarRenderer extends LineBarRenderer {
                 const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
                 const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                 if (noteNumbers) {
-                    for (const [str, noteNumber] of noteNumbers.notesPerString) {
-                        if (!noteNumber.isEmpty) {
+                    for (const str of noteNumbers.notesPerString.keys()) {
+                        if (!noteNumbers.notesPerString.get(str)!.isEmpty) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
                                 bucketCount[lineIdx]++;
@@ -330,8 +303,8 @@ export class TabBarRenderer extends LineBarRenderer {
                 if (noteNumbers) {
                     const relativeXBase = noteNumbers.x - padding;
                     const fullWidth = noteNumbers.width + padding * 2;
-                    for (const [str, noteNumber] of noteNumbers.notesPerString) {
-                        if (!noteNumber.isEmpty) {
+                    for (const str of noteNumbers.notesPerString.keys()) {
+                        if (!noteNumbers.notesPerString.get(str)!.isEmpty) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
                                 const idx = fwdCursor[lineIdx]++;
@@ -380,7 +353,8 @@ export class TabBarRenderer extends LineBarRenderer {
         }
 
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            this._hasTuplets = this.voiceContainer.tupletGroups.size > 0;
+            const tupletGroups = this.voiceContainer.tupletGroups;
+            this._hasTuplets = tupletGroups !== null && tupletGroups.size > 0;
             if (this._hasTuplets) {
                 this.registerOverflowBottom(this.settings.notation.rhythmHeight + this.tupletSize);
             }
@@ -553,36 +527,40 @@ export class TabBarRenderer extends LineBarRenderer {
             topY = t;
         }
 
-        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabStem, beat);
-
-        let holes: ReservedLayoutAreaSlot[] = [];
-        if (this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
-            holes = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.slots.slice();
-            holes.sort((a, b) => a.topY - b.topY);
-        }
-
-        // fast path -> single note == full line
-        if (holes.length === 1) {
-            canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
-            return;
-        }
-
-        const bottomYRelative = bottomY - cy;
-        // slow path -> multiple notes == lines between notes
-        const bottomHole = holes[holes.length - 1];
-        canvas.fillRect(
-            x,
-            cy + bottomHole.bottomY,
-            this.smuflMetrics.stemThickness,
-            bottomYRelative - bottomHole.bottomY
-        );
-
-        for (let i = holes.length - 1; i > 0; i--) {
-            const bottomHoleY = holes[i].topY;
-            const topHoleY = holes[i - 1].bottomY;
-            if (topHoleY < bottomHoleY) {
-                canvas.fillRect(x, cy + topHoleY, this.smuflMetrics.stemThickness, bottomHoleY - topHoleY);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.GuitarTabStem, beat);
+        try {
+            let holes: ReservedLayoutAreaSlot[] = [];
+            const reservedAreas = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime;
+            if (reservedAreas !== null && reservedAreas.has(beat.displayStart)) {
+                holes = reservedAreas.get(beat.displayStart)!.slots.slice();
+                holes.sort((a, b) => a.topY - b.topY);
             }
+
+            // fast path -> single note == full line
+            if (holes.length === 1) {
+                canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+                return;
+            }
+
+            const bottomYRelative = bottomY - cy;
+            // slow path -> multiple notes == lines between notes
+            const bottomHole = holes[holes.length - 1];
+            canvas.fillRect(
+                x,
+                cy + bottomHole.bottomY,
+                this.smuflMetrics.stemThickness,
+                bottomYRelative - bottomHole.bottomY
+            );
+
+            for (let i = holes.length - 1; i > 0; i--) {
+                const bottomHoleY = holes[i].topY;
+                const topHoleY = holes[i - 1].bottomY;
+                if (topHoleY < bottomHoleY) {
+                    canvas.fillRect(x, cy + topHoleY, this.smuflMetrics.stemThickness, bottomHoleY - topHoleY);
+                }
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 

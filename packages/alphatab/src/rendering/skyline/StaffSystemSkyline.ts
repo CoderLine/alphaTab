@@ -1,6 +1,6 @@
 import { StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
-import type { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import type { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 
 /**
  * Skyline pair for system-level placement. Assembled by unioning per-bar
@@ -13,11 +13,11 @@ export class StaffSystemSkyline {
     public readonly upSky: Skyline;
     public readonly downSky: Skyline;
 
-    public constructor(staffIndex: number, systemIndex: number, xMin: number, xMax: number, pool: SkylineSegmentPool) {
+    public constructor(staffIndex: number, systemIndex: number, xMin: number, xMax: number, scratch: SkylineScratch) {
         this.staffIndex = staffIndex;
         this.systemIndex = systemIndex;
-        this.upSky = new Skyline(xMin, xMax, pool);
-        this.downSky = new Skyline(xMin, xMax, pool);
+        this.upSky = new Skyline(xMin, xMax, scratch);
+        this.downSky = new Skyline(xMin, xMax, scratch);
     }
 
     public insertPlaced(side: StaffSide, xStart: number, xEnd: number, outerEdgeHeight: number, pad: number): void {
