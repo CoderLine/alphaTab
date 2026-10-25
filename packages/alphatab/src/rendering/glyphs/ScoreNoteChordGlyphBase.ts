@@ -595,6 +595,32 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
     }
 
+    public get hasTopLedgerLines(): boolean {
+        if (!this.minStepsNote) {
+            return false;
+        }
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        return scoreRenderer.getLineY(-1) >= scoreRenderer.getLineY(this.minStepsNote!.steps / 2);
+    }
+
+    public get hasBottomLedgerLines(): boolean {
+        if (!this.maxStepsNote) {
+            return false;
+        }
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        return (
+            scoreRenderer.getLineY(scoreRenderer.drawnLineCount) <=
+            scoreRenderer.getLineY(this.maxStepsNote!.steps / 2)
+        );
+    }
+
+    /**
+     * How far the ledger lines reach beyond the note heads on each side.
+     */
+    public get ledgerLineExtension(): number {
+        return this.renderer.smuflMetrics.legerLineExtension * this.scale;
+    }
+
     private _paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
         if (!this.minStepsNote) {
             return;
@@ -605,7 +631,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
 
         const scale = this.scale;
-        const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
+        const lineExtension: number = this.ledgerLineExtension;
         const lineWidth: number = this.width + lineExtension * 2 - this.noteStartX;
 
         const lineSpacing = scoreRenderer.getLineHeight(1);
