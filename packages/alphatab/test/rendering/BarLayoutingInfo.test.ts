@@ -322,7 +322,7 @@ describe('BarLayoutingInfoMinimumWidths', () => {
         }
     });
 
-        it('stretched bars keep the proportional spacing', () => {
+    it('stretched bars keep the proportional spacing', () => {
         const info = longAndShortBar();
         const natural = info.calculateVoiceWidth(info.minStretchForce);
         const force = info.spaceToForce(natural * 2);

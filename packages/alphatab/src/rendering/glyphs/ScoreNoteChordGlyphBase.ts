@@ -609,8 +609,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
         const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         return (
-            scoreRenderer.getLineY(scoreRenderer.drawnLineCount) <=
-            scoreRenderer.getLineY(this.maxStepsNote!.steps / 2)
+            scoreRenderer.getLineY(scoreRenderer.drawnLineCount) <= scoreRenderer.getLineY(this.maxStepsNote!.steps / 2)
         );
     }
 
