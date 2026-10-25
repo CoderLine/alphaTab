@@ -3,6 +3,7 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Track } from '@coderline/alphatab/model/Track';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Spring } from '@coderline/alphatab/rendering/staves/Spring';
@@ -49,7 +50,11 @@ class HeaderRod {
  * @internal
  */
 export class BarLayoutingInfo {
-    private static readonly _defaultMinDuration: number = 30;
+    /**
+     * The longest duration (in ticks) the spacing reference can have; shorter durations in the score
+     * lower the reference.
+     */
+    public static readonly defaultMinDuration: number = 30;
     private static readonly _defaultMinDurationWidth: number = 6.5;
 
     // Valid range for `DisplaySettings.spacingRatio`. Outside this band the layout
@@ -94,8 +99,10 @@ export class BarLayoutingInfo {
      */
     private _timeSortedOverlayRodsByBand: Map<string, OverlayRod[]> = new Map();
 
-    // the smallest duration we have between two springs to ensure we have positive spring constants
-    private _minDuration: number = BarLayoutingInfo._defaultMinDuration;
+    // the duration reference of the spacing formula, shared by all bars of a layout,
+    // or lowered by the bar's own springs when no reference was given
+    private _minDuration: number;
+    private readonly _usesLocalMinDuration: boolean;
 
     /** Precomputed `log2(spacingRatio)`. Default matches `DisplaySettings.spacingRatio = √2`. */
     private readonly _spacingExponent: number;
@@ -118,8 +125,12 @@ export class BarLayoutingInfo {
     public constructor(
         spacingRatio: number = Math.SQRT2,
         beatContentPadding: number = 0,
-        barlineContentPadding: number = 0
+        barlineContentPadding: number = 0,
+        minDuration: number = BarLayoutingInfo.defaultMinDuration,
+        usesLocalMinDuration: boolean = false
     ) {
+        this._minDuration = minDuration;
+        this._usesLocalMinDuration = usesLocalMinDuration;
         this._spacingExponent = BarLayoutingInfo.spacingExponentFromRatio(spacingRatio);
         this.beatContentPadding = beatContentPadding;
         this.barlineContentPadding = barlineContentPadding;
@@ -238,24 +249,6 @@ export class BarLayoutingInfo {
     public minStretchForce: number = 0;
     public totalSpringConstant: number = 0;
 
-    /**
-     * The smallest note duration encountered within this bar's springs, used as the reference in
-     * the Gourlay stretch formula. Read by the owning {@link StaffSystem} so that the system can
-     * aggregate a shared minimum across all bars and trigger a reconcile if an added bar introduces
-     * a shorter duration than previously seen.
-     */
-    public get localMinDuration(): number {
-        return this._minDuration;
-    }
-
-    /**
-     * The minimum-duration reference against which the spring constants currently held by this info
-     * were computed. Set by {@link finish} and {@link recomputeSpringConstants}. The owning
-     * StaffSystem compares this against its system-wide minimum to decide whether spring constants
-     * need re-derivation.
-     */
-    public computedWithMinDuration: number = 0;
-
     private _updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
             this.minStretchForce = force;
@@ -331,21 +324,8 @@ export class BarLayoutingInfo {
             spring = new Spring();
             spring.timePosition = start;
             spring.allDurations.add(duration);
-            // check in the previous spring for the shortest duration that overlaps with this spring
-            // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring.
-            if (this._timeSortedSprings.length > 0) {
-                let smallestDuration: number = duration;
-                const previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
-                for (const prevDuration of previousSpring.allDurations) {
-                    const end: number = previousSpring.timePosition + prevDuration;
-                    if (end >= start && prevDuration < smallestDuration) {
-                        smallestDuration = prevDuration;
-                    }
-                }
-                //spring.smallestDuration = duration;
-                if (duration < this._minDuration) {
-                    this._minDuration = duration;
-                }
+            if (this._usesLocalMinDuration && this._timeSortedSprings.length > 0 && duration < this._minDuration) {
+                this._minDuration = duration;
             }
             spring.longestDuration = duration;
             spring.postSpringWidth = postSpringSize;
@@ -486,24 +466,33 @@ export class BarLayoutingInfo {
         }
 
         this._calculateSpringConstants(this._minDuration);
-        this.computedWithMinDuration = this._minDuration;
         this.version++;
     }
 
     /**
-     * Re-derives the spring constants (and {@link minStretchForce} / {@link totalSpringConstant})
-     * using a caller-supplied minimum-duration reference rather than this bar's local minimum.
-     *
-     * Called by {@link StaffSystem.reconcileMinDurationIfDirty} when a bar added later to the
-     * system introduced a shorter note than previously seen, invalidating this bar's spring
-     * constants. Grace-rod data is not recomputed — it is independent of the minimum-duration
-     * reference. The internal {@link version} is bumped so downstream consumers (e.g.
-     * {@link BarRendererBase.applyLayoutingInfo}) pick up the refreshed positions.
+     * The spacing duration reference for a layout: the shortest displayed beat duration of the
+     * rendered bars, at most {@link defaultMinDuration}.
      */
-    public recomputeSpringConstants(minDuration: number): void {
-        this._calculateSpringConstants(minDuration);
-        this.computedWithMinDuration = minDuration;
-        this.version++;
+    public static referenceMinDuration(tracks: Track[], firstBarIndex: number, lastBarIndex: number): number {
+        let minDuration = BarLayoutingInfo.defaultMinDuration;
+        for (const track of tracks) {
+            for (const staff of track.staves) {
+                const last = Math.min(lastBarIndex, staff.bars.length - 1);
+                for (let i = firstBarIndex; i <= last; i++) {
+                    for (const voice of staff.bars[i].voices) {
+                        for (const beat of voice.beats) {
+                            if (beat.graceType === GraceType.None) {
+                                const duration = beat.displayDuration;
+                                if (duration > 0 && duration < minDuration) {
+                                    minDuration = duration;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return minDuration;
     }
 
     private _calculateSpringConstants(minDuration: number): void {

@@ -218,6 +218,11 @@ export class RenderStaff implements IStaffDisplayContext {
         this._sharedLayoutData.clear();
     }
 
+    public resetOverflows() {
+        this.topOverflow = 0;
+        this.bottomOverflow = 0;
+    }
+
     public topOverflow = 0;
     public registerOverflowTop(overflow: number) {
         if (overflow > this.topOverflow) {
@@ -376,11 +381,6 @@ export class RenderStaff implements IStaffDisplayContext {
             renderer.finalizeOwnedTies();
             renderer.finalizeEffectBandSpans();
 
-            if (renderer.tiesDirty) {
-                renderer.refreshSizes();
-                renderer.registerStaffOverflows();
-                renderer.clearTiesDirty();
-            }
             if (renderer.height > this.height) {
                 this.height = renderer.height;
             }

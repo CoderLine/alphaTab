@@ -246,36 +246,6 @@ export class StaffSystem {
      */
     public totalContentWidth: number = 0;
 
-    /**
-     * Shortest note duration (in ticks) across every bar that has been added to this system, used
-     * as the common reference in the Gourlay stretch formula so that rhythmically-equivalent beats
-     * in different bars of the same system align column-wise.
-     *
-     * `-1` means "no bar added yet". The value only moves downward during system assembly; when a
-     * new bar introduces a shorter minimum, {@link isMinDurationDirty} is set so that
-     * {@link reconcileMinDurationIfDirty} can re-derive spring constants on the previously-added
-     * bars before layout distribution runs.
-     */
-    public minDuration: number = -1;
-
-    /**
-     * Set when a bar added to this system introduced a shorter {@link minDuration} than previously
-     * seen, leaving earlier bars' spring constants stale. Consumed by
-     * {@link reconcileMinDurationIfDirty} which is called from `VerticalLayoutBase._fitSystem`
-     * once the system is fully assembled.
-     */
-    public isMinDurationDirty: boolean = false;
-
-    /**
-     * Whether this system coordinates a shared minimum-duration reference across its bars for the
-     * Gourlay stretch formula. Defaults to `true` for page-style and parchment layouts where bars
-     * of a system fight for a common staff width. Set to `false` for horizontal layouts where each
-     * bar is sized independently (by `bar.displayWidth` or its intrinsic width) and there is no
-     * column-alignment concern - each bar keeps its local minimum so pre-existing rendering is
-     * preserved.
-     */
-    public shareMinDurationAcrossBars: boolean = true;
-
     public isLast: boolean = false;
     public masterBarsRenderers: MasterBarsRenderers[] = [];
     public staves: StaffTrackGroup[] = [];
@@ -351,10 +321,6 @@ export class StaffSystem {
         this.firstVisibleStaff = firstVisibleStaff;
         this._calculateAccoladeSpacing(tracks);
 
-        // On the resize path the layoutingInfo was finalized in a previous layout pass, so we
-        // only need to check whether its min-duration reference still matches the new system's.
-        this._trackSystemMinDuration(renderers.layoutingInfo);
-
         this._applyLayoutAndUpdateWidth();
         return renderers;
     }
@@ -367,10 +333,13 @@ export class StaffSystem {
         const result: MasterBarsRenderers = new MasterBarsRenderers();
         result.additionalMultiBarRestIndexes = additionalMultiBarRestIndexes;
         const display = this.layout.renderer.settings.display;
+        const sharesMinDuration = this.layout.sharesMinDurationAcrossBars;
         result.layoutingInfo = new BarLayoutingInfo(
             display.spacingRatio,
             display.resources.engravingSettings.beatContentPadding,
-            display.resources.engravingSettings.barlineContentPadding
+            display.resources.engravingSettings.barlineContentPadding,
+            sharesMinDuration ? this.layout.referenceMinDuration : BarLayoutingInfo.defaultMinDuration,
+            !sharesMinDuration
         );
         result.masterBar = tracks[0].score.masterBars[barIndex];
         this.masterBarsRenderers.push(result);
@@ -431,103 +400,11 @@ export class StaffSystem {
         this._calculateAccoladeSpacing(tracks);
 
         barLayoutingInfo.finish();
-        // Reconcile against the system-wide minimum-duration reference now that springs are
-        // finalized. If this bar introduced a shorter note, earlier bars become stale (flagged
-        // for bulk reconcile at fit time). If the system already had a shorter min than this
-        // bar's local one, this bar's spring constants are recomputed immediately so the width
-        // we return below reflects the shared reference.
-        this._trackSystemMinDuration(barLayoutingInfo);
 
         // ensure same widths of new renderer
         result.width = this._applyLayoutAndUpdateWidth();
 
         return result;
-    }
-
-    /**
-     * Updates {@link minDuration} and {@link isMinDurationDirty} when a bar is added, and brings
-     * the just-added bar's {@link BarLayoutingInfo} in line with the current system minimum if the
-     * system already saw a shorter reference. The bulk reconcile over previously-added bars is
-     * deferred to {@link reconcileMinDurationIfDirty} (called from `_fitSystem`) to avoid
-     * re-iterating the system every time a bar is appended.
-     */
-    private _trackSystemMinDuration(info: BarLayoutingInfo): void {
-        if (!this.shareMinDurationAcrossBars) {
-            return;
-        }
-        const localMin = info.localMinDuration;
-        if (this.minDuration === -1 || localMin < this.minDuration) {
-            // this bar shortens the system minimum; earlier bars (if any) are now stale
-            if (this.masterBarsRenderers.length > 1 && localMin !== this.minDuration) {
-                this.isMinDurationDirty = true;
-            }
-            this.minDuration = localMin;
-        }
-        if (info.computedWithMinDuration > this.minDuration) {
-            // this bar was initialized against a larger (local) min than the system carries; pull
-            // it down to the system reference so its computedWidth reflects the shared spacing.
-            info.recomputeSpringConstants(this.minDuration);
-        }
-    }
-
-    /**
-     * Re-derives spring constants on bars whose {@link BarLayoutingInfo.computedWithMinDuration}
-     * is out of sync with the current {@link minDuration}, and rebuilds the cached system totals
-     * (widths, {@link totalFixedOverhead}, {@link totalContentWidth}) from the refreshed bar
-     * widths. Called from `VerticalLayoutBase._fitSystem` after the system is fully assembled and
-     * before distribution runs. No-op when {@link isMinDurationDirty} is false.
-     */
-    public reconcileMinDurationIfDirty(): void {
-        if (!this.isMinDurationDirty) {
-            return;
-        }
-
-        let systemWidth = this.accoladeWidth;
-        let totalFixedOverhead = 0;
-        let totalContentWidth = 0;
-
-        for (const mb of this.masterBarsRenderers) {
-            // Only re-apply renderers whose layoutingInfo was actually
-            // recomputed in this loop. `applyLayoutingInfo` no longer
-            // short-circuits internally, so the caller gates it.
-            const wasRecomputed = mb.layoutingInfo.computedWithMinDuration > this.minDuration;
-            if (wasRecomputed) {
-                mb.layoutingInfo.recomputeSpringConstants(this.minDuration);
-            }
-
-            let maxPrefix = 0;
-            let maxContent = 0;
-            let realWidth = 0;
-            for (const r of mb.renderers) {
-                if (wasRecomputed) {
-                    r.applyLayoutingInfo();
-                }
-                if (r.computedWidth > realWidth) {
-                    realWidth = r.computedWidth;
-                }
-                const overhead = r.fixedOverhead;
-                if (overhead > maxPrefix) {
-                    maxPrefix = overhead;
-                }
-                const content = Math.max(0, r.computedWidth - overhead);
-                if (content > maxContent) {
-                    maxContent = content;
-                }
-            }
-
-            mb.maxFixedOverhead = maxPrefix;
-            mb.maxContentWidth = maxContent;
-            mb.width = realWidth;
-            systemWidth += realWidth;
-            totalFixedOverhead += maxPrefix;
-            totalContentWidth += maxContent;
-        }
-
-        this.width = systemWidth;
-        this.computedWidth = systemWidth;
-        this.totalFixedOverhead = totalFixedOverhead;
-        this.totalContentWidth = totalContentWidth;
-        this.isMinDurationDirty = false;
     }
 
     public getBarDisplayScale(renderer: BarRendererBase) {
@@ -768,6 +645,16 @@ export class StaffSystem {
     public resetAllStavesSharedLayoutData(): void {
         for (const s of this.allStaves) {
             s.resetSharedLayoutData();
+        }
+    }
+
+    /**
+     * Clears the staff overflows before the bars of a fully assembled system are scaled; the bars
+     * register them again from their positioned content, the effect placement adds the bands.
+     */
+    public resetAllStavesOverflows(): void {
+        for (const s of this.allStaves) {
+            s.resetOverflows();
         }
     }
 

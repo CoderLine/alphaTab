@@ -30,28 +30,24 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
 
     /**
      * Builds a single-spring `BarLayoutingInfo` whose only spring covers exactly `duration` ticks
-     * and forces the reference minimum-duration to `duration` via `recomputeSpringConstants`. With
+     * with the reference minimum-duration set to `duration`. With
      * `d == dmin == duration`, phi collapses to `(d/dmin)^exponent = 1` independent of the ratio,
      * so this helper is mainly used to confirm the `phi=1` baseline.
      *
      * Returns phi derived from the spring constant by inverting `k = 1 / (phi * minDurationWidth)`.
      */
     function phiAtMinDuration(duration: number, spacingRatio: number): number {
-        const info = new BarLayoutingInfo(spacingRatio);
+        const info = new BarLayoutingInfo(spacingRatio, 0, 0, duration);
         info.addSpring(0, duration, 0, 0, 0);
         info.addSpring(duration, duration, 0, 0, 0);
         info.finish();
-        // Force the system-wide reference to `duration` (mimics StaffSystem._trackSystemMinDuration).
-        info.recomputeSpringConstants(duration);
         const spring = info.springs.get(0)!;
         return 1 / (spring.springConstant * minDurationWidth);
     }
 
     /**
      * Builds a `BarLayoutingInfo` such that the spring under test has duration `d` (gap to the
-     * next spring) and the system-wide minimum-duration reference is `dmin`. The reference is
-     * forced via `recomputeSpringConstants(dmin)` after `finish()`, mirroring the path
-     * `StaffSystem` takes when a bar's local minimum disagrees with the system minimum.
+     * next spring) and the layout-wide minimum-duration reference is `dmin`.
      *
      * Returns phi for the spring under test, derived from its spring constant. Note that the
      * spring's `smallestDuration` equals its `duration` here (a single duration was added at that
@@ -59,12 +55,11 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
      * `_calculateSpringConstant` is 1 and the read of `phi` is uncontaminated.
      */
     function phiFromGap(d: number, dmin: number, spacingRatio: number): number {
-        const info = new BarLayoutingInfo(spacingRatio);
+        const info = new BarLayoutingInfo(spacingRatio, 0, 0, dmin);
         // Spring 0 at t=0, gap to next = d -> spring 0 gets duration `d`.
         info.addSpring(0, d, 0, 0, 0);
         info.addSpring(d, d, 0, 0, 0);
         info.finish();
-        info.recomputeSpringConstants(dmin);
         const spring = info.springs.get(0)!;
         return 1 / (spring.springConstant * minDurationWidth);
     }
@@ -159,7 +154,7 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
         // (whole / sixteenth = 16x, log2(16) = 4 doublings). Under the OLD additive formula
         // `phi = 1 + 0.85 * log2(d/dmin)`, the whole-rest bar got phi = 1.0 (because d == dmin in
         // its own bar) and the sixteenth bar got phi = 1.0 too - making them equally stiff and
-        // the rest bar absorb justification force disproportionately. With system-wide _minDuration
+        // the rest bar absorb justification force disproportionately. With a shared _minDuration
         // (A2) and the new power-law formula (A1), the whole rest now sits at phi = r^4 against a
         // 60-tick reference.
         const r = 1.5;
@@ -180,16 +175,12 @@ describe('BarLayoutingInfoPowerLawFormula', () => {
     });
 
     it('sub-minimum duration produces phi < 1 (compression)', () => {
-        // d/dmin < 1 means the spring is shorter than the system minimum reference. phi should
+        // d/dmin < 1 means the spring is shorter than the minimum reference. phi should
         // drop below 1 so that the spring is *stiffer* than the reference (less stretchy).
-        // This case can arise during reconcile when an earlier bar's duration is shorter than
-        // the reference passed in by the system.
-        const info = new BarLayoutingInfo(1.5);
+        const info = new BarLayoutingInfo(1.5, 0, 0, 120); // reference: an eighth
         info.addSpring(0, 60, 0, 0, 0);
         info.addSpring(60, 60, 0, 0, 0);
-        // After finish(), recompute against a larger minDuration than this bar's local one.
         info.finish();
-        info.recomputeSpringConstants(120); // pretend the system min is 120 (eighth)
         const spring = info.springs.get(0)!;
         // Spring duration = gap to next spring = 60. With minDuration = 120, d/dmin = 0.5.
         // phi = 0.5 ^ log2(1.5) = 0.5 ^ 0.5849... ≈ 0.6667

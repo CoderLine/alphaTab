@@ -23,6 +23,7 @@ import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry'
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
@@ -135,6 +136,20 @@ export abstract class ScoreLayout {
         compressedBars.clear();
     }
 
+    /**
+     * The duration reference of the spacing formula for all bars of this layout
+     * (see {@link BarLayoutingInfo.referenceMinDuration}).
+     */
+    public referenceMinDuration: number = BarLayoutingInfo.defaultMinDuration;
+
+    /**
+     * Whether all bars are spaced against {@link referenceMinDuration}. Layouts that size every bar
+     * on its own keep a reference per bar instead.
+     */
+    public get sharesMinDurationAcrossBars(): boolean {
+        return true;
+    }
+
     public resize(): void {
         this._lazyPartials.clear();
         this.slurRegistry.clear();
@@ -162,8 +177,16 @@ export abstract class ScoreLayout {
             this.lastBarIndex
         );
 
+        // bars laid out against another reference would be spaced inconsistently
+        const previousReferenceMinDuration = this.referenceMinDuration;
+        this.referenceMinDuration = BarLayoutingInfo.referenceMinDuration(
+            this.renderer.tracks!,
+            this.firstBarIndex,
+            this.lastBarIndex
+        );
+
         const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
-        if (firstChangedMasterBar !== undefined) {
+        if (firstChangedMasterBar !== undefined && previousReferenceMinDuration === this.referenceMinDuration) {
             if (this.doUpdateForBars(renderHints!)) {
                 this._logCompressedBars();
                 return;

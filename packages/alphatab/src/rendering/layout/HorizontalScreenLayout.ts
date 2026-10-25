@@ -34,6 +34,10 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return 'HorizontalScreen';
     }
 
+    public override get sharesMinDurationAcrossBars(): boolean {
+        return false;
+    }
+
     public get supportsResize(): boolean {
         return false;
     }
@@ -79,7 +83,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
         // intrinsic width), so there is no shared staff width to distribute across bars. Keep each
         // bar's spring constants referenced against its own local minimum-duration so rendering
         // matches the historical per-bar behaviour.
-        this._system.shareMinDurationAcrossBars = false;
         this._system.isLast = true;
         this._system.x = this.pagePadding![0];
         this._system.y = this.pagePadding![1];

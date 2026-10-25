@@ -404,11 +404,6 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
      * Realignes the bars in this line according to the available space
      */
     private _fitSystem(system: StaffSystem): void {
-        // If a bar added late in the assembly introduced a shorter note than earlier bars, the
-        // earlier bars' spring constants (and the cached system widths / totals) are stale.
-        // Reconcile now - it's a no-op when nothing changed.
-        system.reconcileMinDurationIfDirty();
-
         const display = this.renderer.settings.display;
         const overflowsAvailable = system.width > this._maxWidth;
         let shouldJustify = system.isFull || overflowsAvailable;
@@ -469,6 +464,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         const contentShare = weightTotal > 0 ? distributable / weightTotal : 0;
 
         system.resetAllStavesSharedLayoutData();
+        system.resetAllStavesOverflows();
 
         for (const s of system.allStaves) {
             let w = 0;

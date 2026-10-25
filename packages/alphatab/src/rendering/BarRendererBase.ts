@@ -99,24 +99,9 @@ export class BarRendererBase {
 
     private _multiSystemSlurs?: ContinuationTieGlyph[];
 
-    /** Set by {@link RenderStaff._finalizeRendererTies} when a tie write grew this renderer's overflow. */
-    private _tiesDirty: boolean = false;
-
     /** Ties whose start beat lives on this renderer. */
     public get ties(): ITieGlyph[] {
         return this._ties;
-    }
-
-    public markTiesDirty(): void {
-        this._tiesDirty = true;
-    }
-
-    public get tiesDirty(): boolean {
-        return this._tiesDirty;
-    }
-
-    public clearTiesDirty(): void {
-        this._tiesDirty = false;
     }
 
     /** Multi-system slur continuations attached to this renderer. Only populated on renderer 0 of a staff. */
@@ -166,6 +151,16 @@ export class BarRendererBase {
     public index: number = 0;
     private _contentTopOverflow: number = 0;
     private _contentBottomOverflow: number = 0;
+
+    // Content overflows are max-only within a pass. These snapshots let every later pass start
+    // from the measured content ({@link doLayout}) and the positioned content
+    // ({@link applyLayoutingInfo}) instead of from the maximum of all previous positions.
+    private _hasMeasuredOverflow: boolean = false;
+    private _measuredTopOverflow: number = 0;
+    private _measuredBottomOverflow: number = 0;
+    private _hasPositionedOverflow: boolean = false;
+    private _positionedTopOverflow: number = 0;
+    private _positionedBottomOverflow: number = 0;
 
     public beatEffectsMinY = Number.NaN;
     public beatEffectsMaxY = Number.NaN;
@@ -402,6 +397,18 @@ export class BarRendererBase {
     }
 
     public scaleToWidth(width: number): void {
+        if (this._hasPositionedOverflow) {
+            this._contentTopOverflow = this._positionedTopOverflow;
+            this._contentBottomOverflow = this._positionedBottomOverflow;
+        } else {
+            this._positionedTopOverflow = this._contentTopOverflow;
+            this._positionedBottomOverflow = this._contentBottomOverflow;
+            this._hasPositionedOverflow = true;
+        }
+        // effect band heights are the result of the placement in finalizeStaff
+        this.topEffects.height = 0;
+        this.bottomEffects.height = 0;
+
         // preBeat and postBeat glyphs do not get resized
         const containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;
 
@@ -444,6 +451,8 @@ export class BarRendererBase {
         this.bottomEffects.populateSkyline();
 
         this.emitSubclassBarLocalSkyline();
+
+        this._registerStaffOverflow();
 
         // Geometry is now settled; cross-renderer chain walks during
         // finalizeStaff can rely on this flag. Reset by {@link afterReverted}.
@@ -572,6 +581,16 @@ export class BarRendererBase {
      * must gate themselves to skip unchanged bars.
      */
     public applyLayoutingInfo(): void {
+        if (this._hasMeasuredOverflow) {
+            this._contentTopOverflow = this._measuredTopOverflow;
+            this._contentBottomOverflow = this._measuredBottomOverflow;
+        } else {
+            this._measuredTopOverflow = this._contentTopOverflow;
+            this._measuredBottomOverflow = this._contentBottomOverflow;
+            this._hasMeasuredOverflow = true;
+        }
+        this._hasPositionedOverflow = false;
+
         // align the header glyphs with the shared columns of all staves
         this._preBeatGlyphs.applyHeaderRod(this.layoutingInfo);
         this._preBeatGlyphs.width = this.layoutingInfo.preBeatSize;
@@ -677,14 +696,10 @@ export class BarRendererBase {
 
                 if (target === this) {
                     if (tieTopOverflow > 0) {
-                        if (target.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow)) {
-                            target.markTiesDirty();
-                        }
+                        target.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow);
                     }
                     if (tieBottomOverflow > 0) {
-                        if (target.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow)) {
-                            target.markTiesDirty();
-                        }
+                        target.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow);
                     }
                 } else {
                     if (tieTopOverflow > 0) {
@@ -708,15 +723,6 @@ export class BarRendererBase {
         this._registerStaffOverflow();
     }
 
-    /**
-     * Public wrapper for `updateSizes`. Cannot widen `updateSizes` directly
-     * because `LineBarRenderer.updateSizes` is `protected override` and the
-     * transpiler does not consistently widen visibility across overrides.
-     */
-    public refreshSizes(): void {
-        this.updateSizes();
-    }
-
     public doLayout(): void {
         if (!this.bar) {
             return;
@@ -728,6 +734,10 @@ export class BarRendererBase {
         this.topEffects.doLayout();
         this.bottomEffects.doLayout();
         this.resetCycleState();
+        this._contentTopOverflow = 0;
+        this._contentBottomOverflow = 0;
+        this._hasMeasuredOverflow = false;
+        this._hasPositionedOverflow = false;
 
         this.createPreBeatGlyphs();
         this.createBeatGlyphs();
@@ -753,13 +763,10 @@ export class BarRendererBase {
     }
 
     protected calculateOverflows(_rendererTop: number, rendererBottom: number) {
-        // Re-emit pre/post-beat (structural header) skylines from scratch each
-        // pass. Pre-beat group x = 0 so its local x equals bar-local x; post-beat
-        // x is not final until scaleToWidth, so the staff-skyline union shifts it
-        // later. These are kept separate from barLocalSkyline (the content
-        // surface) so a band can be placed against content-only.
-        this._emitPreBeatOverflows(rendererBottom);
-
+        // The pre-beat (header) skyline and overflow depend on the position of the bar and are
+        // emitted by applyLayoutingInfo. Post-beat x is not final until scaleToWidth, so the
+        // staff-skyline union shifts it later. Both are kept separate from barLocalSkyline (the
+        // content surface) so a band can be placed against content-only.
         this.postBeatLocalSkyline.reset();
         const postBeatGlyphs = this._postBeatGlyphs.glyphs;
         if (postBeatGlyphs) {
