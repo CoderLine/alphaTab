@@ -646,15 +646,25 @@ export class Gp3To5Importer extends ScoreImporter {
         const effectChannel: number = IOHelper.readInt32LE(this.data) - 1;
         this.data.skip(4); // Fretcount
 
-        const mainMidiChannelInfo = this._midiChannelInfo[port][channel];
-        // const effectMidiChannelInfo = this._midiChannelInfo[port][effectChannel];
-
         const trackPlaybackInfo = new PlaybackInformation();
-        trackPlaybackInfo.volume = mainMidiChannelInfo.volume;
-        trackPlaybackInfo.balance = mainMidiChannelInfo.balance;
-        trackPlaybackInfo.port = port;
-        trackPlaybackInfo.program = mainMidiChannelInfo.program;
-        trackPlaybackInfo.primaryChannel = channel;
+        if (
+            port >= 0 &&
+            port < this._midiChannelInfo.length &&
+            channel >= 0 &&
+            channel < this._midiChannelInfo[port].length
+        ) {
+            const mainMidiChannelInfo = this._midiChannelInfo[port][channel];
+            trackPlaybackInfo.volume = mainMidiChannelInfo.volume;
+            trackPlaybackInfo.balance = mainMidiChannelInfo.balance;
+            trackPlaybackInfo.port = port;
+            trackPlaybackInfo.program = mainMidiChannelInfo.program;
+            trackPlaybackInfo.primaryChannel = channel;
+        } else {
+            Logger.warning(
+                this.name,
+                `Track ${newTrack.index + 1} has an invalid MIDI port ${port + 1} or channel ${channel + 1}, using defaults`
+            );
+        }
         trackPlaybackInfo.secondaryChannel = effectChannel;
         trackPlaybackInfo.isSolo = (flags & 0x10) !== 0;
         trackPlaybackInfo.isMute = (flags & 0x20) !== 0;

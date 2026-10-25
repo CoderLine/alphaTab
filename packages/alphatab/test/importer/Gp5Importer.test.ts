@@ -542,6 +542,48 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[1].playbackInfo.bank).toBe(77);
     });
 
+    it('out-of-range-midi-port-and-channel', async () => {
+        const original = await TestPlatform.loadFile('test-data/guitarpro5/score-info.gp5');
+
+        // track header: flags(1) + name(1+40) + string count(4) + tunings(7*4) + port(4) + channel(4)
+        const trackName = 'Track 1';
+        let namePos = -1;
+        for (let i = 0; i < original.length - trackName.length && namePos === -1; i++) {
+            if (original[i] === trackName.length) {
+                let matches = true;
+                for (let j = 0; j < trackName.length; j++) {
+                    if (original[i + 1 + j] !== trackName.charCodeAt(j)) {
+                        matches = false;
+                        break;
+                    }
+                }
+                if (matches) {
+                    namePos = i;
+                }
+            }
+        }
+        expect(namePos).toBeGreaterThan(0);
+        const portOffset = namePos + 41 + 4 + 28;
+
+        const variants: [number, number][] = [
+            [0, 1],
+            [5, 1],
+            [1, 0],
+            [1, 17]
+        ];
+        for (const [port, channel] of variants) {
+            const data = new Uint8Array(original);
+            data.set(new Uint8Array([port, 0, 0, 0, channel, 0, 0, 0]), portOffset);
+
+            const score = GpImporterTestHelper.prepareImporterWithBytes(data).readScore();
+            expect(score.tracks.length).toBe(2);
+            expect(score.tracks[0].playbackInfo.volume).toBe(15);
+            expect(score.tracks[0].playbackInfo.balance).toBe(8);
+            expect(score.tracks[0].playbackInfo.program).toBe(0);
+            expect(score.tracks[1].playbackInfo.program).toBe(25);
+        }
+    });
+
     it('tuning-bass-clef', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bass-tuning.gp5')).readScore();
         expect(score.tracks[0].staves[0].bars[0].clef).toBe(Clef.G2);
