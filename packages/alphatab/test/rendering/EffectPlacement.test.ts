@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
@@ -10,12 +10,17 @@ import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
+import { describe, expect, it } from 'vitest';
 
 /**
  * Vertical placement of effect bands against the content of the staff.
  */
 describe('EffectPlacementTests', () => {
-    async function render(tex: string, configure?: (settings: Settings, score: Score) => void): Promise<ScoreRenderer> {
+    async function render(
+        tex: string,
+        configure?: (settings: Settings, score: Score) => void,
+        tracks?: number[]
+    ): Promise<ScoreRenderer> {
         await VisualTestHelper.prepareAlphaSkia();
         const settings = new Settings();
         settings.core.engine = 'svg';
@@ -29,7 +34,7 @@ describe('EffectPlacementTests', () => {
         renderer.error.on(e => {
             throw e;
         });
-        renderer.renderScore(score, [0]);
+        renderer.renderScore(score, tracks ?? [0]);
         return renderer;
     }
 
@@ -105,5 +110,33 @@ describe('EffectPlacementTests', () => {
             checked++;
         }
         expect(checked).toBe(3);
+    });
+
+    it('bracket-spike-reserved-once', async () => {
+        // the bar number is placed above the bracket spike; the spike must not add its height again
+        const renderer = await render(
+            `
+            \\tuningDisplayMode staff
+            \\bracketExtendMode groupsimilarinstruments
+            \\track "Guitar 1"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            \\track "Guitar 2"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+        `,
+            (settings, _score) => {
+                settings.display.layoutMode = LayoutMode.Parchment;
+            },
+            [0, 1]
+        );
+        const staff = firstStaff(renderer);
+        const spikeHeight = renderer.settings.display.resources.engravingSettings.glyphHeights.get(
+            MusicFontSymbol.BracketTop
+        )!;
+        const barNumber = band(staff.barRenderers[0], 'BarNumber', true)!;
+        expect(barNumber.placedMagnitude + barNumber.height).toBeGreaterThan(spikeHeight);
+        expect(staff.topOverflow).toBeGreaterThan(spikeHeight);
+        expect(staff.y).toBe(0);
     });
 });
