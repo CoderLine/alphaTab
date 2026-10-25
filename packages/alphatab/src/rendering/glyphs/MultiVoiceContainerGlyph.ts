@@ -189,6 +189,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
                     const previous = beatGlyphs[i - 1];
                     const beatWidth: number = currentBeatGlyph.x - previous.x;
                     previous.scaleToWidth(beatWidth);
+                    previous.fitToNextBeat(currentBeatGlyph);
                     if (emit) {
                         this._emitBeatContainerSkyline(previous);
                     }

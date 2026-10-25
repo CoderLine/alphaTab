@@ -85,6 +85,14 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public applyCenterOffset(target: number): void {
         this.x = target - this.onTimeX;
     }
+
+    /**
+     * Called for each pair of neighbouring beats of a voice once both are positioned,
+     * to adjust glyphs depending on the distance to the next beat.
+     */
+    public fitToNextBeat(_next: BeatContainerGlyphBase): void {
+        // nothing by default
+    }
 }
 
 /**
