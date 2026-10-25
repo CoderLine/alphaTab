@@ -39,6 +39,10 @@ class HeaderRod {
     public rank: number = 0;
     public pre: number = 0;
     public post: number = 0;
+    /**
+     * The extent right of the anchor without the trailing spacing.
+     */
+    public inkPost: number = 0;
     public offset: number = 0;
 }
 
@@ -141,6 +145,7 @@ export class BarLayoutingInfo {
     private _headerRodCount: number = 0;
     private _headerRodsDirty: boolean = false;
     private _preBeatSize: number = 0;
+    private _preBeatTrailingSpace: number = 0;
 
     /**
      * The total width of the bar header (all header columns), shared across all staves.
@@ -156,9 +161,21 @@ export class BarLayoutingInfo {
      * Clears all header columns. Called at the start of each layout cycle of a system,
      * the bar renderers re-register their header glyphs afterwards.
      */
+    /**
+     * The empty space at the end of the bar header (the trailing spacing of its last column),
+     * between the header content (or the start barline) and the first beat.
+     */
+    public get preBeatTrailingSpace(): number {
+        if (this._headerRodsDirty) {
+            this._updateHeaderRods();
+        }
+        return this._preBeatTrailingSpace;
+    }
+
     public resetHeaderRods(): void {
         this._headerRodCount = 0;
         this._preBeatSize = 0;
+        this._preBeatTrailingSpace = 0;
         this._headerRodsDirty = false;
     }
 
@@ -168,8 +185,10 @@ export class BarLayoutingInfo {
      * @param rank The rank identifying (and ordering) the column.
      * @param pre The extent left of the anchor.
      * @param post The extent right of the anchor (including the glyph's trailing spacing).
+     * @param trailingSpace The part of `post` which is empty space after the glyph.
      */
-    public addHeaderRod(rank: number, pre: number, post: number): void {
+    public addHeaderRod(rank: number, pre: number, post: number, trailingSpace: number = 0): void {
+        const inkPost = post - trailingSpace;
         const rods = this._headerRods;
         const count = this._headerRodCount;
         let insertPos = 0;
@@ -186,6 +205,9 @@ export class BarLayoutingInfo {
             if (existing.post < post) {
                 existing.post = post;
             }
+            if (existing.inkPost < inkPost) {
+                existing.inkPost = inkPost;
+            }
             return;
         }
 
@@ -200,6 +222,7 @@ export class BarLayoutingInfo {
         rod.rank = rank;
         rod.pre = pre;
         rod.post = post;
+        rod.inkPost = inkPost;
         rod.offset = 0;
         rods.splice(insertPos, 0, rod);
         this._headerRodCount = count + 1;
@@ -234,6 +257,8 @@ export class BarLayoutingInfo {
             x += rod.pre + rod.post;
         }
         this._preBeatSize = x;
+        this._preBeatTrailingSpace =
+            this._headerRodCount > 0 ? rods[this._headerRodCount - 1].post - rods[this._headerRodCount - 1].inkPost : 0;
         this._headerRodsDirty = false;
     }
 

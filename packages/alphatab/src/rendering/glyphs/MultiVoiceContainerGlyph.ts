@@ -91,7 +91,8 @@ export class MultiVoiceContainerGlyph extends Glyph {
             // applyCenterOffset instead of moving the container itself (which would leave the
             // bar's left portion outside this beat's bounds).
 
-            const target = this.width / 2;
+            // centred between the bar header content (or start barline) and the end barline
+            const target = (this.width - this.renderer.layoutingInfo.preBeatTrailingSpace) / 2;
             for (const beatGlyphs of this.beatGlyphs.values()) {
                 const soleBeatGlyph = beatGlyphs[0];
                 soleBeatGlyph.x = 0;

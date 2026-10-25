@@ -332,3 +332,22 @@ describe('BarLayoutingInfoMinimumWidths', () => {
         expect(g[0]).toBeCloseTo(force / k0, 8);
     });
 });
+
+describe('BarLayoutingInfoHeaderRods', () => {
+    it('the trailing space is the empty space of the last header column', () => {
+        const info = new BarLayoutingInfo();
+        // clef column on two staves: the wider clef defines the ink end, the larger spacing the column end
+        info.addHeaderRod(200, 0, 20 + 4, 4);
+        info.addHeaderRod(200, 0, 16 + 6, 6);
+        info.addHeaderRod(100, 0, 3, 3);
+        expect(info.preBeatSize).toBeCloseTo(3 + 24, 8);
+        expect(info.preBeatTrailingSpace).toBeCloseTo(4, 8);
+    });
+
+    it('a header with only the start spacing is fully empty space', () => {
+        const info = new BarLayoutingInfo();
+        info.addHeaderRod(0, 0, 1);
+        info.addHeaderRod(100, 0, 6, 6);
+        expect(info.preBeatTrailingSpace).toBeCloseTo(6, 8);
+    });
+});

@@ -57,7 +57,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         const half = this.width / 2;
         const spacing =
             this.trailingSpacing >= 0 ? this.trailingSpacing : this.renderer.smuflMetrics.preBeatGlyphSpacing;
-        info.addHeaderRod(TimeSignatureGlyph.HeaderRank, half, half + spacing);
+        info.addHeaderRod(TimeSignatureGlyph.HeaderRank, half, half + spacing, spacing);
     }
 
     public override applyHeaderRod(info: BarLayoutingInfo): void {
