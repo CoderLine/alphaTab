@@ -146,9 +146,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
                         } else {
                             // placement for improper grace beats where no beat in the same bar follows
                             const graceSpring = this.renderer.layoutingInfo.incompleteGraceRods.get(graceGroupId)!;
-                            const relativeOffset =
-                                graceSpring[currentBeatGlyph.graceIndex].postSpringWidth -
-                                graceSpring[currentBeatGlyph.graceIndex].preSpringWidth;
+                            const ownPreBeatWidth = graceSpring[currentBeatGlyph.graceIndex].preBeatWidth;
 
                             if (i > 0) {
                                 if (currentBeatGlyph.graceIndex === 0) {
@@ -168,16 +166,17 @@ export class MultiVoiceContainerGlyph extends Glyph {
                                               this.renderer.layoutingInfo.beatContentPadding
                                             : previous.x + previous.width;
                                 } else {
-                                    // for the multiple grace glyphs we take the width of the grace rod
-                                    // this width setting is aligned with the positioning logic below
+                                    // the following grace beats are placed by their rods, after the previous grace beat
+                                    const previous = beatGlyphs[i - 1];
                                     currentBeatGlyph.x =
-                                        beatGlyphs[i - 1].x +
-                                        graceSpring[currentBeatGlyph.graceIndex - 1].postSpringWidth -
-                                        graceSpring[currentBeatGlyph.graceIndex - 1].preSpringWidth -
-                                        relativeOffset;
+                                        previous.x +
+                                        previous.onTimeX +
+                                        graceSpring[currentBeatGlyph.graceIndex - 1].postSpringWidth +
+                                        ownPreBeatWidth -
+                                        currentBeatGlyph.onTimeX;
                                 }
                             } else {
-                                currentBeatGlyph.x = -relativeOffset;
+                                currentBeatGlyph.x = ownPreBeatWidth - currentBeatGlyph.onTimeX;
                             }
                         }
                         break;
