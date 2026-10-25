@@ -188,7 +188,6 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         super.registerLayoutingInfo(layoutings);
-        this._registerLedgerLineRods(layoutings);
         this._registerSlideRods(layoutings);
     }
 
@@ -232,43 +231,6 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         if (originBeatId >= 0) {
             const preNotesExtent = this.onTimeX - this.preNotes.x;
             layoutings.addOverlayRod(`slide.${originBeatId}`, start, preNotesExtent + smufl.postNoteEffectPadding, 0);
-        }
-    }
-
-    /**
-     * Keeps the ledger lines of neighbouring notes apart: like overlay content, the ledger lines
-     * above (or below) the staff of two neighbouring beats must not touch.
-     */
-    private _registerLedgerLineRods(layoutings: BarLayoutingInfo): void {
-        if (this.beat.graceType !== GraceType.None) {
-            return;
-        }
-        const noteHeads = (this.onNotes as ScoreBeatGlyph).noteHeads;
-        if (!noteHeads) {
-            return;
-        }
-        const hasTop = noteHeads.hasTopLedgerLines;
-        const hasBottom = noteHeads.hasBottomLedgerLines;
-        if (!hasTop && !hasBottom) {
-            return;
-        }
-
-        const extension = noteHeads.ledgerLineExtension;
-        const noteHeadsX = this.onNotes.x + noteHeads.x;
-        const leftExtent = this.onTimeX - (noteHeadsX + noteHeads.noteStartX - extension);
-        const rightExtent = noteHeadsX + noteHeads.width + extension - this.onTimeX;
-        const staff = this.beat.voice.bar.staff;
-        const staffKey = `${staff.track.index}.${staff.index}`;
-        if (hasTop) {
-            layoutings.addOverlayRod(`ledger.top.${staffKey}`, this.beat.absoluteDisplayStart, leftExtent, rightExtent);
-        }
-        if (hasBottom) {
-            layoutings.addOverlayRod(
-                `ledger.bottom.${staffKey}`,
-                this.beat.absoluteDisplayStart,
-                leftExtent,
-                rightExtent
-            );
         }
     }
 
