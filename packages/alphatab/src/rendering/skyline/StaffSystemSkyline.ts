@@ -32,4 +32,10 @@ export class StaffSystemSkyline {
         this.upSky.reset();
         this.downSky.reset();
     }
+
+    /** Replaces both sides with the segments of `other`, which must cover the same range. */
+    public copyFrom(other: StaffSystemSkyline): void {
+        this.upSky.copyFrom(other.upSky);
+        this.downSky.copyFrom(other.downSky);
+    }
 }

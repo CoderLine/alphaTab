@@ -1,17 +1,33 @@
 import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
+import type { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
+import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 
 /**
  * Priority-ordered skyline oracle that positions every {@link EffectBand} on
- * a staff line. Fires from {@link RenderStaff.finalizeStaff}.
+ * a staff line. Fires from {@link RenderStaff.finalizeStaff}. One instance serves all staves of a
+ * layout: it only holds scratch storage that is rebuilt for every staff.
  * @internal
  */
 export class EffectSystemPlacement {
-    private readonly _staff: RenderStaff;
+    /**
+     * The full placement surface of the staff being finalized: content (notes/beams/ties) plus the
+     * structural bar header, assembled from the bar-local skylines. Almost every effect band is
+     * placed against this. The staff keeps a copy as {@link RenderStaff.systemSkyline}.
+     */
+    public readonly systemSkyline: StaffSystemSkyline;
 
-    // Reusable scratch buffers; rebuilt every finalize cycle.
+    /**
+     * The content-only placement surface of the staff being finalized: the same as
+     * {@link systemSkyline} minus the structural bar header. Bands with
+     * {@link EffectInfo.ignoresStructuralHeader} (bar numbers) are placed against this so the
+     * clef/key/time, a fixed fixture already priced into the staff via scalar overflow, never
+     * shoves them up. Only built for staves with such a band ({@link RenderStaff.placesAgainstContentOnly}).
+     */
+    public readonly contentSkyline: StaffSystemSkyline;
+
     private readonly _top: EffectBand[] = [];
     private readonly _bottom: EffectBand[] = [];
     private readonly _groupBands: EffectBand[] = [];
@@ -20,13 +36,17 @@ export class EffectSystemPlacement {
     private readonly _clearXStarts: number[] = [];
     private readonly _clearXEnds: number[] = [];
 
-    public constructor(staff: RenderStaff) {
-        this._staff = staff;
+    public constructor(scratch: SkylineScratch) {
+        this.systemSkyline = new StaffSystemSkyline(0, 0, 0, Number.MAX_SAFE_INTEGER, scratch);
+        this.contentSkyline = new StaffSystemSkyline(0, 0, 0, Number.MAX_SAFE_INTEGER, scratch);
     }
 
-    public placeAndApply(): void {
-        const staff = this._staff;
-        const sky = staff.systemSkyline;
+    /**
+     * Places the effect bands of the staff against {@link systemSkyline} (and {@link contentSkyline}),
+     * which must hold the assembled skylines of the staff.
+     */
+    public placeAndApply(staff: RenderStaff): void {
+        const sky = this.systemSkyline;
         const pad = staff.system.layout.renderer.settings.display.effectBandPaddingBottom;
 
         const top = this._top;
@@ -63,7 +83,7 @@ export class EffectSystemPlacement {
         // Content-only surface for bands that ignore the structural header (bar
         // numbers). Null when no such band exists, in which case every band is
         // placed against the full skyline exactly as before.
-        const contentSky = staff.placesAgainstContentOnly ? staff.contentSkyline : null;
+        const contentSky = staff.placesAgainstContentOnly ? this.contentSkyline : null;
         this._placeSide(top, sky.upSky, contentSky ? contentSky.upSky : null, pad, /* isTop */ true);
         this._placeSide(bottom, sky.downSky, contentSky ? contentSky.downSky : null, pad, /* isTop */ false);
 

@@ -4,30 +4,47 @@ import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper
 /**
  * @internal
  */
-export class ReservedLayoutAreaSlot {
-    public topY: number = 0;
-    public bottomY: number = 0;
-    public constructor(topY: number, bottomY: number) {
-        this.topY = topY;
-        this.bottomY = bottomY;
-    }
-}
-
-/**
- * @internal
- */
 export class ReservedLayoutArea {
     public beat: Beat;
     public topY: number = -1000;
     public bottomY: number = -1000;
-    public slots: ReservedLayoutAreaSlot[] = [];
+    /**
+     * The reserved slots in insertion order as interleaved pairs: `[top0, bottom0, top1, bottom1, ...]`.
+     */
+    public slots: number[] = [];
 
     public constructor(beat: Beat) {
         this.beat = beat;
     }
 
+    /**
+     * A copy of {@link slots} sorted by the top of the slots, keeping the insertion order of equal tops.
+     */
+    public getSlotsSortedByTop(): number[] {
+        const slots = this.slots;
+        const sorted = new Array<number>(slots.length);
+        for (let i = 0; i < slots.length; i += 2) {
+            const topY = slots[i];
+            const bottomY = slots[i + 1];
+            let j = i;
+            while (j > 0 && sorted[j - 2] > topY) {
+                sorted[j] = sorted[j - 2];
+                sorted[j + 1] = sorted[j - 1];
+                j -= 2;
+            }
+            sorted[j] = topY;
+            sorted[j + 1] = bottomY;
+        }
+        return sorted;
+    }
+
     public addSlot(topY: number, bottomY: number) {
-        this.slots.push(new ReservedLayoutAreaSlot(topY, bottomY));
+        if (this.slots.length === 0) {
+            this.slots = [topY, bottomY];
+        } else {
+            this.slots.push(topY);
+            this.slots.push(bottomY);
+        }
         if (this.topY === -1000) {
             this.topY = topY;
             this.bottomY = bottomY;
@@ -130,11 +147,14 @@ export class BarCollisionHelper {
                 let newRestTopY = oldRestTopY;
 
                 const reservedSlots = reservedAreas.get(beat.playbackStart)!;
+                const slots = reservedSlots.slots;
                 let hasCollision = false;
-                for (const slot of reservedSlots.slots) {
+                for (let i = 0; i < slots.length; i += 2) {
+                    const slotTopY = slots[i];
+                    const slotBottomY = slots[i + 1];
                     if (
-                        (oldRestTopY >= slot.topY && oldRestTopY <= slot.bottomY) ||
-                        (oldRestBottomY >= slot.topY && oldRestBottomY <= slot.bottomY)
+                        (oldRestTopY >= slotTopY && oldRestTopY <= slotBottomY) ||
+                        (oldRestBottomY >= slotTopY && oldRestBottomY <= slotBottomY)
                     ) {
                         hasCollision = true;
                         break;

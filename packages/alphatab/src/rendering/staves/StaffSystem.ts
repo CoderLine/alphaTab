@@ -58,6 +58,19 @@ export abstract class SystemBracket {
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
+    /**
+     * Clears the state derived from the bars of the system; the staves in the bracket are kept.
+     */
+    public reset(): void {
+        this.firstVisibleStaffInBracket = undefined;
+        this.lastVisibleStaffInBracket = undefined;
+        this.braceScale = 1;
+        this.width = 0;
+        this.canPaint = false;
+        this._initialPaintabilityCaptured = false;
+        this.reservesAccoladeSpace = false;
+    }
+
     public updateCanPaint() {
         let firstVisibleStaff: RenderStaff | undefined = undefined;
         let lastVisibleStaff: RenderStaff | undefined = undefined;
@@ -260,6 +273,41 @@ export class StaffSystem {
         this.layout = layout;
         this.topPadding = layout.renderer.settings.display.systemPaddingTop;
         this.bottomPadding = layout.renderer.settings.display.systemPaddingBottom;
+    }
+
+    /**
+     * Prepares the system to be filled with bars again: the staves, track groups and brackets are
+     * kept, everything derived from the bars is cleared.
+     */
+    public reset(): void {
+        const display = this.layout.renderer.settings.display;
+        this._accoladeVisibilityFingerprint = -1;
+        this._contentHeight = 0;
+        this._hasSystemSeparator = false;
+        this.x = 0;
+        this.y = 0;
+        this.accoladeWidth = 0;
+        this.isFull = false;
+        this.width = 0;
+        this.computedWidth = 0;
+        this.totalBarDisplayScale = 0;
+        this.totalFixedOverhead = 0;
+        this.totalContentWidth = 0;
+        this.isLast = false;
+        this.masterBarsRenderers.splice(0, this.masterBarsRenderers.length);
+        this.topPadding = display.systemPaddingTop;
+        this.bottomPadding = display.systemPaddingBottom;
+        this.firstVisibleStaff = undefined;
+        for (const g of this.staves) {
+            g.firstVisibleStaff = undefined;
+            g.lastVisibleStaff = undefined;
+        }
+        for (const s of this.allStaves) {
+            s.reset();
+        }
+        for (const b of this._brackets) {
+            b.reset();
+        }
     }
 
     public get firstBarIndex(): number {

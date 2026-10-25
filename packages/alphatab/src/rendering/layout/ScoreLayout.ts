@@ -2,6 +2,7 @@ import { Environment } from '@coderline/alphatab/Environment';
 import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Duration } from '@coderline/alphatab/model/Duration';
 import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
@@ -14,6 +15,7 @@ import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSystemPlacement';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
@@ -60,6 +62,8 @@ export abstract class ScoreLayout {
 
     public readonly skylineScratch: SkylineScratch = new SkylineScratch();
 
+    public readonly effectPlacement: EffectSystemPlacement;
+
     public multiBarRestInfo: Map<number, number[]> | null = null;
 
     public get scaledWidth() {
@@ -73,6 +77,7 @@ export abstract class ScoreLayout {
 
     public constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
+        this.effectPlacement = new EffectSystemPlacement(this.skylineScratch);
     }
 
     public abstract get firstBarX(): number;
@@ -83,7 +88,10 @@ export abstract class ScoreLayout {
     public abstract get systems(): StaffSystem[];
 
     public slurRegistry = new SlurRegistry();
-    public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
+    /**
+     * The beaming rule lookups by beaming rules id and rule duration.
+     */
+    public beamingRuleLookups = new Map<string, Map<Duration, BeamingRuleLookup>>();
 
     /**
      * The master bars which had to be compressed below their minimum width in the current layout pass,
@@ -235,6 +243,10 @@ export abstract class ScoreLayout {
 
     protected getExistingPartialArgs(id: string): RenderFinishedEventArgs | undefined {
         return this._lazyPartials.has(id) ? this._lazyPartials.get(id)!.args : undefined;
+    }
+
+    protected unregisterPartial(id: string): void {
+        this._lazyPartials.delete(id);
     }
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {

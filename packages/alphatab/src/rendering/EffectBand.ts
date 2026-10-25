@@ -180,6 +180,8 @@ export class EffectBand extends Glyph {
         this._xRangeBaseDirty = false;
     }
 
+    private readonly _shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat) => boolean;
+
     public constructor(
         voice: Voice,
         info: EffectInfo,
@@ -190,6 +192,7 @@ export class EffectBand extends Glyph {
         super(0, 0);
         this.voice = voice;
         this.info = info;
+        this._shouldCreateGlyph = info.shouldCreateGlyph;
         this._container = container;
         this.renderer = renderer;
         const clampedOrder = order < 0 ? 0 : order > 0xffff ? 0xffff : order;
@@ -242,38 +245,35 @@ export class EffectBand extends Glyph {
         }
     }
 
-    public static shouldCreateGlyph(beat: Beat, info: EffectInfo, renderer: BarRendererBase) {
-        return info.shouldCreateGlyph(renderer, beat) && (!info.hideOnMultiTrack || renderer.staff!.trackIndex === 0);
+    /** Adds the glyph of the given beat of {@link voice} if the effect applies to it. */
+    public createGlyph(beat: Beat): void {
+        if (this._shouldCreateGlyph(this.renderer, beat)) {
+            this.addBeatGlyph(beat);
+        }
     }
 
-    public createGlyph(beat: Beat): void {
-        if (beat.voice !== this.voice) {
-            return;
+    /** Adds the glyph of the given beat of {@link voice}; the effect must apply to it. */
+    public addBeatGlyph(beat: Beat): void {
+        this.isEmpty = false;
+        if (!this.firstBeat || beat.isBefore(this.firstBeat)) {
+            this.firstBeat = beat;
         }
-        // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not.
-        // so it's okay to access the staff here while creating the glyphs.
-        if (EffectBand.shouldCreateGlyph(beat, this.info, this.renderer)) {
-            this.isEmpty = false;
-            if (!this.firstBeat || beat.isBefore(this.firstBeat)) {
-                this.firstBeat = beat;
+        if (!this.lastBeat || beat.isAfter(this.lastBeat)) {
+            this.lastBeat = beat;
+            // for "toEnd" sizing occupy until next follow-up-beat
+            switch (this.info.sizingMode) {
+                case EffectBarGlyphSizing.SingleOnBeatToEnd:
+                case EffectBarGlyphSizing.GroupedOnBeatToEnd:
+                    if (this.lastBeat.nextBeat) {
+                        this.lastBeat = this.lastBeat.nextBeat;
+                    }
+                    break;
             }
-            if (!this.lastBeat || beat.isAfter(this.lastBeat)) {
-                this.lastBeat = beat;
-                // for "toEnd" sizing occupy until next follow-up-beat
-                switch (this.info.sizingMode) {
-                    case EffectBarGlyphSizing.SingleOnBeatToEnd:
-                    case EffectBarGlyphSizing.GroupedOnBeatToEnd:
-                        if (this.lastBeat.nextBeat) {
-                            this.lastBeat = this.lastBeat.nextBeat;
-                        }
-                        break;
-                }
-            }
-            const glyph: EffectGlyph = this._createOrResizeGlyph(this.info.sizingMode, beat);
-            if (glyph.height > this.height) {
-                this.height = glyph.height;
-                this.originalHeight = glyph.height;
-            }
+        }
+        const glyph: EffectGlyph = this._createOrResizeGlyph(this.info.sizingMode, beat);
+        if (glyph.height > this.height) {
+            this.height = glyph.height;
+            this.originalHeight = glyph.height;
         }
     }
 

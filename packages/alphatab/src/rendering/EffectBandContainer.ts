@@ -1,9 +1,28 @@
+import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import type { EffectBandInfo } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+
+/**
+ * An effect of a staff that can create glyphs there: its notation element is visible and it is
+ * not hidden for the staff's track.
+ * @internal
+ */
+export class ActiveEffectBand {
+    public readonly effect: EffectInfo;
+    /** Visual-stack position within {@link EffectInfo.placementCategory}. Higher value = closer to staff. */
+    public readonly order: number;
+    public readonly shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat) => boolean;
+
+    public constructor(effect: EffectInfo, order: number) {
+        this.effect = effect;
+        this.order = order;
+        this.shouldCreateGlyph = effect.shouldCreateGlyph;
+    }
+}
 
 /**
  * Per-(voice × effect) {@link EffectBand} list for one side of a bar
@@ -17,7 +36,7 @@ export class EffectBandContainer {
     private _bandLookup: Map<number, Map<string, EffectBand>> | null = null;
     public height: number = 0;
 
-    public infos!: EffectBandInfo[];
+    public infos!: ActiveEffectBand[];
     private _renderer: BarRendererBase;
     private _isTopContainer: boolean;
 
@@ -78,43 +97,40 @@ export class EffectBandContainer {
 
     public createVoiceGlyphs(voice: Voice) {
         const renderer = this._renderer;
-        const notationSettings = renderer.settings.notation;
-        for (let i = 0; i < this.infos.length; i++) {
-            const info = this.infos[i];
-            if (!notationSettings.isNotationElementVisible(info.effect.notationElement)) {
-                continue;
-            }
-
-            // Fallback: declaration index in the staff's infos list.
-            const order = info.order ?? i;
-
+        const infos = this.infos;
+        const beats = voice.beats;
+        for (let i = 0, n = infos.length; i < n; i++) {
+            const info = infos[i];
+            // bands are created on the first beat with a glyph
             let band: EffectBand | undefined = undefined;
-
-            for (const b of voice.beats) {
-                // lazy create band to avoid creating and managing bands for all events
-                // even if only a few exist
-                if (!band && EffectBand.shouldCreateGlyph(b, info.effect, renderer)) {
-                    band = new EffectBand(voice, info.effect, this, this._renderer, order);
-                    band.doLayout();
-                    this._bands.push(band);
-                    let bandLookup = this._bandLookup;
-                    if (!bandLookup) {
-                        bandLookup = new Map<number, Map<string, EffectBand>>();
-                        this._bandLookup = bandLookup;
-                    }
-                    let perVoice = bandLookup.get(voice.index);
-                    if (!perVoice) {
-                        perVoice = new Map<string, EffectBand>();
-                        bandLookup.set(voice.index, perVoice);
-                    }
-                    perVoice.set(info.effect.effectId, band);
-                }
-
+            for (let j = 0, m = beats.length; j < m; j++) {
+                const b = beats[j];
                 if (band !== undefined) {
                     band.createGlyph(b);
+                } else if (info.shouldCreateGlyph(renderer, b)) {
+                    band = this._createBand(voice, info);
+                    band.addBeatGlyph(b);
                 }
             }
         }
+    }
+
+    private _createBand(voice: Voice, info: ActiveEffectBand): EffectBand {
+        const band = new EffectBand(voice, info.effect, this, this._renderer, info.order);
+        band.doLayout();
+        this._bands.push(band);
+        let bandLookup = this._bandLookup;
+        if (!bandLookup) {
+            bandLookup = new Map<number, Map<string, EffectBand>>();
+            this._bandLookup = bandLookup;
+        }
+        let perVoice = bandLookup.get(voice.index);
+        if (!perVoice) {
+            perVoice = new Map<string, EffectBand>();
+            bandLookup.set(voice.index, perVoice);
+        }
+        perVoice.set(info.effect.effectId, band);
+        return band;
     }
 
     public doLayout() {

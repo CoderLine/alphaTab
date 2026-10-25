@@ -80,8 +80,12 @@ export class BarLayoutingInfo implements IHeaderRodSink {
 
     private _timeSortedSprings: Spring[] = [];
     private _minTime: number = -1;
-    private _onTimePositionsForce: number = 0;
-    private _onTimePositions: Map<number, number> = new Map();
+    private static readonly _noOnTimePositions: number[] = [];
+    // the on-time positions of the last computed force and of the force before, see buildOnTimePositions
+    private _onTimeForce: number = Number.NaN;
+    private _onTimePositions: number[] = BarLayoutingInfo._noOnTimePositions;
+    private _previousOnTimeForce: number = Number.NaN;
+    private _previousOnTimePositions: number[] = BarLayoutingInfo._noOnTimePositions;
     private _incompleteGraceRodsWidth: number = 0;
     private _beatSizes: Map<number, BarLayoutingInfoBeatSizes> = new Map();
 
@@ -264,19 +268,19 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         return undefined;
     }
 
-    public setBeatSizes(beat: BeatContainerGlyphBase, sizes: BarLayoutingInfoBeatSizes) {
+    public setBeatSizes(beat: BeatContainerGlyphBase, preBeatSize: number, onBeatSize: number) {
         const key = beat.absoluteDisplayStart;
         if (this._beatSizes.has(key)) {
             const current = this._beatSizes.get(key)!;
-            if (current.onBeatSize < sizes.onBeatSize) {
-                current.onBeatSize = sizes.onBeatSize;
+            if (current.onBeatSize < onBeatSize) {
+                current.onBeatSize = onBeatSize;
             }
 
-            if (current.preBeatSize < sizes.preBeatSize) {
-                current.preBeatSize = sizes.preBeatSize;
+            if (current.preBeatSize < preBeatSize) {
+                current.preBeatSize = preBeatSize;
             }
         } else {
-            this._beatSizes.set(key, sizes);
+            this._beatSizes.set(key, { preBeatSize, onBeatSize });
         }
     }
 
@@ -338,7 +342,10 @@ export class BarLayoutingInfo implements IHeaderRodSink {
             while (insertPos > 0 && timeSorted[insertPos].timePosition > start) {
                 insertPos--;
             }
-            this._timeSortedSprings.splice(insertPos + 1, 0, spring);
+            timeSorted.splice(insertPos + 1, 0, spring);
+            for (let i = insertPos + 1; i < timeSorted.length; i++) {
+                timeSorted[i].index = i;
+            }
         } else {
             spring = this.springs.get(start)!;
             if (spring.postSpringWidth < postSpringSize) {
@@ -406,7 +413,7 @@ export class BarLayoutingInfo implements IHeaderRodSink {
                 }
             }
 
-            this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize);
+            beat.spring = this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize);
         }
     }
 
@@ -701,24 +708,42 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         return force / springConstant;
     }
 
-    public buildOnTimePositions(force: number): Map<number, number> {
+    /**
+     * The x positions of the time-sorted springs at the given force, indexed by {@link Spring.index}.
+     * The result is shared: it stays valid until positions for two other forces were requested and
+     * must not be modified.
+     */
+    public buildOnTimePositions(force: number): number[] {
         if (this.totalSpringConstant === -1) {
-            return new Map<number, number>();
+            return BarLayoutingInfo._noOnTimePositions;
         }
-        if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {
+        if (ModelUtils.isAlmostEqualTo(this._onTimeForce, force)) {
             return this._onTimePositions;
         }
-        this._onTimePositionsForce = force;
-        const positions: Map<number, number> = new Map<number, number>();
-        this._onTimePositions = positions;
+
+        // the layout alternates between the natural and the fitted force of a bar
+        const previousForce = this._previousOnTimeForce;
+        let positions = this._previousOnTimePositions;
+        this._previousOnTimeForce = this._onTimeForce;
+        this._previousOnTimePositions = this._onTimePositions;
+        this._onTimeForce = force;
+        if (previousForce === force) {
+            this._onTimePositions = positions;
+            return positions;
+        }
+
         const sortedSprings: Spring[] = this._timeSortedSprings;
+        if (positions.length !== sortedSprings.length) {
+            positions = new Array<number>(sortedSprings.length);
+        }
+        this._onTimePositions = positions;
         if (sortedSprings.length === 0) {
             return positions;
         }
 
         let springX: number = sortedSprings[0].preSpringWidth;
         for (let i: number = 0; i < sortedSprings.length; i++) {
-            positions.set(sortedSprings[i].timePosition, springX);
+            positions[i] = springX;
             springX += this._calculateWidth(force, sortedSprings[i].springConstant);
         }
         return positions;

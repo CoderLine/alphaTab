@@ -13,6 +13,7 @@ import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { Spring } from '@coderline/alphatab/rendering/staves/Spring';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
@@ -35,6 +36,12 @@ export interface BeatEffectOverflow {
  */
 export abstract class BeatContainerGlyphBase extends Glyph {
     private _pendingEffectOverflows: BeatEffectOverflow[] | null = null;
+
+    /**
+     * The spring of the beat in the layouting info of its renderer, `null` for grace beats and
+     * beats which are not registered there.
+     */
+    public spring: Spring | null = null;
 
     public get pendingEffectOverflows(): BeatEffectOverflow[] {
         let pending = this._pendingEffectOverflows;
@@ -254,10 +261,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         // store sizes for usages in effects
         // we might have empty content in the individual bar renderers, but need to know
         // the "shared" maximum widths
-        layoutings.setBeatSizes(this, {
-            preBeatSize: this.preNotes.width,
-            onBeatSize: this.onNotes.width
-        });
+        layoutings.setBeatSizes(this, this.preNotes.width, this.onNotes.width);
     }
 
     public applyLayoutingInfo(_info: BarLayoutingInfo): void {

@@ -37,6 +37,9 @@ export class BoundsLookup {
                     const b = new Map<string, unknown>();
                     b.set('visualBounds', BoundsLookup._boundsToJson(bar.visualBounds));
                     b.set('realBounds', BoundsLookup._boundsToJson(bar.realBounds));
+                    b.set('barIndex', bar.bar.index);
+                    b.set('staffIndex', bar.bar.staff.index);
+                    b.set('trackIndex', bar.bar.staff.track.index);
                     const bBeats: Map<string, unknown>[] = [];
                     b.set('beats', bBeats);
                     for (const beat of bar.beats) {
@@ -95,6 +98,13 @@ export class BoundsLookup {
                     const b: BarBounds = new BarBounds();
                     b.visualBounds = BoundsLookup._boundsFromJson(bar.get('visualBounds') as Map<string, unknown>);
                     b.realBounds = BoundsLookup._boundsFromJson(bar.get('realBounds') as Map<string, unknown>);
+                    // absent in JSON written by older versions
+                    if (bar.has('barIndex')) {
+                        b.bar =
+                            score.tracks[bar.get('trackIndex') as number].staves[bar.get('staffIndex') as number].bars[
+                                bar.get('barIndex') as number
+                            ];
+                    }
                     mb.addBar(b);
                     for (const beat of bar.get('beats') as Map<string, unknown>[]) {
                         const bb: BeatBounds = new BeatBounds();

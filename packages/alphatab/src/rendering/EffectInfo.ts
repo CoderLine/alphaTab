@@ -88,7 +88,7 @@ export interface EffectInfo {
 
     /**
      * When `true`, this band is placed against the content-only skyline
-     * ({@link import('@coderline/alphatab/rendering/staves/RenderStaff').RenderStaff.contentSkyline}),
+     * ({@link import('@coderline/alphatab/rendering/EffectSystemPlacement').EffectSystemPlacement.contentSkyline}),
      * i.e. it ignores the structural bar header (clef, key signature, time
      * signature, barlines, repeat counts) when finding its vertical position.
      *

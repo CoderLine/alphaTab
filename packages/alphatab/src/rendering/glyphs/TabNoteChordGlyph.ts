@@ -21,8 +21,27 @@ export class TabNoteChordGlyph extends Glyph {
     public maxStringNote: Note | null = null;
     public minStringNote: Note | null = null;
     private _beatEffects: Map<string, Glyph> | null = null;
-    public notesPerString: Map<number, NoteNumberGlyph> = new Map();
     public noteStringWidth: number = 0;
+
+    /**
+     * The note glyphs in the order they were added.
+     */
+    public get noteGlyphs(): NoteNumberGlyph[] {
+        return this._notes;
+    }
+
+    /**
+     * The glyph shown on the given string: the last added one if several notes share the string.
+     */
+    public getNoteGlyphForString(str: number): NoteNumberGlyph | null {
+        const notes = this._notes;
+        for (let i = notes.length - 1; i >= 0; i--) {
+            if (notes[i].note.string === str) {
+                return notes[i];
+            }
+        }
+        return null;
+    }
 
     public get beatEffects(): Map<string, Glyph> {
         let effects = this._beatEffects;
@@ -45,9 +64,8 @@ export class TabNoteChordGlyph extends Glyph {
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        if (this.notesPerString.has(note.string)) {
-            const n = this.notesPerString.get(note.string)!;
-
+        const n = this.getNoteGlyphForString(note.string);
+        if (n) {
             let pos = this.x + n.x;
             switch (requestedPosition) {
                 case NoteXPosition.Left:
@@ -73,8 +91,8 @@ export class TabNoteChordGlyph extends Glyph {
     }
 
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        if (this.notesPerString.has(note.string)) {
-            const n = this.notesPerString.get(note.string)!;
+        const n = this.getNoteGlyphForString(note.string);
+        if (n) {
             let pos = this.y + n.y;
 
             switch (requestedPosition) {
@@ -157,8 +175,11 @@ export class TabNoteChordGlyph extends Glyph {
     }
 
     public addNoteGlyph(noteGlyph: NoteNumberGlyph, note: Note): void {
-        this._notes.push(noteGlyph);
-        this.notesPerString.set(note.string, noteGlyph);
+        if (this._notes.length === 0) {
+            this._notes = [noteGlyph];
+        } else {
+            this._notes.push(noteGlyph);
+        }
         if (!this.minStringNote || note.string < this.minStringNote.string) {
             this.minStringNote = note;
         }

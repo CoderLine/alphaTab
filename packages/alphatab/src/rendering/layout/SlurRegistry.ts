@@ -32,6 +32,10 @@ interface SlurInfoContainer {
  *
  */
 export class SlurRegistry {
+    public static staffKey(staff: RenderStaff): string {
+        return `${staff.modelStaff.index}.${staff.modelStaff.track.index}.${staff.staffId}`;
+    }
+
     private _staffLookup = new Map<string, SlurInfoContainer>();
 
     public clear() {
@@ -39,7 +43,7 @@ export class SlurRegistry {
     }
 
     public startMultiSystemSlur(startGlyph: TieGlyph) {
-        const staffId = SlurRegistry._staffId(startGlyph.renderer.staff!);
+        const staffId = startGlyph.renderer.staff!.slurRegistryKey;
         let container: SlurInfoContainer;
         if (!this._staffLookup.has(staffId)) {
             container = {
@@ -53,12 +57,8 @@ export class SlurRegistry {
         container.startedSlurs.set(startGlyph.slurEffectId, { startGlyph });
     }
 
-    private static _staffId(staff: RenderStaff): string {
-        return `${staff.modelStaff.index}.${staff.modelStaff.track.index}.${staff.staffId}`;
-    }
-
     public completeMultiSystemSlur(endGlyph: TieGlyph) {
-        const staffId = SlurRegistry._staffId(endGlyph.renderer.staff!);
+        const staffId = endGlyph.renderer.staff!.slurRegistryKey;
         if (!this._staffLookup.has(staffId)) {
             return undefined;
         }
@@ -71,17 +71,29 @@ export class SlurRegistry {
         return undefined;
     }
 
-    public *getAllContinuations(renderer: BarRendererBase): Generator<TieGlyph> {
-        const staffId = SlurRegistry._staffId(renderer.staff!);
-        if (!this._staffLookup.has(staffId) || renderer.index > 0) {
-            return;
+    /**
+     * The started slurs and ties which continue on the staff of the given renderer, `null` when
+     * there are none.
+     */
+    public getAllContinuations(renderer: BarRendererBase): TieGlyph[] | null {
+        if (this._staffLookup.size === 0 || renderer.index > 0) {
+            return null;
+        }
+        const container = this._staffLookup.get(renderer.staff!.slurRegistryKey);
+        if (container === undefined) {
+            return null;
         }
 
-        const container = this._staffLookup.get(staffId)!;
+        let continuations: TieGlyph[] | null = null;
         for (const g of container.startedSlurs.values()) {
             if (g.startGlyph.shouldCreateMultiSystemSlur(renderer)) {
-                yield g.startGlyph;
+                if (continuations === null) {
+                    continuations = [g.startGlyph];
+                } else {
+                    continuations.push(g.startGlyph);
+                }
             }
         }
+        return continuations;
     }
 }

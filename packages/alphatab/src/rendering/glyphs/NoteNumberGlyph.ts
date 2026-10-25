@@ -30,6 +30,10 @@ export class NoteNumberGlyph extends Glyph {
         this._note = note;
     }
 
+    public get note(): Note {
+        return this._note;
+    }
+
     private get _padding() {
         return (this.renderer as TabBarRenderer).lineSpacing * 0.25;
     }

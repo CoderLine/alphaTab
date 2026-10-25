@@ -70,11 +70,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
             case WhammyType.Dive:
             case WhammyType.PrediveDive:
                 {
-                    const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
-                        'postwhammy',
-                        this._beat,
-                        false
-                    );
+                    const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                     this._endGlyph = endGlyphs;
                     endGlyphs.renderer = sr;
                     const lastWhammyPoint: BendPoint =
@@ -98,11 +94,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         // handled separately
                         return;
                     } else {
-                        const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
-                            'middlewhammy',
-                            this._beat,
-                            false
-                        );
+                        const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         middleGlyphs.renderer = sr;
                         if (sr.settings.notation.notationMode === NotationMode.GuitarPro) {
                             const middleBendPoint: BendPoint = this._beat.whammyBarPoints![1];
@@ -116,11 +108,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         }
                         middleGlyphs.doLayout();
                         this.addGlyph(middleGlyphs);
-                        const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
-                            'postwhammy',
-                            this._beat,
-                            false
-                        );
+                        const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         endGlyphs.renderer = sr;
                         this._endGlyph = endGlyphs;
 

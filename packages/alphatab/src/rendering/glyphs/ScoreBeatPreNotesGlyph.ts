@@ -62,14 +62,15 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     }
 
     private _createGlyphs() {
-        const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
-        accidentals.renderer = this.renderer;
+        let accidentals: AccidentalGroupGlyph | null = null;
 
-        const fingering: FingeringGroupGlyph = new FingeringGroupGlyph();
-        fingering.renderer = this.renderer;
+        let fingering: FingeringGroupGlyph | null = null;
 
-        const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
-        ghost.renderer = this.renderer;
+        let ghost: GhostNoteContainerGlyph | null = null;
+        if (GhostNoteContainerGlyph.hasAnyParenthesis(this.renderer, this.container.beat.notes)) {
+            ghost = new GhostNoteContainerGlyph(true);
+            ghost.renderer = this.renderer;
+        }
 
         let preBends: BendNoteHeadGroupGlyph | null = null;
 
@@ -88,7 +89,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         case BendType.Prebend:
                         case BendType.PrebendRelease:
                             if (!preBends) {
-                                preBends = new BendNoteHeadGroupGlyph('prebend', this.container.beat, true);
+                                preBends = new BendNoteHeadGroupGlyph(this.container.beat, true);
                                 preBends.renderer = this.renderer;
                             }
                             preBends.addGlyph(note.displayValue - ((note.bendPoints![0].value / 2) | 0), false, color);
@@ -99,7 +100,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         case WhammyType.PrediveDive:
                         case WhammyType.Predive:
                             if (!preBends) {
-                                preBends = new BendNoteHeadGroupGlyph('prebend', this.container.beat, true);
+                                preBends = new BendNoteHeadGroupGlyph(this.container.beat, true);
                                 preBends.renderer = this.renderer;
                             }
                             preBends.addGlyph(
@@ -110,9 +111,13 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             break;
                     }
                 }
-                this._createAccidentalGlyph(note, accidentals);
-                ghost.addParenthesis(note);
-                fingering.addFingers(note);
+                accidentals = this._createAccidentalGlyph(note, accidentals);
+                ghost?.addParenthesis(note);
+                if (!fingering && FingeringGroupGlyph.hasFingers(this.renderer.settings, note)) {
+                    fingering = new FingeringGroupGlyph();
+                    fingering.renderer = this.renderer;
+                }
+                fingering?.addFingers(note);
 
                 switch (note.slideInType) {
                     case SlideInType.IntoFromBelow:
@@ -157,7 +162,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 )
             );
         }
-        if (!fingering.isEmpty) {
+        if (fingering) {
             if (!this.isEmpty) {
                 this.addNormal(
                     new SpacingGlyph(
@@ -180,7 +185,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             );
         }
 
-        if (!ghost.isEmpty) {
+        if (ghost) {
             this.addEffect(ghost);
         }
 
@@ -191,7 +196,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         // the pre-beat glyphs already have a bit spacing, hence we have reduced values here
 
         if (this.container.beat.index === 0) {
-            if (accidentals.isEmpty) {
+            if (!accidentals) {
                 this.addNormal(
                     new SpacingGlyph(
                         0,
@@ -204,7 +209,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             }
         }
 
-        if (!accidentals.isEmpty) {
+        if (accidentals) {
             this.accidentals = accidentals;
             this.addNormal(accidentals);
             this.addNormal(
@@ -218,7 +223,11 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         }
     }
 
-    private _createAccidentalGlyph(n: Note, accidentals: AccidentalGroupGlyph): void {
+    /**
+     * Adds the accidentals of the note to the given group, creating the group for the first one.
+     * @returns the group, `null` if it was not created yet
+     */
+    private _createAccidentalGlyph(n: Note, accidentals: AccidentalGroupGlyph | null): AccidentalGroupGlyph | null {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidental(n);
         let noteSteps: number = sr.getNoteSteps(n);
@@ -229,7 +238,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             const g = new AccidentalGlyph(0, sr.getScoreY(noteSteps), accidental, graceScale);
             g.colorOverride = color;
             g.renderer = this.renderer;
-            accidentals.addGlyph(g);
+            accidentals = this._addAccidental(accidentals, g);
         }
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             const harmonicFret: number = n.displayValue + n.harmonicPitch;
@@ -238,7 +247,17 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             const g = new AccidentalGlyph(0, sr.getScoreY(noteSteps), accidental, graceScale);
             g.colorOverride = color;
             g.renderer = this.renderer;
-            accidentals.addGlyph(g);
+            accidentals = this._addAccidental(accidentals, g);
         }
+        return accidentals;
+    }
+
+    private _addAccidental(accidentals: AccidentalGroupGlyph | null, g: AccidentalGlyph): AccidentalGroupGlyph {
+        if (!accidentals) {
+            accidentals = new AccidentalGroupGlyph();
+            accidentals.renderer = this.renderer;
+        }
+        accidentals.addGlyph(g);
+        return accidentals;
     }
 }

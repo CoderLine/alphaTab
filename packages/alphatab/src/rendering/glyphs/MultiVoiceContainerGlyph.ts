@@ -1,4 +1,3 @@
-import { Environment } from '@coderline/alphatab/Environment';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -10,7 +9,6 @@ import type { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -25,9 +23,11 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
     public voiceDrawOrder?: number[];
 
-    private readonly _beatGlyphLookup = new Map<number, BeatContainerGlyphBase>();
-
-    public beatGlyphs = new Map<number, BeatContainerGlyphBase[]>();
+    /**
+     * The beat containers per voice index, in beat order. Voices without containers have an
+     * empty list, so consumers skip empty entries.
+     */
+    public beatGlyphs: BeatContainerGlyphBase[][] = [];
     public tupletGroups: Map<number, TupletGroup[]> | null = null;
 
     public constructor() {
@@ -36,7 +36,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
     public override getBoundingBoxTop(): number {
         let y = Number.NaN;
-        for (const v of this.beatGlyphs.values()) {
+        for (const v of this.beatGlyphs) {
             for (const b of v) {
                 y = ModelUtils.minBoundingBox(y, b.getBoundingBoxTop());
             }
@@ -46,7 +46,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
 
     public override getBoundingBoxBottom(): number {
         let y = Number.NaN;
-        for (const v of this.beatGlyphs.values()) {
+        for (const v of this.beatGlyphs) {
             for (const b of v) {
                 y = ModelUtils.maxBoundingBox(y, b.getBoundingBoxBottom());
             }
@@ -57,7 +57,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
     /** Positions every beat container and emits its per-beat skyline contribution. */
     public scaleToWidth(width: number): void {
         const force: number = this.renderer.layoutingInfo.spaceToForce(width);
-        this._scaleToForce(force, true);
+        this._scaleToForce(force);
     }
 
     /**
@@ -80,8 +80,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
         return spring.allDurations.size === 1 && spring.longestDuration === masterBar.calculateDuration();
     }
 
-    /** `emit=false`: positioning-only path; final skyline emission runs later via {@link scaleToWidth}. */
-    private _scaleToForce(force: number, emit: boolean): void {
+    private _scaleToForce(force: number): void {
         this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
 
         if (this._isCenteredFullBar()) {
@@ -91,34 +90,36 @@ export class MultiVoiceContainerGlyph extends Glyph {
             // bar's left portion outside this beat's bounds).
 
             const target = this.width / 2;
-            for (const beatGlyphs of this.beatGlyphs.values()) {
+            for (const beatGlyphs of this.beatGlyphs) {
+                if (beatGlyphs.length === 0) {
+                    continue;
+                }
                 const soleBeatGlyph = beatGlyphs[0];
                 soleBeatGlyph.x = 0;
                 soleBeatGlyph.applyCenterOffset(target);
                 soleBeatGlyph.scaleToWidth(this.width);
-                if (emit) {
-                    this._emitBeatContainerSkyline(soleBeatGlyph);
-                }
+                this._emitBeatContainerSkyline(soleBeatGlyph);
             }
             return;
         }
 
-        const positions = this.renderer.layoutingInfo.buildOnTimePositions(force);
-        for (const beatGlyphs of this.beatGlyphs.values()) {
+        const layoutingInfo = this.renderer.layoutingInfo;
+        const positions = layoutingInfo.buildOnTimePositions(force);
+        for (const beatGlyphs of this.beatGlyphs) {
             for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
                 const currentBeatGlyph = beatGlyphs[i];
 
                 switch (currentBeatGlyph.graceType) {
                     case GraceType.None:
-                        currentBeatGlyph.x =
-                            positions.get(currentBeatGlyph.absoluteDisplayStart)! - currentBeatGlyph.onTimeX;
+                        currentBeatGlyph.x = positions[currentBeatGlyph.spring!.index] - currentBeatGlyph.onTimeX;
                         break;
                     default:
                         const graceDisplayStart = currentBeatGlyph.graceGroup!.beats[0].absoluteDisplayStart;
                         const graceGroupId = currentBeatGlyph.graceGroup!.id;
+                        const graceTargetSpring = layoutingInfo.springs.get(graceDisplayStart);
                         // placement for proper grace notes which have a following note
-                        if (currentBeatGlyph.graceGroup!.isComplete && positions.has(graceDisplayStart)) {
-                            currentBeatGlyph.x = positions.get(graceDisplayStart)! - currentBeatGlyph.onTimeX;
+                        if (currentBeatGlyph.graceGroup!.isComplete && graceTargetSpring !== undefined) {
+                            currentBeatGlyph.x = positions[graceTargetSpring.index] - currentBeatGlyph.onTimeX;
 
                             const graceSprings = this.renderer.layoutingInfo.allGraceRods.get(graceGroupId)!;
 
@@ -188,17 +189,13 @@ export class MultiVoiceContainerGlyph extends Glyph {
                     const previous = beatGlyphs[i - 1];
                     const beatWidth: number = currentBeatGlyph.x - previous.x;
                     previous.scaleToWidth(beatWidth);
-                    if (emit) {
-                        this._emitBeatContainerSkyline(previous);
-                    }
+                    this._emitBeatContainerSkyline(previous);
                 }
                 // for the last glyph size based on the full width
                 if (i === j - 1) {
                     const beatWidth: number = this.width - beatGlyphs[beatGlyphs.length - 1].x;
                     currentBeatGlyph.scaleToWidth(beatWidth);
-                    if (emit) {
-                        this._emitBeatContainerSkyline(currentBeatGlyph);
-                    }
+                    this._emitBeatContainerSkyline(currentBeatGlyph);
                 }
             }
         }
@@ -213,19 +210,16 @@ export class MultiVoiceContainerGlyph extends Glyph {
         const topOver = !Number.isNaN(containerTop) && containerTop < 0;
         const botOver = !Number.isNaN(containerBottom) && containerBottom > rendererBottom;
 
-        // Lazy getter hoisted once per beat; per-emit guards inlined to skip the wrapper.
-        const sky = renderer.barLocalSkyline;
-
         // Notehead extent (PreNotes..PostNotes), not slot width (which includes spring spacing).
         if (topOver || botOver) {
             const xStart = base + beatContainer.getBeatX(BeatXPosition.PreNotes, false);
             const xEnd = base + beatContainer.getBeatX(BeatXPosition.PostNotes, false);
             if (xEnd > xStart) {
                 if (topOver) {
-                    sky.insertPlaced(StaffSide.Top, xStart, xEnd, containerTop * -1, 0);
+                    renderer.insertSkylineTop(xStart, xEnd, containerTop * -1);
                 }
                 if (botOver) {
-                    sky.insertPlaced(StaffSide.Bottom, xStart, xEnd, containerBottom - rendererBottom, 0);
+                    renderer.insertSkylineBottom(xStart, xEnd, containerBottom - rendererBottom);
                 }
             }
         }
@@ -237,10 +231,10 @@ export class MultiVoiceContainerGlyph extends Glyph {
             if (pendingXEnd > pendingXStart) {
                 for (const r of pending) {
                     if (r.minY < 0) {
-                        sky.insertPlaced(StaffSide.Top, pendingXStart, pendingXEnd, r.minY * -1, 0);
+                        renderer.insertSkylineTop(pendingXStart, pendingXEnd, r.minY * -1);
                     }
                     if (r.maxY > rendererBottom) {
-                        sky.insertPlaced(StaffSide.Bottom, pendingXStart, pendingXEnd, r.maxY - rendererBottom, 0);
+                        renderer.insertSkylineBottom(pendingXStart, pendingXEnd, r.maxY - rendererBottom);
                     }
                 }
             }
@@ -250,7 +244,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
     }
 
     public registerLayoutingInfo(info: BarLayoutingInfo): void {
-        for (const beatGlyphs of this.beatGlyphs.values()) {
+        for (const beatGlyphs of this.beatGlyphs) {
             for (const b of beatGlyphs) {
                 b.registerLayoutingInfo(info);
             }
@@ -258,31 +252,38 @@ export class MultiVoiceContainerGlyph extends Glyph {
     }
 
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
-        for (const beatGlyphs of this.beatGlyphs.values()) {
+        for (const beatGlyphs of this.beatGlyphs) {
             for (const b of beatGlyphs) {
                 b.applyLayoutingInfo(info);
             }
         }
-        this._scaleToForce(Math.max(this.renderer.settings.display.stretchForce, info.minStretchForce), false);
+        // beats are positioned by the scaleToWidth that follows on every layout
+        this.width = info.calculateVoiceWidth(
+            Math.max(this.renderer.settings.display.stretchForce, info.minStretchForce)
+        );
     }
 
     public addGlyph(bg: BeatContainerGlyphBase): void {
-        let beatGlyphs: BeatContainerGlyphBase[];
-        if (this.beatGlyphs.has(bg.voiceIndex)) {
-            beatGlyphs = this.beatGlyphs.get(bg.voiceIndex)!;
-        } else {
-            beatGlyphs = [];
-            this.beatGlyphs.set(bg.voiceIndex, beatGlyphs);
-        }
-
-        bg.x =
-            beatGlyphs.length === 0 ? 0 : beatGlyphs[beatGlyphs.length - 1].x + beatGlyphs[beatGlyphs.length - 1].width;
+        const voiceIndex = bg.voiceIndex;
+        const allBeatGlyphs = this.beatGlyphs;
         bg.renderer = this.renderer;
-        beatGlyphs.push(bg);
-
-        const id = bg.beatId;
-        if (id >= 0) {
-            this._beatGlyphLookup.set(id, bg);
+        if (voiceIndex < allBeatGlyphs.length && allBeatGlyphs[voiceIndex].length > 0) {
+            const beatGlyphs = allBeatGlyphs[voiceIndex];
+            const last = beatGlyphs[beatGlyphs.length - 1];
+            bg.x = last.x + last.width;
+            beatGlyphs.push(bg);
+        } else {
+            bg.x = 0;
+            if (voiceIndex < allBeatGlyphs.length) {
+                allBeatGlyphs[voiceIndex].push(bg);
+            } else if (allBeatGlyphs.length === 0 && voiceIndex === 0) {
+                this.beatGlyphs = [[bg]];
+            } else {
+                while (allBeatGlyphs.length < voiceIndex) {
+                    allBeatGlyphs.push([]);
+                }
+                allBeatGlyphs.push([bg]);
+            }
         }
 
         const newWidth = bg.x + bg.width;
@@ -359,20 +360,35 @@ export class MultiVoiceContainerGlyph extends Glyph {
         return 0;
     }
 
+    /**
+     * The container of the given beat, or `undefined` if the beat is not rendered by this bar.
+     */
     public getBeatContainer(beat: Beat): BeatContainerGlyphBase | undefined {
-        if (!this._beatGlyphLookup.has(beat.id)) {
+        const voice = beat.voice;
+        const allBeatGlyphs = this.beatGlyphs;
+        if (voice.bar !== this.renderer.bar || voice.index >= allBeatGlyphs.length) {
             return undefined;
         }
-        return this._beatGlyphLookup.get(beat.id);
+        // containers without a beat (e.g. numbered dashes) can precede the beat's container
+        const beatGlyphs = allBeatGlyphs[voice.index];
+        const id = beat.id;
+        for (let i = beat.index, j = beatGlyphs.length; i < j; i++) {
+            const container = beatGlyphs[i];
+            if (container.beatId === id) {
+                return container;
+            }
+        }
+        return undefined;
     }
 
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void {
         const x = cx + this.x;
         const y = cy + this.y;
         const voices = this.renderer.bar.voices;
-        for (const c of this.beatGlyphs.values()) {
-            const index = c[0].voiceIndex;
-            if (index === 0 || !voices[index].isEmpty) {
+        const allBeatGlyphs = this.beatGlyphs;
+        for (let index = 0; index < allBeatGlyphs.length; index++) {
+            const c = allBeatGlyphs[index];
+            if (c.length > 0 && (index === 0 || !voices[index].isEmpty)) {
                 for (let i = 0; i < c.length; i++) {
                     c[i].buildBoundingsLookup(barBounds, x, y);
                 }
@@ -381,7 +397,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        for (const v of this.beatGlyphs.values()) {
+        for (const v of this.beatGlyphs) {
             let x = 0;
             for (const b of v) {
                 b.prepareForOverflowPass();
@@ -400,12 +416,26 @@ export class MultiVoiceContainerGlyph extends Glyph {
         }
 
         // draw order is reversed so that the main voice overlaps secondary ones
-        this.voiceDrawOrder = Array.from(this.beatGlyphs.keys());
-        Environment.sortDescending(this.voiceDrawOrder);
+        const allBeatGlyphs = this.beatGlyphs;
+        let voiceCount = 0;
+        for (const v of allBeatGlyphs) {
+            if (v.length > 0) {
+                voiceCount++;
+            }
+        }
+        const voiceDrawOrder = new Array<number>(voiceCount);
+        let drawIndex = 0;
+        for (let i = allBeatGlyphs.length - 1; i >= 0; i--) {
+            if (allBeatGlyphs[i].length > 0) {
+                voiceDrawOrder[drawIndex] = i;
+                drawIndex++;
+            }
+        }
+        this.voiceDrawOrder = voiceDrawOrder;
     }
 
     private _doMultiVoiceLayout() {
-        for (const v of this.beatGlyphs.values()) {
+        for (const v of this.beatGlyphs) {
             let x = 0;
             for (const b of v) {
                 b.x = x;
@@ -425,7 +455,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
         const x = cx + this.x;
         const y = cy + this.y;
         for (const v of this.voiceDrawOrder!) {
-            const beatGlyphs = this.beatGlyphs.get(v)!;
+            const beatGlyphs = this.beatGlyphs[v];
             const voice = this.renderer.bar.voices[v];
             const previousColor = ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, voice, true);
             try {

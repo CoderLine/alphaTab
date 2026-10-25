@@ -21,7 +21,6 @@ import { TabTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TabT
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
-import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -257,13 +256,14 @@ export class TabBarRenderer extends LineBarRenderer {
         // First pass: count gaps per string-line for exact typed-array sizing.
         const bucketCount = new Uint32Array(drawnLineCount);
         let total = 0;
-        for (const voice of this.voiceContainer.beatGlyphs.values()) {
+        for (const voice of this.voiceContainer.beatGlyphs) {
             for (const bg of voice) {
                 const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
                 const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                 if (noteNumbers) {
-                    for (const str of noteNumbers.notesPerString.keys()) {
-                        if (!noteNumbers.notesPerString.get(str)!.isEmpty) {
+                    for (const g of noteNumbers.noteGlyphs) {
+                        const str = g.note.string;
+                        if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
                                 bucketCount[lineIdx]++;
@@ -297,15 +297,16 @@ export class TabBarRenderer extends LineBarRenderer {
         const beatRefs: TabBeatContainerGlyph[] = new Array(total);
         const padding: number = this.smuflMetrics.staffLineThickness;
 
-        for (const voice of this.voiceContainer.beatGlyphs.values()) {
+        for (const voice of this.voiceContainer.beatGlyphs) {
             for (const bg of voice) {
                 const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
                 const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                 if (noteNumbers) {
                     const relativeXBase = noteNumbers.x - padding;
                     const fullWidth = noteNumbers.width + padding * 2;
-                    for (const str of noteNumbers.notesPerString.keys()) {
-                        if (!noteNumbers.notesPerString.get(str)!.isEmpty) {
+                    for (const g of noteNumbers.noteGlyphs) {
+                        const str = g.note.string;
+                        if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
                                 const idx = fwdCursor[lineIdx]++;
@@ -329,11 +330,6 @@ export class TabBarRenderer extends LineBarRenderer {
         this._gapRelXAndWidth = null;
         this._gapBeatRefs = null;
         this._gapCount = 0;
-    }
-
-    public override invalidateLayoutCache(): void {
-        super.invalidateLayoutCache();
-        this._invalidateGapCache();
     }
 
     protected override recreatePreBeatGlyphs(): void {
@@ -535,32 +531,32 @@ export class TabBarRenderer extends LineBarRenderer {
 
         const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.GuitarTabStem, beat);
         try {
-            let holes: ReservedLayoutAreaSlot[] = [];
+            // interleaved top/bottom pairs
+            let holes: number[] = [];
             const reservedAreas = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime;
             if (reservedAreas !== null && reservedAreas.has(beat.displayStart)) {
-                holes = reservedAreas.get(beat.displayStart)!.slots.slice();
-                holes.sort((a, b) => a.topY - b.topY);
+                holes = reservedAreas.get(beat.displayStart)!.getSlotsSortedByTop();
             }
 
             // fast path -> single note == full line
-            if (holes.length === 1) {
+            if (holes.length === 2) {
                 canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
                 return;
             }
 
             const bottomYRelative = bottomY - cy;
             // slow path -> multiple notes == lines between notes
-            const bottomHole = holes[holes.length - 1];
+            const bottomHoleBottomY = holes[holes.length - 1];
             canvas.fillRect(
                 x,
-                cy + bottomHole.bottomY,
+                cy + bottomHoleBottomY,
                 this.smuflMetrics.stemThickness,
-                bottomYRelative - bottomHole.bottomY
+                bottomYRelative - bottomHoleBottomY
             );
 
-            for (let i = holes.length - 1; i > 0; i--) {
-                const bottomHoleY = holes[i].topY;
-                const topHoleY = holes[i - 1].bottomY;
+            for (let i = holes.length - 2; i > 0; i -= 2) {
+                const bottomHoleY = holes[i];
+                const topHoleY = holes[i - 1];
                 if (topHoleY < bottomHoleY) {
                     canvas.fillRect(x, cy + topHoleY, this.smuflMetrics.stemThickness, bottomHoleY - topHoleY);
                 }

@@ -18,6 +18,8 @@ import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSyst
  */
 export abstract class VerticalLayoutBase extends ScoreLayout {
     private _systems: StaffSystem[] = [];
+    // the systems created since the last full layout by index, refilled by later resizes
+    private _systemPool: StaffSystem[] = [];
     // the measured master bars in order; systems are built from them
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
 
@@ -39,6 +41,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
         this._reuseViewPort = renderHints?.reuseViewport ?? false;
         this._systems = [];
+        this._systemPool = [];
 
         //
         // 1. Score Info
@@ -113,6 +116,13 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         // e.g. we could only shift systems where the content didn't change,
         // but we might still have ties/slurs which have to be updated.
         const removeSystems = this._systems.splice(systemIndex, this._systems.length - systemIndex);
+        // the removed systems are not refilled: the renderers of their bars stay reachable through the
+        // bar renderer lookup (and ties caching them) until the bars are measured again
+        this._systemPool.splice(systemIndex, this._systemPool.length - systemIndex);
+        // the partials would keep the removed systems alive
+        for (let i = systemIndex; i < this._systemPartialIds.length; i++) {
+            this.unregisterPartial(this._systemPartialIds[i]);
+        }
         this._systemPartialIds.splice(systemIndex, this._systemPartialIds.length - systemIndex);
         const system = removeSystems[0];
         let y = system.y;
@@ -335,9 +345,18 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _layoutAndRenderSystems(y: number, firstIndex: number, totalHeight: number): number {
         const tracks = this.renderer.tracks!;
         const maxWidth = this._maxWidth;
+        const pool = this._systemPool;
         let index = firstIndex;
         while (true) {
-            const system: StaffSystem = this.createEmptyStaffSystem(this._systems.length);
+            const systemIndex = this._systems.length;
+            let system: StaffSystem;
+            if (systemIndex < pool.length) {
+                system = pool[systemIndex];
+                system.reset();
+            } else {
+                system = this.createEmptyStaffSystem(systemIndex);
+                pool.push(system);
+            }
             system.x = this.pagePadding![0];
             system.y = y;
             const first = this._masterBarsAt(index, system);

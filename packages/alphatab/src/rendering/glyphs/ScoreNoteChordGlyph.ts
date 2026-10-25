@@ -24,9 +24,6 @@ import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
  * @internal
  */
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
-    private _notes: Note[] = [];
-    /** The main note head of each entry in {@link _notes} (same index). */
-    private _noteGlyphs: NoteHeadGlyphBase[] = [];
     private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: TremoloPickingGlyph | null = null;
     private _stemLengthExtension = 0;
@@ -75,28 +72,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             return new ScoreChordNoteHeadInfo(this.direction);
         }
 
-        const staff = this.beat.voice.bar.staff;
-        const key = `score.noteheads.${staff.track.index}.${staff.index}.${this.beat.voice.bar.index}.${this.beat.absoluteDisplayStart}`;
-        let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
-        if (!existing) {
-            existing = new ScoreChordNoteHeadInfo(this.direction);
-            this.renderer.staff!.setSharedLayoutData(key, existing);
-        }
-        return existing;
-    }
-
-    private _getNoteGlyph(note: Note): NoteHeadGlyphBase | null {
-        const notes = this._notes;
-        for (let i = notes.length - 1; i >= 0; i--) {
-            if (notes[i].id === note.id) {
-                return this._noteGlyphs[i];
-            }
-        }
-        return null;
+        return (this.renderer as ScoreBarRenderer).getChordNoteHeadInfo(this.beat.displayStart, this.direction);
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        const n = this._getNoteGlyph(note);
+        const n = this.getNoteGlyph(note);
         if (n) {
             let pos = this.x + n.x;
             switch (requestedPosition) {
@@ -115,7 +95,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        const n = this._getNoteGlyph(note);
+        const n = this.getNoteGlyph(note);
         if (n) {
             return this._internalGetNoteY(n, requestedPosition);
         }
@@ -161,13 +141,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public addMainNoteGlyph(noteGlyph: NoteHeadGlyphBase, note: Note, noteLine: number): void {
-        super.add(noteGlyph, noteLine);
-        this._notes.push(note);
-        this._noteGlyphs.push(noteGlyph);
+        super.add(noteGlyph, noteLine, note);
     }
 
     public addEffectNoteGlyph(noteGlyph: NoteHeadGlyphBase, noteLine: number): void {
-        super.add(noteGlyph, noteLine);
+        super.add(noteGlyph, noteLine, null);
     }
 
     public override doLayout(): void {
@@ -287,8 +265,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         const scale = this.renderer.settings.display.scale;
-        for (const note of this._notes) {
-            const glyph = this._getNoteGlyph(note);
+        // note bounds are listed in the note order of the beat
+        for (const note of this.beat.notes) {
+            const glyph = this.getNoteGlyph(note);
             if (glyph) {
                 const noteBounds: NoteBounds = new NoteBounds();
                 noteBounds.note = note;

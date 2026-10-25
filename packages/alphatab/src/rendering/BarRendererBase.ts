@@ -229,6 +229,21 @@ export class BarRendererBase {
         return this._postBeatLocalSkyline;
     }
 
+    /** {@link barLocalSkyline}, or `null` if it was never created because nothing was inserted. */
+    public get barLocalSkylineOrNull(): BarLocalSkyline | null {
+        return this._barLocalSkyline;
+    }
+
+    /** {@link preBeatLocalSkyline}, or `null` if it was never created because nothing was inserted. */
+    public get preBeatLocalSkylineOrNull(): BarLocalSkyline | null {
+        return this._preBeatLocalSkyline;
+    }
+
+    /** {@link postBeatLocalSkyline}, or `null` if it was never created because nothing was inserted. */
+    public get postBeatLocalSkylineOrNull(): BarLocalSkyline | null {
+        return this._postBeatLocalSkyline;
+    }
+
     public get postBeatGroupOffset(): number {
         return this._postBeatGlyphs.x;
     }
@@ -424,7 +439,7 @@ export class BarRendererBase {
 
         // Re-emit scale-dependent segments. pre/postBeatLocalSkyline are
         // owned by calculateOverflows and untouched here.
-        this.barLocalSkyline.reset();
+        this._barLocalSkyline?.reset();
 
         // Spring-X about to be re-laid-out, so cached BeamingHelperDrawInfo is stale.
         for (const v of this.helpers.beamHelpers) {
@@ -523,7 +538,7 @@ export class BarRendererBase {
         }
     }
 
-    public _registerOverlayRods(): void {
+    private _registerOverlayRods(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
         this._collectOverlayRods(this.topEffects, info);
         this._collectOverlayRods(this.bottomEffects, info);
@@ -563,11 +578,8 @@ export class BarRendererBase {
 
     public afterReverted() {
         this.staff = undefined;
-        this.registerMultiSystemSlurs(undefined);
+        this.registerMultiSystemSlurs(null);
         this.isFinalized = false;
-        // `_layoutInvariantCached` and `_voiceWalkDone` deliberately survive:
-        // they cache bar-local invariant state and `afterReverted` fires every
-        // resize cycle — invalidating here would defeat the optimisation.
     }
 
     public afterStaffBarReverted() {
@@ -616,20 +628,8 @@ export class BarRendererBase {
 
     public isFinalized: boolean = false;
 
-    /**
-     * Set once {@link doLayout} has populated the bar-local invariant state
-     * (`_preBeatGlyphs.width`, `_postBeatGlyphs.width`, broker per-beat sizes,
-     * local pre/post-beat skylines). Lets {@link reLayout} skip the bar-local
-     * re-walk on width-only changes.
-     */
-    private _layoutInvariantCached: boolean = false;
-
-    public invalidateLayoutCache(): void {
-        this._layoutInvariantCached = false;
-    }
-
-    public registerMultiSystemSlurs(startedTies: Generator<TieGlyph> | undefined) {
-        if (!startedTies) {
+    public registerMultiSystemSlurs(startedTies: TieGlyph[] | null) {
+        if (startedTies === null) {
             this._multiSystemSlurs = undefined;
             return;
         }
@@ -641,9 +641,10 @@ export class BarRendererBase {
             continuation.tieDirection = g.tieDirection;
 
             if (!ties) {
-                ties = [];
+                ties = [continuation];
+            } else {
+                ties.push(continuation);
             }
-            ties.push(continuation);
         }
 
         this._multiSystemSlurs = ties;
@@ -755,8 +756,6 @@ export class BarRendererBase {
         this.computedWidth = this.width;
 
         this.calculateOverflows(0, this.height);
-
-        this._layoutInvariantCached = true;
     }
 
     protected calculateOverflows(_rendererTop: number, rendererBottom: number) {
@@ -764,10 +763,10 @@ export class BarRendererBase {
         // emitted by applyLayoutingInfo. Post-beat x is not final until scaleToWidth, so the
         // staff-skyline union shifts it later. Both are kept separate from barLocalSkyline (the
         // content surface) so a band can be placed against content-only.
-        this.postBeatLocalSkyline.reset();
+        this._postBeatLocalSkyline?.reset();
         const postBeatGlyphs = this._postBeatGlyphs.glyphs;
         if (postBeatGlyphs) {
-            this._emitGroupOverflows(postBeatGlyphs, this.postBeatLocalSkyline, rendererBottom);
+            this._emitPostBeatOverflows(postBeatGlyphs, rendererBottom);
         }
 
         const v = this.voiceContainer;
@@ -793,8 +792,7 @@ export class BarRendererBase {
     }
 
     private _emitPreBeatOverflows(rendererBottom: number): void {
-        const skyline = this.preBeatLocalSkyline;
-        skyline.reset();
+        this._preBeatLocalSkyline?.reset();
         const profile = this._headerProfile;
         if (!profile) {
             return;
@@ -813,13 +811,13 @@ export class BarRendererBase {
             if (topOver) {
                 this.registerOverflowTop(g.top * -1);
                 if (hasExtent) {
-                    skyline.insertPlaced(StaffSide.Top, xL, xR, g.top * -1, 0);
+                    this.preBeatLocalSkyline.insertPlaced(StaffSide.Top, xL, xR, g.top * -1, 0);
                 }
             }
             if (bottomOver) {
                 this.registerOverflowBottom(g.bottom - rendererBottom);
                 if (hasExtent) {
-                    skyline.insertPlaced(StaffSide.Bottom, xL, xR, g.bottom - rendererBottom, 0);
+                    this.preBeatLocalSkyline.insertPlaced(StaffSide.Bottom, xL, xR, g.bottom - rendererBottom, 0);
                 }
             }
         }
@@ -888,8 +886,8 @@ export class BarRendererBase {
         group.paint(cx, cy, canvas);
     }
 
-    /** Emit per-glyph overflow into the given group skyline. Shared by pre- and post-beat groups. */
-    private _emitGroupOverflows(glyphs: Glyph[], skyline: BarLocalSkyline, rendererBottom: number): void {
+    /** Emit per-glyph overflow into {@link postBeatLocalSkyline}. */
+    private _emitPostBeatOverflows(glyphs: Glyph[], rendererBottom: number): void {
         for (const g of glyphs) {
             const topY = g.getBoundingBoxTop();
             const bottomY = g.getBoundingBoxBottom();
@@ -904,13 +902,13 @@ export class BarRendererBase {
             if (topOver) {
                 this.registerOverflowTop(topY * -1);
                 if (hasExtent) {
-                    skyline.insertPlaced(StaffSide.Top, xL, xR, topY * -1, 0);
+                    this.postBeatLocalSkyline.insertPlaced(StaffSide.Top, xL, xR, topY * -1, 0);
                 }
             }
             if (bottomOver) {
                 this.registerOverflowBottom(bottomY - rendererBottom);
                 if (hasExtent) {
-                    skyline.insertPlaced(StaffSide.Bottom, xL, xR, bottomY - rendererBottom, 0);
+                    this.postBeatLocalSkyline.insertPlaced(StaffSide.Bottom, xL, xR, bottomY - rendererBottom, 0);
                 }
             }
         }
@@ -1087,12 +1085,9 @@ export class BarRendererBase {
         this._refreshHeaderForPosition();
 
         // Must always re-register: the broker resets its header rods at the head of every resize cycle.
+        // Overlay rods and content overflows are bar-local: they only feed the broker's `finish` and
+        // the measured overflow snapshot, both taken after doLayout.
         this._registerLayoutingInfo();
-        this._registerOverlayRods();
-        if (!this._layoutInvariantCached) {
-            this.calculateOverflows(0, this.height);
-            this._layoutInvariantCached = true;
-        }
     }
 
     // the header depends on the position: first in the staff and, for first-system-only
@@ -1116,8 +1111,6 @@ export class BarRendererBase {
     }
 
     protected recreatePreBeatGlyphs() {
-        // Pre-beat composition is changing — invalidate cached bar-local state.
-        this._layoutInvariantCached = false;
         this._updateHeaderProfile();
     }
 

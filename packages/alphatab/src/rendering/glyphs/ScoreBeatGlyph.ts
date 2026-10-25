@@ -207,8 +207,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         const noteHeads = new ScoreNoteChordGlyph();
         this.noteHeads = noteHeads;
         noteHeads.beat = this.container.beat;
-        const ghost = new GhostNoteContainerGlyph(false);
-        ghost.renderer = this.renderer;
+        let ghost: GhostNoteContainerGlyph | null = null;
 
         if (this.container.beat.slashed) {
             const steps = sr.heightLineCount - 1;
@@ -220,16 +219,21 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             );
             this.noteHeads!.addMainNoteGlyph(slash, this.container.beat.notes[0], steps);
         } else {
-            for (const note of this.container.beat.notes) {
+            const notes = this.container.beat.notes;
+            if (GhostNoteContainerGlyph.hasAnyParenthesis(sr, notes)) {
+                ghost = new GhostNoteContainerGlyph(false);
+                ghost.renderer = this.renderer;
+            }
+            for (const note of notes) {
                 if (note.isVisible) {
                     this._createNoteGlyph(note);
-                    ghost.addParenthesis(note);
+                    ghost?.addParenthesis(note);
                 }
             }
         }
 
         this.addNormal(noteHeads);
-        if (!ghost.isEmpty) {
+        if (ghost) {
             this.addEffect(ghost);
         }
 

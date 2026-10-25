@@ -1,5 +1,5 @@
 import { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
-import type { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
+import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 
 /** @internal */
 export enum StaffSide {
@@ -14,6 +14,21 @@ export enum StaffSide {
 export class BarLocalSkyline {
     public readonly upSky: Skyline;
     public readonly downSky: Skyline;
+
+    private static _empty: BarLocalSkyline | null = null;
+
+    /**
+     * A skyline pair without segments that stands in for bar-local skylines which were never
+     * created. Must not be inserted into.
+     */
+    public static get empty(): BarLocalSkyline {
+        let empty = BarLocalSkyline._empty;
+        if (!empty) {
+            empty = new BarLocalSkyline(0, Number.MAX_SAFE_INTEGER, new SkylineScratch());
+            BarLocalSkyline._empty = empty;
+        }
+        return empty;
+    }
 
     public constructor(xMin: number, xMax: number, scratch: SkylineScratch) {
         this.upSky = new Skyline(xMin, xMax, scratch);

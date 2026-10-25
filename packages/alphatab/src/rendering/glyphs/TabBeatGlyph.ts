@@ -117,7 +117,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public override doLayout(): void {
         const tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
 
-        const centeredEffectGlyphs: Glyph[] = [];
+        let tremoloGlyph: Glyph | null = null;
         if (!this.container.beat.isRest) {
             //
             // Note numbers
@@ -155,7 +155,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                     const glyph = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloPicking!);
                     glyph.offsetY = this.renderer.smuflMetrics.glyphTop.get(glyph.symbol)!;
                     beatEffects.set('tremolo', glyph);
-                    centeredEffectGlyphs.push(glyph);
+                    tremoloGlyph = glyph;
                 }
             }
 
@@ -223,8 +223,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
 
         // effects like tremolos sit on the (potentially hidden) stem
         const effectX = BeamingHelper.beatHasStem(this.container.beat) ? this.stemX : this.onTimeX;
-        for (const g of centeredEffectGlyphs) {
-            g.x = effectX;
+        if (tremoloGlyph) {
+            tremoloGlyph.x = effectX;
         }
     }
 
