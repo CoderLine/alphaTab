@@ -298,7 +298,31 @@ describe('BarLayoutingInfoMinimumWidths', () => {
         }
     });
 
-    it('stretched bars keep the proportional spacing', () => {
+    it('overlay content widens only the gap it needs', () => {
+        const plain = longAndShortBar();
+        const info = new BarLayoutingInfo(Math.SQRT2);
+        info.addSpring(0, 1920, 0, 0, 10);
+        for (let i = 0; i < 4; i++) {
+            info.addSpring(1920 + i * 120, 120, 0, 0, 10);
+        }
+        // a 60 wide text on the second 32nd, the third 32nd has a 1 wide one
+        info.addOverlayRod('text', 2040, 0, 60);
+        info.addOverlayRod('text', 2160, 0, 1);
+        info.finish();
+
+        expect(info.minStretchForce).toBeCloseTo(plain.minStretchForce, 8);
+        const force = info.minStretchForce;
+        const natural = info.calculateVoiceWidth(force);
+        const g = gaps(info, force, natural);
+        const plainGaps = gaps(plain, force, plain.calculateVoiceWidth(force));
+        // 60 + 3 (overlay padding)
+        expect(g[2]).toBeCloseTo(63, 8);
+        for (const i of [0, 1, 3, 4]) {
+            expect(g[i]).toBeCloseTo(plainGaps[i], 8);
+        }
+    });
+
+        it('stretched bars keep the proportional spacing', () => {
         const info = longAndShortBar();
         const natural = info.calculateVoiceWidth(info.minStretchForce);
         const force = info.spaceToForce(natural * 2);

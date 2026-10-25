@@ -10,16 +10,16 @@ import { describe, it } from 'vitest';
  *
  * Overlay rods are a first-class minimum-distance constraint registered against beats
  * that carry overlay content (lyrics, beat text). They live on `BarLayoutingInfo`
- * parallel to the rhythmic spring-rod model and contribute additional `minStretchForce`
- * constraints inside the existing `_calculateSpringConstants` flow. Beats without
+ * parallel to the rhythmic spring-rod model and raise the minimum widths of the springs
+ * they span inside the existing `_calculateSpringConstants` flow. Beats without
  * overlays never register a rod, so:
  *
  *   - **non-overlapping content does not bloat spacing** — short syllables that fit
  *     between adjacent beats produce the same width as a no-lyrics control bar.
  *   - **sparse lyrics work naturally** — the overlay-rod loop walks only registered
  *     rods, regardless of how many silent (non-overlay) beats sit between two overlay-
- *     bearing beats. Multiple springs in between contribute through the `sum(1/k)`
- *     term of the multi-spring force constraint.
+ *     bearing beats. Multiple springs in between share the required gap in proportion
+ *     to their natural widths (`1/k`).
  *
  * Each test below pins one specific invariant of this system. Together they form the
  * regression guard for the overlay-rod calculation in
@@ -51,7 +51,7 @@ describe('OverlayRodSpacingTests', () => {
     /**
      * Lyrics only on beats 1 and 3 of a 4-beat bar; beats 2 and 4 are silent. The
      * overlay-rod loop must walk by registered overlay-bearing beats (1 -> 3), spanning
-     * two springs (1->2 and 2->3) via the `sum(1/k)` multi-spring force constraint.
+     * two springs (1->2 and 2->3) which share the required gap by their natural widths.
      * Beats 2 and 4 stay close to their natural spring positions because no rod
      * inflation reaches them. Baseline: gap between beats 1 and 3 visibly widened to
      * clear the long syllables, beats 2 / 4 are not bloated.
@@ -97,8 +97,8 @@ describe('OverlayRodSpacingTests', () => {
      * Right-edge overflow via the phantom-next-beat reframe. A long left-aligned
      * beat-text on the LAST beat of a bar has rightExtent = full text width, so the
      * overlay extends past the natural rhythmic post-content of the last beat. The
-     * last spring's `requiredSpace` becomes max(postSpringWidth, rightExtent + padding),
-     * force grows accordingly, and the bar widens such that the text ends inside the
+     * last spring's minimum width becomes max(postSpringWidth, rightExtent + padding),
+     * and the bar widens such that the text ends inside the
      * voice container before the barline. Pins right-edge overflow handling
      * exclusively — does NOT exercise pair-overlap (only one rod registered).
      */
@@ -215,7 +215,7 @@ describe('OverlayRodSpacingTests', () => {
 
     /**
      * RESIZE / RECOMPUTE: pair-overlap constraint must be re-applied when the system
-     * is resized. After the initial layout produces a `minStretchForce` that includes
+     * is resized. After the initial layout produces spring minimum widths that include
      * the overlay constraint, a width change triggers `reconcileMinDurationIfDirty`
      * which calls `recomputeSpringConstants` -> `_calculateSpringConstants`. The
      * overlay-rod loop is INSIDE `_calculateSpringConstants`, so the constraint is
