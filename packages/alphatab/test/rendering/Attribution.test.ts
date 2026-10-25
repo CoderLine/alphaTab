@@ -375,6 +375,46 @@ describe('AttributionTests', () => {
         );
     });
 
+    it('gap-to-neighbouring-text', async () => {
+        // the beat text ends right before the mark at the end of the first system
+        await VisualTestHelper.prepareAlphaSkia();
+        const settings = new Settings();
+        // skia engine and fonts of the visual references: text widths decide whether marks touch
+        VisualTestHelper.prepareSettingsForTest(settings);
+        settings.display.barsPerRow = 2;
+        const score = ScoreLoader.loadAlphaTex(`:4 C4 D4 E4 F4 | C4 D4 E4{txt "abcdefghijkl"} F4 ${filler}`, settings);
+        const run = new AttributionTestRun(settings);
+        run.renderer.width = 700;
+        run.renderer.renderScore(score, [0]);
+        const owners = run.owners();
+        expect(owners.length).toBe(1);
+        const owner = owners[0];
+
+        const glyph = owner.attribution!;
+        const gap = owner.smuflMetrics.oneStaffSpace * 0.5;
+        const markLeft = owner.x + glyph.x;
+        const markRight = markLeft + glyph.width;
+        const markBottom = -(glyph.y + glyph.height);
+        let neighbours = 0;
+        for (const r of owner.staff!.barRenderers) {
+            for (const b of r.topEffects.bands) {
+                const range = { xStart: 0, xEnd: 0 };
+                if (b.isEmpty || !b.computeLocalXRange(range)) {
+                    continue;
+                }
+                const left = r.x + range.xStart;
+                const right = r.x + range.xEnd;
+                if (right <= markLeft - gap || left >= markRight + gap) {
+                    continue;
+                }
+                neighbours++;
+                const bandTop = b.placedMagnitude + b.height;
+                expect(markBottom).toBeGreaterThanOrEqual(bandTop + gap - 0.01);
+            }
+        }
+        expect(neighbours).toBe(1);
+    });
+
     it('repeat-count-below-mark', async () => {
         const run = await render(`:4 C4 D4 E4 F4 | \\ro \\rc 3 G4 A4 B4 C5 ${filler}`, (s, _score) => {
             s.display.barsPerRow = 2;

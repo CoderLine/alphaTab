@@ -379,8 +379,13 @@ export class RenderStaff implements IStaffDisplayContext {
 
         const xEnd = last.x + last.width;
         const xStart = xEnd - glyph.width;
-        const clearance = Math.max(this.systemSkyline.upSky.maxHeightInRange(xStart, xEnd), last.staffTopClearance);
-        const top = clearance + last.smuflMetrics.oneStaffSpace * 0.5 + glyph.height;
+        // the same gap to neighbouring marks horizontally as vertically
+        const gap = last.smuflMetrics.oneStaffSpace * 0.5;
+        const clearance = Math.max(
+            this.systemSkyline.upSky.maxHeightInRange(xStart - gap, xEnd + gap),
+            last.staffTopClearance
+        );
+        const top = clearance + gap + glyph.height;
         glyph.x = xStart - last.x;
         glyph.y = -top;
 
