@@ -1,3 +1,4 @@
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
@@ -172,5 +173,39 @@ describe('Gp4ImporterTest', () => {
         const b6 = score.tracks[0].staves[0].bars[1].voices[0].beats[2];
         expect(b6.notes[0].harmonicType).toBe(HarmonicType.Semi);
         expect(b6.notes[0].harmonicValue).toBe(12);
+    });
+
+    it('negative-and-missing-fret', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro4/fade-to-black.gp4')).readScore();
+        const beats = score.tracks[2].staves[0].bars[20].voices[0].beats;
+
+        // grace note stored with fret -1: Guitar Pro shows a dead note
+        expect(beats[4].graceType).not.toBe(GraceType.None);
+        expect(beats[4].notes.length).toBe(1);
+        expect(beats[4].notes[0].isDead).toBe(true);
+        expect(beats[4].notes[0].fret).toBe(0);
+        expect(beats[4].notes[0].isStringed).toBe(true);
+
+        // second note on string 5 is stored without a fret: Guitar Pro does not show it
+        expect(beats[5].notes.length).toBe(1);
+        expect(beats[5].notes[0].string).toBe(6);
+        expect(beats[5].notes[0].fret).toBe(14);
+
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            for (const note of beat.notes) {
+                                if (!staff.isPercussion) {
+                                    expect(note.isStringed).toBe(true);
+                                    expect(note.fret).toBeGreaterThanOrEqual(0);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     });
 });
