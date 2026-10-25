@@ -13,7 +13,8 @@ import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRende
 export const barNumberEffectInfo: EffectInfo = {
     effectId: 'BarNumber',
     notationElement: NotationElement.BarNumber,
-    hideOnMultiTrack: true,
+    // created on every track: whether it shows depends on the first visible staff of the system (hideEmptyStaves)
+    hideOnMultiTrack: false,
     sizingMode: EffectBarGlyphSizing.SingleStartBar,
     shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.voice.index === 0 && beat.index === 0 && (renderer as LineBarRenderer).hasBarNumber;

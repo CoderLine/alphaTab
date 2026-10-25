@@ -1,4 +1,4 @@
-import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import type { EffectBand, EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
@@ -107,10 +107,13 @@ export class EffectSystemPlacement {
     }
 
     /** The height the placed bands add on top of the given content overflow. */
+    private static readonly _rangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
     private static _effectsHeight(bands: EffectBand[], contentOverflow: number): number {
         let max = 0;
         for (const b of bands) {
-            if (!b.isEmpty) {
+            // bands without extent (e.g. hidden bar numbers) take no part in the placement
+            if (b.computeLocalXRange(EffectSystemPlacement._rangeScratch)) {
                 const outer = b.placedMagnitude + b.height;
                 if (outer > max) {
                     max = outer;

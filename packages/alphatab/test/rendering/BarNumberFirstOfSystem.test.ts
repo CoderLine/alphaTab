@@ -7,6 +7,7 @@ import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -103,11 +104,14 @@ class BarNumberFirstOfSystemHelper {
     public static async render(
         score: Score,
         widths: number[],
-        expected: (api: AlphaTabApiBase<unknown>) => number[]
+        expected: (api: AlphaTabApiBase<unknown>) => number[],
+        tracks: number[] = [0],
+        layoutMode: LayoutMode = LayoutMode.Page
     ): Promise<void> {
         await VisualTestHelper.prepareAlphaSkia();
         const settings = new Settings();
         VisualTestHelper.prepareSettingsForTest(settings);
+        settings.display.layoutMode = layoutMode;
 
         const uiFacade = new TestUiFacade();
         uiFacade.rootContainer.width = widths[0];
@@ -162,7 +166,7 @@ class BarNumberFirstOfSystemHelper {
                     );
                 });
                 const renderScore = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
-                api.renderScore(renderScore, [0]);
+                api.renderScore(renderScore, tracks);
                 setTimeout(() => reject(new Error('bar number render timed out')), 10000);
             });
         } finally {
@@ -283,6 +287,17 @@ describe('BarNumberFirstOfSystem', () => {
             return systemStarts(api);
         });
         expect(restStarts.length).toBeGreaterThan(0);
+    });
+
+    it('hide-empty-staves-first-visible-track', async () => {
+        // a system in which the first track is hidden is numbered on the first visible one
+        const score = BarNumberFirstOfSystemHelper.createScore(
+            '\\hideEmptyStaves \\defaultSystemsLayout 2 ' +
+                '\\track "T1" C4.1 | C4.1 | r.1 | r.1 | C4.1 | C4.1 ' +
+                '\\track "T2" C4.1 | C4.1 | C4.1 | C4.1 | r.1 | r.1',
+            BarNumberDisplay.FirstOfSystem
+        );
+        await BarNumberFirstOfSystemHelper.render(score, [600], systemStarts, [0, 1], LayoutMode.Parchment);
     });
 
     it('bar-override-shown', async () => {
