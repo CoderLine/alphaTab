@@ -408,7 +408,7 @@ export class BarRendererBase {
             return;
         }
         // small tolerance for rounding differences in the system width distribution
-        const missingWidth = info.calculateVoiceWidth(info.minStretchForce) - containerWidth;
+        const missingWidth = info.minVoiceWidth - containerWidth;
         if (missingWidth > BarRendererBase._compressionTolerance) {
             this.scoreRenderer.layout!.reportCompressedBar(this.bar.masterBar.index, missingWidth);
         }
