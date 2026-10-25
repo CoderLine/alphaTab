@@ -321,19 +321,26 @@ export class BarLayoutingInfo {
     public allGraceRods: Map<string, Spring[]> = new Map();
     public springs: Map<number, Spring> = new Map();
 
+    /**
+     * @param isEmptyBeat Whether the spring is added for a placeholder beat of an empty voice. Its duration
+     * keeps the spacing but is not one of the {@link Spring.allDurations} played at this position.
+     */
     public addSpring(
         start: number,
         duration: number,
         graceBeatWidth: number,
         preBeatWidth: number,
-        postSpringSize: number
+        postSpringSize: number,
+        isEmptyBeat: boolean = false
     ): Spring {
         this.version++;
         let spring: Spring;
         if (!this.springs.has(start)) {
             spring = new Spring();
             spring.timePosition = start;
-            spring.allDurations.add(duration);
+            if (!isEmptyBeat) {
+                spring.allDurations.add(duration);
+            }
             // check in the previous spring for the shortest duration that overlaps with this spring
             // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring.
             if (this._timeSortedSprings.length > 0) {
@@ -378,7 +385,9 @@ export class BarLayoutingInfo {
             if (duration > spring.longestDuration) {
                 spring.longestDuration = duration;
             }
-            spring.allDurations.add(duration);
+            if (!isEmptyBeat) {
+                spring.allDurations.add(duration);
+            }
         }
         if (this._minTime === -1 || this._minTime > start) {
             this._minTime = start;
@@ -428,7 +437,7 @@ export class BarLayoutingInfo {
                 }
             }
 
-            this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize);
+            this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize, beat.isEmptyBeat);
         }
     }
 

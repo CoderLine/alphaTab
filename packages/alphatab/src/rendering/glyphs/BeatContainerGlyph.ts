@@ -47,6 +47,12 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract get beatId(): number;
     public abstract get absoluteDisplayStart(): number;
     public abstract get displayDuration(): number;
+    /**
+     * Whether this is a placeholder beat of an empty voice, which draws nothing.
+     */
+    public get isEmptyBeat(): boolean {
+        return false;
+    }
     public abstract get onTimeX(): number;
     public abstract get graceType(): GraceType;
     public abstract get graceIndex(): number;
@@ -109,6 +115,10 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
 
     public override get displayDuration(): number {
         return this.beat.displayDuration;
+    }
+
+    public override get isEmptyBeat(): boolean {
+        return this.beat.isEmpty;
     }
 
     public override get graceIndex(): number {
