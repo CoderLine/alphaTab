@@ -203,8 +203,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             if (minEffectY === null || minEffectY > belowBeatEffectsY) {
                 minEffectY = belowBeatEffectsY;
             }
-            if (maxEffectY === null || maxEffectY < belowBeatEffectsY) {
-                maxEffectY = belowBeatEffectsY;
+            const effectBottom = belowBeatEffectsY + effect.height;
+            if (maxEffectY === null || maxEffectY < effectBottom) {
+                maxEffectY = effectBottom;
             }
 
             belowBeatEffectsY += effect.height + effectSpacing;

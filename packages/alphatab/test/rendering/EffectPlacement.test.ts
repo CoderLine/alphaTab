@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
@@ -80,5 +81,29 @@ describe('EffectPlacementTests', () => {
             :2 7.3{tb (0 4) txt "grad."} -.3{tb (4 4)} | 7.3{tb (0 4) txt "grad."} -.3{tb (4 4)}
         `);
         expectTextAboveTiedSlur(renderer);
+    });
+
+    it('dynamics-below-accents', async () => {
+        // low notes with up stems: the accent sits below the note head, the dynamics below the accent
+        const renderer = await render(`
+            \\staff {score}
+            :1 1.3{ac}{dy fp} | :1 0.2{ac}{dy fp} | :2 2.3{ac}{dy f} 1.1{ac}{dy p} | :1 3.4{ac}{dy mf}
+        `);
+        const staff = firstStaff(renderer);
+        let checked = 0;
+        for (const r of staff.barRenderers) {
+            const dynamics = band(r, 'EffectDynamics', false);
+            if (!dynamics) {
+                continue;
+            }
+            const note = r.bar.voices[0].beats[0].notes[0];
+            const accentBottom =
+                r.getNoteY(note, NoteYPosition.Bottom) +
+                r.smuflMetrics.onNoteEffectPadding +
+                r.smuflMetrics.glyphHeights.get(MusicFontSymbol.ArticAccentAbove)!;
+            expect(dynamics.placedMagnitude).toBeGreaterThanOrEqual(accentBottom - r.height);
+            checked++;
+        }
+        expect(checked).toBe(3);
     });
 });
