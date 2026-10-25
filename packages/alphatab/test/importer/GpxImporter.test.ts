@@ -311,4 +311,13 @@ describe('GpxImporterTest', () => {
         });
         expect(tiesPerTrack).toEqual([44, 26, 7, 1, 0, 17, 7, 48, 4, 0, 0]);
     });
+
+    it('drum-tablature-follows-part-configuration', async () => {
+        const score = (await prepareImporterWithFile('conversion/full-song.gpx')).readScore();
+        const drums = score.tracks[10].staves[0];
+        expect(drums.isPercussion).toBe(true);
+        // the PartConfiguration of this file enables standard notation and tablature on the drum track
+        expect(drums.showTablature).toBe(true);
+        expect(drums.showStandardNotation).toBe(true);
+    });
 });

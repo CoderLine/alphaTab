@@ -208,4 +208,14 @@ describe('Gp4ImporterTest', () => {
             }
         }
     });
+
+    it('drum-tablature-hidden', async () => {
+        // GP3/4 have no tablature flag
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro4/fade-to-black.gp4')).readScore();
+        const drums = score.tracks.filter(t => t.staves[0].isPercussion);
+        expect(drums.length).toBe(1);
+        expect(drums[0].staves[0].showTablature).toBe(false);
+        expect(drums[0].staves[0].showStandardNotation).toBe(true);
+        expect(score.tracks.filter(t => !t.staves[0].isPercussion).every(t => t.staves[0].showTablature)).toBe(true);
+    });
 });

@@ -620,6 +620,8 @@ export class Gp3To5Importer extends ScoreImporter {
         newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this._stringEncoding);
         if ((flags & 0x01) !== 0) {
             mainStaff.isPercussion = true;
+            // GP3/4 have no tablature flag, GP5 reads it from the staff flags below
+            mainStaff.showTablature = false;
         }
         if (this._versionNumber >= 500) {
             newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;

@@ -26,6 +26,8 @@ import { GpifWriter } from '@coderline/alphatab/exporter/GpifWriter';
 import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
+import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 describe('Gp7ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
@@ -1079,6 +1081,21 @@ describe('Gp7ImporterTest', () => {
                 noteIndex++;
             }
         }
+    });
+
+    it('drum-tablature-follows-part-configuration', async () => {
+        const data = await TestPlatform.loadFile('test-data/guitarpro7/drum-custom-lines.gp');
+        const withPartConfiguration = ScoreLoader.loadScoreFromBytes(data, new Settings());
+        expect(withPartConfiguration.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(withPartConfiguration.tracks[0].staves[0].showTablature).toBe(true);
+
+        // score.gpif alone has no notation visibility: drum tablature stays hidden
+        const entries = new ZipReader(ByteBuffer.fromBuffer(data), Number.MAX_SAFE_INTEGER).read();
+        const gpif = entries.find(e => e.fileName === 'score.gpif')!;
+        const parser = new GpifParser();
+        parser.parseXml(IOHelper.toString(gpif.data, 'utf-8'), new Settings());
+        expect(parser.score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(parser.score.tracks[0].staves[0].showTablature).toBe(false);
     });
 
     it('drum-custom-lines-preserves-string-assignments', async () => {

@@ -185,6 +185,14 @@ export class GpifParser {
 
         this._parseDom(dom);
         this._buildModel();
+        // GPIF has no notation visibility, drum tablature is shown only when a PartConfiguration asks for it
+        for (const track of this.score.tracks) {
+            for (const staff of track.staves) {
+                if (staff.isPercussion) {
+                    staff.showTablature = false;
+                }
+            }
+        }
         ModelUtils.consolidate(this.score);
         if (this.isGp6) {
             this._assignFingeringForGp6();

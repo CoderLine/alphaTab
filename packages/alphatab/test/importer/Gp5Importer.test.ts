@@ -584,6 +584,13 @@ describe('Gp5ImporterTest', () => {
         }
     });
 
+    it('drum-tablature-follows-staff-flags', async () => {
+        // Guitar Pro shows the drum tablature of this file, its staff flags enable it
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/percussion-all.gp5')).readScore();
+        expect(score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
+    });
+
     it('tuning-bass-clef', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bass-tuning.gp5')).readScore();
         expect(score.tracks[0].staves[0].bars[0].clef).toBe(Clef.G2);
