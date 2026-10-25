@@ -7,6 +7,23 @@ import { SvgCanvas } from '@coderline/alphatab/platform/svg/SvgCanvas';
  * @internal
  */
 export class CssFontSvgCanvas extends SvgCanvas {
+    private static _symbolTexts: Map<MusicFontSymbol, string> | null = null;
+
+    private static _symbolText(symbol: MusicFontSymbol): string {
+        let texts = CssFontSvgCanvas._symbolTexts;
+        if (texts === null) {
+            texts = new Map<MusicFontSymbol, string>();
+            CssFontSvgCanvas._symbolTexts = texts;
+        }
+        let text = texts.get(symbol);
+        if (text === undefined) {
+            // as number: Kotlin would otherwise format the enum value as a double (57424.0)
+            text = '&#' + (symbol as number) + ';';
+            texts.set(symbol, text);
+        }
+        return text;
+    }
+
     public fillMusicFontSymbol(
         x: number,
         y: number,
@@ -17,7 +34,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this._fillMusicFontSymbolText(x, y, relativeScale, '&#' + symbol, centerAtPosition);
+        this._fillMusicFontSymbolText(x, y, relativeScale, CssFontSvgCanvas._symbolText(symbol), centerAtPosition);
     }
 
     public fillMusicFontSymbols(
@@ -28,9 +45,10 @@ export class CssFontSvgCanvas extends SvgCanvas {
         centerAtPosition?: boolean
     ): void {
         let s: string = '';
-        for (const symbol of symbols) {
+        for (let i = 0; i < symbols.length; i++) {
+            const symbol = symbols[i];
             if (symbol !== MusicFontSymbol.None) {
-                s += `&#${symbol};`;
+                s += CssFontSvgCanvas._symbolText(symbol);
             }
         }
         this._fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);

@@ -34,6 +34,8 @@ export type IAlphaTabWorkerMessage =
     | { cmd: 'alphaTab.partialLayoutFinished'; result: RenderFinishedEventArgs }
     | { cmd: 'alphaTab.renderFinished'; result: RenderFinishedEventArgs }
     | { cmd: 'alphaTab.postRenderFinished'; boundsLookup: Map<string, unknown> | null }
+    // web only: a BoundsLookupWire Float64Array, sent in the transfer list
+    | { cmd: 'alphaTab.postRenderFinishedWire'; boundsLookup: unknown }
     | { cmd: 'alphaTab.error'; error: Error };
 
 /**

@@ -45,11 +45,12 @@ export class BeatBounds {
      * @param bounds The note bounds to add.
      */
     public addNote(bounds: NoteBounds): void {
-        if (!this.notes) {
-            this.notes = [];
-        }
         bounds.beatBounds = this;
-        this.notes.push(bounds);
+        if (!this.notes) {
+            this.notes = [bounds];
+        } else {
+            this.notes.push(bounds);
+        }
     }
 
     /**

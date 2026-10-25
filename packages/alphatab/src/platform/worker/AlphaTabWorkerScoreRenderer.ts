@@ -16,6 +16,7 @@ import type {
 import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -109,6 +110,14 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
                 if (score && data.boundsLookup) {
                     this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
                     this.boundsLookup?.finish();
+                }
+                (this.postRenderFinished as EventEmitter).trigger();
+                break;
+            /*@target web*/
+            case 'alphaTab.postRenderFinishedWire':
+                if (this._api.score) {
+                    this.boundsLookup = BoundsLookupWire.decode(data.boundsLookup as Float64Array, this._api.score);
+                    this.boundsLookup.finish();
                 }
                 (this.postRenderFinished as EventEmitter).trigger();
                 break;

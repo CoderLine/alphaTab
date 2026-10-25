@@ -10,6 +10,7 @@ import type {
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -57,12 +58,7 @@ export class AlphaTabWebWorker {
                         result: result
                     });
                 });
-                this._renderer.postRenderFinished.on(() => {
-                    this._main.postMessage({
-                        cmd: 'alphaTab.postRenderFinished',
-                        boundsLookup: this._renderer.boundsLookup?.toJson() ?? null
-                    });
-                });
+                this._renderer.postRenderFinished.on(() => this._postRenderFinished());
                 this._renderer.preRender.on(resize => {
                     this._main.postMessage({
                         cmd: 'alphaTab.preRender',
@@ -94,6 +90,33 @@ export class AlphaTabWebWorker {
                 this._updateSettings(data.settings);
                 break;
         }
+    }
+
+    private _postRenderFinished(): void {
+        /*@target web*/
+        if (this._postBoundsLookupWire()) {
+            return;
+        }
+        this._main.postMessage({
+            cmd: 'alphaTab.postRenderFinished',
+            boundsLookup: this._renderer.boundsLookup?.toJson() ?? null
+        });
+    }
+
+    /**
+     * @target web
+     */
+    private _postBoundsLookupWire(): boolean {
+        const boundsLookup = this._renderer.boundsLookup;
+        if (!boundsLookup) {
+            return false;
+        }
+        const data = BoundsLookupWire.encode(boundsLookup);
+        (this._main as unknown as DedicatedWorkerGlobalScope).postMessage(
+            { cmd: 'alphaTab.postRenderFinishedWire', boundsLookup: data },
+            [data.buffer]
+        );
+        return true;
     }
 
     private _updateFontSizes(fontSizes: Map<string, FontSizeDefinition>): void {

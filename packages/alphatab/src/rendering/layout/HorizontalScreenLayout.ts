@@ -126,6 +126,12 @@ export class HorizontalScreenLayout extends ScoreLayout {
             (this._system.x + this._system.width + this.pagePadding![2]) * this.renderer.settings.display.scale;
         currentBarIndex = 0;
 
+        // before any partial is registered: without lazy loading, registering a partial paints it, and painting
+        // changes glyph sizes that the bounds read
+        if (partials.length > 0) {
+            this._system.buildBoundingsLookup(0, 0);
+        }
+
         let x = 0;
         for (let i: number = 0; i < partials.length; i++) {
             const partial: HorizontalScreenLayoutPartialInfo = partials[i];
@@ -146,7 +152,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
             // pull to local scope for lambda
             const partialBarIndex = currentBarIndex;
             const partialIndex = i;
-            this._system.buildBoundingsLookup(0, 0);
             this.registerPartial(e, canvas => {
                 let renderX: number = this._system!.getBarX(partial.masterBars[0].index) + this._system!.accoladeWidth;
                 if (partialIndex === 0) {

@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
@@ -12,6 +11,7 @@ import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
+import { describe, expect, it } from 'vitest';
 
 // The worker hands the bounds lookup to the main thread via toJson/fromJson.
 describe('BoundsLookupJson', () => {
