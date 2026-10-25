@@ -105,7 +105,7 @@ class BarNumberFirstOfSystemHelper {
         score: Score,
         widths: number[],
         expected: (api: AlphaTabApiBase<unknown>) => number[],
-        tracks: number[] = [0],
+        tracks: number[] | null = null,
         layoutMode: LayoutMode = LayoutMode.Page
     ): Promise<void> {
         await VisualTestHelper.prepareAlphaSkia();
@@ -166,7 +166,7 @@ class BarNumberFirstOfSystemHelper {
                     );
                 });
                 const renderScore = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), settings);
-                api.renderScore(renderScore, tracks);
+                api.renderScore(renderScore, tracks ?? [0]);
                 setTimeout(() => reject(new Error('bar number render timed out')), 10000);
             });
         } finally {
