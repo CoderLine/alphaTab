@@ -165,6 +165,21 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/string-numbers-pitched.mxml');
     });
 
+    it('string-annotation-tab', async () => {
+        // tab positions from string + pitch, no fret number for notes without tab position
+        const score = ScoreLoader.loadScoreFromBytes(
+            await TestPlatform.loadFile('test-data/musicxml4/string-annotation.xml'),
+            new Settings()
+        );
+        const o = new VisualTestOptions(
+            score,
+            [new VisualTestRun(-1, 'test-data/visual-tests/effects-and-annotations/string-annotation-tab.png')],
+            new Settings()
+        );
+        o.tracks = [0, 1];
+        await VisualTestHelper.runVisualTestFull(o);
+    });
+
     it('beat-slash', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/beat-slash.gp');
     });

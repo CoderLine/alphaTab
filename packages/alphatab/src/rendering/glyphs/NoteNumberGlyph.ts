@@ -59,7 +59,10 @@ export class NoteNumberGlyph extends Glyph {
             }
         }
 
-        if (!n.isTieDestination) {
+        if (!n.isStringed && !n.isPercussion) {
+            // a pitched note without tab position (e.g. a string annotation) has no fret to show
+            this._noteString = '';
+        } else if (!n.isTieDestination) {
             this._noteString = n.isDead ? 'x' : fret.toString();
             if (n.isGhost) {
                 this._noteString = `(${this._noteString})`;

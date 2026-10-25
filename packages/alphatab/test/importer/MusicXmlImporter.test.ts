@@ -450,9 +450,11 @@ describe('MusicXmlImporterTests', () => {
         expect(tab[0].realValue).toBe(69);
         expect(tab[0].showStringNumber).toBe(false);
 
-        expect(tab[1].isStringed).toBe(false);
+        // string without fret: the pitch defines the fret
+        expect(tab[1].isStringed).toBe(true);
         expect(tab[1].string).toBe(5);
-        expect(tab[1].showStringNumber).toBe(true);
+        expect(tab[1].fret).toBe(10);
+        expect(tab[1].showStringNumber).toBe(false);
         expect(tab[1].realValue).toBe(69);
 
         // out of range string

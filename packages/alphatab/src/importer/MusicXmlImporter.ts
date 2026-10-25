@@ -3068,9 +3068,19 @@ export class MusicXmlImporter extends ScoreImporter {
         // (e.g. hammer-on destinations, let ring ending on the same string)
         note.beat.noteStringLookup.set(note.string, note);
 
-        // dead notes are commonly written without fret (e.g. Guitar Pro 5), the string still defines the tab position
-        if (!note.isStringed && note.isDead && note.beat.voice.bar.staff.tuning.length > 0) {
-            note.fret = Math.max(0, this._calculatePitchedNoteValue(note) - note.stringTuning);
+        // on a staff with tuning, string and pitch define the tab position of a note written without fret
+        // (e.g. dead notes written by Guitar Pro 5)
+        if (
+            !note.isStringed &&
+            (note.isDead || !note.isPercussion) &&
+            note.beat.voice.bar.staff.tuning.length > 0
+        ) {
+            const fret = this._calculatePitchedNoteValue(note) - note.stringTuning;
+            if (fret >= 0) {
+                note.fret = fret;
+            } else if (note.isDead) {
+                note.fret = 0;
+            }
         }
 
         if (!note.isStringed && !note.isPercussion) {
