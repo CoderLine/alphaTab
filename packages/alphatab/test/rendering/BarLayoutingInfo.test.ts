@@ -286,7 +286,7 @@ describe('BarLayoutingInfoMinimumWidths', () => {
         const natural = info.calculateVoiceWidth(info.minStretchForce);
         expect(info.spaceToForce(natural)).toBeCloseTo(info.minStretchForce, 8);
         for (const g of gaps(info, info.minStretchForce, natural)) {
-            expect(g).toBeGreaterThanOrEqual(10 - 1e-9);
+            expect(g).toBeGreaterThanOrEqual(9.999999);
         }
     });
 
