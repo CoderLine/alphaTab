@@ -172,6 +172,37 @@ class BarNumberFirstOfSystemHelper {
         expect(errors.join('\n')).toBe('');
     }
 
+    /**
+     * Gets the bar index of every bar renderer of the first staff (a multi-bar rest is one renderer).
+     */
+    public static rendererStarts(api: AlphaTabApiBase<unknown>): number[] {
+        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
+        const inner = wrapper.instance as unknown as ScoreRenderer;
+        const result: number[] = [];
+        for (const system of inner.layout!.systems) {
+            for (const renderer of system.staves[0].staves[0].barRenderers) {
+                result.push(renderer.bar.index);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Gets the bar indices of the systems starting with a multi-bar rest.
+     */
+    public static multiBarRestSystemStarts(api: AlphaTabApiBase<unknown>): number[] {
+        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
+        const inner = wrapper.instance as unknown as ScoreRenderer;
+        const result: number[] = [];
+        for (const system of inner.layout!.systems) {
+            const first = system.staves[0].staves[0].barRenderers[0];
+            if (first.additionalMultiRestBars) {
+                result.push(first.bar.index);
+            }
+        }
+        return result;
+    }
+
     public static allBars(api: AlphaTabApiBase<unknown>): number[] {
         const wrapper = api.renderer as unknown as ScoreRendererWrapper;
         const inner = wrapper.instance as unknown as ScoreRenderer;
@@ -228,6 +259,30 @@ describe('BarNumberFirstOfSystem', () => {
             BarNumberDisplay.AllBars
         );
         await BarNumberFirstOfSystemHelper.render(score, [600, 1300], BarNumberFirstOfSystemHelper.allBars);
+    });
+
+    it('multibar-rest-all-bars', async () => {
+        // every multi-bar rest carries the number of its first bar
+        let tex = '\\track { multiBarRest } ';
+        for (let i = 0; i < 6; i++) {
+            tex += ':4 c4 d4 e4 f4 | r.1 | r.1 | r.1 |';
+        }
+        const score = BarNumberFirstOfSystemHelper.createScore(tex, BarNumberDisplay.AllBars);
+        await BarNumberFirstOfSystemHelper.render(score, [600, 1300], BarNumberFirstOfSystemHelper.rendererStarts);
+    });
+
+    it('multibar-rest-first-of-system', async () => {
+        // a system starting with a multi-bar rest is numbered
+        const score = BarNumberFirstOfSystemHelper.createScore(
+            '\\track { multiBarRest } C4.1 | C4.1 | C4.1 | r.1 | r.1 | r.1 | r.1 | C4.1 | C4.1 | C4.1 | C4.1 | r.1 | r.1 | r.1 | C4.1',
+            BarNumberDisplay.FirstOfSystem
+        );
+        let restStarts: number[] = [];
+        await BarNumberFirstOfSystemHelper.render(score, [500], api => {
+            restStarts = BarNumberFirstOfSystemHelper.multiBarRestSystemStarts(api);
+            return systemStarts(api);
+        });
+        expect(restStarts.length).toBeGreaterThan(0);
     });
 
     it('bar-override-shown', async () => {

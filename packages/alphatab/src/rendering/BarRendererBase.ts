@@ -942,6 +942,8 @@ export class BarRendererBase {
         if (this.additionalMultiRestBars) {
             const container = new MultiBarRestBeatContainerGlyph();
             this.addBeatGlyph(container);
+            this.topEffects.createBarStartGlyphs(this.bar.voices[0]);
+            this.bottomEffects.createBarStartGlyphs(this.bar.voices[0]);
         } else {
             for (const index of this.bar.filledVoices) {
                 this.createVoiceGlyphs(this.bar.voices[index]);

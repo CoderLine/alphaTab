@@ -3,6 +3,7 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { EffectBandInfo } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
 /**
@@ -77,11 +78,26 @@ export class EffectBandContainer {
     }
 
     public createVoiceGlyphs(voice: Voice) {
+        this._createGlyphs(voice, false);
+    }
+
+    /**
+     * Creates only the glyphs placed at the start of the bar ({@link EffectBarGlyphSizing.SingleStartBar}),
+     * for renderers without beat glyphs like multi-bar rests.
+     */
+    public createBarStartGlyphs(voice: Voice) {
+        this._createGlyphs(voice, true);
+    }
+
+    private _createGlyphs(voice: Voice, barStartOnly: boolean) {
         const renderer = this._renderer;
         const notationSettings = renderer.settings.notation;
         for (let i = 0; i < this.infos.length; i++) {
             const info = this.infos[i];
             if (!notationSettings.isNotationElementVisible(info.effect.notationElement)) {
+                continue;
+            }
+            if (barStartOnly && info.effect.sizingMode !== EffectBarGlyphSizing.SingleStartBar) {
                 continue;
             }
 
