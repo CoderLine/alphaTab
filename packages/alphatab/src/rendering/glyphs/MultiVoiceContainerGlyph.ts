@@ -76,8 +76,9 @@ export class MultiVoiceContainerGlyph extends Glyph {
             return false;
         }
 
+        // a pick-up bar is shorter than its time signature, its notes are not full-bar notes
         const spring = springs.get(masterBar.start)!;
-        return spring.allDurations.size === 1 && spring.longestDuration === masterBar.calculateDuration();
+        return spring.allDurations.size === 1 && spring.longestDuration === masterBar.calculateDuration(false);
     }
 
     /** `emit=false`: positioning-only path; final skyline emission runs later via {@link scaleToWidth}. */
