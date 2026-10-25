@@ -455,13 +455,6 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         // the center of score notes, (used for aligning the beat to the right on-time position)
         // is always the center of the "correct note" position.
-        // a group without note heads (e.g. bend helper notes not shown in this notation mode) has no extent
-        if (Number.isNaN(noteGroup.minX)) {
-            this.onTimeX = this.noteStartX;
-            this.width = this.noteStartX;
-            return;
-        }
-
         this.onTimeX = noteGroup.correctNotes.minX + noteGroup.correctNotes.width / 2;
 
         this.width = this.noteStartX + noteGroup.multiVoiceShiftX + noteGroup.maxX - noteGroup.minX;

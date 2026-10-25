@@ -77,11 +77,8 @@ export class BarLayoutingInfo {
     }
 
     private _timeSortedSprings: Spring[] = [];
-    /** The springs ordered by the force at which they start to stretch beyond their {@link Spring.minWidth}. */
-    private _springsByStretchForce: Spring[] = [];
-    private _totalMinWidth: number = 0;
     private _minTime: number = -1;
-    private _onTimePositionsForce: number = Number.NaN;
+    private _onTimePositionsForce: number = 0;
     private _onTimePositions: Map<number, number> = new Map();
     private _incompleteGraceRodsWidth: number = 0;
     private _beatSizes: Map<number, BarLayoutingInfoBeatSizes> = new Map();
@@ -546,7 +543,6 @@ export class BarLayoutingInfo {
     private _calculateSpringConstants(minDuration: number): void {
         let totalSpringConstant: number = 0;
         const sortedSprings: Spring[] = this._timeSortedSprings;
-        this._onTimePositionsForce = Number.NaN;
         if (sortedSprings.length === 0) {
             this.totalSpringConstant = -1;
             this.minStretchForce = -1;
@@ -583,7 +579,6 @@ export class BarLayoutingInfo {
             // it is a fixed offset in front of the first spring (see calculateVoiceWidth,
             // spaceToForce and buildOnTimePositions) and does not need to be stretched in.
 
-            currentSpring.minWidth = requiredSpace;
             const requiredSpaceForce = requiredSpace * currentSpring.springConstant;
             this._updateMinStretchForce(requiredSpaceForce);
         }
@@ -598,26 +593,6 @@ export class BarLayoutingInfo {
         for (const rods of this._timeSortedOverlayRodsByBand.values()) {
             this._applyOverlayRodConstraints(rods, sortedSprings, overlayPadding);
         }
-
-        this._updateSpringsByStretchForce();
-    }
-
-    private _updateSpringsByStretchForce(): void {
-        const byForce: Spring[] = [];
-        let totalMinWidth = 0;
-        for (const spring of this._timeSortedSprings) {
-            totalMinWidth += spring.minWidth;
-            const stretchForce = spring.minWidth * spring.springConstant;
-            byForce.push(spring);
-            let i = byForce.length - 1;
-            while (i > 0 && byForce[i - 1].minWidth * byForce[i - 1].springConstant > stretchForce) {
-                byForce[i] = byForce[i - 1];
-                i--;
-            }
-            byForce[i] = spring;
-        }
-        this._springsByStretchForce = byForce;
-        this._totalMinWidth = totalMinWidth;
     }
 
     /**
@@ -733,51 +708,21 @@ export class BarLayoutingInfo {
         return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
     }
 
-    /**
-     * Gets the force at which the voices take the given width (the inverse of {@link calculateVoiceWidth}).
-     * A spring keeps its {@link Spring.minWidth} until the force stretches it further, so a bar narrower
-     * than its natural width takes the space from the springs stretched beyond their minimum first.
-     * Below the bar's minimum width the force is negative (down to -1), and all springs are squeezed
-     * proportionally to their minimum widths.
-     */
     public spaceToForce(space: number): number {
-        if (this.totalSpringConstant === -1) {
-            return -1;
-        }
-        space -= this._timeSortedSprings[0].preSpringWidth;
-        space -= this._incompleteGraceRodsWidth;
-        if (space < 0) {
-            space = 0;
-        }
-
-        let fixedWidth = this._totalMinWidth;
-        if (space < fixedWidth) {
-            return space / fixedWidth - 1;
-        }
-
-        let inverseSpringConstant = 0;
-        for (const spring of this._springsByStretchForce) {
-            const stretchForce = spring.minWidth * spring.springConstant;
-            if (fixedWidth + stretchForce * inverseSpringConstant >= space) {
-                break;
+        if (this.totalSpringConstant !== -1) {
+            if (this._timeSortedSprings.length > 0) {
+                space -= this._timeSortedSprings[0].preSpringWidth;
             }
-            fixedWidth -= spring.minWidth;
-            inverseSpringConstant += 1 / spring.springConstant;
+            space -= this._incompleteGraceRodsWidth;
+            return Math.max(space, 0) * this.totalSpringConstant;
         }
-        return inverseSpringConstant > 0 ? (space - fixedWidth) * (1 / inverseSpringConstant) : 0;
-    }
-
-    /**
-     * The narrowest width the voices can take without overlapping content.
-     */
-    public get minVoiceWidth(): number {
-        return this.calculateVoiceWidth(0);
+        return -1;
     }
 
     public calculateVoiceWidth(force: number): number {
         let width = 0;
-        for (const spring of this._timeSortedSprings) {
-            width += this._calculateSpringWidth(spring, force);
+        if (this.totalSpringConstant !== -1) {
+            width = this._calculateWidth(force, this.totalSpringConstant);
         }
 
         if (this._timeSortedSprings.length > 0) {
@@ -787,12 +732,8 @@ export class BarLayoutingInfo {
         return width;
     }
 
-    private _calculateSpringWidth(spring: Spring, force: number): number {
-        if (force < 0) {
-            return spring.minWidth * (1 + force);
-        }
-        const width = force / spring.springConstant;
-        return width < spring.minWidth ? spring.minWidth : width;
+    private _calculateWidth(force: number, springConstant: number): number {
+        return force / springConstant;
     }
 
     public buildOnTimePositions(force: number): Map<number, number> {
@@ -813,7 +754,7 @@ export class BarLayoutingInfo {
         let springX: number = sortedSprings[0].preSpringWidth;
         for (let i: number = 0; i < sortedSprings.length; i++) {
             positions.set(sortedSprings[i].timePosition, springX);
-            springX += this._calculateSpringWidth(sortedSprings[i], force);
+            springX += this._calculateWidth(force, sortedSprings[i].springConstant);
         }
         return positions;
     }
