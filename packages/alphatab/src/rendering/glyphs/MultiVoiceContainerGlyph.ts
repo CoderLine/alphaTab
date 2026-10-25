@@ -248,6 +248,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
             }
         }
 
+        beatContainer.emitSkyline(base);
         renderer.emitBeatSkyline(beatContainer);
     }
 

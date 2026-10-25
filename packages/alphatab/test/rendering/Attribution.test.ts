@@ -353,6 +353,28 @@ describe('AttributionTests', () => {
         expect(owner.bar.index).toBe(1);
     });
 
+    it('multi-bar-rest-count-below-mark', async () => {
+        const run = await render(
+            'C4.1 | C4.1 | C4.1 | r.1 | r.1 | r.1 | r.1 | C4.1 | C4.1 | C4.1 | C4.1 | r.1 | r.1 | r.1 | C4.1',
+            (s, score) => {
+                s.display.layoutMode = LayoutMode.Page;
+                score.stylesheet.multiTrackMultiBarRest = true;
+                score.stylesheet.perTrackMultiBarRest = new Set<number>([0]);
+            }
+        );
+        run.results.clear();
+        run.renderer.width = 500;
+        run.renderer.resizeRender();
+        const owner = run.expectSingleMark();
+        expect(owner.additionalMultiRestBars).toBeTruthy();
+        const markBottom = -(owner.attribution!.y + owner.attribution!.height);
+        // the count above the multi-bar rest is the only content above this bar (overflow is rounded up)
+        expect(owner.contentTopOverflow).toBeGreaterThan(0);
+        expect(markBottom).toBeGreaterThanOrEqual(
+            owner.contentTopOverflow - 1 + owner.smuflMetrics.oneStaffSpace * 0.5
+        );
+    });
+
     it('repeat-count-below-mark', async () => {
         const run = await render(`:4 C4 D4 E4 F4 | \\ro \\rc 3 G4 A4 B4 C5 ${filler}`, (s, _score) => {
             s.display.barsPerRow = 2;

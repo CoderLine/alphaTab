@@ -93,6 +93,15 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public fitToNextBeat(_next: BeatContainerGlyphBase): void {
         // nothing by default
     }
+
+    /**
+     * Emits ink outside the staff which the notehead extent of {@link getBoundingBoxTop} and
+     * {@link getBoundingBoxBottom} does not describe into the renderer's bar-local skyline.
+     * @param base The renderer-local x of this container.
+     */
+    public emitSkyline(_base: number): void {
+        // nothing by default
+    }
 }
 
 /**
