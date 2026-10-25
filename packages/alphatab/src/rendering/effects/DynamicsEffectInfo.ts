@@ -5,6 +5,7 @@ import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGly
 import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { DynamicsGlyph } from '@coderline/alphatab/rendering/glyphs/DynamicsGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
+import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 
 function getPreviousDynamicsBeat(beat: Beat): Beat | null {
     let previousBeat = beat.previousBeat;
@@ -51,6 +52,7 @@ export const dynamicsEffectInfo: EffectInfo = {
     notationElement: NotationElement.EffectDynamics,
     hideOnMultiTrack: false,
     sizingMode: EffectBarGlyphSizing.SingleOnBeat,
+    overlayRodPolicy: OverlayRodPolicy.Centered,
     shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return shouldCreateDynamicsGlyph(beat);
     },
