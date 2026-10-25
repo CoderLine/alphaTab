@@ -68,7 +68,10 @@ export class FingeringAssigner {
         this._lastStringByMidi.fill(0);
     }
 
-    /** Assigns `(string, fret)` to notes that don't already carry both. */
+    /**
+     * Assigns `(string, fret)` to notes that don't already carry both, and registers them
+     * in {@link Beat.noteStringLookup}.
+     */
     public assign(beat: Beat): void {
         const notes = beat.notes;
         const K = notes.length;
@@ -92,6 +95,7 @@ export class FingeringAssigner {
                 if (art !== null) {
                     if (Number.isNaN(note.string)) {
                         note.string = Math.max(1, Math.min(6, 7 - art.staffLine));
+                        beat.noteStringLookup.set(note.string, note);
                     }
                     if (Number.isNaN(note.fret)) {
                         note.fret = art.outputMidiNumber;
@@ -103,6 +107,7 @@ export class FingeringAssigner {
             if (note.isTieDestination && tieOrigin !== null && tieOrigin.isStringed) {
                 note.string = tieOrigin.string;
                 note.fret = tieOrigin.fret;
+                beat.noteStringLookup.set(note.string, note);
                 continue;
             }
             let j = n;
@@ -132,38 +137,50 @@ export class FingeringAssigner {
 
             let bestString = 1;
             let bestFret = 0;
-            let bestCost = Number.POSITIVE_INFINITY;
 
-            for (let s = 1; s <= N; s++) {
-                const fret = target - (this._capo + this._tuning[N - s]);
-                const distanceCost = Math.abs(fret - this._handPosition);
-                const openBonus = fret === 0 ? opts.openStringBonus : 0;
-                const negFretPenalty = fret < 0 ? -fret * opts.negativeFretPenaltyWeight : 0;
-                const highFretPenalty = fret > 12 ? (fret - 12) * opts.highFretPenaltyWeight : 0;
-                const collisionCost = (usedStrings & (1 << (s - 1))) !== 0 ? opts.collisionPenalty : 0;
-                const leftUsed = s > 1 && (usedStrings & (1 << (s - 2))) !== 0;
-                const rightUsed = s < N && (usedStrings & (1 << s)) !== 0;
-                const adjacencyBonus = leftUsed || rightUsed ? opts.adjacentStringBonus : 0;
-                const continuityBonus = s === continuityString ? opts.stringContinuityBonus : 0;
+            // a tie destination continues on the string of its origin, the last note of this pitch
+            if (
+                note.isTieDestination &&
+                continuityString > 0 &&
+                continuityString <= N &&
+                (usedStrings & (1 << (continuityString - 1))) === 0
+            ) {
+                bestString = continuityString;
+                bestFret = target - (this._capo + this._tuning[N - continuityString]);
+            } else {
+                let bestCost = Number.POSITIVE_INFINITY;
+                for (let s = 1; s <= N; s++) {
+                    const fret = target - (this._capo + this._tuning[N - s]);
+                    const distanceCost = Math.abs(fret - this._handPosition);
+                    const openBonus = fret === 0 ? opts.openStringBonus : 0;
+                    const negFretPenalty = fret < 0 ? -fret * opts.negativeFretPenaltyWeight : 0;
+                    const highFretPenalty = fret > 12 ? (fret - 12) * opts.highFretPenaltyWeight : 0;
+                    const collisionCost = (usedStrings & (1 << (s - 1))) !== 0 ? opts.collisionPenalty : 0;
+                    const leftUsed = s > 1 && (usedStrings & (1 << (s - 2))) !== 0;
+                    const rightUsed = s < N && (usedStrings & (1 << s)) !== 0;
+                    const adjacencyBonus = leftUsed || rightUsed ? opts.adjacentStringBonus : 0;
+                    const continuityBonus = s === continuityString ? opts.stringContinuityBonus : 0;
 
-                const cost =
-                    distanceCost +
-                    openBonus +
-                    negFretPenalty +
-                    highFretPenalty +
-                    collisionCost +
-                    adjacencyBonus +
-                    continuityBonus;
+                    const cost =
+                        distanceCost +
+                        openBonus +
+                        negFretPenalty +
+                        highFretPenalty +
+                        collisionCost +
+                        adjacencyBonus +
+                        continuityBonus;
 
-                if (cost < bestCost) {
-                    bestCost = cost;
-                    bestString = s;
-                    bestFret = fret;
+                    if (cost < bestCost) {
+                        bestCost = cost;
+                        bestString = s;
+                        bestFret = fret;
+                    }
                 }
             }
 
             note.string = bestString;
             note.fret = bestFret;
+            beat.noteStringLookup.set(note.string, note);
             usedStrings |= 1 << (bestString - 1);
             if (realValue >= 0 && realValue < 128) {
                 this._lastStringByMidi[realValue] = bestString;

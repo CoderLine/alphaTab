@@ -287,4 +287,28 @@ describe('GpxImporterTest', () => {
         const score = (await prepareImporterWithFile('guitarpro6/slash.gpx')).readScore();
         GpImporterTestHelper.checkSlash(score);
     });
+
+    it('synthesized-fingering-keeps-ties', async () => {
+        const score = (await prepareImporterWithFile('conversion/full-song.gpx')).readScore();
+        const tiesPerTrack = score.tracks.map(t => {
+            let ties = 0;
+            for (const staff of t.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            for (const note of beat.notes) {
+                                if (note.isTieDestination && note.tieOrigin !== null) {
+                                    expect(note.tieOrigin.string).toBe(note.string);
+                                    expect(note.tieOrigin.realValue).toBe(note.realValue);
+                                    ties++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return ties;
+        });
+        expect(tiesPerTrack).toEqual([44, 26, 7, 1, 0, 17, 7, 48, 4, 0, 0]);
+    });
 });
