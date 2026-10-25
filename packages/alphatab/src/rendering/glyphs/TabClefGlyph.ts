@@ -1,7 +1,7 @@
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 
 /**
  * @internal
@@ -21,12 +21,12 @@ export class TabClefGlyph extends MusicFontGlyph {
         this.offsetX = this.width / 2;
     }
 
-    public override registerHeaderRod(info: BarLayoutingInfo): void {
+    public override registerHeaderRod(info: IHeaderRodSink): void {
         // shares the column with the standard notation clefs, left aligned
         info.addHeaderRod(ClefGlyph.HeaderRank, 0, this.width + this.renderer.smuflMetrics.preBeatGlyphSpacing);
     }
 
-    public override applyHeaderRod(info: BarLayoutingInfo): void {
+    public override applyHeaderRod(info: IHeaderRodSink): void {
         this.x = info.getHeaderRodX(ClefGlyph.HeaderRank, 0);
     }
 }

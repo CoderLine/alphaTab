@@ -61,11 +61,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         if (this.noteHeads && this.container.beat.notes.length > 0) {
             const noteBounds = new NoteBounds();
             noteBounds.note = this.container.beat.notes[0];
-            noteBounds.noteHeadBounds = new Bounds();
-            noteBounds.noteHeadBounds.x = cx + this.x + this.noteHeads.x;
-            noteBounds.noteHeadBounds.y = cy + this.y + this.noteHeads.y - this.noteHeads.height / 2;
-            noteBounds.noteHeadBounds.w = this.width;
-            noteBounds.noteHeadBounds.h = this.height;
+            const scale = this.renderer.settings.display.scale;
+            noteBounds.noteHeadBounds = new Bounds(
+                (cx + this.x + this.noteHeads.x) * scale,
+                (cy + this.y + this.noteHeads.y - this.noteHeads.height / 2) * scale,
+                this.width * scale,
+                this.height * scale
+            );
             beatBounds.addNote(noteBounds);
         }
     }

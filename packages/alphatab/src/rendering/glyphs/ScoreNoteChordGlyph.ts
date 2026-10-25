@@ -286,16 +286,18 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+        const scale = this.renderer.settings.display.scale;
         for (const note of this._notes) {
             const glyph = this._getNoteGlyph(note);
             if (glyph) {
                 const noteBounds: NoteBounds = new NoteBounds();
                 noteBounds.note = note;
-                noteBounds.noteHeadBounds = new Bounds();
-                noteBounds.noteHeadBounds.x = cx + this.x + glyph.x;
-                noteBounds.noteHeadBounds.y = cy + this.y + glyph.y - glyph.height / 2;
-                noteBounds.noteHeadBounds.w = glyph.width;
-                noteBounds.noteHeadBounds.h = glyph.height;
+                noteBounds.noteHeadBounds = new Bounds(
+                    (cx + this.x + glyph.x) * scale,
+                    (cy + this.y + glyph.y - glyph.height / 2) * scale,
+                    glyph.width * scale,
+                    glyph.height * scale
+                );
                 beatBounds.addNote(noteBounds);
             }
         }

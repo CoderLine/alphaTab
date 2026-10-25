@@ -6,6 +6,7 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Track } from '@coderline/alphatab/model/Track';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { Spring } from '@coderline/alphatab/rendering/staves/Spring';
 
 /**
@@ -49,7 +50,7 @@ class HeaderRod {
  * to align the parts across multiple staves.
  * @internal
  */
-export class BarLayoutingInfo {
+export class BarLayoutingInfo implements IHeaderRodSink {
     /**
      * The longest duration (in ticks) the spacing reference can have; shorter durations in the score
      * lower the reference.

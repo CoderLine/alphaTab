@@ -384,63 +384,62 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number) {
-        const beatBoundings: BeatBounds = new BeatBounds();
-        beatBoundings.beat = this.beat;
-
-        if (this.beat.isEmpty) {
-            beatBoundings.visualBounds = new Bounds();
-            beatBoundings.visualBounds.x = cx + this.x;
-            beatBoundings.visualBounds.y = barBounds.visualBounds.y;
-            beatBoundings.visualBounds.w = this.width;
-            beatBoundings.visualBounds.h = barBounds.visualBounds.h;
-
-            beatBoundings.realBounds = new Bounds();
-            beatBoundings.realBounds.x = cx + this.x;
-            beatBoundings.realBounds.y = barBounds.realBounds.y;
-            beatBoundings.realBounds.w = this.width;
-            beatBoundings.realBounds.h = barBounds.realBounds.h;
-
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX;
-        } else {
-            beatBoundings.visualBounds = new Bounds();
-            beatBoundings.visualBounds.x = cx + this.x;
-
+        const scale = this.renderer.settings.display.scale;
+        const x = cx + this.x;
+        let visualX = x;
+        let visualW = this.width;
+        if (!this.beat.isEmpty) {
             if (!this.preNotes.isEmpty) {
-                beatBoundings.visualBounds.x = cx + this.x + this.preNotes.x;
+                visualX = x + this.preNotes.x;
             } else if (!this.onNotes.isEmpty) {
-                beatBoundings.visualBounds.x = cx + this.x + this.onNotes.x;
-            } else {
-                beatBoundings.visualBounds.x = cx + this.x;
+                visualX = x + this.onNotes.x;
             }
 
             let visualEndX = 0;
-
             if (!this.onNotes.isEmpty) {
-                visualEndX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX + this.postBeatStretch;
+                visualEndX = x + this.onNotes.x + this.onNotes.onTimeX + this.postBeatStretch;
             } else if (!this.preNotes.isEmpty) {
-                visualEndX = cx + this.x + this.preNotes.x + this.preNotes.width;
+                visualEndX = x + this.preNotes.x + this.preNotes.width;
             } else {
-                visualEndX = cx + this.x + this.width;
+                visualEndX = x + this.width;
             }
-
-            beatBoundings.visualBounds.w = visualEndX - beatBoundings.visualBounds.x;
-            beatBoundings.visualBounds.y = barBounds.visualBounds.y;
-            beatBoundings.visualBounds.h = barBounds.visualBounds.h;
-
-            beatBoundings.realBounds = new Bounds();
-            beatBoundings.realBounds.x = cx + this.x;
-            beatBoundings.realBounds.y = barBounds.realBounds.y;
-            beatBoundings.realBounds.w = this.width;
-            beatBoundings.realBounds.h = barBounds.realBounds.h;
-
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX;
+            visualW = visualEndX - visualX;
         }
+        visualW = this.getBoundsVisualWidth(visualX, visualW);
+        const realW = this.getBoundsRealWidth(x, this.width);
+
+        const beatBoundings: BeatBounds = new BeatBounds();
+        beatBoundings.beat = this.beat;
+        beatBoundings.visualBounds = new Bounds(
+            visualX * scale,
+            barBounds.visualBounds.y,
+            visualW * scale,
+            barBounds.visualBounds.h
+        );
+        beatBoundings.realBounds = new Bounds(x * scale, barBounds.realBounds.y, realW * scale, barBounds.realBounds.h);
+        beatBoundings.onNotesX = (x + this.onNotes.x + this.onNotes.onTimeX) * scale;
 
         barBounds.addBeat(beatBoundings);
 
         if (this.renderer.settings.core.includeNoteBounds) {
-            this.onNotes.buildBoundingsLookup(beatBoundings, cx + this.x, cy + this.y);
+            this.onNotes.buildBoundingsLookup(beatBoundings, x, cy + this.y);
         }
+    }
+
+    /**
+     * The unscaled width of the visual beat bounds starting at `visualX`.
+     * @param width The width covered by the beat glyphs.
+     */
+    protected getBoundsVisualWidth(_visualX: number, width: number): number {
+        return width;
+    }
+
+    /**
+     * The unscaled width of the real beat bounds starting at `realX`.
+     * @param width The width of the beat container.
+     */
+    protected getBoundsRealWidth(_realX: number, width: number): number {
+        return width;
     }
 
     public getBeatX(requestedPosition: BeatXPosition, useSharedSizes: boolean = false) {

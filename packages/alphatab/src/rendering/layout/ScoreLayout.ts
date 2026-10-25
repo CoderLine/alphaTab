@@ -24,6 +24,7 @@ import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFin
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import { HeaderKey, type HeaderProfile } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
@@ -143,6 +144,19 @@ export abstract class ScoreLayout {
     public referenceMinDuration: number = BarLayoutingInfo.defaultMinDuration;
 
     /**
+     * The header profiles of this layout by {@link HeaderKey.high} and {@link HeaderKey.low}.
+     */
+    public readonly headerProfiles: Map<number, Map<number, HeaderProfile>> = new Map<
+        number,
+        Map<number, HeaderProfile>
+    >();
+
+    /**
+     * Reused while building the header key of a bar renderer.
+     */
+    public readonly headerKey: HeaderKey = new HeaderKey();
+
+    /**
      * Whether all bars are spaced against {@link referenceMinDuration}. Layouts that size every bar
      * on its own keep a reference per bar instead.
      */
@@ -195,6 +209,7 @@ export abstract class ScoreLayout {
 
         this._lazyPartials.clear();
         this.beamingRuleLookups.clear();
+        this.headerProfiles.clear();
         this._barRendererLookup.clear();
 
         this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;

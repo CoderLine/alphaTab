@@ -255,10 +255,13 @@ export class BoundsLookup {
      * @param bounds The beat bounds to add.
      */
     public addBeat(bounds: BeatBounds): void {
-        if (!this._beatLookup.has(bounds.beat.id)) {
-            this._beatLookup.set(bounds.beat.id, []);
+        const id = bounds.beat.id;
+        const list = this._beatLookup.get(id);
+        if (list) {
+            list.push(bounds);
+        } else {
+            this._beatLookup.set(id, [bounds]);
         }
-        this._beatLookup.get(bounds.beat.id)?.push(bounds);
     }
 
     /**
@@ -267,10 +270,7 @@ export class BoundsLookup {
      * @returns The master bar bounds if it was rendered, or null if no boundary information is available.
      */
     public findMasterBarByIndex(index: number): MasterBarBounds | null {
-        if (this._masterBarLookup.has(index)) {
-            return this._masterBarLookup.get(index)!;
-        }
-        return null;
+        return this._masterBarLookup.get(index) ?? null;
     }
 
     /**
@@ -279,11 +279,7 @@ export class BoundsLookup {
      * @returns The master bar bounds if it was rendered, or null if no boundary information is available.
      */
     public findMasterBar(bar: MasterBar): MasterBarBounds | null {
-        const id: number = bar.index;
-        if (this._masterBarLookup.has(id)) {
-            return this._masterBarLookup.get(id)!;
-        }
-        return null;
+        return this._masterBarLookup.get(bar.index) ?? null;
     }
 
     /**
@@ -302,11 +298,7 @@ export class BoundsLookup {
      * @returns The beat bounds if it was rendered, or null if no boundary information is available.
      */
     public findBeats(beat: Beat): BeatBounds[] | null {
-        const id: number = beat.id;
-        if (this._beatLookup.has(id)) {
-            return this._beatLookup.get(id)!;
-        }
-        return null;
+        return this._beatLookup.get(beat.id) ?? null;
     }
 
     /**

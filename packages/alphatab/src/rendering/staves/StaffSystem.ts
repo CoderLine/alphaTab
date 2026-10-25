@@ -1312,57 +1312,74 @@ export class StaffSystem {
         const lineHeight = lineBottom - lineTop;
 
         const x: number = this.x + firstStaff.x;
+        const scale = this.layout.renderer.settings.display.scale;
+        const systemX = (cx + this.x) * scale;
+        const systemY = (cy + this.y) * scale;
+        const systemW = this.width * scale;
         const staffSystemBounds = new StaffSystemBounds();
-        staffSystemBounds.visualBounds = new Bounds();
-        staffSystemBounds.visualBounds.x = cx + this.x;
-        staffSystemBounds.visualBounds.y = cy + this.y;
-        staffSystemBounds.visualBounds.w = this.width;
-        staffSystemBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
-        staffSystemBounds.realBounds = new Bounds();
-        staffSystemBounds.realBounds.x = cx + this.x;
-        staffSystemBounds.realBounds.y = cy + this.y;
-        staffSystemBounds.realBounds.w = this.width;
-        staffSystemBounds.realBounds.h = this.height;
+        staffSystemBounds.visualBounds = new Bounds(
+            systemX,
+            systemY,
+            systemW,
+            (this.height - this.topPadding - this.bottomPadding) * scale
+        );
+        staffSystemBounds.realBounds = new Bounds(systemX, systemY, systemW, this.height * scale);
 
-        this.layout.renderer.boundsLookup!.addStaffSystem(staffSystemBounds);
-        const masterBarBoundsLookup: Map<number, MasterBarBounds> = new Map<number, MasterBarBounds>();
+        const boundsLookup = this.layout.renderer.boundsLookup!;
+        boundsLookup.addStaffSystem(staffSystemBounds);
+
+        const scaledRealTop = realTop * scale;
+        const scaledRealHeight = realHeight * scale;
+        const scaledVisualTop = visualTop * scale;
+        const scaledVisualHeight = visualHeight * scale;
+        const scaledLineTop = lineTop * scale;
+        const scaledLineHeight = lineHeight * scale;
+        const systemBars = staffSystemBounds.bars;
         for (let i: number = 0; i < this.staves.length; i++) {
-            for (const staff of this.staves[i].staves) {
+            const staves = this.staves[i].staves;
+            for (let s = 0; s < staves.length; s++) {
+                const staff = staves[s];
                 if (!staff.isVisible) {
                     continue;
                 }
-                for (const renderer of staff.barRenderers) {
-                    let masterBarBounds: MasterBarBounds;
-                    if (!masterBarBoundsLookup.has(renderer.bar.masterBar.index)) {
-                        masterBarBounds = new MasterBarBounds();
-                        masterBarBounds.index = renderer.bar.masterBar.index;
-                        masterBarBounds.isFirstOfLine = renderer.isFirstOfStaff;
-                        masterBarBounds.realBounds = new Bounds();
-                        masterBarBounds.realBounds.x = x + renderer.x;
-                        masterBarBounds.realBounds.y = realTop;
-                        masterBarBounds.realBounds.w = renderer.width;
-                        masterBarBounds.realBounds.h = realHeight;
-
-                        masterBarBounds.visualBounds = new Bounds();
-                        masterBarBounds.visualBounds.x = x + renderer.x;
-                        masterBarBounds.visualBounds.y = visualTop;
-                        masterBarBounds.visualBounds.w = renderer.width;
-                        masterBarBounds.visualBounds.h = visualHeight;
-
-                        masterBarBounds.lineAlignedBounds = new Bounds();
-                        masterBarBounds.lineAlignedBounds.x = x + renderer.x;
-                        masterBarBounds.lineAlignedBounds.y = lineTop;
-                        masterBarBounds.lineAlignedBounds.w = renderer.width;
-                        masterBarBounds.lineAlignedBounds.h = lineHeight;
-                        this.layout.renderer.boundsLookup!.addMasterBar(masterBarBounds);
-                        masterBarBoundsLookup.set(masterBarBounds.index, masterBarBounds);
+                const renderers = staff.barRenderers;
+                for (let j = 0; j < renderers.length; j++) {
+                    const renderer = renderers[j];
+                    const masterBarIndex = renderer.bar.masterBar.index;
+                    // staves usually hold one renderer per master bar of the system, in the same order
+                    let masterBarBounds: MasterBarBounds | null = null;
+                    if (j < systemBars.length && systemBars[j].index === masterBarIndex) {
+                        masterBarBounds = systemBars[j];
                     } else {
-                        masterBarBounds = masterBarBoundsLookup.get(renderer.bar.masterBar.index)!;
+                        for (const b of systemBars) {
+                            if (b.index === masterBarIndex) {
+                                masterBarBounds = b;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!masterBarBounds) {
+                        const barX = (x + renderer.x) * scale;
+                        const barW = renderer.width * scale;
+                        masterBarBounds = new MasterBarBounds();
+                        masterBarBounds.index = masterBarIndex;
+                        masterBarBounds.isFirstOfLine = renderer.isFirstOfStaff;
+                        masterBarBounds.realBounds = new Bounds(barX, scaledRealTop, barW, scaledRealHeight);
+                        masterBarBounds.visualBounds = new Bounds(barX, scaledVisualTop, barW, scaledVisualHeight);
+                        masterBarBounds.lineAlignedBounds = new Bounds(barX, scaledLineTop, barW, scaledLineHeight);
+                        boundsLookup.addMasterBar(masterBarBounds);
                     }
                     renderer.buildBoundingsLookup(masterBarBounds, x, cy + this.y + staff.y);
                 }
             }
         }
+
+        for (const masterBarBounds of systemBars) {
+            masterBarBounds.sortBars();
+        }
+        // the bounds are built scaled and sorted: BoundsLookup.finish must not process them again
+        staffSystemBounds.isFinished = true;
     }
 
     public getBarX(index: number): number {

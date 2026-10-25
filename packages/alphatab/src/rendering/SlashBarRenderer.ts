@@ -11,6 +11,7 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
+import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
@@ -146,6 +147,10 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Up;
+    }
+
+    protected override buildLineHeaderKey(key: HeaderKey): void {
+        this.buildTimeSignatureHeaderKey(key);
     }
 
     protected override createLinePreBeatGlyphs(): void {

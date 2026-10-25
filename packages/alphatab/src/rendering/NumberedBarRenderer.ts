@@ -20,6 +20,7 @@ import {
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
+import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper, BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
@@ -272,6 +273,15 @@ export class NumberedBarRenderer extends LineBarRenderer {
         }
         this.createStartSpacing();
         this.createLinePreBeatGlyphs();
+    }
+
+    protected override buildHeaderKey(key: HeaderKey): void {
+        super.buildHeaderKey(key);
+        key.addHighFlag(this.staff!.isCascadePrimary);
+    }
+
+    protected override buildLineHeaderKey(key: HeaderKey): void {
+        this.buildTimeSignatureHeaderKey(key);
     }
 
     protected override createLinePreBeatGlyphs(): void {

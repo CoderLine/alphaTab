@@ -6,6 +6,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Bar } from '@coderline/alphatab/model/Bar';
+import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import { HeaderKey, HeaderProfile } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -21,27 +23,56 @@ class RodRecorder {
     }
 }
 
-function rodsOf(r: BarRendererBase): string {
+function productionKey(r: BarRendererBase): string {
+    const key = new HeaderKey();
+    (r as any).buildHeaderKey(key);
+    return key.isValid ? `${key.high}:${key.low}` : 'invalid';
+}
+
+/** Creates the header glyphs of the renderer for its current position and measures them. */
+function freshProfile(r: BarRendererBase): HeaderProfile {
+    const renderer = r as any;
+    const group = new LeftToRightLayoutingGlyphGroup();
+    group.renderer = r;
+    const previous = renderer._preBeatGlyphs;
+    const wasFirstOfStaff = renderer.wasFirstOfStaff;
+    renderer._preBeatGlyphs = group;
+    try {
+        renderer.createPreBeatGlyphs();
+    } finally {
+        renderer._preBeatGlyphs = previous;
+        renderer.wasFirstOfStaff = wasFirstOfStaff;
+    }
+    return HeaderProfile.measure(group);
+}
+
+function rodsOfProfile(p: HeaderProfile): string {
     const recorder = new RodRecorder();
-    (r as any)._preBeatGlyphs.registerHeaderRod(recorder);
+    p.registerHeaderRods(recorder as unknown as HeaderProfile);
     return recorder.rods.join(' ');
 }
 
+function rodsOf(r: BarRendererBase): string {
+    return rodsOfProfile(freshProfile(r));
+}
+
 /**
- * Everything layout reads from the header glyphs besides the rods: per glyph its width and its
+ * Everything layout reads from the header glyphs besides the rods: per glyph its column and its
  * bounding box relative to its own x (overflow and skyline input), in creation order.
  */
-function profileOf(r: BarRendererBase): string {
-    const parts: string[] = [];
-    const glyphs = (r as any)._preBeatGlyphs.glyphs as any[] | null;
-    for (const g of glyphs ?? []) {
-        const f = (v: number) => v.toFixed(3);
+function serializeProfile(p: HeaderProfile): string {
+    const f = (v: number) => (Number.isNaN(v) ? 'NaN' : v.toFixed(6));
+    const parts: string[] = [`w=${f(p.naturalWidth)}`];
+    for (const g of p.glyphs) {
         parts.push(
-            `${g.constructor.name} w=${f(g.width)} l=${f(g.getBoundingBoxLeft() - g.x)} r=${f(g.getBoundingBoxRight() - g.x)} ` +
-                `t=${f(g.getBoundingBoxTop())} b=${f(g.getBoundingBoxBottom())}`
+            `r=${g.rank} pre=${f(g.ownPre)} x=${f(g.localX)} l=${f(g.left)} r=${f(g.right)} t=${f(g.top)} b=${f(g.bottom)}`
         );
     }
     return parts.join(' | ');
+}
+
+function profileOf(r: BarRendererBase): string {
+    return serializeProfile(freshProfile(r));
 }
 
 function display(r: BarRendererBase, method: string): string {
@@ -155,6 +186,9 @@ describe('HeaderCacheSpike', () => {
         const full = new KeyStats();
         const compact = new KeyStats();
         const profiles = new KeyStats();
+        let productionMismatches = 0;
+        const productionMismatchReport: string[] = [];
+        const productionKeys = new Set<string>();
         const distinctProfiles = new Set<string>();
         const distinctRods = new Set<string>();
         let renderersSeen = 0;
@@ -180,6 +214,17 @@ describe('HeaderCacheSpike', () => {
                             full.add(fullKey(r, rel), rods, where);
                             compact.add(compactKey(r), rods, where);
                             const profile = profileOf(r);
+                            const used = (r as any)._headerProfile as HeaderProfile;
+                            const usedSerialized = `${rodsOfProfile(used)} || ${serializeProfile(used)}`;
+                            if (usedSerialized !== `${rods} || ${profile}`) {
+                                productionMismatches++;
+                                if (productionMismatchReport.length < 10) {
+                                    productionMismatchReport.push(
+                                        `MISMATCH key=${productionKey(r)} @ ${where}\n    used:  ${usedSerialized}\n    fresh: ${rods} || ${profile}`
+                                    );
+                                }
+                            }
+                            productionKeys.add(productionKey(r));
                             profiles.add(compactKey(r), profile, where);
                             distinctProfiles.add(`${r.staff!.staffId} ${profile}`);
                             distinctRods.add(`${r.staff!.staffId} ${rods}`);
@@ -200,6 +245,10 @@ describe('HeaderCacheSpike', () => {
         out.push(`compact key (corpus-wide): keys=${compact.byKey.size} conflicts=${compact.conflicts.length}`);
         out.push(`distinct rod lists per staff kind (corpus-wide): ${distinctRods.size}`);
         out.push(
+            `production header cache: keys=${productionKeys.size} renderers whose cached profile differs from a fresh measurement=${productionMismatches}`
+        );
+        out.push(...productionMismatchReport);
+        out.push(
             `header geometry profile by compact key: keys=${profiles.byKey.size} conflicts=${profiles.conflicts.length} distinct profiles=${distinctProfiles.size}`
         );
         for (const [label, stats] of [
@@ -214,7 +263,7 @@ describe('HeaderCacheSpike', () => {
                 }
             }
         }
-        console.log(out.slice(0, 6).join('\n'));
+        console.log(out.slice(0, 7).join('\n'));
         const report = path.join(LayoutCorpus.outDir(root), 'header-cache-spike.txt');
         fs.writeFileSync(report, out.join('\n'));
         console.log(`report written to ${report}`);
@@ -246,11 +295,23 @@ describe('HeaderCacheSpike', () => {
                 }
                 r.index = index;
             }
-            // cost of creating the header glyphs of every renderer once more (the work a cache avoids)
+            // cost of creating the header glyphs of every renderer once more (the work the cache avoids)
+            const createAll = () => {
+                const groups: LeftToRightLayoutingGlyphGroup[] = [];
+                for (const r of renderers) {
+                    const renderer = r as any;
+                    const group = new LeftToRightLayoutingGlyphGroup();
+                    group.renderer = r;
+                    const previous = renderer._preBeatGlyphs;
+                    renderer._preBeatGlyphs = group;
+                    renderer.createPreBeatGlyphs();
+                    renderer._preBeatGlyphs = previous;
+                    groups.push(group);
+                }
+                return groups;
+            };
             const t1 = performance.now();
-            for (const r of renderers) {
-                (r as any).recreatePreBeatGlyphs();
-            }
+            const groups = createAll();
             const headerMs = performance.now() - t1;
             let glyphs = 0;
             const countGlyphs = (g: any) => {
@@ -261,13 +322,11 @@ describe('HeaderCacheSpike', () => {
                     }
                 }
             };
-            for (const r of renderers) {
-                countGlyphs((r as any)._preBeatGlyphs);
+            for (const g of groups) {
+                countGlyphs(g);
             }
             const alloc = AllocationSampler.measure(() => {
-                for (const r of renderers) {
-                    (r as any).recreatePreBeatGlyphs();
-                }
+                createAll();
             }, 512);
 
             out.push(

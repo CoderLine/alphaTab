@@ -19,6 +19,7 @@ import { TabClefGlyph } from '@coderline/alphatab/rendering/glyphs/TabClefGlyph'
 import type { TabNoteChordGlyph } from '@coderline/alphatab/rendering/glyphs/TabNoteChordGlyph';
 import { TabTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TabTimeSignatureGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import type { ReservedLayoutAreaSlot } from '@coderline/alphatab/rendering/utils/BarCollisionHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -386,6 +387,11 @@ export class TabBarRenderer extends LineBarRenderer {
         if (hasBottom) {
             this.insertSkylineBottom(xStart, xEnd, halfLine);
         }
+    }
+
+    protected override buildLineHeaderKey(key: HeaderKey): void {
+        key.addHighFlag(StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveClefDisplay()));
+        this.buildTimeSignatureHeaderKey(key);
     }
 
     protected override createLinePreBeatGlyphs(): void {

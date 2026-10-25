@@ -367,11 +367,14 @@ export class MultiVoiceContainerGlyph extends Glyph {
     }
 
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void {
-        for (const [index, c] of this.beatGlyphs) {
-            const voice = this.renderer.bar.voices[index];
-            if (index === 0 || !voice.isEmpty) {
-                for (const bc of c) {
-                    bc.buildBoundingsLookup(barBounds, cx + this.x, cy + this.y);
+        const x = cx + this.x;
+        const y = cy + this.y;
+        const voices = this.renderer.bar.voices;
+        for (const c of this.beatGlyphs.values()) {
+            const index = c[0].voiceIndex;
+            if (index === 0 || !voices[index].isEmpty) {
+                for (let i = 0; i < c.length; i++) {
+                    c[i].buildBoundingsLookup(barBounds, x, y);
                 }
             }
         }

@@ -20,6 +20,7 @@ import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/Sc
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -204,6 +205,23 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     protected override getMaxLineOfBeat(beat: Beat): number {
         return this.accidentalHelper.getMaxSteps(beat) / 2;
+    }
+
+    protected override buildLineHeaderKey(key: HeaderKey): void {
+        const bar = this.bar;
+        const previous = bar.previousBar;
+        key.addHighFlag(StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveClefDisplay()));
+        key.addHigh(bar.clef as number, 3);
+        key.addHigh(bar.clefOttava as number, 3);
+        key.addHighFlag(StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveKeySignatureDisplay()));
+        key.addHigh((bar.keySignature as number) + 7, 4);
+        key.addHighFlag(previous !== null);
+        if (previous) {
+            key.addHigh(previous.clef as number, 3);
+            key.addHigh(previous.clefOttava as number, 3);
+            key.addHigh((previous.keySignature as number) + 7, 4);
+        }
+        this.buildTimeSignatureHeaderKey(key);
     }
 
     protected override createLinePreBeatGlyphs(): void {

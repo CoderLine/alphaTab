@@ -19,6 +19,8 @@ import { RepeatCountGlyph } from '@coderline/alphatab/rendering/glyphs/RepeatCou
 import { StartSpacingGlyph } from '@coderline/alphatab/rendering/glyphs/StartSpacingGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { BeamingHelper, type BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
+import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
+import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -621,6 +623,59 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this.addPreBeatGlyph(new BarLineGlyph(false, this.bar.staff.track.score.stylesheet.extendBarLines));
         this.createStartSpacing();
         this.createLinePreBeatGlyphs();
+    }
+
+    private static readonly _laneKinds: Map<string, number> = new Map<string, number>();
+
+    protected override buildHeaderKey(key: HeaderKey): void {
+        const staff = this.staff!;
+        const kinds = LineBarRenderer._laneKinds;
+        if (!kinds.has(staff.staffId)) {
+            kinds.set(staff.staffId, kinds.size);
+        }
+        const bar = this.bar;
+        const isStart = this.isFirstOfStaff;
+        const previous = this.previousRenderer;
+        const previousRight =
+            previous && previous.staff === staff ? (previous.bar.getActualBarLineRight() as number) : -1;
+        // the lane (staff kind, track and staff) determines the vertical geometry
+        key.addHigh(kinds.get(staff.staffId)!, 4);
+        key.addHigh(staff.trackIndex, 8);
+        key.addHigh(staff.modelStaff.index, 4);
+        key.addHighFlag(isStart);
+        key.addHigh(bar.getActualBarLineLeft(isStart) as number, 4);
+        key.addHighFlag(bar.masterBar.isRepeatStart);
+        key.addHigh(previousRight + 1, 4);
+        this.buildLineHeaderKey(key);
+    }
+
+    /**
+     * Adds the inputs of the glyphs created by {@link createLinePreBeatGlyphs} to the header key.
+     */
+    protected buildLineHeaderKey(_key: HeaderKey): void {
+        // to be implemented in subclasses
+    }
+
+    protected buildTimeSignatureHeaderKey(key: HeaderKey): void {
+        const masterBar = this.bar.masterBar;
+        const previousBar = this.bar.previousBar;
+        const previousMasterBar = masterBar.previousMasterBar;
+        key.addLowFlag(StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveTimeSignatureDisplay()));
+        key.addLow(masterBar.timeSignatureNumerator, 8);
+        key.addLow(masterBar.timeSignatureDenominator, 8);
+        key.addLowFlag(masterBar.timeSignatureCommon);
+        key.addLowFlag(masterBar.isFreeTime);
+        key.addLowFlag(previousBar !== null);
+        if (previousBar) {
+            const previous = previousBar.masterBar;
+            key.addLow(previous.timeSignatureNumerator, 8);
+            key.addLow(previous.timeSignatureDenominator, 8);
+            key.addLowFlag(previous.isFreeTime);
+        }
+        key.addLowFlag(previousMasterBar !== null);
+        if (previousMasterBar) {
+            key.addLowFlag(previousMasterBar.isFreeTime);
+        }
     }
 
     public resolveClefDisplay(): ElementDisplay {

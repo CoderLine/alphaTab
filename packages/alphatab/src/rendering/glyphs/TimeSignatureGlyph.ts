@@ -6,7 +6,7 @@ import { GhostParenthesisGlyph } from '@coderline/alphatab/rendering/glyphs/Ghos
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 
 /**
  * @internal
@@ -56,7 +56,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         }
     }
 
-    public override registerHeaderRod(info: BarLayoutingInfo): void {
+    public override registerHeaderRod(info: IHeaderRodSink): void {
         // center aligned: time signatures differ in size across staff types (e.g. tabs)
         const half = this.width / 2;
         const spacing =
@@ -64,7 +64,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         info.addHeaderRod(TimeSignatureGlyph.HeaderRank, half, half + spacing);
     }
 
-    public override applyHeaderRod(info: BarLayoutingInfo): void {
+    public override applyHeaderRod(info: IHeaderRodSink): void {
         this.x = info.getHeaderRodX(TimeSignatureGlyph.HeaderRank, this.width / 2);
     }
 

@@ -15,6 +15,7 @@ import {
 } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import { type HeaderKey, HeaderProfile } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
 import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
@@ -91,7 +92,11 @@ export enum NoteXPosition {
  */
 export class BarRendererBase {
     private static readonly _compressionTolerance: number = 1;
+    // the layout works on _headerProfile; the header glyphs are only created once they are needed
+    // for painting and kept as long as the header of the bar does not change
     private _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
+    private _headerProfile: HeaderProfile | null = null;
+    private _headerInFirstSystem: boolean = false;
     protected readonly voiceContainer = new MultiVoiceContainerGlyph();
     private readonly _postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
 
@@ -446,12 +451,6 @@ export class BarRendererBase {
         this.topEffects.alignGlyphs();
         this.bottomEffects.alignGlyphs();
 
-        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
-        if (preBeatGlyphs) {
-            for (const g of preBeatGlyphs) {
-                g.populateSkyline();
-            }
-        }
         this.topEffects.populateSkyline();
         this.bottomEffects.populateSkyline();
 
@@ -508,7 +507,7 @@ export class BarRendererBase {
         const info: BarLayoutingInfo = this.layoutingInfo;
         // header glyphs (clef, key signature, time signature...) register their
         // columns to be aligned across all staves.
-        this._preBeatGlyphs.registerHeaderRod(info);
+        this._headerProfile!.registerHeaderRods(info);
         if (!this._voiceWalkDone) {
             const container = this.voiceContainer;
             container.registerLayoutingInfo(info);
@@ -596,7 +595,6 @@ export class BarRendererBase {
         this._hasPositionedOverflow = false;
 
         // align the header glyphs with the shared columns of all staves
-        this._preBeatGlyphs.applyHeaderRod(this.layoutingInfo);
         this._preBeatGlyphs.width = this.layoutingInfo.preBeatSize;
         // header glyphs moved: re-emit their skyline spans (overflow magnitudes are x-independent)
         this._emitPreBeatOverflows(this.height);
@@ -745,7 +743,7 @@ export class BarRendererBase {
         this._hasMeasuredOverflow = false;
         this._hasPositionedOverflow = false;
 
-        this.createPreBeatGlyphs();
+        this._updateHeaderProfile();
         this.createBeatGlyphs();
         this.createPostBeatGlyphs();
 
@@ -802,11 +800,99 @@ export class BarRendererBase {
     }
 
     private _emitPreBeatOverflows(rendererBottom: number): void {
-        this.preBeatLocalSkyline.reset();
-        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
-        if (preBeatGlyphs) {
-            this._emitGroupOverflows(preBeatGlyphs, this.preBeatLocalSkyline, rendererBottom);
+        const skyline = this.preBeatLocalSkyline;
+        skyline.reset();
+        const profile = this._headerProfile;
+        if (!profile) {
+            return;
         }
+        const info = this.layoutingInfo;
+        for (const g of profile.glyphs) {
+            const topOver = g.top < 0;
+            const bottomOver = g.bottom > rendererBottom;
+            if (!topOver && !bottomOver) {
+                continue;
+            }
+            const x = profile.glyphX(g, info);
+            const xL = x + g.left;
+            const xR = x + g.right;
+            const hasExtent = xR > xL;
+            if (topOver) {
+                this.registerOverflowTop(g.top * -1);
+                if (hasExtent) {
+                    skyline.insertPlaced(StaffSide.Top, xL, xR, g.top * -1, 0);
+                }
+            }
+            if (bottomOver) {
+                this.registerOverflowBottom(g.bottom - rendererBottom);
+                if (hasExtent) {
+                    skyline.insertPlaced(StaffSide.Bottom, xL, xR, g.bottom - rendererBottom, 0);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds the inputs the bar header (start barline, clef, key signature, time signature ...) is
+     * created from for the current position: bars with equal keys have the same header geometry.
+     * Keys hold inputs rather than the decisions derived from them so that they cannot diverge from
+     * {@link createPreBeatGlyphs}. Headers with an invalid key are not shared.
+     */
+    protected buildHeaderKey(key: HeaderKey): void {
+        key.invalidate();
+    }
+
+    private _updateHeaderProfile(): void {
+        const layout = this.scoreRenderer.layout!;
+        const key = layout.headerKey;
+        key.reset();
+        this.buildHeaderKey(key);
+        const profiles = layout.headerProfiles;
+        let byLow: Map<number, HeaderProfile> | null = null;
+        let profile: HeaderProfile | null = null;
+        if (key.isValid && profiles.has(key.high)) {
+            byLow = profiles.get(key.high)!;
+            if (byLow.has(key.low)) {
+                profile = byLow.get(key.low)!;
+            }
+        }
+        const group = this._preBeatGlyphs;
+        if (profile) {
+            this.wasFirstOfStaff = this.isFirstOfStaff;
+            if (profile !== this._headerProfile) {
+                group.glyphs = null;
+            }
+        } else {
+            const high = key.high;
+            const low = key.low;
+            const isValid = key.isValid;
+            group.width = 0;
+            group.glyphs = null;
+            this.createPreBeatGlyphs();
+            profile = HeaderProfile.measure(group);
+            if (isValid) {
+                if (!byLow) {
+                    byLow = new Map<number, HeaderProfile>();
+                    profiles.set(high, byLow);
+                }
+                byLow.set(low, profile);
+            }
+        }
+        group.width = profile.naturalWidth;
+        this._headerProfile = profile;
+        this._headerInFirstSystem = this.staff!.system.index === 0;
+    }
+
+    private _paintHeader(cx: number, cy: number, canvas: ICanvas): void {
+        const group = this._preBeatGlyphs;
+        if (!group.glyphs) {
+            const width = group.width;
+            group.width = 0;
+            this.createPreBeatGlyphs();
+            group.width = width;
+        }
+        group.applyHeaderRod(this.layoutingInfo);
+        group.paint(cx, cy, canvas);
     }
 
     /** Emit per-glyph overflow into the given group skyline. Shared by pre- and post-beat groups. */
@@ -881,7 +967,7 @@ export class BarRendererBase {
         this.paintBackground(cx, cy, canvas);
 
         canvas.color = this.resources.mainGlyphColor;
-        this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
+        this._paintHeader(cx + this.x, cy + this.y, canvas);
         this.voiceContainer.paint(cx + this.x, cy + this.y, canvas);
         canvas.color = this.resources.mainGlyphColor;
         this._postBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
@@ -912,22 +998,21 @@ export class BarRendererBase {
     }
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
+        const scale = this.settings.display.scale;
+        const x = cx + this.x;
+        const y = cy + this.y;
+        const scaledX = x * scale;
+        const scaledY = y * scale;
+        const scaledW = this.width * scale;
+        const scaledH = this.height * scale;
         const barBounds: BarBounds = new BarBounds();
         barBounds.bar = this.bar;
-        barBounds.visualBounds = new Bounds();
-        barBounds.visualBounds.x = cx + this.x;
-        barBounds.visualBounds.y = cy + this.y;
-        barBounds.visualBounds.w = this.width;
-        barBounds.visualBounds.h = this.height;
-
-        barBounds.realBounds = new Bounds();
-        barBounds.realBounds.x = cx + this.x;
-        barBounds.realBounds.y = cy + this.y;
-        barBounds.realBounds.w = this.width;
-        barBounds.realBounds.h = this.height;
+        barBounds.visualBounds = new Bounds(scaledX, scaledY, scaledW, scaledH);
+        barBounds.realBounds = new Bounds(scaledX, scaledY, scaledW, scaledH);
 
         masterBarBounds.addBar(barBounds);
-        this.voiceContainer.buildBoundingsLookup(barBounds, cx + this.x, cy + this.y);
+        this.voiceContainer.buildBoundingsLookup(barBounds, x, y);
+        barBounds.sortBeats();
     }
 
     protected addPostBeatGlyph(g: Glyph): void {
@@ -1006,9 +1091,12 @@ export class BarRendererBase {
         this.bottomEffects.height = 0;
         this.updateSizes();
 
-        // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
-        // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
-        if ((this.wasFirstOfStaff && !this.isFirstOfStaff) || (!this.wasFirstOfStaff && this.isFirstOfStaff)) {
+        // the header depends on the position: first in the staff and, for first-system-only
+        // elements, the first system
+        if (
+            this.wasFirstOfStaff !== this.isFirstOfStaff ||
+            this._headerInFirstSystem !== (this.staff!.system.index === 0)
+        ) {
             this.recreatePreBeatGlyphs();
         }
 
@@ -1024,9 +1112,7 @@ export class BarRendererBase {
     protected recreatePreBeatGlyphs() {
         // Pre-beat composition is changing — invalidate cached bar-local state.
         this._layoutInvariantCached = false;
-        this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
-        this._preBeatGlyphs.renderer = this;
-        this.createPreBeatGlyphs();
+        this._updateHeaderProfile();
     }
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {

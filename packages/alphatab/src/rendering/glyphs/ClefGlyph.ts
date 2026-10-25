@@ -6,7 +6,7 @@ import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 
 /**
  * @internal
@@ -102,12 +102,12 @@ export class ClefGlyph extends MusicFontGlyph {
         this._ottavaGlyph!.doLayout();
     }
 
-    public override registerHeaderRod(info: BarLayoutingInfo): void {
+    public override registerHeaderRod(info: IHeaderRodSink): void {
         // left aligned
         info.addHeaderRod(ClefGlyph.HeaderRank, 0, this.width + this.renderer.smuflMetrics.preBeatGlyphSpacing);
     }
 
-    public override applyHeaderRod(info: BarLayoutingInfo): void {
+    public override applyHeaderRod(info: IHeaderRodSink): void {
         this.x = info.getHeaderRodX(ClefGlyph.HeaderRank, 0);
     }
 

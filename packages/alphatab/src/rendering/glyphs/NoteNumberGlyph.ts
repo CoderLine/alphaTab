@@ -160,11 +160,13 @@ export class NoteNumberGlyph extends Glyph {
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         const noteBounds: NoteBounds = new NoteBounds();
         noteBounds.note = this._note;
-        noteBounds.noteHeadBounds = new Bounds();
-        noteBounds.noteHeadBounds.x = cx + this.x;
-        noteBounds.noteHeadBounds.y = cy + this.y - this.height / 2;
-        noteBounds.noteHeadBounds.w = this.width;
-        noteBounds.noteHeadBounds.h = this.height;
+        const scale = this.renderer.settings.display.scale;
+        noteBounds.noteHeadBounds = new Bounds(
+            (cx + this.x) * scale,
+            (cy + this.y - this.height / 2) * scale,
+            this.width * scale,
+            this.height * scale
+        );
         beatBounds.addNote(noteBounds);
     }
 }
