@@ -572,8 +572,14 @@ describe('Gp5ImporterTest', () => {
             [1, 17]
         ];
         for (const [port, channel] of variants) {
-            const data = new Uint8Array(original);
-            data.set(new Uint8Array([port, 0, 0, 0, channel, 0, 0, 0]), portOffset);
+            const data = new Uint8Array(original.length);
+            data.set(original, 0);
+            // little-endian int32 values below 256
+            for (let i = 0; i < 8; i++) {
+                data[portOffset + i] = 0;
+            }
+            data[portOffset] = port;
+            data[portOffset + 4] = channel;
 
             const score = GpImporterTestHelper.prepareImporterWithBytes(data).readScore();
             expect(score.tracks.length).toBe(2);

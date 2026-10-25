@@ -681,17 +681,22 @@ describe('MusicXmlImporterTests', () => {
     });
 
     it('adjacent-trills-stay-separate', async () => {
-        const trillStarts = async (file: string, barIndex: number) => {
-            const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml-testsuite/${file}`);
-            return score.tracks[0].staves[0].bars[barIndex].voices[0].beats.map(b =>
-                b.notes.length > 0 && b.notes[0].isTrill ? b.notes[0].isTrillStart : undefined
-            );
-        };
         // two trill marks with their own wavy lines on notes 1-2 and 3-4
-        expect(await trillStarts('34a-Print-Object-Spanners.xml', 3)).toEqual([true, false, true, false]);
+        const spanners = await MusicXmlImporterTestHelper.loadFile(
+            'test-data/musicxml-testsuite/34a-Print-Object-Spanners.xml'
+        );
+        const bar4 = spanners.tracks[0].staves[0].bars[3].voices[0].beats;
+        expect(bar4.map(b => b.notes[0].isTrill)).toEqual([true, true, true, true]);
+        expect(bar4.map(b => b.notes[0].isTrillStart)).toEqual([true, false, true, false]);
+
         // a trill over bar 6, and a separate single-note trill in bar 7
-        expect(await trillStarts('33a-Spanners.xml', 5)).toEqual([true, false, false]);
-        expect((await trillStarts('33a-Spanners.xml', 6))[0]).toBe(true);
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml-testsuite/33a-Spanners.xml');
+        const bar6 = score.tracks[0].staves[0].bars[5].voices[0].beats;
+        expect(bar6.map(b => b.notes[0].isTrill)).toEqual([true, true, true]);
+        expect(bar6.map(b => b.notes[0].isTrillStart)).toEqual([true, false, false]);
+        const bar7 = score.tracks[0].staves[0].bars[6].voices[0].beats;
+        expect(bar7[0].notes[0].isTrill).toBe(true);
+        expect(bar7[0].notes[0].isTrillStart).toBe(true);
     });
 
     describe('barnumberdisplay', async () => {

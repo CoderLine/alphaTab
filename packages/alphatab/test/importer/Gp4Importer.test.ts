@@ -216,6 +216,10 @@ describe('Gp4ImporterTest', () => {
         expect(drums.length).toBe(1);
         expect(drums[0].staves[0].showTablature).toBe(false);
         expect(drums[0].staves[0].showStandardNotation).toBe(true);
-        expect(score.tracks.filter(t => !t.staves[0].isPercussion).every(t => t.staves[0].showTablature)).toBe(true);
+        for (const track of score.tracks) {
+            if (!track.staves[0].isPercussion) {
+                expect(track.staves[0].showTablature).toBe(true);
+            }
+        }
     });
 });
