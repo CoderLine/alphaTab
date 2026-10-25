@@ -752,13 +752,6 @@ export class BarRendererBase {
 
         this.updateSizes();
 
-        // finish up all helpers
-        for (const v of this.helpers.beamHelpers) {
-            for (const h of v) {
-                h.finish();
-            }
-        }
-
         this.computedWidth = this.width;
 
         this.calculateOverflows(0, this.height);
@@ -1091,14 +1084,7 @@ export class BarRendererBase {
         this.bottomEffects.height = 0;
         this.updateSizes();
 
-        // the header depends on the position: first in the staff and, for first-system-only
-        // elements, the first system
-        if (
-            this.wasFirstOfStaff !== this.isFirstOfStaff ||
-            this._headerInFirstSystem !== (this.staff!.system.index === 0)
-        ) {
-            this.recreatePreBeatGlyphs();
-        }
+        this._refreshHeaderForPosition();
 
         // Must always re-register: the broker resets its header rods at the head of every resize cycle.
         this._registerLayoutingInfo();
@@ -1107,6 +1093,26 @@ export class BarRendererBase {
             this.calculateOverflows(0, this.height);
             this._layoutInvariantCached = true;
         }
+    }
+
+    // the header depends on the position: first in the staff and, for first-system-only
+    // elements, the first system
+    private _refreshHeaderForPosition(): void {
+        if (
+            this.wasFirstOfStaff !== this.isFirstOfStaff ||
+            this._headerInFirstSystem !== (this.staff!.system.index === 0)
+        ) {
+            this.recreatePreBeatGlyphs();
+        }
+    }
+
+    /**
+     * Registers the header columns of the bar for its current {@link staff} and {@link index}
+     * without laying it out again.
+     */
+    public registerHeaderForPosition(): void {
+        this._refreshHeaderForPosition();
+        this._headerProfile!.registerHeaderRods(this.layoutingInfo);
     }
 
     protected recreatePreBeatGlyphs() {

@@ -49,6 +49,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         (this.preNotes as ScoreBeatPreNotesGlyph).doMultiVoiceLayout();
         this.onNotes.x = this.preNotes.x + this.preNotes.width;
         (this.onNotes as ScoreBeatGlyph).doMultiVoiceLayout();
+        this.invalidateNoteExtent();
 
         this._bend?.doMultiVoiceLayout();
     }

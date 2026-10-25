@@ -178,6 +178,29 @@ export class RenderStaff implements IStaffDisplayContext {
         }
     }
 
+    /**
+     * Creates and lays out the renderer of the bar as if it were the next bar of this staff,
+     * without adding it.
+     */
+    public createBarRenderer(
+        bar: Bar,
+        layoutingInfo: BarLayoutingInfo,
+        additionalMultiBarsRestBars: Bar[] | null
+    ): BarRendererBase {
+        const renderer = this._factory.create(this.system.layout.renderer, bar);
+
+        renderer.topEffects.infos = this.topEffectInfos;
+        renderer.bottomEffects.infos = this.bottomEffectInfos;
+
+        renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
+        renderer.staff = this;
+        renderer.index = this.barRenderers.length;
+        renderer.layoutingInfo = layoutingInfo;
+        renderer.doLayout();
+        this.system.layout.registerBarRenderer(this.staffId, renderer);
+        return renderer;
+    }
+
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
         const renderer = this._factory.create(this.system.layout.renderer, bar);
 

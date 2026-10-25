@@ -27,6 +27,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     private _endNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _container: ScoreBeatContainerGlyph;
+    /** Height of the gradual bend label; the label font is fixed for the lifetime of this glyph. */
+    private _gradualLabelHeight = Number.NaN;
 
     public readonly checkForOverflow = false; // handled separately in ScoreBeatContainerGlyph
 
@@ -125,8 +127,12 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
             if (note.bendStyle === BendStyle.Gradual) {
                 const res = this.renderer.resources;
                 const c = this.renderer.scoreRenderer.canvas!;
+                // the font is set on every call so the canvas state does not depend on the cache
                 c.font = res.elementFonts.get(NotationElement.ScoreBendSlur)!;
-                slurHeight += c.measureText('grad.').height;
+                if (Number.isNaN(this._gradualLabelHeight)) {
+                    this._gradualLabelHeight = c.measureText('grad.').height;
+                }
+                slurHeight += this._gradualLabelHeight;
             }
 
             if (slurHeight > maxSlurHeight) {

@@ -325,6 +325,69 @@ export class StaffSystem {
         return renderers;
     }
 
+    /**
+     * Creates and lays out the renderers of the master bar as if it were the next bar of this
+     * system, without adding them (see {@link addMasterBarRenderers}).
+     */
+    public measureBars(
+        tracks: Track[],
+        barIndex: number,
+        additionalMultiBarRestIndexes: number[] | null
+    ): MasterBarsRenderers {
+        const result: MasterBarsRenderers = new MasterBarsRenderers();
+        result.additionalMultiBarRestIndexes = additionalMultiBarRestIndexes;
+        const display = this.layout.renderer.settings.display;
+        const sharesMinDuration = this.layout.sharesMinDurationAcrossBars;
+        result.layoutingInfo = new BarLayoutingInfo(
+            display.spacingRatio,
+            display.resources.engravingSettings.beatContentPadding,
+            display.resources.engravingSettings.barlineContentPadding,
+            sharesMinDuration ? this.layout.referenceMinDuration : BarLayoutingInfo.defaultMinDuration,
+            !sharesMinDuration
+        );
+        result.masterBar = tracks[0].score.masterBars[barIndex];
+
+        for (const g of this.staves) {
+            for (const s of g.staves) {
+                const bar: Bar = g.track.staves[s.modelStaff.index].bars[barIndex];
+                const additionalMultiBarsRestBars: Bar[] | null =
+                    additionalMultiBarRestIndexes == null
+                        ? null
+                        : additionalMultiBarRestIndexes.map(b => g.track.staves[s.modelStaff.index].bars[b]);
+                const renderer = s.createBarRenderer(bar, result.layoutingInfo, additionalMultiBarsRestBars);
+                result.renderers.push(renderer);
+                if (renderer.isLinkedToPrevious) {
+                    result.isLinkedToPrevious = true;
+                }
+                if (bar.simileMark === SimileMark.SecondOfDouble) {
+                    result.canWrap = false;
+                }
+            }
+        }
+
+        result.layoutingInfo.finish();
+        return result;
+    }
+
+    /**
+     * The width the master bar would have as the next bar of this system, or as the bar after
+     * `pending` more bars. Positions the renderers on the staves of this system without adding them.
+     */
+    public measureWidth(renderers: MasterBarsRenderers, pending: number = 0): number {
+        const info = renderers.layoutingInfo;
+        info.resetHeaderRods();
+        let src: number = 0;
+        for (const g of this.staves) {
+            for (const s of g.staves) {
+                const renderer: BarRendererBase = renderers.renderers[src++];
+                renderer.staff = s;
+                renderer.index = s.barRenderers.length + pending;
+                renderer.registerHeaderForPosition();
+            }
+        }
+        return info.naturalBarWidth(this.layout.renderer.settings.display.stretchForce);
+    }
+
     public addBars(
         tracks: Track[],
         barIndex: number,

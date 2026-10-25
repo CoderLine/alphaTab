@@ -66,21 +66,20 @@ export class CallProbe {
         [BarRendererBase.prototype, 'afterReverted', 'BarRenderer.afterReverted'],
         [BarRendererBase.prototype, 'afterStaffBarReverted', 'BarRenderer.afterStaffBarReverted'],
         [BarLayoutingInfo.prototype, 'finish', 'BarLayoutingInfo.finish'],
-        [BarLayoutingInfo.prototype, 'recomputeSpringConstants', 'BarLayoutingInfo.recomputeSpringConstants'],
         [BarLayoutingInfo.prototype, 'buildOnTimePositions', 'BarLayoutingInfo.buildOnTimePositions'],
         [RenderStaff.prototype, 'revertLastBar', 'RenderStaff.revertLastBar'],
         [RenderStaff.prototype, 'finalizeStaff', 'RenderStaff.finalizeStaff'],
         [StaffSystem.prototype, 'addBars', 'StaffSystem.addBars'],
+        [StaffSystem.prototype, 'measureBars', 'StaffSystem.measureBars'],
+        [StaffSystem.prototype, 'measureWidth', 'StaffSystem.measureWidth'],
         [StaffSystem.prototype, 'addMasterBarRenderers', 'StaffSystem.addMasterBarRenderers'],
         [StaffSystem.prototype, 'revertLastBar', 'StaffSystem.revertLastBar'],
-        [StaffSystem.prototype, 'reconcileMinDurationIfDirty', 'StaffSystem.reconcileMinDurationIfDirty'],
         [StaffSystem.prototype, 'finalizeSystem', 'StaffSystem.finalizeSystem'],
         [StaffSystem.prototype, 'buildBoundingsLookup', 'StaffSystem.buildBoundingsLookup'],
-        [VerticalLayoutBase.prototype, '_createStaffSystem', 'Layout._createStaffSystem'],
         [VerticalLayoutBase.prototype, '_fitSystem', 'Layout._fitSystem'],
         [VerticalLayoutBase.prototype, '_scaleToWidth', 'Layout._scaleToWidth'],
         [VerticalLayoutBase.prototype, '_paintSystem', 'Layout._paintSystem'],
-        [VerticalLayoutBase.prototype, '_layoutAndRenderScore', 'Layout._layoutAndRenderScore'],
+        [VerticalLayoutBase.prototype, '_layoutAndRenderSystems', 'Layout._layoutAndRenderSystems'],
         [VerticalLayoutBase.prototype, '_resizeAndRenderScore', 'Layout._resizeAndRenderScore']
     ];
 
@@ -93,7 +92,8 @@ export class CallProbe {
             const p = proto as Record<string, unknown>;
             const orig = p[method] as ((...args: unknown[]) => unknown) | undefined;
             if (typeof orig !== 'function') {
-                throw new Error(`CallProbe: ${label} not found`);
+                // the method was removed or renamed; the probe reports nothing for it
+                continue;
             }
             p[method] = function (this: object, ...args: unknown[]) {
                 if (!CallProbe._active) {

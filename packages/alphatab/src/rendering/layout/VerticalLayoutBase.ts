@@ -1,6 +1,7 @@
 import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import { ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import type { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
@@ -17,8 +18,8 @@ import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSyst
  */
 export abstract class VerticalLayoutBase extends ScoreLayout {
     private _systems: StaffSystem[] = [];
+    // the measured master bars in order; systems are built from them
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
-    private _barsFromPreviousSystem: MasterBarsRenderers[] = [];
 
     public override get systems(): StaffSystem[] {
         return this._systems;
@@ -50,7 +51,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         y = this._layoutAndRenderChordDiagrams(y, -1);
         //
         // 4. One result per StaffSystem
-        y = this._layoutAndRenderScore(y, this.firstBarIndex);
+        y = this._layoutAndRenderSystems(y, 0, -1);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
@@ -115,7 +116,8 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         this._systemPartialIds.splice(systemIndex, this._systemPartialIds.length - systemIndex);
         const system = removeSystems[0];
         let y = system.y;
-        const firstBarIndex = system.masterBarsRenderers[0].masterBar.index;
+        const firstUnit = this._allMasterBarRenderers.indexOf(system.masterBarsRenderers[0]);
+        this._allMasterBarRenderers.splice(firstUnit, this._allMasterBarRenderers.length - firstUnit);
 
         // signal all partials which didn't change
         for (const preSystemPartial of this._preSystemPartialIds) {
@@ -126,7 +128,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         }
 
         // new partials for all other prats
-        y = this._layoutAndRenderScore(y, firstBarIndex);
+        y = this._layoutAndRenderSystems(y, firstUnit, -1);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
@@ -297,77 +299,119 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                     b.afterReverted();
                 }
             }
-
             this._systems = [];
-            let currentIndex: number = 0;
-            const maxWidth: number = this._maxWidth;
-            let system: StaffSystem = this.createEmptyStaffSystem(this._systems.length);
-            system.x = this.pagePadding![0];
-            system.y = y;
-            while (currentIndex < this._allMasterBarRenderers.length) {
-                // if the current renderer still has space in the current system add it
-                // also force adding in case the system is empty
-                let renderers: MasterBarsRenderers | null = this._allMasterBarRenderers[currentIndex];
-
-                if (system.width + renderers!.width <= maxWidth || system.masterBarsRenderers.length === 0) {
-                    system.addMasterBarRenderers(this.renderer.tracks!, renderers!);
-                    // move to next bar
-                    currentIndex++;
-
-                    if (this._needsLineBreak(currentIndex)) {
-                        system.isFull = true;
-                    }
-                } else {
-                    // if we cannot wrap on the current bar, we remove the last bar
-                    // (this might even remove multiple ones until we reach a bar that can wrap);
-                    while (renderers && !renderers.canWrap && system.masterBarsRenderers.length > 1) {
-                        renderers = system.revertLastBar();
-                        currentIndex--;
-                    }
-                    // in case we do not have space, we create a new system
-                    system.isFull = true;
-                }
-
-                if (system.isFull) {
-                    system.isLast = this.lastBarIndex === system.lastBarIndex;
-                    this._systems.push(system);
-                    this._fitSystem(system);
-                    y += this._paintSystem(system, oldHeight);
-                    // note: we do not increase currentIndex here to have it added to the next system
-                    system = this.createEmptyStaffSystem(this._systems.length);
-                    system.x = this.pagePadding![0];
-                    system.y = y;
-                }
-            }
-            if (system.masterBarsRenderers.length > 0) {
-                system.isLast = this.lastBarIndex === system.lastBarIndex;
-                this._systems.push(system);
-                this._fitSystem(system);
-                y += this._paintSystem(system, oldHeight);
-            }
+            y = this._layoutAndRenderSystems(y, 0, oldHeight);
         }
         return y;
     }
 
-    private _layoutAndRenderScore(y: number, startIndex: number): number {
-        let currentBarIndex: number = startIndex;
-        const endBarIndex: number = this.lastBarIndex;
+    /**
+     * The measured master bar at the given position, measuring the next bar of the score as the
+     * next bar of the given system when needed. `null` after the last bar.
+     */
+    private _masterBarsAt(index: number, system: StaffSystem): MasterBarsRenderers | null {
+        const all = this._allMasterBarRenderers;
+        if (index < all.length) {
+            return all[index];
+        }
+        const barIndex = all.length === 0 ? this.firstBarIndex : all[all.length - 1].lastMasterBarIndex + 1;
+        if (barIndex > this.lastBarIndex) {
+            return null;
+        }
+        const multiBarRestInfo = this.multiBarRestInfo;
+        const additionalMultiBarsRestBarIndices: number[] | null =
+            multiBarRestInfo !== null && multiBarRestInfo.has(barIndex) ? multiBarRestInfo.get(barIndex)! : null;
+        const renderers = system.measureBars(this.renderer.tracks!, barIndex, additionalMultiBarsRestBarIndices);
+        all.push(renderers);
+        return renderers;
+    }
 
-        while (currentBarIndex <= endBarIndex) {
-            // create system and align set proper coordinates
-            const system: StaffSystem = this._createStaffSystem(currentBarIndex, endBarIndex);
-            this._systems.push(system);
+    /**
+     * Fills, fits and paints systems with the measured master bars from the given position on.
+     * A master bar is only added to a system after its width at that position was found to fit,
+     * so no bar is ever removed again.
+     * @param totalHeight The total height reported with the partials, -1 for the running height.
+     */
+    private _layoutAndRenderSystems(y: number, firstIndex: number, totalHeight: number): number {
+        const tracks = this.renderer.tracks!;
+        const maxWidth = this._maxWidth;
+        let index = firstIndex;
+        while (true) {
+            const system: StaffSystem = this.createEmptyStaffSystem(this._systems.length);
             system.x = this.pagePadding![0];
             system.y = y;
-            currentBarIndex = system.lastBarIndex + 1;
-            // finalize system (sizing etc).
+            const first = this._masterBarsAt(index, system);
+            if (!first) {
+                break;
+            }
+            system.addMasterBarRenderers(tracks, first);
+            index++;
+
+            const barsPerSystem = this.getBarsPerSystem(system.index);
+            while (true) {
+                const last = system.masterBarsRenderers[system.masterBarsRenderers.length - 1];
+                if (this._needsLineBreak(last.lastMasterBarIndex)) {
+                    system.isFull = true;
+                    break;
+                }
+                const next = this._masterBarsAt(index, system);
+                if (!next) {
+                    break;
+                }
+                // a bar that cannot start a system (the second of a double simile) stays with its predecessor
+                if (next.canWrap) {
+                    const keepsFollowing = !this._canWrapBefore(next.lastMasterBarIndex + 1);
+                    const count = keepsFollowing ? 2 : 1;
+                    if (barsPerSystem > 0) {
+                        if (system.masterBarsRenderers.length + count > barsPerSystem) {
+                            system.isFull = true;
+                            break;
+                        }
+                    } else {
+                        let width = system.measureWidth(next);
+                        if (keepsFollowing) {
+                            width += system.measureWidth(this._masterBarsAt(index + 1, system)!, 1);
+                        }
+                        if (system.width + width > maxWidth) {
+                            system.isFull = true;
+                            break;
+                        }
+                    }
+                }
+                system.addMasterBarRenderers(tracks, next);
+                index++;
+                // a staff that became visible can widen the accolade beyond the available width
+                if (barsPerSystem <= 0 && next.canWrap && system.width > maxWidth) {
+                    system.revertLastBar();
+                    index--;
+                    system.isFull = true;
+                    break;
+                }
+            }
+
+            // bars measured for this system but not added must not look like a part of it
+            // (e.g. to ties ending in them)
+            const all = this._allMasterBarRenderers;
+            for (let i = index; i < all.length && i <= index + 1; i++) {
+                for (const r of all[i].renderers) {
+                    if (r.staff && r.staff.system === system) {
+                        r.afterReverted();
+                    }
+                }
+            }
+
+            system.isLast = system.lastBarIndex === this.lastBarIndex;
+            this._systems.push(system);
             this._fitSystem(system);
             Logger.debug(
                 this.name,
                 `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`,
                 null
             );
-            y += this._paintSystem(system, y);
+            y += this._paintSystem(system, totalHeight === -1 ? y : totalHeight);
+            if (system.isLast) {
+                break;
+            }
         }
         return y;
     }
@@ -485,64 +529,22 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
     protected abstract getBarsPerSystem(systemIndex: number): number;
 
-    private _createStaffSystem(currentBarIndex: number, endIndex: number): StaffSystem {
-        const system: StaffSystem = this.createEmptyStaffSystem(this._systems.length);
-        const barsPerRow: number = this.getBarsPerSystem(system.index);
-        const maxWidth: number = this._maxWidth;
-        const end: number = endIndex + 1;
-
-        let barIndex = currentBarIndex;
-        while (barIndex < end) {
-            if (this._barsFromPreviousSystem.length > 0) {
-                for (const renderer of this._barsFromPreviousSystem) {
-                    system.addMasterBarRenderers(this.renderer.tracks!, renderer);
-                    barIndex = renderer.lastMasterBarIndex;
-                }
-            } else {
-                const multiBarRestInfo = this.multiBarRestInfo;
-                const additionalMultiBarsRestBarIndices: number[] | null =
-                    multiBarRestInfo !== null && multiBarRestInfo.has(barIndex)
-                        ? multiBarRestInfo.get(barIndex)!
-                        : null;
-
-                const renderers = system.addBars(this.renderer.tracks!, barIndex, additionalMultiBarsRestBarIndices);
-                this._allMasterBarRenderers.push(renderers);
-                barIndex = renderers.lastMasterBarIndex;
-            }
-            this._barsFromPreviousSystem = [];
-            let systemIsFull: boolean = false;
-            // can bar placed in this line?
-            if (barsPerRow === -1 && system.width >= maxWidth && system.masterBarsRenderers.length !== 0) {
-                systemIsFull = true;
-            } else if (system.masterBarsRenderers.length === barsPerRow + 1) {
-                systemIsFull = true;
-            }
-            if (systemIsFull) {
-                let reverted = system.revertLastBar();
-                if (reverted) {
-                    this._barsFromPreviousSystem.push(reverted);
-                    while (reverted && !reverted.canWrap && system.masterBarsRenderers.length > 1) {
-                        reverted = system.revertLastBar();
-                        if (reverted) {
-                            this._barsFromPreviousSystem.push(reverted);
-                        }
-                    }
-                }
-                system.isFull = true;
-                system.isLast = false;
-                this._barsFromPreviousSystem.reverse();
-                return system;
-            }
-            if (this._needsLineBreak(barIndex)) {
-                system.isFull = true;
-                system.isLast = false;
-                return system;
-            }
-            system.x = 0;
-            barIndex++;
+    /**
+     * Whether a system can start with the given bar: the second bar of a double simile stays with
+     * the first one.
+     */
+    private _canWrapBefore(barIndex: number): boolean {
+        if (barIndex > this.lastBarIndex) {
+            return true;
         }
-        system.isLast = endIndex === system.lastBarIndex;
-        return system;
+        for (const track of this.renderer.tracks!) {
+            for (const staff of track.staves) {
+                if (barIndex < staff.bars.length && staff.bars[barIndex].simileMark === SimileMark.SecondOfDouble) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private _needsLineBreak(barIndex: number) {

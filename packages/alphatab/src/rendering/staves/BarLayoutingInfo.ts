@@ -675,6 +675,15 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         return -1;
     }
 
+    /**
+     * The width of the bars of this master bar before justification, as
+     * {@link BarRendererBase.applyLayoutingInfo} computes it.
+     */
+    public naturalBarWidth(stretchForce: number): number {
+        const voiceWidth = this.calculateVoiceWidth(Math.max(stretchForce, this.minStretchForce));
+        return Math.ceil(Math.floor(this.preBeatSize + voiceWidth) + this.postBeatSize);
+    }
+
     public calculateVoiceWidth(force: number): number {
         let width = 0;
         if (this.totalSpringConstant !== -1) {

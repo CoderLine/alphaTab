@@ -184,15 +184,24 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         this.renderer.registerTie(tie);
     }
 
-    public override getBoundingBoxTop(): number {
+    /**
+     * Vertical extent of {@link preNotes} and {@link onNotes}. Their glyphs only move vertically in
+     * {@link doLayout} and {@link doMultiVoiceLayout}, which invalidate the cache when done.
+     * Horizontal positioning (layouting info, scaling, centering) keeps it valid.
+     */
+    private _noteExtentValid = false;
+    private _noteExtentTop = 0;
+    private _noteExtentBottom = 0;
+
+    protected invalidateNoteExtent(): void {
+        this._noteExtentValid = false;
+    }
+
+    private _updateNoteExtent(): void {
         let top = ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
         if (Number.isNaN(top)) {
             top = (this.renderer as LineBarRenderer).middleYPosition;
         }
-        return top;
-    }
-
-    public override getBoundingBoxBottom(): number {
         let bottom = ModelUtils.maxBoundingBox(
             this.preNotes.getBoundingBoxBottom(),
             this.onNotes.getBoundingBoxBottom()
@@ -200,7 +209,23 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         if (Number.isNaN(bottom)) {
             bottom = (this.renderer as LineBarRenderer).middleYPosition;
         }
-        return bottom;
+        this._noteExtentTop = top;
+        this._noteExtentBottom = bottom;
+        this._noteExtentValid = true;
+    }
+
+    public override getBoundingBoxTop(): number {
+        if (!this._noteExtentValid) {
+            this._updateNoteExtent();
+        }
+        return this._noteExtentTop;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (!this._noteExtentValid) {
+            this._updateNoteExtent();
+        }
+        return this._noteExtentBottom;
     }
 
     protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
@@ -252,6 +277,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         this.onNotes.doLayout();
         this.createBeatTies();
         this.updateWidth();
+        this.invalidateNoteExtent();
     }
 
     /**
@@ -278,6 +304,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         }
     }
 
+    /** Overrides that move note glyphs vertically must call {@link invalidateNoteExtent} when done. */
     public override doMultiVoiceLayout(): void {
         // do nothing by default, overridden when needed
     }
