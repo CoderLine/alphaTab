@@ -1,4 +1,5 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
@@ -9,6 +10,37 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  * @internal
  */
 export class ScoreHelperNotesBaseGlyph extends GlyphGroup {
+    private _isMeasuring: boolean = false;
+
+    /** The extent recorded since {@link beginMeasure}; `NaN` if nothing was recorded. */
+    protected measuredLeft: number = Number.NaN;
+    protected measuredRight: number = Number.NaN;
+    protected measuredTop: number = Number.NaN;
+    protected measuredBottom: number = Number.NaN;
+
+    /**
+     * Until {@link endMeasure}, {@link drawBendSlur} and {@link drawTie} record the extent of what they
+     * would paint instead of painting.
+     */
+    protected beginMeasure(): void {
+        this._isMeasuring = true;
+        this.measuredLeft = Number.NaN;
+        this.measuredRight = Number.NaN;
+        this.measuredTop = Number.NaN;
+        this.measuredBottom = Number.NaN;
+    }
+
+    protected endMeasure(): void {
+        this._isMeasuring = false;
+    }
+
+    protected measure(left: number, top: number, right: number, bottom: number): void {
+        this.measuredLeft = ModelUtils.minBoundingBox(this.measuredLeft, left);
+        this.measuredRight = ModelUtils.maxBoundingBox(this.measuredRight, right);
+        this.measuredTop = ModelUtils.minBoundingBox(this.measuredTop, top);
+        this.measuredBottom = ModelUtils.maxBoundingBox(this.measuredBottom, bottom);
+    }
+
     protected drawBendSlur(
         canvas: ICanvas,
         x1: number,
@@ -18,7 +50,40 @@ export class ScoreHelperNotesBaseGlyph extends GlyphGroup {
         down: boolean,
         slurText?: string
     ): void {
-        TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, this.renderer.smuflMetrics.tieHeight, slurText);
+        const slurHeight = this.renderer.smuflMetrics.tieHeight;
+        if (!this._isMeasuring) {
+            TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, slurHeight, slurText);
+            return;
+        }
+
+        const b = TieGlyph.calculateBendSlurHeight(x1, y1, x2, y2, down, slurHeight);
+        this.measure(b.x, b.y, b.x + b.w, b.y + b.h);
+        if (slurText) {
+            // text placement of TieGlyph.drawBendSlur
+            const size = canvas.measureText(slurText);
+            const centerX = TieGlyph.calculateBendSlurTopX(x1, y1, x2, y2, down, 1, slurHeight);
+            const cp1Y = TieGlyph.calculateBendSlurTopY(x1, y1, x2, y2, down, 1, slurHeight);
+            const textTop = down ? cp1Y : cp1Y - canvas.font.size;
+            this.measure(centerX - size.width / 2, textTop, centerX + size.width / 2, textTop + size.height);
+        }
+    }
+
+    protected drawTie(
+        canvas: ICanvas,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        offset: number,
+        size: number
+    ): void {
+        if (!this._isMeasuring) {
+            TieGlyph.paintTie(canvas, 1, x1, y1, x2, y2, down, offset, size);
+            return;
+        }
+        const b = TieGlyph.calculateActualTieHeight(1, x1, y1, x2, y2, down, offset, size);
+        this.measure(b.x, b.y, b.x + b.w, b.y + b.h);
     }
 
     public override doLayout(): void {

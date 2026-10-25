@@ -495,6 +495,31 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         return cp1Y;
     }
 
+    public static calculateBendSlurTopX(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        scale: number,
+        bendSlurHeight: number
+    ) {
+        let normalVectorX: number = y2 - y1;
+        const normalVectorY: number = x2 - x1;
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        if (down) {
+            normalVectorX *= -1;
+        }
+        normalVectorX /= length;
+
+        let offset: number = bendSlurHeight * scale;
+        if (x2 - x1 < 20) {
+            offset /= 2;
+        }
+        const centerX: number = (x2 + x1) / 2;
+        return centerX + offset * normalVectorX;
+    }
+
     public static calculateBendSlurHeight(
         x1: number,
         y1: number,

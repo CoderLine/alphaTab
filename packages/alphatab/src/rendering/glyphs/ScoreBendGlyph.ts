@@ -28,7 +28,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _container: ScoreBeatContainerGlyph;
 
-    public readonly checkForOverflow = false; // handled separately in ScoreBeatContainerGlyph
+    public readonly checkForOverflow = true;
+    private _isMeasured: boolean = false;
 
     public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
@@ -39,23 +40,50 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     public override doLayout(): void {
         super.doLayout();
         this.width = 0;
+        this._isMeasured = false;
     }
 
-    public override getBoundingBoxTop(): number {
+    /** The top of the slurs estimated before the beats are positioned. */
+    public getEstimatedBoundingBoxTop(): number {
         return super.getBoundingBoxTop() - this._calculateMaxSlurHeight(BeamDirection.Up);
     }
 
-    public override getBoundingBoxBottom(): number {
+    /** The bottom of the slurs estimated before the beats are positioned. */
+    public getEstimatedBoundingBoxBottom(): number {
         return super.getBoundingBoxBottom() + this._calculateMaxSlurHeight(BeamDirection.Down);
     }
 
-    /** Staff-local x ({@link ITieGlyph} convention); spans the start beat. */
+    // The painted extent of the helper notes, slurs and slur texts ({@link ITieGlyph} convention:
+    // staff-local x, renderer-local y). Only valid once the beats are positioned.
+
+    public override getBoundingBoxTop(): number {
+        this._measure();
+        return this.measuredTop;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        this._measure();
+        return this.measuredBottom;
+    }
+
     public override getBoundingBoxLeft(): number {
-        return this.renderer.x + this.renderer.getBeatX(this._beat, BeatXPosition.PostNotes);
+        this._measure();
+        return this.measuredLeft;
     }
 
     public override getBoundingBoxRight(): number {
-        return this.renderer.x + this.renderer.getBeatX(this._beat, BeatXPosition.EndBeat);
+        this._measure();
+        return this.measuredRight;
+    }
+
+    private _measure(): void {
+        if (this._isMeasured) {
+            return;
+        }
+        this._isMeasured = true;
+        this.beginMeasure();
+        this._paintOrMeasure(0, -this.renderer.y, this.renderer.scoreRenderer.canvas!, true);
+        this.endMeasure();
     }
 
     public doMultiVoiceLayout(): void {
@@ -221,6 +249,10 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this._paintOrMeasure(cx, cy, canvas, false);
+    }
+
+    private _paintOrMeasure(cx: number, cy: number, canvas: ICanvas, isMeasuring: boolean): void {
         // Draw note heads
         const startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff!.staffId,
@@ -245,12 +277,12 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         if (this._middleNoteGlyph) {
             this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.onTimeX;
             this._middleNoteGlyph.y = cy + startNoteRenderer.y;
-            this._middleNoteGlyph.paint(0, 0, canvas);
+            this._paintOrMeasureHelperNotes(this._middleNoteGlyph, canvas, isMeasuring);
         }
         if (this._endNoteGlyph) {
             this._endNoteGlyph.x = endBeatX - this._endNoteGlyph.onTimeX;
             this._endNoteGlyph.y = cy + startNoteRenderer.y;
-            this._endNoteGlyph.paint(0, 0, canvas);
+            this._paintOrMeasureHelperNotes(this._endNoteGlyph, canvas, isMeasuring);
         }
         this._notes.sort((a, b) => {
             return b.displayValue - a.displayValue;
@@ -259,6 +291,19 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         // draw slurs
         if (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ScoreBendSlur)) {
             this._paintSlurs(cx, cy, canvas, startNoteRenderer, startX, middleX, endBeatX);
+        }
+    }
+
+    private _paintOrMeasureHelperNotes(glyph: BendNoteHeadGroupGlyph, canvas: ICanvas, isMeasuring: boolean): void {
+        if (isMeasuring) {
+            this.measure(
+                glyph.getBoundingBoxLeft(),
+                glyph.getBoundingBoxTop(),
+                glyph.getBoundingBoxRight(),
+                glyph.getBoundingBoxBottom()
+            );
+        } else {
+            glyph.paint(0, 0, canvas);
         }
     }
 
@@ -308,9 +353,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             startNoteRenderer.accidentalHelper.getNoteStepsForValue(noteValueToDraw, false)
                         );
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
-                        TieGlyph.paintTie(
+                        this.drawTie(
                             canvas,
-                            1,
                             startX,
                             startY,
                             endX,
@@ -338,9 +382,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                         endY += noteHeadHeight;
                     }
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
-                        TieGlyph.paintTie(
+                        this.drawTie(
                             canvas,
-                            1,
                             startX,
                             startY,
                             endX,
