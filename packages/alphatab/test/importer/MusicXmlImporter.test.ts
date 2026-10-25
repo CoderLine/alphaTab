@@ -680,6 +680,20 @@ describe('MusicXmlImporterTests', () => {
         expect(notes.map(n => n.realValue)).toEqual([67, 67, 60, 74, 60, 84, 79, 74, 72, 64, 76]);
     });
 
+    it('adjacent-trills-stay-separate', async () => {
+        const trillStarts = async (file: string, barIndex: number) => {
+            const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml-testsuite/${file}`);
+            return score.tracks[0].staves[0].bars[barIndex].voices[0].beats.map(b =>
+                b.notes.length > 0 && b.notes[0].isTrill ? b.notes[0].isTrillStart : undefined
+            );
+        };
+        // two trill marks with their own wavy lines on notes 1-2 and 3-4
+        expect(await trillStarts('34a-Print-Object-Spanners.xml', 3)).toEqual([true, false, true, false]);
+        // a trill over bar 6, and a separate single-note trill in bar 7
+        expect(await trillStarts('33a-Spanners.xml', 5)).toEqual([true, false, false]);
+        expect((await trillStarts('33a-Spanners.xml', 6))[0]).toBe(true);
+    });
+
     describe('barnumberdisplay', async () => {
         // the measure-numbering holds until it is changed
         async function testPartwise(filename: string, display: BarNumberDisplay) {

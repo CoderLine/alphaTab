@@ -80,6 +80,7 @@ export class NoteSerializer {
         o.set("righthandfinger", obj.rightHandFinger as number);
         o.set("trillvalue", obj.trillValue);
         o.set("trillspeed", obj.trillSpeed as number);
+        o.set("istrillstart", obj.isTrillStart);
         o.set("durationpercent", obj.durationPercent);
         o.set("accidentalmode", obj.accidentalMode as number);
         o.set("dynamics", obj.dynamics as number);
@@ -191,6 +192,9 @@ export class NoteSerializer {
                 return true;
             case "trillspeed":
                 obj.trillSpeed = JsonHelper.parseEnum<Duration>(v, Duration)!;
+                return true;
+            case "istrillstart":
+                obj.isTrillStart = v! as boolean;
                 return true;
             case "durationpercent":
                 obj.durationPercent = v! as number;

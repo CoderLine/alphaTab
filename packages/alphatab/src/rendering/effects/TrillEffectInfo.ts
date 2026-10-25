@@ -18,6 +18,6 @@ export const trillEffectInfo: EffectInfo = {
     sizingMode: EffectBarGlyphSizing.GroupedOnBeatToEnd,
     shouldCreateGlyph: createNoteShouldCreateGlyph((note: Note): boolean => note.isTrill),
     createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph => new TrillGlyph(0, 0),
-    canExpand: (_from: Beat, _to: Beat): boolean => true,
+    canExpand: (_from: Beat, to: Beat): boolean => !to.notes.some(n => n.isTrill && n.isTrillStart),
     placementCategory: EffectBandPlacementCategory.Span
 };

@@ -562,6 +562,13 @@ export class Note {
     public trillSpeed: Duration = Duration.ThirtySecond;
 
     /**
+     * Gets or sets whether a separate trill starts on this note.
+     * If set, the trill does not continue a trill on the previous beat.
+     * @since 1.9.0
+     */
+    public isTrillStart: boolean = false;
+
+    /**
      * Gets or sets the percentual duration of the note relative to the overall beat duration.
      */
     public durationPercent: number = 1;
