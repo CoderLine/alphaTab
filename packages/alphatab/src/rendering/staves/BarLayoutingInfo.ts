@@ -590,8 +590,8 @@ export class BarLayoutingInfo {
 
         // Overlay rods: pair-overlap + last-rod phantom-next-beat per band. Bands
         // occupy different vertical tracks (lyric below, beat-text above, ...) so
-        // each bucket is evaluated independently and their requirements max-merge into
-        // the minimum widths of the springs they span (not into `minStretchForce`).
+        // each bucket is evaluated independently and their forces max-merge into
+        // `minStretchForce`.
         // TODO(overlay-rods, cross-bar): bar-local only. A system-level accumulator
         // could pair bar N's last rod with bar N+1's first rod across the boundary.
         const overlayPadding = BarLayoutingInfo._overlayMinPadding;
@@ -629,10 +629,9 @@ export class BarLayoutingInfo {
             return;
         }
 
-        // Pair-overlap pass: for each adjacent (A, B), the springs anchored in
-        // [A.timePosition, B.timePosition) must span the required gap
-        // `A.rightExtent + B.leftExtent + padding`. It is shared among them in proportion
-        // to their natural widths (1/k), raising only their minimum widths.
+        // Pair-overlap pass: for each adjacent (A, B), sum 1/k over the springs
+        // anchored in [A.timePosition, B.timePosition) and convert the required gap
+        // `A.rightExtent + B.leftExtent + padding` to a force `requiredGap / invSum`.
         let springIdx = 0;
         while (springIdx < sortedSprings.length && sortedSprings[springIdx].timePosition !== rods[0].timePosition) {
             springIdx++;
@@ -642,7 +641,6 @@ export class BarLayoutingInfo {
             const a = rods[r - 1];
             const b = rods[r];
 
-            const spanStart = springIdx;
             let invSum = 0;
             while (springIdx < sortedSprings.length && sortedSprings[springIdx].timePosition !== b.timePosition) {
                 invSum += 1 / sortedSprings[springIdx].springConstant;
@@ -652,28 +650,23 @@ export class BarLayoutingInfo {
             const requiredGap = a.rightExtent + b.leftExtent + overlayPadding;
             if (requiredGap > 0 && invSum > 0) {
                 const overlayForce = requiredGap / invSum;
-                for (let i = spanStart; i < springIdx; i++) {
-                    const spring = sortedSprings[i];
-                    const width = overlayForce / spring.springConstant;
-                    if (spring.minWidth < width) {
-                        spring.minWidth = width;
-                    }
-                }
+                this._updateMinStretchForce(overlayForce);
             }
         }
 
         // Last-rod phantom-next-beat: treat the bar's right edge as a phantom beat
-        // with leftExtent=0. The last spring plus postBeatSize must cover the rod's
-        // right extent.
+        // with leftExtent=0. Natural gap = force/k_last + postBeatSize, floored by
+        // lastSpring.postSpringWidth + postBeatSize. Fires only on overflow.
         // TODO: symmetric handling for the first beat's
         // LEFT edge is an accepted MVP gap (no force-scaled gap before first onTime).
         const lastRod = rods[rods.length - 1];
         const lastSpring = sortedSprings[sortedSprings.length - 1];
         if (lastRod.timePosition === lastSpring.timePosition) {
             const overlayRightRequirement = lastRod.rightExtent + overlayPadding;
-            const requiredWidth = overlayRightRequirement - this.postBeatSize;
-            if (lastSpring.minWidth < requiredWidth) {
-                lastSpring.minWidth = requiredWidth;
+            const naturalRightBudget = lastSpring.postSpringWidth + this.postBeatSize;
+            if (overlayRightRequirement > naturalRightBudget) {
+                const requiredForce = (overlayRightRequirement - this.postBeatSize) * lastSpring.springConstant;
+                this._updateMinStretchForce(requiredForce);
             }
         }
     }
