@@ -877,6 +877,17 @@ export class BarRendererBase {
         this.bottomEffects.paint(cx + this.x, bottomEffectBandY, canvas);
     }
 
+    /**
+     * Paints the effects of this bar which reach left of its start, onto a canvas holding only the bars before it.
+     */
+    public paintLeftOverhang(cx: number, cy: number, canvas: ICanvas): void {
+        const topEffectBandY = cy + this.y - this.staff!.topOverflow;
+        this.topEffects.paintLeftOverhang(cx + this.x, topEffectBandY, canvas);
+
+        const bottomEffectBandY = cy + this.y + this.height + this.staff!.bottomOverflow - this.bottomEffects.height;
+        this.bottomEffects.paintLeftOverhang(cx + this.x, bottomEffectBandY, canvas);
+    }
+
     protected paintContent(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
 

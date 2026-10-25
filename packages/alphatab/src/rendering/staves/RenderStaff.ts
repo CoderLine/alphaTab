@@ -443,12 +443,14 @@ export class RenderStaff implements IStaffDisplayContext {
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.system.width - this.x, this.height);
 
-        for (
-            let i: number = startIndex, j: number = Math.min(startIndex + count, this.barRenderers.length);
-            i < j;
-            i++
-        ) {
+        const endIndex: number = Math.min(startIndex + count, this.barRenderers.length);
+        for (let i: number = startIndex; i < endIndex; i++) {
             this.barRenderers[i].paint(cx + this.x, cy + this.y, canvas);
+        }
+
+        // partial rendering: the bar after the range can reach into it (e.g. a bar number centred on its barline)
+        if (endIndex < this.barRenderers.length) {
+            this.barRenderers[endIndex].paintLeftOverhang(cx + this.x, cy + this.y, canvas);
         }
     }
 }
