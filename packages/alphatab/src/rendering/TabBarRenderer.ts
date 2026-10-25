@@ -565,6 +565,11 @@ export class TabBarRenderer extends LineBarRenderer {
             holes.sort((a, b) => a.topY - b.topY);
         }
 
+        // no note on the tab (e.g. pitched notes without tab position) -> no stem
+        if (holes.length === 0) {
+            return;
+        }
+
         // fast path -> single note == full line
         if (holes.length === 1) {
             canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
