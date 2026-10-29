@@ -110,17 +110,17 @@ export class NoteNumberGlyph extends Glyph {
         }
         this.isEmpty = !this._noteString;
         if (!this.isEmpty) {
-            this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.tablatureFont;
+            const scoreRenderer = this.renderer.scoreRenderer;
+            const canvas = scoreRenderer.canvas!;
+            const textMeasures = scoreRenderer.layout!.textMeasures;
+            canvas.font = this.renderer.resources.tablatureFont;
             const hasTrill: boolean = !!this._trillNoteString;
-            this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(
-                this._noteString + (hasTrill ? ' ' : '')
-            ).width;
+            this.noteStringWidth = textMeasures.measureText(canvas, this._noteString + (hasTrill ? ' ' : '')).width;
             this.width = this.noteStringWidth;
-            this.height = this.renderer.scoreRenderer.canvas!.font.size;
+            this.height = canvas.font.size;
             if (hasTrill) {
-                this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-                this._trillNoteStringWidth =
-                    3 + this.renderer.scoreRenderer.canvas!.measureText(this._trillNoteString).width;
+                canvas.font = this.renderer.resources.graceFont;
+                this._trillNoteStringWidth = 3 + textMeasures.measureText(canvas, this._trillNoteString).width;
                 this.width += this._trillNoteStringWidth;
             }
         }

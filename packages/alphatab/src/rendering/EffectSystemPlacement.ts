@@ -51,9 +51,14 @@ export class EffectSystemPlacement {
 
         const top = this._top;
         const bottom = this._bottom;
-        // splice() instead of `.length = 0`: transpile-safe array clear.
-        top.splice(0, top.length);
-        bottom.splice(0, bottom.length);
+        // pop() loops clear without reallocating the backing store (splice allocates a result
+        // array, `.length = 0` drops the store; C#/Kotlin splice copies lists).
+        while (top.length > 0) {
+            top.pop();
+        }
+        while (bottom.length > 0) {
+            bottom.pop();
+        }
 
         // Filter non-empty bands and run `finalizeBand` (settles dynamic-height
         // effects like TabWhammy) in one walk.
@@ -128,7 +133,13 @@ export class EffectSystemPlacement {
 
     /** Sort by precomputed {@link EffectBand.sortKey} (placementCategory, order desc, voice, renderer). */
     private static _sortByPriority(bands: EffectBand[]): void {
-        bands.sort((a, b) => a.sortKey - b.sortKey);
+        if (bands.length > 1) {
+            bands.sort(EffectSystemPlacement._compareSortKey);
+        }
+    }
+
+    private static _compareSortKey(a: EffectBand, b: EffectBand): number {
+        return a.sortKey - b.sortKey;
     }
 
     private _placeSide(
@@ -176,17 +187,27 @@ export class EffectSystemPlacement {
             // clef/key/time never enters their magnitude.
             const querySky = contentSky !== null && band.info.ignoresStructuralHeader === true ? contentSky : sky;
 
-            groupBands.splice(0, groupBands.length);
-            groupXStarts.splice(0, groupXStarts.length);
-            groupXEnds.splice(0, groupXEnds.length);
+            while (groupBands.length > 0) {
+                groupBands.pop();
+            }
+            while (groupXStarts.length > 0) {
+                groupXStarts.pop();
+            }
+            while (groupXEnds.length > 0) {
+                groupXEnds.pop();
+            }
             let groupMagnitude = 0;
             for (let k = i; k < groupEnd; k++) {
                 const m = bands[k];
                 // one entry per occupied range (note-attached bands: one per glyph)
                 const clearStarts = this._clearXStarts;
                 const clearEnds = this._clearXEnds;
-                clearStarts.splice(0, clearStarts.length);
-                clearEnds.splice(0, clearEnds.length);
+                while (clearStarts.length > 0) {
+                    clearStarts.pop();
+                }
+                while (clearEnds.length > 0) {
+                    clearEnds.pop();
+                }
                 const firstRange = groupXStarts.length;
                 if (!m.collectPlacementRanges(clearStarts, clearEnds, groupXStarts, groupXEnds)) {
                     continue;

@@ -4,6 +4,7 @@ import { Font, FontStyle } from '@coderline/alphatab/model/Font';
 import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { type ICanvas, MeasuredText, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
+import { SvgBuffer } from '@coderline/alphatab/platform/svg/SvgBuffer';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -11,10 +12,18 @@ import type { Settings } from '@coderline/alphatab/Settings';
  * @internal
  */
 export abstract class SvgCanvas implements ICanvas {
-    protected buffer: string = '';
+    protected readonly buffer: SvgBuffer = new SvgBuffer();
 
     private _currentPath: string = '';
     private _currentPathIsEmpty: boolean = true;
+
+    private _rectTailColor: string = '';
+    private _rectTail: string = '';
+    private _textTailFont: string = '';
+    private _textTailBaseline: TextBaseline = TextBaseline.Top;
+    private _textTailColor: string = '';
+    private _textTailAlign: TextAlign = TextAlign.Left;
+    private _textTail: string = '';
 
     public scale = 1;
 
@@ -29,59 +38,57 @@ export abstract class SvgCanvas implements ICanvas {
 
     public beginRender(width: number, height: number): void {
         this.scale = this.settings.display.scale;
-        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${
-            height | 0
-        }px" class="at-surface-svg">\n`;
+        this.buffer.reset(
+            `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${
+                height | 0
+            }px" class="at-surface-svg">\n`
+        );
         this._currentPath = '';
         this._currentPathIsEmpty = true;
         this.textBaseline = TextBaseline.Top;
     }
 
     public beginGroup(identifier: string): void {
-        this.buffer += '<g class="' + identifier + '">';
+        this.buffer.append('<g class="' + identifier + '">');
     }
 
     public endGroup(): void {
-        this.buffer += '</g>';
+        this.buffer.append('</g>');
     }
 
     public endRender(): unknown {
-        this.buffer += '</svg>';
-        return this.buffer;
+        this.buffer.append('</svg>');
+        return this.buffer.build();
     }
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
+            const rgba = this.color.rgba;
+            if (rgba !== this._rectTailColor) {
+                this._rectTailColor = rgba;
+                this._rectTail = '" fill="' + rgba + '" />\n';
+            }
             // scale=1 fast path: skip the 4 multiplies and use `+` concat to avoid template-literal overhead.
             const s = this.scale;
             if (s === 1) {
-                this.buffer +=
-                    '<rect x="' +
-                    x +
-                    '" y="' +
-                    y +
-                    '" width="' +
-                    w +
-                    '" height="' +
-                    h +
-                    '" fill="' +
-                    this.color.rgba +
-                    '" />\n';
+                this.buffer.append('<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + this._rectTail);
             } else {
-                this.buffer += `<rect x="${x * s}" y="${y * s}" width="${w * s}" height="${h * s}" fill="${this.color.rgba}" />\n`;
+                this.buffer.append(
+                    `<rect x="${x * s}" y="${y * s}" width="${w * s}" height="${h * s}` + this._rectTail
+                );
             }
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = (this.lineWidth * this.scale) % 2 === 0 ? 0 : 0.5;
-        this.buffer += `<rect x="${x * this.scale + blurOffset}" y="${y * this.scale + blurOffset}" width="${
-            w * this.scale
-        }" height="${h * this.scale}" stroke="${this.color.rgba}"`;
-        if (this.lineWidth !== 1) {
-            this.buffer += ` stroke-width="${this.lineWidth * this.scale}"`;
-        }
-        this.buffer += ' fill="transparent" />\n';
+        this.buffer.append(
+            `<rect x="${x * this.scale + blurOffset}" y="${y * this.scale + blurOffset}" width="${
+                w * this.scale
+            }" height="${h * this.scale}" stroke="${this.color.rgba}"` +
+                (this.lineWidth !== 1 ? ` stroke-width="${this.lineWidth * this.scale}"` : '') +
+                ' fill="transparent" />\n'
+        );
     }
 
     public beginPath(): void {
@@ -155,11 +162,12 @@ export abstract class SvgCanvas implements ICanvas {
 
     public fill(): void {
         if (!this._currentPathIsEmpty) {
-            this.buffer += '<path d="' + this._currentPath + '"';
-            if (this.color.rgba !== '#000000') {
-                this.buffer += ' fill="' + this.color.rgba + '"';
-            }
-            this.buffer += ' style="stroke: none"/>';
+            const rgba = this.color.rgba;
+            this.buffer.append(
+                '<path d="' +
+                    this._currentPath +
+                    (rgba !== '#000000' ? '" fill="' + rgba + '" style="stroke: none"/>' : '" style="stroke: none"/>')
+            );
         }
         this._currentPath = '';
         this._currentPathIsEmpty = true;
@@ -172,7 +180,7 @@ export abstract class SvgCanvas implements ICanvas {
                 s += ` stroke-width="${this.lineWidth * this.scale}"`;
             }
             s += ' style="fill: none" />';
-            this.buffer += s;
+            this.buffer.append(s);
         }
         this._currentPath = '';
         this._currentPathIsEmpty = true;
@@ -182,30 +190,37 @@ export abstract class SvgCanvas implements ICanvas {
         if (text === '') {
             return;
         }
+        const font = this.font.toCssString(this.settings.display.scale);
+        const rgba = this.color.rgba;
+        if (
+            font !== this._textTailFont ||
+            this.textBaseline !== this._textTailBaseline ||
+            rgba !== this._textTailColor ||
+            this.textAlign !== this._textTailAlign
+        ) {
+            this._textTailFont = font;
+            this._textTailBaseline = this.textBaseline;
+            this._textTailColor = rgba;
+            this._textTailAlign = this.textAlign;
+            let tail: string = '" style=\'stroke: none; font:' + font + '; ' + this.getSvgBaseLine() + "'";
+            if (rgba !== '#000000') {
+                tail += ' fill="' + rgba + '"';
+            }
+            if (this.textAlign !== TextAlign.Left) {
+                tail += ' text-anchor="' + this.getSvgTextAlignment(this.textAlign) + '"';
+            }
+            this._textTail = tail + '>';
+        }
         const sc = this.scale;
-        let s: string;
         if (sc === 1) {
-            s =
-                '<text x="' +
-                x +
-                '" y="' +
-                y +
-                '" style=\'stroke: none; font:' +
-                this.font.toCssString(this.settings.display.scale) +
-                '; ' +
-                this.getSvgBaseLine() +
-                "'";
+            this.buffer.append(
+                '<text x="' + x + '" y="' + y + this._textTail + SvgCanvas._escapeText(text) + '</text>'
+            );
         } else {
-            s = `<text x="${x * sc}" y="${y * sc}" style='stroke: none; font:${this.font.toCssString(this.settings.display.scale)}; ${this.getSvgBaseLine()}'`;
+            this.buffer.append(
+                `<text x="${x * sc}" y="${y * sc}` + this._textTail + SvgCanvas._escapeText(text) + '</text>'
+            );
         }
-        if (this.color.rgba !== '#000000') {
-            s += ` fill="${this.color.rgba}"`;
-        }
-        if (this.textAlign !== TextAlign.Left) {
-            s += ` text-anchor="${this.getSvgTextAlignment(this.textAlign)}"`;
-        }
-        s += `>${SvgCanvas._escapeText(text)}</text>`;
-        this.buffer += s;
     }
 
     private static readonly _escapeTextRegex = /[&<>"']/;
@@ -288,10 +303,12 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public beginRotate(centerX: number, centerY: number, angle: number): void {
-        this.buffer += `<g transform="translate(${centerX * this.scale} ,${centerY * this.scale}) rotate( ${angle})">`;
+        this.buffer.append(
+            `<g transform="translate(${centerX * this.scale} ,${centerY * this.scale}) rotate( ${angle})">`
+        );
     }
 
     public endRotate(): void {
-        this.buffer += '</g>';
+        this.buffer.append('</g>');
     }
 }

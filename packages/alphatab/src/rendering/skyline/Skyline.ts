@@ -6,8 +6,10 @@ import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScr
  * @internal
  */
 export class Skyline {
-    public readonly xMin: number;
-    public readonly xMax: number;
+    // The initializers keep V8 from tracking the fields as tagged, which would box every double
+    // mixed with them in the union/insert loops.
+    public readonly xMin: number = 0;
+    public readonly xMax: number = 0;
 
     private readonly _scratch: SkylineScratch;
 

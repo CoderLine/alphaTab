@@ -26,8 +26,10 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
             this.forceGroupedRendering = true;
         }
         super.doLayout();
-        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.elementFonts.get(this._fontElement)!;
-        const size = this.renderer.scoreRenderer.canvas!.measureText(this._label);
+        const scoreRenderer = this.renderer.scoreRenderer;
+        const canvas = scoreRenderer.canvas!;
+        canvas.font = this.renderer.resources.elementFonts.get(this._fontElement)!;
+        const size = scoreRenderer.layout!.textMeasures.measureText(canvas, this._label);
         this.height = size.height;
         this._labelWidth = size.width;
     }

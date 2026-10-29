@@ -294,18 +294,23 @@ export class StaffSystem {
         this.totalFixedOverhead = 0;
         this.totalContentWidth = 0;
         this.isLast = false;
-        this.masterBarsRenderers.splice(0, this.masterBarsRenderers.length);
+        while (this.masterBarsRenderers.length > 0) {
+            this.masterBarsRenderers.pop();
+        }
         this.topPadding = display.systemPaddingTop;
         this.bottomPadding = display.systemPaddingBottom;
         this.firstVisibleStaff = undefined;
-        for (const g of this.staves) {
+        for (let i = 0; i < this.staves.length; i++) {
+            const g = this.staves[i];
             g.firstVisibleStaff = undefined;
             g.lastVisibleStaff = undefined;
         }
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             s.reset();
         }
-        for (const b of this._brackets) {
+        for (let i = 0; i < this._brackets.length; i++) {
+            const b = this._brackets[i];
             b.reset();
         }
     }
@@ -329,11 +334,13 @@ export class StaffSystem {
         let firstVisibleStaff: RenderStaff | undefined = undefined;
         let anyStaffVisible = false;
 
-        for (const g of this.staves) {
+        for (let i = 0; i < this.staves.length; i++) {
+            const g = this.staves[i];
             let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
             let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
 
-            for (const s of g.staves) {
+            for (let j = 0; j < g.staves.length; j++) {
+                const s = g.staves[j];
                 const renderer: BarRendererBase = renderers.renderers[src++];
                 s.addBarRenderer(renderer);
 
@@ -425,8 +432,10 @@ export class StaffSystem {
         const info = renderers.layoutingInfo;
         info.resetHeaderRods();
         let src: number = 0;
-        for (const g of this.staves) {
-            for (const s of g.staves) {
+        for (let i = 0; i < this.staves.length; i++) {
+            const g = this.staves[i];
+            for (let j = 0; j < g.staves.length; j++) {
+                const s = g.staves[j];
                 const renderer: BarRendererBase = renderers.renderers[src++];
                 renderer.staff = s;
                 renderer.index = s.barRenderers.length + pending;
@@ -530,11 +539,13 @@ export class StaffSystem {
             let barDisplayScale = 0;
 
             let firstVisibleStaff: RenderStaff | undefined = undefined;
-            for (const g of this.staves) {
+            for (let i = 0; i < this.staves.length; i++) {
+                const g = this.staves[i];
                 let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
                 let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
 
-                for (const s of g.staves) {
+                for (let j = 0; j < g.staves.length; j++) {
+                    const s = g.staves[j];
                     const lastBar: BarRendererBase = s.revertLastBar();
                     const computedWidth = lastBar.computedWidth;
                     if (computedWidth > width) {
@@ -582,7 +593,8 @@ export class StaffSystem {
         let maxContentWidth: number = 0;
 
         let barDisplayScale = 0;
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             const last = s.barRenderers[s.barRenderers.length - 1];
             last.applyLayoutingInfo();
 
@@ -627,7 +639,8 @@ export class StaffSystem {
         // `calculateHeightForAccolade` reads.
         const visibilityFingerprint = this._computeVisibilityFingerprint();
         if (this._accoladeVisibilityFingerprint === visibilityFingerprint) {
-            for (const b of this._brackets) {
+            for (let i = 0; i < this._brackets.length; i++) {
+                const b = this._brackets[i];
                 b.updateCanPaint();
                 b.finalizeBracket(settings.display.resources.engravingSettings);
             }
@@ -724,14 +737,16 @@ export class StaffSystem {
         this.accoladeWidth += this._inlineTuningWidth;
 
         let currentY: number = 0;
-        for (const staff of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const staff = this.allStaves[i];
             staff.y = currentY;
             staff.calculateHeightForAccolade();
             currentY += staff.height;
         }
 
         let braceWidth = 0;
-        for (const b of this._brackets) {
+        for (let i = 0; i < this._brackets.length; i++) {
+            const b = this._brackets[i];
             b.updateCanPaint();
             b.finalizeBracket(settings.display.resources.engravingSettings);
             if (b.reservesAccoladeSpace) {
@@ -754,7 +769,8 @@ export class StaffSystem {
      * Per-revert resets are handled separately by {@link RenderStaff.revertLastBar}.
      */
     public resetAllStavesSharedLayoutData(): void {
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             s.resetSharedLayoutData();
         }
     }
@@ -764,7 +780,8 @@ export class StaffSystem {
      * register them again from their positioned content, the effect placement adds the bands.
      */
     public resetAllStavesOverflows(): void {
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             s.resetOverflows();
         }
     }
@@ -774,7 +791,8 @@ export class StaffSystem {
         // we stay in JS double-precision safe-integer range; bitwise ops would
         // cap at 32 bits. See `_accoladeVisibilityFingerprint` for the limit.
         let fingerprint = 0;
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             fingerprint = fingerprint * 2 + (s.isVisible ? 1 : 0);
         }
         return fingerprint;
@@ -1190,7 +1208,8 @@ export class StaffSystem {
             this._finalizeTrackGroups(true);
         }
 
-        for (const b of this._brackets!) {
+        for (let i = 0; i < this._brackets.length; i++) {
+            const b = this._brackets[i];
             b.finalizeBracket(settings.display.resources.engravingSettings);
         }
         Profiler.end('layout.finalizeSystem');
@@ -1266,10 +1285,12 @@ export class StaffSystem {
 
         let endSpikeOverflow = 0;
         let anyStaffVisible = false;
-        for (const group of this.staves) {
+        for (let i = 0; i < this.staves.length; i++) {
+            const group = this.staves[i];
             let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
             let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
-            for (const staff of group.staves) {
+            for (let j = 0; j < group.staves.length; j++) {
+                const staff = group.staves[j];
                 // check if we need "in-between padding"
                 if (previousStaff !== undefined && previousStaff!.trackIndex !== staff.trackIndex) {
                     currentY += settings.display.trackStaffPaddingBetween;
@@ -1486,7 +1507,8 @@ export class StaffSystem {
             }
         }
 
-        for (const masterBarBounds of systemBars) {
+        for (let i = 0; i < systemBars.length; i++) {
+            const masterBarBounds = systemBars[i];
             masterBarBounds.sortBars();
         }
         // the bounds are built scaled and sorted: BoundsLookup.finish must not process them again

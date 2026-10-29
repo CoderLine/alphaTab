@@ -20,6 +20,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _systems: StaffSystem[] = [];
     // the systems created since the last full layout by index, refilled by later resizes
     private _systemPool: StaffSystem[] = [];
+    private _previousSystemCount: number = 0;
     // the measured master bars in order; systems are built from them
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
 
@@ -304,9 +305,11 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         } else {
             // clear out staves during re-layout, this info is outdated during
             // re-layout of the bars
-            for (const r of this._allMasterBarRenderers) {
-                for (const b of r.renderers) {
-                    b.afterReverted();
+            const all = this._allMasterBarRenderers;
+            for (let i = 0; i < all.length; i++) {
+                const renderers = all[i].renderers;
+                for (let j = 0; j < renderers.length; j++) {
+                    renderers[j].afterReverted();
                 }
             }
             this._systems = [];
@@ -412,7 +415,9 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
             // (e.g. to ties ending in them)
             const all = this._allMasterBarRenderers;
             for (let i = index; i < all.length && i <= index + 1; i++) {
-                for (const r of all[i].renderers) {
+                const renderers = all[i].renderers;
+                for (let j = 0; j < renderers.length; j++) {
+                    const r = renderers[j];
                     if (r.staff && r.staff.system === system) {
                         r.afterReverted();
                     }
@@ -432,7 +437,23 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                 break;
             }
         }
+        this._trimSystemPool();
         return y;
+    }
+
+    /**
+     * Drops pooled systems a narrower width created and the current one does not use. The systems of
+     * the previous pass stay pooled (up to half again the current count), so alternating between two
+     * widths reuses them instead of recreating them.
+     */
+    private _trimSystemPool(): void {
+        const used = this._systems.length;
+        const keep = Math.max(used, Math.min(this._previousSystemCount, Math.ceil(used * 1.5)));
+        const pool = this._systemPool;
+        if (pool.length > keep) {
+            pool.splice(keep, pool.length - keep);
+        }
+        this._previousSystemCount = used;
     }
 
     private _paintSystem(system: StaffSystem, totalHeight: number): number {
@@ -529,7 +550,9 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         system.resetAllStavesSharedLayoutData();
         system.resetAllStavesOverflows();
 
-        for (const s of system.allStaves) {
+        const allStaves = system.allStaves;
+        for (let j = 0; j < allStaves.length; j++) {
+            const s = allStaves[j];
             let w = 0;
             for (let i = 0; i < s.barRenderers.length; i++) {
                 const renderer = s.barRenderers[i];

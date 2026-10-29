@@ -2,7 +2,7 @@
 // biome-ignore-all lint/style/useTemplate: mirrors the string concatenation of SvgCanvas
 // What the SVG paint produces and what building it costs: output size and element census per
 // reference score (DOM parse/retain estimates), canvas call counts, the copy volume an immutable
-// string buffer causes (C#/Kotlin `buffer += …`), and paint allocations of alternative buffer
+// string buffer would cause (`buffer += …` on C#/Kotlin strings), and paint allocations of alternative buffer
 // strategies. Run: npm run test-layout-flow -- PaintOutput   (LAYOUT_FLOW_FILE=<name> limits the scores)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -188,22 +188,28 @@ function installStateCounter(canvas: any) {
 }
 
 /**
- * Replaces the canvas `buffer` and `_currentPath` fields with accessors that count appends and
- * sum the resulting lengths: the characters an immutable string `+=` copies.
+ * Counts the buffer writes and the `_currentPath` assignments and sums the resulting lengths: the
+ * characters an immutable string `+=` copies.
  */
 function installCopyCounter(canvas: any) {
     const stats = { bufferSets: 0, bufferCopied: 0, pathSets: 0, pathCopied: 0 };
-    let buffer: string = canvas.buffer;
+    const buffer = canvas.buffer;
+    const reset = buffer.reset;
+    const append = buffer.append;
+    let length = 0;
+    buffer.reset = function (this: any, v: string) {
+        stats.bufferSets++;
+        length = v.length;
+        stats.bufferCopied += length;
+        return reset.call(this, v);
+    };
+    buffer.append = function (this: any, v: string) {
+        stats.bufferSets++;
+        length += v.length;
+        stats.bufferCopied += length;
+        return append.call(this, v);
+    };
     let p: string = canvas._currentPath;
-    Object.defineProperty(canvas, 'buffer', {
-        configurable: true,
-        get: () => buffer,
-        set: (v: string) => {
-            stats.bufferSets++;
-            stats.bufferCopied += v.length;
-            buffer = v;
-        }
-    });
     Object.defineProperty(canvas, '_currentPath', {
         configurable: true,
         get: () => p,
@@ -216,9 +222,9 @@ function installCopyCounter(canvas: any) {
     return {
         stats,
         uninstall: () => {
-            delete canvas.buffer;
+            delete buffer.reset;
+            delete buffer.append;
             delete canvas._currentPath;
-            canvas.buffer = buffer;
             canvas._currentPath = p;
         }
     };
@@ -226,59 +232,34 @@ function installCopyCounter(canvas: any) {
 
 /** Collects the appended pieces in an array that `endRender` joins. */
 function installPartsBuffer(canvas: any) {
+    const original = canvas.buffer;
     let parts: string[] = [];
-    const proto = Object.getPrototypeOf(canvas);
-    const endRender = proto.endRender;
-    Object.defineProperty(canvas, 'buffer', {
-        configurable: true,
-        get: () => '',
-        set: (v: string) => {
+    canvas.buffer = {
+        reset: (v: string) => {
+            parts = [v];
+        },
+        append: (v: string) => {
             parts.push(v);
-        }
-    });
-    canvas.beginRender = function (w: number, h: number) {
-        parts = [];
-        return proto.beginRender.call(this, w, h);
-    };
-    canvas.endRender = () => {
-        parts.push('</svg>');
-        const r = parts.join('');
-        parts = [];
-        return r;
+        },
+        build: () => {
+            const r = parts.join('');
+            parts = [];
+            return r;
+        },
+        parts: () => parts
     };
     return () => {
-        delete canvas.buffer;
-        delete canvas.beginRender;
-        delete canvas.endRender;
-        canvas.buffer = '';
-        void endRender;
+        canvas.buffer = original;
     };
 }
 
 /** `fillRect` writing its pieces straight into a parts array (numbers converted by `join`). */
 function installPiecewiseRect(canvas: any) {
     const uninstallParts = installPartsBuffer(canvas);
-    let parts: string[] = [];
-    const proto = Object.getPrototypeOf(canvas);
-    Object.defineProperty(canvas, 'buffer', {
-        configurable: true,
-        get: () => '',
-        set: (v: string) => {
-            parts.push(v);
-        }
-    });
-    canvas.beginRender = function (w: number, h: number) {
-        parts = [];
-        return proto.beginRender.call(this, w, h);
-    };
-    canvas.endRender = () => {
-        parts.push('</svg>');
-        const r = parts.join('');
-        parts = [];
-        return r;
-    };
+    const buffer = canvas.buffer;
     canvas.fillRect = function (this: any, x: number, y: number, w: number, h: number) {
         if (w > 0) {
+            const parts: string[] = buffer.parts();
             parts.push('<rect x="', x as any, '" y="', y as any, '" width="', w as any, '" height="', h as any);
             parts.push('" fill="', this.color.rgba, '" />\n');
         }
@@ -310,7 +291,9 @@ function installCachedTails(canvas: any, blackRectFill: boolean, round: boolean)
                 rectColor = c;
                 rectTail = !blackRectFill && c.rgba === '#000000' ? '" />\n' : '" fill="' + c.rgba + '" />\n';
             }
-            this.buffer += '<rect x="' + r(x) + '" y="' + r(y) + '" width="' + r(w) + '" height="' + r(h) + rectTail;
+            this.buffer.append(
+                '<rect x="' + r(x) + '" y="' + r(y) + '" width="' + r(w) + '" height="' + r(h) + rectTail
+            );
         }
     };
     canvas.fillText = function (this: any, text: string, x: number, y: number) {
@@ -335,7 +318,7 @@ function installCachedTails(canvas: any, blackRectFill: boolean, round: boolean)
             }
             textTail = t + '>';
         }
-        this.buffer += '<text x="' + r(x) + '" y="' + r(y) + textTail + escapeText(text) + '</text>';
+        this.buffer.append('<text x="' + r(x) + '" y="' + r(y) + textTail + escapeText(text) + '</text>');
     };
     canvas._fillMusicFontSymbolText = function (
         this: any,
@@ -357,8 +340,9 @@ function installCachedTails(canvas: any, blackRectFill: boolean, round: boolean)
             }
             symTail = t + '>';
         }
-        this.buffer +=
-            '<g transform="translate(' + r(x) + ' ' + r(y) + ')" class="at" ><text' + symTail + symbols + '</text></g>';
+        this.buffer.append(
+            '<g transform="translate(' + r(x) + ' ' + r(y) + ')" class="at" ><text' + symTail + symbols + '</text></g>'
+        );
     };
     return () => {
         delete canvas.fillRect;

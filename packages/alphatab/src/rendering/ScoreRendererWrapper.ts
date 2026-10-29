@@ -115,7 +115,9 @@ export class ScoreRendererWrapper implements IScoreRenderer {
 
     public destroy(): void {
         this._instance?.destroy();
-        this._instance = undefined;
+        this.instance = undefined;
+        this._score = null;
+        this._trackIndexes = null;
     }
 
     public readonly preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();

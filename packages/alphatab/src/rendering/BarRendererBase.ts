@@ -309,6 +309,14 @@ export class BarRendererBase {
         return true;
     }
 
+    /**
+     * Whether this renderer paints the rhythm (stems, flags, beams, tuplets) of its beats.
+     * When false, no beaming helpers or stem collision slots exist for the bar.
+     */
+    public get drawsRhythm(): boolean {
+        return true;
+    }
+
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         this.scoreRenderer = renderer;
         this.bar = bar;

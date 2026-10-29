@@ -32,6 +32,7 @@ import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { TextMeasureCache } from '@coderline/alphatab/rendering/utils/TextMeasureCache';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { Lazy } from '@coderline/alphatab/util/Lazy';
 
@@ -161,6 +162,11 @@ export abstract class ScoreLayout {
     >();
 
     /**
+     * Text measurements of this layout's canvas, reset with every full layout.
+     */
+    public readonly textMeasures: TextMeasureCache = new TextMeasureCache();
+
+    /**
      * The effects that can create glyphs, by `2 * RenderStaff.index` (top) and `2 * RenderStaff.index + 1`
      * (bottom): every staff system of a layout has the same staves.
      */
@@ -225,6 +231,7 @@ export abstract class ScoreLayout {
         this._lazyPartials.clear();
         this.beamingRuleLookups.clear();
         this.headerProfiles.clear();
+        this.textMeasures.clear();
         this.activeEffects.clear();
         this._barRendererLookup.clear();
 
@@ -289,8 +296,20 @@ export abstract class ScoreLayout {
         const canvas = this.renderer.canvas!;
         canvas.beginRender(args.width, args.height);
         callback(canvas);
-        args.renderResult = canvas.endRender();
-        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
+        // the registered args outlive the event: storing the result on them would keep every painted partial alive
+        const rendered = new RenderFinishedEventArgs();
+        rendered.id = args.id;
+        rendered.reuseViewport = args.reuseViewport;
+        rendered.x = args.x;
+        rendered.y = args.y;
+        rendered.width = args.width;
+        rendered.height = args.height;
+        rendered.totalWidth = args.totalWidth;
+        rendered.totalHeight = args.totalHeight;
+        rendered.firstMasterBarIndex = args.firstMasterBarIndex;
+        rendered.lastMasterBarIndex = args.lastMasterBarIndex;
+        rendered.renderResult = canvas.endRender();
+        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(rendered);
     }
 
     public renderLazyPartial(resultId: string) {

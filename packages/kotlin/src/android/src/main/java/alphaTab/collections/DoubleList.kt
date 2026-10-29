@@ -145,6 +145,11 @@ public class DoubleList : IDoubleIterable {
         return d
     }
 
+    public fun pop(): Double {
+        _size--
+        return _items[_size]
+    }
+
     public fun spread(): DoubleArray {
         return _items;
     }

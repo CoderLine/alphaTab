@@ -9,6 +9,11 @@ import { SvgCanvas } from '@coderline/alphatab/platform/svg/SvgCanvas';
 export class CssFontSvgCanvas extends SvgCanvas {
     private static _symbolTexts: Map<MusicFontSymbol, string> | null = null;
 
+    private _symbolTailScale: number = -1;
+    private _symbolTailColor: string = '';
+    private _symbolTailCenter: boolean = false;
+    private _symbolTail: string = '';
+
     private static _symbolText(symbol: MusicFontSymbol): string {
         let texts = CssFontSvgCanvas._symbolTexts;
         if (texts === null) {
@@ -62,25 +67,40 @@ export class CssFontSvgCanvas extends SvgCanvas {
         centerAtPosition?: boolean
     ): void {
         const s = this.scale;
+        const scale = s * relativeScale;
+        const rgba = this.color.rgba;
+        const center = centerAtPosition === true;
+        if (scale !== this._symbolTailScale || rgba !== this._symbolTailColor || center !== this._symbolTailCenter) {
+            this._symbolTailScale = scale;
+            this._symbolTailColor = rgba;
+            this._symbolTailCenter = center;
+            let tail: string =
+                scale !== 1 ? ` style="font-size: ${scale * 100}%; stroke:none"` : ' style="stroke:none"';
+            if (rgba !== '#000000') {
+                tail += ' fill="' + rgba + '"';
+            }
+            if (center) {
+                tail += ' text-anchor="middle"';
+            }
+            this._symbolTail = tail + '>';
+        }
         if (s === 1) {
-            this.buffer += '<g transform="translate(' + x + ' ' + y + ')" class="at" ><text';
+            this.buffer.append(
+                '<g transform="translate(' +
+                    x +
+                    ' ' +
+                    y +
+                    ')" class="at" ><text' +
+                    this._symbolTail +
+                    symbols +
+                    '</text></g>'
+            );
         } else {
             const sx = x * s;
             const sy = y * s;
-            this.buffer += `<g transform="translate(${sx} ${sy})" class="at" ><text`;
+            this.buffer.append(
+                `<g transform="translate(${sx} ${sy})" class="at" ><text` + this._symbolTail + symbols + '</text></g>'
+            );
         }
-        const scale = s * relativeScale;
-        if (scale !== 1) {
-            this.buffer += ` style="font-size: ${scale * 100}%; stroke:none"`;
-        } else {
-            this.buffer += ' style="stroke:none"';
-        }
-        if (this.color.rgba !== '#000000') {
-            this.buffer += ' fill="' + this.color.rgba + '"';
-        }
-        if (centerAtPosition) {
-            this.buffer += ' text-anchor="middle"';
-        }
-        this.buffer += '>' + symbols + '</text></g>';
     }
 }

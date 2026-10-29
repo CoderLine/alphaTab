@@ -43,6 +43,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
 
     public destroy(): void {
         this._worker.terminate();
+        this.boundsLookup = null;
     }
 
     public updateSettings(settings: Settings): void {

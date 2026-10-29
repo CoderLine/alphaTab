@@ -506,6 +506,18 @@ export class AlphaTabApiBase<TSettings> {
         this._player.destroy();
         this.uiFacade.destroy();
         this._renderer.destroy();
+
+        this._score = null;
+        this._tracks = [];
+        this._trackIndexes = null;
+        this._trackIndexLookup = null;
+        this._tickCache = null;
+        this._beatVisibilityChecker.bounds = null;
+        this._currentBeat = null;
+        this._currentBeatBounds = null;
+        this._previousCursorCache = null;
+        this._selectionStart = undefined;
+        this._selectionEnd = undefined;
     }
 
     /**

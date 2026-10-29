@@ -14,12 +14,13 @@ import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
  * @internal
  */
 export class BarHelpers {
+    private static readonly _noHelpers: BeamingHelper[][] = [];
     private _renderer: BarRendererBase;
     /**
      * The beaming helper per voice index and beat index.
      */
-    private _beamHelperLookup: BeamingHelper[][] = [];
-    public beamHelpers: BeamingHelper[][] = [];
+    private _beamHelperLookup: BeamingHelper[][] = BarHelpers._noHelpers;
+    public beamHelpers: BeamingHelper[][] = BarHelpers._noHelpers;
     public collisionHelper: BarCollisionHelper;
     public preferredBeamDirection: BeamDirection | null = null;
 
@@ -31,6 +32,11 @@ export class BarHelpers {
     public initialize() {
         const barRenderer = this._renderer;
         const bar = this._renderer.bar;
+        if (!barRenderer.drawsRhythm) {
+            this._beamHelperLookup = BarHelpers._noHelpers;
+            this.beamHelpers = BarHelpers._noHelpers;
+            return;
+        }
 
         const masterBar = bar.masterBar;
         const beamingRules = masterBar.actualBeamingRules ?? BarHelpers._findOrBuildDefaultBeamingRules(masterBar);

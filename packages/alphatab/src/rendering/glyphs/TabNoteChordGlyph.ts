@@ -131,8 +131,6 @@ export class TabNoteChordGlyph extends Glyph {
             let noteStringWidth: number = 0;
             for (let i: number = 0, j: number = this._notes.length; i < j; i++) {
                 const g: NoteNumberGlyph = this._notes[i];
-                g.renderer = this.renderer;
-                g.doLayout();
                 if (g.width > w) {
                     w = g.width;
                 }
@@ -175,6 +173,9 @@ export class TabNoteChordGlyph extends Glyph {
         this.width = w;
     }
 
+    /**
+     * Adds a note number that is already laid out.
+     */
     public addNoteGlyph(noteGlyph: NoteNumberGlyph, note: Note): void {
         if (this._notes.length === 0) {
             this._notes = [noteGlyph];

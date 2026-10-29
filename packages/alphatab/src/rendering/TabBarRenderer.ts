@@ -517,6 +517,14 @@ export class TabBarRenderer extends LineBarRenderer {
         }
     }
 
+    public override get drawsRhythm(): boolean {
+        return this.rhythmMode !== TabRhythmMode.Hidden;
+    }
+
+    public override getBeatDirection(_beat: Beat): BeamDirection {
+        return BeamDirection.Down;
+    }
+
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
         return BeamDirection.Down;
     }

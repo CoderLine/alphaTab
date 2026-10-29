@@ -212,7 +212,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         // slashes attach the stem like regular note heads (SMuFL stem anchor)
         this.stemX = this.slash ? this.slash.x + this.slash.stemX : this.middleX;
 
-        if (this.slash) {
+        if (this.slash && this.renderer.drawsRhythm) {
             // reserve the slash area so stems are not painted through it
             this.renderer.collisionHelper.reserveBeatSlot(
                 this.container.beat,
@@ -236,10 +236,13 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
-        const topY = noteNumberGlyph.getBoundingBoxTop();
-        const bottomY = noteNumberGlyph.getBoundingBoxBottom();
-
-        this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
+        if (tr.drawsRhythm) {
+            tr.collisionHelper.reserveBeatSlot(
+                this.container.beat,
+                noteNumberGlyph.getBoundingBoxTop(),
+                noteNumberGlyph.getBoundingBoxBottom()
+            );
+        }
 
         // minString/maxString track the topmost/bottommost used line (not the string number)
         const minString = tr.minString;

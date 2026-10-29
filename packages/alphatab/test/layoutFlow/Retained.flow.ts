@@ -110,13 +110,17 @@ function breakdown(file: string, prepare: (s: Settings) => void, tracks: (s: Sco
     step('+ score model (import)');
     h.render(score, tracks(score), 1300);
     step('+ layout (render, no paint)');
+    let svgChars = 0;
+    h.renderer.partialRenderFinished.on(e => {
+        svgChars += typeof e.renderResult === 'string' ? (e.renderResult as string).length : 0;
+    });
     for (const id of h.partialIds) {
         h.renderer.renderResult(id);
     }
     step('+ paint all partials (svg kept in lazy partial args)');
     const c = counts(h);
+    c.svgChars = svgChars;
     for (const p of lazyPartials(h).values()) {
-        c.svgChars += typeof p.args.renderResult === 'string' ? (p.args.renderResult as string).length : 0;
         p.args.renderResult = null;
     }
     step('- svg strings in lazy partial args');
@@ -426,13 +430,16 @@ describe('Retained', () => {
         h.render(score, null, 1300);
         let before = '';
         let after = '';
+        let svgs: string[] = [];
+        h.renderer.partialRenderFinished.on(e => {
+            svgs.push(e.renderResult as string);
+        });
         for (const id of h.partialIds) {
             h.renderer.renderResult(id);
         }
         let elements = 0;
         let svgChars = 0;
-        for (const p of lazyPartials(h).values()) {
-            const svg = p.args.renderResult as string;
+        for (const svg of svgs) {
             svgChars += svg.length;
             for (let i = 0; i < svg.length; i++) {
                 if (svg.charCodeAt(i) === 60 && svg.charCodeAt(i + 1) !== 47) {
@@ -441,9 +448,7 @@ describe('Retained', () => {
             }
         }
         before = T();
-        for (const p of lazyPartials(h).values()) {
-            p.args.renderResult = null;
-        }
+        svgs = [];
         after = T();
         out.push(`### svg strings (${svgChars} chars, ${elements} elements)`);
         censusLines(D(after, before), 6, 6, out);

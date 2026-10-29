@@ -195,8 +195,10 @@ export class RenderStaff implements IStaffDisplayContext {
      * Prepares the staff to be filled with bars again; the effect band setup is kept.
      */
     public reset(): void {
-        this._sharedLayoutData.clear();
-        this.barRenderers.splice(0, this.barRenderers.length);
+        this.resetSharedLayoutData();
+        while (this.barRenderers.length > 0) {
+            this.barRenderers.pop();
+        }
         this.x = 0;
         this.y = 0;
         this.height = 0;
@@ -322,7 +324,10 @@ export class RenderStaff implements IStaffDisplayContext {
     }
 
     public resetSharedLayoutData() {
-        this._sharedLayoutData.clear();
+        // Map.clear() allocates a fresh hash table in V8 even when the map is empty.
+        if (this._sharedLayoutData.size > 0) {
+            this._sharedLayoutData.clear();
+        }
     }
 
     public resetOverflows() {

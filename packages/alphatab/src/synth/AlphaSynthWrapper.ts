@@ -290,7 +290,7 @@ export class AlphaSynthWrapper implements IAlphaSynth {
     public destroy(): void {
         if (this._instance) {
             this._instance!.destroy();
-            this._instance = undefined;
+            this.instance = undefined;
         }
     }
 

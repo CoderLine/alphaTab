@@ -130,7 +130,7 @@ export class Voice {
         const tmpLoopEndDbl: number = tmpLoopEnd + 1.0;
         let tmpSourceSamplePosition: number = this.sourceSamplePosition;
 
-        const tmpLowpass: VoiceLowPass = new VoiceLowPass(this.lowPass);
+        const tmpLowpass: VoiceLowPass = this.lowPass;
 
         const dynamicLowpass: boolean = region.modLfoToFilterFc !== 0 || region.modEnvToFilterFc !== 0;
         let tmpSampleRate: number = 0;
@@ -335,9 +335,6 @@ export class Voice {
         }
 
         this.sourceSamplePosition = tmpSourceSamplePosition;
-        if (tmpLowpass.active || dynamicLowpass) {
-            this.lowPass = tmpLowpass;
-        }
     }
 
     public kill(): void {

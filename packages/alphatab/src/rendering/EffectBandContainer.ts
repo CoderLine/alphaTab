@@ -31,9 +31,9 @@ export class ActiveEffectBand {
  * @internal
  */
 export class EffectBandContainer {
-    private _bands: EffectBand[] = [];
-    /** Per-voice (effectId → band) lookup; nested to avoid string-key allocation in `_createOrResizeGlyph`. */
-    private _bandLookup: Map<number, Map<string, EffectBand>> | null = null;
+    /** Shared by all containers without bands; never modified. */
+    private static readonly _noBands: EffectBand[] = [];
+    private _bands: EffectBand[] = EffectBandContainer._noBands;
     public height: number = 0;
 
     public infos!: ActiveEffectBand[];
@@ -118,25 +118,16 @@ export class EffectBandContainer {
     private _createBand(voice: Voice, info: ActiveEffectBand): EffectBand {
         const band = new EffectBand(voice, info.effect, this, this._renderer, info.order);
         band.doLayout();
-        this._bands.push(band);
-        let bandLookup = this._bandLookup;
-        if (!bandLookup) {
-            bandLookup = new Map<number, Map<string, EffectBand>>();
-            this._bandLookup = bandLookup;
+        if (this._bands.length === 0) {
+            this._bands = [band];
+        } else {
+            this._bands.push(band);
         }
-        let perVoice = bandLookup.get(voice.index);
-        if (!perVoice) {
-            perVoice = new Map<string, EffectBand>();
-            bandLookup.set(voice.index, perVoice);
-        }
-        perVoice.set(info.effect.effectId, band);
         return band;
     }
 
     public doLayout() {
-        // splice() instead of `.length = 0`: transpile-safe array clear.
-        this._bands.splice(0, this._bands.length);
-        this._bandLookup?.clear();
+        this._bands = EffectBandContainer._noBands;
         this.height = 0;
     }
 
@@ -151,14 +142,14 @@ export class EffectBandContainer {
     }
 
     public getBand(voice: Voice, effectId: string): EffectBand | null {
-        const bandLookup = this._bandLookup;
-        if (!bandLookup) {
-            return null;
+        const bands = this._bands;
+        const voiceIndex = voice.index;
+        for (let i = 0, n = bands.length; i < n; i++) {
+            const band = bands[i];
+            if (band.voice.index === voiceIndex && band.info.effectId === effectId) {
+                return band;
+            }
         }
-        const perVoice = bandLookup.get(voice.index);
-        if (!perVoice) {
-            return null;
-        }
-        return perVoice.get(effectId) ?? null;
+        return null;
     }
 }

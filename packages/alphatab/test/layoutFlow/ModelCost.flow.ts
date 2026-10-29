@@ -10,16 +10,10 @@ import v8 from 'node:v8';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
-import {
-    ControlChangeEvent,
-    type MidiEvent,
-    MidiEventType,
-    NoteOffEvent,
-    NoteOnEvent,
-    PitchBendEvent
-} from '@coderline/alphatab/midi/MidiEvent';
-import { MidiFile, MidiTrack } from '@coderline/alphatab/midi/MidiFile';
+import { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
+import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
+import { MidiFileWire } from '@coderline/alphatab/midi/MidiFileWire';
 import type { MidiTickLookupFindBeatResult } from '@coderline/alphatab/midi/MidiTickLookup';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -469,68 +463,17 @@ describe('ModelCost', () => {
         const cloned = v8.deserialize(ser);
         const tBack = timed(runs, () => JsonConverter.jsObjectToMidiFile(cloned));
 
-        // flat prototype: 7 numbers per event, notes/control/pitch-bend decoded directly
-        const encode = () => {
-            const f = new Float64Array(events.length * 7);
-            let o = 0;
-            for (const e of events) {
-                const x = e as any;
-                f[o] = e.type;
-                f[o + 1] = e.track;
-                f[o + 2] = e.tick;
-                switch (e.type) {
-                    case MidiEventType.NoteOn:
-                    case MidiEventType.NoteOff:
-                        f[o + 3] = x.channel;
-                        f[o + 4] = x.noteKey;
-                        f[o + 5] = x.noteVelocity;
-                        break;
-                    case MidiEventType.ControlChange:
-                        f[o + 3] = x.channel;
-                        f[o + 4] = x.controller;
-                        f[o + 5] = x.value;
-                        break;
-                    case MidiEventType.PitchBend:
-                        f[o + 3] = x.channel;
-                        f[o + 4] = x.value;
-                        break;
-                }
-                o += 7;
-            }
-            return f;
-        };
-        const decode = (f: Float64Array) => {
-            const m = new MidiFile();
-            const track = new MidiTrack();
-            m.tracks.push(track);
-            for (let o = 0; o < f.length; o += 7) {
-                const type = f[o];
-                let e: MidiEvent;
-                switch (type) {
-                    case MidiEventType.NoteOn:
-                        e = new NoteOnEvent(f[o + 1], f[o + 2], f[o + 3], f[o + 4], f[o + 5]);
-                        break;
-                    case MidiEventType.NoteOff:
-                        e = new NoteOffEvent(f[o + 1], f[o + 2], f[o + 3], f[o + 4], f[o + 5]);
-                        break;
-                    case MidiEventType.ControlChange:
-                        e = new ControlChangeEvent(f[o + 1], f[o + 2], f[o + 3], f[o + 4], f[o + 5]);
-                        break;
-                    case MidiEventType.PitchBend:
-                        e = new PitchBendEvent(f[o + 1], f[o + 2], f[o + 3], f[o + 4]);
-                        break;
-                    default:
-                        e = new NoteOnEvent(f[o + 1], f[o + 2], 0, 0, 0);
-                        break;
-                }
-                track.events.push(e);
-            }
-            return m;
-        };
+        const encode = () => MidiFileWire.encode(midi);
+        const decode = (f: Float64Array) => MidiFileWire.decode(f);
         const flat = encode();
         const tEnc = timed(runs, encode);
         const aEnc = AllocationSampler.measure(encode, 1024);
         const tDec = timed(runs, () => decode(flat));
+        const aDec = AllocationSampler.measure(() => decode(flat), 1024);
+        const tWire = timed(runs, () => {
+            const f = encode();
+            structuredClone(f, { transfer: [f.buffer] });
+        });
         const byType = new Map<number, number>();
         for (const e of events) {
             byType.set(e.type, (byType.get(e.type) ?? 0) + 1);
@@ -549,9 +492,10 @@ describe('ModelCost', () => {
         out.push(`| structured clone deserialize (Maps) | synth | ${tDe.toFixed(1)} | |`);
         out.push(`| jsObjectToMidiFile | synth | ${tBack.toFixed(1)} | |`);
         out.push(
-            `| flat encode (Float64Array, transferable) | main | ${tEnc.toFixed(2)} | ${mb(aEnc.totalBytes)} (${(flat.byteLength / 1024).toFixed(0)} KB) |`
+            `| MidiFileWire.encode (transferable) | main | ${tEnc.toFixed(2)} | ${mb(aEnc.totalBytes)} (${(flat.byteLength / 1024).toFixed(0)} KB) |`
         );
-        out.push(`| flat decode to MidiFile | synth | ${tDec.toFixed(2)} | |`);
+        out.push(`| MidiFileWire.decode | synth | ${tDec.toFixed(2)} | ${mb(aDec.totalBytes)} |`);
+        out.push(`| encode + transfer (structuredClone) | main | ${tWire.toFixed(2)} | |`);
         out.push('');
     });
 
