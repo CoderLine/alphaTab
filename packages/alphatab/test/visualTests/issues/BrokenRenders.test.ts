@@ -160,6 +160,21 @@ describe('BrokenRendersTests', () => {
         }
     });
 
+    it('dead-slapped-beats', () => {
+        for (const tex of [
+            '\\staff {score tabs slash numbered} r.1 {ds}',
+            '\\staff {numbered} \\ts 8 4 :-2 r {ds}',
+            '\\staff {score tabs slash numbered} \\ts 3 2 :1 C4 {tu 3} C4 {tu 3} r {tu 3 ds}',
+            '\\staff {score tabs slash numbered} :8 r {ds beam merge} r {ds} r r r r r r'
+        ]) {
+            const results = renderSvg(ScoreLoader.loadAlphaTex(tex), 1300);
+            expect(results.length, tex).toBeGreaterThan(0);
+            for (const r of results) {
+                expect(r.includes('NaN'), `NaN in SVG for ${tex}`).toBe(false);
+            }
+        }
+    });
+
     it('squeezed-bar-warning', () => {
         const settings = new Settings();
         settings.core.engine = 'svg';

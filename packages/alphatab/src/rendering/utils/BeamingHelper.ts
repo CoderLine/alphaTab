@@ -307,14 +307,6 @@ export class BeamingHelper {
         return ModelUtils.getIndex(a.duration) - 2 - barIndex > 0 && ModelUtils.getIndex(b.duration) - 2 - barIndex > 0;
     }
 
-    public get beatOfLowestNote(): Beat {
-        return this.lowestNoteInHelper!.beat;
-    }
-
-    public get beatOfHighestNote(): Beat {
-        return this.highestNoteInHelper!.beat;
-    }
-
     /**
      * Per-direction beam drawing info cache. BeamDirection is a 2-value enum
      * (Up=0, Down=1) so we use two pre-allocated `BeamingHelperDrawInfo`
