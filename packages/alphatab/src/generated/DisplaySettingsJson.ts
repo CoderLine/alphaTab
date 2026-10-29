@@ -354,7 +354,7 @@ export interface DisplaySettingsJson {
      * The left padding applied between the left line and the first glyph in the following staff in a system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `2`
+     * @defaultValue `6`
      */
     staffPaddingLeft?: number;
     /**
@@ -386,7 +386,7 @@ export interface DisplaySettingsJson {
      * The mode used to arrange staves and systems.
      * @since 1.3.0
      * @category Display
-     * @defaultValue `1`
+     * @defaultValue `SystemsLayoutMode.Automatic`
      * @remarks
      * By default alphaTab uses an own (automatic) mode to arrange and scale the bars when
      * putting them into staves. This property allows changing this mode to change the music sheet arrangement.
