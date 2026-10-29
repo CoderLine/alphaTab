@@ -95,6 +95,10 @@ public class List<T> : Iterable<T> {
         return _data.any(predicate)
     }
 
+    public fun every(predicate: (T) -> Boolean): Boolean {
+        return _data.all(predicate)
+    }
+
     public fun includes(value: T): Boolean {
         return _data.contains(value)
     }

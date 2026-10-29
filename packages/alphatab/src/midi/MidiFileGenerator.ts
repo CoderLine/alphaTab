@@ -95,6 +95,7 @@ class PlayThroughContext {
 export class MidiFileGenerator {
     private static readonly _defaultDurationDead: number = 30;
     private static readonly _defaultDurationPalmMute: number = 80;
+    private static readonly _fullExpression: number = 127;
 
     private readonly _score: Score;
     private _settings: Settings;
@@ -103,6 +104,7 @@ export class MidiFileGenerator {
 
     private _currentTime: number = 0;
     private _calculatedBeatTimers: Set<number> = new Set<number>();
+    private _fadedVoices: Set<string> = new Set<string>();
 
     /**
      * Gets a lookup object which can be used to quickly find beats and bars
@@ -143,6 +145,7 @@ export class MidiFileGenerator {
     public generate(): void {
         this.transpositionPitches.clear();
         this._calculatedBeatTimers.clear();
+        this._fadedVoices.clear();
         this._currentTime = 0;
 
         // initialize tracks
@@ -757,6 +760,14 @@ export class MidiFileGenerator {
         for (const automation of beat.automations) {
             this._generateNonTempoAutomation(beat, automation, barStartTick);
         }
+        const voiceKey = MidiFileGenerator._voiceKey(beat);
+        if (!beat.isRest && this._fadedVoices.has(voiceKey)) {
+            this._fadedVoices.delete(voiceKey);
+            // a fading beat sets the expression with its own ramp
+            if (beat.fade === FadeType.None) {
+                this._addExpression(track, barStartTick + beatStart, MidiFileGenerator._fullExpression);
+            }
+        }
         if (beat.isRest) {
             this._handler.addRest(track.index, barStartTick + beatStart, track.playbackInfo.primaryChannel);
         } else if (beat.deadSlapped) {
@@ -1314,56 +1325,39 @@ export class MidiFileGenerator {
         const track: Track = beat.voice.bar.staff.track;
         switch (beat.fade) {
             case FadeType.FadeIn:
-                this._generateFadeSteps(
-                    track,
-                    beatStart,
-                    beatDuration,
-                    0,
-                    MidiFileGenerator._toChannelShort(track.playbackInfo.volume)
-                );
-                break;
+                this._generateFadeSteps(track, beatStart, beatDuration, 0, MidiFileGenerator._fullExpression);
+                return;
             case FadeType.FadeOut:
-                this._generateFadeSteps(
-                    track,
-                    beatStart,
-                    beatDuration,
-                    MidiFileGenerator._toChannelShort(track.playbackInfo.volume),
-                    0
-                );
+                this._generateFadeSteps(track, beatStart, beatDuration, MidiFileGenerator._fullExpression, 0);
                 break;
             case FadeType.VolumeSwell:
                 const half = (beatDuration / 2) | 0;
-                this._generateFadeSteps(
-                    track,
-                    beatStart,
-                    half,
-                    0,
-                    MidiFileGenerator._toChannelShort(track.playbackInfo.volume)
-                );
-                this._generateFadeSteps(
-                    track,
-                    beatStart + half,
-                    half,
-                    MidiFileGenerator._toChannelShort(track.playbackInfo.volume),
-                    0
-                );
-
+                this._generateFadeSteps(track, beatStart, half, 0, MidiFileGenerator._fullExpression);
+                this._generateFadeSteps(track, beatStart + half, half, MidiFileGenerator._fullExpression, 0);
                 break;
         }
+
+        // the expression is restored with the voice's next non-rest beat, so the release of the faded notes stays silent
+        this._fadedVoices.add(MidiFileGenerator._voiceKey(beat));
+    }
+
+    private static _voiceKey(beat: Beat): string {
+        const staff = beat.voice.bar.staff;
+        return `${staff.track.index}:${staff.index}:${beat.voice.index}`;
     }
 
     private _generateFadeSteps(
         track: Track,
         start: number,
         duration: number,
-        startVolume: number,
-        endVolume: number
+        startExpression: number,
+        endExpression: number
     ): void {
         const tickStep: number = 120;
         // we want to reach the target volume a bit earlier than the end of the note
         duration = (duration * 0.8) | 0;
 
-        const volumeFactor: number = (endVolume - startVolume) / duration;
+        const expressionFactor: number = (endExpression - startExpression) / duration;
 
         const steps: number = (duration / tickStep + 1) | 0;
         const endTick: number = start + duration;
@@ -1372,23 +1366,28 @@ export class MidiFileGenerator {
             // ensure final value at end depending on rounding we might not reach it exactly
             const isLast = i === steps - 1;
             const tick: number = isLast ? endTick : start + i * tickStep;
-            const volume: number = isLast ? endVolume : Math.round(startVolume + (tick - start) * volumeFactor);
-
-            this._handler.addControlChange(
-                track.index,
-                tick,
-                track.playbackInfo.primaryChannel,
-                ControllerType.VolumeCoarse,
-                volume
-            );
-            this._handler.addControlChange(
-                track.index,
-                tick,
-                track.playbackInfo.secondaryChannel,
-                ControllerType.VolumeCoarse,
-                volume
-            );
+            const expression: number = isLast
+                ? endExpression
+                : Math.round(startExpression + (tick - start) * expressionFactor);
+            this._addExpression(track, tick, expression);
         }
+    }
+
+    private _addExpression(track: Track, tick: number, expression: number): void {
+        this._handler.addControlChange(
+            track.index,
+            tick,
+            track.playbackInfo.primaryChannel,
+            ControllerType.ExpressionControllerCoarse,
+            expression
+        );
+        this._handler.addControlChange(
+            track.index,
+            tick,
+            track.playbackInfo.secondaryChannel,
+            ControllerType.ExpressionControllerCoarse,
+            expression
+        );
     }
 
     private _generateVibrato(
@@ -2446,7 +2445,12 @@ export class MidiFileGenerator {
 
     public generateSingleBeat(beat: Beat) {
         const tempo = this.prepareSingleBeat(beat);
+        this._fadedVoices.clear();
         this._generateBeat(beat, -beat.playbackStart /* to bring it to 0*/, beat.voice.bar, tempo);
+        if (this._fadedVoices.size > 0) {
+            this._fadedVoices.clear();
+            this._addExpression(beat.voice.bar.staff.track, beat.playbackDuration, MidiFileGenerator._fullExpression);
+        }
     }
 
     public generateSingleNote(note: Note) {

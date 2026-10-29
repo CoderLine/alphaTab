@@ -197,4 +197,13 @@ public class DoubleList : IDoubleIterable {
         }
         return false
     }
+
+    public fun every(predicate: (Double) -> Boolean): Boolean {
+        for (el in this) {
+            if(!predicate(el)) {
+                return false
+            }
+        }
+        return true
+    }
 }
