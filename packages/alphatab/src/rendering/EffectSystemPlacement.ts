@@ -106,9 +106,9 @@ export class EffectSystemPlacement {
         }
     }
 
-    /** The height the placed bands add on top of the given content overflow. */
     private static readonly _rangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
 
+    /** The height the placed bands add on top of the given content overflow. */
     private static _effectsHeight(bands: EffectBand[], contentOverflow: number): number {
         let max = 0;
         for (const b of bands) {

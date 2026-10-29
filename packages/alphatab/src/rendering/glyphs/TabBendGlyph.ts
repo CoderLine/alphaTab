@@ -4,7 +4,6 @@ import { BendStyle } from '@coderline/alphatab/model/BendStyle';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import type { Color } from '@coderline/alphatab/model/Color';
 import type { Font } from '@coderline/alphatab/model/Font';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
@@ -48,8 +47,7 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
         super(0, 0);
     }
 
-    // The reserved bend height over the painted range of the bends ({@link ITieGlyph} convention:
-    // staff-local x, renderer-local y). Only valid once the beats are positioned.
+    // The reserved bend height ({@link ITieGlyph} convention: renderer-local y).
 
     public override getBoundingBoxTop(): number {
         return this._notes.length === 0 ? Number.NaN : -this._bendHeight;
@@ -59,32 +57,12 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
         return this._notes.length === 0 ? Number.NaN : 0;
     }
 
-    public override getBoundingBoxLeft(): number {
-        let left = Number.NaN;
-        for (const note of this._notes) {
-            this._resolvePaintRange(0, note);
-            left = ModelUtils.minBoundingBox(left, this._paintStartX);
-        }
-        return left;
-    }
-
-    public override getBoundingBoxRight(): number {
-        const arrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
-        let right = Number.NaN;
-        for (const note of this._notes) {
-            this._resolvePaintRange(0, note);
-            // the arrow and the label are centred on the end of the bend
-            const canvas = this.renderer.scoreRenderer.canvas!;
-            canvas.font = this.renderer.resources.tablatureFont;
-            const labelHalfWidth = canvas.measureText('full').width / 2;
-            right = ModelUtils.maxBoundingBox(right, this._paintEndX + Math.max(arrowSize, labelHalfWidth));
-        }
-        return right;
-    }
-
     public collectSkylineShape(shape: SkylineShape): void {
         this._shape = shape;
-        this.paint(0, -this.renderer.y, this.renderer.scoreRenderer.canvas!);
+        const canvas = this.renderer.scoreRenderer.canvas!;
+        // the 'grad.' label is measured with the font set before it (_paintBendLineSlurText)
+        canvas.font = this.renderer.resources.tablatureFont;
+        this.paint(0, -this.renderer.y, canvas);
         this._shape = null;
     }
 

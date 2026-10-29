@@ -71,7 +71,7 @@
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
         "prepack": "tsx scripts/prepack.mts",
-        "attribution-outlines": "tsx scripts/attribution-outlines.ts",
+        "attribution-outlines": "tsx scripts/attribution-outlines.ts && biome format --write src/rendering/glyphs/AttributionOutlines.ts",
         "bravura-smufl": "tsx scripts/smufl-metadata.ts font/bravura/bravura_metadata.json font/bravura/bravura_alphatab_metadata.json true",
         "generate-typescript": "rimraf src/generated && tsx scripts/generate-typescript.ts",
         "build": "npm run generate-typescript && vite build --mode esm && vite build --mode umd",

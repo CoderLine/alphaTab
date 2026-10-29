@@ -20,12 +20,11 @@ interface OutlineFont {
     unitsPerEm: number;
     charToGlyph(c: string): OutlineGlyph;
     getPath(text: string, x: number, y: number, fontSize: number, options: { kerning: boolean }): OutlinePath;
-    getAdvanceWidth(text: string, fontSize: number, options: { kerning: boolean }): number;
 }
 const opentype = opentypeModule as { parse(buffer: ArrayBuffer): OutlineFont };
 
 // Writes src/rendering/glyphs/AttributionOutlines.ts from the shipped fonts.
-// Usage: tsx scripts/attribution-outlines.ts
+// Usage: npm run attribution-outlines (formats the output with biome)
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -45,75 +44,62 @@ function encode(p: OutlinePath): number[] {
     const out: number[] = [];
     let lastX = 0;
     let lastY = 0;
-    const r = (v: number) => Math.round(v);
     for (const c of p.commands) {
         switch (c.type) {
             case 'M':
-                out.push(MoveTo, r(c.x), r(c.y));
-                lastX = c.x;
-                lastY = c.y;
-                break;
             case 'L':
-                out.push(LineTo, r(c.x), r(c.y));
-                lastX = c.x;
-                lastY = c.y;
+                out.push(c.type === 'M' ? MoveTo : LineTo, c.x, c.y);
                 break;
             case 'C':
-                out.push(CubicTo, r(c.x1), r(c.y1), r(c.x2), r(c.y2), r(c.x), r(c.y));
-                lastX = c.x;
-                lastY = c.y;
+                out.push(CubicTo, c.x1, c.y1, c.x2, c.y2, c.x, c.y);
                 break;
             case 'Q':
                 out.push(
                     CubicTo,
-                    r(lastX + (2 / 3) * (c.x1 - lastX)),
-                    r(lastY + (2 / 3) * (c.y1 - lastY)),
-                    r(c.x + (2 / 3) * (c.x1 - c.x)),
-                    r(c.y + (2 / 3) * (c.y1 - c.y)),
-                    r(c.x),
-                    r(c.y)
+                    lastX + (2 / 3) * (c.x1 - lastX),
+                    lastY + (2 / 3) * (c.y1 - lastY),
+                    c.x + (2 / 3) * (c.x1 - c.x),
+                    c.y + (2 / 3) * (c.y1 - c.y),
+                    c.x,
+                    c.y
                 );
-                lastX = c.x;
-                lastY = c.y;
                 break;
             case 'Z':
                 out.push(Close);
-                break;
+                continue;
         }
+        lastX = c.x;
+        lastY = c.y;
     }
-    return out;
+    return out.map(v => Math.round(v));
 }
 
-// greedy wrap at 120 columns to match the repository formatter
-function formatArray(values: number[]): string {
-    const indent = '        ';
-    const lines: string[] = [];
-    let line = indent;
-    for (let i = 0; i < values.length; i++) {
-        const item = i < values.length - 1 ? `${values[i]},` : `${values[i]}`;
-        const candidate = line === indent ? line + item : `${line} ${item}`;
-        if (candidate.length > 120 && line !== indent) {
-            lines.push(line);
-            line = indent + item;
-        } else {
-            line = candidate;
+/** The hull `[left, top, right, bottom]` of all points including the control points. */
+function bounds(commands: number[]): number[] {
+    const b = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+    let i = 0;
+    while (i < commands.length) {
+        const argCount = commands[i] === CubicTo ? 6 : commands[i] === Close ? 0 : 2;
+        for (let a = 1; a < argCount; a += 2) {
+            b[0] = Math.min(b[0], commands[i + a]);
+            b[1] = Math.min(b[1], commands[i + a + 1]);
+            b[2] = Math.max(b[2], commands[i + a]);
+            b[3] = Math.max(b[3], commands[i + a + 1]);
         }
+        i += argCount + 1;
     }
-    lines.push(line);
-    return `[\n${lines.join('\n')}\n    ]`;
+    return b;
 }
 
 const textFont = await loadFont('font/noto-sans/NotoSans-Regular.otf');
 const markFont = await loadFont('font/bravura/Bravura.otf');
 
-const text = 'alphaTab.net';
 const textUpm = textFont.unitsPerEm;
-const textPath = textFont.getPath(text, 0, 0, textUpm, { kerning: true });
-const textAdvance = Math.round(textFont.getAdvanceWidth(text, textUpm, { kerning: true }));
+const text = encode(textFont.getPath('alphaTab.net', 0, 0, textUpm, { kerning: true }));
 
 const markUpm = markFont.unitsPerEm;
 const markGlyph = markFont.charToGlyph(String.fromCodePoint(0xeca7));
-const markPath = markGlyph.getPath(0, 0, markUpm);
+const mark = encode(markGlyph.getPath(0, 0, markUpm));
 const markAdvance = Math.round(markGlyph.advanceWidth ?? 0);
 
 const source = `/**
@@ -121,16 +107,18 @@ const source = `/**
  * Text from Noto Sans Regular, mark from Bravura (MetNote8thUp), both under the SIL Open Font License 1.1.
  * Commands: 0 = moveTo(x, y), 1 = lineTo(x, y), 2 = cubicTo(c1x, c1y, c2x, c2y, x, y), 3 = close.
  * Coordinates are font units with y pointing down and the origin at the start of the baseline.
+ * Bounds are \`[left, top, right, bottom]\` over all points including the control points.
  * @internal
  */
 export class AttributionOutlines {
     public static readonly textUnitsPerEm: number = ${textUpm};
-    public static readonly textAdvance: number = ${textAdvance};
-    public static readonly text: number[] = ${formatArray(encode(textPath))};
+    public static readonly text: number[] = ${JSON.stringify(text)};
+    public static readonly textBounds: number[] = ${JSON.stringify(bounds(text))};
 
     public static readonly markUnitsPerEm: number = ${markUpm};
     public static readonly markAdvance: number = ${markAdvance};
-    public static readonly mark: number[] = ${formatArray(encode(markPath))};
+    public static readonly mark: number[] = ${JSON.stringify(mark)};
+    public static readonly markBounds: number[] = ${JSON.stringify(bounds(mark))};
 }
 `;
 

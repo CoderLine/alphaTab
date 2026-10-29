@@ -77,19 +77,11 @@ export class EffectBandContainer {
         this._isTopContainer = isTopContainer;
     }
 
-    public createVoiceGlyphs(voice: Voice) {
-        this._createGlyphs(voice, false);
-    }
-
     /**
-     * Creates only the glyphs placed at the start of the bar ({@link EffectBarGlyphSizing.SingleStartBar}),
-     * for renderers without beat glyphs like multi-bar rests.
+     * @param barStartOnly Creates only the glyphs placed at the start of the bar
+     * ({@link EffectBarGlyphSizing.SingleStartBar}), for renderers without beat glyphs like multi-bar rests.
      */
-    public createBarStartGlyphs(voice: Voice) {
-        this._createGlyphs(voice, true);
-    }
-
-    private _createGlyphs(voice: Voice, barStartOnly: boolean) {
+    public createVoiceGlyphs(voice: Voice, barStartOnly: boolean) {
         const renderer = this._renderer;
         const notationSettings = renderer.settings.notation;
         for (let i = 0; i < this.infos.length; i++) {

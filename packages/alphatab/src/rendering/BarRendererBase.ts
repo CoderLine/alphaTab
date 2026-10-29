@@ -406,7 +406,7 @@ export class BarRendererBase {
      */
     private _reportCompression(containerWidth: number): void {
         const info = this.layoutingInfo;
-        if (info.totalSpringConstant === -1) {
+        if (!info.hasSprings) {
             return;
         }
         // small tolerance for rounding differences in the system width distribution
@@ -658,8 +658,6 @@ export class BarRendererBase {
     }
 
     private _emitTies(ties: Iterable<ITieGlyph>): void {
-        const staffRenderers = this.staff!.barRenderers;
-        const startIndex = this.index;
         for (const t of ties) {
             const tie = t as unknown as Glyph;
             tie.doLayout();
@@ -672,49 +670,26 @@ export class BarRendererBase {
             const tieBottom = t.getBoundingBoxBottom();
             const tieTopOverflow = tieTop < 0 ? -tieTop : 0;
 
-            const tieLeftStaff = t.getBoundingBoxLeft();
-            const tieRightStaff = t.getBoundingBoxRight();
-
             if (t.hasSkylineShape) {
                 this._emitTieShape(t, tieTopOverflow, tieBottom - this.height);
                 continue;
             }
 
-            for (let i = startIndex; i < staffRenderers.length; i++) {
-                const target = staffRenderers[i];
-                if (target.x >= tieRightStaff) {
-                    break;
-                }
-                const targetXStart = target.x;
-                const targetXEnd = target.x + target.width;
-                const xStartStaff = Math.max(targetXStart, tieLeftStaff);
-                const xEndStaff = Math.min(targetXEnd, tieRightStaff);
-                if (xEndStaff <= xStartStaff) {
-                    continue;
-                }
-                const xStart = xStartStaff - targetXStart;
-                const xEnd = xEndStaff - targetXStart;
-                const tieBottomOverflow = tieBottom - target.height;
+            const tieLeftStaff = t.getBoundingBoxLeft();
+            const tieRightStaff = t.getBoundingBoxRight();
+            this._insertTieSkyline(this.index + 1, tieLeftStaff, tieTop, tieRightStaff, tieBottom);
 
-                if (target === this) {
-                    if (tieTopOverflow > 0) {
-                        if (target.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow)) {
-                            target.markTiesDirty();
-                        }
-                    }
-                    if (tieBottomOverflow > 0) {
-                        if (target.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow)) {
-                            target.markTiesDirty();
-                        }
-                    }
-                } else {
-                    if (tieTopOverflow > 0) {
-                        target.barLocalSkyline.insertPlaced(StaffSide.Top, xStart, xEnd, tieTopOverflow, 0);
-                    }
-                    if (tieBottomOverflow > 0) {
-                        target.barLocalSkyline.insertPlaced(StaffSide.Bottom, xStart, xEnd, tieBottomOverflow, 0);
-                    }
-                }
+            const xStart = Math.max(this.x, tieLeftStaff) - this.x;
+            const xEnd = Math.min(this.x + this.width, tieRightStaff) - this.x;
+            if (xEnd <= xStart) {
+                continue;
+            }
+            const tieBottomOverflow = tieBottom - this.height;
+            if (tieTopOverflow > 0 && this.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow)) {
+                this.markTiesDirty();
+            }
+            if (tieBottomOverflow > 0 && this.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow)) {
+                this.markTiesDirty();
             }
         }
     }
@@ -740,28 +715,32 @@ export class BarRendererBase {
         const shape = this._tieShape;
         shape.clear();
         t.collectSkylineShape(shape);
-        const staffRenderers = this.staff!.barRenderers;
         for (let k = 0; k < shape.count; k++) {
-            const left = shape.xStart(k);
-            const right = shape.xEnd(k);
-            const top = shape.top(k);
-            const bottom = shape.bottom(k);
-            for (let i = this.index; i < staffRenderers.length; i++) {
-                const target = staffRenderers[i];
-                if (target.x >= right) {
-                    break;
-                }
-                const xStart = Math.max(target.x, left) - target.x;
-                const xEnd = Math.min(target.x + target.width, right) - target.x;
-                if (xEnd <= xStart) {
-                    continue;
-                }
-                if (top < 0) {
-                    target.barLocalSkyline.insertPlaced(StaffSide.Top, xStart, xEnd, -top, 0);
-                }
-                if (bottom > target.height) {
-                    target.barLocalSkyline.insertPlaced(StaffSide.Bottom, xStart, xEnd, bottom - target.height, 0);
-                }
+            this._insertTieSkyline(this.index, shape.xStart(k), shape.top(k), shape.xEnd(k), shape.bottom(k));
+        }
+    }
+
+    /**
+     * Inserts the parts of a tie box outside the staff into the skylines of the renderers it reaches,
+     * starting at the renderer `fromIndex` of the staff.
+     */
+    private _insertTieSkyline(fromIndex: number, left: number, top: number, right: number, bottom: number): void {
+        const staffRenderers = this.staff!.barRenderers;
+        for (let i = fromIndex; i < staffRenderers.length; i++) {
+            const target = staffRenderers[i];
+            if (target.x >= right) {
+                break;
+            }
+            const xStart = Math.max(target.x, left) - target.x;
+            const xEnd = Math.min(target.x + target.width, right) - target.x;
+            if (xEnd <= xStart) {
+                continue;
+            }
+            if (top < 0) {
+                target.barLocalSkyline.insertPlaced(StaffSide.Top, xStart, xEnd, -top, 0);
+            }
+            if (bottom > target.height) {
+                target.barLocalSkyline.insertPlaced(StaffSide.Bottom, xStart, xEnd, bottom - target.height, 0);
             }
         }
     }
@@ -1031,8 +1010,8 @@ export class BarRendererBase {
         if (this.additionalMultiRestBars) {
             const container = new MultiBarRestBeatContainerGlyph();
             this.addBeatGlyph(container);
-            this.topEffects.createBarStartGlyphs(this.bar.voices[0]);
-            this.bottomEffects.createBarStartGlyphs(this.bar.voices[0]);
+            this.topEffects.createVoiceGlyphs(this.bar.voices[0], true);
+            this.bottomEffects.createVoiceGlyphs(this.bar.voices[0], true);
         } else {
             for (const index of this.bar.filledVoices) {
                 this.createVoiceGlyphs(this.bar.voices[index]);
@@ -1047,8 +1026,8 @@ export class BarRendererBase {
     }
 
     protected createVoiceGlyphs(voice: Voice): void {
-        this.topEffects.createVoiceGlyphs(voice);
-        this.bottomEffects.createVoiceGlyphs(voice);
+        this.topEffects.createVoiceGlyphs(voice, false);
+        this.bottomEffects.createVoiceGlyphs(voice, false);
     }
 
     protected createPostBeatGlyphs(): void {

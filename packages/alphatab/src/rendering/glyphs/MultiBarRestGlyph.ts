@@ -45,10 +45,8 @@ export class MultiBarRestGlyph extends Glyph {
      */
     public emitSkyline(base: number): void {
         const top = this.y + this._numberInkTop;
-        if (top < 0) {
-            const center = base + this.x + this.width / 2;
-            this.renderer.insertSkylineTop(center - this._numberWidth / 2, center + this._numberWidth / 2, -top);
-        }
+        const center = base + this.x + this.width / 2;
+        this.renderer.insertSkylineTop(center - this._numberWidth / 2, center + this._numberWidth / 2, -top);
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

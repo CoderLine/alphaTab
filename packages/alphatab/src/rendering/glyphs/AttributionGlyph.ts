@@ -1,7 +1,6 @@
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { AttributionOutlines } from '@coderline/alphatab/rendering/glyphs/AttributionOutlines';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import { ScrambledPath } from '@coderline/alphatab/rendering/utils/ScrambledPath';
+import type { ScrambledPath } from '@coderline/alphatab/rendering/utils/ScrambledPath';
 
 /**
  * The "♪ alphaTab.net" attribution, filled together with the staff lines of the bar it ends at.
@@ -26,18 +25,15 @@ export class AttributionGlyph extends Glyph {
 
     public constructor() {
         super(0, 0);
-        const bounds = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER, -Number.MAX_SAFE_INTEGER];
-        AttributionGlyph._extendBounds(bounds, AttributionOutlines.mark, AttributionGlyph._markScale, 0);
-        AttributionGlyph._extendBounds(
-            bounds,
-            AttributionOutlines.text,
-            AttributionGlyph._textScale,
-            AttributionGlyph._textOffsetX
-        );
-        this._inkLeft = bounds[0];
-        this._inkTop = bounds[1];
-        this.width = bounds[2] - bounds[0];
-        this.height = bounds[3] - bounds[1];
+        const mark = AttributionOutlines.markBounds;
+        const markScale = AttributionGlyph._markScale;
+        const text = AttributionOutlines.textBounds;
+        const textScale = AttributionGlyph._textScale;
+        const textOffsetX = AttributionGlyph._textOffsetX;
+        this._inkLeft = Math.min(mark[0] * markScale, textOffsetX + text[0] * textScale);
+        this._inkTop = Math.min(mark[1] * markScale, text[1] * textScale);
+        this.width = Math.max(mark[2] * markScale, textOffsetX + text[2] * textScale) - this._inkLeft;
+        this.height = Math.max(mark[3] * markScale, text[3] * textScale) - this._inkTop;
     }
 
     public appendTo(path: ScrambledPath, cx: number, cy: number): void {
@@ -51,29 +47,6 @@ export class AttributionGlyph extends Glyph {
             originX + AttributionGlyph._textOffsetX,
             originY
         );
-    }
-
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const path = new ScrambledPath();
-        this.appendTo(path, cx, cy);
-        path.fill(canvas);
-    }
-
-    private static _extendBounds(bounds: number[], commands: number[], scale: number, offsetX: number): void {
-        let i = 0;
-        while (i < commands.length) {
-            const argCount = AttributionGlyph._argCount(commands[i]);
-            // control points included: the hull of a cubic contains the curve
-            for (let a = 1; a < argCount; a += 2) {
-                const x = offsetX + commands[i + a] * scale;
-                const y = commands[i + a + 1] * scale;
-                bounds[0] = Math.min(bounds[0], x);
-                bounds[1] = Math.min(bounds[1], y);
-                bounds[2] = Math.max(bounds[2], x);
-                bounds[3] = Math.max(bounds[3], y);
-            }
-            i += argCount + 1;
-        }
     }
 
     private static _appendOutline(

@@ -420,7 +420,6 @@ export class RenderStaff implements IStaffDisplayContext {
             renderer.finalizeOwnedTies();
             renderer.finalizeEffectBandSpans();
 
-            // the renderers are already scaled: only the overflow changes, not the sizes
             if (renderer.tiesDirty) {
                 renderer.registerStaffOverflows();
                 renderer.clearTiesDirty();

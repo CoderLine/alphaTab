@@ -12,26 +12,21 @@ import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
-import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
-import type { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * @internal
  */
-export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGlyph {
+export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;
     private _notes: Note[] = [];
     private _endNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _container: ScoreBeatContainerGlyph;
-
-    public readonly checkForOverflow = true;
-    public readonly hasSkylineShape = true;
-    private _isMeasured: boolean = false;
 
     public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
@@ -42,56 +37,17 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     public override doLayout(): void {
         super.doLayout();
         this.width = 0;
-        this._isMeasured = false;
+        this.isMeasured = false;
     }
 
     /** The top of the slurs estimated before the beats are positioned. */
     public getEstimatedBoundingBoxTop(): number {
-        return super.getBoundingBoxTop() - this._calculateMaxSlurHeight(BeamDirection.Up);
+        return this.getNoteHeadsBoundingBoxTop() - this._calculateMaxSlurHeight(BeamDirection.Up);
     }
 
     /** The bottom of the slurs estimated before the beats are positioned. */
     public getEstimatedBoundingBoxBottom(): number {
-        return super.getBoundingBoxBottom() + this._calculateMaxSlurHeight(BeamDirection.Down);
-    }
-
-    // The painted extent of the helper notes, slurs and slur texts ({@link ITieGlyph} convention:
-    // staff-local x, renderer-local y). Only valid once the beats are positioned.
-
-    public override getBoundingBoxTop(): number {
-        this._measure();
-        return this.measuredTop;
-    }
-
-    public override getBoundingBoxBottom(): number {
-        this._measure();
-        return this.measuredBottom;
-    }
-
-    public override getBoundingBoxLeft(): number {
-        this._measure();
-        return this.measuredLeft;
-    }
-
-    public override getBoundingBoxRight(): number {
-        this._measure();
-        return this.measuredRight;
-    }
-
-    private _measure(): void {
-        if (this._isMeasured) {
-            return;
-        }
-        this._isMeasured = true;
-        this.beginMeasure(null);
-        this._paintOrMeasure(0, -this.renderer.y, this.renderer.scoreRenderer.canvas!, true);
-        this.endMeasure();
-    }
-
-    public collectSkylineShape(shape: SkylineShape): void {
-        this.beginMeasure(shape);
-        this._paintOrMeasure(0, -this.renderer.y, this.renderer.scoreRenderer.canvas!, true);
-        this.endMeasure();
+        return this.getNoteHeadsBoundingBoxBottom() + this._calculateMaxSlurHeight(BeamDirection.Down);
     }
 
     public doMultiVoiceLayout(): void {
@@ -256,11 +212,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         }
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        this._paintOrMeasure(cx, cy, canvas, false);
-    }
-
-    private _paintOrMeasure(cx: number, cy: number, canvas: ICanvas, isMeasuring: boolean): void {
+    protected override paintOrMeasure(cx: number, cy: number, canvas: ICanvas): void {
         // Draw note heads
         const startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff!.staffId,
@@ -285,12 +237,12 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         if (this._middleNoteGlyph) {
             this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.onTimeX;
             this._middleNoteGlyph.y = cy + startNoteRenderer.y;
-            this._paintOrMeasureHelperNotes(this._middleNoteGlyph, canvas, isMeasuring);
+            this.paintOrMeasureHelperNotes(this._middleNoteGlyph, canvas);
         }
         if (this._endNoteGlyph) {
             this._endNoteGlyph.x = endBeatX - this._endNoteGlyph.onTimeX;
             this._endNoteGlyph.y = cy + startNoteRenderer.y;
-            this._paintOrMeasureHelperNotes(this._endNoteGlyph, canvas, isMeasuring);
+            this.paintOrMeasureHelperNotes(this._endNoteGlyph, canvas);
         }
         this._notes.sort((a, b) => {
             return b.displayValue - a.displayValue;
@@ -299,19 +251,6 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         // draw slurs
         if (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ScoreBendSlur)) {
             this._paintSlurs(cx, cy, canvas, startNoteRenderer, startX, middleX, endBeatX);
-        }
-    }
-
-    private _paintOrMeasureHelperNotes(glyph: BendNoteHeadGroupGlyph, canvas: ICanvas, isMeasuring: boolean): void {
-        if (isMeasuring) {
-            this.measure(
-                glyph.getBoundingBoxLeft(),
-                glyph.getBoundingBoxTop(),
-                glyph.getBoundingBoxRight(),
-                glyph.getBoundingBoxBottom()
-            );
-        } else {
-            glyph.paint(0, 0, canvas);
         }
     }
 

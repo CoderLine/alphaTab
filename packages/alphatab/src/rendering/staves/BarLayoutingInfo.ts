@@ -158,10 +158,6 @@ export class BarLayoutingInfo {
     }
 
     /**
-     * Clears all header columns. Called at the start of each layout cycle of a system,
-     * the bar renderers re-register their header glyphs afterwards.
-     */
-    /**
      * The empty space at the end of the bar header (the trailing spacing of its last column),
      * between the header content (or the start barline) and the first beat.
      */
@@ -172,6 +168,10 @@ export class BarLayoutingInfo {
         return this._preBeatTrailingSpace;
     }
 
+    /**
+     * Clears all header columns. Called at the start of each layout cycle of a system,
+     * the bar renderers re-register their header glyphs afterwards.
+     */
     public resetHeaderRods(): void {
         this._headerRodCount = 0;
         this._preBeatSize = 0;
@@ -264,7 +264,8 @@ export class BarLayoutingInfo {
 
     public postBeatSize: number = 0;
     public minStretchForce: number = 0;
-    public totalSpringConstant: number = 0;
+    /** Whether the last spring constant calculation found any springs. */
+    public hasSprings: boolean = true;
 
     /**
      * The smallest note duration encountered within this bar's springs, used as the reference in
@@ -528,7 +529,7 @@ export class BarLayoutingInfo {
     }
 
     /**
-     * Re-derives the spring constants (and {@link minStretchForce} / {@link totalSpringConstant})
+     * Re-derives the spring constants (and {@link minStretchForce} / {@link hasSprings})
      * using a caller-supplied minimum-duration reference rather than this bar's local minimum.
      *
      * Called by {@link StaffSystem.reconcileMinDurationIfDirty} when a bar added later to the
@@ -544,11 +545,10 @@ export class BarLayoutingInfo {
     }
 
     private _calculateSpringConstants(minDuration: number): void {
-        let totalSpringConstant: number = 0;
         const sortedSprings: Spring[] = this._timeSortedSprings;
         this._onTimePositionsForce = Number.NaN;
         if (sortedSprings.length === 0) {
-            this.totalSpringConstant = -1;
+            this.hasSprings = false;
             this.minStretchForce = -1;
             return;
         }
@@ -562,9 +562,8 @@ export class BarLayoutingInfo {
                 duration = Math.abs(nextSpring.timePosition - currentSpring.timePosition);
             }
             currentSpring.springConstant = this._calculateSpringConstant(currentSpring, duration, minDuration);
-            totalSpringConstant += 1 / currentSpring.springConstant;
         }
-        this.totalSpringConstant = 1 / totalSpringConstant;
+        this.hasSprings = true;
 
         // calculate the force required to have at least the minimum size.
         this.minStretchForce = 0;
@@ -741,7 +740,7 @@ export class BarLayoutingInfo {
      * proportionally to their minimum widths.
      */
     public spaceToForce(space: number): number {
-        if (this.totalSpringConstant === -1) {
+        if (!this.hasSprings) {
             return -1;
         }
         space -= this._timeSortedSprings[0].preSpringWidth;
@@ -796,7 +795,7 @@ export class BarLayoutingInfo {
     }
 
     public buildOnTimePositions(force: number): Map<number, number> {
-        if (this.totalSpringConstant === -1) {
+        if (!this.hasSprings) {
             return new Map<number, number>();
         }
         if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {

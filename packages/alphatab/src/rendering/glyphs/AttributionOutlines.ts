@@ -3,11 +3,11 @@
  * Text from Noto Sans Regular, mark from Bravura (MetNote8thUp), both under the SIL Open Font License 1.1.
  * Commands: 0 = moveTo(x, y), 1 = lineTo(x, y), 2 = cubicTo(c1x, c1y, c2x, c2y, x, y), 3 = close.
  * Coordinates are font units with y pointing down and the origin at the start of the baseline.
+ * Bounds are `[left, top, right, bottom]` over all points including the control points.
  * @internal
  */
 export class AttributionOutlines {
     public static readonly textUnitsPerEm: number = 1000;
-    public static readonly textAdvance: number = 6076;
     public static readonly text: number[] = [
         0, 288, -545, 2, 218, -545, 152, -524, 105, -499, 1, 132, -433, 2, 176, -454, 227, -474, 283, -474, 2, 353,
         -474, 394, -444, 394, -355, 1, 394, -323, 1, 303, -320, 2, 128, -315, 46, -256, 46, -149, 2, 46, -40, 118, 10,
@@ -48,6 +48,7 @@ export class AttributionOutlines {
         -659, 1, 5808, -545, 1, 5731, -510, 1, 5731, -468, 1, 5807, -468, 1, 5807, -156, 2, 5807, -26, 5880, 10, 5964,
         10, 2, 5996, 10, 6035, 3, 6054, -6, 1, 6054, -73, 2, 6037, -67, 6005, -62, 5979, -62
     ];
+    public static readonly textBounds: number[] = [46, -760, 6054, 240];
 
     public static readonly markUnitsPerEm: number = 1000;
     public static readonly markAdvance: number = 534;
@@ -59,4 +60,5 @@ export class AttributionOutlines {
         -696, 1, 311, -696, 2, 306, -696, 302, -696, 302, -689, 1, 302, -115, 2, 283, -132, 255, -141, 222, -141, 2, 99,
         -141, 0, -50, 0, 47
     ];
+    public static readonly markBounds: number[] = [0, -696, 533, 141];
 }

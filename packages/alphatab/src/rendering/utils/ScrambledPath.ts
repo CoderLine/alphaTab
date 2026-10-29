@@ -4,31 +4,22 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
  * @internal
  */
 class ScrambledSegment {
-    public isCubic: boolean = false;
-    public c1x: number = 0;
-    public c1y: number = 0;
-    public c2x: number = 0;
-    public c2y: number = 0;
-    public x: number = 0;
-    public y: number = 0;
+    public readonly isCubic: boolean;
+    public readonly c1x: number;
+    public readonly c1y: number;
+    public readonly c2x: number;
+    public readonly c2y: number;
+    public readonly x: number;
+    public readonly y: number;
 
-    public static line(x: number, y: number): ScrambledSegment {
-        const s = new ScrambledSegment();
-        s.x = x;
-        s.y = y;
-        return s;
-    }
-
-    public static cubic(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): ScrambledSegment {
-        const s = new ScrambledSegment();
-        s.isCubic = true;
-        s.c1x = c1x;
-        s.c1y = c1y;
-        s.c2x = c2x;
-        s.c2y = c2y;
-        s.x = x;
-        s.y = y;
-        return s;
+    public constructor(isCubic: boolean, c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number) {
+        this.isCubic = isCubic;
+        this.c1x = c1x;
+        this.c1y = c1y;
+        this.c2x = c2x;
+        this.c2y = c2y;
+        this.x = x;
+        this.y = y;
     }
 }
 
@@ -42,28 +33,20 @@ export class ScrambledPath {
     private _current: ScrambledSegment[] | null = null;
     private _startX: number = 0;
     private _startY: number = 0;
-    private _lastX: number = 0;
-    private _lastY: number = 0;
 
     public moveTo(x: number, y: number): void {
         this.closePath();
         this._current = [];
         this._startX = x;
         this._startY = y;
-        this._lastX = x;
-        this._lastY = y;
     }
 
     public lineTo(x: number, y: number): void {
-        this._current!.push(ScrambledSegment.line(x, y));
-        this._lastX = x;
-        this._lastY = y;
+        this._current!.push(new ScrambledSegment(false, 0, 0, 0, 0, x, y));
     }
 
     public bezierCurveTo(c1x: number, c1y: number, c2x: number, c2y: number, x: number, y: number): void {
-        this._current!.push(ScrambledSegment.cubic(c1x, c1y, c2x, c2y, x, y));
-        this._lastX = x;
-        this._lastY = y;
+        this._current!.push(new ScrambledSegment(true, c1x, c1y, c2x, c2y, x, y));
     }
 
     public closePath(): void {
@@ -71,10 +54,11 @@ export class ScrambledPath {
         if (current === null) {
             return;
         }
-        if (this._lastX !== this._startX || this._lastY !== this._startY) {
-            current.push(ScrambledSegment.line(this._startX, this._startY));
-        }
         if (current.length > 0) {
+            const last = current[current.length - 1];
+            if (last.x !== this._startX || last.y !== this._startY) {
+                current.push(new ScrambledSegment(false, 0, 0, 0, 0, this._startX, this._startY));
+            }
             this._contours.push(current);
         }
         this._current = null;
