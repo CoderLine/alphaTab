@@ -329,6 +329,22 @@ export function getJsDocTagText(
   );
 }
 
+export function getDeprecation(
+  context: GenerateContext,
+  node: ts.Node
+): string | undefined {
+  const tag = getJSDocTags(context, node).find((t) => t.tagName.text === "deprecated");
+  return tag ? jsDocCommentToMarkdown(context, tag.comment) : undefined;
+}
+
+export function getDeprecationNotice(context: GenerateContext, node: ts.Node): string {
+  const deprecation = getDeprecation(context, node);
+  if (deprecation === undefined) {
+    return "";
+  }
+  return `:::warning[Deprecated]\n\n${deprecation || "This member is deprecated."}\n\n:::\n\n`;
+}
+
 export function getSummary(
   context: GenerateContext,
   node: ts.Node,
@@ -1070,6 +1086,7 @@ async function writeCommonDescription(
   member: ts.TypeElement | ts.ClassElement,
   referenceDoc: boolean
 ) {
+  await fileStream.write(getDeprecationNotice(context, member));
   await fileStream.write(`${getFullDescription(context, member)}`);
   if (referenceDoc) {
     await fileStream.write(`${getInheritenceInfo(context, parent, member)}`);

@@ -55,7 +55,7 @@ export async function generateSettings(context: GenerateContext) {
               (mod) => mod.kind == ts.SyntaxKind.StaticKeyword
             );
 
-          if (ts.isPropertyDeclaration(member) && !isSubSettingPropStatic) {
+          if ((ts.isPropertyDeclaration(member) || ts.isGetAccessorDeclaration(member)) && !isSubSettingPropStatic) {
             const settingFileName = member.name.getText().toLowerCase() + ".mdx";
             const settingFile = path.join(
               basePath,

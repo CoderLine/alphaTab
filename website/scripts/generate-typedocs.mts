@@ -3,6 +3,8 @@ import path from "path";
 import ts from "typescript";
 import {
   collectMembers,
+  getDeprecation,
+  getDeprecationNotice,
   getFullDescription,
   getJsDocTagText,
   isEvent,
@@ -47,6 +49,7 @@ export async function generateTypeDocs(context: GenerateContext) {
     fileStream.suspend = context.emptyFiles;
     await writeCommonImports(fileStream);
 
+    await fileStream.write(getDeprecationNotice(context, exportedType));
     await fileStream.write(`${getFullDescription(context, exportedType)}\n\n`);
 
     if (
@@ -301,6 +304,10 @@ async function writeEnumMembers(
     await fileStream.write(`      <td>\`${numericValue}\`</td>\n`);
 
     let description = getFullDescription(context, member);
+    const deprecation = getDeprecation(context, member);
+    if (deprecation !== undefined) {
+      description = `**Deprecated**${deprecation ? `: ${deprecation}` : ""}\n\n${description}`;
+    }
     const since = getJsDocTagText(context, member, "since");
     if (since) {
       description = `${description}\n        <SinceBadge inline={true} since="${since}" />`;
