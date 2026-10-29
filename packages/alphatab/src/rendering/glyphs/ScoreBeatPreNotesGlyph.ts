@@ -15,7 +15,6 @@ import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/Ben
 import { FingeringGroupGlyph } from '@coderline/alphatab/rendering/glyphs/FingeringGroupGlyph';
 import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
 import { ScoreBrushGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBrushGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
@@ -46,19 +45,13 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     }
 
     public override doLayout(): void {
+        this.beginPlacement();
         if (!this.container.beat.isRest) {
             this._createGlyphs();
         } else if (this.container.beat.index === 0 && !this.container.beat.isEmpty) {
             // rests need the same initial spacing as notes (empty beats show no rest)
-            this.addNormal(
-                new SpacingGlyph(
-                    0,
-                    0,
-                    ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace
-                )
-            );
+            this.placeSpacing(ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace);
         }
-        super.doLayout();
     }
 
     private _createGlyphs() {
@@ -129,64 +122,44 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         }
 
         if (hasSimpleSlideIn) {
-            this.addNormal(
-                new SpacingGlyph(
-                    0,
-                    0,
-                    this.renderer.smuflMetrics.simpleSlideWidth *
-                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                )
+            this.placeSpacing(
+                this.renderer.smuflMetrics.simpleSlideWidth *
+                    (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
             );
         }
 
         this._prebends = preBends;
         if (preBends) {
-            this.addEffect(preBends);
-            this.addNormal(
-                new SpacingGlyph(
-                    0,
-                    0,
-                    this.renderer.smuflMetrics.preNoteEffectPadding *
-                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                )
+            this.placeEffect(preBends);
+            this.placeSpacing(
+                this.renderer.smuflMetrics.preNoteEffectPadding *
+                    (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
             );
         }
         if (this.container.beat.brushType !== BrushType.None) {
-            this.addEffect(new ScoreBrushGlyph(this.container.beat));
-            this.addNormal(
-                new SpacingGlyph(
-                    0,
-                    0,
-                    this.renderer.smuflMetrics.preNoteEffectPadding *
-                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                )
+            this.placeEffect(new ScoreBrushGlyph(this.container.beat));
+            this.placeSpacing(
+                this.renderer.smuflMetrics.preNoteEffectPadding *
+                    (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
             );
         }
         if (fingering) {
             if (!this.isEmpty) {
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding *
-                            (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                    )
+                this.placeSpacing(
+                    this.renderer.smuflMetrics.preNoteEffectPadding *
+                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
                 );
             }
 
-            this.addEffect(fingering);
-            this.addNormal(
-                new SpacingGlyph(
-                    0,
-                    0,
-                    this.renderer.smuflMetrics.preNoteEffectPadding *
-                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                )
+            this.placeEffect(fingering);
+            this.placeSpacing(
+                this.renderer.smuflMetrics.preNoteEffectPadding *
+                    (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
             );
         }
 
         if (ghost) {
-            this.addEffect(ghost);
+            this.placeEffect(ghost);
         }
 
         // Behind bars:
@@ -197,12 +170,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
         if (this.container.beat.index === 0) {
             if (!accidentals) {
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace
-                    )
+                this.placeSpacing(
+                    ScoreBeatPreNotesGlyph._initialBeatSpacing * this.renderer.smuflMetrics.oneStaffSpace
                 );
             }  else{
                 accidentals.applyInitialNotePadding = true;
@@ -211,14 +180,10 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
         if (accidentals) {
             this.accidentals = accidentals;
-            this.addNormal(accidentals);
-            this.addNormal(
-                new SpacingGlyph(
-                    0,
-                    0,
-                    this.renderer.smuflMetrics.preNoteEffectPadding *
-                        (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
-                )
+            this.placeNormal(accidentals);
+            this.placeSpacing(
+                this.renderer.smuflMetrics.preNoteEffectPadding *
+                    (this.container.beat.graceType !== GraceType.None ? EngravingSettings.GraceScale : 1)
             );
         }
     }

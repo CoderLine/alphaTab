@@ -24,10 +24,7 @@ import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayout
 import { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
-import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
 
 /**
  * @internal
@@ -312,6 +309,88 @@ export class StaffSystem {
         for (let i = 0; i < this._brackets.length; i++) {
             const b = this._brackets[i];
             b.reset();
+        }
+    }
+
+    /**
+     * Restores the bars of {@link masterBarsRenderers} on the staves holding them, after other systems
+     * measured some of them as their next bar (which detaches them again). Fails without changes when
+     * a staff does not hold the renderers anymore or one is attached elsewhere.
+     * @returns Whether every staff holds its renderers at the positions they were added at.
+     */
+    public reattachBars(): boolean {
+        const count = this.masterBarsRenderers.length;
+        if (count === 0) {
+            return false;
+        }
+        const allStaves = this.allStaves;
+        for (let i = 0; i < allStaves.length; i++) {
+            if (allStaves[i].barRenderers.length !== count) {
+                return false;
+            }
+        }
+        let anyDetached = false;
+        for (let i = 0; i < count; i++) {
+            const renderers = this.masterBarsRenderers[i].renderers;
+            let attached = 0;
+            for (let j = 0; j < allStaves.length; j++) {
+                const staff = allStaves[j];
+                const r = renderers[j];
+                if (staff.barRenderers[i] !== r) {
+                    return false;
+                }
+                if (r.staff === staff && r.index === i) {
+                    attached++;
+                } else if (r.staff !== undefined) {
+                    return false;
+                }
+            }
+            if (attached === 0) {
+                anyDetached = true;
+            } else if (attached !== allStaves.length) {
+                return false;
+            }
+        }
+        if (!anyDetached) {
+            return true;
+        }
+        for (let i = 0; i < count; i++) {
+            const bars = this.masterBarsRenderers[i];
+            const renderers = bars.renderers;
+            if (renderers[0].staff !== undefined) {
+                continue;
+            }
+            bars.layoutingInfo.resetHeaderRods();
+            for (let j = 0; j < allStaves.length; j++) {
+                const r = renderers[j];
+                r.staff = allStaves[j];
+                r.index = i;
+                r.reLayout();
+            }
+            for (let j = 0; j < allStaves.length; j++) {
+                renderers[j].applyLayoutingInfo();
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Prepares a system holding its assembled bars (see {@link reattachBars}) to be fitted and
+     * finalized again: the state is the one after the last bar was added.
+     */
+    public prepareRefit(): void {
+        const display = this.layout.renderer.settings.display;
+        this.width = this.computedWidth;
+        this.topPadding = display.systemPaddingTop;
+        this.bottomPadding = display.systemPaddingBottom;
+        this._hasSystemSeparator = false;
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const renderers = this.allStaves[i].barRenderers;
+            for (let j = 0; j < renderers.length; j++) {
+                const r = renderers[j];
+                r.registerMultiSystemSlurs(null);
+                r.isFinalized = false;
+            }
         }
     }
 
@@ -1422,7 +1501,8 @@ export class StaffSystem {
     }
 
     public buildBoundingsLookup(cx: number, cy: number): void {
-        if (this.layout.renderer.boundsLookup!.isFinished) {
+        const writer = this.layout.renderer.boundsWriter;
+        if (writer.isFinished) {
             return;
         }
         const firstStaff = this.allStaves[0];
@@ -1445,20 +1525,13 @@ export class StaffSystem {
 
         const x: number = this.x + firstStaff.x;
         const scale = this.layout.renderer.settings.display.scale;
-        const systemX = (cx + this.x) * scale;
-        const systemY = (cy + this.y) * scale;
-        const systemW = this.width * scale;
-        const staffSystemBounds = new StaffSystemBounds();
-        staffSystemBounds.visualBounds = new Bounds(
-            systemX,
-            systemY,
-            systemW,
-            (this.height - this.topPadding - this.bottomPadding) * scale
+        writer.beginStaffSystem(
+            (cx + this.x) * scale,
+            (cy + this.y) * scale,
+            this.width * scale,
+            (this.height - this.topPadding - this.bottomPadding) * scale,
+            this.height * scale
         );
-        staffSystemBounds.realBounds = new Bounds(systemX, systemY, systemW, this.height * scale);
-
-        const boundsLookup = this.layout.renderer.boundsLookup!;
-        boundsLookup.addStaffSystem(staffSystemBounds);
 
         const scaledRealTop = realTop * scale;
         const scaledRealHeight = realHeight * scale;
@@ -1466,7 +1539,6 @@ export class StaffSystem {
         const scaledVisualHeight = visualHeight * scale;
         const scaledLineTop = lineTop * scale;
         const scaledLineHeight = lineHeight * scale;
-        const systemBars = staffSystemBounds.bars;
         for (let i: number = 0; i < this.staves.length; i++) {
             const staves = this.staves[i].staves;
             for (let s = 0; s < staves.length; s++) {
@@ -1479,40 +1551,28 @@ export class StaffSystem {
                     const renderer = renderers[j];
                     const masterBarIndex = renderer.bar.masterBar.index;
                     // staves usually hold one renderer per master bar of the system, in the same order
-                    let masterBarBounds: MasterBarBounds | null = null;
-                    if (j < systemBars.length && systemBars[j].index === masterBarIndex) {
-                        masterBarBounds = systemBars[j];
-                    } else {
-                        for (const b of systemBars) {
-                            if (b.index === masterBarIndex) {
-                                masterBarBounds = b;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!masterBarBounds) {
+                    if (!writer.openMasterBar(masterBarIndex, j)) {
                         const barX = (x + renderer.x) * scale;
                         const barW = renderer.width * scale;
-                        masterBarBounds = new MasterBarBounds();
-                        masterBarBounds.index = masterBarIndex;
-                        masterBarBounds.isFirstOfLine = renderer.isFirstOfStaff;
-                        masterBarBounds.realBounds = new Bounds(barX, scaledRealTop, barW, scaledRealHeight);
-                        masterBarBounds.visualBounds = new Bounds(barX, scaledVisualTop, barW, scaledVisualHeight);
-                        masterBarBounds.lineAlignedBounds = new Bounds(barX, scaledLineTop, barW, scaledLineHeight);
-                        boundsLookup.addMasterBar(masterBarBounds);
+                        writer.addMasterBar(
+                            masterBarIndex,
+                            renderer.isFirstOfStaff,
+                            barX,
+                            barW,
+                            scaledRealTop,
+                            scaledRealHeight,
+                            scaledVisualTop,
+                            scaledVisualHeight,
+                            scaledLineTop,
+                            scaledLineHeight
+                        );
                     }
-                    renderer.buildBoundingsLookup(masterBarBounds, x, cy + this.y + staff.y);
+                    renderer.buildBoundingsLookup(writer, x, cy + this.y + staff.y);
                 }
             }
         }
 
-        for (let i = 0; i < systemBars.length; i++) {
-            const masterBarBounds = systemBars[i];
-            masterBarBounds.sortBars();
-        }
-        // the bounds are built scaled and sorted: BoundsLookup.finish must not process them again
-        staffSystemBounds.isFinished = true;
+        writer.endStaffSystem();
     }
 
     public getBarX(index: number): number {

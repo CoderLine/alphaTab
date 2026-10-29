@@ -8,10 +8,8 @@ import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSetti
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -168,16 +166,14 @@ export class NoteNumberGlyph extends Glyph {
         }
     }
 
-    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
-        const noteBounds: NoteBounds = new NoteBounds();
-        noteBounds.note = this._note;
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         const scale = this.renderer.settings.display.scale;
-        noteBounds.noteHeadBounds = new Bounds(
+        writer.addNote(
+            this._note,
             (cx + this.x) * scale,
             (cy + this.y - this.height / 2) * scale,
             this.width * scale,
             this.height * scale
         );
-        beatBounds.addNote(noteBounds);
     }
 }

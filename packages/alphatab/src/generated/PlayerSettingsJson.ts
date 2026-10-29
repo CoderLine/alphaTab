@@ -305,7 +305,7 @@ export interface PlayerSettingsJson {
     /**
      * The interval in milliseconds in which the audio output reports the played audio to the player.
      * @since 1.9.0
-     * @defaultValue `0`
+     * @defaultValue `10`
      * @category Player
      * @remarks
      * The played audio advances the player position and with it the cursor, `playerPositionChanged`

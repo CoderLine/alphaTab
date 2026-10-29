@@ -33,11 +33,12 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public get prebendNoteHeadOffset() {
-        return (this.preNotes as ScoreBeatPreNotesGlyph).prebendNoteHeadOffset;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
+        return preNotes ? preNotes.prebendNoteHeadOffset : 0;
     }
 
     public get accidentalsWidth() {
-        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
         if (preNotes && preNotes.accidentals) {
             return preNotes.accidentals.width;
         }
@@ -45,9 +46,14 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public override doMultiVoiceLayout(): void {
-        this.preNotes.x = 0;
-        (this.preNotes as ScoreBeatPreNotesGlyph).doMultiVoiceLayout();
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
+        if (preNotes) {
+            preNotes.x = 0;
+            preNotes.doMultiVoiceLayout();
+            this.onNotes.x = preNotes.x + preNotes.width;
+        } else {
+            this.onNotes.x = 0;
+        }
         (this.onNotes as ScoreBeatGlyph).doMultiVoiceLayout();
         this.invalidateNoteExtent();
 

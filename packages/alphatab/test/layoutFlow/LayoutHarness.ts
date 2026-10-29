@@ -9,6 +9,7 @@ import { LogLevel } from '@coderline/alphatab/LogLevel';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
 import { Settings } from '@coderline/alphatab/Settings';
 
 function seededRandom(seed: number): () => number {
@@ -53,6 +54,12 @@ export class LayoutHarness {
     public readonly renderer: ScoreRenderer;
     public readonly settings: Settings;
 
+    /**
+     * The wire writer the renderer writes its bounds into like in the web worker (then `boundsLookup` stays
+     * null), or null for the object lookup. Set `LAYOUT_FLOW_WORKER_BOUNDS=1` to use it in every harness.
+     */
+    public readonly boundsWire: BoundsLookupWireWriter | null = null;
+
     /** Whether {@link render} and {@link resize} paint every partial after the layout pass. */
     public paint: boolean = true;
 
@@ -69,6 +76,10 @@ export class LayoutHarness {
         this.settings.core.logLevel = LogLevel.None;
         Logger.logLevel = LogLevel.None;
         this.renderer = new ScoreRenderer(this.settings);
+        if (process.env.LAYOUT_FLOW_WORKER_BOUNDS) {
+            this.boundsWire = new BoundsLookupWireWriter();
+            this.renderer.boundsWriter = this.boundsWire;
+        }
         this.renderer.partialLayoutFinished.on(e => this._onLayout(e));
         this.renderer.partialRenderFinished.on(e => this._onRender(e));
         // the renderer reports layout exceptions only through this event

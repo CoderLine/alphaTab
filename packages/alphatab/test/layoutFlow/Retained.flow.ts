@@ -14,7 +14,9 @@ import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { BoundsLookupObjectWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupObjectWriter';
 import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
+import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
@@ -271,6 +273,20 @@ describe('Retained', () => {
             let t = heap();
             decoded = null;
             out.push(`    main thread: decoded bounds lookup ${mb(t - heap())} (wire ${mb(wireBytes)})`);
+            {
+                // the web worker writes its bounds in wire format and keeps only the wire writer's buffers
+                const hw = new LayoutHarness(new Settings());
+                hw.paint = false;
+                let writer: BoundsLookupWireWriter | null = new BoundsLookupWireWriter();
+                hw.renderer.boundsWriter = writer;
+                hw.render(LayoutHarness.loadScore(file, hw.settings), null, 1300);
+                hw.resize(1000);
+                hw.resize(1300);
+                const before = heap();
+                hw.renderer.boundsWriter = new BoundsLookupObjectWriter(hw.renderer);
+                writer = null;
+                out.push(`    worker: wire writer buffers ${mb(before - heap())} (instead of the bounds lookup)`);
+            }
             let jsObject: unknown = ScoreSerializer.toJsObject(score);
             t = heap();
             let workerScore: Score | null = JsonConverter.jsObjectToScore(jsObject, h.settings);

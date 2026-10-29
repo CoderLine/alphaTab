@@ -43,14 +43,14 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
 
     public override getBoundingBoxTop(): number {
         if (this._endGlyph?.minStepsNote) {
-            return this._endGlyph.minStepsNote.glyph.getBoundingBoxTop();
+            return this._endGlyph.minStepsNote.getBoundingBoxTop();
         }
         return super.getBoundingBoxTop();
     }
 
     public override getBoundingBoxBottom(): number {
         if (this._endGlyph?.maxStepsNote) {
-            return this._endGlyph.maxStepsNote.glyph.getBoundingBoxBottom();
+            return this._endGlyph.maxStepsNote.getBoundingBoxBottom();
         }
         return super.getBoundingBoxBottom();
     }

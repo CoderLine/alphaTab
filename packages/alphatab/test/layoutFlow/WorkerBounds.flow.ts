@@ -12,9 +12,10 @@ import path from 'node:path';
 import v8 from 'node:v8';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
+import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, it } from 'vitest';
-import { AllocationSampler } from './AllocationSampler';
+import { type AllocationReport, AllocationSampler } from './AllocationSampler';
 import { LayoutCorpus } from './LayoutCorpus';
 import { LayoutHarness } from './LayoutHarness';
 
@@ -171,6 +172,40 @@ describe('WorkerBounds', () => {
                     'decode + finish (main)',
                     timed(runs, () => BoundsLookupWire.decode(wire, score).finish()),
                     AllocationSampler.measure(() => BoundsLookupWire.decode(wire, score).finish()).totalBytes
+                );
+
+                // the worker writes the wire directly instead of building and encoding a lookup
+                const hw = new LayoutHarness(new Settings());
+                hw.settings.core.includeNoteBounds = includeNoteBounds;
+                hw.paint = false;
+                const writer = new BoundsLookupWireWriter();
+                hw.renderer.boundsWriter = writer;
+                hw.render(LayoutHarness.loadScore(file, hw.settings), null, 1300);
+                const resizeWireMs =
+                    timed(runs, () => {
+                        hw.resize(1000);
+                        hw.resize(1300);
+                    }) / 2;
+                const written = writer.encode()!;
+                if (written.length !== wire.length || written.some((v, i) => !Object.is(v, wire[i]))) {
+                    throw new Error('wire writer differs from the encoded lookup');
+                }
+                const boundsStage = (r: AllocationReport) => r.byStage.values.get('bounds lookup') ?? 0;
+                h.resize(1000);
+                const objectResize = AllocationSampler.measure(() => h.resize(1300), 1024);
+                hw.resize(1000);
+                const wireResize = AllocationSampler.measure(() => hw.resize(1300), 1024);
+                out.push('worker side per resize 1000 -> 1300 (no paint), JS heap allocations:');
+                row('  resize, lookup objects', resizeMs, objectResize.totalBytes);
+                out.push(`      bounds lookup stage ${AllocationSampler.mb(boundsStage(objectResize))}`);
+                row('  resize, wire writer', resizeWireMs, wireResize.totalBytes);
+                out.push(`      bounds lookup stage ${AllocationSampler.mb(boundsStage(wireResize))}`);
+                row(
+                    '  encode from wire writer (copy)',
+                    timed(runs, () => writer.encode())
+                );
+                out.push(
+                    `  wire writer buffers (off-heap, reused): store ${((writer as any)._store.byteLength / 1048576).toFixed(1)} MB, scratch ${((writer as any)._bars.byteLength / 1048576).toFixed(2)} MB; each post copies ${(written.byteLength / 1048576).toFixed(1)} MB`
                 );
 
                 console.log(out.join('\n'));

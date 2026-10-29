@@ -27,11 +27,11 @@ import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSyst
  * @internal
  */
 export class BoundsLookupWire {
-    private static readonly _systemSize = 10;
-    private static readonly _masterBarSize = 15;
-    private static readonly _barSize = 12;
-    private static readonly _beatSize = 15;
-    private static readonly _noteSize = 5;
+    public static readonly systemSize = 10;
+    public static readonly masterBarSize = 15;
+    public static readonly barSize = 12;
+    public static readonly beatSize = 15;
+    public static readonly noteSize = 5;
 
     public static encode(lookup: BoundsLookup): Float64Array {
         const data = new Float64Array(BoundsLookupWire._encodedLength(lookup));
@@ -148,14 +148,14 @@ export class BoundsLookupWire {
     private static _encodedLength(lookup: BoundsLookup): number {
         let length = 0;
         for (const system of lookup.staffSystems) {
-            length += BoundsLookupWire._systemSize;
+            length += BoundsLookupWire.systemSize;
             for (const masterBar of system.bars) {
-                length += BoundsLookupWire._masterBarSize;
+                length += BoundsLookupWire.masterBarSize;
                 for (const bar of masterBar.bars) {
-                    length += BoundsLookupWire._barSize + bar.beats.length * BoundsLookupWire._beatSize;
+                    length += BoundsLookupWire.barSize + bar.beats.length * BoundsLookupWire.beatSize;
                     for (const beat of bar.beats) {
                         if (beat.notes) {
-                            length += beat.notes.length * BoundsLookupWire._noteSize;
+                            length += beat.notes.length * BoundsLookupWire.noteSize;
                         }
                     }
                 }

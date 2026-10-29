@@ -30,7 +30,7 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  * @record
  * @internal
  */
-interface BeamingBounds {
+export interface BeamingBounds {
     topY: number;
     bottomY: number;
 }
@@ -1063,10 +1063,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         out.bottomY = bottomY;
     }
 
-    private readonly _beamingBoundsScratch: BeamingBounds = { topY: 0, bottomY: 0 };
-
     protected calculateBeamingOverflows(rendererTop: number, rendererBottom: number) {
-        const out = this._beamingBoundsScratch;
+        const out = this.scoreRenderer.layout!.beamingBoundsScratch;
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
                 this._computeBeamingBounds(h, out);
@@ -1082,7 +1080,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected override emitHelperSkyline(h: BeamingHelper): void {
         const rendererBottom = this.height;
-        const out = this._beamingBoundsScratch;
+        const out = this.scoreRenderer.layout!.beamingBoundsScratch;
         this._computeBeamingBounds(h, out);
         if (out.topY >= 0 && out.bottomY <= rendererBottom) {
             return;

@@ -101,7 +101,8 @@ export class PlayerPositionRateApp implements Mountable {
 
         const intervalSelect = this.panel.querySelector<HTMLSelectElement>('.at-ppr-interval')!;
         for (const interval of intervals) {
-            const label = interval === 0 ? '0 ms (every quantum, default)' : `${interval} ms`;
+            const label =
+                interval === 0 ? '0 ms (every quantum)' : interval === 10 ? '10 ms (default)' : `${interval} ms`;
             intervalSelect.appendChild(new Option(label, String(interval)));
         }
         intervalSelect.value = String(api.settings.player.positionUpdateIntervalInMilliseconds);

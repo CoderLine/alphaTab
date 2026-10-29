@@ -41,7 +41,7 @@ export abstract class SvgCanvas implements ICanvas {
         this.buffer.reset(
             `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${
                 height | 0
-            }px" class="at-surface-svg">\n`
+            }px" class="at-surface-svg">`
         );
         this._currentPath = '';
         this._currentPathIsEmpty = true;
@@ -66,7 +66,8 @@ export abstract class SvgCanvas implements ICanvas {
             const rgba = this.color.rgba;
             if (rgba !== this._rectTailColor) {
                 this._rectTailColor = rgba;
-                this._rectTail = '" fill="' + rgba + '" />\n';
+                // black is the initial fill, as for paths and text
+                this._rectTail = rgba === '#000000' ? '" />' : '" fill="' + rgba + '" />';
             }
             // scale=1 fast path: skip the 4 multiplies and use `+` concat to avoid template-literal overhead.
             const s = this.scale;
@@ -87,7 +88,7 @@ export abstract class SvgCanvas implements ICanvas {
                 w * this.scale
             }" height="${h * this.scale}" stroke="${this.color.rgba}"` +
                 (this.lineWidth !== 1 ? ` stroke-width="${this.lineWidth * this.scale}"` : '') +
-                ' fill="transparent" />\n'
+                ' fill="transparent" />'
         );
     }
 

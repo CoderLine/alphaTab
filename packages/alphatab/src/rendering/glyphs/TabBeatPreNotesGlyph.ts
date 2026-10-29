@@ -1,7 +1,6 @@
 import { BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { BeatGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatGlyphBase';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import { TabBrushGlyph } from '@coderline/alphatab/rendering/glyphs/TabBrushGlyph';
 
 /**
@@ -9,15 +8,15 @@ import { TabBrushGlyph } from '@coderline/alphatab/rendering/glyphs/TabBrushGlyp
  */
 export class TabBeatPreNotesGlyph extends BeatGlyphBase {
     public override doLayout(): void {
+        this.beginPlacement();
         if (this.container.beat.index === 0) {
-            this.addNormal(new SpacingGlyph(0, 0, 1 * this.renderer.smuflMetrics.oneStaffSpace));
+            this.placeSpacing(1 * this.renderer.smuflMetrics.oneStaffSpace);
         }
 
         if (this.container.beat.brushType !== BrushType.None && !this.container.beat.isRest) {
-            this.addEffect(new TabBrushGlyph(this.container.beat));
-            this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.preNoteEffectPadding));
+            this.placeEffect(new TabBrushGlyph(this.container.beat));
+            this.placeSpacing(this.renderer.smuflMetrics.preNoteEffectPadding);
         }
-        super.doLayout();
     }
 
     protected override get effectElement() {

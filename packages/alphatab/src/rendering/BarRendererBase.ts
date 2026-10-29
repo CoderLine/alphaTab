@@ -5,6 +5,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
@@ -24,12 +25,9 @@ import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer'
 import { BarLocalSkyline, StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
-import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -1011,22 +1009,13 @@ export class BarRendererBase {
         // canvas.strokeRect(cx + this.x, cy + this.y - this.topOverflow, this.width, this.height + this.topOverflow + this.bottomOverflow);
     }
 
-    public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number): void {
         const scale = this.settings.display.scale;
         const x = cx + this.x;
         const y = cy + this.y;
-        const scaledX = x * scale;
-        const scaledY = y * scale;
-        const scaledW = this.width * scale;
-        const scaledH = this.height * scale;
-        const barBounds: BarBounds = new BarBounds();
-        barBounds.bar = this.bar;
-        barBounds.visualBounds = new Bounds(scaledX, scaledY, scaledW, scaledH);
-        barBounds.realBounds = new Bounds(scaledX, scaledY, scaledW, scaledH);
-
-        masterBarBounds.addBar(barBounds);
-        this.voiceContainer.buildBoundingsLookup(barBounds, x, y);
-        barBounds.sortBeats();
+        writer.addBar(this.bar, x * scale, y * scale, this.width * scale, this.height * scale);
+        this.voiceContainer.buildBoundingsLookup(writer, x, y);
+        writer.endBar();
     }
 
     protected addPostBeatGlyph(g: Glyph): void {

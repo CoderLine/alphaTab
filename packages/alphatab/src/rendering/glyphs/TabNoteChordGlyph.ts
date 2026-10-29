@@ -1,12 +1,12 @@
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -57,9 +57,9 @@ export class TabNoteChordGlyph extends Glyph {
         this._isGrace = isGrace;
     }
 
-    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         for (const note of this._notes) {
-            note.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
+            note.buildBoundingsLookup(writer, cx + this.x, cy + this.y);
         }
     }
 

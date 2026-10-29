@@ -16,12 +16,9 @@ import { BeatOnNoteGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatOn
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -39,6 +36,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
         if (this.skipLayout) {
             return;
         }
+        this.beginPlacement();
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
             const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             accidentals.renderer = this.renderer;
@@ -90,12 +88,11 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     g.colorOverride = color;
                     g.renderer = this.renderer;
                     accidentals.addGlyph(g);
-                    this.addNormal(accidentals);
-                    this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.preNoteEffectPadding));
+                    this.placeNormal(accidentals);
+                    this.placeSpacing(this.renderer.smuflMetrics.preNoteEffectPadding);
                 }
             }
         }
-        super.doLayout();
     }
 }
 
@@ -134,18 +131,16 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         return 0;
     }
 
-    public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public override buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         if (this.noteHeads && this.container.beat.notes.length > 0) {
-            const noteBounds = new NoteBounds();
-            noteBounds.note = this.container.beat.notes[0];
             const scale = this.renderer.settings.display.scale;
-            noteBounds.noteHeadBounds = new Bounds(
+            writer.addNote(
+                this.container.beat.notes[0],
                 (cx + this.x + this.noteHeads.x) * scale,
                 (cy + this.y + this.noteHeads.y - this.noteHeads.height / 2) * scale,
                 this.width * scale,
                 this.height * scale
             );
-            beatBounds.addNote(noteBounds);
         }
     }
 

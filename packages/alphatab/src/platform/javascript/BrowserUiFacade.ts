@@ -200,6 +200,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                         this._detachedPartials.remove(placeholder);
                         htmlElement.replaceChildren(...placeholder.renderedResult!);
                         placeholder.resultState = ResultState.RenderDone;
+                        this._reapplyHighlights(placeholder);
                     }
                 } else if (placeholder.resultState === ResultState.RenderDone) {
                     this._detachPartial(placeholder);
@@ -696,6 +697,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         placeholder.resultState = ResultState.RenderDone;
         placeholder.renderedResultId = renderResult.id;
         placeholder.renderedResult = Array.from(placeholder.children);
+        this._reapplyHighlights(placeholder);
         // scrolled out of view while the render was requested: no visibility change will detach it later
         if (placeholder.isOnScreen === false && this._api.settings.core.enableLazyLoading) {
             this._detachPartial(placeholder);
@@ -827,20 +829,46 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private _highlightedElements: HTMLElement[] = [];
+    /**
+     * The active highlights as parallel group id / master bar index lists, re-applied to partials
+     * whose rendered result is inserted while they are active.
+     */
+    private _highlightedGroupIds: string[] = [];
+    private _highlightedMasterBarIndexes: number[] = [];
+
     public highlightElements(groupId: string, masterBarIndex: number): void {
+        this._highlightedGroupIds.push(groupId);
+        this._highlightedMasterBarIndexes.push(masterBarIndex);
         const element = this._barToElementLookup.get(masterBarIndex);
         if (element) {
-            const elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
-            for (let i: number = 0; i < elementsToHighlight.length; i++) {
-                elementsToHighlight.item(i)!.classList.add('at-highlight');
-                this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+            this._highlightGroup(element, groupId);
+        }
+    }
+
+    private _highlightGroup(element: HTMLElement, groupId: string) {
+        const elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
+        for (let i: number = 0; i < elementsToHighlight.length; i++) {
+            elementsToHighlight.item(i)!.classList.add('at-highlight');
+            this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+        }
+    }
+
+    private _reapplyHighlights(placeholder: ResultPlaceholder) {
+        const masterBarIndexes = this._highlightedMasterBarIndexes;
+        for (let i = 0; i < masterBarIndexes.length; i++) {
+            if (this._barToElementLookup.get(masterBarIndexes[i]) === placeholder) {
+                this._highlightGroup(placeholder, this._highlightedGroupIds[i]);
             }
         }
     }
 
     public removeHighlights(): void {
+        if (this._highlightedGroupIds.length > 0) {
+            this._highlightedGroupIds = [];
+            this._highlightedMasterBarIndexes = [];
+        }
         const highlightedElements = this._highlightedElements;
-        if (!highlightedElements) {
+        if (highlightedElements.length === 0) {
             return;
         }
         for (const element of highlightedElements) {

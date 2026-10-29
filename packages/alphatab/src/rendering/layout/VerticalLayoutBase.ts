@@ -12,6 +12,26 @@ import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/M
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 
 /**
+ * How the fill loop chose the bars of a pooled system: the system holds the measured master bars
+ * `[firstIndex, endIndex)` for every available width in `[minWidth, breakWidth)`.
+ * @internal
+ */
+class SystemFill {
+    public isValid: boolean = false;
+    public firstIndex: number = 0;
+    public endIndex: number = 0;
+    public barsPerSystem: number = 0;
+    /** The largest width a bar addition required to fit. */
+    public minWidth: number = 0;
+    /** The width the rejected next bar required, infinite when the end did not depend on the width. */
+    public breakWidth: number = 0;
+
+    public holdsBarsFor(maxWidth: number): boolean {
+        return this.isValid && this.minWidth <= maxWidth && maxWidth < this.breakWidth;
+    }
+}
+
+/**
  * Base layout for page and parchment style layouts where we have an endless
  * vertical page with fitted systems.
  * @internal
@@ -20,6 +40,8 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _systems: StaffSystem[] = [];
     // the systems created since the last full layout by index, refilled by later resizes
     private _systemPool: StaffSystem[] = [];
+    // how the bars of the pooled system at the same index were chosen
+    private _systemFills: SystemFill[] = [];
     private _previousSystemCount: number = 0;
     // the measured master bars in order; systems are built from them
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
@@ -43,6 +65,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         this._reuseViewPort = renderHints?.reuseViewport ?? false;
         this._systems = [];
         this._systemPool = [];
+        this._systemFills = [];
 
         //
         // 1. Score Info
@@ -106,10 +129,10 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         }
 
         // Bars from the start of the re-layouted system onward will be re-registered during the
-        // paint pass. Clear their old entries from the preserved BoundsLookup so registration
+        // paint pass. Clear their old entries from the preserved bounds so registration
         // produces a clean, complete lookup after this render finishes.
         const firstRebuiltBarIndex = this._systems[systemIndex].masterBarsRenderers[0].masterBar.index;
-        this.renderer.boundsLookup!.clearFromMasterBar(firstRebuiltBarIndex);
+        this.renderer.boundsWriter.clearFromMasterBar(firstRebuiltBarIndex);
 
         // for now we do a full relayout from the first modified masterbar
         // there is a lot of room for even more performant updates, but they come
@@ -120,6 +143,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         // the removed systems are not refilled: the renderers of their bars stay reachable through the
         // bar renderer lookup (and ties caching them) until the bars are measured again
         this._systemPool.splice(systemIndex, this._systemPool.length - systemIndex);
+        this._systemFills.splice(systemIndex, this._systemFills.length - systemIndex);
         // the partials would keep the removed systems alive
         for (let i = systemIndex; i < this._systemPartialIds.length; i++) {
             this.unregisterPartial(this._systemPartialIds[i]);
@@ -303,13 +327,28 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                 y += this._paintSystem(system, oldHeight);
             }
         } else {
-            // clear out staves during re-layout, this info is outdated during
-            // re-layout of the bars
+            // the bars are detached from their systems, except the ones of systems which may keep
+            // them at the new width (detached when the system is filled again)
+            const maxWidth = this._maxWidth;
+            const pool = this._systemPool;
+            const fills = this._systemFills;
             const all = this._allMasterBarRenderers;
             for (let i = 0; i < all.length; i++) {
                 const renderers = all[i].renderers;
                 for (let j = 0; j < renderers.length; j++) {
-                    renderers[j].afterReverted();
+                    const r = renderers[j];
+                    const staff = r.staff;
+                    if (staff) {
+                        const systemIndex = staff.system.index;
+                        if (
+                            systemIndex < pool.length &&
+                            pool[systemIndex] === staff.system &&
+                            fills[systemIndex].holdsBarsFor(maxWidth)
+                        ) {
+                            continue;
+                        }
+                    }
+                    r.afterReverted();
                 }
             }
             this._systems = [];
@@ -349,27 +388,57 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         const tracks = this.renderer.tracks!;
         const maxWidth = this._maxWidth;
         const pool = this._systemPool;
+        const fills = this._systemFills;
         let index = firstIndex;
         while (true) {
             const systemIndex = this._systems.length;
+            const barsPerSystem = this.getBarsPerSystem(systemIndex);
             let system: StaffSystem;
+            let fill: SystemFill;
             if (systemIndex < pool.length) {
                 system = pool[systemIndex];
+                fill = fills[systemIndex];
+                if (
+                    fill.holdsBarsFor(maxWidth) &&
+                    fill.firstIndex === index &&
+                    fill.barsPerSystem === barsPerSystem &&
+                    system.reattachBars()
+                ) {
+                    // the fill loop would add the same bars again
+                    system.prepareRefit();
+                    system.x = this.pagePadding![0];
+                    system.y = y;
+                    index = fill.endIndex;
+                    y += this._fitAndPaintSystem(system, y, totalHeight);
+                    if (system.isLast) {
+                        break;
+                    }
+                    continue;
+                }
+                this._detachBars(system);
                 system.reset();
             } else {
                 system = this.createEmptyStaffSystem(systemIndex);
+                fill = new SystemFill();
                 pool.push(system);
+                fills.push(fill);
             }
+            fill.isValid = false;
             system.x = this.pagePadding![0];
             system.y = y;
             const first = this._masterBarsAt(index, system);
             if (!first) {
                 break;
             }
+            fill.firstIndex = index;
+            fill.barsPerSystem = barsPerSystem;
+            fill.minWidth = 0;
+            fill.breakWidth = Number.POSITIVE_INFINITY;
+            let reverted = false;
+            this._detachForeignBars(first, system);
             system.addMasterBarRenderers(tracks, first);
             index++;
 
-            const barsPerSystem = this.getBarsPerSystem(system.index);
             while (true) {
                 const last = system.masterBarsRenderers[system.masterBarsRenderers.length - 1];
                 if (this._needsLineBreak(last.lastMasterBarIndex)) {
@@ -380,6 +449,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                 if (!next) {
                     break;
                 }
+                this._detachForeignBars(next, system);
                 // a bar that cannot start a system (the second of a double simile) stays with its predecessor
                 if (next.canWrap) {
                     const keepsFollowing = !this._canWrapBefore(next.lastMasterBarIndex + 1);
@@ -392,24 +462,39 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
                     } else {
                         let width = system.measureWidth(next);
                         if (keepsFollowing) {
-                            width += system.measureWidth(this._masterBarsAt(index + 1, system)!, 1);
+                            const following = this._masterBarsAt(index + 1, system)!;
+                            this._detachForeignBars(following, system);
+                            width += system.measureWidth(following, 1);
                         }
-                        if (system.width + width > maxWidth) {
+                        const required = system.width + width;
+                        if (required > maxWidth) {
                             system.isFull = true;
+                            fill.breakWidth = required;
                             break;
+                        }
+                        if (required > fill.minWidth) {
+                            fill.minWidth = required;
                         }
                     }
                 }
                 system.addMasterBarRenderers(tracks, next);
                 index++;
-                // a staff that became visible can widen the accolade beyond the available width
-                if (barsPerSystem <= 0 && next.canWrap && system.width > maxWidth) {
-                    system.revertLastBar();
-                    index--;
-                    system.isFull = true;
-                    break;
+                if (barsPerSystem <= 0 && next.canWrap) {
+                    // a staff that became visible can widen the accolade beyond the available width
+                    if (system.width > maxWidth) {
+                        system.revertLastBar();
+                        index--;
+                        system.isFull = true;
+                        reverted = true;
+                        break;
+                    }
+                    if (system.width > fill.minWidth) {
+                        fill.minWidth = system.width;
+                    }
                 }
             }
+            fill.endIndex = index;
+            fill.isValid = !reverted;
 
             // bars measured for this system but not added must not look like a part of it
             // (e.g. to ties ending in them)
@@ -425,20 +510,51 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
             }
 
             system.isLast = system.lastBarIndex === this.lastBarIndex;
-            this._systems.push(system);
-            this._fitSystem(system);
-            Logger.debug(
-                this.name,
-                `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`,
-                null
-            );
-            y += this._paintSystem(system, totalHeight === -1 ? y : totalHeight);
+            y += this._fitAndPaintSystem(system, y, totalHeight);
             if (system.isLast) {
                 break;
             }
         }
         this._trimSystemPool();
         return y;
+    }
+
+    private _fitAndPaintSystem(system: StaffSystem, y: number, totalHeight: number): number {
+        this._systems.push(system);
+        this._fitSystem(system);
+        Logger.debug(this.name, `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`, null);
+        return this._paintSystem(system, totalHeight === -1 ? y : totalHeight);
+    }
+
+    /**
+     * Detaches the bars a pooled system holds from it before the system is filled again.
+     */
+    private _detachBars(system: StaffSystem): void {
+        const allStaves = system.allStaves;
+        for (let i = 0; i < allStaves.length; i++) {
+            const staff = allStaves[i];
+            const renderers = staff.barRenderers;
+            for (let j = 0; j < renderers.length; j++) {
+                const r = renderers[j];
+                if (r.staff === staff) {
+                    r.afterReverted();
+                }
+            }
+        }
+    }
+
+    /**
+     * Detaches the bars from the system which held them in the previous pass before another system
+     * measures or adds them.
+     */
+    private _detachForeignBars(bars: MasterBarsRenderers, system: StaffSystem): void {
+        const renderers = bars.renderers;
+        for (let i = 0; i < renderers.length; i++) {
+            const r = renderers[i];
+            if (r.staff && r.staff.system !== system) {
+                r.afterReverted();
+            }
+        }
     }
 
     /**
@@ -452,6 +568,12 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         const pool = this._systemPool;
         if (pool.length > keep) {
             pool.splice(keep, pool.length - keep);
+            this._systemFills.splice(keep, this._systemFills.length - keep);
+        }
+        // the bars of an unused system were added to others, which changed their state
+        const fills = this._systemFills;
+        for (let i = used; i < fills.length; i++) {
+            fills[i].isValid = false;
         }
         this._previousSystemCount = used;
     }

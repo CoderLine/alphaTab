@@ -10,7 +10,7 @@ import type {
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
+import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -19,6 +19,10 @@ import type { Settings } from '@coderline/alphatab/Settings';
  */
 export class AlphaTabWebWorker {
     private _renderer!: ScoreRenderer;
+    /**
+     * @target web
+     */
+    private _boundsWire: BoundsLookupWireWriter | null = null;
     private _main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>;
 
     public constructor(main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>) {
@@ -40,6 +44,8 @@ export class AlphaTabWebWorker {
                 const settings: Settings = JsonConverter.jsObjectToSettings(data.settings);
                 Logger.logLevel = settings.core.logLevel;
                 this._renderer = new ScoreRenderer(settings);
+                /*@target web*/
+                this._installBoundsWire();
                 this._renderer.partialRenderFinished.on(result => {
                     this._main.postMessage({
                         cmd: 'alphaTab.partialRenderFinished',
@@ -108,14 +114,23 @@ export class AlphaTabWebWorker {
     }
 
     /**
+     * The main thread is the only consumer of the bounds, so the renderer writes them in wire format
+     * and its `boundsLookup` stays null.
+     * @target web
+     */
+    private _installBoundsWire(): void {
+        this._boundsWire = new BoundsLookupWireWriter();
+        this._renderer.boundsWriter = this._boundsWire;
+    }
+
+    /**
      * @target web
      */
     private _postBoundsLookupWire(): boolean {
-        const boundsLookup = this._renderer.boundsLookup;
-        if (!boundsLookup) {
+        const data = this._boundsWire?.encode() ?? null;
+        if (!data) {
             return false;
         }
-        const data = BoundsLookupWire.encode(boundsLookup);
         (this._main as unknown as DedicatedWorkerGlobalScope).postMessage(
             { cmd: 'alphaTab.postRenderFinishedWire', boundsLookup: data },
             [data.buffer]

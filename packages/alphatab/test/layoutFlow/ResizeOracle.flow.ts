@@ -5,7 +5,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { Settings } from '@coderline/alphatab/Settings';
+import type { Score } from '@coderline/alphatab/model/Score';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { describe, it } from 'vitest';
+import { BoundsDump } from './BoundsDump';
 import { LayoutCorpus, type LayoutVariant } from './LayoutCorpus';
 import { type CapturedPass, LayoutHarness } from './LayoutHarness';
 
@@ -14,30 +17,32 @@ class OracleResult {
     public breakDiffs: number = 0;
     public geometryDiffs: number = 0;
     public paintDiffs: number = 0;
+    public boundsDiffs: number = 0;
+    public knownBoundsDiffs: number = 0;
     public skipped: number = 0;
     public report: string[] = [];
+    public known: string[] = [];
 
     public add(o: OracleResult) {
         this.cases += o.cases;
         this.breakDiffs += o.breakDiffs;
         this.geometryDiffs += o.geometryDiffs;
         this.paintDiffs += o.paintDiffs;
+        this.boundsDiffs += o.boundsDiffs;
+        this.knownBoundsDiffs += o.knownBoundsDiffs;
+        this.known.push(...o.known);
         this.skipped += o.skipped;
         this.report.push(...o.report);
     }
 
     public toString() {
-        const ok = this.cases - this.breakDiffs - this.geometryDiffs - this.paintDiffs;
+        const ok = this.cases - this.breakDiffs - this.geometryDiffs - this.paintDiffs - this.boundsDiffs;
         return (
             `cases=${this.cases} equal=${ok} breakDiffs=${this.breakDiffs} ` +
-            `geometryDiffs=${this.geometryDiffs} paintOnlyDiffs=${this.paintDiffs} skipped=${this.skipped}`
+            `geometryDiffs=${this.geometryDiffs} paintOnlyDiffs=${this.paintDiffs} ` +
+            `boundsOnlyDiffs=${this.boundsDiffs} knownBoundsDiffs=${this.knownBoundsDiffs} skipped=${this.skipped}`
         );
     }
-}
-
-/** The svg engine prints unrounded coordinates; compare them at a precision far below a pixel. */
-function normalizeSvg(svg: string) {
-    return svg.replace(/-?\d+\.\d+/g, n => String(Math.round(Number.parseFloat(n) * 1000) / 1000));
 }
 
 /** Summation order differs between the paths, so widths are compared with a tolerance. */
@@ -45,7 +50,54 @@ function near(a: number, b: number) {
     return Math.abs(a - b) < 1e-6;
 }
 
-function compare(result: OracleResult, label: string, fresh: CapturedPass, resized: CapturedPass) {
+function beats(bar: number, counts: number[], firstBeat: number = 0): string[] {
+    const keys: string[] = [];
+    for (let i = 0; i < counts.length; i++) {
+        for (let e = i === 0 ? firstBeat : 0; e < counts[i]; e++) {
+            keys.push(`t0s0b${bar + i}v0e${e}`);
+        }
+    }
+    return keys;
+}
+
+/**
+ * N38: the visual width of these beats grows with every resize. Cases whose bounds differ only in
+ * these widths are listed as known baseline differences instead of being counted.
+ */
+const knownBeatWidthDifferences = new Map<string, Set<string>>([
+    ['effects-and-annotations/tremolo-bar.gp', new Set<string>(beats(3, [3, 6, 6], 1))],
+    ['general/colors.gp', new Set<string>(['t0s0b0v0e0'])],
+    [
+        'notation-legend/notation-legend.gp',
+        new Set<string>(['t0s0b101v0e0', ...beats(102, [3, 6, 6, 4, 4], 1), 't0s0b121v0e0'])
+    ]
+]);
+
+function knownBeatWidths(file: string): Set<string> | null {
+    for (const [suffix, keys] of knownBeatWidthDifferences) {
+        if (file.replace(/\\/g, '/').endsWith(suffix)) {
+            return keys;
+        }
+    }
+    return null;
+}
+
+interface OraclePass {
+    pass: CapturedPass;
+    bounds: BoundsDump;
+    lookup: BoundsLookup | null;
+    score: Score;
+}
+
+function compare(
+    result: OracleResult,
+    label: string,
+    knownWidths: Set<string> | null,
+    freshPass: OraclePass,
+    resizedPass: OraclePass
+) {
+    const fresh = freshPass.pass;
+    const resized = resizedPass.pass;
     result.cases++;
     const fb = LayoutHarness.breaksOf(fresh);
     const rb = LayoutHarness.breaksOf(resized);
@@ -87,7 +139,8 @@ function compare(result: OracleResult, label: string, fresh: CapturedPass, resiz
             if (!first) {
                 first = `first at system ${i} (bars ${f.firstBar}-${f.lastBar}): ${differing.join(', ')}`;
             }
-        } else if (f.svg !== r.svg && normalizeSvg(f.svg) !== normalizeSvg(r.svg)) {
+        } else if (!BoundsDump.nearlyEqual(f.svg, r.svg)) {
+            // the svg engine prints unrounded coordinates: compare them at a precision far below a pixel
             paint++;
             if (process.env.LAYOUT_FLOW_DUMP && paint === 1) {
                 const base = path.join(LayoutCorpus.outDir(process.cwd()), 'dump', label.replace(/[^\w.-]+/g, '_'));
@@ -97,6 +150,7 @@ function compare(result: OracleResult, label: string, fresh: CapturedPass, resiz
             }
         }
     }
+    const bounds = geometry > 0 ? null : BoundsDump.firstDifference(freshPass.bounds, resizedPass.bounds);
     if (geometry > 0) {
         result.geometryDiffs++;
         const counts = Array.from(fields.entries())
@@ -105,24 +159,60 @@ function compare(result: OracleResult, label: string, fresh: CapturedPass, resiz
         result.report.push(`${label}: GEOMETRY ${geometry}/${fresh.systems.length} systems [${counts}] ${first}`);
     } else if (paint > 0) {
         result.paintDiffs++;
-        result.report.push(`${label}: PAINT ${paint}/${fresh.systems.length} systems differ`);
+        const boundsNote = bounds === null ? '' : `; BOUNDS ${bounds}`;
+        result.report.push(`${label}: PAINT ${paint}/${fresh.systems.length} systems differ${boundsNote}`);
+    } else if (bounds !== null) {
+        const masked =
+            knownWidths !== null &&
+            BoundsDump.firstDifference(
+                BoundsDump.of(freshPass.lookup, freshPass.score, knownWidths),
+                BoundsDump.of(resizedPass.lookup, resizedPass.score, knownWidths)
+            ) === null;
+        if (masked) {
+            result.knownBoundsDiffs++;
+            result.known.push(`${label}: ${bounds}`);
+        } else {
+            result.boundsDiffs++;
+            result.report.push(`${label}: BOUNDS ${bounds}`);
+        }
     }
 }
 
-function freshRender(file: string, variant: LayoutVariant, width: number): CapturedPass {
-    const h = new LayoutHarness(new Settings());
-    const score = LayoutHarness.loadScore(file, h.settings);
-    variant.prepare(score);
-    return h.render(score, variant.tracks(score), width);
+/** Variants that also register the note bounds. */
+const noteBoundsVariants = ['all-tracks', 'hide-empty-staves'];
+
+function createSettings(variant: LayoutVariant): Settings {
+    const settings = new Settings();
+    settings.core.includeNoteBounds = noteBoundsVariants.indexOf(variant.name) >= 0;
+    return settings;
 }
 
-function checkFile(file: string, variant: LayoutVariant): OracleResult {
+function capture(h: LayoutHarness, score: Score, pass: CapturedPass): OraclePass {
+    const lookup = h.renderer.boundsLookup;
+    return { pass, bounds: BoundsDump.of(lookup, score), lookup, score };
+}
+
+function freshRender(file: string, variant: LayoutVariant, width: number): OraclePass {
+    const h = new LayoutHarness(createSettings(variant));
+    const score = LayoutHarness.loadScore(file, h.settings);
+    variant.prepare(score);
+    return capture(h, score, h.render(score, variant.tracks(score), width));
+}
+
+/**
+ * Small steps as while dragging a window edge (from the initial 1300): most systems keep their bars
+ * between consecutive passes.
+ */
+const dragWidths = [1295, 1290, 1300, 900, 1290, 1280, 1000, 995, 990, 1005];
+
+function checkFile(file: string, variant: LayoutVariant, widths: number[], name: string): OracleResult {
     const result = new OracleResult();
     const rel = path.relative(process.cwd(), file);
     let h: LayoutHarness;
+    let score: Score;
     try {
-        h = new LayoutHarness(new Settings());
-        const score = LayoutHarness.loadScore(file, h.settings);
+        h = new LayoutHarness(createSettings(variant));
+        score = LayoutHarness.loadScore(file, h.settings);
         variant.prepare(score);
         h.render(score, variant.tracks(score), 1300);
     } catch (e) {
@@ -130,15 +220,15 @@ function checkFile(file: string, variant: LayoutVariant): OracleResult {
         result.report.push(`SKIP ${variant.name} ${rel}: ${(e as Error).message}`);
         return result;
     }
-    const widths = LayoutCorpus.resizeWidths;
+    const knownWidths = knownBeatWidths(file);
     for (let i = 0; i < widths.length; i++) {
         try {
-            const resized = h.resize(widths[i]);
+            const resized = capture(h, score, h.resize(widths[i]));
             const fresh = freshRender(file, variant, widths[i]);
-            compare(result, `${variant.name} ${rel} step ${i} (w=${widths[i]})`, fresh, resized);
+            compare(result, `${name} ${rel} step ${i} (w=${widths[i]})`, knownWidths, fresh, resized);
         } catch (e) {
             result.skipped++;
-            result.report.push(`ERROR ${variant.name} ${rel} step ${i} (w=${widths[i]}): ${(e as Error).message}`);
+            result.report.push(`ERROR ${name} ${rel} step ${i} (w=${widths[i]}): ${(e as Error).message}`);
             return result;
         }
     }
@@ -154,26 +244,37 @@ describe('ResizeOracle', () => {
         v => !process.env.LAYOUT_FLOW_VARIANT || v.name === process.env.LAYOUT_FLOW_VARIANT
     );
     const total = new OracleResult();
+    const dragTotal = new OracleResult();
     const summary: string[] = [];
 
     for (const variant of variants) {
         it(variant.name, () => {
             const perVariant = new OracleResult();
+            const drag = new OracleResult();
             for (const file of files) {
-                perVariant.add(checkFile(file, variant));
+                perVariant.add(checkFile(file, variant, LayoutCorpus.resizeWidths, variant.name));
+                drag.add(checkFile(file, variant, dragWidths, `${variant.name} (drag)`));
             }
             const line = `${variant.name}: ${perVariant.toString()}`;
+            const dragLine = `${variant.name} (drag): ${drag.toString()}`;
             console.log(line);
+            console.log(dragLine);
             summary.push(line);
+            summary.push(dragLine);
             total.add(perVariant);
+            dragTotal.add(drag);
         });
     }
 
     it('report', () => {
         summary.push(`total: ${total.toString()}`);
         console.log(summary[summary.length - 1]);
+        summary.push(`drag-sequence: ${dragTotal.toString()}`);
+        console.log(summary[summary.length - 1]);
+        total.add(dragTotal);
         const out = path.join(LayoutCorpus.outDir(root), 'resize-oracle.txt');
-        fs.writeFileSync(out, [...summary, '', ...total.report].join('\n'));
+        const known = ['', `known baseline bounds differences (${total.known.length}):`, ...total.known];
+        fs.writeFileSync(out, [...summary, '', ...total.report, ...known].join('\n'));
         console.log(`report written to ${out}`);
     });
 });

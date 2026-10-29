@@ -15,10 +15,8 @@ import {
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -103,11 +101,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public getLowestNoteY(requestedPosition: NoteYPosition): number {
-        return this.maxStepsNote ? this._internalGetNoteY(this.maxStepsNote.glyph, requestedPosition) : 0;
+        return this.maxStepsNote ? this._internalGetNoteY(this.maxStepsNote, requestedPosition) : 0;
     }
 
     public getHighestNoteY(requestedPosition: NoteYPosition): number {
-        return this.minStepsNote ? this._internalGetNoteY(this.minStepsNote.glyph, requestedPosition) : 0;
+        return this.minStepsNote ? this._internalGetNoteY(this.minStepsNote, requestedPosition) : 0;
     }
 
     private _internalGetNoteY(n: NoteHeadGlyphBase, requestedPosition: NoteYPosition): number {
@@ -169,14 +167,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
         } else {
             if (this.direction === BeamDirection.Up) {
-                belowBeatEffectsY =
-                    this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.Bottom) + effectSpacing;
+                belowBeatEffectsY = this._internalGetNoteY(this.maxStepsNote!, NoteYPosition.Bottom) + effectSpacing;
                 aboveBeatEffectsY =
-                    this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.TopWithStem) - effectSpacing;
+                    this._internalGetNoteY(this.minStepsNote!, NoteYPosition.TopWithStem) - effectSpacing;
             } else {
                 belowBeatEffectsY =
-                    this._internalGetNoteY(this.maxStepsNote!.glyph, NoteYPosition.BottomWithStem) + effectSpacing;
-                aboveBeatEffectsY = this._internalGetNoteY(this.minStepsNote!.glyph, NoteYPosition.Top) - effectSpacing;
+                    this._internalGetNoteY(this.maxStepsNote!, NoteYPosition.BottomWithStem) + effectSpacing;
+                aboveBeatEffectsY = this._internalGetNoteY(this.minStepsNote!, NoteYPosition.Top) - effectSpacing;
             }
         }
 
@@ -263,21 +260,19 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         g.x = tremoloX;
     }
 
-    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         const scale = this.renderer.settings.display.scale;
         // note bounds are listed in the note order of the beat
         for (const note of this.beat.notes) {
             const glyph = this.getNoteGlyph(note);
             if (glyph) {
-                const noteBounds: NoteBounds = new NoteBounds();
-                noteBounds.note = note;
-                noteBounds.noteHeadBounds = new Bounds(
+                writer.addNote(
+                    note,
                     (cx + this.x + glyph.x) * scale,
                     (cy + this.y + glyph.y - glyph.height / 2) * scale,
                     glyph.width * scale,
                     glyph.height * scale
                 );
-                beatBounds.addNote(noteBounds);
             }
         }
     }

@@ -14,7 +14,9 @@ import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
-import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import { BoundsLookupObjectWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupObjectWriter';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -36,6 +38,12 @@ export class ScoreRenderer implements IScoreRenderer {
     public layout: ScoreLayout | null = null;
     public settings: Settings;
     public boundsLookup: BoundsLookup | null = null;
+    /**
+     * The sink the layout writes the bounds into. By default it fills {@link boundsLookup}; with any other
+     * writer {@link boundsLookup} stays null.
+     * @internal
+     */
+    public boundsWriter: IBoundsLookupWriter;
     public width: number = 0;
 
     /**
@@ -44,6 +52,7 @@ export class ScoreRenderer implements IScoreRenderer {
      */
     public constructor(settings: Settings) {
         this.settings = settings;
+        this.boundsWriter = new BoundsLookupObjectWriter(this);
         this._recreateCanvas();
         this._recreateLayout();
     }
@@ -160,14 +169,10 @@ export class ScoreRenderer implements IScoreRenderer {
             Logger.warning('Rendering', 'AlphaTab skipped rendering because of width=0 (element invisible)', null);
             return false;
         }
-        // For partial renders we preserve the existing lookup so bars outside the re-layouted
-        // range keep their already-scaled bounds - the layout will clear the changed range
-        // before the paint pass re-registers fresh entries for it.
-        if (renderHints?.firstChangedMasterBar !== undefined && this.boundsLookup) {
-            this.boundsLookup.resetForPartialUpdate();
-        } else {
-            this.boundsLookup = new BoundsLookup();
-        }
+        // For partial renders we preserve the existing bounds so bars outside the re-layouted
+        // range keep them - the layout will clear the changed range before the paint pass
+        // writes fresh entries for it.
+        this.boundsWriter.begin(renderHints?.firstChangedMasterBar !== undefined);
         this._recreateCanvas();
         this.canvas!.lineWidth = 1;
         this.canvas!.settings = this.settings;
@@ -199,7 +204,7 @@ export class ScoreRenderer implements IScoreRenderer {
             finished = this._renderProfiled();
         } else if (this.layout!.supportsResize) {
             Logger.debug('Rendering', 'Starting optimized rerendering for resize');
-            this.boundsLookup = new BoundsLookup();
+            this.boundsWriter.begin(false);
             (this.preRender as EventEmitterOfT<boolean>).trigger(true);
             this.canvas!.settings = this.settings;
             Profiler.begin('resize.layoutResize');
@@ -244,7 +249,7 @@ export class ScoreRenderer implements IScoreRenderer {
     public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 
     private _onRenderFinished() {
-        this.boundsLookup?.finish(this.settings.display.scale);
+        this.boundsWriter.finish(this.settings.display.scale);
         const e = new RenderFinishedEventArgs();
         e.totalHeight = this.layout!.height;
         e.totalWidth = this.layout!.width;

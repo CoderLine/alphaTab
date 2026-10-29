@@ -71,6 +71,38 @@ describe('DetachedPartialCache', () => {
 });
 
 /**
+ * An element stand-in carrying a class list.
+ */
+class FakeElement {
+    public classes: Set<string>;
+
+    public constructor(classes: string[]) {
+        this.classes = new Set<string>(classes);
+    }
+
+    public get classList() {
+        const classes = this.classes;
+        return {
+            add: (c: string) => classes.add(c),
+            remove: (c: string) => classes.delete(c)
+        };
+    }
+}
+
+/**
+ * A rendered SVG stand-in whose descendants are the elements with a `class` attribute in the markup.
+ */
+class FakeSvg {
+    public descendants: FakeElement[] = [];
+
+    public constructor(markup: string) {
+        for (const m of markup.matchAll(/class="([^"]*)"/g)) {
+            this.descendants.push(new FakeElement(m[1].split(' ')));
+        }
+    }
+}
+
+/**
  * A placeholder stand-in with the DOM members the facade uses.
  */
 class FakePlaceholder {
@@ -82,7 +114,21 @@ class FakePlaceholder {
     }
 
     public set innerHTML(value: string) {
-        this.children = [{ svg: value }];
+        this.children = [new FakeSvg(value)];
+    }
+
+    public getElementsByClassName(className: string) {
+        const found: FakeElement[] = [];
+        for (const child of this.children) {
+            if (child instanceof FakeSvg) {
+                for (const e of child.descendants) {
+                    if (e.classes.has(className)) {
+                        found.push(e);
+                    }
+                }
+            }
+        }
+        return { length: found.length, item: (i: number) => found[i] };
     }
 
     public get style(): Record<string, string> {
@@ -118,6 +164,9 @@ describe('BrowserUiFacadeDetachedPartials', () => {
         internals._totalResultCount = 0;
         internals._resultIdToElementLookup = new Map();
         internals._barToElementLookup = new Map();
+        internals._highlightedElements = [];
+        internals._highlightedGroupIds = [];
+        internals._highlightedMasterBarIndexes = [];
         internals._intersectionObserver = { observe() {}, unobserve() {} };
         internals._detachedPartials = new DetachedPartialCache<FakePlaceholder>(
             0,
@@ -138,6 +187,8 @@ describe('BrowserUiFacadeDetachedPartials', () => {
                 r.width = viewportWidth;
                 r.height = viewportHeight / 2;
                 r.y = (i * viewportHeight) / 2;
+                r.firstMasterBarIndex = i;
+                r.lastMasterBarIndex = i;
                 facade.beginAppendRenderResults(r);
                 results.push(r);
             }
@@ -162,7 +213,7 @@ describe('BrowserUiFacadeDetachedPartials', () => {
     function deliver(facade: BrowserUiFacade, r: RenderFinishedEventArgs) {
         const painted = new RenderFinishedEventArgs();
         painted.id = r.id;
-        painted.renderResult = `<svg id="${r.id}"></svg>`;
+        painted.renderResult = `<svg id="${r.id}"><g class="b${r.id}"></g><g class="b${r.id}-other"></g></svg>`;
         facade.beginUpdateRenderResults(painted);
     }
 
@@ -223,5 +274,71 @@ describe('BrowserUiFacadeDetachedPartials', () => {
         visibility(internals, p, true);
         expect(requested.length).toBe(1);
         expect(p.children.length).toBe(1);
+    });
+    function isHighlighted(p: FakePlaceholder, groupId: string): boolean {
+        const elements = p.getElementsByClassName(groupId);
+        return elements.length > 0 && elements.item(0).classes.has('at-highlight');
+    }
+
+    it('reapplies-highlights-to-repainted-partials', () => {
+        const { facade, internals, requested } = createFacade();
+        const { results, placeholders } = scrollThrough(facade, internals, 8);
+        const groupId = `b${results[1].id}`;
+        facade.highlightElements(groupId, 1);
+        expect(isHighlighted(placeholders[1], `b${results[1].id}-other`)).toBe(false);
+
+        // partial 1 was released: its result is requested again and arrives with fresh elements
+        visibility(internals, placeholders[1], true);
+        expect(requested[requested.length - 1]).toBe(results[1].id);
+        deliver(facade, results[1]);
+        expect(isHighlighted(placeholders[1], groupId)).toBe(true);
+        expect(isHighlighted(placeholders[1], `b${results[1].id}-other`)).toBe(false);
+
+        // re-applied elements are cleared like the others
+        facade.removeHighlights();
+        expect(isHighlighted(placeholders[1], groupId)).toBe(false);
+    });
+
+    it('does-not-reapply-removed-highlights', () => {
+        const { facade, internals } = createFacade();
+        const { results, placeholders } = scrollThrough(facade, internals, 8);
+        const groupId = `b${results[1].id}`;
+        facade.highlightElements(groupId, 1);
+        facade.removeHighlights();
+
+        visibility(internals, placeholders[1], true);
+        deliver(facade, results[1]);
+        expect(isHighlighted(placeholders[1], groupId)).toBe(false);
+    });
+
+    it('highlights-results-arriving-while-highlight-is-active', () => {
+        const { facade, internals } = createFacade();
+        const results = layout(facade, 2);
+        const all = internals._resultIdToElementLookup as Map<string, FakePlaceholder>;
+        const p0 = all.get(results[0].id)!;
+        const p1 = all.get(results[1].id)!;
+        const groupId = `b${results[1].id}`;
+        facade.highlightElements(groupId, 1);
+
+        visibility(internals, p0, true);
+        visibility(internals, p1, true);
+        deliver(facade, results[0]);
+        deliver(facade, results[1]);
+        expect(isHighlighted(p1, groupId)).toBe(true);
+        expect(isHighlighted(p0, `b${results[0].id}`)).toBe(false);
+    });
+
+    it('highlights-partials-restored-from-detached-dom', () => {
+        const { facade, internals, requested } = createFacade();
+        const { results, placeholders } = scrollThrough(facade, internals, 8);
+        const groupId = `b${results[6].id}`;
+        // partial 6 is detached but kept: its elements are not in the document while highlighting
+        facade.highlightElements(groupId, 6);
+
+        visibility(internals, placeholders[6], true);
+        expect(requested.length).toBe(8);
+        expect(isHighlighted(placeholders[6], groupId)).toBe(true);
+        facade.removeHighlights();
+        expect(isHighlighted(placeholders[6], groupId)).toBe(false);
     });
 });

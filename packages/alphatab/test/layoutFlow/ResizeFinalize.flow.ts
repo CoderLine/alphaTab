@@ -307,7 +307,11 @@ describe('ResizeFinalize', () => {
             report('resize 1300 -> 1300 (same width, forced)', same, out, 15);
 
             out.push('### bounds objects per resize (1300)');
-            out.push(`    ${boundsCounts(h.renderer.boundsLookup!)}`);
+            out.push(
+                h.boundsWire
+                    ? `    worker bounds (wire writer): ${h.boundsWire.encode()!.length} numbers`
+                    : `    ${boundsCounts(h.renderer.boundsLookup!)}`
+            );
 
             if (!noInline) {
                 out.push('### geometry kept between widths (renderers are reused across resizes)');

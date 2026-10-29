@@ -1,7 +1,10 @@
 import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { Staff } from '@coderline/alphatab/model/Staff';
-import { type IStaffDisplayContext, StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
+import {
+    type IStaffDisplayContext,
+    StaffDisplayResolver
+} from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -107,6 +110,37 @@ describe('StaffDisplayResolver.merge', () => {
         const display: ElementDisplay = StaffDisplayResolver.merge(perBar, perStaff, stylesheet);
         expect(display.isVisible).toBe(false);
         expect(display.staffPlacement).toBe(StaffPlacement.Primary);
+    });
+
+    it('shares one result for every merge without overrides', () => {
+        const defaults: ElementDisplay = {
+            isVisible: true,
+            staffPlacement: StaffPlacement.AllStaves,
+            systemDisplay: SystemDisplay.AllSystems
+        };
+        const a: ElementDisplay = StaffDisplayResolver.merge(undefined, undefined, undefined);
+        const visible: ElementDisplay = { isVisible: true };
+        const b: ElementDisplay = StaffDisplayResolver.merge(undefined, visible, defaults);
+        expect(b).toBe(a);
+        expect(a.isVisible).toBe(true);
+        expect(a.staffPlacement).toBe(StaffPlacement.AllStaves);
+        expect(a.systemDisplay).toBe(SystemDisplay.AllSystems);
+    });
+
+    it('returns the stylesheet display when it decides every axis', () => {
+        const stylesheet: ElementDisplay = {
+            isVisible: true,
+            staffPlacement: StaffPlacement.Primary,
+            systemDisplay: SystemDisplay.AllSystems
+        };
+        expect(StaffDisplayResolver.merge(undefined, undefined, stylesheet)).toBe(stylesheet);
+        const hidden: ElementDisplay = { isVisible: false };
+        const overridden: ElementDisplay = StaffDisplayResolver.merge(hidden, undefined, stylesheet);
+        expect(overridden).not.toBe(stylesheet);
+        expect(overridden.isVisible).toBe(false);
+        expect(overridden.staffPlacement).toBe(StaffPlacement.Primary);
+        expect(overridden.systemDisplay).toBe(SystemDisplay.AllSystems);
+        expect(stylesheet.isVisible).toBe(true);
     });
 });
 

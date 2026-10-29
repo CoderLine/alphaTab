@@ -14,10 +14,8 @@ import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { Spring } from '@coderline/alphatab/rendering/staves/Spring';
-import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * Per-beat effect-glyph overflow; consumed by the per-beat skyline emission
@@ -85,7 +83,7 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract getHighestNoteY(requestedPosition: NoteYPosition): number;
     public abstract registerLayoutingInfo(layoutings: BarLayoutingInfo): void;
     public abstract applyLayoutingInfo(info: BarLayoutingInfo): void;
-    public abstract buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void;
+    public abstract buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number): void;
     public scaleToWidth(beatWidth: number) {
         this.width = beatWidth;
     }
@@ -109,7 +107,10 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     private _ties: ITieGlyph[] | null = null;
     private _tieWidth = 0;
     public beat: Beat;
-    public preNotes!: BeatGlyphBase;
+    /**
+     * The glyphs before the notes (accidentals, spacing, effects), `null` after the layout when there are none.
+     */
+    public preNotes: BeatGlyphBase | null = null;
     public onNotes!: BeatOnNoteGlyphBase;
 
     public override getLowestNoteY(requestedPosition: NoteYPosition): number {
@@ -205,14 +206,16 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     private _updateNoteExtent(): void {
-        let top = ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
+        const preNotes = this.preNotes;
+        let top = preNotes
+            ? ModelUtils.minBoundingBox(preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop())
+            : this.onNotes.getBoundingBoxTop();
         if (Number.isNaN(top)) {
             top = (this.renderer as LineBarRenderer).middleYPosition;
         }
-        let bottom = ModelUtils.maxBoundingBox(
-            this.preNotes.getBoundingBoxBottom(),
-            this.onNotes.getBoundingBoxBottom()
-        );
+        let bottom = preNotes
+            ? ModelUtils.maxBoundingBox(preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom())
+            : this.onNotes.getBoundingBoxBottom();
         if (Number.isNaN(bottom)) {
             bottom = (this.renderer as LineBarRenderer).middleYPosition;
         }
@@ -244,7 +247,8 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
-        const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.onTimeX;
+        const preNotes = this.preNotes;
+        const preBeatStretch: number = preNotes ? preNotes.computedWidth + this.onNotes.onTimeX : this.onNotes.onTimeX;
 
         let postBeatStretch: number = this.postBeatStretch;
 
@@ -261,7 +265,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         // store sizes for usages in effects
         // we might have empty content in the individual bar renderers, but need to know
         // the "shared" maximum widths
-        layoutings.setBeatSizes(this, this.preNotes.width, this.onNotes.width);
+        layoutings.setBeatSizes(this, preNotes ? preNotes.width : 0, this.onNotes.width);
     }
 
     public applyLayoutingInfo(_info: BarLayoutingInfo): void {
@@ -269,10 +273,16 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     public override doLayout(): void {
-        this.preNotes.x = 0;
-        this.preNotes.renderer = this.renderer;
-        this.preNotes.container = this;
-        this.preNotes.doLayout();
+        const preNotes = this.preNotes;
+        if (preNotes) {
+            preNotes.x = 0;
+            preNotes.renderer = this.renderer;
+            preNotes.container = this;
+            preNotes.doLayout();
+            if (preNotes.isEmpty) {
+                this.preNotes = null;
+            }
+        }
         // preNotes.width is only final once preNotes.doLayout() has run, so onNotes.x must be
         // derived here, not before.
         this._layoutOnsetX();
@@ -290,15 +300,25 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
      * repeatedly (once per `_scaleToForce` pass) without compounding a previous offset.
      */
     private _layoutOnsetX(): void {
-        this.preNotes.x = 0;
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        const preNotes = this.preNotes;
+        if (preNotes) {
+            preNotes.x = 0;
+            this.onNotes.x = preNotes.x + preNotes.width;
+        } else {
+            this.onNotes.x = 0;
+        }
     }
 
     public override applyCenterOffset(target: number): void {
         this._layoutOnsetX();
         const offset = target - this.onTimeX;
-        this.preNotes.x = offset;
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        const preNotes = this.preNotes;
+        if (preNotes) {
+            preNotes.x = offset;
+            this.onNotes.x = preNotes.x + preNotes.width;
+        } else {
+            this.onNotes.x = offset;
+        }
     }
 
     protected createBeatTies() {
@@ -314,7 +334,8 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     protected updateWidth(): void {
-        let width = this.preNotes.width + this.onNotes.width;
+        const preNotes = this.preNotes;
+        let width = preNotes ? preNotes.width + this.onNotes.width : this.onNotes.width;
         let tieWidth: number = 0;
         const ties = this._ties;
         if (ties) {
@@ -390,7 +411,8 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         // canvas.color = c;
 
         const ties = this._ties;
-        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && (!ties || ties.length === 0);
+        const preNotes = this.preNotes;
+        const isEmptyGlyph: boolean = !preNotes && this.onNotes.isEmpty && (!ties || ties.length === 0);
         if (isEmptyGlyph) {
             return;
         }
@@ -398,7 +420,9 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
 
         const x = cx + this.x;
         const y = cy + this.y;
-        this.preNotes.paint(x, y, canvas);
+        if (preNotes) {
+            preNotes.paint(x, y, canvas);
+        }
         this.onNotes.paint(x, y, canvas);
 
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
@@ -414,14 +438,15 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         canvas.endGroup();
     }
 
-    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number) {
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         const scale = this.renderer.settings.display.scale;
         const x = cx + this.x;
         let visualX = x;
         let visualW = this.width;
+        const preNotes = this.preNotes;
         if (!this.beat.isEmpty) {
-            if (!this.preNotes.isEmpty) {
-                visualX = x + this.preNotes.x;
+            if (preNotes) {
+                visualX = x + preNotes.x;
             } else if (!this.onNotes.isEmpty) {
                 visualX = x + this.onNotes.x;
             }
@@ -429,8 +454,8 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
             let visualEndX = 0;
             if (!this.onNotes.isEmpty) {
                 visualEndX = x + this.onNotes.x + this.onNotes.onTimeX + this.postBeatStretch;
-            } else if (!this.preNotes.isEmpty) {
-                visualEndX = x + this.preNotes.x + this.preNotes.width;
+            } else if (preNotes) {
+                visualEndX = x + preNotes.x + preNotes.width;
             } else {
                 visualEndX = x + this.width;
             }
@@ -439,21 +464,17 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         visualW = this.getBoundsVisualWidth(visualX, visualW);
         const realW = this.getBoundsRealWidth(x, this.width);
 
-        const beatBoundings: BeatBounds = new BeatBounds();
-        beatBoundings.beat = this.beat;
-        beatBoundings.visualBounds = new Bounds(
+        writer.addBeat(
+            this.beat,
             visualX * scale,
-            barBounds.visualBounds.y,
             visualW * scale,
-            barBounds.visualBounds.h
+            x * scale,
+            realW * scale,
+            (x + this.onNotes.x + this.onNotes.onTimeX) * scale
         );
-        beatBoundings.realBounds = new Bounds(x * scale, barBounds.realBounds.y, realW * scale, barBounds.realBounds.h);
-        beatBoundings.onNotesX = (x + this.onNotes.x + this.onNotes.onTimeX) * scale;
-
-        barBounds.addBeat(beatBoundings);
 
         if (this.renderer.settings.core.includeNoteBounds) {
-            this.onNotes.buildBoundingsLookup(beatBoundings, x, cy + this.y);
+            this.onNotes.buildBoundingsLookup(writer, x, cy + this.y);
         }
     }
 
@@ -476,7 +497,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     public getBeatX(requestedPosition: BeatXPosition, useSharedSizes: boolean = false) {
         switch (requestedPosition) {
             case BeatXPosition.PreNotes:
-                return this.preNotes.x;
+                return this.preNotes ? this.preNotes.x : this.onNotes.x;
             case BeatXPosition.OnNotes:
                 return this.onNotes.x;
             case BeatXPosition.MiddleNotes:
@@ -491,6 +512,6 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
             case BeatXPosition.EndBeat:
                 return this.width;
         }
-        return this.preNotes.x;
+        return this.preNotes ? this.preNotes.x : this.onNotes.x;
     }
 }

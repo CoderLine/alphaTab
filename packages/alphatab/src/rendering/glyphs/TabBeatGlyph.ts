@@ -14,7 +14,7 @@ import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph'
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -23,6 +23,16 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public slash: SlashNoteHeadGlyph | null = null;
     public noteNumbers: TabNoteChordGlyph | null = null;
     public restGlyph: TabRestGlyph | null = null;
+
+    protected override get mainGlyph(): Glyph | null {
+        if (this.slash) {
+            return this.slash;
+        }
+        if (this.noteNumbers) {
+            return this.noteNumbers;
+        }
+        return this.restGlyph;
+    }
 
     protected override get effectElement() {
         return BeatSubElement.GuitarTabEffects;
@@ -108,9 +118,9 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         return this.noteNumbers ? this.noteNumbers.getHighestNoteY(requestedPosition) : 0;
     }
 
-    public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public override buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         if (this.noteNumbers) {
-            this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
+            this.noteNumbers.buildBoundingsLookup(writer, cx + this.x, cy + this.y);
         }
     }
 
@@ -132,7 +142,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 slashNoteHead.effectElement = BeatSubElement.GuitarTabEffects;
                 this.slash = slashNoteHead;
                 slashNoteHead.beat = this.container.beat;
-                this.addNormal(slashNoteHead);
+                slashNoteHead.renderer = this.renderer;
             } else {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 this.noteNumbers = tabNoteNumbers;
@@ -142,7 +152,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                         this._createNoteGlyph(note);
                     }
                 }
-                this.addNormal(tabNoteNumbers);
+                tabNoteNumbers.renderer = this.renderer;
             }
 
             //
@@ -175,7 +185,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph = restGlyph;
             restGlyph.beat = this.container.beat;
-            this.addNormal(restGlyph);
+            restGlyph.renderer = this.renderer;
             //
             // Note dots
             //
@@ -189,16 +199,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         if (this.isEmpty) {
             return;
         }
-        let w: number = 0;
-        for (let i: number = 0, j: number = this.glyphs!.length; i < j; i++) {
-            const g: Glyph = this.glyphs![i];
-            g.x = w;
-            g.renderer = this.renderer;
-            g.doLayout();
-            w += g.width;
-        }
-        this.width = w;
-        this.computedWidth = w;
+        super.doLayout();
         if (this.container.beat.isEmpty) {
             this.onTimeX = this.width / 2;
         } else if (this.restGlyph) {

@@ -45,7 +45,14 @@ export class RenderStaff implements IStaffDisplayContext {
         return this.system.firstVisibleStaff === this;
     }
 
+    /**
+     * The effect bands above the staff. The list is shared with the staves at the same position in
+     * the other staff systems of the layout and must not be changed once the first system is built.
+     */
     public topEffectInfos: EffectBandInfo[] = [];
+    /**
+     * The effect bands below the staff, shared like {@link topEffectInfos}.
+     */
     public bottomEffectInfos: EffectBandInfo[] = [];
     private _activeTopEffects: ActiveEffectBand[] | null = null;
     private _activeBottomEffects: ActiveEffectBand[] | null = null;
@@ -170,7 +177,16 @@ export class RenderStaff implements IStaffDisplayContext {
         this.trackIndex = trackIndex;
         this.modelStaff = staff;
         this.system = system;
-        for (const b of factory.effectBands) {
+        this._updateVisibility();
+    }
+
+    /**
+     * Fills {@link topEffectInfos} and {@link bottomEffectInfos} with the effect bands of the factory
+     * that apply to this staff.
+     */
+    public createEffectInfos(): void {
+        const staff = this.modelStaff;
+        for (const b of this._factory.effectBands) {
             if (b.shouldCreate && !b.shouldCreate!(staff)) {
                 continue;
             }
@@ -187,8 +203,6 @@ export class RenderStaff implements IStaffDisplayContext {
                     break;
             }
         }
-
-        this._updateVisibility();
     }
 
     /**

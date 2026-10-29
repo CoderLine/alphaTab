@@ -20,6 +20,7 @@ import { DeadNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/DeadNote
 import { DiamondNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/DiamondNoteHeadGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { GhostNoteContainerGlyph } from '@coderline/alphatab/rendering/glyphs/GhostNoteContainerGlyph';
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGolpeGlyph';
 import { NoteHeadGlyph, type NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
@@ -35,8 +36,8 @@ import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRen
 import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -53,9 +54,16 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         return BeatSubElement.StandardNotationEffects;
     }
 
-    public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    protected override get mainGlyph(): Glyph | null {
         if (this.noteHeads) {
-            this.noteHeads.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
+            return this.noteHeads;
+        }
+        return this.restGlyph;
+    }
+
+    public override buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
+        if (this.noteHeads) {
+            this.noteHeads.buildBoundingsLookup(writer, cx + this.x, cy + this.y);
         }
     }
 
@@ -153,6 +161,11 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         this._whammy?.doMultiVoiceLayout();
 
         let w: number = 0;
+        const main = this.mainGlyph;
+        if (main) {
+            main.x = 0;
+            w = main.width;
+        }
         if (this.glyphs) {
             for (const g of this.glyphs) {
                 g.x = w;
@@ -232,7 +245,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             }
         }
 
-        this.addNormal(noteHeads);
+        noteHeads.renderer = this.renderer;
         if (ghost) {
             this.addEffect(ghost);
         }
@@ -312,7 +325,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         const restGlyph = new ScoreRestGlyph(0, sr.getScoreY(steps), this.container.beat.duration);
         this.restGlyph = restGlyph;
         restGlyph.beat = this.container.beat;
-        this.addNormal(restGlyph);
+        restGlyph.renderer = this.renderer;
 
         if (this.renderer.bar.isMultiVoice) {
             if (this.container.beat.voice.index === 0) {

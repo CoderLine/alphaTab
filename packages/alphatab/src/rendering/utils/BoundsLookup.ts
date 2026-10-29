@@ -156,7 +156,10 @@ export class BoundsLookup {
         return json;
     }
 
-    private _beatLookup: Map<number, BeatBounds[]> = new Map();
+    /** The first registered bounds of every beat. */
+    private _beatLookup: Map<number, BeatBounds> = new Map();
+    /** All bounds of the beats registered more than once or queried through {@link findBeats}. */
+    private _beatLookupAll: Map<number, BeatBounds[]> = new Map();
     private _masterBarLookup: Map<number, MasterBarBounds> = new Map();
     private _currentStaffSystem: StaffSystemBounds | null = null;
     /**
@@ -222,12 +225,20 @@ export class BoundsLookup {
 
         // drop beat entries whose beats belong to cleared bars.
         for (const key of Array.from(this._beatLookup.keys())) {
-            const list = this._beatLookup.get(key)!;
+            const list = this._beatLookupAll.get(key);
+            if (list === undefined) {
+                if (this._beatLookup.get(key)!.beat.voice.bar.index >= masterBarIndex) {
+                    this._beatLookup.delete(key);
+                }
+                continue;
+            }
             const filtered = list.filter(b => b.beat.voice.bar.index < masterBarIndex);
             if (filtered.length === 0) {
                 this._beatLookup.delete(key);
+                this._beatLookupAll.delete(key);
             } else if (filtered.length !== list.length) {
-                this._beatLookup.set(key, filtered);
+                this._beatLookup.set(key, filtered[0]);
+                this._beatLookupAll.set(key, filtered);
             }
         }
 
@@ -266,11 +277,16 @@ export class BoundsLookup {
      */
     public addBeat(bounds: BeatBounds): void {
         const id = bounds.beat.id;
-        const list = this._beatLookup.get(id);
-        if (list) {
-            list.push(bounds);
+        const first = this._beatLookup.get(id);
+        if (first === undefined) {
+            this._beatLookup.set(id, bounds);
+            return;
+        }
+        const all = this._beatLookupAll.get(id);
+        if (all !== undefined) {
+            all.push(bounds);
         } else {
-            this._beatLookup.set(id, [bounds]);
+            this._beatLookupAll.set(id, [first, bounds]);
         }
     }
 
@@ -298,8 +314,7 @@ export class BoundsLookup {
      * @returns The beat bounds if it was rendered, or null if no boundary information is available.
      */
     public findBeat(beat: Beat): BeatBounds | null {
-        const all = this.findBeats(beat);
-        return all ? all[0] : null;
+        return this._beatLookup.get(beat.id) ?? null;
     }
 
     /**
@@ -308,7 +323,18 @@ export class BoundsLookup {
      * @returns The beat bounds if it was rendered, or null if no boundary information is available.
      */
     public findBeats(beat: Beat): BeatBounds[] | null {
-        return this._beatLookup.get(beat.id) ?? null;
+        const id = beat.id;
+        const all = this._beatLookupAll.get(id);
+        if (all !== undefined) {
+            return all;
+        }
+        const first = this._beatLookup.get(id);
+        if (first === undefined) {
+            return null;
+        }
+        const single = [first];
+        this._beatLookupAll.set(id, single);
+        return single;
     }
 
     /**
@@ -361,13 +387,15 @@ export class BoundsLookup {
      * @returns The note at the given position within the beat.
      */
     public getNoteAtPos(beat: Beat, x: number, y: number): Note | null {
-        const beatBounds = this.findBeats(beat);
-        if (beatBounds) {
-            for (const b of beatBounds) {
-                const note = b.findNoteAtPos(x, y);
-                if (note) {
-                    return note;
-                }
+        const all = this._beatLookupAll.get(beat.id);
+        if (all === undefined) {
+            const first = this._beatLookup.get(beat.id);
+            return first !== undefined ? first.findNoteAtPos(x, y) : null;
+        }
+        for (const b of all) {
+            const note = b.findNoteAtPos(x, y);
+            if (note) {
+                return note;
             }
         }
         return null;

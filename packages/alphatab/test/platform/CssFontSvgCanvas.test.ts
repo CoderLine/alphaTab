@@ -60,9 +60,9 @@ describe('CssFontSvgCanvasTests', () => {
 
         const clef = `&#${MusicFontSymbol.GClef as number};`;
         const expected =
-            '<rect x="1" y="2" width="3" height="4" fill="#000000" />\n' +
-            '<rect x="1.5" y="2" width="3" height="4" fill="#FF0000" />\n' +
-            '<rect x="1" y="2" width="3" height="4" fill="#000000" />\n' +
+            '<rect x="1" y="2" width="3" height="4" />' +
+            '<rect x="1.5" y="2" width="3" height="4" fill="#FF0000" />' +
+            '<rect x="1" y="2" width="3" height="4" />' +
             '<text x="5" y="6" style=\'stroke: none; font:12px Arial; dominant-baseline: middle\' text-anchor="middle">a</text>' +
             '<text x="5" y="6" style=\'stroke: none; font:12px Arial; dominant-baseline: middle\'>b</text>' +
             '<text x="5" y="6" style=\'stroke: none; font:12px Arial; dominant-baseline: middle\' fill="#0000FF">c</text>' +
@@ -73,7 +73,7 @@ describe('CssFontSvgCanvasTests', () => {
             `<g transform="translate(10 10)" class="at" ><text style="font-size: 50%; stroke:none" text-anchor="middle">${clef}</text></g>` +
             `<g transform="translate(10 10)" class="at" ><text style="font-size: 50%; stroke:none">${clef}</text></g>` +
             '</svg>';
-        expect(svg.substring(svg.indexOf('\n') + 1)).toBe(expected);
+        expect(svg.substring(svg.indexOf('>') + 1)).toBe(expected);
     });
 
     it('begin-render-starts-a-new-document', () => {

@@ -442,8 +442,6 @@ export class EffectBand extends Glyph {
         return true;
     }
 
-    private readonly _placementRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
-
     /**
      * Collects the renderer-local x-ranges of this band for the vertical placement: the ranges which must be
      * clear of other content (`clearStarts`/`clearEnds`) and the ranges the band occupies (`xStarts`/`xEnds`).
@@ -500,7 +498,7 @@ export class EffectBand extends Glyph {
             return found;
         }
 
-        const range = this._placementRangeScratch;
+        const range = this.renderer.scoreRenderer.layout!.effectBandRangeScratch;
         if (!this.computeLocalXRange(range)) {
             return false;
         }

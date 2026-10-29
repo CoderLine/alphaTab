@@ -10,8 +10,8 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
-import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * This glyph acts as container for handling
@@ -381,7 +381,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
         return undefined;
     }
 
-    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void {
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number): void {
         const x = cx + this.x;
         const y = cy + this.y;
         const voices = this.renderer.bar.voices;
@@ -390,7 +390,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
             const c = allBeatGlyphs[index];
             if (c.length > 0 && (index === 0 || !voices[index].isEmpty)) {
                 for (let i = 0; i < c.length; i++) {
-                    c[i].buildBoundingsLookup(barBounds, x, y);
+                    c[i].buildBoundingsLookup(writer, x, y);
                 }
             }
         }

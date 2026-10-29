@@ -15,14 +15,17 @@ import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import type { EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import type { ActiveEffectBand } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSystemPlacement';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
 import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
+import type { BeamingBounds } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
@@ -63,6 +66,17 @@ export abstract class ScoreLayout {
     public height: number = 0;
 
     public readonly skylineScratch: SkylineScratch = new SkylineScratch();
+    /**
+     * Scratch result of the beaming bounds computation of the bar renderers.
+     */
+    public readonly beamingBoundsScratch: BeamingBounds = { topY: 0, bottomY: 0 };
+    /**
+     * Scratch range of the effect band placement.
+     */
+    public readonly effectBandRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
+    /** Scratch for the geometry of the tie being laid out, see {@link TieGlyph.newControlPoints}. */
+    public readonly tieControlPoints: number[] = TieGlyph.newControlPoints();
 
     public readonly effectPlacement: EffectSystemPlacement;
 
@@ -233,6 +247,7 @@ export abstract class ScoreLayout {
         this.headerProfiles.clear();
         this.textMeasures.clear();
         this.activeEffects.clear();
+        this._staffEffectInfos = [];
         this._barRendererLookup.clear();
 
         this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
@@ -521,12 +536,21 @@ export abstract class ScoreLayout {
 
     public lastBarIndex: number = 0;
 
+    /**
+     * The top and bottom effect infos of the staves of the first staff system (two entries per staff),
+     * shared by all staff systems of the layout.
+     */
+    private _staffEffectInfos: EffectBandInfo[][] = [];
+
     protected createEmptyStaffSystem(index: number): StaffSystem {
         const system: StaffSystem = new StaffSystem(this);
         system.index = index;
         const allFactories = Environment.defaultRenderers;
 
         const renderStaves: RenderStaff[] = [];
+        // every staff system has the same staves
+        const staffEffectInfos = this._staffEffectInfos;
+        const reuseEffectInfos = staffEffectInfos.length > 0;
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
             const track: Track = this.renderer.tracks![trackIndex];
 
@@ -541,9 +565,15 @@ export abstract class ScoreLayout {
                 for (const factory of allFactories) {
                     if (this.profile.has(factory.staffId) && factory.canCreate(track, staff)) {
                         const renderStaff = new RenderStaff(system, trackIndex, staff, factory);
-                        // insert shared effect bands at front
-                        renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
-                        renderStaff.bottomEffectInfos.push(...sharedBottomEffects);
+                        if (reuseEffectInfos) {
+                            renderStaff.topEffectInfos = staffEffectInfos[renderStaves.length * 2];
+                            renderStaff.bottomEffectInfos = staffEffectInfos[renderStaves.length * 2 + 1];
+                        } else {
+                            renderStaff.createEffectInfos();
+                            // insert shared effect bands at front
+                            renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
+                            renderStaff.bottomEffectInfos.push(...sharedBottomEffects);
+                        }
                         previousStaff = renderStaff;
                         // just remember staff, adding to system comes later when we have all effects collected
                         renderStaves.push(renderStaff);
@@ -564,7 +594,7 @@ export abstract class ScoreLayout {
                 }
 
                 // don't forget any left-over shared effects.
-                if (previousStaff) {
+                if (previousStaff && !reuseEffectInfos) {
                     if (sharedTopEffects.length > 0) {
                         previousStaff.bottomEffectInfos.push(...sharedTopEffects);
                     }
@@ -577,6 +607,10 @@ export abstract class ScoreLayout {
 
         for (const staff of renderStaves) {
             system.addStaff(staff);
+            if (!reuseEffectInfos) {
+                staffEffectInfos.push(staff.topEffectInfos);
+                staffEffectInfos.push(staff.bottomEffectInfos);
+            }
         }
 
         return system;

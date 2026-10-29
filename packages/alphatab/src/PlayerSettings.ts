@@ -489,7 +489,7 @@ export class PlayerSettings {
     /**
      * The interval in milliseconds in which the audio output reports the played audio to the player.
      * @since 1.9.0
-     * @defaultValue `0`
+     * @defaultValue `10`
      * @category Player
      * @remarks
      * The played audio advances the player position and with it the cursor, `playerPositionChanged`
@@ -500,5 +500,5 @@ export class PlayerSettings {
      *
      * Only the Web Audio output with audio worklets uses this setting. It applies from the next start of the playback.
      */
-    public positionUpdateIntervalInMilliseconds: number = 0;
+    public positionUpdateIntervalInMilliseconds: number = 10;
 }
