@@ -23,8 +23,8 @@ describe('EffectPlacementTests', () => {
     ): Promise<ScoreRenderer> {
         await VisualTestHelper.prepareAlphaSkia();
         const settings = new Settings();
-        settings.core.engine = 'svg';
-        settings.core.enableLazyLoading = false;
+        // skia engine and fonts of the visual references: text sizes take part in the placement
+        VisualTestHelper.prepareSettingsForTest(settings);
         const score = ScoreLoader.loadAlphaTex(tex, settings);
         if (configure) {
             configure(settings, score);
