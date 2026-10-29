@@ -941,6 +941,21 @@ export class BarRendererBase {
         return this.voiceContainer.getBeatContainer(beat);
     }
 
+    /**
+     * Paints the staff lines of `renderers[from..to)`, the bars of this renderer's staff painted next.
+     * Called on the first of them, before any of them paints its content.
+     */
+    public paintStaffLines(
+        _cx: number,
+        _cy: number,
+        _canvas: ICanvas,
+        _renderers: BarRendererBase[],
+        _from: number,
+        _to: number
+    ): void {
+        // no staff lines
+    }
+
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);

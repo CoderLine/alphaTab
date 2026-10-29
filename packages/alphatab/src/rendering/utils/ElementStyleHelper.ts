@@ -124,6 +124,18 @@ export class ElementStyleHelper {
         return ElementStyleHelper._apply<BarSubElement>(canvas, element, bar.style, defaultColor);
     }
 
+    /**
+     * The colour of a staff-line sub-element of the bar. Staff lines inherit no colour from other elements:
+     * without an entry in the bar style the default staff-line colour applies.
+     */
+    public static staffLineColor(res: RenderingResources, element: BarSubElement, bar: Bar): Color {
+        const style = bar.style;
+        if (style && style.colors.has(element)) {
+            return style.colors.get(element) ?? res.staffLineColor;
+        }
+        return res.staffLineColor;
+    }
+
     public static voice(
         canvas: ICanvas,
         element: VoiceSubElement,

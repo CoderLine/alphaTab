@@ -145,6 +145,35 @@ describe('GeneralTests', () => {
         });
     });
 
+    it('colors-partial-staff-lines', async () => {
+        const bar = ':4 3.3 5.3 7.3 8.3';
+        await VisualTestHelper.runVisualTestTex(
+            `\\track \\staff {score tabs} ${[bar, bar, bar, bar, bar, bar].join(' | ')}`,
+            'test-data/visual-tests/general/colors-partial-staff-lines.png',
+            undefined,
+            o => {
+                const bars = o.score.tracks[0].staves[0].bars;
+
+                // a style without staff-line entries keeps the default staff-line colour
+                bars[1].style = new BarStyle();
+                bars[1].style.colors.set(BarSubElement.StandardNotationBarNumber, Color.fromJson('#00AA00')!);
+
+                // adjacent bars with the same colour
+                for (const b of [bars[2], bars[3]]) {
+                    b.style = new BarStyle();
+                    b.style.colors.set(BarSubElement.StandardNotationStaffLine, Color.fromJson('#DD0000')!);
+                    b.style.colors.set(BarSubElement.GuitarTabsStaffLine, Color.fromJson('#DD0000')!);
+                }
+
+                // standard notation coloured with equal colours of separate styles, tab lines default
+                for (const b of [bars[4], bars[5]]) {
+                    b.style = new BarStyle();
+                    b.style.colors.set(BarSubElement.StandardNotationStaffLine, Color.fromJson('#0000DD')!);
+                }
+            }
+        );
+    });
+
     it('color-performance', async () => {
         // warm-up
         for (let i = 0; i < 5; i++) {

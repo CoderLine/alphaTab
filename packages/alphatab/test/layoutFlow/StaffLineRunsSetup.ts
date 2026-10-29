@@ -5,7 +5,7 @@ import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { type StaffLineMode, StaffLineRuns } from './StaffLineRuns';
 
 StaffLineRuns.install();
-StaffLineRuns.mode = (process.env.STAFF_LINE_MODE as StaffLineMode | undefined) ?? 'runs';
+StaffLineRuns.mode = (process.env.STAFF_LINE_MODE as StaffLineMode | undefined) ?? 'production';
 
 const outDir = process.env.STAFF_LINE_OUT;
 if (outDir) {

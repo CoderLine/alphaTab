@@ -120,28 +120,69 @@ export abstract class LineBarRenderer extends BarRendererBase {
         super.paintBackground(cx, cy, canvas);
         // canvas.color = Color.random(100);
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
-        //
-        // draw string lines
-        //
-
-        this.paintStaffLines(cx, cy, canvas);
 
         this.paintSimileMark(cx, cy, canvas);
     }
 
-    protected paintStaffLines(cx: number, cy: number, canvas: ICanvas) {
-        const previousColor = ElementStyleHelper.applyBar(canvas, this.staffLineBarSubElement, this.bar, true);
-        try {
-            // we want the lines to be exactly virtually aligned with the respective Y-position
-            // for note heads to align correctly
-            const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
+    public override paintStaffLines(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        renderers: BarRendererBase[],
+        from: number,
+        to: number
+    ): void {
+        if (this.drawnLineCount === 0) {
+            return;
+        }
 
-            for (let i: number = 0; i < this.drawnLineCount; i++) {
-                const lineY = this.getLineY(i) - lineYOffset;
-                canvas.fillRect(cx + this.x, cy + this.y + lineY, this.width, this.smuflMetrics.staffLineThickness);
+        const res = this.resources;
+        const element = this.staffLineBarSubElement;
+        const previousColor = canvas.color;
+        try {
+            let runStart = from;
+            let runColor = ElementStyleHelper.staffLineColor(res, element, renderers[from].bar);
+            for (let i = from + 1; i < to; i++) {
+                const color = ElementStyleHelper.staffLineColor(res, element, renderers[i].bar);
+                if (color !== runColor && color.raw !== runColor.raw) {
+                    canvas.color = runColor;
+                    this.paintStaffLineRun(cx, cy, canvas, renderers, runStart, i);
+                    runStart = i;
+                    runColor = color;
+                }
             }
+            canvas.color = runColor;
+            this.paintStaffLineRun(cx, cy, canvas, renderers, runStart, to);
         } finally {
-            ElementStyleHelper.restore(canvas, previousColor);
+            canvas.color = previousColor;
+        }
+    }
+
+    /**
+     * Paints the staff lines across `renderers[from..to)` in the current canvas colour.
+     */
+    protected paintStaffLineRun(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        renderers: BarRendererBase[],
+        from: number,
+        to: number
+    ): void {
+        const last = renderers[to - 1];
+        const startX = cx + renderers[from].x;
+        const width = cx + last.x + last.width - startX;
+        if (width <= 0) {
+            return;
+        }
+
+        // we want the lines to be exactly virtually aligned with the respective Y-position
+        // for note heads to align correctly
+        const thickness = this.smuflMetrics.staffLineThickness;
+        const lineYOffset = thickness / 2;
+        for (let i: number = 0; i < this.drawnLineCount; i++) {
+            const lineY = this.getLineY(i) - lineYOffset;
+            canvas.fillRect(startX, cy + this.y + lineY, width, thickness);
         }
     }
 

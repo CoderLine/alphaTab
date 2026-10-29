@@ -48,4 +48,16 @@ describe('GuitarTabsTests', () => {
         settings.display.staveProfile = StaveProfile.Tab;
         await VisualTestHelper.runVisualTest('guitar-tabs/string-variations.gp', settings);
     });
+
+    it('multi-voice-same-string', async () => {
+        // notes of both voices on the same string at the same time, with fret numbers of different widths
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track \\staff { tabs }
+            \\voice :4 12.3 10.3 5.3 12.3 | 5.3 12.3 10.3 7.3
+            \\voice :4 5.3 12.3 5.3 7.3 | 12.3 5.3 10.3 12.3
+            `,
+            'test-data/visual-tests/guitar-tabs/multi-voice-same-string.png'
+        );
+    });
 });

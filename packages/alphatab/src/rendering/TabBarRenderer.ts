@@ -7,7 +7,7 @@ import type { BarNumberDisplay } from '@coderline/alphatab/model/RenderStyleshee
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import {
     BeatContainerGlyph,
@@ -142,110 +142,128 @@ export class TabBarRenderer extends LineBarRenderer {
     public minString = Number.NaN;
     public maxString = Number.NaN;
 
-    protected override paintStaffLines(cx: number, cy: number, canvas: ICanvas): void {
-        const previousColor = ElementStyleHelper.applyBar(canvas, this.staffLineBarSubElement, this.bar, true);
-        try {
-            const lineWidth = this.width;
-            const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
-            const thickness = this.smuflMetrics.staffLineThickness;
-            const drawnLineCount = this.drawnLineCount;
-            const cxLocal = cx + this.x;
-            const cyLocal = cy + this.y;
+    protected override paintStaffLineRun(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        renderers: BarRendererBase[],
+        from: number,
+        to: number
+    ): void {
+        const last = renderers[to - 1];
+        const startX = cx + renderers[from].x;
+        const endX = cx + last.x + last.width;
+        const thickness = this.smuflMetrics.staffLineThickness;
+        const lineYOffset = thickness / 2;
+        const cyLocal = cy + this.y;
+        const drawnLineCount = this.drawnLineCount;
 
-            if (this.additionalMultiRestBars) {
-                for (let line = 0; line < drawnLineCount; line++) {
-                    const lineY = this.getLineY(line) - lineYOffset;
-                    canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
-                }
-                return;
+        for (let line = 0; line < drawnLineCount; line++) {
+            const y = cyLocal + (this.getLineY(line) - lineYOffset);
+            let lineX = startX;
+            for (let i = from; i < to; i++) {
+                lineX = (renderers[i] as TabBarRenderer)._paintStaffLineUpToGaps(cx, y, line, lineX, canvas);
             }
-
-            if (this._gapBucketEnd === null) {
-                this._buildGapCache();
+            if (endX > lineX) {
+                canvas.fillRect(lineX, y, endX - lineX, thickness);
             }
-
-            const count = this._gapCount;
-            if (count === 0) {
-                for (let line = 0; line < drawnLineCount; line++) {
-                    const lineY = this.getLineY(line) - lineYOffset;
-                    canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
-                }
-                return;
-            }
-
-            const bucketEnd = this._gapBucketEnd!;
-            const relXAndWidth = this._gapRelXAndWidth!;
-            const beatRefs = this._gapBeatRefs!;
-            const base = this.beatGlyphsStart;
-
-            let cursor = 0;
-            for (let line = 0; line < drawnLineCount; line++) {
-                const lineY = this.getLineY(line) - lineYOffset;
-                const cyLine = cyLocal + lineY;
-                const end = bucketEnd[line];
-
-                // Gaps were built in beat-iteration order, which is left-to-right
-                // except for grace-note edge cases — sort only on inversion.
-                let lineX = 0;
-                if (end > cursor + 1) {
-                    let inverted = false;
-                    let prevX = base + beatRefs[cursor].x + beatRefs[cursor].onNotes.x + relXAndWidth[cursor * 2];
-                    for (let k = cursor + 1; k < end; k++) {
-                        const xk = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
-                        if (xk < prevX) {
-                            inverted = true;
-                            break;
-                        }
-                        prevX = xk;
-                    }
-                    if (inverted) {
-                        const segCount = end - cursor;
-                        const xs = new Float32Array(segCount);
-                        const ws = new Float32Array(segCount);
-                        for (let k = 0; k < segCount; k++) {
-                            const ki = cursor + k;
-                            xs[k] = base + beatRefs[ki].x + beatRefs[ki].onNotes.x + relXAndWidth[ki * 2];
-                            ws[k] = relXAndWidth[ki * 2 + 1];
-                        }
-                        const order = new Uint32Array(segCount);
-                        for (let k = 0; k < segCount; k++) {
-                            order[k] = k;
-                        }
-                        for (let k = 1; k < segCount; k++) {
-                            const cur = order[k];
-                            const curX = xs[cur];
-                            let m = k - 1;
-                            while (m >= 0 && xs[order[m]] > curX) {
-                                order[m + 1] = order[m];
-                                m--;
-                            }
-                            order[m + 1] = cur;
-                        }
-                        for (let k = 0; k < segCount; k++) {
-                            const oi = order[k];
-                            const gx = xs[oi];
-                            const gw = ws[oi];
-                            canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
-                            lineX = gx + gw;
-                        }
-                        canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
-                        cursor = end;
-                        continue;
-                    }
-                }
-
-                for (let k = cursor; k < end; k++) {
-                    const gx = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
-                    const gw = relXAndWidth[k * 2 + 1];
-                    canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
-                    lineX = gx + gw;
-                }
-                canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
-                cursor = end;
-            }
-        } finally {
-            ElementStyleHelper.restore(canvas, previousColor);
         }
+    }
+
+    /**
+     * Paints the staff line from `lineX` up to each hole of this bar on the line, skipping what earlier holes
+     * already cover.
+     * @returns The x after the last hole, never less than `lineX`.
+     */
+    private _paintStaffLineUpToGaps(cx: number, y: number, line: number, lineX: number, canvas: ICanvas): number {
+        if (this.additionalMultiRestBars) {
+            return lineX;
+        }
+        if (this._gapBucketEnd === null) {
+            this._buildGapCache();
+        }
+        if (this._gapCount === 0) {
+            return lineX;
+        }
+
+        const bucketEnd = this._gapBucketEnd!;
+        const begin = line === 0 ? 0 : bucketEnd[line - 1];
+        const end = bucketEnd[line];
+        if (end === begin) {
+            return lineX;
+        }
+
+        const relXAndWidth = this._gapRelXAndWidth!;
+        const beatRefs = this._gapBeatRefs!;
+        const base = this.beatGlyphsStart;
+        const cxLocal = cx + this.x;
+        const thickness = this.smuflMetrics.staffLineThickness;
+
+        // Gaps were built in beat-iteration order, which is left-to-right
+        // except for grace notes and multiple voices — sort only on inversion.
+        let prevX = base + beatRefs[begin].x + beatRefs[begin].onNotes.x + relXAndWidth[begin * 2];
+        for (let k = begin + 1; k < end; k++) {
+            const xk = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
+            if (xk < prevX) {
+                return this._paintStaffLineUpToSortedGaps(cxLocal, y, begin, end, lineX, canvas);
+            }
+            prevX = xk;
+        }
+
+        for (let k = begin; k < end; k++) {
+            const gx = cxLocal + (base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2]);
+            if (gx > lineX) {
+                canvas.fillRect(lineX, y, gx - lineX, thickness);
+            }
+            const gapEnd = gx + relXAndWidth[k * 2 + 1];
+            if (gapEnd > lineX) {
+                lineX = gapEnd;
+            }
+        }
+        return lineX;
+    }
+
+    private _paintStaffLineUpToSortedGaps(
+        cxLocal: number,
+        y: number,
+        begin: number,
+        end: number,
+        lineX: number,
+        canvas: ICanvas
+    ): number {
+        const relXAndWidth = this._gapRelXAndWidth!;
+        const beatRefs = this._gapBeatRefs!;
+        const base = this.beatGlyphsStart;
+        const thickness = this.smuflMetrics.staffLineThickness;
+
+        const xs: number[] = [];
+        const ws: number[] = [];
+        for (let k = begin; k < end; k++) {
+            const gx = cxLocal + (base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2]);
+            const gw = relXAndWidth[k * 2 + 1];
+            let m = xs.length;
+            xs.push(gx);
+            ws.push(gw);
+            while (m > 0 && xs[m - 1] > gx) {
+                xs[m] = xs[m - 1];
+                ws[m] = ws[m - 1];
+                m--;
+            }
+            xs[m] = gx;
+            ws[m] = gw;
+        }
+
+        for (let k = 0; k < xs.length; k++) {
+            const gx = xs[k];
+            if (gx > lineX) {
+                canvas.fillRect(lineX, y, gx - lineX, thickness);
+            }
+            const gapEnd = gx + ws[k];
+            if (gapEnd > lineX) {
+                lineX = gapEnd;
+            }
+        }
+        return lineX;
     }
 
     private _buildGapCache(): void {

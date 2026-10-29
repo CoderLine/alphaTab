@@ -493,12 +493,16 @@ export class RenderStaff implements IStaffDisplayContext {
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.system.width - this.x, this.height);
 
-        for (
-            let i: number = startIndex, j: number = Math.min(startIndex + count, this.barRenderers.length);
-            i < j;
-            i++
-        ) {
-            this.barRenderers[i].paint(cx + this.x, cy + this.y, canvas);
+        const end = Math.min(startIndex + count, this.barRenderers.length);
+        if (startIndex >= end) {
+            return;
+        }
+
+        const x = cx + this.x;
+        const y = cy + this.y;
+        this.barRenderers[startIndex].paintStaffLines(x, y, canvas, this.barRenderers, startIndex, end);
+        for (let i: number = startIndex; i < end; i++) {
+            this.barRenderers[i].paint(x, y, canvas);
         }
     }
 }

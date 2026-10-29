@@ -1,7 +1,6 @@
 /** @target web */
-// What painting staff lines costs per bar today and what painting them once per run of bars would
-// save (backlog #25): canvas calls, SVG bytes, paint allocations and paint time for the reference
-// scores. Run: npm run test-layout-flow -- StaffLineCost   (LAYOUT_FLOW_FILE=<name> limits the scores)
+// What painting staff lines costs: canvas calls, SVG bytes, paint allocations and paint time of the
+// staff-line run painter against painting no staff lines, for the reference scores. Run: npm run test-layout-flow -- StaffLineCost   (LAYOUT_FLOW_FILE=<name> limits the scores)
 import fs from 'node:fs';
 import path from 'node:path';
 import { CssFontSvgCanvas } from '@coderline/alphatab/platform/svg/CssFontSvgCanvas';
@@ -171,7 +170,7 @@ describe('StaffLineCost', () => {
     const refs = LayoutCorpus.referenceScores.filter(
         r => !process.env.LAYOUT_FLOW_FILE || r.file.includes(process.env.LAYOUT_FLOW_FILE)
     );
-    const modes = (process.env.STAFF_LINE_MODES ?? 'perBar,runs,none').split(',') as StaffLineMode[];
+    const modes = (process.env.STAFF_LINE_MODES ?? 'production,none').split(',') as StaffLineMode[];
     const rounds = Number(process.env.LAYOUT_FLOW_RUNS ?? 9);
     StaffLineRuns.install();
 
@@ -230,7 +229,7 @@ describe('StaffLineCost', () => {
                     }
                 }
             }
-            StaffLineRuns.mode = 'perBar';
+            StaffLineRuns.mode = 'production';
             paintAll(); // builds the lazy tab gap caches
             for (const sys of systems) {
                 for (const s of sys.allStaves) {
@@ -266,13 +265,10 @@ describe('StaffLineCost', () => {
                         calls += v;
                     }
                     counts.set(m, { calls, fillRect: counted.get('fillRect') ?? 0, emptyFillRect, svgBytes });
-                    if (m === 'runs') {
+                    if (m === 'production') {
                         out.push(
-                            `runs: ${StaffLineRuns.runs} runs over ${StaffLineRuns.runBars} bars (${(StaffLineRuns.runBars / Math.max(1, StaffLineRuns.runs)).toFixed(1)} bars/run), inherit-colour bars ${StaffLineRuns.inheritBars}`
+                            `staff passes ${StaffLineRuns.staffPasses}, runs ${StaffLineRuns.runs} over ${StaffLineRuns.runBars} bars (${(StaffLineRuns.runBars / Math.max(1, StaffLineRuns.runs)).toFixed(1)} bars/run)`
                         );
-                    }
-                    if (m === 'perBar') {
-                        out.push(`perBar: paintStaffLines calls ${StaffLineRuns.perBarCalls}`);
                     }
                 }
             } finally {
@@ -328,7 +324,7 @@ describe('StaffLineCost', () => {
                     `| ${m} | ${a.map(b => (b / 1024 / 1024).toFixed(1)).join(' / ')} | ${median(times.get(m)!).toFixed(1)} |`
                 );
             }
-            StaffLineRuns.mode = 'perBar';
+            StaffLineRuns.mode = 'production';
             console.log(out.join('\n'));
             lines.push(...out, '');
         });

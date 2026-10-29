@@ -54,6 +54,17 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTest('layout/horizontal-layout.gp', settings);
     });
 
+    it('horizontal-layout-tie-across-partial', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Horizontal;
+        settings.display.barCountPerPartial = 2;
+        await VisualTestHelper.runVisualTestTex(
+            '\\track \\staff {score tabs} :2 5.3 7.3 | 7.3{t} 5.3 | 5.3{t} 3.3 | 3.3{t} 5.3 | 5.3{t} 7.3',
+            'test-data/visual-tests/layout/horizontal-layout-tie-across-partial.png',
+            settings
+        );
+    });
+
     it('horizontal-layout-bar5to8', async () => {
         const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
