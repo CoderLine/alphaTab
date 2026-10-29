@@ -160,7 +160,18 @@ export class ScoreChordNoteHeadInfo {
                 return;
             case NoteHeadIntersectionKind.ExactMatch:
                 // handling note head
-                if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
+                if (
+                    ScoreChordNoteHeadInfo._isBottomNoteHeadDisplaced(mainGroup) ||
+                    ScoreChordNoteHeadInfo._isBottomNoteHeadDisplaced(noteGroup)
+                ) {
+                    // a displaced note head sits on the far side of its stem and cannot be shared:
+                    // the down-stemmed part goes to the right, clear of all up-stemmed note heads (Behind Bars p. 53)
+                    if (mainGroup.direction === BeamDirection.Up) {
+                        noteGroup.multiVoiceShiftX = mainGroup.maxX - noteGroup.minX + spacing;
+                    } else {
+                        mainGroup.multiVoiceShiftX = noteGroup.maxX - mainGroup.minX + spacing;
+                    }
+                } else if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
                     // align stems back-to-back with additional spacing
                     if (mainGroup.direction === BeamDirection.Up) {
                         if (noteGroup.displacedNotes) {
@@ -228,9 +239,21 @@ export class ScoreChordNoteHeadInfo {
         }
     }
 
+    private static _bottomStep(group: ScoreChordNoteHeadGroup) {
+        return group.direction === BeamDirection.Up ? group.maxStep : group.minStep;
+    }
+
+    /**
+     * Whether the note head at the step facing the other stem direction is on the far side of the stem.
+     * Happens when voices of the same stem direction form a second there.
+     */
+    private static _isBottomNoteHeadDisplaced(group: ScoreChordNoteHeadGroup) {
+        return !group.correctNotes.notes.has(ScoreChordNoteHeadInfo._bottomStep(group));
+    }
+
     private static _canShareNoteHead(mainGroup: ScoreChordNoteHeadGroup, thisGroup: ScoreChordNoteHeadGroup) {
-        const mainGroupBottom = mainGroup.direction === BeamDirection.Up ? mainGroup.maxStep : mainGroup.minStep;
-        const thisGroupBottom = thisGroup.direction === BeamDirection.Up ? thisGroup.maxStep : thisGroup.minStep;
+        const mainGroupBottom = ScoreChordNoteHeadInfo._bottomStep(mainGroup);
+        const thisGroupBottom = ScoreChordNoteHeadInfo._bottomStep(thisGroup);
 
         const mainGroupBottomNoteHead = mainGroup.correctNotes.notes.get(mainGroupBottom)!;
         if (mainGroupBottomNoteHead.length > 1) {

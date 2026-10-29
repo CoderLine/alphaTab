@@ -40,6 +40,17 @@ describe('BrokenRendersTests', () => {
         );
     });
 
+    it('two-voice-unison-and-second', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track \\staff {score} \\tuning piano \\clef G2 \\ts (1 4)
+            \\voice :4 c5 | :4 e5 {beam up} | :4 d5 {beam down}
+            \\voice :4 b4 | :4 d5 {beam up} | :4 e5 {beam up}
+            \\voice :4 c5 | :4 d5 {beam down} | :4 d5 {beam up}`,
+            'test-data/visual-tests/issues/two-voice-unison-and-second.png'
+        );
+    });
+
     it('whammy-resize-wrap', async () => {
         const score = ScoreLoader.loadAlphaTex(`
             \\staff {tabs}
