@@ -2,6 +2,7 @@ import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import type { EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
@@ -399,7 +400,7 @@ describe('AttributionTests', () => {
         let neighbours = 0;
         for (const r of owner.staff!.barRenderers) {
             for (const b of r.topEffects.bands) {
-                const range = { xStart: 0, xEnd: 0 };
+                const range: EffectBandXRange = { xStart: 0, xEnd: 0 };
                 if (b.isEmpty || !b.computeLocalXRange(range)) {
                     continue;
                 }
