@@ -13,24 +13,71 @@ export interface CensusEntry {
     selfBytes: number;
 }
 
+/** @internal */
+interface ParsedSnapshot {
+    meta: any;
+    nodes: Uint32Array;
+    edges: Uint32Array;
+    strings: string[];
+}
+
 /**
  * Counts live heap objects by constructor name via a heap snapshot (which runs a full GC first, so
  * only reachable objects are counted).
  * @internal
  */
 export class HeapCensus {
-    public static take(): Map<string, CensusEntry> {
+    private static readonly _attributed = new Set<string>(['(array)', '(number)', 'Array', 'Map', 'Set']);
+    private static readonly _attributedAll = new Set<string>([
+        ...HeapCensus._attributed,
+        'Object',
+        '(string)',
+        '(concatenated string)'
+    ]);
+    private static _fileCounter = 0;
+
+    /**
+     * Takes a census and keeps it in a temporary file instead of the heap, so that holding it does
+     * not show up in later censuses. Read it back with {@link load}.
+     */
+    public static takeToFile(attributeAll: boolean = false): string {
+        const census = HeapCensus.take(attributeAll);
+        const file = path.join(
+            process.cwd(),
+            'temp/layout-flow',
+            `census-${process.pid}-${HeapCensus._fileCounter++}.json`
+        );
+        fs.writeFileSync(file, JSON.stringify(Array.from(census.values())));
+        return file;
+    }
+
+    /** Reads (and deletes) a census written by {@link takeToFile}. */
+    public static load(file: string): Map<string, CensusEntry> {
+        const entries = JSON.parse(fs.readFileSync(file, 'utf8')) as CensusEntry[];
+        fs.unlinkSync(file);
+        return new Map(entries.map(e => [e.name, e]));
+    }
+
+    /**
+     * @param attributeAll Also attribute plain objects and strings to their owners (more distinct
+     * entries; prefer {@link takeToFile} when holding several censuses).
+     */
+    /** Retainer chains of the objects named in the `trace` argument of the last {@link take}. */
+    public static lastTraces: string[] = [];
+
+    public static take(attributeAll: boolean = false, trace: string[] = []): Map<string, CensusEntry> {
+        const attributed = attributeAll ? HeapCensus._attributedAll : HeapCensus._attributed;
         // writeHeapSnapshot runs a full GC and writes synchronously
         const dir = path.join(process.cwd(), 'temp/layout-flow');
         fs.mkdirSync(dir, { recursive: true });
         const file = v8.writeHeapSnapshot(path.join(dir, `census-${process.pid}.heapsnapshot`));
-        let snapshot: any;
+        let snapshot: ParsedSnapshot;
         try {
-            snapshot = JSON.parse(fs.readFileSync(file, 'utf8'));
+            snapshot = HeapCensus._parse(fs.readFileSync(file));
         } finally {
             fs.unlinkSync(file);
         }
-        const meta = snapshot.snapshot.meta;
+        const meta = snapshot.meta;
         const fields: string[] = meta.node_fields;
         const types: string[] = meta.node_types[0];
         const edgeFields: string[] = meta.edge_fields;
@@ -44,9 +91,9 @@ export class HeapCensus {
         const eTypeIdx = edgeFields.indexOf('type');
         const eNameIdx = edgeFields.indexOf('name_or_index');
         const eToIdx = edgeFields.indexOf('to_node');
-        const nodes: number[] = snapshot.nodes;
-        const edges: number[] = snapshot.edges;
-        const strings: string[] = snapshot.strings;
+        const nodes = snapshot.nodes;
+        const edges = snapshot.edges;
+        const strings = snapshot.strings;
         const nodeCount = nodes.length / stride;
 
         const nameOf = (n: number): string => {
@@ -73,6 +120,36 @@ export class HeapCensus {
                 }
             }
         }
+        HeapCensus.lastTraces = [];
+        for (const t of trace) {
+            // an instance, not the class, its prototype or its map
+            let n = 0;
+            while (
+                n < nodeCount &&
+                (nameOf(n) !== t ||
+                    (!t.startsWith('(') && types[nodes[n * stride + typeIdx]] !== 'object') ||
+                    retainerEdge[n] < 0 ||
+                    strings[edges[retainerEdge[n] + eNameIdx]] === 'prototype' ||
+                    edgeTypes[edges[retainerEdge[n] + eTypeIdx]] === 'internal')
+            ) {
+                n++;
+            }
+            const chain: string[] = [];
+            for (let hop = 0; n < nodeCount && n >= 0 && hop < 16; hop++) {
+                const edge = retainerEdge[n];
+                let en = '';
+                if (edge >= 0) {
+                    const et = edgeTypes[edges[edge + eTypeIdx]];
+                    en =
+                        et === 'element' || et === 'hidden'
+                            ? `[${edges[edge + eNameIdx]}]`
+                            : `${et}:${strings[edges[edge + eNameIdx]]}`;
+                }
+                chain.push(edge < 0 ? nameOf(n) : `${nameOf(n)} <-${en}-`);
+                n = retainer[n];
+            }
+            HeapCensus.lastTraces.push(`${t}: ${chain.join(' ')}`);
+        }
         const ownerOf = (n: number, depth: number = 0): string => {
             // skip intermediate storage (backing arrays, JS arrays, property stores) up to 3 hops
             let cur = n;
@@ -90,7 +167,14 @@ export class HeapCensus {
                 if ((rn === 'Map' || rn === 'Set') && depth < 2) {
                     return `${rn}<${ownerOf(r, depth + 1)}>${label}`;
                 }
-                if (rn !== '(array)' && rn !== 'Array' && rn !== '(object properties)' && en !== 'elements') {
+                if (
+                    rn !== '(array)' &&
+                    rn !== 'Array' &&
+                    rn !== '(object properties)' &&
+                    rn !== '(concatenated string)' &&
+                    rn !== '(sliced string)' &&
+                    en !== 'elements'
+                ) {
                     return `${rn}${label}`;
                 }
                 cur = r;
@@ -116,11 +200,48 @@ export class HeapCensus {
             const name = nameOf(n);
             const size = nodes[n * stride + sizeIdx];
             add(name, size);
-            if (name === '(array)' || name === '(number)' || name === 'Array' || name === 'Map' || name === 'Set') {
+            if (attributed.has(name)) {
                 add(`  ${name} owned by ${ownerOf(n)}`, size);
             }
         }
         return result;
+    }
+
+    /**
+     * Parses the snapshot from bytes: the node and edge arrays of large heaps exceed the maximum
+     * string length, so only the header and the string table go through `JSON.parse`.
+     */
+    private static _parse(buf: Buffer): ParsedSnapshot {
+        const nodesKey = buf.indexOf('"nodes":[');
+        const header = JSON.parse(`${buf.toString('utf8', 0, nodesKey).replace(/,\s*$/, '')}}`);
+        const meta = header.snapshot.meta;
+        const readInts = (start: number, count: number): { values: Uint32Array; end: number } => {
+            const values = new Uint32Array(count);
+            let i = start;
+            let n = 0;
+            let cur = 0;
+            let inNumber = false;
+            while (n < count) {
+                const c = buf[i++];
+                if (c >= 48 && c <= 57) {
+                    cur = cur * 10 + (c - 48);
+                    inNumber = true;
+                } else if (inNumber) {
+                    values[n++] = cur;
+                    cur = 0;
+                    inNumber = false;
+                }
+            }
+            return { values, end: i };
+        };
+        const nodeCount = header.snapshot.node_count * meta.node_fields.length;
+        const nodes = readInts(nodesKey + 9, nodeCount);
+        const edgesKey = buf.indexOf('"edges":[', nodes.end);
+        const edges = readInts(edgesKey + 9, header.snapshot.edge_count * meta.edge_fields.length);
+        const stringsKey = buf.indexOf('"strings":[', edges.end);
+        const stringsEnd = buf.lastIndexOf(']');
+        const strings = JSON.parse(buf.toString('utf8', stringsKey + 10, stringsEnd + 1)) as string[];
+        return { meta, nodes: nodes.values, edges: edges.values, strings };
     }
 
     /** Entries of `after` minus `before`, largest self size first. */
