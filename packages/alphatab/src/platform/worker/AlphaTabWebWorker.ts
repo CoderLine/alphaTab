@@ -71,7 +71,11 @@ export class AlphaTabWebWorker {
                 this._renderer.render(data.renderHints);
                 break;
             case 'alphaTab.resizeRender':
-                this._renderer.resizeRender();
+                try {
+                    this._renderer.resizeRender();
+                } finally {
+                    this._main.postMessage({ cmd: 'alphaTab.resizeRenderFinished' });
+                }
                 break;
             case 'alphaTab.renderResult':
                 this._renderer.renderResult(data.resultId);

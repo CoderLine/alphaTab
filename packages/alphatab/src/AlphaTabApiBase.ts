@@ -767,8 +767,15 @@ export class AlphaTabApiBase<TSettings> {
                 this._trackIndexes.push(track.index);
             }
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
-            this._onScoreLoaded(score);
+            let generateMidi = this._onScoreLoaded(score);
+            if (generateMidi && !this._canRenderBeforeMidi(score)) {
+                this.loadMidiForScore();
+                generateMidi = false;
+            }
             this.render(renderHints);
+            if (generateMidi) {
+                this.loadMidiForScore();
+            }
         } else {
             this._tracks = tracks;
 
@@ -3490,16 +3497,41 @@ export class AlphaTabApiBase<TSettings> {
      *
      */
     public readonly scoreLoaded: IEventEmitterOfT<Score>;
-    private _onScoreLoaded(score: Score): void {
+    /**
+     * @returns true if the caller has to generate the midi for the current player
+     * (a new player generates it once it is ready).
+     */
+    private _onScoreLoaded(score: Score): boolean {
         if (this._isDestroyed) {
-            return;
+            return false;
         }
         (this.scoreLoaded as EventEmitterOfT<Score>).trigger(score);
         this.uiFacade.triggerEvent(this.container, 'scoreLoaded', score);
-        if (!this._setupOrDestroyPlayer()) {
-            // feed midi into current player (a new player will trigger a midi generation once the player is ready)
-            this.loadMidiForScore();
+        return !this._setupOrDestroyPlayer();
+    }
+
+    /**
+     * Whether the score can be handed to the renderer before its midi is generated.
+     * A synchronous renderer gains nothing from it, and beat timers are only known after the midi generation.
+     */
+    private _canRenderBeforeMidi(score: Score): boolean {
+        if (this._renderer.instance instanceof ScoreRenderer) {
+            return false;
         }
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            if (beat.showTimer) {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**

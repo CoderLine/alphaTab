@@ -70,6 +70,10 @@ export interface IScoreRenderer {
      *
      * In case the UI is resized, this method can be used to trigger a rearrangement of the existing elements
      * into the newly available space.
+     *
+     * Renderers running in a background worker coalesce resizes: while one resize is still running,
+     * further calls are combined into a single resize that runs afterwards with the latest width and settings.
+     * The skipped intermediate widths raise no `preRender`, `renderFinished` or `postRenderFinished` events.
      * @since 0.9.6
      */
     resizeRender(): void;

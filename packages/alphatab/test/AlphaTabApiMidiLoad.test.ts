@@ -5,10 +5,17 @@
  * @target web
  */
 import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
-import type { EventEmitter } from '@coderline/alphatab/EventEmitter';
+import type { EventEmitter, IEventEmitter, IEventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { MidiEventType, type NoteOnEvent } from '@coderline/alphatab/midi/MidiEvent';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { PlayerMode } from '@coderline/alphatab/PlayerSettings';
+import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import type { IAlphaSynth } from '@coderline/alphatab/synth/IAlphaSynth';
@@ -28,15 +35,110 @@ class DeferredReadyTestOutput extends TestOutput {
 }
 
 /**
+ * Renders asynchronously like the worker renderer and keeps a serialized copy of every score
+ * handed to it, which is what a rendering worker receives.
+ * @internal
+ */
+class DeferredTestRenderer implements IScoreRenderer {
+    private readonly _inner: ScoreRenderer;
+    private readonly _settings: Settings;
+    private readonly _log: string[];
+    public readonly postedScores: Score[] = [];
+
+    public constructor(settings: Settings, log: string[]) {
+        this._inner = new ScoreRenderer(settings);
+        this._settings = settings;
+        this._log = log;
+    }
+
+    public get boundsLookup(): BoundsLookup | null {
+        return this._inner.boundsLookup;
+    }
+
+    public get width(): number {
+        return this._inner.width;
+    }
+
+    public set width(value: number) {
+        this._inner.width = value;
+    }
+
+    public render(renderHints?: RenderHints): void {
+        setImmediate(() => this._inner.render(renderHints));
+    }
+
+    public resizeRender(): void {
+        setImmediate(() => this._inner.resizeRender());
+    }
+
+    public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
+        this._log.push('renderPosted');
+        if (score) {
+            this.postedScores.push(JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score), this._settings));
+        }
+        setImmediate(() => this._inner.renderScore(score, trackIndexes, renderHints));
+    }
+
+    public renderResult(resultId: string): void {
+        this._inner.renderResult(resultId);
+    }
+
+    public updateSettings(settings: Settings): void {
+        this._inner.updateSettings(settings);
+    }
+
+    public destroy(): void {
+        this._inner.destroy();
+    }
+
+    public get preRender(): IEventEmitterOfT<boolean> {
+        return this._inner.preRender;
+    }
+
+    public get renderFinished(): IEventEmitterOfT<RenderFinishedEventArgs> {
+        return this._inner.renderFinished;
+    }
+
+    public get partialRenderFinished(): IEventEmitterOfT<RenderFinishedEventArgs> {
+        return this._inner.partialRenderFinished;
+    }
+
+    public get partialLayoutFinished(): IEventEmitterOfT<RenderFinishedEventArgs> {
+        return this._inner.partialLayoutFinished;
+    }
+
+    public get postRenderFinished(): IEventEmitter {
+        return this._inner.postRenderFinished;
+    }
+
+    public get error(): IEventEmitterOfT<Error> {
+        return this._inner.error;
+    }
+}
+
+/**
  * @internal
  */
 class MidiLoadTestUiFacade extends TestUiFacade {
     public deferredReady: boolean = false;
     public log: string[];
+    public workerRenderer: DeferredTestRenderer | null = null;
+    private _settings: Settings | null = null;
 
-    public constructor(log: string[]) {
+    public constructor(log: string[], useWorkers: boolean = false) {
         super();
         this.log = log;
+        (this as { areWorkersSupported: boolean }).areWorkersSupported = useWorkers;
+    }
+
+    public override initialize(api: AlphaTabApiBase<unknown>, raw: unknown): void {
+        super.initialize(api, raw);
+        this._settings = api.settings;
+    }
+
+    public override createWorkerRenderer(): IScoreRenderer {
+        this.workerRenderer = new DeferredTestRenderer(this._settings!, this.log);
+        return this.workerRenderer;
     }
 
     public override createWorkerPlayer(): IAlphaSynth | null {
@@ -65,14 +167,19 @@ describe('AlphaTabApiMidiLoadTests', () => {
         }
     }
 
-    async function createApi(playerMode: PlayerMode, deferredReady: boolean = false): Promise<Fixture> {
+    async function createApi(
+        playerMode: PlayerMode,
+        deferredReady: boolean = false,
+        useWorkers: boolean = false
+    ): Promise<Fixture> {
         const settings = new Settings();
         settings.core.engine = 'svg';
+        settings.core.useWorkers = useWorkers;
         settings.player.playerMode = playerMode;
         settings.player.enableCursor = true;
 
         const log: string[] = [];
-        const facade = new MidiLoadTestUiFacade(log);
+        const facade = new MidiLoadTestUiFacade(log, useWorkers);
         facade.deferredReady = deferredReady;
         facade.rootContainer.width = 1300;
         const api = new AlphaTabApiBase<unknown>(facade, settings);
@@ -234,5 +341,112 @@ describe('AlphaTabApiMidiLoadTests', () => {
         expect(events).toEqual(['playerReady']);
         expect(f.api.isReadyForPlayback).toBe(true);
         f.api.destroy();
+    });
+
+    function noteKeys(midi: MidiFile): number[] {
+        const keys: number[] = [];
+        for (const e of midi.events) {
+            if (e.type === MidiEventType.NoteOn) {
+                keys.push((e as NoteOnEvent).noteKey);
+            }
+        }
+        return keys;
+    }
+
+    it('worker-first-load-existing-player', async () => {
+        const f = await createApi(PlayerMode.EnabledSynthesizer, false, true);
+        expect(f.facade.workerRenderer !== null).toBe(true);
+        const events = await render(f, () => f.api.renderScore(createScore(f.api.settings)));
+        expect(events).toEqual(['scoreLoaded', 'renderPosted', 'midiLoad', 'midiLoaded', 'postRenderFinished']);
+        expect(f.api.tickCache !== null).toBe(true);
+        f.api.destroy();
+    });
+
+    it('worker-second-load-existing-player', async () => {
+        const f = await createApi(PlayerMode.EnabledSynthesizer, false, true);
+        await render(f, () => f.api.renderScore(createScore(f.api.settings)));
+        const events = await render(f, () => f.api.renderScore(createScore(f.api.settings)));
+        expect(events).toEqual(['scoreLoaded', 'renderPosted', 'midiLoad', 'midiLoaded', 'postRenderFinished']);
+        f.api.destroy();
+    });
+
+    it('worker-automatic-creates-player', async () => {
+        const f = await createApi(PlayerMode.EnabledAutomatic, false, true);
+        const events = await render(f, () => f.api.renderScore(createScore(f.api.settings)));
+        expect(events).toEqual([
+            'scoreLoaded',
+            'createPlayer',
+            'midiLoad',
+            'midiLoaded',
+            'renderPosted',
+            'postRenderFinished'
+        ]);
+        f.api.destroy();
+    });
+
+    it('worker-player-disabled', async () => {
+        const f = await createApi(PlayerMode.Disabled, false, true);
+        const events = await render(f, () => f.api.renderScore(createScore(f.api.settings)));
+        expect(events).toEqual(['scoreLoaded', 'renderPosted', 'midiLoad', 'postRenderFinished']);
+        expect(f.api.tickCache !== null).toBe(true);
+        f.api.destroy();
+    });
+
+    it('worker-render-tracks-same-score', async () => {
+        const f = await createApi(PlayerMode.EnabledSynthesizer, false, true);
+        await render(f, () => f.api.renderScore(createScore(f.api.settings)));
+        const events = await render(f, () => f.api.renderTracks([f.api.score!.tracks[1]]));
+        expect(events).toEqual(['renderPosted', 'postRenderFinished']);
+        f.api.destroy();
+    });
+
+    it('worker-beat-timers-generate-midi-first', async () => {
+        const f = await createApi(PlayerMode.EnabledSynthesizer, false, true);
+        const score = ScoreLoader.loadAlphaTex(
+            '\\tempo 120 . 3.3.4 { timer } 3.3.4*3 | 3.3.4 { timer } 3.3.4*3',
+            f.api.settings
+        );
+        const events = await render(f, () => f.api.renderScore(score));
+        expect(events).toEqual(['scoreLoaded', 'midiLoad', 'midiLoaded', 'renderPosted', 'postRenderFinished']);
+        const posted = f.facade.workerRenderer!.postedScores;
+        const bars = posted[posted.length - 1].tracks[0].staves[0].bars;
+        expect(bars[0].voices[0].beats[0].timer).toBe(0);
+        expect(bars[1].voices[0].beats[0].timer).toBe(2000);
+        f.api.destroy();
+    });
+
+    async function expectScoreLoadedModificationApplied(useWorkers: boolean) {
+        const f = await createApi(PlayerMode.EnabledSynthesizer, false, useWorkers);
+        const score = ScoreLoader.loadAlphaTex('\\track "A" 3.3.4 r.4 r.2 | r.1', f.api.settings);
+        const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const originalKey = note.realValue;
+        let midi: MidiFile | null = null;
+        f.api.midiLoad.on(m => {
+            midi = m;
+        });
+        f.api.scoreLoaded.on(s => {
+            s.tracks[0].name = 'Modified';
+            s.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret += 4;
+        });
+        await render(f, () => f.api.renderScore(score));
+
+        const keys = noteKeys(midi!);
+        expect(keys.indexOf(originalKey + 4)).toBeGreaterThanOrEqual(0);
+        expect(keys.indexOf(originalKey)).toBe(-1);
+        if (useWorkers) {
+            const posted = f.facade.workerRenderer!.postedScores;
+            const rendered = posted[posted.length - 1];
+            expect(rendered.tracks[0].name).toBe('Modified');
+            expect(rendered.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).toBe(7);
+        }
+        f.api.destroy();
+    }
+
+    it('score-loaded-modification-rendered-and-played', async () => {
+        await expectScoreLoadedModificationApplied(false);
+    });
+
+    it('worker-score-loaded-modification-rendered-and-played', async () => {
+        await expectScoreLoadedModificationApplied(true);
     });
 });

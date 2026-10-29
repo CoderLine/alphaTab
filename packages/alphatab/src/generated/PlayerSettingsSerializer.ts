@@ -49,6 +49,7 @@ export class PlayerSettingsSerializer {
         o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide));
         o.set("playtripletfeel", obj.playTripletFeel);
         o.set("buffertimeinmilliseconds", obj.bufferTimeInMilliseconds);
+        o.set("positionupdateintervalinmilliseconds", obj.positionUpdateIntervalInMilliseconds);
         return o;
     }
     /**
@@ -58,7 +59,7 @@ export class PlayerSettingsSerializer {
         if (!obj) {
             return null;
         }
-        const o: Record<string, unknown> = { "soundfont": obj.soundFont, "outputmode": obj.outputMode as number, "enableplayer": obj.enablePlayer, "playermode": obj.playerMode as number, "enablecursor": obj.enableCursor, "enableanimatedbeatcursor": obj.enableAnimatedBeatCursor, "enableelementhighlighting": obj.enableElementHighlighting, "enableseektoclick": obj.enableSeekToClick, "enableplaybackrangeselection": obj.enablePlaybackRangeSelection, "resetplaybackrangeonclick": obj.resetPlaybackRangeOnClick, "scrolloffsetx": obj.scrollOffsetX, "scrolloffsety": obj.scrollOffsetY, "scrollmode": obj.scrollMode as number, "scrollspeed": obj.scrollSpeed, "nativebrowsersmoothscroll": obj.nativeBrowserSmoothScroll, "songbookbendduration": obj.songBookBendDuration, "songbookdipduration": obj.songBookDipDuration, "vibrato": VibratoPlaybackSettingsSerializer.toJsObject(obj.vibrato), "slide": SlidePlaybackSettingsSerializer.toJsObject(obj.slide), "playtripletfeel": obj.playTripletFeel, "buffertimeinmilliseconds": obj.bufferTimeInMilliseconds };
+        const o: Record<string, unknown> = { "soundfont": obj.soundFont, "outputmode": obj.outputMode as number, "enableplayer": obj.enablePlayer, "playermode": obj.playerMode as number, "enablecursor": obj.enableCursor, "enableanimatedbeatcursor": obj.enableAnimatedBeatCursor, "enableelementhighlighting": obj.enableElementHighlighting, "enableseektoclick": obj.enableSeekToClick, "enableplaybackrangeselection": obj.enablePlaybackRangeSelection, "resetplaybackrangeonclick": obj.resetPlaybackRangeOnClick, "scrolloffsetx": obj.scrollOffsetX, "scrolloffsety": obj.scrollOffsetY, "scrollmode": obj.scrollMode as number, "scrollspeed": obj.scrollSpeed, "nativebrowsersmoothscroll": obj.nativeBrowserSmoothScroll, "songbookbendduration": obj.songBookBendDuration, "songbookdipduration": obj.songBookDipDuration, "vibrato": VibratoPlaybackSettingsSerializer.toJsObject(obj.vibrato), "slide": SlidePlaybackSettingsSerializer.toJsObject(obj.slide), "playtripletfeel": obj.playTripletFeel, "buffertimeinmilliseconds": obj.bufferTimeInMilliseconds, "positionupdateintervalinmilliseconds": obj.positionUpdateIntervalInMilliseconds };
         return o;
     }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
@@ -129,6 +130,9 @@ export class PlayerSettingsSerializer {
                 return true;
             case "buffertimeinmilliseconds":
                 obj.bufferTimeInMilliseconds = v! as number;
+                return true;
+            case "positionupdateintervalinmilliseconds":
+                obj.positionUpdateIntervalInMilliseconds = v! as number;
                 return true;
         }
         if (["vibrato"].indexOf(property) >= 0) {

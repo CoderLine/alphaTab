@@ -485,4 +485,20 @@ export class PlayerSettings {
      * This buffer size can be changed whenever needed.
      */
     public bufferTimeInMilliseconds: number = 500;
+
+    /**
+     * The interval in milliseconds in which the audio output reports the played audio to the player.
+     * @since 1.9.0
+     * @defaultValue `0`
+     * @category Player
+     * @remarks
+     * The played audio advances the player position and with it the cursor, `playerPositionChanged`
+     * and `midiEventsPlayed`. With `0` every audio render quantum (128 frames, about 3 milliseconds)
+     * is reported. Larger values reduce the number of position updates (and the messages between the audio thread,
+     * the synthesizer worker and the UI thread), but the position, the cursor and the beat changes can lag behind
+     * the audio by up to this interval.
+     *
+     * Only the Web Audio output with audio worklets uses this setting. It applies from the next start of the playback.
+     */
+    public positionUpdateIntervalInMilliseconds: number = 0;
 }

@@ -28,6 +28,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     private _api: AlphaTabApiBase<T>;
     private _worker!: IAlphaTabRenderingWorker;
     private _width: number = 0;
+    private _isResizeInFlight: boolean = false;
+    private _isResizePending: boolean = false;
 
     public boundsLookup: BoundsLookup | null = null;
 
@@ -93,10 +95,32 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
+    /**
+     * At most one resize is queued in the worker. Requests arriving while one is in flight collapse
+     * into a single follow-up resize, which the worker runs with the newest width and settings
+     * because those messages are posted immediately and processed before it.
+     */
     public resizeRender(): void {
+        if (this._isResizeInFlight) {
+            this._isResizePending = true;
+            return;
+        }
+        this._postResizeRender();
+    }
+
+    private _postResizeRender(): void {
+        this._isResizeInFlight = true;
         this._worker.postMessage({
             cmd: 'alphaTab.resizeRender'
         });
+    }
+
+    private _onResizeRenderFinished(): void {
+        this._isResizeInFlight = false;
+        if (this._isResizePending) {
+            this._isResizePending = false;
+            this._postResizeRender();
+        }
     }
 
     public renderResult(resultId: string): void {
@@ -149,6 +173,9 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
                     this.boundsLookup.finish();
                 }
                 (this.postRenderFinished as EventEmitter).trigger();
+                break;
+            case 'alphaTab.resizeRenderFinished':
+                this._onResizeRenderFinished();
                 break;
             case 'alphaTab.error':
                 (this.error as EventEmitterOfT<Error>).trigger(data.error);

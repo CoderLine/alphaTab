@@ -37,6 +37,8 @@ export type IAlphaTabWorkerMessage =
     | { cmd: 'alphaTab.postRenderFinished'; boundsLookup: Map<string, unknown> | null }
     // web only: a BoundsLookupWire Float64Array, sent in the transfer list
     | { cmd: 'alphaTab.postRenderFinishedWire'; boundsLookup: unknown }
+    // sent after every 'alphaTab.resizeRender', also when it produced no render
+    | { cmd: 'alphaTab.resizeRenderFinished' }
     | { cmd: 'alphaTab.error'; error: Error };
 
 /**
