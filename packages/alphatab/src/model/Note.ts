@@ -25,6 +25,7 @@ import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
+import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
@@ -559,6 +560,13 @@ export class Note {
      * Gets or sets the speed of the trill effect.
      */
     public trillSpeed: Duration = Duration.ThirtySecond;
+
+    /**
+     * Gets or sets whether a separate trill starts on this note.
+     * If set, the trill does not continue a trill on the previous beat.
+     * @since 1.9.0
+     */
+    public isTrillStart: boolean = false;
 
     /**
      * Gets or sets the percentual duration of the note relative to the overall beat duration.
@@ -1152,6 +1160,8 @@ export class Note {
 
     private static _noteIdLookupKey = 'NoteIdLookup';
 
+    private static readonly _legacyUnsetKeys = ['fret', 'string', 'octave', 'tone', 'percussionarticulation'];
+
     private _noteIdBag: NoteIdBag | null = null;
     public chain(sharedDataBag: Map<string, unknown> | null = null) {
         // mainly for backwards compat in case we reach this code from somewhere outside.
@@ -1285,6 +1295,35 @@ export class Note {
         }
         if (this.slideOrigin !== null) {
             o.slideoriginnoteid = this.slideOrigin.id;
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public afterFromJson(m: unknown) {
+        // 1.8 and earlier write all of these keys with -1 for unset values, later versions omit unset values
+        for (const key of Note._legacyUnsetKeys) {
+            const v = JsonHelper.getValue(m, key);
+            if (v === null || v === undefined) {
+                return;
+            }
+        }
+
+        if (this.string === -1) {
+            this.string = Number.NaN;
+            if (this.fret === -1) {
+                this.fret = Number.NaN;
+            }
+        }
+        if (this.octave === -1) {
+            this.octave = Number.NaN;
+        }
+        if (this.tone === -1) {
+            this.tone = Number.NaN;
+        }
+        if (this.percussionArticulation === -1) {
+            this.percussionArticulation = Number.NaN;
         }
     }
 

@@ -542,6 +542,44 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[1].playbackInfo.bank).toBe(77);
     });
 
+    it('out-of-range-midi-port-and-channel', async () => {
+        const original = await TestPlatform.loadFile('test-data/guitarpro5/score-info.gp5');
+
+        // int32 port and channel of the first track header
+        const portOffset = 1452;
+
+        const variants: [number, number][] = [
+            [0, 1],
+            [5, 1],
+            [1, 0],
+            [1, 17]
+        ];
+        for (const [port, channel] of variants) {
+            const data = new Uint8Array(original.length);
+            data.set(original, 0);
+            // little-endian int32 values below 256
+            for (let i = 0; i < 8; i++) {
+                data[portOffset + i] = 0;
+            }
+            data[portOffset] = port;
+            data[portOffset + 4] = channel;
+
+            const score = GpImporterTestHelper.prepareImporterWithBytes(data).readScore();
+            expect(score.tracks.length).toBe(2);
+            expect(score.tracks[0].playbackInfo.volume).toBe(15);
+            expect(score.tracks[0].playbackInfo.balance).toBe(8);
+            expect(score.tracks[0].playbackInfo.program).toBe(0);
+            expect(score.tracks[1].playbackInfo.program).toBe(25);
+        }
+    });
+
+    it('drum-tablature-follows-staff-flags', async () => {
+        // Guitar Pro shows the drum tablature of this file, its staff flags enable it
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/percussion-all.gp5')).readScore();
+        expect(score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
+    });
+
     it('tuning-bass-clef', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bass-tuning.gp5')).readScore();
         expect(score.tracks[0].staves[0].bars[0].clef).toBe(Clef.G2);

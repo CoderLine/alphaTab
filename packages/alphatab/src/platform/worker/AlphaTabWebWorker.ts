@@ -23,6 +23,7 @@ export class AlphaTabWebWorker {
      * @target web
      */
     private _boundsWire: BoundsLookupWireWriter | null = null;
+    private _scoreId = 0;
     private _main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>;
 
     public constructor(main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>) {
@@ -90,6 +91,7 @@ export class AlphaTabWebWorker {
                 this._renderer.width = data.width;
                 break;
             case 'alphaTab.renderScore':
+                this._scoreId = data.scoreId;
                 this._updateFontSizes(data.fontSizes);
                 const renderHints = data.renderHints;
                 const score =
@@ -109,6 +111,7 @@ export class AlphaTabWebWorker {
         }
         this._main.postMessage({
             cmd: 'alphaTab.postRenderFinished',
+            scoreId: this._scoreId,
             boundsLookup: this._renderer.boundsLookup?.toJson() ?? null
         });
     }
@@ -132,7 +135,7 @@ export class AlphaTabWebWorker {
             return false;
         }
         (this._main as unknown as DedicatedWorkerGlobalScope).postMessage(
-            { cmd: 'alphaTab.postRenderFinishedWire', boundsLookup: data },
+            { cmd: 'alphaTab.postRenderFinishedWire', scoreId: this._scoreId, boundsLookup: data },
             [data.buffer]
         );
         return true;

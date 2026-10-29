@@ -96,6 +96,7 @@ export interface IMidiFileHandler {
 
     /**
      * Adds a metronome click to the generated midi file.
+     * @since 1.9.0
      * @param tick The midi ticks when the click should be happening.
      * @param counter The index of the beat within the bar as per time signature (0 = first beat of the bar).
      * @param durationInTicks The duration of one metronome beat in midi ticks.

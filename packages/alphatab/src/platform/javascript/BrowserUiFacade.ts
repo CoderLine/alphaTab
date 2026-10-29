@@ -32,7 +32,6 @@ import { ScalableHtmlElementContainer } from '@coderline/alphatab/platform/javas
 import { PlayerOutputMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
 import { AudioElementBackingTrackSynthOutput } from '@coderline/alphatab/platform/javascript/AudioElementBackingTrackSynthOutput';
-import { BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import { CoreSettings, FontFileFormat } from '@coderline/alphatab/CoreSettings';
 import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExporter';
 import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthAudioExporterWorkerApi';
@@ -1113,10 +1112,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public createBackingTrackPlayer(): IAlphaSynth | null {
-        return new BackingTrackPlayer(
-            new AudioElementBackingTrackSynthOutput(),
-            this._api.settings.player.bufferTimeInMilliseconds
-        );
+        return AudioElementBackingTrackSynthOutput.createPlayer(this._api.settings.player.bufferTimeInMilliseconds);
     }
 
     public throttle(action: () => void, delay: number): () => void {

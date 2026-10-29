@@ -20,6 +20,12 @@ import { TestPlatform } from 'test/TestPlatform';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
+import { Gp7Exporter } from '@coderline/alphatab/exporter/Gp7Exporter';
+import { GpifWriter } from '@coderline/alphatab/exporter/GpifWriter';
+import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 
 describe('Gp7ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
@@ -874,28 +880,57 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].lyrics).toBe(null);
     });
 
-    it('track-volume', async () => {
-        const reader = await prepareImporterWithFile('guitarpro7/track-volume.gp');
-        const score: Score = reader.readScore();
+    it('track-mixer-roundtrip', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            \\track "Full Left" { volume 16 balance 0 } 3.1.4 5.1.4 | 7.1.2
+            \\track "Center" { volume 9 balance 8 } 0.6.2 3.6.2 | 0.6.1
+            \\track "Right" { volume 2 balance 13 } 2.4.4 r.4 | 2.4.2
+            \\track "Silent" { volume 0 balance 16 } 0.2.1 | 1.2.1
+        `);
+        const imported = prepareImporterWithBytes(new Gp7Exporter().export(score, null)).readScore();
 
-        expect(score.tracks[0].playbackInfo.volume).toBe(16);
-        expect(score.tracks[1].playbackInfo.volume).toBe(14);
-        expect(score.tracks[2].playbackInfo.volume).toBe(12);
-        expect(score.tracks[3].playbackInfo.volume).toBe(10);
-        expect(score.tracks[4].playbackInfo.volume).toBe(7);
-        expect(score.tracks[5].playbackInfo.volume).toBe(3);
-        expect(score.tracks[6].playbackInfo.volume).toBe(0);
+        expect(imported.tracks.map(t => t.playbackInfo.volume)).toEqual([16, 9, 2, 0]);
+        expect(imported.tracks.map(t => t.playbackInfo.balance)).toEqual([0, 8, 13, 16]);
     });
 
-    it('track-balance', async () => {
-        const reader = await prepareImporterWithFile('guitarpro7/track-balance.gp');
-        const score: Score = reader.readScore();
+    it('track-mixer-channel-strip', () => {
+        const unrelated = '0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5';
+        const channelStrips = [
+            // pan and volume between the steps of the internal range are rounded down
+            `${unrelated} 0.33 0.71 0.5 0.5 0.5`,
+            `${unrelated} 0.999 0.0624 0.5 0.5 0.5`,
+            // unreadable values fall back to a centered pan and the Guitar Pro default volume
+            `${unrelated} left loud 0.5 0.5 0.5`,
+            // volume missing
+            `${unrelated} 0.25`,
+            // pan and volume missing
+            unrelated
+        ];
+        const doc = new XmlDocument();
+        doc.parse(
+            new GpifWriter().writeXml(
+                ScoreLoader.loadAlphaTex(`
+                    \\track "A" 1.1.1
+                    \\track "B" 1.2.1
+                    \\track "C" 1.3.1
+                    \\track "D" 1.4.1
+                    \\track "E" 1.5.1
+                `)
+            )
+        );
+        const tracks = doc.firstElement!.findChildElement('Tracks')!.getElementsByTagName('Track');
+        expect(tracks.length).toBe(channelStrips.length);
+        for (let i = 0; i < tracks.length; i++) {
+            const channelStrip = tracks[i].findChildElement('RSE')!.findChildElement('ChannelStrip')!;
+            channelStrip.findChildElement('Parameters')!.innerText = channelStrips[i];
+        }
+        const parser = new GpifParser();
+        parser.parseXml(doc.toFormattedString('', true), new Settings());
+        const score = parser.score;
 
-        expect(score.tracks[0].playbackInfo.balance).toBe(0);
-        expect(score.tracks[1].playbackInfo.balance).toBe(4);
-        expect(score.tracks[2].playbackInfo.balance).toBe(8);
-        expect(score.tracks[3].playbackInfo.balance).toBe(12);
-        expect(score.tracks[4].playbackInfo.balance).toBe(16);
+        const defaults = new PlaybackInformation();
+        expect(score.tracks.map(t => t.playbackInfo.balance)).toEqual([5, 15, 8, 4, defaults.balance]);
+        expect(score.tracks.map(t => t.playbackInfo.volume)).toEqual([11, 0, 14, 14, defaults.volume]);
     });
 
     it('program-change', async () => {
@@ -1042,6 +1077,19 @@ describe('Gp7ImporterTest', () => {
                 noteIndex++;
             }
         }
+    });
+
+    it('drum-tablature-follows-part-configuration', async () => {
+        const data = await TestPlatform.loadFile('test-data/guitarpro7/drum-custom-lines.gp');
+        const withPartConfiguration = ScoreLoader.loadScoreFromBytes(data, new Settings());
+        expect(withPartConfiguration.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(withPartConfiguration.tracks[0].staves[0].showTablature).toBe(true);
+
+        // score.gpif alone has no notation visibility: drum tablature stays hidden
+        const parser = new GpifParser();
+        parser.parseXml(GpImporterTestHelper.extractGpif(data), new Settings());
+        expect(parser.score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(parser.score.tracks[0].staves[0].showTablature).toBe(false);
     });
 
     it('drum-custom-lines-preserves-string-assignments', async () => {

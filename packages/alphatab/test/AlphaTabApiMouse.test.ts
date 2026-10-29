@@ -4,7 +4,7 @@ import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { IContainer } from '@coderline/alphatab/platform/IContainer';
 import type { IMouseEventArgs } from '@coderline/alphatab/platform/IMouseEventArgs';
-import { PlayerMode } from '@coderline/alphatab/PlayerSettings';
+import { PlayerMode, ScrollMode } from '@coderline/alphatab/PlayerSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestUiFacade } from 'test/visualTests/TestUiFacade';
 import { describe, expect, it } from 'vitest';
@@ -88,6 +88,24 @@ describe('AlphaTabApiMouseTests', () => {
 
     function mouseUp(api: AlphaTabApiBase<unknown>, args: IMouseEventArgs) {
         (api.canvasElement.mouseUp as EventEmitterOfT<IMouseEventArgs>).trigger(args);
+    }
+
+    async function click(api: AlphaTabApiBase<unknown>, beat: Beat): Promise<void> {
+        const args = argsAtBeat(api, beat);
+        mouseDown(api, args);
+        mouseUp(api, args);
+
+        // the cursor is placed in an invoke queued by the click
+        const cursorPlaced = Promise.withResolvers<boolean>();
+        api.uiFacade.beginInvoke(() => cursorPlaced.resolve(true));
+        await cursorPlaced.promise;
+    }
+
+    function scrollToCursorFromTop(api: AlphaTabApiBase<unknown>): number {
+        const scroll = api.uiFacade.getScrollContainer();
+        scroll.scrollTop = 0;
+        api.scrollToCursor();
+        return scroll.scrollTop;
     }
 
     function trackHighlights(api: AlphaTabApiBase<unknown>): PlaybackHighlightChangeEventArgs[] {
@@ -178,6 +196,26 @@ describe('AlphaTabApiMouseTests', () => {
         mouseMove(api, argsAtBeat(api, beats(api)[2]));
 
         expect(highlights.length).toBe(0);
+
+        api.destroy();
+    });
+
+    it('scroll-mode-off-at-runtime-page-layout', async () => {
+        const api = await createApi(s => {
+            s.player.scrollMode = ScrollMode.Continuous;
+            s.display.barsPerRow = 1;
+        });
+        await click(api, api.score!.tracks[0].staves[0].bars[1].voices[0].beats[0]);
+
+        expect(scrollToCursorFromTop(api)).toBeGreaterThan(0);
+
+        api.settings.player.scrollMode = ScrollMode.Off;
+        api.updateSettings();
+        expect(scrollToCursorFromTop(api)).toBe(0);
+
+        api.settings.player.scrollMode = ScrollMode.Continuous;
+        api.updateSettings();
+        expect(scrollToCursorFromTop(api)).toBeGreaterThan(0);
 
         api.destroy();
     });

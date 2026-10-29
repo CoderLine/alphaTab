@@ -1,7 +1,7 @@
 import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
-import { buildTsconfigAliases } from './vite';
+import { buildTsconfigAliases } from './tsconfig-aliases';
 import { stripProfilingPlugin } from './vite.plugin.strip-profiling';
 
 class SummaryLabelReporter {
@@ -33,6 +33,7 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
         },
         test: {
             include: ['test/**/*.test.ts'],
+            isolate: false,
             testTimeout: options.testTimeout ?? 30000,
             setupFiles: options.setupFiles,
             passWithNoTests: true,

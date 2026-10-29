@@ -9,6 +9,7 @@ import type { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/Be
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@coderline/alphatab/rendering/glyphs/NoteVibratoGlyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 
 /**
@@ -44,6 +45,11 @@ export class TabSlideLineGlyph extends Glyph implements ITieGlyph {
 
     // the slide line cannot overflow anything and there are ties drawn in here
     public readonly checkForOverflow = false;
+    public readonly hasSkylineShape = false;
+
+    public collectSkylineShape(_shape: SkylineShape): void {
+        // not part of the skyline
+    }
 
     public constructor(inType: SlideInType, outType: SlideOutType, startNote: Note, parent: BeatContainerGlyph) {
         super(0, 0);

@@ -119,7 +119,7 @@ function filterDtsVisitor(
     };
 }
 
-function filterDtsImportsVisitor(checker: ts.TypeChecker, removedSymbols: Set<string>) {
+function filterDtsImportsVisitor(checker: ts.TypeChecker, removedSymbols: Set<string>, removedImports: string[]) {
     let importedSourceFile: string | undefined;
     return function visitor(node: ts.Node) {
         if (ts.isImportDeclaration(node) && node.importClause) {
@@ -132,6 +132,7 @@ function filterDtsImportsVisitor(checker: ts.TypeChecker, removedSymbols: Set<st
             if (node.importClause.name) {
                 const symbol = exportSymbolKey(sourceFile.fileName, '');
                 if (removedSymbols.has(symbol)) {
+                    removedImports.push(node.importClause.name.text);
                     return undefined;
                 }
             } else if (node.importClause.namedBindings) {
@@ -154,12 +155,43 @@ function filterDtsImportsVisitor(checker: ts.TypeChecker, removedSymbols: Set<st
         } else if (ts.isImportSpecifier(node) && importedSourceFile) {
             const symbol = exportSymbolKey(importedSourceFile, node.name.getText());
             if (removedSymbols.has(symbol)) {
+                removedImports.push(node.name.text);
                 return undefined;
             }
         }
 
         return ts.visitEachChild(node, visitor, undefined);
     };
+}
+
+function findTypeReferences(file: ts.SourceFile, names: string[]): Set<string> {
+    const found = new Set<string>();
+    if (names.length === 0) {
+        return found;
+    }
+    const leftMost = (name: ts.EntityName | ts.Expression): ts.Node =>
+        ts.isQualifiedName(name)
+            ? leftMost(name.left)
+            : ts.isPropertyAccessExpression(name)
+              ? leftMost(name.expression)
+              : name;
+    const check = (node: ts.Node) => {
+        if (ts.isIdentifier(node) && names.includes(node.text)) {
+            found.add(node.text);
+        }
+    };
+    const visit = (node: ts.Node) => {
+        if (ts.isTypeReferenceNode(node)) {
+            check(leftMost(node.typeName));
+        } else if (ts.isExpressionWithTypeArguments(node)) {
+            check(leftMost(node.expression));
+        } else if (ts.isTypeQueryNode(node)) {
+            check(leftMost(node.exprName));
+        }
+        ts.forEachChild(node, visit);
+    };
+    ts.forEachChild(file, visit);
+    return found;
 }
 
 export async function createApiDtsFiles(
@@ -209,9 +241,20 @@ export async function createApiDtsFiles(
     );
 
     // Pass 2: Filter imports of remoevd exports
-    sourceFiles = sourceFiles.map(
-        s => ts.visitEachChild(s, filterDtsImportsVisitor(checker, removedSymbols), undefined) as ts.SourceFile
-    );
+    sourceFiles = sourceFiles.map(s => {
+        const removedImports: string[] = [];
+        const filtered = ts.visitEachChild(
+            s,
+            filterDtsImportsVisitor(checker, removedSymbols, removedImports),
+            undefined
+        ) as ts.SourceFile;
+        for (const name of findTypeReferences(filtered, removedImports)) {
+            logger.error(
+                `${s.fileName}: '${name}' is still referenced, but its import was removed because the export is not public`
+            );
+        }
+        return filtered;
+    });
 
     // Pass 3: filter any files which do not have any exports
     sourceFiles = sourceFiles.filter(s =>
@@ -239,4 +282,3 @@ export async function createApiDtsFiles(
         await fs.promises.writeFile(outputFile, result);
     }
 }
-

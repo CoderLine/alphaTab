@@ -10,26 +10,29 @@ function generateFromJsonBody(
     importer('JsonHelper', '@coderline/alphatab/io/JsonHelper');
 
     const serializerName = `${input.name!.text}Serializer`;
-    return ts.factory.createBlock(
-        [
-            createNodeFromSource<ts.IfStatement>(
-                `if(!m) { 
+    const statements: ts.Statement[] = [
+        createNodeFromSource<ts.IfStatement>(
+            `if(!m) { 
             return; 
         }`,
-                ts.SyntaxKind.IfStatement
-            ),
-            serializable.isStrict
-                ? createNodeFromSource<ts.ExpressionStatement>(
-                      `JsonHelper.forEach(m, (v, k) => ${serializerName}.setProperty(obj, k, v));`,
-                      ts.SyntaxKind.ExpressionStatement
-                  )
-                : createNodeFromSource<ts.ExpressionStatement>(
-                      `JsonHelper.forEach(m, (v, k) => ${serializerName}.setProperty(obj, k.toLowerCase(), v));`,
-                      ts.SyntaxKind.ExpressionStatement
-                  )
-        ],
-        true
-    );
+            ts.SyntaxKind.IfStatement
+        ),
+        serializable.isStrict
+            ? createNodeFromSource<ts.ExpressionStatement>(
+                  `JsonHelper.forEach(m, (v, k) => ${serializerName}.setProperty(obj, k, v));`,
+                  ts.SyntaxKind.ExpressionStatement
+              )
+            : createNodeFromSource<ts.ExpressionStatement>(
+                  `JsonHelper.forEach(m, (v, k) => ${serializerName}.setProperty(obj, k.toLowerCase(), v));`,
+                  ts.SyntaxKind.ExpressionStatement
+              )
+    ];
+    if (serializable.hasAfterFromJsonExtension) {
+        statements.push(
+            createNodeFromSource<ts.ExpressionStatement>('obj.afterFromJson(m);', ts.SyntaxKind.ExpressionStatement)
+        );
+    }
+    return ts.factory.createBlock(statements, true);
 }
 
 export function createFromJsonMethod(

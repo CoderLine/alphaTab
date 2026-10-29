@@ -199,6 +199,7 @@ export enum AlphaTexDiagnosticCode {
 
     /**
      * A string number can only be specified on pitched notes, use the 'fret.string' syntax to specify the string of fretted notes.
+     * @since 1.9.0
      */
     AT221 = 221,
 
@@ -239,6 +240,7 @@ export enum AlphaTexDiagnosticCode {
 
     /**
      * The staff display property is not supported by the staff type, the value has no effect.
+     * @since 1.9.0
      */
     AT307 = 307,
 
@@ -293,6 +295,7 @@ export enum AlphaTexVoiceMode {
 
 /**
  * The staff types selected by the alphaTex staff display tags (`\defaultStaffDisplay`, `\staffDisplay`, `\barDisplay`).
+ * @since 1.9.0
  * @public
  */
 export enum AlphaTexStaffType {

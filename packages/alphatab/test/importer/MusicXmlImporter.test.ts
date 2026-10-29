@@ -7,11 +7,13 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import { BendType } from '@coderline/alphatab/model/BendType';
 import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -23,28 +25,17 @@ import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHe
 import { describe, expect, it } from 'vitest';
 
 describe('MusicXmlImporterTests', () => {
-    it('track-volume', async () => {
+    it('midi-instrument-volume-pan', async () => {
         const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/track-volume-balance.musicxml'
+            'test-data/musicxml4/part-volume-pan.xml',
+            false
         );
 
-        expect(score.tracks[0].playbackInfo.volume).toBe(16);
-        expect(score.tracks[1].playbackInfo.volume).toBe(12);
-        expect(score.tracks[2].playbackInfo.volume).toBe(8);
-        expect(score.tracks[3].playbackInfo.volume).toBe(4);
-        expect(score.tracks[4].playbackInfo.volume).toBe(0);
-    });
-
-    it('track-balance', async () => {
-        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/track-volume-balance.musicxml'
-        );
-
-        expect(score.tracks[0].playbackInfo.balance).toBe(0);
-        expect(score.tracks[1].playbackInfo.balance).toBe(4);
-        expect(score.tracks[2].playbackInfo.balance).toBe(8);
-        expect(score.tracks[3].playbackInfo.balance).toBe(12);
-        expect(score.tracks[4].playbackInfo.balance).toBe(16);
+        // volume 0-100 and pan -90 (left) to 90 (right) are scaled to 0-16, between the steps rounded down.
+        // only the first instrument of a part defines the track mixer, a part without values keeps the defaults.
+        const defaults = new PlaybackInformation();
+        expect(score.tracks.map(t => t.playbackInfo.volume)).toEqual([16, 10, 4, 0, 5, 8, defaults.volume]);
+        expect(score.tracks.map(t => t.playbackInfo.balance)).toEqual([0, 12, 8, 16, 5, 8, defaults.balance]);
     });
 
     it('full-bar-rest', async () => {
@@ -261,6 +252,12 @@ describe('MusicXmlImporterTests', () => {
         expect(score).toMatchSnapshot();
     });
 
+    it('measure-number-zero', async () => {
+        // an explicit (non-implicit) measure 0 starts the counting at 0
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-measure-number-zero.xml');
+        expect(score.masterBars.map(mb => mb.barNumberText)).toEqual(['0', '1', '2']);
+    });
+
     it('timewise-anacrusis', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/timewise-anacrusis.xml');
         expect(score).toMatchSnapshot();
@@ -460,9 +457,11 @@ describe('MusicXmlImporterTests', () => {
         expect(tab[0].realValue).toBe(69);
         expect(tab[0].showStringNumber).toBe(false);
 
-        expect(tab[1].isStringed).toBe(false);
+        // string without fret: the pitch defines the fret
+        expect(tab[1].isStringed).toBe(true);
         expect(tab[1].string).toBe(5);
-        expect(tab[1].showStringNumber).toBe(true);
+        expect(tab[1].fret).toBe(10);
+        expect(tab[1].showStringNumber).toBe(false);
         expect(tab[1].realValue).toBe(69);
 
         // out of range string
@@ -690,18 +689,51 @@ describe('MusicXmlImporterTests', () => {
         expect(notes.map(n => n.realValue)).toEqual([67, 67, 60, 74, 60, 84, 79, 74, 72, 64, 76]);
     });
 
+    it('adjacent-trills-stay-separate', async () => {
+        // two trill marks with their own wavy lines on notes 1-2 and 3-4
+        const spanners = await MusicXmlImporterTestHelper.loadFile(
+            'test-data/musicxml-testsuite/34a-Print-Object-Spanners.xml'
+        );
+        const bar4 = spanners.tracks[0].staves[0].bars[3].voices[0].beats;
+        expect(bar4.map(b => b.notes[0].isTrill)).toEqual([true, true, true, true]);
+        expect(bar4.map(b => b.notes[0].isTrillStart)).toEqual([true, false, true, false]);
+
+        // a trill over bar 6, and a separate single-note trill in bar 7
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml-testsuite/33a-Spanners.xml');
+        const bar6 = score.tracks[0].staves[0].bars[5].voices[0].beats;
+        expect(bar6.map(b => b.notes[0].isTrill)).toEqual([true, true, true]);
+        expect(bar6.map(b => b.notes[0].isTrillStart)).toEqual([true, false, false]);
+        const bar7 = score.tracks[0].staves[0].bars[6].voices[0].beats;
+        expect(bar7[0].notes[0].isTrill).toBe(true);
+        expect(bar7[0].notes[0].isTrillStart).toBe(true);
+    });
+
     describe('barnumberdisplay', async () => {
+        // the measure-numbering holds until it is changed
         async function testPartwise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
-            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).toBe(display);
-            expect(score.tracks[1].staves[0].bars[2].barNumberDisplay).toBe(display);
+            expect(score.tracks[0].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
+            expect(score.tracks[1].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([
+                undefined,
+                undefined,
+                display
+            ]);
         }
 
         async function testTimewise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
-            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).toBe(display);
-            expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).toBe(display);
+            expect(score.tracks[0].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
+            expect(score.tracks[1].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
         }
+
+        it('partwise-first-measure-applies-to-all', async () => {
+            const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml-samples/Telemann.xml');
+            for (const track of score.tracks) {
+                for (const bar of track.staves[0].bars) {
+                    expect(bar.barNumberDisplay).toBe(BarNumberDisplay.Hide);
+                }
+            }
+        });
 
         it('partwise-none', async () =>
             await testPartwise('partwise-measure-numbering-none.xml', BarNumberDisplay.Hide));
@@ -1527,6 +1559,180 @@ describe('MusicXmlImporterTests', () => {
                     CrescendoType.Decrescendo,
                     CrescendoType.None
                 ]);
+            });
+        });
+
+        describe('dynamics', () => {
+            const dynamic = (value: string, extra: string) =>
+                direction(`<direction-type><dynamics><${value}/></dynamics></direction-type>`, extra);
+            const rest = (voice: number, staff: number) =>
+                `<note><rest/><duration>1</duration><voice>${voice}</voice><type>quarter</type>${staff > 0 ? `<staff>${staff}</staff>` : ''}</note>`;
+            const backup = '<backup><duration>4</duration></backup>';
+            const dynamicsOf = (beats: Beat[]) => beats.map(b => b.dynamics);
+            const shownOf = (beats: Beat[]) => beats.map(b => b.showDynamics === true);
+
+            it('not-other-parts', () => {
+                const withoutMarkings = load([[quarters(4)]], 2);
+                expect(withoutMarkings.stylesheet.hideDynamics).toBe(true);
+                expect(beatsOf(withoutMarkings)[0].showDynamics).toBeUndefined();
+
+                const score = load(
+                    [
+                        [quarters(3) + dynamic('pp', '') + quarters(1), quarters(4)],
+                        [quarters(4), quarters(4)]
+                    ],
+                    2
+                );
+                const f = DynamicValue.F;
+                const pp = DynamicValue.PP;
+                expect(dynamicsOf(beatsOf(score, 0, 0, 0, 0))).toEqual([f, f, f, pp]);
+                expect(dynamicsOf(beatsOf(score, 1, 0, 0, 0))).toEqual([pp, pp, pp, pp]);
+                expect(shownOf(beatsOf(score, 0, 0, 0, 0))).toEqual([false, false, false, true]);
+                for (let bar = 0; bar < 2; bar++) {
+                    expect(dynamicsOf(beatsOf(score, bar, 0, 0, 1))).toEqual([f, f, f, f]);
+                    expect(shownOf(beatsOf(score, bar, 0, 0, 1))).toEqual([false, false, false, false]);
+                }
+            });
+
+            it('own-staff-at-same-position', () => {
+                // separate markings for both hands, a later single marking applies to both again
+                const score = load(
+                    [
+                        [
+                            dynamic('mf', '<staff>1</staff>') +
+                                quarters(2, 'C5', 1, 1) +
+                                dynamic('f', '<staff>1</staff>') +
+                                quarters(2, 'C5', 1, 1) +
+                                backup +
+                                dynamic('p', '<staff>2</staff>') +
+                                quarters(4, 'C3', 5, 2)
+                        ]
+                    ],
+                    2
+                );
+                const mf = DynamicValue.MF;
+                const p = DynamicValue.P;
+                const f = DynamicValue.F;
+                expect(dynamicsOf(beatsOf(score, 0, 0))).toEqual([mf, mf, f, f]);
+                expect(dynamicsOf(beatsOf(score, 0, 1))).toEqual([p, p, f, f]);
+                expect(shownOf(beatsOf(score, 0, 0))).toEqual([true, false, true, false]);
+                expect(shownOf(beatsOf(score, 0, 1))).toEqual([true, false, false, false]);
+            });
+
+            it('struck-before-marking', () => {
+                // a note started before the marking keeps the previous dynamics
+                const half = (pitch: string) => note(pitch, 5, 2, '', 2, 'half');
+                const score = load(
+                    [
+                        [
+                            quarters(1, 'C5', 1, 1) +
+                                dynamic('p', '<staff>1</staff>') +
+                                quarters(3, 'C5', 1, 1) +
+                                backup +
+                                half('C3') +
+                                half('D3')
+                        ]
+                    ],
+                    2
+                );
+                expect(dynamicsOf(beatsOf(score, 0, 1))).toEqual([DynamicValue.F, DynamicValue.P]);
+            });
+
+            it('shown-on-first-note', () => {
+                const score = load([[dynamic('p', '<offset>1</offset>') + rest(1, 0) + quarters(3)]], 2);
+                expect(dynamicsOf(beatsOf(score))).toEqual([
+                    DynamicValue.F,
+                    DynamicValue.P,
+                    DynamicValue.P,
+                    DynamicValue.P
+                ]);
+                expect(shownOf(beatsOf(score))).toEqual([false, true, false, false]);
+            });
+
+            it('note-notations', () => {
+                const score = load(
+                    [
+                        [
+                            quarters(4, 'C5', 1, 1) +
+                                backup +
+                                note('C3', 5, 2) +
+                                note('C3', 5, 2, '<dynamics><pp/></dynamics>') +
+                                quarters(2, 'C3', 5, 2)
+                        ]
+                    ],
+                    2
+                );
+                const f = DynamicValue.F;
+                const pp = DynamicValue.PP;
+                expect(score.stylesheet.hideDynamics).toBe(false);
+                expect(dynamicsOf(beatsOf(score, 0, 0))).toEqual([f, pp, pp, pp]);
+                expect(dynamicsOf(beatsOf(score, 0, 1))).toEqual([f, pp, pp, pp]);
+                expect(shownOf(beatsOf(score, 0, 0))).toEqual([false, false, false, false]);
+                expect(shownOf(beatsOf(score, 0, 1))).toEqual([false, true, false, false]);
+            });
+
+            it('repeated-on-staff', () => {
+                // Guitar Pro writes the dynamics on every note, the marking of the other staff is not repeated
+                const score = load(
+                    [
+                        [
+                            dynamic('p', '<staff>1</staff>') +
+                                note('C5', 1, 1, '<dynamics><mf/></dynamics>') +
+                                note('C5', 1, 1, '<dynamics><mf/></dynamics>') +
+                                quarters(2, 'C5', 1, 1) +
+                                backup +
+                                quarters(2, 'C3', 5, 2) +
+                                note('C3', 5, 2, '<dynamics><mf/></dynamics>') +
+                                note('C3', 5, 2, '<dynamics><mf/></dynamics>')
+                        ]
+                    ],
+                    2
+                );
+                expect(shownOf(beatsOf(score, 0, 0))).toEqual([true, false, false, false]);
+                expect(shownOf(beatsOf(score, 0, 1))).toEqual([false, false, true, false]);
+            });
+
+            it('restated-direction', () => {
+                const wedge = (type: string) => direction(`<direction-type><wedge type="${type}"/></direction-type>`);
+                const score = load(
+                    [
+                        [
+                            dynamic('p', '') +
+                                wedge('crescendo') +
+                                quarters(1) +
+                                wedge('stop') +
+                                wedge('diminuendo') +
+                                quarters(1) +
+                                wedge('stop') +
+                                dynamic('p', '') +
+                                quarters(2)
+                        ]
+                    ],
+                    2
+                );
+                expect(shownOf(beatsOf(score))).toEqual([true, false, true, false]);
+            });
+
+            it('43e-Multistaff-ClefDynamics', async () => {
+                const score = await MusicXmlImporterTestHelper.loadFile(
+                    'test-data/musicxml-testsuite/43e-Multistaff-ClefDynamics.xml'
+                );
+                // the markings of staff 1 are played on both staves of the piano, but only shown on staff 1
+                const ffff = DynamicValue.FFFF;
+                const p = DynamicValue.P;
+                for (const staff of score.tracks[0].staves) {
+                    expect(staff.bars.map(bar => dynamicsOf(bar.voices[0].beats))).toEqual([
+                        [ffff, ffff, ffff, p],
+                        [p, p, p, p],
+                        [p, p, p, p],
+                        [p]
+                    ]);
+                }
+                const none = [false, false, false, false];
+                const shown = (staff: number) =>
+                    score.tracks[0].staves[staff].bars.map(bar => shownOf(bar.voices[0].beats));
+                expect(shown(0)).toEqual([[true, false, false, true], none, none, [false]]);
+                expect(shown(1)).toEqual([none, none, none, [false]]);
             });
         });
 

@@ -3,7 +3,6 @@ import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Duration } from '@coderline/alphatab/model/Duration';
-import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
@@ -79,6 +78,32 @@ export abstract class ScoreLayout {
     public readonly tieControlPoints: number[] = TieGlyph.newControlPoints();
 
     public readonly effectPlacement: EffectSystemPlacement;
+
+    private _showAttribution: boolean = true;
+
+    /**
+     * The index of the bar renderer within each staff of `system` that carries the attribution, or -1.
+     * Whether the attribution is shown at all is decided at the start of every layout and resize pass.
+     */
+    public attributionRendererIndex(system: StaffSystem): number {
+        return this._showAttribution ? this.getAttributionRendererIndex(system) : -1;
+    }
+
+    protected abstract getAttributionRendererIndex(system: StaffSystem): number;
+
+    /**
+     * Songs up to this many bars are rendered without attribution, unless more than `_attributionFreeTrackCount`
+     * tracks are rendered.
+     */
+    private static readonly _attributionFreeBarCount: number = 10;
+    private static readonly _attributionFreeTrackCount: number = 2;
+
+    private _resolveShowAttribution(): boolean {
+        return (
+            this.renderer.score!.masterBars.length > ScoreLayout._attributionFreeBarCount ||
+            this.renderer.tracks!.length > ScoreLayout._attributionFreeTrackCount
+        );
+    }
 
     public multiBarRestInfo: Map<number, number[]> | null = null;
 
@@ -200,6 +225,7 @@ export abstract class ScoreLayout {
     }
 
     public resize(): void {
+        this._showAttribution = this._resolveShowAttribution();
         this._lazyPartials.clear();
         this.slurRegistry.clear();
         this._compressedBars.clear();
@@ -213,6 +239,7 @@ export abstract class ScoreLayout {
     public abstract doUpdateForBars(renderHints: RenderHints): boolean;
 
     public layoutAndRender(renderHints?: RenderHints): void {
+        this._showAttribution = this._resolveShowAttribution();
         this.slurRegistry.clear();
         this._compressedBars.clear();
 
@@ -698,45 +725,5 @@ export abstract class ScoreLayout {
             glyph.x = this.firstBarX;
             glyph.textAlign = TextAlign.Left;
         }
-    }
-
-    protected _layoutAndRenderAnnotation(y: number): number {
-        // attention, you are not allowed to remove change this notice within any version of this library without permission!
-        const msg: string = 'rendered by alphaTab';
-        const resources: RenderingResources = this.renderer.settings.display.resources;
-        const size: number = 12;
-        const fontFamilies = resources.elementFonts.has(NotationElement.ScoreCopyright)
-            ? resources.elementFonts.get(NotationElement.ScoreCopyright)!.families
-            : resources.tablatureFont.families;
-
-        const font = Font.withFamilyList(fontFamilies, size, FontStyle.Plain, FontWeight.Bold);
-
-        const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
-        const glyph = new TextGlyph(0, 0, msg, font, TextAlign.Center, undefined, resources.mainGlyphColor);
-        glyph.renderer = fakeBarRenderer;
-        glyph.doLayout();
-        this.alignScoreInfoGlyph(glyph);
-
-        const e = new RenderFinishedEventArgs();
-
-        e.width = glyph.x + glyph.width;
-        e.x = 0;
-        e.height = size;
-        e.y = y;
-
-        e.totalWidth = this.scaledWidth;
-        e.totalHeight = y + size;
-        e.firstMasterBarIndex = -1;
-        e.lastMasterBarIndex = -1;
-
-        this.registerPartial(e, canvas => {
-            canvas.color = resources.mainGlyphColor;
-            canvas.font = font;
-            canvas.textAlign = TextAlign.Left;
-            canvas.textBaseline = TextBaseline.Top;
-            glyph.paint(0, 0, canvas);
-        });
-
-        return y + size;
     }
 }

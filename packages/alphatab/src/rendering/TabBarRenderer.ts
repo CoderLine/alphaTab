@@ -24,6 +24,7 @@ import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/Staff
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { ScrambledPath } from '@coderline/alphatab/rendering/utils/ScrambledPath';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -146,6 +147,7 @@ export class TabBarRenderer extends LineBarRenderer {
         cx: number,
         cy: number,
         canvas: ICanvas,
+        lines: ScrambledPath | null,
         renderers: BarRendererBase[],
         from: number,
         to: number
@@ -162,10 +164,10 @@ export class TabBarRenderer extends LineBarRenderer {
             const y = cyLocal + (this.getLineY(line) - lineYOffset);
             let lineX = startX;
             for (let i = from; i < to; i++) {
-                lineX = (renderers[i] as TabBarRenderer)._paintStaffLineUpToGaps(cx, y, line, lineX, canvas);
+                lineX = (renderers[i] as TabBarRenderer)._paintStaffLineUpToGaps(cx, y, line, lineX, canvas, lines);
             }
             if (endX > lineX) {
-                canvas.fillRect(lineX, y, endX - lineX, thickness);
+                this.fillStaffLine(canvas, lines, lineX, y, endX - lineX, thickness);
             }
         }
     }
@@ -175,7 +177,14 @@ export class TabBarRenderer extends LineBarRenderer {
      * already cover.
      * @returns The x after the last hole, never less than `lineX`.
      */
-    private _paintStaffLineUpToGaps(cx: number, y: number, line: number, lineX: number, canvas: ICanvas): number {
+    private _paintStaffLineUpToGaps(
+        cx: number,
+        y: number,
+        line: number,
+        lineX: number,
+        canvas: ICanvas,
+        lines: ScrambledPath | null
+    ): number {
         if (this.additionalMultiRestBars) {
             return lineX;
         }
@@ -205,7 +214,7 @@ export class TabBarRenderer extends LineBarRenderer {
         for (let k = begin + 1; k < end; k++) {
             const xk = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
             if (xk < prevX) {
-                return this._paintStaffLineUpToSortedGaps(cxLocal, y, begin, end, lineX, canvas);
+                return this._paintStaffLineUpToSortedGaps(cxLocal, y, begin, end, lineX, canvas, lines);
             }
             prevX = xk;
         }
@@ -213,7 +222,7 @@ export class TabBarRenderer extends LineBarRenderer {
         for (let k = begin; k < end; k++) {
             const gx = cxLocal + (base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2]);
             if (gx > lineX) {
-                canvas.fillRect(lineX, y, gx - lineX, thickness);
+                this.fillStaffLine(canvas, lines, lineX, y, gx - lineX, thickness);
             }
             const gapEnd = gx + relXAndWidth[k * 2 + 1];
             if (gapEnd > lineX) {
@@ -229,7 +238,8 @@ export class TabBarRenderer extends LineBarRenderer {
         begin: number,
         end: number,
         lineX: number,
-        canvas: ICanvas
+        canvas: ICanvas,
+        lines: ScrambledPath | null
     ): number {
         const relXAndWidth = this._gapRelXAndWidth!;
         const beatRefs = this._gapBeatRefs!;
@@ -256,7 +266,7 @@ export class TabBarRenderer extends LineBarRenderer {
         for (let k = 0; k < xs.length; k++) {
             const gx = xs[k];
             if (gx > lineX) {
-                canvas.fillRect(lineX, y, gx - lineX, thickness);
+                this.fillStaffLine(canvas, lines, lineX, y, gx - lineX, thickness);
             }
             const gapEnd = gx + ws[k];
             if (gapEnd > lineX) {
@@ -562,6 +572,11 @@ export class TabBarRenderer extends LineBarRenderer {
             const reservedAreas = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime;
             if (reservedAreas !== null && reservedAreas.has(beat.displayStart)) {
                 holes = reservedAreas.get(beat.displayStart)!.getSlotsSortedByTop();
+            }
+
+            // no note on the tab (e.g. pitched notes without tab position) -> no stem
+            if (holes.length === 0) {
+                return;
             }
 
             // fast path -> single note == full line

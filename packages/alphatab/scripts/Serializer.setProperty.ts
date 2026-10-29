@@ -43,7 +43,15 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                 )
             );
 
-        if (!prop.asRaw && prop.type.isUnionType) {
+        if (prop.isUnsetAsNaN) {
+            caseStatements.push(
+                createNodeFromSource<ts.ExpressionStatement>(
+                    `obj.${fieldName} = v === null || v === undefined ? Number.NaN : (v as number);`,
+                    ts.SyntaxKind.ExpressionStatement
+                )
+            );
+            caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
+        } else if (!prop.asRaw && prop.type.isUnionType) {
             caseStatements.push(
                 assignField(
                     ts.factory.createAsExpression(

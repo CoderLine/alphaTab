@@ -47,6 +47,7 @@ export class NoteCloner {
         clone.rightHandFinger = original.rightHandFinger;
         clone.trillValue = original.trillValue;
         clone.trillSpeed = original.trillSpeed;
+        clone.isTrillStart = original.isTrillStart;
         clone.durationPercent = original.durationPercent;
         clone.accidentalMode = original.accidentalMode;
         clone.dynamics = original.dynamics;

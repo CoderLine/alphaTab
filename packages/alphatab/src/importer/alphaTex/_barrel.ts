@@ -3,6 +3,7 @@ export {
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
     type AlphaTexAstNodeLocation,
+    type AlphaTexAtTokenNode,
     type AlphaTexBackSlashTokenNode,
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,

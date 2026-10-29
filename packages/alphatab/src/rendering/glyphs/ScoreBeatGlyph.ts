@@ -76,7 +76,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
 
         if (this._whammy?.hasBoundingBox) {
-            y = Math.min(y, this._whammy.getBoundingBoxTop());
+            y = Math.min(y, this._whammy.getEstimatedBoundingBoxTop());
         }
         return y;
     }
@@ -90,7 +90,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
 
         if (this._whammy?.hasBoundingBox) {
-            y = Math.max(y, this._whammy.getBoundingBoxBottom());
+            y = Math.max(y, this._whammy.getEstimatedBoundingBoxBottom());
         }
         return y;
     }
@@ -454,7 +454,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             } else {
                 container = aboveBeatEffects.get('StringNumber')! as StringNumberContainerGlyph;
             }
-            container.addString(n.string);
+            container.addString(n.string, n.realValue);
         }
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);

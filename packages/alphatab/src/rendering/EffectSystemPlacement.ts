@@ -1,4 +1,4 @@
-import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import type { EffectBand, EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
 import type { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
@@ -42,10 +42,11 @@ export class EffectSystemPlacement {
     }
 
     /**
-     * Places the effect bands of the staff against {@link systemSkyline} (and {@link contentSkyline}),
-     * which must hold the assembled skylines of the staff.
+     * Places the non-empty effect bands of the staff against {@link systemSkyline} (and {@link contentSkyline}),
+     * which must hold the assembled skylines of the staff, and publishes them into it.
+     * Must be followed by {@link apply} for the same staff.
      */
-    public placeAndApply(staff: RenderStaff): void {
+    public place(staff: RenderStaff): void {
         const sky = this.systemSkyline;
         const pad = staff.system.layout.renderer.settings.display.effectBandPaddingBottom;
 
@@ -91,6 +92,15 @@ export class EffectSystemPlacement {
         const contentSky = staff.placesAgainstContentOnly ? this.contentSkyline : null;
         this._placeSide(top, sky.upSky, contentSky ? contentSky.upSky : null, pad, /* isTop */ true);
         this._placeSide(bottom, sky.downSky, contentSky ? contentSky.downSky : null, pad, /* isTop */ false);
+    }
+
+    /**
+     * Reserves the placed bands in the renderer and staff overflows and positions them relative to the final
+     * staff overflow. Overflow registered on the staff between {@link place} and this call is respected.
+     */
+    public apply(staff: RenderStaff): void {
+        const top = this._top;
+        const bottom = this._bottom;
 
         // A bar reserves its own content and the bands placed on it. Bands know their final
         // position (magnitude + height), so the reserved height does not depend on the skyline before
@@ -117,11 +127,14 @@ export class EffectSystemPlacement {
         }
     }
 
+    private static readonly _rangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
     /** The height the placed bands add on top of the given content overflow. */
     private static _effectsHeight(bands: EffectBand[], contentOverflow: number): number {
         let max = 0;
         for (const b of bands) {
-            if (!b.isEmpty) {
+            // bands without extent (e.g. hidden bar numbers) take no part in the placement
+            if (b.computeLocalXRange(EffectSystemPlacement._rangeScratch)) {
                 const outer = b.placedMagnitude + b.height;
                 if (outer > max) {
                     max = outer;

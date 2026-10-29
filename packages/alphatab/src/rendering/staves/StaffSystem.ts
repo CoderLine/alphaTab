@@ -1377,12 +1377,6 @@ export class StaffSystem {
 
                 const bracket = this._staffToBracket.has(staff) ? this._staffToBracket.get(staff) : undefined;
                 const hasBracket = bracket && !bracket.drawAsBrace && bracket.canPaint;
-                if (hasBracket && bracket!.firstStaffInBracket === staff) {
-                    const spikeOverflow = topBracketSpikeHeight - staff.topOverflow;
-                    if (spikeOverflow > 0) {
-                        currentY += spikeOverflow;
-                    }
-                }
 
                 // the bracket spike curls into the first bar of whichever staff it is
                 // anchored on; register that horizontal footprint in the bar's own skyline
@@ -1398,10 +1392,18 @@ export class StaffSystem {
                 }
 
                 staff.x = this.accoladeWidth;
-                staff.y = currentY;
                 if (!onlyFirstGroup) {
                     staff.finalizeStaff();
                 }
+
+                // the top overflow is final only after finalizeStaff (it may already reserve the spike)
+                if (hasBracket && bracket!.firstStaffInBracket === staff) {
+                    const spikeOverflow = topBracketSpikeHeight - staff.topOverflow;
+                    if (spikeOverflow > 0) {
+                        currentY += spikeOverflow;
+                    }
+                }
+                staff.y = currentY;
 
                 if (staff.isVisible) {
                     // ensure the content of adjacent staves keeps a minimum padding

@@ -319,14 +319,6 @@ export class BeamingHelper {
         return ModelUtils.getIndex(a.duration) - 2 - barIndex > 0 && ModelUtils.getIndex(b.duration) - 2 - barIndex > 0;
     }
 
-    public get beatOfLowestNote(): Beat {
-        return this.lowestNoteInHelper!.beat;
-    }
-
-    public get beatOfHighestNote(): Beat {
-        return this.highestNoteInHelper!.beat;
-    }
-
     /**
      * Per-direction beam drawing info, created on first use and reused across
      * layout cycles; `*Valid=false` means callers must re-initialize before reading.

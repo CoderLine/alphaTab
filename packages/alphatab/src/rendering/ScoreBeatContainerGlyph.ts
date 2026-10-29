@@ -6,7 +6,10 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
-import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import {
+    BeatContainerGlyph,
+    type BeatContainerGlyphBase
+} from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
 import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
@@ -91,7 +94,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override getBoundingBoxTop(): number {
         if (this._bend !== null) {
-            return ModelUtils.minBoundingBox(this._bend.getBoundingBoxTop(), super.getBoundingBoxTop());
+            return ModelUtils.minBoundingBox(this._bend.getEstimatedBoundingBoxTop(), super.getBoundingBoxTop());
         } else {
             return super.getBoundingBoxTop();
         }
@@ -99,7 +102,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override getBoundingBoxBottom(): number {
         if (this._bend !== null) {
-            return ModelUtils.maxBoundingBox(this._bend.getBoundingBoxBottom(), super.getBoundingBoxBottom());
+            return ModelUtils.maxBoundingBox(this._bend.getEstimatedBoundingBoxBottom(), super.getBoundingBoxBottom());
         } else {
             return super.getBoundingBoxBottom();
         }
@@ -191,6 +194,47 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             }
         }
     }
+
+    public override fitToNextBeat(next: BeatContainerGlyphBase): void {
+        const own = (this.onNotes as ScoreBeatGlyph).noteHeads;
+        const other = next instanceof ScoreBeatContainerGlyph ? (next.onNotes as ScoreBeatGlyph).noteHeads : null;
+        const both = own !== null && other !== null;
+        const sharesTop = both && own!.hasTopLedgerLines && other!.hasTopLedgerLines;
+        const sharesBottom = both && own!.hasBottomLedgerLines && other!.hasBottomLedgerLines;
+
+        let ownTrim = 0;
+        let otherTrim = 0;
+        if (sharesTop || sharesBottom) {
+            const ownExtension = own!.ledgerLineExtension;
+            const otherExtension = other!.ledgerLineExtension;
+            const ownEnd = this.x + this.onNotes.x + own!.x + own!.width + ownExtension;
+            const otherStart =
+                next.x + (next as ScoreBeatContainerGlyph).onNotes.x + other!.x + other!.noteStartX - otherExtension;
+            const missing =
+                ScoreBeatContainerGlyph.ledgerLineGap * this.renderer.smuflMetrics.oneStaffSpace -
+                (otherStart - ownEnd);
+            if (missing > 0) {
+                // shorten both facing ledger lines equally, but never shorter than the note heads
+                ownTrim = Math.min(ownExtension, missing / 2);
+                otherTrim = Math.min(otherExtension, missing - ownTrim);
+                ownTrim = Math.min(ownExtension, missing - otherTrim);
+            }
+        }
+
+        if (own) {
+            own.topLedgerLineTrimRight = sharesTop ? ownTrim : 0;
+            own.bottomLedgerLineTrimRight = sharesBottom ? ownTrim : 0;
+        }
+        if (other) {
+            other.topLedgerLineTrimLeft = sharesTop ? otherTrim : 0;
+            other.bottomLedgerLineTrimLeft = sharesBottom ? otherTrim : 0;
+        }
+    }
+
+    /**
+     * The minimum gap between the ledger lines of neighbouring notes in stave-spaces (MuseScore's ledger line padding).
+     */
+    public static readonly ledgerLineGap: number = 0.25;
 
     private _flagStretch = 0;
 

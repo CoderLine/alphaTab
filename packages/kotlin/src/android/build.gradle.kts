@@ -36,7 +36,9 @@ fun loadSetting(envKey: String, propKey: String, setter: (value: String) -> Unit
 }
 
 var libDescription =
-    "alphaTab is a cross platform music notation and guitar tablature rendering library."
+    "alphaTab is a cross platform music notation and guitar tablature rendering library. " +
+        "The \"alphaTab.net\" attribution in rendered scores must stay visible, " +
+        "see https://alphatab.net/docs/attribution"
 var libAuthorId = "danielku15"
 var libAuthorName = "Daniel Kuschny"
 var libOrgUrl = "https://github.com/coderline"

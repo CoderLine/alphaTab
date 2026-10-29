@@ -76,8 +76,9 @@ export class MultiVoiceContainerGlyph extends Glyph {
             return false;
         }
 
+        // a pick-up bar is shorter than its time signature, its notes are not full-bar notes
         const spring = springs.get(masterBar.start)!;
-        return spring.allDurations.size === 1 && spring.longestDuration === masterBar.calculateDuration();
+        return spring.allDurations.size === 1 && spring.longestDuration === masterBar.calculateDuration(false);
     }
 
     private _scaleToForce(force: number): void {
@@ -89,7 +90,8 @@ export class MultiVoiceContainerGlyph extends Glyph {
             // applyCenterOffset instead of moving the container itself (which would leave the
             // bar's left portion outside this beat's bounds).
 
-            const target = this.width / 2;
+            // centred between the bar header content (or start barline) and the end barline
+            const target = (this.width - this.renderer.layoutingInfo.preBeatTrailingSpace) / 2;
             for (const beatGlyphs of this.beatGlyphs) {
                 if (beatGlyphs.length === 0) {
                     continue;
@@ -146,9 +148,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
                         } else {
                             // placement for improper grace beats where no beat in the same bar follows
                             const graceSpring = this.renderer.layoutingInfo.incompleteGraceRods.get(graceGroupId)!;
-                            const relativeOffset =
-                                graceSpring[currentBeatGlyph.graceIndex].postSpringWidth -
-                                graceSpring[currentBeatGlyph.graceIndex].preSpringWidth;
+                            const ownPreBeatWidth = graceSpring[currentBeatGlyph.graceIndex].preBeatWidth;
 
                             if (i > 0) {
                                 if (currentBeatGlyph.graceIndex === 0) {
@@ -168,16 +168,17 @@ export class MultiVoiceContainerGlyph extends Glyph {
                                               this.renderer.layoutingInfo.beatContentPadding
                                             : previous.x + previous.width;
                                 } else {
-                                    // for the multiple grace glyphs we take the width of the grace rod
-                                    // this width setting is aligned with the positioning logic below
+                                    // the following grace beats are placed by their rods, after the previous grace beat
+                                    const previous = beatGlyphs[i - 1];
                                     currentBeatGlyph.x =
-                                        beatGlyphs[i - 1].x +
-                                        graceSpring[currentBeatGlyph.graceIndex - 1].postSpringWidth -
-                                        graceSpring[currentBeatGlyph.graceIndex - 1].preSpringWidth -
-                                        relativeOffset;
+                                        previous.x +
+                                        previous.onTimeX +
+                                        graceSpring[currentBeatGlyph.graceIndex - 1].postSpringWidth +
+                                        ownPreBeatWidth -
+                                        currentBeatGlyph.onTimeX;
                                 }
                             } else {
-                                currentBeatGlyph.x = -relativeOffset;
+                                currentBeatGlyph.x = ownPreBeatWidth - currentBeatGlyph.onTimeX;
                             }
                         }
                         break;
@@ -189,6 +190,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
                     const previous = beatGlyphs[i - 1];
                     const beatWidth: number = currentBeatGlyph.x - previous.x;
                     previous.scaleToWidth(beatWidth);
+                    previous.fitToNextBeat(currentBeatGlyph);
                     this._emitBeatContainerSkyline(previous);
                 }
                 // for the last glyph size based on the full width
@@ -240,6 +242,7 @@ export class MultiVoiceContainerGlyph extends Glyph {
             }
         }
 
+        beatContainer.emitSkyline(base);
         renderer.emitBeatSkyline(beatContainer);
     }
 

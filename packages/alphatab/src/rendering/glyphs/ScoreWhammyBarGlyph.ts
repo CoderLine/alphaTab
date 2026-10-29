@@ -11,7 +11,6 @@ import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
-import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -20,12 +19,10 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 /**
  * @internal
  */
-export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements ITieGlyph {
+export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     private _container: ScoreBeatContainerGlyph;
     private _beat: Beat;
     private _endGlyph: BendNoteHeadGroupGlyph | null = null;
-
-    public readonly checkForOverflow = false;
 
     public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
@@ -41,18 +38,20 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
         return !!endGlyph.minStepsNote && !!endGlyph.maxStepsNote;
     }
 
-    public override getBoundingBoxTop(): number {
+    /** The top of the helper notes before the beats are positioned. */
+    public getEstimatedBoundingBoxTop(): number {
         if (this._endGlyph?.minStepsNote) {
             return this._endGlyph.minStepsNote.getBoundingBoxTop();
         }
-        return super.getBoundingBoxTop();
+        return this.getNoteHeadsBoundingBoxTop();
     }
 
-    public override getBoundingBoxBottom(): number {
+    /** The bottom of the helper notes before the beats are positioned. */
+    public getEstimatedBoundingBoxBottom(): number {
         if (this._endGlyph?.maxStepsNote) {
             return this._endGlyph.maxStepsNote.getBoundingBoxBottom();
         }
-        return super.getBoundingBoxBottom();
+        return this.getNoteHeadsBoundingBoxBottom();
     }
 
     public doMultiVoiceLayout() {
@@ -60,6 +59,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
     }
 
     public override doLayout(): void {
+        this.isMeasured = false;
         const sr = this.renderer as ScoreBarRenderer;
         const whammyMode: NotationMode = sr.settings.notation.notationMode;
         switch (this._beat.whammyBarType) {
@@ -136,7 +136,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
         this.width = this.width / 2;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+    protected override paintOrMeasure(cx: number, cy: number, canvas: ICanvas): void {
         const beat: Beat = this._beat;
         switch (beat.whammyBarType) {
             case WhammyType.None:
@@ -234,9 +234,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
             switch (beat.whammyBarType) {
                 case WhammyType.Hold:
                     if (note.isTieOrigin) {
-                        TieGlyph.paintTie(
+                        this.drawTie(
                             canvas,
-                            1,
                             startX,
                             startY,
                             endX,
@@ -253,7 +252,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         g0.x = endX - g0.onTimeX;
                         const previousY = this.glyphs![0].y;
                         g0.y = cy + startNoteRenderer.y;
-                        g0.paint(0, 0, canvas);
+                        this.paintOrMeasureHelperNotes(g0, canvas);
                         if (g0.containsNoteValue(endValue)) {
                             endY -= previousY;
                             endY += g0.y;
@@ -270,9 +269,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                             slurText
                         );
                     } else if (note.isTieOrigin) {
-                        TieGlyph.paintTie(
+                        this.drawTie(
                             canvas,
-                            1,
                             startX,
                             startY,
                             endX,
@@ -286,9 +284,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                 case WhammyType.Dip:
                     if (whammyMode === NotationMode.SongBook) {
                         if (note.isTieOrigin) {
-                            TieGlyph.paintTie(
+                            this.drawTie(
                                 canvas,
-                                1,
                                 startX,
                                 startY,
                                 endX,
@@ -303,7 +300,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
                         g0.x = middleX - g0.onTimeX;
                         g0.y = cy + startNoteRenderer.y;
-                        g0.paint(0, 0, canvas);
+                        this.paintOrMeasureHelperNotes(g0, canvas);
                         const middleValue: number = this._getBendNoteValue(note, beat.whammyBarPoints![1]);
                         const middleY: number = g0.getNoteValueY(middleValue) + heightOffset;
                         this.drawBendSlur(
@@ -319,7 +316,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         const g1 = this.glyphs![1] as BendNoteHeadGroupGlyph;
                         g1.x = endX - g1.onTimeX;
                         g1.y = cy + startNoteRenderer.y;
-                        g1.paint(0, 0, canvas);
+                        this.paintOrMeasureHelperNotes(g1, canvas);
                         endY = g1.getNoteValueY(endValue) + heightOffset;
                         this.drawBendSlur(
                             canvas,
@@ -352,7 +349,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph implements IT
                         const g0 = this.glyphs![0] as BendNoteHeadGroupGlyph;
                         g0.x = endX - g0.onTimeX;
                         g0.y = cy + startNoteRenderer.y;
-                        g0.paint(0, 0, canvas);
+                        this.paintOrMeasureHelperNotes(g0, canvas);
                         this.drawBendSlur(
                             canvas,
                             startX,

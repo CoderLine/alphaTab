@@ -25,16 +25,22 @@ import type { Settings } from '@coderline/alphatab/Settings';
  * @internal
  */
 export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
-    private _api: AlphaTabApiBase<T>;
     private _worker!: IAlphaTabRenderingWorker;
     private _width: number = 0;
     private _isResizeInFlight: boolean = false;
     private _isResizePending: boolean = false;
 
+    /**
+     * The scores sent to the worker, by the id sent along. The worker handles messages in order,
+     * so results arriving for an id mean no results follow for older ids.
+     */
+    private _sentScores = new Map<number, Score>();
+    private _lastScoreId = 0;
+    private _oldestSentScoreId = 1;
+
     public boundsLookup: BoundsLookup | null = null;
 
     public constructor(api: AlphaTabApiBase<T>, worker: IAlphaTabRenderingWorker) {
-        this._api = api;
         this._worker = worker;
         this._worker.postMessage({
             cmd: 'alphaTab.initialize',
@@ -159,17 +165,18 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
                 (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
             case 'alphaTab.postRenderFinished':
-                const score = this._api.score;
+                const score = this._takeSentScore(data.scoreId);
                 if (score && data.boundsLookup) {
-                    this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
+                    this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, score);
                     this.boundsLookup?.finish();
                 }
                 (this.postRenderFinished as EventEmitter).trigger();
                 break;
             /*@target web*/
             case 'alphaTab.postRenderFinishedWire':
-                if (this._api.score) {
-                    this.boundsLookup = BoundsLookupWire.decode(data.boundsLookup as Float64Array, this._api.score);
+                const wireScore = this._takeSentScore(data.scoreId);
+                if (wireScore) {
+                    this.boundsLookup = BoundsLookupWire.decode(data.boundsLookup as Float64Array, wireScore);
                     this.boundsLookup.finish();
                 }
                 (this.postRenderFinished as EventEmitter).trigger();
@@ -183,11 +190,27 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         }
     }
 
+    /**
+     * The score a render result with the given id was made for. The api might already hold a newer score.
+     */
+    private _takeSentScore(scoreId: number): Score | undefined {
+        for (let id = this._oldestSentScoreId; id < scoreId; id++) {
+            this._sentScores.delete(id);
+        }
+        this._oldestSentScoreId = Math.max(this._oldestSentScoreId, scoreId);
+        return this._sentScores.get(scoreId);
+    }
+
     public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
         const jsObject: unknown =
             score == null ? null : this._serializeScoreForWorker(Environment.prepareForPostMessage(score));
+        const scoreId = ++this._lastScoreId;
+        if (score) {
+            this._sentScores.set(scoreId, score);
+        }
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
+            scoreId,
             score: jsObject,
             trackIndexes: Environment.prepareForPostMessage(trackIndexes),
             fontSizes: FontSizes.fontSizeLookupTables,

@@ -23,7 +23,8 @@ export class TabClefGlyph extends MusicFontGlyph {
 
     public override registerHeaderRod(info: IHeaderRodSink): void {
         // shares the column with the standard notation clefs, left aligned
-        info.addHeaderRod(ClefGlyph.HeaderRank, 0, this.width + this.renderer.smuflMetrics.preBeatGlyphSpacing);
+        const spacing = this.renderer.smuflMetrics.preBeatGlyphSpacing;
+        info.addHeaderRod(ClefGlyph.HeaderRank, 0, this.width + spacing, spacing);
     }
 
     public override applyHeaderRod(info: IHeaderRodSink): void {

@@ -95,6 +95,10 @@ public class List<T> : Iterable<T> {
         return _data.any(predicate)
     }
 
+    public fun every(predicate: (T) -> Boolean): Boolean {
+        return _data.all(predicate)
+    }
+
     public fun includes(value: T): Boolean {
         return _data.contains(value)
     }
@@ -147,6 +151,15 @@ public class List<T> : Iterable<T> {
         val mapped = DoubleList(_data.size)
         _data.forEachIndexed { index, item ->
             mapped[index] = transform(item).toDouble()
+        }
+        return mapped
+    }
+
+    @kotlin.jvm.JvmName("mapToBoolean")
+    internal fun map(transform: (v: T) -> Boolean): BooleanList {
+        val mapped = BooleanList(_data.size)
+        _data.forEachIndexed { index, item ->
+            mapped[index] = transform(item)
         }
         return mapped
     }

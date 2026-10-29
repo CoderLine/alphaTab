@@ -9,6 +9,7 @@ import {
     EffectBandMode
 } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { ActiveEffectBand } from '@coderline/alphatab/rendering/EffectBandContainer';
+import { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
 import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
 import { BarLocalSkyline } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
@@ -466,6 +467,46 @@ export class RenderStaff implements IStaffDisplayContext {
         this.bottomPadding = isLast ? settings.lastNotationStaffPaddingBottom : settings.notationStaffPaddingBottom;
     }
 
+    /**
+     * Rests the attribution above everything placed on the top staff, ending at the barline of the bar chosen by
+     * the layout. Runs after effect band placement so that it never displaces notation.
+     */
+    private _placeAttribution(sky: StaffSystemSkyline): void {
+        const index = this.isFirstInSystem ? this.system.layout.attributionRendererIndex(this.system) : -1;
+        let last: BarRendererBase | null = null;
+        for (let i = 0; i < this.barRenderers.length; i++) {
+            if (i === index) {
+                last = this.barRenderers[i];
+            } else {
+                this.barRenderers[i].attribution = null;
+            }
+        }
+        if (last === null) {
+            return;
+        }
+
+        const glyph = last.attribution ?? new AttributionGlyph();
+        glyph.renderer = last;
+        last.attribution = glyph;
+
+        const xEnd = last.x + last.width;
+        const xStart = xEnd - glyph.width;
+        const gap = last.smuflMetrics.oneStaffSpace * 0.5;
+        const upSky = sky.upSky;
+        let bottom = Math.max(upSky.maxHeightInRange(xStart, xEnd), last.staffTopClearance) + gap;
+        // marks beside it which reach up next to it keep the same gap horizontally
+        const beside = Math.max(upSky.maxHeightInRange(xStart - gap, xStart), upSky.maxHeightInRange(xEnd, xEnd + gap));
+        if (beside > bottom) {
+            bottom = beside + gap;
+        }
+        const top = bottom + glyph.height;
+        glyph.x = xStart - last.x;
+        glyph.y = -top;
+
+        upSky.insert(xStart, xEnd, top, 0);
+        this.registerOverflowTop(Math.ceil(top));
+    }
+
     public finalizeStaff(): void {
         Profiler.begin('layout.finalizeStaff');
         this._applyStaffPaddings();
@@ -497,7 +538,9 @@ export class RenderStaff implements IStaffDisplayContext {
             RenderStaff._unionBarLocalIntoStaffSkyline(renderer, sky, content);
         }
 
-        placement.placeAndApply(this);
+        placement.place(this);
+        this._placeAttribution(sky);
+        placement.apply(this);
         this.systemSkyline.copyFrom(sky);
 
         if (this.height > 0) {
@@ -519,15 +562,18 @@ export class RenderStaff implements IStaffDisplayContext {
         // canvas.fillRect(cx + this.x, cy + this.y, this.system.width - this.x, this.height);
 
         const end = Math.min(startIndex + count, this.barRenderers.length);
-        if (startIndex >= end) {
-            return;
-        }
-
         const x = cx + this.x;
         const y = cy + this.y;
-        this.barRenderers[startIndex].paintStaffLines(x, y, canvas, this.barRenderers, startIndex, end);
-        for (let i: number = startIndex; i < end; i++) {
-            this.barRenderers[i].paint(x, y, canvas);
+        if (startIndex < end) {
+            this.barRenderers[startIndex].paintStaffLines(x, y, canvas, this.barRenderers, startIndex, end);
+            for (let i: number = startIndex; i < end; i++) {
+                this.barRenderers[i].paint(x, y, canvas);
+            }
+        }
+
+        // partial rendering: the bar after the range can reach into it (e.g. a bar number centred on its barline)
+        if (end < this.barRenderers.length) {
+            this.barRenderers[end].paintLeftOverhang(x, y, canvas);
         }
     }
 }

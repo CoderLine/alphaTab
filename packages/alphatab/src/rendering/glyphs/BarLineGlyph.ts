@@ -386,7 +386,7 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
 
     public override registerHeaderRod(info: IHeaderRodSink): void {
         if (!this._isRight) {
-            info.addHeaderRod(BarLineGlyph.HeaderRank, 0, this.width);
+            info.addHeaderRod(BarLineGlyph.HeaderRank, 0, this.width, 0);
         }
     }
 

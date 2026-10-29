@@ -12,7 +12,7 @@ export class StartSpacingGlyph extends SpacingGlyph {
     public static readonly HeaderRank: number = 100;
 
     public override registerHeaderRod(info: IHeaderRodSink): void {
-        info.addHeaderRod(StartSpacingGlyph.HeaderRank, 0, this.width);
+        info.addHeaderRod(StartSpacingGlyph.HeaderRank, 0, this.width, this.width);
     }
 
     public override applyHeaderRod(info: IHeaderRodSink): void {

@@ -4,27 +4,12 @@ import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '../VisualTes
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import type { Score } from '@coderline/alphatab/model/Score';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { type ILogger, Logger } from '@coderline/alphatab/Logger';
+import { Logger } from '@coderline/alphatab/Logger';
 import { LogLevel } from '@coderline/alphatab/LogLevel';
-
-/**
- * @internal
- */
-class WarningCollectingLogger implements ILogger {
-    public warnings: string[] = [];
-
-    public debug(_category: string, _msg: string, ..._details: unknown[]): void {}
-
-    public warning(_category: string, msg: string, ..._details: unknown[]): void {
-        this.warnings.push(msg);
-    }
-
-    public info(_category: string, _msg: string, ..._details: unknown[]): void {}
-
-    public error(_category: string, _msg: string, ..._details: unknown[]): void {}
-}
+import { WarningCollectingLogger } from 'test/WarningCollectingLogger';
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {
@@ -37,6 +22,17 @@ describe('BrokenRendersTests', () => {
             \\lyrics "Do Re Mi Fa So"
             C4 {tr 16} C4 C4 C4 | C4 c4`,
             'test-data/visual-tests/issues/bottom-effect-band.png'
+        );
+    });
+
+    it('two-voice-unison-and-second', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track \\staff {score} \\tuning piano \\clef G2 \\ts (1 4)
+            \\voice :4 c5 | :4 e5 {beam up} | :4 d5 {beam down}
+            \\voice :4 b4 | :4 d5 {beam up} | :4 e5 {beam up}
+            \\voice :4 c5 | :4 d5 {beam down} | :4 d5 {beam up}`,
+            'test-data/visual-tests/issues/two-voice-unison-and-second.png'
         );
     });
 
@@ -119,27 +115,62 @@ describe('BrokenRendersTests', () => {
         (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 |
     `;
 
-    it('squeezed-legato-slur', () => {
+    function renderSvg(score: Score, width: number): string[] {
         const settings = new Settings();
         settings.core.engine = 'svg';
         settings.core.enableLazyLoading = false;
+        const api = new ScoreRenderer(settings);
+        const results: string[] = [];
+        api.partialRenderFinished.on(e => {
+            if (e.renderResult !== null) {
+                results.push(e.renderResult as string);
+            }
+        });
+        api.error.on(e => {
+            throw e;
+        });
+        api.width = width;
+        api.renderScore(score, [0]);
+        return results;
+    }
 
+    it('squeezed-legato-slur', () => {
         const score = ScoreLoader.loadAlphaTex(squeezedLegatoTex);
-
         for (const width of [400, 300]) {
-            const api = new ScoreRenderer(settings);
-            const results: string[] = [];
-            api.partialRenderFinished.on(e => {
-                if (e.renderResult !== null) {
-                    results.push(e.renderResult as string);
-                }
-            });
-            api.width = width;
-            api.renderScore(score, [0]);
-
+            const results = renderSvg(score, width);
             expect(results.length).toBeGreaterThan(0);
             for (const r of results) {
                 expect(r.includes('NaN'), `NaN in SVG at width ${width}`).toBe(false);
+            }
+        }
+    });
+
+    it('numbered-whole-rest', () => {
+        for (const tex of [
+            '\\staff {numbered} :1 r',
+            '\\staff {numbered} :4 C4 D4 E4 F4 | :1 r',
+            '\\staff {numbered} \\ts 8 4 :-2 r',
+            '\\staff {numbered} \\ts 3 2 :1 {tu 3} r :1 {tu 3} r :1 {tu 3} r'
+        ]) {
+            const results = renderSvg(ScoreLoader.loadAlphaTex(tex), 1300);
+            expect(results.length, tex).toBeGreaterThan(0);
+            for (const r of results) {
+                expect(r.includes('NaN'), `NaN in SVG for ${tex}`).toBe(false);
+            }
+        }
+    });
+
+    it('dead-slapped-beats', () => {
+        for (const tex of [
+            '\\staff {score tabs slash numbered} r.1 {ds}',
+            '\\staff {numbered} \\ts 8 4 :-2 r {ds}',
+            '\\staff {score tabs slash numbered} \\ts 3 2 :1 C4 {tu 3} C4 {tu 3} r {tu 3 ds}',
+            '\\staff {score tabs slash numbered} :8 r {ds beam merge} r {ds} r r r r r r'
+        ]) {
+            const results = renderSvg(ScoreLoader.loadAlphaTex(tex), 1300);
+            expect(results.length, tex).toBeGreaterThan(0);
+            for (const r of results) {
+                expect(r.includes('NaN'), `NaN in SVG for ${tex}`).toBe(false);
             }
         }
     });

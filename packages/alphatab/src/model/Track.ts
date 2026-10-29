@@ -162,6 +162,7 @@ export class Track {
      * Returns the index of {@link articulation} in {@link percussionArticulations},
      * appending it (deduplicated by `uniqueId`) when not yet present. Callers store the
      * returned index in {@link Note.percussionArticulation}.
+     * @since 1.9.0
      */
     public getOrRegisterPercussionArticulation(articulation: InstrumentArticulation): number {
         const uniqueId = articulation.uniqueId;

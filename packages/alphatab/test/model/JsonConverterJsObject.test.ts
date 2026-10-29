@@ -18,7 +18,7 @@ import { ComparisonHelpers } from './ComparisonHelpers';
  * must decode to the same model and the public JSON strings must stay byte-identical.
  */
 describe('JsonConverterJsObjectTest', () => {
-    const scoreExtensions = /\.(gp|gp[3-5]|gpx|xml|musicxml|mxml|mxl|cap|capx)$/i;
+    const scoreExtensions = /\.(gp|gp[3-5]|gpx|xml|musicxml|mxml|mxl|cap|capx|json)$/i;
 
     function mapReplacer(_: string, v: unknown) {
         return v instanceof Map ? Object.fromEntries(v) : v;
@@ -43,6 +43,9 @@ describe('JsonConverterJsObjectTest', () => {
 
     function tryLoad(file: string): Score | null {
         try {
+            if (file.endsWith('.json')) {
+                return JsonConverter.jsonToScore(fs.readFileSync(file, 'utf8'));
+            }
             return ScoreLoader.loadScoreFromBytes(new Uint8Array(fs.readFileSync(file)));
         } catch {
             return null;

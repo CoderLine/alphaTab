@@ -64,8 +64,12 @@ export class BeatSerializer {
         o.set("text", obj.text);
         o.set("slashed", obj.slashed);
         o.set("deadslapped", obj.deadSlapped);
-        o.set("restdisplaytone", obj.restDisplayTone);
-        o.set("restdisplayoctave", obj.restDisplayOctave);
+        if (!Number.isNaN(obj.restDisplayTone)) {
+            o.set("restdisplaytone", obj.restDisplayTone);
+        }
+        if (!Number.isNaN(obj.restDisplayOctave)) {
+            o.set("restdisplayoctave", obj.restDisplayOctave);
+        }
         o.set("brushtype", obj.brushType as number);
         o.set("brushduration", obj.brushDuration);
         o.set("tupletdenominator", obj.tupletDenominator);
@@ -90,6 +94,7 @@ export class BeatSerializer {
         o.set("overridedisplayduration", obj.overrideDisplayDuration);
         o.set("golpe", obj.golpe as number);
         o.set("dynamics", obj.dynamics as number);
+        o.set("showdynamics", obj.showDynamics);
         o.set("invertbeamdirection", obj.invertBeamDirection);
         o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
         o.set("beamingmode", obj.beamingMode as number);
@@ -111,7 +116,19 @@ export class BeatSerializer {
         if (!obj) {
             return null;
         }
-        const o: Record<string, unknown> = { "id": obj.id, "notes": obj.notes.map(i => NoteSerializer.toJsObject(i)), "isempty": obj.isEmpty, "whammystyle": obj.whammyStyle as number, "ottava": obj.ottava as number, "islegatoorigin": obj.isLegatoOrigin, "duration": obj.duration as number, "automations": obj.automations.map(i => AutomationSerializer.toJsObject(i)), "dots": obj.dots, "fade": obj.fade as number, "lyrics": obj.lyrics, "pop": obj.pop, "slap": obj.slap, "tap": obj.tap, "text": obj.text, "slashed": obj.slashed, "deadslapped": obj.deadSlapped, "restdisplaytone": obj.restDisplayTone, "restdisplayoctave": obj.restDisplayOctave, "brushtype": obj.brushType as number, "brushduration": obj.brushDuration, "tupletdenominator": obj.tupletDenominator, "tupletnumerator": obj.tupletNumerator, "iscontinuedwhammy": obj.isContinuedWhammy, "whammybartype": obj.whammyBarType as number };
+        const o: Record<string, unknown> = { "id": obj.id, "notes": obj.notes.map(i => NoteSerializer.toJsObject(i)), "isempty": obj.isEmpty, "whammystyle": obj.whammyStyle as number, "ottava": obj.ottava as number, "islegatoorigin": obj.isLegatoOrigin, "duration": obj.duration as number, "automations": obj.automations.map(i => AutomationSerializer.toJsObject(i)), "dots": obj.dots, "fade": obj.fade as number, "lyrics": obj.lyrics, "pop": obj.pop, "slap": obj.slap, "tap": obj.tap, "text": obj.text, "slashed": obj.slashed, "deadslapped": obj.deadSlapped };
+        if (!Number.isNaN(obj.restDisplayTone)) {
+            o["restdisplaytone"] = obj.restDisplayTone;
+        }
+        if (!Number.isNaN(obj.restDisplayOctave)) {
+            o["restdisplayoctave"] = obj.restDisplayOctave;
+        }
+        o["brushtype"] = obj.brushType as number;
+        o["brushduration"] = obj.brushDuration;
+        o["tupletdenominator"] = obj.tupletDenominator;
+        o["tupletnumerator"] = obj.tupletNumerator;
+        o["iscontinuedwhammy"] = obj.isContinuedWhammy;
+        o["whammybartype"] = obj.whammyBarType as number;
         if (obj.whammyBarPoints !== null) {
             o["whammybarpoints"] = obj.whammyBarPoints?.map(i => BendPointSerializer.toJsObject(i));
         }
@@ -130,6 +147,7 @@ export class BeatSerializer {
         o["overridedisplayduration"] = obj.overrideDisplayDuration;
         o["golpe"] = obj.golpe as number;
         o["dynamics"] = obj.dynamics as number;
+        o["showdynamics"] = obj.showDynamics;
         o["invertbeamdirection"] = obj.invertBeamDirection;
         o["preferredbeamdirection"] = obj.preferredBeamDirection as number | null;
         o["beamingmode"] = obj.beamingMode as number;
@@ -211,10 +229,10 @@ export class BeatSerializer {
                 obj.deadSlapped = v! as boolean;
                 return true;
             case "restdisplaytone":
-                obj.restDisplayTone = v! as number;
+                obj.restDisplayTone = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "restdisplayoctave":
-                obj.restDisplayOctave = v! as number;
+                obj.restDisplayOctave = v === null || v === undefined ? Number.NaN : (v as number);
                 return true;
             case "brushtype":
                 obj.brushType = JsonHelper.parseEnum<BrushType>(v, BrushType)!;
@@ -291,6 +309,9 @@ export class BeatSerializer {
                 return true;
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
+                return true;
+            case "showdynamics":
+                obj.showDynamics = v as boolean | undefined;
                 return true;
             case "invertbeamdirection":
                 obj.invertBeamDirection = v! as boolean;

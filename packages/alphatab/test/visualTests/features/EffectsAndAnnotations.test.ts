@@ -145,6 +145,26 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/triplet-feel.gp');
     });
 
+    it('triplet-feel-and-capo-multi-voice', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track "Piano"
+            \\staff {score}
+            \\capo 2
+            \\tf t8
+            \\voice
+            :8 c5 d5 e5 f5 g5 a5 b5 c6 | \\tf t16 c5 d5 e5 f5 g5 a5 b5 c6
+            \\voice
+            :2 c4 c4 | c4 c4
+            \\staff {score}
+            \\capo 5
+            \\clef F4
+            :8 c3 d3 e3 f3 g3 a3 b3 c4 | c3 d3 e3 f3 g3 a3 b3 c4
+            `,
+            'test-data/visual-tests/effects-and-annotations/triplet-feel-and-capo-multi-voice.png'
+        );
+    });
+
     it('free-time', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/free-time.gp');
     });
@@ -163,6 +183,21 @@ describe('EffectsAndAnnotationsTests', () => {
 
     it('string-numbers-pitched', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/string-numbers-pitched.mxml');
+    });
+
+    it('string-annotation-tab', async () => {
+        // tab positions from string + pitch, no fret number for notes without tab position
+        const score = ScoreLoader.loadScoreFromBytes(
+            await TestPlatform.loadFile('test-data/musicxml4/string-annotation.xml'),
+            new Settings()
+        );
+        const o = new VisualTestOptions(
+            score,
+            [new VisualTestRun(-1, 'test-data/visual-tests/effects-and-annotations/string-annotation-tab.png')],
+            new Settings()
+        );
+        o.tracks = [0, 1];
+        await VisualTestHelper.runVisualTestFull(o);
     });
 
     it('beat-slash', async () => {

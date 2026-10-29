@@ -206,14 +206,13 @@ describe('SystemSpacingTests', () => {
     it('stretch-formula-duration-spacing', async () => {
         // A single bar with three distinct durations - half, quarter, two eighths - laid out in
         // decreasing order. The power-law formula `phi = (d/dmin)^log2(spacingRatio)` (default
-        // r=1.5, exponent ≈ 0.585) makes the half-note occupy visibly more horizontal space than
+        // r=√2, exponent 0.5) makes the half-note occupy visibly more horizontal space than
         // the quarter, which occupies more than each eighth. The 1:2:4 duration ratio maps to
-        // 1.0 : 1.5 : 2.25 in `phi`, i.e. successive durations get 1.5x the natural length.
+        // 1.0 : 1.41 : 2.0 in `phi`, i.e. successive durations get √2x the natural length.
         //
         // No short notes are involved, so this test also validates the non-phase-B path and pins
         // the current formula's proportions: a change to the default `spacingRatio` (or a switch
-        // back to the additive formula, or to linear / square-root spacing) would shift this
-        // baseline visibly.
+        // back to the additive formula, or to linear spacing) would shift this baseline visibly.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
@@ -234,11 +233,11 @@ describe('SystemSpacingTests', () => {
      * Reference: `docs/spacing/spacing-spike-plan.md` Section 6.3, "Tests to add per phase".
      */
     it('power-law-rest-bar-not-ballooning', async () => {
-        // Two-bar system rendered at default `spacingRatio = 1.5`:
+        // Two-bar system rendered at default `spacingRatio = √2`:
         //   Bar 1: a dense bar with sixteenth-note runs (60-tick duration).
         //   Bar 2: a single whole-note rest (3840-tick duration).
         // System-wide minDuration resolves to 60 (the sixteenth) so bar 2's rest sits at
-        // d/dmin = 64 -> phi = 64^log2(1.5) ≈ 16.0. The whole rest is therefore proportionally
+        // d/dmin = 64 -> phi = 64^log2(√2) = 8.0. The whole rest is therefore proportionally
         // wider than the sixteenths but NOT the runaway 4-5x balloon that the additive formula
         // produced when `stretchForce` was raised.
         //
@@ -262,12 +261,12 @@ describe('SystemSpacingTests', () => {
 
     it('power-law-duration-proportions', async () => {
         // A single bar containing whole, half, quarter, eighth, sixteenth in sequence (decreasing
-        // duration). With the default `spacingRatio = 1.5`, each successive note allocates 1.5x
+        // duration). With the default `spacingRatio = √2`, each successive note allocates √2x
         // the horizontal space of its half-duration successor (because doubling the duration
         // multiplies phi by exactly `spacingRatio`).
         //
         // Expected baseline: visually the durations form a clean geometric progression in
-        // horizontal allocation - the whole occupies ~1.5x the half, the half ~1.5x the quarter,
+        // horizontal allocation - the whole occupies ~1.41x the half, the half ~1.41x the quarter,
         // and so on. This is the classic power-law visual signature used by Dorico/MuseScore.
         //
         // The bar exceeds 4/4 by design - the durations are placed inside 13/4 to give every
@@ -288,7 +287,7 @@ describe('SystemSpacingTests', () => {
     it('power-law-stretch-force-orthogonal', async () => {
         // Same single-bar score rendered at `stretchForce ∈ {0.5, 1.0, 1.5}` across three runs
         // (output stacked into a single canvas via the multi-run mechanism). Each run uses the
-        // default `spacingRatio = 1.5`. The expected behaviour is that increasing `stretchForce`
+        // default `spacingRatio = √2`. The expected behaviour is that increasing `stretchForce`
         // makes everything wider proportionally - the *shape* of the spacing curve (relative
         // widths of half / quarter / eighth) stays constant, only the overall scale changes.
         //
@@ -333,10 +332,10 @@ describe('SystemSpacingTests', () => {
     it('power-law-spacing-ratio-tight', async () => {
         // Same score rendered with `spacingRatio = 1.2` (the tight end of the documented range).
         // At r=1.2, exponent = log2(1.2) ≈ 0.263, so doubling the duration multiplies phi by
-        // 1.2 - durations crowd together more tightly than at the default 1.5.
+        // 1.2 - durations crowd together more tightly than at the default √2.
         //
         // Expected baseline: the half-note's allocated space is only ~1.2x the quarter (vs.
-        // ~1.5x at default). Visually this looks more "compressed" than the default.
+        // ~1.41x at default). Visually this looks more "compressed" than the default.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
         settings.display.spacingRatio = 1.2;
@@ -354,9 +353,9 @@ describe('SystemSpacingTests', () => {
     it('power-law-spacing-ratio-loose', async () => {
         // Same score rendered with `spacingRatio = 1.8` (the loose end of the documented range).
         // At r=1.8, exponent = log2(1.8) ≈ 0.848, so doubling the duration multiplies phi by 1.8 -
-        // durations spread further apart than at the default 1.5.
+        // durations spread further apart than at the default √2.
         //
-        // Expected baseline: the half-note's allocated space is ~1.8x the quarter (vs. ~1.5x at
+        // Expected baseline: the half-note's allocated space is ~1.8x the quarter (vs. ~1.41x at
         // default). Visually this looks more "open" / "traditional" than the default and closer
         // to Finale's Fibonacci-style spacing.
         const settings = new Settings();

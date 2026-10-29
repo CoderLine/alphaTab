@@ -66,7 +66,18 @@ function generateToJsonBody(
         let propertyStatements: ts.Statement[] = [];
         let simpleValue: string | null = null;
 
-        if (prop.asRaw || prop.type.isPrimitiveType) {
+        if (prop.isUnsetAsNaN) {
+            propertyStatements.push(
+                createNodeFromSource<ts.IfStatement>(
+                    `
+                    if(!Number.isNaN(obj.${fieldName})) {
+                        ${set(jsonName, `obj.${fieldName}`)};
+                    }
+                `,
+                    ts.SyntaxKind.IfStatement
+                )
+            );
+        } else if (prop.asRaw || prop.type.isPrimitiveType) {
             simpleValue = `obj.${fieldName}`;
         } else if (prop.type.isEnumType) {
             if (prop.type.isNullable) {

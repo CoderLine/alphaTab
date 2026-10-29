@@ -50,6 +50,10 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         return this._systems;
     }
 
+    protected override getAttributionRendererIndex(system: StaffSystem): number {
+        return system.index === 0 ? system.masterBarsRenderers.length - 1 : -1;
+    }
+
     private _reuseViewPort: boolean = false;
 
     private _preSystemPartialIds: string[] = [];
@@ -81,8 +85,6 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         y = this._layoutAndRenderSystems(y, 0, -1);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
-
-        y = this._layoutAndRenderAnnotation(y);
 
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }
@@ -167,8 +169,6 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
         y = this.layoutAndRenderBottomScoreInfo(y);
 
-        y = this._layoutAndRenderAnnotation(y);
-
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
 
         return true;
@@ -194,8 +194,6 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
         y = this._resizeAndRenderScore(y, oldHeight);
 
         y = this.layoutAndRenderBottomScoreInfo(y);
-
-        y = this._layoutAndRenderAnnotation(y);
 
         this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }

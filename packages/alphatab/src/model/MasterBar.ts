@@ -187,6 +187,7 @@ export class MasterBar {
      * Even with a custom string, this masterbar contributes to the incremental bar numbers 
      * across the score. Set the {@link customBarNumber} for the next master bar if you want 
      * alternative counting.
+     * @since 1.9.0
      */
     public customBarNumberText?: string;
 
@@ -195,6 +196,7 @@ export class MasterBar {
      * e.g. allows setting the initial bar number to 10 and the second will be 11.
      * Any change to {@link customBarNumber} requires an additional call to {@link Score.finish} 
      * to consolidate the counting.
+     * @since 1.9.0
      */
     public customBarNumber?: number;
 
@@ -204,6 +206,7 @@ export class MasterBar {
      * The final bar number is not guaranteed to be unique. using {@see customBarNumber} 
      * users might reset or change counting in any custom fashion. Do not rely on the bar number
      * for lookup or indexing.
+     * @since 1.9.0
      */
     public get barNumber(): number {
         return this._realBarNumber;
@@ -212,6 +215,7 @@ export class MasterBar {
     /**
      * Returns the actual text displayed for this master bar respecting any custom overrides and
      * out-of-order numbers. Only available after data model finish.
+     * @since 1.9.0
      */
     public get barNumberText(): string {
         let text = this.customBarNumberText;

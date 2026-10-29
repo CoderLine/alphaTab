@@ -41,6 +41,10 @@ class HeaderRod {
     public rank: number = 0;
     public pre: number = 0;
     public post: number = 0;
+    /**
+     * The extent right of the anchor without the trailing spacing.
+     */
+    public inkPost: number = 0;
     public offset: number = 0;
 }
 
@@ -79,6 +83,9 @@ export class BarLayoutingInfo implements IHeaderRodSink {
     }
 
     private _timeSortedSprings: Spring[] = [];
+    /** The springs ordered by the force at which they start to stretch beyond their {@link Spring.minWidth}. */
+    private readonly _springsByStretchForce: Spring[] = [];
+    private _totalMinWidth: number = 0;
     private _minTime: number = -1;
     private static readonly _noOnTimePositions: number[] = [];
     // the on-time positions of the last computed force and of the force before, see buildOnTimePositions
@@ -90,11 +97,11 @@ export class BarLayoutingInfo implements IHeaderRodSink {
     private _beatSizes: Map<number, BarLayoutingInfoBeatSizes> = new Map();
 
     /**
-     * Overlay rods bucketed per visual band. Outer key is a `bandKey` (typically the
-     * band's `NotationElement` stringified). Inner map keyed by `Spring.timePosition`.
+     * Overlay rods bucketed per visual band. Outer key is a `bandKey` identifying one
+     * band row (staff, side and `NotationElement`). Inner map keyed by `Spring.timePosition`.
      * Rods in different bands occupy different vertical tracks and never collide;
      * pair-overlap evaluates each band independently. Same-band, same-timePosition
-     * registrations (lyric-on-score + lyric-on-tab for one beat) max-merge.
+     * registrations max-merge.
      */
     private _overlayRodsByBand: Map<string, Map<number, OverlayRod>> = new Map();
 
@@ -154,6 +161,7 @@ export class BarLayoutingInfo implements IHeaderRodSink {
     private _headerRodCount: number = 0;
     private _headerRodsDirty: boolean = false;
     private _preBeatSize: number = 0;
+    private _preBeatTrailingSpace: number = 0;
 
     /**
      * The total width of the bar header (all header columns), shared across all staves.
@@ -166,12 +174,24 @@ export class BarLayoutingInfo implements IHeaderRodSink {
     }
 
     /**
+     * The empty space at the end of the bar header (the trailing spacing of its last column),
+     * between the header content (or the start barline) and the first beat.
+     */
+    public get preBeatTrailingSpace(): number {
+        if (this._headerRodsDirty) {
+            this._updateHeaderRods();
+        }
+        return this._preBeatTrailingSpace;
+    }
+
+    /**
      * Clears all header columns. Called at the start of each layout cycle of a system,
      * the bar renderers re-register their header glyphs afterwards.
      */
     public resetHeaderRods(): void {
         this._headerRodCount = 0;
         this._preBeatSize = 0;
+        this._preBeatTrailingSpace = 0;
         this._headerRodsDirty = false;
     }
 
@@ -181,8 +201,10 @@ export class BarLayoutingInfo implements IHeaderRodSink {
      * @param rank The rank identifying (and ordering) the column.
      * @param pre The extent left of the anchor.
      * @param post The extent right of the anchor (including the glyph's trailing spacing).
+     * @param trailingSpace The part of `post` which is empty space after the glyph.
      */
-    public addHeaderRod(rank: number, pre: number, post: number): void {
+    public addHeaderRod(rank: number, pre: number, post: number, trailingSpace: number = 0): void {
+        const inkPost = post - trailingSpace;
         const rods = this._headerRods;
         const count = this._headerRodCount;
         let insertPos = 0;
@@ -199,6 +221,9 @@ export class BarLayoutingInfo implements IHeaderRodSink {
             if (existing.post < post) {
                 existing.post = post;
             }
+            if (existing.inkPost < inkPost) {
+                existing.inkPost = inkPost;
+            }
             return;
         }
 
@@ -213,6 +238,7 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         rod.rank = rank;
         rod.pre = pre;
         rod.post = post;
+        rod.inkPost = inkPost;
         rod.offset = 0;
         rods.splice(insertPos, 0, rod);
         this._headerRodCount = count + 1;
@@ -247,12 +273,15 @@ export class BarLayoutingInfo implements IHeaderRodSink {
             x += rod.pre + rod.post;
         }
         this._preBeatSize = x;
+        this._preBeatTrailingSpace =
+            this._headerRodCount > 0 ? rods[this._headerRodCount - 1].post - rods[this._headerRodCount - 1].inkPost : 0;
         this._headerRodsDirty = false;
     }
 
     public postBeatSize: number = 0;
     public minStretchForce: number = 0;
-    public totalSpringConstant: number = 0;
+    /** Whether the last spring constant calculation found any springs. */
+    public hasSprings: boolean = true;
 
     private _updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
@@ -316,19 +345,26 @@ export class BarLayoutingInfo implements IHeaderRodSink {
     public allGraceRods: Map<string, Spring[]> = new Map();
     public springs: Map<number, Spring> = new Map();
 
+    /**
+     * @param isEmptyBeat Whether the spring is added for a placeholder beat of an empty voice. Its duration
+     * keeps the spacing but is not one of the {@link Spring.allDurations} played at this position.
+     */
     public addSpring(
         start: number,
         duration: number,
         graceBeatWidth: number,
         preBeatWidth: number,
-        postSpringSize: number
+        postSpringSize: number,
+        isEmptyBeat: boolean = false
     ): Spring {
         this.version++;
         let spring: Spring;
         if (!this.springs.has(start)) {
             spring = new Spring();
             spring.timePosition = start;
-            spring.allDurations.add(duration);
+            if (!isEmptyBeat) {
+                spring.allDurations.add(duration);
+            }
             if (this._usesLocalMinDuration && this._timeSortedSprings.length > 0 && duration < this._minDuration) {
                 this._minDuration = duration;
             }
@@ -363,7 +399,9 @@ export class BarLayoutingInfo implements IHeaderRodSink {
             if (duration > spring.longestDuration) {
                 spring.longestDuration = duration;
             }
-            spring.allDurations.add(duration);
+            if (!isEmptyBeat) {
+                spring.allDurations.add(duration);
+            }
         }
         if (this._minTime === -1 || this._minTime > start) {
             this._minTime = start;
@@ -413,13 +451,20 @@ export class BarLayoutingInfo implements IHeaderRodSink {
                 }
             }
 
-            beat.spring = this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize);
+            beat.spring = this.addSpring(
+                start,
+                beat.displayDuration,
+                graceBeatSize,
+                preBeatSize,
+                postBeatSize,
+                beat.isEmptyBeat
+            );
         }
     }
 
     /**
      * Registers an overlay rod for a beat into the bucket identified by `bandKey`
-     * (typically `String(band.info.notationElement)`). Same-band, same-timePosition
+     * (one band row: staff, side and notation element). Same-band, same-timePosition
      * duplicates max-merge.
      */
     public addOverlayRod(bandKey: string, timePosition: number, leftExtent: number, rightExtent: number): void {
@@ -504,10 +549,11 @@ export class BarLayoutingInfo implements IHeaderRodSink {
     }
 
     private _calculateSpringConstants(minDuration: number): void {
-        let totalSpringConstant: number = 0;
         const sortedSprings: Spring[] = this._timeSortedSprings;
+        this._onTimeForce = Number.NaN;
+        this._previousOnTimeForce = Number.NaN;
         if (sortedSprings.length === 0) {
-            this.totalSpringConstant = -1;
+            this.hasSprings = false;
             this.minStretchForce = -1;
             return;
         }
@@ -521,9 +567,8 @@ export class BarLayoutingInfo implements IHeaderRodSink {
                 duration = Math.abs(nextSpring.timePosition - currentSpring.timePosition);
             }
             currentSpring.springConstant = this._calculateSpringConstant(currentSpring, duration, minDuration);
-            totalSpringConstant += 1 / currentSpring.springConstant;
         }
-        this.totalSpringConstant = 1 / totalSpringConstant;
+        this.hasSprings = true;
 
         // calculate the force required to have at least the minimum size.
         this.minStretchForce = 0;
@@ -542,6 +587,7 @@ export class BarLayoutingInfo implements IHeaderRodSink {
             // it is a fixed offset in front of the first spring (see calculateVoiceWidth,
             // spaceToForce and buildOnTimePositions) and does not need to be stretched in.
 
+            currentSpring.minWidth = requiredSpace;
             const requiredSpaceForce = requiredSpace * currentSpring.springConstant;
             this._updateMinStretchForce(requiredSpaceForce);
         }
@@ -556,6 +602,28 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         for (const rods of this._timeSortedOverlayRodsByBand.values()) {
             this._applyOverlayRodConstraints(rods, sortedSprings, overlayPadding);
         }
+
+        this._updateSpringsByStretchForce();
+    }
+
+    private _updateSpringsByStretchForce(): void {
+        const byForce: Spring[] = this._springsByStretchForce;
+        while (byForce.length > 0) {
+            byForce.pop();
+        }
+        let totalMinWidth = 0;
+        for (const spring of this._timeSortedSprings) {
+            totalMinWidth += spring.minWidth;
+            const stretchForce = spring.minWidth * spring.springConstant;
+            byForce.push(spring);
+            let i = byForce.length - 1;
+            while (i > 0 && byForce[i - 1].minWidth * byForce[i - 1].springConstant > stretchForce) {
+                byForce[i] = byForce[i - 1];
+                i--;
+            }
+            byForce[i] = spring;
+        }
+        this._totalMinWidth = totalMinWidth;
     }
 
     /**
@@ -671,15 +739,45 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
     }
 
+    /**
+     * Gets the force at which the voices take the given width (the inverse of {@link calculateVoiceWidth}).
+     * A spring keeps its {@link Spring.minWidth} until the force stretches it further, so a bar narrower
+     * than its natural width takes the space from the springs stretched beyond their minimum first.
+     * Below the bar's minimum width the force is negative (down to -1), and all springs are squeezed
+     * proportionally to their minimum widths.
+     */
     public spaceToForce(space: number): number {
-        if (this.totalSpringConstant !== -1) {
-            if (this._timeSortedSprings.length > 0) {
-                space -= this._timeSortedSprings[0].preSpringWidth;
-            }
-            space -= this._incompleteGraceRodsWidth;
-            return Math.max(space, 0) * this.totalSpringConstant;
+        if (!this.hasSprings) {
+            return -1;
         }
-        return -1;
+        space -= this._timeSortedSprings[0].preSpringWidth;
+        space -= this._incompleteGraceRodsWidth;
+        if (space < 0) {
+            space = 0;
+        }
+
+        let fixedWidth = this._totalMinWidth;
+        if (space < fixedWidth) {
+            return space / fixedWidth - 1;
+        }
+
+        let inverseSpringConstant = 0;
+        for (const spring of this._springsByStretchForce) {
+            const stretchForce = spring.minWidth * spring.springConstant;
+            if (fixedWidth + stretchForce * inverseSpringConstant >= space) {
+                break;
+            }
+            fixedWidth -= spring.minWidth;
+            inverseSpringConstant += 1 / spring.springConstant;
+        }
+        return inverseSpringConstant > 0 ? (space - fixedWidth) * (1 / inverseSpringConstant) : 0;
+    }
+
+    /**
+     * The narrowest width the voices can take without overlapping content.
+     */
+    public get minVoiceWidth(): number {
+        return this.calculateVoiceWidth(0);
     }
 
     /**
@@ -693,8 +791,8 @@ export class BarLayoutingInfo implements IHeaderRodSink {
 
     public calculateVoiceWidth(force: number): number {
         let width = 0;
-        if (this.totalSpringConstant !== -1) {
-            width = this._calculateWidth(force, this.totalSpringConstant);
+        for (const spring of this._timeSortedSprings) {
+            width += this._calculateSpringWidth(spring, force);
         }
 
         if (this._timeSortedSprings.length > 0) {
@@ -704,8 +802,12 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         return width;
     }
 
-    private _calculateWidth(force: number, springConstant: number): number {
-        return force / springConstant;
+    private _calculateSpringWidth(spring: Spring, force: number): number {
+        if (force < 0) {
+            return spring.minWidth * (1 + force);
+        }
+        const width = force / spring.springConstant;
+        return width < spring.minWidth ? spring.minWidth : width;
     }
 
     /**
@@ -714,7 +816,7 @@ export class BarLayoutingInfo implements IHeaderRodSink {
      * must not be modified.
      */
     public buildOnTimePositions(force: number): number[] {
-        if (this.totalSpringConstant === -1) {
+        if (!this.hasSprings) {
             return BarLayoutingInfo._noOnTimePositions;
         }
         if (ModelUtils.isAlmostEqualTo(this._onTimeForce, force)) {
@@ -744,7 +846,7 @@ export class BarLayoutingInfo implements IHeaderRodSink {
         let springX: number = sortedSprings[0].preSpringWidth;
         for (let i: number = 0; i < sortedSprings.length; i++) {
             positions[i] = springX;
-            springX += this._calculateWidth(force, sortedSprings[i].springConstant);
+            springX += this._calculateSpringWidth(sortedSprings[i], force);
         }
         return positions;
     }

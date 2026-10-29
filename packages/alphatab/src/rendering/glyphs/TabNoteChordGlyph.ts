@@ -144,7 +144,7 @@ export class TabNoteChordGlyph extends Glyph {
             let minEffectY = Number.NaN;
             let maxEffectY = Number.NaN;
 
-            let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
+            let effectY: number = this.getHighestNoteY(NoteYPosition.Center) + tabHeight / 2;
             const effectSpacing: number = this.renderer.smuflMetrics.onNoteEffectPadding;
             const beatEffects = this._beatEffects;
             if (beatEffects) {

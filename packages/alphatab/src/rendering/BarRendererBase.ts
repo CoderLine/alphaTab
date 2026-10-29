@@ -9,12 +9,14 @@ import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IB
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
+import type { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
 import {
     BeatContainerGlyph,
     type BeatContainerGlyphBase,
     type BeatEffectOverflow
 } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 import { type HeaderKey, HeaderProfile } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
@@ -23,6 +25,7 @@ import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/Mu
 import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BarLocalSkyline, StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
+import { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
@@ -172,6 +175,18 @@ export class BarRendererBase {
 
     public beatEffectsMinY = Number.NaN;
     public beatEffectsMaxY = Number.NaN;
+
+    /**
+     * Set by {@link RenderStaff.finalizeStaff} on the renderer that paints the attribution, otherwise `null`.
+     */
+    public attribution: AttributionGlyph | null = null;
+
+    /**
+     * The height above renderer y=0 that marks resting on this staff must clear at minimum.
+     */
+    public get staffTopClearance(): number {
+        return 0;
+    }
 
     private _barLocalSkyline: BarLocalSkyline | null = null;
     private _preBeatLocalSkyline: BarLocalSkyline | null = null;
@@ -417,11 +432,11 @@ export class BarRendererBase {
      */
     private _reportCompression(containerWidth: number): void {
         const info = this.layoutingInfo;
-        if (info.totalSpringConstant === -1) {
+        if (!info.hasSprings) {
             return;
         }
         // small tolerance for rounding differences in the system width distribution
-        const missingWidth = info.calculateVoiceWidth(info.minStretchForce) - containerWidth;
+        const missingWidth = info.minVoiceWidth - containerWidth;
         if (missingWidth > BarRendererBase._compressionTolerance) {
             this.scoreRenderer.layout!.reportCompressedBar(this.bar.masterBar.index, missingWidth);
         }
@@ -546,17 +561,19 @@ export class BarRendererBase {
 
     private _registerOverlayRods(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
-        this._collectOverlayRods(this.topEffects, info);
-        this._collectOverlayRods(this.bottomEffects, info);
+        // all staves of a master bar share the layouting info; bands of different staves never share a row
+        const staffKey = `${this.bar.staff.track.index}/${this.bar.staff.index}/${this.staff!.staffId}`;
+        this._collectOverlayRods(this.topEffects, info, `${staffKey}/top`);
+        this._collectOverlayRods(this.bottomEffects, info, `${staffKey}/bottom`);
     }
 
-    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
+    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo, rowKey: string): void {
         for (const band of container.bands) {
             const policy = band.info.overlayRodPolicy;
             if (policy === undefined) {
                 continue;
             }
-            const bandKey = String(band.info.notationElement);
+            const bandKey = `${rowKey}/${band.info.notationElement}`;
             for (const voiceGlyphs of band.glyphsByVoice) {
                 for (const glyph of voiceGlyphs) {
                     if (!glyph.beat || glyph.width <= 0) {
@@ -672,8 +689,6 @@ export class BarRendererBase {
     }
 
     private _emitTies(ties: Iterable<ITieGlyph>): void {
-        const staffRenderers = this.staff!.barRenderers;
-        const startIndex = this.index;
         for (const t of ties) {
             const tie = t as unknown as Glyph;
             tie.doLayout();
@@ -686,40 +701,78 @@ export class BarRendererBase {
             const tieBottom = t.getBoundingBoxBottom();
             const tieTopOverflow = tieTop < 0 ? -tieTop : 0;
 
+            if (t.hasSkylineShape) {
+                this._emitTieShape(t, tieTopOverflow, tieBottom - this.height);
+                continue;
+            }
+
             const tieLeftStaff = t.getBoundingBoxLeft();
             const tieRightStaff = t.getBoundingBoxRight();
+            this._insertTieSkyline(this.index + 1, tieLeftStaff, tieTop, tieRightStaff, tieBottom);
 
-            for (let i = startIndex; i < staffRenderers.length; i++) {
-                const target = staffRenderers[i];
-                if (target.x >= tieRightStaff) {
-                    break;
-                }
-                const targetXStart = target.x;
-                const targetXEnd = target.x + target.width;
-                const xStartStaff = Math.max(targetXStart, tieLeftStaff);
-                const xEndStaff = Math.min(targetXEnd, tieRightStaff);
-                if (xEndStaff <= xStartStaff) {
-                    continue;
-                }
-                const xStart = xStartStaff - targetXStart;
-                const xEnd = xEndStaff - targetXStart;
-                const tieBottomOverflow = tieBottom - target.height;
+            const xStart = Math.max(this.x, tieLeftStaff) - this.x;
+            const xEnd = Math.min(this.x + this.width, tieRightStaff) - this.x;
+            if (xEnd <= xStart) {
+                continue;
+            }
+            const tieBottomOverflow = tieBottom - this.height;
+            if (tieTopOverflow > 0) {
+                this.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow);
+            }
+            if (tieBottomOverflow > 0) {
+                this.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow);
+            }
+        }
+    }
 
-                if (target === this) {
-                    if (tieTopOverflow > 0) {
-                        target.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow);
-                    }
-                    if (tieBottomOverflow > 0) {
-                        target.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow);
-                    }
-                } else {
-                    if (tieTopOverflow > 0) {
-                        target.barLocalSkyline.insertPlaced(StaffSide.Top, xStart, xEnd, tieTopOverflow, 0);
-                    }
-                    if (tieBottomOverflow > 0) {
-                        target.barLocalSkyline.insertPlaced(StaffSide.Bottom, xStart, xEnd, tieBottomOverflow, 0);
-                    }
-                }
+    private _tieShape: SkylineShape | null = null;
+
+    /**
+     * The overflow of the tie is registered as a whole on this renderer, the skyline gets the drawn shape
+     * in every renderer of the staff it reaches into.
+     */
+    private _emitTieShape(t: ITieGlyph, topOverflow: number, bottomOverflow: number): void {
+        if (topOverflow > 0) {
+            this.registerOverflowTop(topOverflow);
+        }
+        if (bottomOverflow > 0) {
+            this.registerOverflowBottom(bottomOverflow);
+        }
+
+        let shape = this._tieShape;
+        if (shape === null) {
+            shape = new SkylineShape();
+            this._tieShape = shape;
+        } else {
+            shape.clear();
+        }
+        t.collectSkylineShape(shape);
+        for (let k = 0; k < shape.count; k++) {
+            this._insertTieSkyline(this.index, shape.xStart(k), shape.top(k), shape.xEnd(k), shape.bottom(k));
+        }
+    }
+
+    /**
+     * Inserts the parts of a tie box outside the staff into the skylines of the renderers it reaches,
+     * starting at the renderer `fromIndex` of the staff.
+     */
+    private _insertTieSkyline(fromIndex: number, left: number, top: number, right: number, bottom: number): void {
+        const staffRenderers = this.staff!.barRenderers;
+        for (let i = fromIndex; i < staffRenderers.length; i++) {
+            const target = staffRenderers[i];
+            if (target.x >= right) {
+                break;
+            }
+            const xStart = Math.max(target.x, left) - target.x;
+            const xEnd = Math.min(target.x + target.width, right) - target.x;
+            if (xEnd <= xStart) {
+                continue;
+            }
+            if (top < 0) {
+                target.barLocalSkyline.insertPlaced(StaffSide.Top, xStart, xEnd, -top, 0);
+            }
+            if (bottom > target.height) {
+                target.barLocalSkyline.insertPlaced(StaffSide.Bottom, xStart, xEnd, bottom - target.height, 0);
             }
         }
     }
@@ -811,21 +864,38 @@ export class BarRendererBase {
                 continue;
             }
             const x = profile.glyphX(g, info);
-            const xL = x + g.left;
-            const xR = x + g.right;
-            const hasExtent = xR > xL;
             if (topOver) {
                 this.registerOverflowTop(g.top * -1);
-                if (hasExtent) {
-                    this.preBeatLocalSkyline.insertPlaced(StaffSide.Top, xL, xR, g.top * -1, 0);
-                }
             }
             if (bottomOver) {
                 this.registerOverflowBottom(g.bottom - rendererBottom);
-                if (hasExtent) {
-                    this.preBeatLocalSkyline.insertPlaced(StaffSide.Bottom, xL, xR, g.bottom - rendererBottom, 0);
+            }
+            const boxes = g.skylineBoxes;
+            if (boxes === null) {
+                this._insertPreBeatSkyline(x + g.left, x + g.right, g.top, g.bottom, rendererBottom);
+            } else {
+                for (let k = 0; k < boxes.length; k += 4) {
+                    this._insertPreBeatSkyline(
+                        x + boxes[k],
+                        x + boxes[k + 1],
+                        boxes[k + 2],
+                        boxes[k + 3],
+                        rendererBottom
+                    );
                 }
             }
+        }
+    }
+
+    private _insertPreBeatSkyline(xL: number, xR: number, top: number, bottom: number, rendererBottom: number): void {
+        if (!(xR > xL)) {
+            return;
+        }
+        if (top < 0) {
+            this.preBeatLocalSkyline.insertPlaced(StaffSide.Top, xL, xR, top * -1, 0);
+        }
+        if (bottom > rendererBottom) {
+            this.preBeatLocalSkyline.insertPlaced(StaffSide.Bottom, xL, xR, bottom - rendererBottom, 0);
         }
     }
 
@@ -902,21 +972,44 @@ export class BarRendererBase {
             if (!topOver && !bottomOver) {
                 continue;
             }
-            const xL = g.getBoundingBoxLeft();
-            const xR = g.getBoundingBoxRight();
-            const hasExtent = xR > xL;
             if (topOver) {
                 this.registerOverflowTop(topY * -1);
-                if (hasExtent) {
-                    this.postBeatLocalSkyline.insertPlaced(StaffSide.Top, xL, xR, topY * -1, 0);
-                }
             }
             if (bottomOver) {
                 this.registerOverflowBottom(bottomY - rendererBottom);
-                if (hasExtent) {
-                    this.postBeatLocalSkyline.insertPlaced(StaffSide.Bottom, xL, xR, bottomY - rendererBottom, 0);
-                }
             }
+            BarRendererBase._insertGlyphSkyline(g, 0, this.postBeatLocalSkyline, rendererBottom);
+        }
+    }
+
+    /**
+     * Inserts the extent of the glyph outside the staff into the skyline: per child for glyph groups
+     * (e.g. the accidentals of a key signature), so the group does not claim its full height over its full width.
+     */
+    private static _insertGlyphSkyline(
+        g: Glyph,
+        offsetX: number,
+        skyline: BarLocalSkyline,
+        rendererBottom: number
+    ): void {
+        if (g instanceof GlyphGroup && g.glyphs && g.glyphs.length > 0) {
+            for (const c of g.glyphs) {
+                BarRendererBase._insertGlyphSkyline(c, offsetX + g.x, skyline, rendererBottom);
+            }
+            return;
+        }
+        const xL = offsetX + g.getBoundingBoxLeft();
+        const xR = offsetX + g.getBoundingBoxRight();
+        if (!(xR > xL)) {
+            return;
+        }
+        const topY = g.getBoundingBoxTop();
+        if (topY < 0) {
+            skyline.insertPlaced(StaffSide.Top, xL, xR, topY * -1, 0);
+        }
+        const bottomY = g.getBoundingBoxBottom();
+        if (bottomY > rendererBottom) {
+            skyline.insertPlaced(StaffSide.Bottom, xL, xR, bottomY - rendererBottom, 0);
         }
     }
 
@@ -975,6 +1068,17 @@ export class BarRendererBase {
         this.bottomEffects.paint(cx + this.x, bottomEffectBandY, canvas);
     }
 
+    /**
+     * Paints the effects of this bar which reach left of its start, onto a canvas holding only the bars before it.
+     */
+    public paintLeftOverhang(cx: number, cy: number, canvas: ICanvas): void {
+        const topEffectBandY = cy + this.y - this.staff!.topOverflow;
+        this.topEffects.paintLeftOverhang(cx + this.x, topEffectBandY, canvas);
+
+        const bottomEffectBandY = cy + this.y + this.height + this.staff!.bottomOverflow - this.bottomEffects.height;
+        this.bottomEffects.paintLeftOverhang(cx + this.x, bottomEffectBandY, canvas);
+    }
+
     protected paintContent(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
 
@@ -1030,6 +1134,8 @@ export class BarRendererBase {
         if (this.additionalMultiRestBars) {
             const container = new MultiBarRestBeatContainerGlyph();
             this.addBeatGlyph(container);
+            this.topEffects.createVoiceGlyphs(this.bar.voices[0], true);
+            this.bottomEffects.createVoiceGlyphs(this.bar.voices[0], true);
         } else {
             for (const index of this.bar.filledVoices) {
                 this.createVoiceGlyphs(this.bar.voices[index]);
@@ -1044,8 +1150,8 @@ export class BarRendererBase {
     }
 
     protected createVoiceGlyphs(voice: Voice): void {
-        this.topEffects.createVoiceGlyphs(voice);
-        this.bottomEffects.createVoiceGlyphs(voice);
+        this.topEffects.createVoiceGlyphs(voice, false);
+        this.bottomEffects.createVoiceGlyphs(voice, false);
     }
 
     protected createPostBeatGlyphs(): void {

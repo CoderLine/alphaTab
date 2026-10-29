@@ -1091,7 +1091,7 @@ export class AlphaTabApiBase<TSettings> {
 
             currentHandler?.onDetach(cursors);
             if (value) {
-                value?.onDetach(cursors);
+                value.onAttach(cursors);
             } else if (this._defaultCursorHandler) {
                 this._defaultCursorHandler!.onAttach(cursors);
             }
@@ -2266,6 +2266,8 @@ export class AlphaTabApiBase<TSettings> {
             const scroll = this.uiFacade.getScrollContainer();
             this.uiFacade.stopScrolling(scroll);
         }
+        this._scrollHandlerMode = scrollMode;
+        this._scrollHandlerVertical = isVertical;
 
         switch (scrollMode) {
             case ScrollMode.Off:

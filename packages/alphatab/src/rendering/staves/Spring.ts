@@ -10,6 +10,12 @@ export class Spring {
     public force: number = 0;
     public springConstant: number = 0;
 
+    /**
+     * The minimum distance from this spring's on-time position to the next spring
+     * (or to the bar end for the last spring) at which no content overlaps.
+     */
+    public minWidth: number = 0;
+
     public get springWidth(): number {
         return this.preSpringWidth + this.postSpringWidth;
     }

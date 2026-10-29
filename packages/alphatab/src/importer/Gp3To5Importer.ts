@@ -620,6 +620,8 @@ export class Gp3To5Importer extends ScoreImporter {
         newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this._stringEncoding);
         if ((flags & 0x01) !== 0) {
             mainStaff.isPercussion = true;
+            // GP3/4 have no tablature flag, GP5 reads it from the staff flags below
+            mainStaff.showTablature = false;
         }
         if (this._versionNumber >= 500) {
             newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;
@@ -646,15 +648,25 @@ export class Gp3To5Importer extends ScoreImporter {
         const effectChannel: number = IOHelper.readInt32LE(this.data) - 1;
         this.data.skip(4); // Fretcount
 
-        const mainMidiChannelInfo = this._midiChannelInfo[port][channel];
-        // const effectMidiChannelInfo = this._midiChannelInfo[port][effectChannel];
-
         const trackPlaybackInfo = new PlaybackInformation();
-        trackPlaybackInfo.volume = mainMidiChannelInfo.volume;
-        trackPlaybackInfo.balance = mainMidiChannelInfo.balance;
-        trackPlaybackInfo.port = port;
-        trackPlaybackInfo.program = mainMidiChannelInfo.program;
-        trackPlaybackInfo.primaryChannel = channel;
+        if (
+            port >= 0 &&
+            port < this._midiChannelInfo.length &&
+            channel >= 0 &&
+            channel < this._midiChannelInfo[port].length
+        ) {
+            const mainMidiChannelInfo = this._midiChannelInfo[port][channel];
+            trackPlaybackInfo.volume = mainMidiChannelInfo.volume;
+            trackPlaybackInfo.balance = mainMidiChannelInfo.balance;
+            trackPlaybackInfo.port = port;
+            trackPlaybackInfo.program = mainMidiChannelInfo.program;
+            trackPlaybackInfo.primaryChannel = channel;
+        } else {
+            Logger.warning(
+                this.name,
+                `Track ${newTrack.index + 1} has an invalid MIDI port ${port + 1} or channel ${channel + 1}, using defaults`
+            );
+        }
         trackPlaybackInfo.secondaryChannel = effectChannel;
         trackPlaybackInfo.isSolo = (flags & 0x10) !== 0;
         trackPlaybackInfo.isMute = (flags & 0x20) !== 0;
@@ -982,7 +994,7 @@ export class Gp3To5Importer extends ScoreImporter {
         for (let i: number = 6; i >= 0; i--) {
             if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
                 const note = this.readNote(track, bar, voice, newBeat, 6 - i);
-                if (allNoteHarmonicType !== HarmonicType.None) {
+                if (note !== null && allNoteHarmonicType !== HarmonicType.None) {
                     note.harmonicType = allNoteHarmonicType;
                     note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
                 }
@@ -1432,7 +1444,11 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
-    public readNote(track: Track, bar: Bar, voice: Voice, beat: Beat, stringIndex: number): Note {
+    /**
+     * Reads a note and adds it to the beat. Notes stored without a fret are read but not added,
+     * as Guitar Pro does not show them.
+     */
+    public readNote(track: Track, bar: Bar, voice: Voice, beat: Beat, stringIndex: number): Note | null {
         const newNote: Note = new Note();
         newNote.string = bar.staff.tuning.length - stringIndex;
         const flags: number = this.data.readByte();
@@ -1460,8 +1476,9 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.dynamics = this.toDynamicValue(dynamicNumber);
             beat.dynamics = newNote.dynamics;
         }
-        if ((flags & 0x20) !== 0) {
-            newNote.fret = IOHelper.readSInt8(this.data);
+        const hasFret = (flags & 0x20) !== 0;
+        if (hasFret) {
+            this._readFret(bar.staff, newNote);
         }
         if ((flags & 0x80) !== 0) {
             newNote.leftHandFinger = IOHelper.readSInt8(this.data) as Fingers;
@@ -1478,6 +1495,10 @@ export class Gp3To5Importer extends ScoreImporter {
         beat.addNote(newNote);
         if ((flags & 0x08) !== 0) {
             this.readNoteEffects(track, voice, beat, newNote);
+        }
+        if (!hasFret) {
+            beat.removeNote(newNote);
+            return null;
         }
 
         if (bar.staff.isPercussion) {
@@ -1592,11 +1613,22 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
+    private _readFret(staff: Staff, note: Note): void {
+        const fret = IOHelper.readSInt8(this.data);
+        // Guitar Pro shows a negative fret on a stringed staff as a dead note
+        if (fret < 0 && !staff.isPercussion) {
+            note.isDead = true;
+            note.fret = 0;
+        } else {
+            note.fret = fret;
+        }
+    }
+
     public readGrace(voice: Voice, note: Note): void {
         const graceBeat: Beat = new Beat();
         const graceNote: Note = new Note();
         graceNote.string = note.string;
-        graceNote.fret = IOHelper.readSInt8(this.data);
+        this._readFret(voice.bar.staff, graceNote);
         graceBeat.duration = Duration.ThirtySecond;
         graceBeat.dynamics = this.toDynamicValue(IOHelper.readSInt8(this.data));
         const transition: number = IOHelper.readSInt8(this.data);
@@ -1620,7 +1652,9 @@ export class Gp3To5Importer extends ScoreImporter {
             graceBeat.graceType = GraceType.BeforeBeat;
         } else {
             const flags: number = this.data.readByte();
-            graceNote.isDead = (flags & 0x01) !== 0;
+            if ((flags & 0x01) !== 0) {
+                graceNote.isDead = true;
+            }
             graceBeat.graceType = (flags & 0x02) !== 0 ? GraceType.OnBeat : GraceType.BeforeBeat;
         }
         voice.addGraceBeat(graceBeat);

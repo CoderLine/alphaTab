@@ -238,8 +238,17 @@ export class ComparisonHelpers {
                                     ignoredKeyLookup.add(k);
                                 }
                             }
-                            const expectedKeys = Array.from(expectedMap.keys()).filter(k => !ignoredKeyLookup.has(k));
-                            const actualKeys = Array.from(actualMap.keys()).filter(k => !ignoredKeyLookup.has(k));
+                            // unset (NaN) numbers are not serialized, a number without counterpart compares like NaN
+                            const expectedKeys = Array.from(expectedMap.keys()).filter(
+                                k =>
+                                    !ignoredKeyLookup.has(k) &&
+                                    (actualMap.has(k) || typeof expectedMap.get(k) !== 'number')
+                            );
+                            const actualKeys = Array.from(actualMap.keys()).filter(
+                                k =>
+                                    !ignoredKeyLookup.has(k) &&
+                                    (expectedMap.has(k) || typeof actualMap.get(k) !== 'number')
+                            );
                             expectedKeys.sort();
                             actualKeys.sort();
 

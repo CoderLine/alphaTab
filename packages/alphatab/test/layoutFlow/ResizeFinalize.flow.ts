@@ -134,7 +134,8 @@ function install() {
         }
         return r;
     };
-    wrap(EffectSystemPlacement.prototype, 'placeAndApply', 'EffectSystemPlacement.placeAndApply');
+    wrap(EffectSystemPlacement.prototype, 'place', 'EffectSystemPlacement.place');
+    wrap(EffectSystemPlacement.prototype, 'apply', 'EffectSystemPlacement.apply');
     wrap(EffectSystemPlacement.prototype, '_placeSide', 'EffectSystemPlacement._placeSide');
     wrap(RenderStaff.prototype, 'reset', 'RenderStaff.reset', self => {
         bump('RenderStaff.reset (non-empty barRenderers)', (self as RenderStaff).barRenderers.length > 0 ? 1 : 0);

@@ -1,3 +1,5 @@
+import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import type { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 
 /**
@@ -6,7 +8,7 @@ import type { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/renderi
  * @internal
  */
 export interface IHeaderRodSink {
-    addHeaderRod(rank: number, pre: number, post: number): void;
+    addHeaderRod(rank: number, pre: number, post: number, trailingSpace: number): void;
     getHeaderRodX(rank: number, ownPre: number): number;
 }
 
@@ -28,6 +30,12 @@ export class HeaderProfileGlyph {
     public right: number = 0;
     public top: number = 0;
     public bottom: number = 0;
+    /**
+     * The boxes the glyph occupies in the skyline, as `left, right, top, bottom` per box relative to the
+     * glyph x: one per leaf child of a glyph group (e.g. the accidentals of a key signature), so the group
+     * does not claim its full height over its full width. `null` if the bounding box is used.
+     */
+    public skylineBoxes: number[] | null = null;
 }
 
 /**
@@ -40,6 +48,7 @@ export class HeaderProfile implements IHeaderRodSink {
     private readonly _rodRanks: number[] = [];
     private readonly _rodPres: number[] = [];
     private readonly _rodPosts: number[] = [];
+    private readonly _rodTrailingSpaces: number[] = [];
     public readonly glyphs: HeaderProfileGlyph[] = [];
     /**
      * The width of the header glyphs laid out next to each other, before column alignment.
@@ -62,6 +71,11 @@ export class HeaderProfile implements IHeaderRodSink {
                 entry.right = g.getBoundingBoxRight();
                 entry.top = g.getBoundingBoxTop();
                 entry.bottom = g.getBoundingBoxBottom();
+                if (g instanceof GlyphGroup && g.glyphs && g.glyphs.length > 0) {
+                    const boxes: number[] = [];
+                    HeaderProfile._collectSkylineBoxes(g, 0, boxes);
+                    entry.skylineBoxes = boxes;
+                }
                 g.x = entry.localX;
                 profile._current = entry;
                 g.registerHeaderRod(profile);
@@ -73,10 +87,28 @@ export class HeaderProfile implements IHeaderRodSink {
         return profile;
     }
 
-    public addHeaderRod(rank: number, pre: number, post: number): void {
+    private static _collectSkylineBoxes(g: Glyph, offsetX: number, boxes: number[]): void {
+        if (g instanceof GlyphGroup && g.glyphs && g.glyphs.length > 0) {
+            for (const c of g.glyphs) {
+                HeaderProfile._collectSkylineBoxes(c, offsetX + g.x, boxes);
+            }
+            return;
+        }
+        const left = offsetX + g.getBoundingBoxLeft();
+        const right = offsetX + g.getBoundingBoxRight();
+        if (right > left) {
+            boxes.push(left);
+            boxes.push(right);
+            boxes.push(g.getBoundingBoxTop());
+            boxes.push(g.getBoundingBoxBottom());
+        }
+    }
+
+    public addHeaderRod(rank: number, pre: number, post: number, trailingSpace: number): void {
         this._rodRanks.push(rank);
         this._rodPres.push(pre);
         this._rodPosts.push(post);
+        this._rodTrailingSpaces.push(trailingSpace);
     }
 
     public getHeaderRodX(rank: number, ownPre: number): number {
@@ -91,7 +123,7 @@ export class HeaderProfile implements IHeaderRodSink {
     public registerHeaderRods(sink: IHeaderRodSink): void {
         const ranks = this._rodRanks;
         for (let i = 0; i < ranks.length; i++) {
-            sink.addHeaderRod(ranks[i], this._rodPres[i], this._rodPosts[i]);
+            sink.addHeaderRod(ranks[i], this._rodPres[i], this._rodPosts[i], this._rodTrailingSpaces[i]);
         }
     }
 

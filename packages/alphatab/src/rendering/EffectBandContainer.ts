@@ -2,7 +2,8 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
-import { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import { EffectBand, type EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 
@@ -95,12 +96,19 @@ export class EffectBandContainer {
         this._isTopContainer = isTopContainer;
     }
 
-    public createVoiceGlyphs(voice: Voice) {
+    /**
+     * @param barStartOnly Creates only the glyphs placed at the start of the bar
+     * ({@link EffectBarGlyphSizing.SingleStartBar}), for renderers without beat glyphs like multi-bar rests.
+     */
+    public createVoiceGlyphs(voice: Voice, barStartOnly: boolean) {
         const renderer = this._renderer;
         const infos = this.infos;
         const beats = voice.beats;
         for (let i = 0, n = infos.length; i < n; i++) {
             const info = infos[i];
+            if (barStartOnly && info.effect.sizingMode !== EffectBarGlyphSizing.SingleStartBar) {
+                continue;
+            }
             // bands are created on the first beat with a glyph
             let band: EffectBand | undefined = undefined;
             for (let j = 0, m = beats.length; j < m; j++) {
@@ -136,6 +144,22 @@ export class EffectBandContainer {
         for (const effectBand of this._bands) {
             canvas.color = effectBand.voice.index === 0 ? resources.mainGlyphColor : resources.secondaryGlyphColor;
             if (!effectBand.isEmpty) {
+                effectBand.paint(cx, cy, canvas);
+            }
+        }
+    }
+
+    private static readonly _overhangRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
+    /**
+     * Paints the bands which have glyphs left of the bar start.
+     */
+    public paintLeftOverhang(cx: number, cy: number, canvas: ICanvas) {
+        const resources = this._renderer.resources;
+        const range = EffectBandContainer._overhangRangeScratch;
+        for (const effectBand of this._bands) {
+            if (effectBand.computeLocalXRange(range) && effectBand.x + range.xStart < 0) {
+                canvas.color = effectBand.voice.index === 0 ? resources.mainGlyphColor : resources.secondaryGlyphColor;
                 effectBand.paint(cx, cy, canvas);
             }
         }

@@ -511,8 +511,16 @@ export class EffectBand extends Glyph {
 
     private _alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         const g: EffectGlyph = this._glyphsByBeat[beat.index]!;
-        const container = this.renderer.getBeatContainer(beat)!;
+        // bar-anchored glyphs also exist on renderers without beat glyphs (multi-bar rests)
+        switch (sizing) {
+            case EffectBarGlyphSizing.FullBar:
+                g.width = this.renderer.width;
+                return;
+            case EffectBarGlyphSizing.SingleStartBar:
+                return;
+        }
 
+        const container = this.renderer.getBeatContainer(beat)!;
         switch (sizing) {
             case EffectBarGlyphSizing.SinglePreBeat:
                 const offsetToBegin = this.renderer.layoutingInfo.getPreBeatSize(beat);
@@ -532,11 +540,6 @@ export class EffectBand extends Glyph {
                     const offsetToEnd = this.renderer.layoutingInfo.getPostBeatSize(beat);
                     g.width = offsetToEnd;
                 }
-                break;
-            case EffectBarGlyphSizing.FullBar:
-                g.width = this.renderer.width;
-                break;
-            case EffectBarGlyphSizing.SingleStartBar:
                 break;
         }
     }
