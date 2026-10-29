@@ -1,6 +1,6 @@
 import { detectionGlobalPlugin } from '@coderline/alphatab-vite/detectionGlobalPlugin';
+import type { Plugin } from 'vite';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
-import type { Plugin } from './bridge';
 import { copyAssetsPlugin } from './copyAssetsPlugin';
 import { importMetaUrlPlugin } from './importMetaPlugin';
 import { workerPlugin } from './workerPlugin';

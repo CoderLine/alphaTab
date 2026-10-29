@@ -33,6 +33,7 @@
 
 import * as path from 'node:path';
 import MagicString from 'magic-string';
+import type { Plugin } from 'vite';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 import {
     AlphaTabWorkerTypes,
@@ -40,7 +41,6 @@ import {
     ENV_PUBLIC_PATH,
     encodeURIPath,
     isSameContent,
-    type Plugin,
     type ResolvedConfig,
     toOutputFilePathInJS,
     WORKER_ASSET_ID,

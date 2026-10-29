@@ -108,21 +108,25 @@ export class Staff {
 
     /**
      * Per-{@link Staff} override for the standard-notation staff's display.
+     * @since 1.9.0
      */
     public scoreConfig?: ScoreStaffConfig;
 
     /**
      * Per-{@link Staff} override for the tablature staff's display.
+     * @since 1.9.0
      */
     public tabConfig?: TabStaffConfig;
 
     /**
      * Per-{@link Staff} override for the slash staff's display.
+     * @since 1.9.0
      */
     public slashConfig?: SlashStaffConfig;
 
     /**
      * Per-{@link Staff} override for the numbered (jianpu) staff's display.
+     * @since 1.9.0
      */
     public numberedConfig?: NumberedStaffConfig;
 

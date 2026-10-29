@@ -18,6 +18,7 @@ import type { Settings } from '@coderline/alphatab/Settings';
  */
 export class AlphaTabWebWorker {
     private _renderer!: ScoreRenderer;
+    private _scoreId = 0;
     private _main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>;
 
     public constructor(main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>) {
@@ -60,6 +61,7 @@ export class AlphaTabWebWorker {
                 this._renderer.postRenderFinished.on(() => {
                     this._main.postMessage({
                         cmd: 'alphaTab.postRenderFinished',
+                        scoreId: this._scoreId,
                         boundsLookup: this._renderer.boundsLookup?.toJson() ?? null
                     });
                 });
@@ -84,6 +86,7 @@ export class AlphaTabWebWorker {
                 this._renderer.width = data.width;
                 break;
             case 'alphaTab.renderScore':
+                this._scoreId = data.scoreId;
                 this._updateFontSizes(data.fontSizes);
                 const renderHints = data.renderHints;
                 const score =

@@ -12,7 +12,7 @@ import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@coderline/alphatab/rendering/glyphs/BendNoteHeadGroupGlyph';
 import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreHelperNotesBaseGlyph';
-import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -21,14 +21,12 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 /**
  * @internal
  */
-export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGlyph {
+export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;
     private _notes: Note[] = [];
     private _endNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _container: ScoreBeatContainerGlyph;
-
-    public readonly checkForOverflow = false; // handled separately in ScoreBeatContainerGlyph
 
     public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
@@ -39,23 +37,17 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     public override doLayout(): void {
         super.doLayout();
         this.width = 0;
+        this.isMeasured = false;
     }
 
-    public override getBoundingBoxTop(): number {
-        return super.getBoundingBoxTop() - this._calculateMaxSlurHeight(BeamDirection.Up);
+    /** The top of the slurs estimated before the beats are positioned. */
+    public getEstimatedBoundingBoxTop(): number {
+        return this.getNoteHeadsBoundingBoxTop() - this._calculateMaxSlurHeight(BeamDirection.Up);
     }
 
-    public override getBoundingBoxBottom(): number {
-        return super.getBoundingBoxBottom() + this._calculateMaxSlurHeight(BeamDirection.Down);
-    }
-
-    /** Staff-local x ({@link ITieGlyph} convention); spans the start beat. */
-    public override getBoundingBoxLeft(): number {
-        return this.renderer.x + this.renderer.getBeatX(this._beat, BeatXPosition.PostNotes);
-    }
-
-    public override getBoundingBoxRight(): number {
-        return this.renderer.x + this.renderer.getBeatX(this._beat, BeatXPosition.EndBeat);
+    /** The bottom of the slurs estimated before the beats are positioned. */
+    public getEstimatedBoundingBoxBottom(): number {
+        return this.getNoteHeadsBoundingBoxBottom() + this._calculateMaxSlurHeight(BeamDirection.Down);
     }
 
     public doMultiVoiceLayout(): void {
@@ -220,7 +212,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         }
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+    protected override paintOrMeasure(cx: number, cy: number, canvas: ICanvas): void {
         // Draw note heads
         const startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff!.staffId,
@@ -245,12 +237,12 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
         if (this._middleNoteGlyph) {
             this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.onTimeX;
             this._middleNoteGlyph.y = cy + startNoteRenderer.y;
-            this._middleNoteGlyph.paint(0, 0, canvas);
+            this.paintOrMeasureHelperNotes(this._middleNoteGlyph, canvas);
         }
         if (this._endNoteGlyph) {
             this._endNoteGlyph.x = endBeatX - this._endNoteGlyph.onTimeX;
             this._endNoteGlyph.y = cy + startNoteRenderer.y;
-            this._endNoteGlyph.paint(0, 0, canvas);
+            this.paintOrMeasureHelperNotes(this._endNoteGlyph, canvas);
         }
         this._notes.sort((a, b) => {
             return b.displayValue - a.displayValue;
@@ -308,9 +300,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                             startNoteRenderer.accidentalHelper.getNoteStepsForValue(noteValueToDraw, false)
                         );
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
-                        TieGlyph.paintTie(
+                        this.drawTie(
                             canvas,
-                            1,
                             startX,
                             startY,
                             endX,
@@ -338,9 +329,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
                         endY += noteHeadHeight;
                     }
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
-                        TieGlyph.paintTie(
+                        this.drawTie(
                             canvas,
-                            1,
                             startX,
                             startY,
                             endX,

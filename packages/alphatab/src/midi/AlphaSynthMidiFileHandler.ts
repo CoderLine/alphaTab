@@ -71,6 +71,9 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         }
     }
 
+    /**
+     * @since 1.9.0
+     */
     public addMetronome(tick: number, counter: number, durationInTicks: number): void {
         tick += this.tickShift;
         if (!this._smf1Mode) {

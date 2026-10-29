@@ -47,6 +47,12 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract get beatId(): number;
     public abstract get absoluteDisplayStart(): number;
     public abstract get displayDuration(): number;
+    /**
+     * Whether this is a placeholder beat of an empty voice, which draws nothing.
+     */
+    public get isEmptyBeat(): boolean {
+        return false;
+    }
     public abstract get onTimeX(): number;
     public abstract get graceType(): GraceType;
     public abstract get graceIndex(): number;
@@ -79,6 +85,23 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public applyCenterOffset(target: number): void {
         this.x = target - this.onTimeX;
     }
+
+    /**
+     * Called for each pair of neighbouring beats of a voice once both are positioned,
+     * to adjust glyphs depending on the distance to the next beat.
+     */
+    public fitToNextBeat(_next: BeatContainerGlyphBase): void {
+        // nothing by default
+    }
+
+    /**
+     * Emits ink outside the staff which the notehead extent of {@link getBoundingBoxTop} and
+     * {@link getBoundingBoxBottom} does not describe into the renderer's bar-local skyline.
+     * @param base The renderer-local x of this container.
+     */
+    public emitSkyline(_base: number): void {
+        // nothing by default
+    }
 }
 
 /**
@@ -109,6 +132,10 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
 
     public override get displayDuration(): number {
         return this.beat.displayDuration;
+    }
+
+    public override get isEmptyBeat(): boolean {
+        return this.beat.isEmpty;
     }
 
     public override get graceIndex(): number {

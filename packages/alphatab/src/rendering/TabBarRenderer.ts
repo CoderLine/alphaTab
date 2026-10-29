@@ -181,12 +181,14 @@ export class TabBarRenderer extends LineBarRenderer {
         const drawnLineCount = this.drawnLineCount;
         const cxLocal = cx + this.x;
         const cyLocal = cy + this.y;
+        const lines = this.beginStaffLines();
 
         if (this.additionalMultiRestBars) {
             for (let line = 0; line < drawnLineCount; line++) {
                 const lineY = this.getLineY(line) - lineYOffset;
-                canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
+                this.fillStaffLine(canvas, lines, cxLocal, cyLocal + lineY, lineWidth, thickness);
             }
+            this.endStaffLines(cx, cy, canvas, lines);
             return;
         }
 
@@ -198,8 +200,9 @@ export class TabBarRenderer extends LineBarRenderer {
         if (count === 0) {
             for (let line = 0; line < drawnLineCount; line++) {
                 const lineY = this.getLineY(line) - lineYOffset;
-                canvas.fillRect(cxLocal, cyLocal + lineY, lineWidth, thickness);
+                this.fillStaffLine(canvas, lines, cxLocal, cyLocal + lineY, lineWidth, thickness);
             }
+            this.endStaffLines(cx, cy, canvas, lines);
             return;
         }
 
@@ -255,10 +258,10 @@ export class TabBarRenderer extends LineBarRenderer {
                         const oi = order[k];
                         const gx = xs[oi];
                         const gw = ws[oi];
-                        canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
+                        this.fillStaffLine(canvas, lines, cxLocal + lineX, cyLine, gx - lineX, thickness);
                         lineX = gx + gw;
                     }
-                    canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
+                    this.fillStaffLine(canvas, lines, cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
                     cursor = end;
                     continue;
                 }
@@ -267,12 +270,13 @@ export class TabBarRenderer extends LineBarRenderer {
             for (let k = cursor; k < end; k++) {
                 const gx = base + beatRefs[k].x + beatRefs[k].onNotes.x + relXAndWidth[k * 2];
                 const gw = relXAndWidth[k * 2 + 1];
-                canvas.fillRect(cxLocal + lineX, cyLine, gx - lineX, thickness);
+                this.fillStaffLine(canvas, lines, cxLocal + lineX, cyLine, gx - lineX, thickness);
                 lineX = gx + gw;
             }
-            canvas.fillRect(cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
+            this.fillStaffLine(canvas, lines, cxLocal + lineX, cyLine, lineWidth - lineX, thickness);
             cursor = end;
         }
+        this.endStaffLines(cx, cy, canvas, lines);
     }
 
     private _buildGapCache(): void {
@@ -559,6 +563,11 @@ export class TabBarRenderer extends LineBarRenderer {
         if (this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
             holes = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.slots.slice();
             holes.sort((a, b) => a.topY - b.topY);
+        }
+
+        // no note on the tab (e.g. pitched notes without tab position) -> no stem
+        if (holes.length === 0) {
+            return;
         }
 
         // fast path -> single note == full line

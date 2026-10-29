@@ -71,4 +71,14 @@ describe('SpecialNotesTests', () => {
             'test-data/visual-tests/special-notes/full-bar-notes-rests.png'
         );
     });
+
+    it('full-bar-notes-pickup', async () => {
+        // the pick-up quarter is a single beat spanning its (shortened) bar but is not a full-bar note
+        await VisualTestHelper.runVisualTestTex(
+            `
+                \\ac C4.4 | C4.1 | r.1 | D4.4
+            `,
+            'test-data/visual-tests/special-notes/full-bar-notes-pickup.png'
+        );
+    });
 });

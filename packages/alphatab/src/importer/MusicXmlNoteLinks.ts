@@ -202,6 +202,10 @@ export class MusicXmlNoteLinks {
                 }
                 if (link.value >= 0) {
                     note.trillValue = note.calculateRealValue(false, false) + link.value;
+                    // each trill mark is a separate trill, also next to another one
+                    if (beat === link.origin.beat) {
+                        note.isTrillStart = true;
+                    }
                 } else if (note.vibrato === VibratoType.None) {
                     note.vibrato = VibratoType.Slight;
                 }

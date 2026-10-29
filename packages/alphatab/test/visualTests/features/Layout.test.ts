@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
@@ -60,6 +61,24 @@ describe('LayoutTests', () => {
         settings.display.startBar = 5;
         settings.display.barCount = 4;
         await VisualTestHelper.runVisualTest('layout/horizontal-layout-5to8.gp', settings);
+    });
+
+    it('horizontal-layout-bar-numbers-partials', async () => {
+        // the first bar of a partial has its number centred on the barline, reaching into the previous partial
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Horizontal;
+        let tex = '';
+        for (let i = 0; i < 12; i++) {
+            tex += 'C4.4 D4 E4 F4 |';
+        }
+        await VisualTestHelper.runVisualTestTex(
+            tex,
+            'test-data/visual-tests/layout/horizontal-layout-bar-numbers-partials.png',
+            settings,
+            o => {
+                o.score.stylesheet.barNumberDisplay = BarNumberDisplay.AllBars;
+            }
+        );
     });
 
     it('horizontal-layout-scale', () => {

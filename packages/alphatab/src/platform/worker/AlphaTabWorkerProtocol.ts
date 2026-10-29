@@ -23,6 +23,7 @@ export type IAlphaTabWorkerMessage =
     | { cmd: 'alphaTab.setWidth'; width: number }
     | {
           cmd: 'alphaTab.renderScore';
+          scoreId: number;
           score: Map<string, unknown> | null;
           trackIndexes: number[] | null;
           fontSizes: Map<string, FontSizeDefinition>;
@@ -33,7 +34,7 @@ export type IAlphaTabWorkerMessage =
     | { cmd: 'alphaTab.partialRenderFinished'; result: RenderFinishedEventArgs }
     | { cmd: 'alphaTab.partialLayoutFinished'; result: RenderFinishedEventArgs }
     | { cmd: 'alphaTab.renderFinished'; result: RenderFinishedEventArgs }
-    | { cmd: 'alphaTab.postRenderFinished'; boundsLookup: Map<string, unknown> | null }
+    | { cmd: 'alphaTab.postRenderFinished'; scoreId: number; boundsLookup: Map<string, unknown> | null }
     | { cmd: 'alphaTab.error'; error: Error };
 
 /**

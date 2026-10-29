@@ -204,8 +204,13 @@ async function bundleWorkerEntryRolldown(
             viteMode: true
         }
     });
+    // Rolldown minifies as an output option; terser stays a renderChunk plugin of the worker environment.
+    const workerMinify = workerEnvironment.config.build.minify;
     try {
-        const { output } = await bundle.generate(generateOptions);
+        const { output } = await bundle.generate({
+            minify: workerMinify === 'oxc' ? true : workerMinify === false ? 'dce-only' : undefined,
+            ...generateOptions
+        });
         const [outputChunk, ...rest] = output;
         for (const o of rest) {
             if (o.type === 'asset') {

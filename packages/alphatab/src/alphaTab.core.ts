@@ -51,7 +51,11 @@ export { WebPlatform } from '@coderline/alphatab/platform/javascript/WebPlatform
 
 export { VersionInfo as meta } from '@coderline/alphatab/generated/VersionInfo';
 
-export type { ICursorHandler } from '@coderline/alphatab/CursorHandler';
+export {
+    type ICursorHandler,
+    ToNextBeatAnimatingCursorHandler,
+    NonAnimatingCursorHandler
+} from '@coderline/alphatab/CursorHandler';
 
 // alphaTab2.0: We should reliminate the big bundles but ship individual
 // modules which can be imported. e.g. import { Track } from '@coderline/alphatab/model/Track'

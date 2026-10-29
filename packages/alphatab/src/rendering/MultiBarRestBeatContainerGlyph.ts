@@ -138,6 +138,10 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
         }
     }
 
+    public override emitSkyline(base: number): void {
+        this._glyph?.emitSkyline(base);
+    }
+
     public override buildBoundingsLookup(_barBounds: BarBounds, _cx: number, _cy: number): void {}
 
     public override doLayout(): void {

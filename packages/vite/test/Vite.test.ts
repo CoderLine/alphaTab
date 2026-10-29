@@ -5,6 +5,11 @@ import { alphaTab } from '../src/alphaTab.vite';
 
 type ViteLike = typeof import('vite');
 
+function expectMinified(fileName: string, text: string) {
+    // the unminified bundle has tens of thousands of lines, the minified one only the license banners
+    expect(text.split('\n').length, `${fileName} is not minified`).toBeLessThan(1000);
+}
+
 async function runBundleSmokeTest(vite: ViteLike) {
     const bundlerProject = './test-data/project';
 
@@ -66,12 +71,14 @@ async function runBundleSmokeTest(vite: ViteLike) {
                 expect(text).toContain('initializeWorker()');
                 // without custom chunking the app will bundle alphatab directly
                 expect(text).toContain('.at-surface');
+                expectMinified(file.name, text);
 
                 workerValidated = true;
             } else if (file.name.startsWith('alphaTab.worklet-')) {
                 expect(text).toContain('initializeAudioWorklet()');
                 // without custom chunking the app will bundle alphatab directly
                 expect(text).toContain('.at-surface');
+                expectMinified(file.name, text);
                 workletValidated = true;
             }
         }
@@ -93,6 +100,13 @@ async function loadVite(major: 7 | 8): Promise<ViteLike> {
 // Both cases share global state (process.cwd, the dist/ folder), so they
 // must run sequentially — that is what vitest does inside a single describe.
 describe('Vite', () => {
+    it('peer range accepts every tested vite major', () => {
+        const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+        const ranges = (pkg.peerDependencies.vite as string).split('||').map(r => r.trim());
+        expect(ranges).toContain('^7');
+        expect(ranges).toContain('^8');
+    });
+
     it('bundle-correctly (vite 8, rolldown)', { timeout: 30000 }, async () => {
         await runBundleSmokeTest(await loadVite(8));
     });

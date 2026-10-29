@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import * as path from 'node:path';
 import * as url from 'node:url';
+import type { Plugin } from 'vite';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
-import type { Plugin, ResolvedConfig } from './bridge';
+import type { ResolvedConfig } from './bridge';
 
 /**
  * @public

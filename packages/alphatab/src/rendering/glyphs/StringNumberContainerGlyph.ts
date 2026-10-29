@@ -7,16 +7,33 @@ import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas
  * @internal
  */
 export class StringNumberContainerGlyph extends EffectGlyph {
-    private _strings: Set<number> = new Set<number>();
+    // top to bottom: highest note first
+    private _strings: number[] = [];
+    private _pitches: number[] = [];
 
-    public addString(string: number) {
-        this._strings.add(string);
+    public addString(string: number, pitch: number) {
+        if (this._strings.indexOf(string) >= 0) {
+            return;
+        }
+        this._strings.push(string);
+        this._pitches.push(pitch);
+        let i = this._strings.length - 1;
+        while (
+            i > 0 &&
+            (this._pitches[i - 1] < pitch || (this._pitches[i - 1] === pitch && this._strings[i - 1] < string))
+        ) {
+            this._strings[i] = this._strings[i - 1];
+            this._pitches[i] = this._pitches[i - 1];
+            i--;
+        }
+        this._strings[i] = string;
+        this._pitches[i] = pitch;
     }
 
     public override doLayout(): void {
         const circleHeight =
             this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GuitarString0)! * this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
-        this.height = (circleHeight + this.renderer.smuflMetrics.stringNumberCirclePadding) * this._strings.size;
+        this.height = (circleHeight + this.renderer.smuflMetrics.stringNumberCirclePadding) * this._strings.length;
         this.width = circleHeight;
     }
 

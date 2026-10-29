@@ -1,4 +1,4 @@
-import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
+import type { EffectBand, EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
@@ -24,7 +24,11 @@ export class EffectSystemPlacement {
         this._staff = staff;
     }
 
-    public placeAndApply(): void {
+    /**
+     * Places all non-empty effect bands of the staff on its skyline and publishes them into it.
+     * Must be followed by {@link apply}.
+     */
+    public place(): void {
         const staff = this._staff;
         const sky = staff.systemSkyline;
         const pad = staff.system.layout.renderer.settings.display.effectBandPaddingBottom;
@@ -66,6 +70,16 @@ export class EffectSystemPlacement {
         const contentSky = staff.placesAgainstContentOnly ? staff.contentSkyline : null;
         this._placeSide(top, sky.upSky, contentSky ? contentSky.upSky : null, pad, /* isTop */ true);
         this._placeSide(bottom, sky.downSky, contentSky ? contentSky.downSky : null, pad, /* isTop */ false);
+    }
+
+    /**
+     * Reserves the placed bands in the renderer and staff overflows and positions them relative to the final
+     * staff overflow. Overflow registered on the staff between {@link place} and this call is respected.
+     */
+    public apply(): void {
+        const staff = this._staff;
+        const top = this._top;
+        const bottom = this._bottom;
 
         // A bar reserves its own content and the bands placed on it. Bands know their final
         // position (magnitude + height), so the reserved height does not depend on the skyline before
@@ -92,11 +106,14 @@ export class EffectSystemPlacement {
         }
     }
 
+    private static readonly _rangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
     /** The height the placed bands add on top of the given content overflow. */
     private static _effectsHeight(bands: EffectBand[], contentOverflow: number): number {
         let max = 0;
         for (const b of bands) {
-            if (!b.isEmpty) {
+            // bands without extent (e.g. hidden bar numbers) take no part in the placement
+            if (b.computeLocalXRange(EffectSystemPlacement._rangeScratch)) {
                 const outer = b.placedMagnitude + b.height;
                 if (outer > max) {
                     max = outer;

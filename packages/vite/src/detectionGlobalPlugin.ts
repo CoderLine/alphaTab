@@ -1,5 +1,6 @@
 import MagicString from 'magic-string';
-import type { Plugin, ResolvedConfig } from './bridge';
+import type { Plugin } from 'vite';
+import type { ResolvedConfig } from './bridge';
 
 const marker = '__ALPHATAB_VITE__';
 

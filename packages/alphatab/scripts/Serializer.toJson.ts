@@ -36,7 +36,18 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
 
         let propertyStatements: ts.Statement[] = [];
 
-        if (prop.asRaw || prop.type.isPrimitiveType) {
+        if (prop.isUnsetAsNaN) {
+            propertyStatements.push(
+                createNodeFromSource<ts.IfStatement>(
+                    `
+                    if(!Number.isNaN(obj.${fieldName})) {
+                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName});
+                    }
+                `,
+                    ts.SyntaxKind.IfStatement
+                )
+            );
+        } else if (prop.asRaw || prop.type.isPrimitiveType) {
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
                     `

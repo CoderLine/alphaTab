@@ -12,6 +12,7 @@ import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -23,28 +24,17 @@ import { MusicXmlImporterTestHelper } from 'test/importer/MusicXmlImporterTestHe
 import { describe, expect, it } from 'vitest';
 
 describe('MusicXmlImporterTests', () => {
-    it('track-volume', async () => {
+    it('midi-instrument-volume-pan', async () => {
         const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/track-volume-balance.musicxml'
+            'test-data/musicxml4/part-volume-pan.xml',
+            false
         );
 
-        expect(score.tracks[0].playbackInfo.volume).toBe(16);
-        expect(score.tracks[1].playbackInfo.volume).toBe(12);
-        expect(score.tracks[2].playbackInfo.volume).toBe(8);
-        expect(score.tracks[3].playbackInfo.volume).toBe(4);
-        expect(score.tracks[4].playbackInfo.volume).toBe(0);
-    });
-
-    it('track-balance', async () => {
-        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/track-volume-balance.musicxml'
-        );
-
-        expect(score.tracks[0].playbackInfo.balance).toBe(0);
-        expect(score.tracks[1].playbackInfo.balance).toBe(4);
-        expect(score.tracks[2].playbackInfo.balance).toBe(8);
-        expect(score.tracks[3].playbackInfo.balance).toBe(12);
-        expect(score.tracks[4].playbackInfo.balance).toBe(16);
+        // volume 0-100 and pan -90 (left) to 90 (right) are scaled to 0-16, between the steps rounded down.
+        // only the first instrument of a part defines the track mixer, a part without values keeps the defaults.
+        const defaults = new PlaybackInformation();
+        expect(score.tracks.map(t => t.playbackInfo.volume)).toEqual([16, 10, 4, 0, 5, 8, defaults.volume]);
+        expect(score.tracks.map(t => t.playbackInfo.balance)).toEqual([0, 12, 8, 16, 5, 8, defaults.balance]);
     });
 
     it('full-bar-rest', async () => {
@@ -261,6 +251,12 @@ describe('MusicXmlImporterTests', () => {
         expect(score).toMatchSnapshot();
     });
 
+    it('measure-number-zero', async () => {
+        // an explicit (non-implicit) measure 0 starts the counting at 0
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-measure-number-zero.xml');
+        expect(score.masterBars.map(mb => mb.barNumberText)).toEqual(['0', '1', '2']);
+    });
+
     it('timewise-anacrusis', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/timewise-anacrusis.xml');
         expect(score).toMatchSnapshot();
@@ -460,9 +456,11 @@ describe('MusicXmlImporterTests', () => {
         expect(tab[0].realValue).toBe(69);
         expect(tab[0].showStringNumber).toBe(false);
 
-        expect(tab[1].isStringed).toBe(false);
+        // string without fret: the pitch defines the fret
+        expect(tab[1].isStringed).toBe(true);
         expect(tab[1].string).toBe(5);
-        expect(tab[1].showStringNumber).toBe(true);
+        expect(tab[1].fret).toBe(10);
+        expect(tab[1].showStringNumber).toBe(false);
         expect(tab[1].realValue).toBe(69);
 
         // out of range string
@@ -690,18 +688,51 @@ describe('MusicXmlImporterTests', () => {
         expect(notes.map(n => n.realValue)).toEqual([67, 67, 60, 74, 60, 84, 79, 74, 72, 64, 76]);
     });
 
+    it('adjacent-trills-stay-separate', async () => {
+        // two trill marks with their own wavy lines on notes 1-2 and 3-4
+        const spanners = await MusicXmlImporterTestHelper.loadFile(
+            'test-data/musicxml-testsuite/34a-Print-Object-Spanners.xml'
+        );
+        const bar4 = spanners.tracks[0].staves[0].bars[3].voices[0].beats;
+        expect(bar4.map(b => b.notes[0].isTrill)).toEqual([true, true, true, true]);
+        expect(bar4.map(b => b.notes[0].isTrillStart)).toEqual([true, false, true, false]);
+
+        // a trill over bar 6, and a separate single-note trill in bar 7
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml-testsuite/33a-Spanners.xml');
+        const bar6 = score.tracks[0].staves[0].bars[5].voices[0].beats;
+        expect(bar6.map(b => b.notes[0].isTrill)).toEqual([true, true, true]);
+        expect(bar6.map(b => b.notes[0].isTrillStart)).toEqual([true, false, false]);
+        const bar7 = score.tracks[0].staves[0].bars[6].voices[0].beats;
+        expect(bar7[0].notes[0].isTrill).toBe(true);
+        expect(bar7[0].notes[0].isTrillStart).toBe(true);
+    });
+
     describe('barnumberdisplay', async () => {
+        // the measure-numbering holds until it is changed
         async function testPartwise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
-            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).toBe(display);
-            expect(score.tracks[1].staves[0].bars[2].barNumberDisplay).toBe(display);
+            expect(score.tracks[0].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
+            expect(score.tracks[1].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([
+                undefined,
+                undefined,
+                display
+            ]);
         }
 
         async function testTimewise(filename: string, display: BarNumberDisplay) {
             const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/${filename}`);
-            expect(score.tracks[0].staves[0].bars[1].barNumberDisplay).toBe(display);
-            expect(score.tracks[1].staves[0].bars[1].barNumberDisplay).toBe(display);
+            expect(score.tracks[0].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
+            expect(score.tracks[1].staves[0].bars.map(b => b.barNumberDisplay)).toEqual([undefined, display, display]);
         }
+
+        it('partwise-first-measure-applies-to-all', async () => {
+            const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml-samples/Telemann.xml');
+            for (const track of score.tracks) {
+                for (const bar of track.staves[0].bars) {
+                    expect(bar.barNumberDisplay).toBe(BarNumberDisplay.Hide);
+                }
+            }
+        });
 
         it('partwise-none', async () =>
             await testPartwise('partwise-measure-numbering-none.xml', BarNumberDisplay.Hide));

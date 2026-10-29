@@ -141,7 +141,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 this.noteNumbers = tabNoteNumbers;
                 tabNoteNumbers.beat = this.container.beat;
                 for (const note of this.container.beat.notes) {
-                    if (note.isVisible) {
+                    // pitched notes without tab position (e.g. string annotations) have no fret to show
+                    if (note.isVisible && (note.isStringed || note.isPercussion)) {
                         this._createNoteGlyph(note);
                     }
                 }

@@ -428,12 +428,14 @@ export class Beat {
     /**
      * Gets or sets the chromatic tone value (0–11) of the pitch at which this rest should be displayed.
      * A value of NaN means use the default position formula.
+     * @since 1.9.0
      */
     public restDisplayTone: number = Number.NaN;
 
     /**
      * Gets or sets the octave at which this rest should be displayed.
      * Only relevant when {@link restDisplayTone} is set. NaN means use the default position formula.
+     * @since 1.9.0
      */
     public restDisplayOctave: number = Number.NaN;
 

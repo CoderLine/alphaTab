@@ -20,6 +20,7 @@ import { StartSpacingGlyph } from '@coderline/alphatab/rendering/glyphs/StartSpa
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { BeamingHelper, type BeamingHelperDrawInfo } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { ScrambledPath } from '@coderline/alphatab/rendering/utils/ScrambledPath';
 
 /**
  * Vertical envelope of a {@link BeamingHelper}'s beam/flag/tuplet-bracket
@@ -104,6 +105,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return this.lineOffset * line;
     }
 
+    public override get staffTopClearance(): number {
+        return Math.max(0, -this.getLineY(0));
+    }
+
     protected abstract get flagsSubElement(): BeatSubElement;
     protected abstract get beamsSubElement(): BeatSubElement;
     protected abstract get tupletSubElement(): BeatSubElement;
@@ -158,12 +163,15 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // for note heads to align correctly
         const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
 
+        const lines = this.beginStaffLines();
         for (let i: number = 0; i < this.drawnLineCount; i++) {
             const lineY = this.getLineY(i) - lineYOffset;
 
             let lineX: number = 0;
             for (const line of spaces[i]) {
-                canvas.fillRect(
+                this.fillStaffLine(
+                    canvas,
+                    lines,
                     cx + this.x + lineX,
                     cy + this.y + lineY,
                     line[0] - lineX,
@@ -171,12 +179,45 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 );
                 lineX = line[0] + line[1];
             }
-            canvas.fillRect(
+            this.fillStaffLine(
+                canvas,
+                lines,
                 cx + this.x + lineX,
                 cy + this.y + lineY,
                 lineWidth - lineX,
                 this.smuflMetrics.staffLineThickness
             );
+        }
+        this.endStaffLines(cx, cy, canvas, lines);
+    }
+
+    /**
+     * Starts the staff lines of this bar: a path shared with the attribution when this renderer paints it,
+     * otherwise `null` for direct filling.
+     */
+    protected beginStaffLines(): ScrambledPath | null {
+        return this.attribution ? new ScrambledPath() : null;
+    }
+
+    protected fillStaffLine(
+        canvas: ICanvas,
+        lines: ScrambledPath | null,
+        x: number,
+        y: number,
+        w: number,
+        h: number
+    ): void {
+        if (lines) {
+            lines.rect(x, y, w, h);
+        } else {
+            canvas.fillRect(x, y, w, h);
+        }
+    }
+
+    protected endStaffLines(cx: number, cy: number, canvas: ICanvas, lines: ScrambledPath | null): void {
+        if (lines) {
+            this.attribution!.appendTo(lines, cx + this.x, cy + this.y);
+            lines.fill(canvas);
         }
     }
 
@@ -960,28 +1001,35 @@ export abstract class LineBarRenderer extends BarRendererBase {
             this.ensureBeamDrawingInfo(h, direction);
             const drawingInfo = h.getDrawingInfo(direction);
             const tupletDirection = this.getTupletBeamDirection(h);
+            // A painted rest-only helper (numbered notation) has no notes, the rest itself is the anchor.
+            const isRest = h.isRestBeamHelper;
             if (direction === BeamDirection.Up) {
                 topY = Math.min(drawingInfo.startY, drawingInfo.endY);
                 if (h.hasTuplet && tupletDirection === direction) {
                     topY -= this.tupletSize + this.tupletOffset;
                 }
+                const lowestBeat = isRest ? h.beats[0] : h.beatOfLowestNote;
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getLowestNoteY skips content below the notehead.
-                    bottomY =
-                        this.getFlagBottomY(h.beatOfLowestNote, tupletDirection) + this.tupletSize + this.tupletOffset;
+                    bottomY = this.getFlagBottomY(lowestBeat, tupletDirection) + this.tupletSize + this.tupletOffset;
+                } else if (isRest) {
+                    bottomY = this.getRestY(lowestBeat, NoteYPosition.Bottom);
                 } else {
-                    bottomY = this.voiceContainer.getLowestNoteY(h.beatOfLowestNote, NoteYPosition.Bottom);
+                    bottomY = this.voiceContainer.getLowestNoteY(lowestBeat, NoteYPosition.Bottom);
                 }
             } else {
                 bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
                 if (h.hasTuplet && tupletDirection === direction) {
                     bottomY += this.tupletSize + this.tupletOffset;
                 }
+                const highestBeat = isRest ? h.beats[0] : h.beatOfHighestNote;
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getHighestNoteY skips octave dots.
-                    topY = this.getFlagTopY(h.beatOfHighestNote, tupletDirection) - this.tupletSize - this.tupletOffset;
+                    topY = this.getFlagTopY(highestBeat, tupletDirection) - this.tupletSize - this.tupletOffset;
+                } else if (isRest) {
+                    topY = this.getRestY(highestBeat, NoteYPosition.Top);
                 } else {
-                    topY = this.voiceContainer.getHighestNoteY(h.beatOfHighestNote, NoteYPosition.Top);
+                    topY = this.voiceContainer.getHighestNoteY(highestBeat, NoteYPosition.Top);
                 }
             }
         }

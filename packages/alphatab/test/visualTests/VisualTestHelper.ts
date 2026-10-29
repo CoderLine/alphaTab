@@ -265,6 +265,23 @@ export class VisualTestHelper {
         }
     }
 
+    /**
+     * Loads `tex` with `settings` and applies `configure`; alphaSkia and the test fonts are
+     * ready for rendering afterwards.
+     */
+    public static async loadTex(
+        tex: string,
+        settings: Settings,
+        configure?: (settings: Settings, score: Score) => void
+    ): Promise<Score> {
+        await VisualTestHelper.prepareAlphaSkia();
+        const score = ScoreLoader.loadAlphaTex(tex, settings);
+        if (configure) {
+            configure(settings, score);
+        }
+        return score;
+    }
+
     public static async compareVisualResult(
         run: VisualTestRun,
         totalWidth: number,
@@ -294,22 +311,14 @@ export class VisualTestHelper {
             options.prepareFullImage!(run, api, actual);
         }
 
+        using actualImage = actual.endRender()!;
+
         // convert reference image to canvas
         if (referenceFileData.length > 0) {
             using expected = AlphaSkiaImage.decode(referenceFileData.buffer as ArrayBuffer);
-            await VisualTestHelper._expectToEqualVisuallyAsync(
-                actual.endRender()!,
-                run.referenceFileName,
-                expected,
-                options
-            );
+            await VisualTestHelper._expectToEqualVisuallyAsync(actualImage, run.referenceFileName, expected, options);
         } else {
-            await VisualTestHelper._expectToEqualVisuallyAsync(
-                actual.endRender()!,
-                run.referenceFileName,
-                undefined,
-                options
-            );
+            await VisualTestHelper._expectToEqualVisuallyAsync(actualImage, run.referenceFileName, undefined, options);
         }
     }
 
@@ -327,15 +336,9 @@ export class VisualTestHelper {
 
         if (expected) {
             const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
-            if (sizeMismatch) {
-                using newActual = new AlphaSkiaCanvas();
-                newActual.beginRender(expected.width, expected.height);
-                newActual.drawImage(actual, 0, 0, expected.width, expected.height);
-                newActual.color = AlphaSkiaCanvas.rgbaToColor(255, 0, 0, 255);
-                newActual.lineWidth = 2;
-                newActual.strokeRect(0, 0, expected.width, expected.height);
-
-                actual = newActual.endRender()!;
+            using resized = sizeMismatch ? VisualTestHelper._resizeWithBorder(actual, expected) : undefined;
+            if (resized) {
+                actual = resized;
             }
 
             const actualImageData = actual.readPixels()!;
@@ -392,6 +395,16 @@ export class VisualTestHelper {
             throw new Error(errorMessage);
         }
         await VisualTestHelper.deleteFiles(expectedFileName);
+    }
+
+    private static _resizeWithBorder(actual: AlphaSkiaImage, expected: AlphaSkiaImage): AlphaSkiaImage {
+        using canvas = new AlphaSkiaCanvas();
+        canvas.beginRender(expected.width, expected.height);
+        canvas.drawImage(actual, 0, 0, expected.width, expected.height);
+        canvas.color = AlphaSkiaCanvas.rgbaToColor(255, 0, 0, 255);
+        canvas.lineWidth = 2;
+        canvas.strokeRect(0, 0, expected.width, expected.height);
+        return canvas.endRender()!;
     }
 
     static async saveFiles(expectedFilePath: string, actual: AlphaSkiaImage): Promise<void> {

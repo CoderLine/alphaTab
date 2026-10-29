@@ -160,7 +160,18 @@ export class ScoreChordNoteHeadInfo {
                 return;
             case NoteHeadIntersectionKind.ExactMatch:
                 // handling note head
-                if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
+                if (
+                    ScoreChordNoteHeadInfo._isBottomNoteHeadDisplaced(mainGroup) ||
+                    ScoreChordNoteHeadInfo._isBottomNoteHeadDisplaced(noteGroup)
+                ) {
+                    // a displaced note head sits on the far side of its stem and cannot be shared:
+                    // the down-stemmed part goes to the right, clear of all up-stemmed note heads (Behind Bars p. 53)
+                    if (mainGroup.direction === BeamDirection.Up) {
+                        noteGroup.multiVoiceShiftX = mainGroup.maxX - noteGroup.minX + spacing;
+                    } else {
+                        mainGroup.multiVoiceShiftX = noteGroup.maxX - mainGroup.minX + spacing;
+                    }
+                } else if (!ScoreChordNoteHeadInfo._canShareNoteHead(mainGroup, noteGroup)) {
                     // align stems back-to-back with additional spacing
                     if (mainGroup.direction === BeamDirection.Up) {
                         if (noteGroup.displacedNotes) {
@@ -228,9 +239,21 @@ export class ScoreChordNoteHeadInfo {
         }
     }
 
+    private static _bottomStep(group: ScoreChordNoteHeadGroup) {
+        return group.direction === BeamDirection.Up ? group.maxStep : group.minStep;
+    }
+
+    /**
+     * Whether the note head at the step facing the other stem direction is on the far side of the stem.
+     * Happens when voices of the same stem direction form a second there.
+     */
+    private static _isBottomNoteHeadDisplaced(group: ScoreChordNoteHeadGroup) {
+        return !group.correctNotes.notes.has(ScoreChordNoteHeadInfo._bottomStep(group));
+    }
+
     private static _canShareNoteHead(mainGroup: ScoreChordNoteHeadGroup, thisGroup: ScoreChordNoteHeadGroup) {
-        const mainGroupBottom = mainGroup.direction === BeamDirection.Up ? mainGroup.maxStep : mainGroup.minStep;
-        const thisGroupBottom = thisGroup.direction === BeamDirection.Up ? thisGroup.maxStep : thisGroup.minStep;
+        const mainGroupBottom = ScoreChordNoteHeadInfo._bottomStep(mainGroup);
+        const thisGroupBottom = ScoreChordNoteHeadInfo._bottomStep(thisGroup);
 
         const mainGroupBottomNoteHead = mainGroup.correctNotes.notes.get(mainGroupBottom)!;
         if (mainGroupBottomNoteHead.length > 1) {
@@ -317,6 +340,26 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     }
 
     public noteStartX: number = 0;
+
+    public hasTopLedgerLines: boolean = false;
+    public hasBottomLedgerLines: boolean = false;
+
+    /**
+     * How much the ledger lines above (top) or below (bottom) the staff are shortened on the left or right
+     * side, to keep them apart from the ledger lines of the neighbouring beat (Behind Bars, p. 26:
+     * ledger lines of adjacent notes should not join up, they may be slightly shortened in cramped conditions).
+     */
+    public topLedgerLineTrimLeft: number = 0;
+    public topLedgerLineTrimRight: number = 0;
+    public bottomLedgerLineTrimLeft: number = 0;
+    public bottomLedgerLineTrimRight: number = 0;
+
+    /**
+     * How far the ledger lines reach beyond the note heads on each side (before shortening).
+     */
+    public get ledgerLineExtension(): number {
+        return this.renderer.smuflMetrics.legerLineExtension * this.scale;
+    }
 
     public onTimeX = 0;
 
@@ -445,6 +488,20 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         info.update();
 
         this._updateSizes();
+        this._updateLedgerLineSides();
+    }
+
+    private _updateLedgerLineSides() {
+        if (!this.minStepsNote) {
+            this.hasTopLedgerLines = false;
+            this.hasBottomLedgerLines = false;
+            return;
+        }
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        this.hasTopLedgerLines = scoreRenderer.getLineY(-1) >= scoreRenderer.getLineY(this.minStepsNote!.steps / 2);
+        this.hasBottomLedgerLines =
+            scoreRenderer.getLineY(scoreRenderer.drawnLineCount) <=
+            scoreRenderer.getLineY(this.maxStepsNote!.steps / 2);
     }
 
     private _updateSizes() {
@@ -455,6 +512,13 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         // the center of score notes, (used for aligning the beat to the right on-time position)
         // is always the center of the "correct note" position.
+        // a group without note heads (e.g. bend helper notes not shown in this notation mode) has no extent
+        if (Number.isNaN(noteGroup.minX)) {
+            this.onTimeX = this.noteStartX;
+            this.width = this.noteStartX;
+            return;
+        }
+
         this.onTimeX = noteGroup.correctNotes.minX + noteGroup.correctNotes.width / 2;
 
         this.width = this.noteStartX + noteGroup.multiVoiceShiftX + noteGroup.maxX - noteGroup.minX;
@@ -598,7 +662,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
 
         const scale = this.scale;
-        const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
+        const lineExtension: number = this.ledgerLineExtension;
         const lineWidth: number = this.width + lineExtension * 2 - this.noteStartX;
 
         const lineSpacing = scoreRenderer.getLineHeight(1);
@@ -612,9 +676,9 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         let y = firstTopLedgerY;
         while (y >= minNoteLineY) {
             canvas.fillRect(
-                cx - lineExtension + this.noteStartX,
+                cx - lineExtension + this.noteStartX + this.topLedgerLineTrimLeft,
                 cy + y - lineYOffset,
-                lineWidth,
+                lineWidth - this.topLedgerLineTrimLeft - this.topLedgerLineTrimRight,
                 this.renderer.smuflMetrics.legerLineThickness * scale
             );
             y -= lineSpacing;
@@ -623,9 +687,9 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         y = firstBottomLedgerY;
         while (y <= maxNoteLineY) {
             canvas.fillRect(
-                cx - lineExtension + this.noteStartX,
+                cx - lineExtension + this.noteStartX + this.bottomLedgerLineTrimLeft,
                 cy + y - lineYOffset,
-                lineWidth,
+                lineWidth - this.bottomLedgerLineTrimLeft - this.bottomLedgerLineTrimRight,
                 this.renderer.smuflMetrics.legerLineThickness * scale
             );
             y += lineSpacing;

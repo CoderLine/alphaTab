@@ -4,6 +4,7 @@ import type { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 
 /**
  * Per-staff-type display configuration for the standard-notation staff.
+ * @since 1.9.0
  * @record
  * @json
  * @public
@@ -17,6 +18,7 @@ export interface ScoreStaffConfig {
 
 /**
  * Per-staff-type display configuration for the tablature staff.
+ * @since 1.9.0
  * @record
  * @json
  * @public
@@ -31,6 +33,7 @@ export interface TabStaffConfig {
 
 /**
  * Per-staff-type display configuration for the slash staff.
+ * @since 1.9.0
  * @record
  * @json
  * @public
@@ -45,6 +48,7 @@ export interface SlashStaffConfig {
  * Per-staff-type display configuration for the numbered (jianpu) staff.
  * The "1=X" key designation is rendered as an above-staff effect-band
  * label, not a header glyph, so this config has no `keySignature` field.
+ * @since 1.9.0
  * @record
  * @json
  * @public

@@ -287,4 +287,36 @@ describe('GpxImporterTest', () => {
         const score = (await prepareImporterWithFile('guitarpro6/slash.gpx')).readScore();
         GpImporterTestHelper.checkSlash(score);
     });
+
+    it('synthesized-fingering-keeps-ties', async () => {
+        const score = (await prepareImporterWithFile('conversion/full-song.gpx')).readScore();
+        let ties = 0;
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            for (const note of beat.notes) {
+                                if (note.isTieDestination && note.tieOrigin !== null) {
+                                    expect(note.tieOrigin.string).toBe(note.string);
+                                    expect(note.tieOrigin.realValue).toBe(note.realValue);
+                                    ties++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        expect(ties).toBeGreaterThan(0);
+    });
+
+    it('drum-tablature-follows-part-configuration', async () => {
+        const score = (await prepareImporterWithFile('conversion/full-song.gpx')).readScore();
+        const drums = score.tracks[10].staves[0];
+        expect(drums.isPercussion).toBe(true);
+        // the PartConfiguration of this file enables standard notation and tablature on the drum track
+        expect(drums.showTablature).toBe(true);
+        expect(drums.showStandardNotation).toBe(true);
+    });
 });

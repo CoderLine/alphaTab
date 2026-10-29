@@ -438,7 +438,7 @@ export class Score {
         for (const mb of this.masterBars) {
             if (mb.isAnacrusis) {
                 mb._realBarNumber = Number.NaN;
-            } else if (mb.customBarNumber) {
+            } else if (mb.customBarNumber !== undefined) {
                 barNumber = mb.customBarNumber!;
                 mb._realBarNumber = barNumber;
                 barNumber++;

@@ -1,13 +1,15 @@
 import fs from 'node:fs';
+import { isBuiltin } from 'node:module';
 import path from 'node:path';
 import { cwd } from 'node:process';
 import url from 'node:url';
+import MagicString from 'magic-string';
 import type { OutputChunk, OutputOptions, OutputPlugin } from 'rollup';
 import license from 'rollup-plugin-license';
 import { nodeExternals } from 'rollup-plugin-node-externals';
 import type { MinifyOptions } from 'terser';
-import ts from 'typescript';
-import { defineConfig, type LibraryOptions, type UserConfig } from 'vite';
+import { defineConfig, type LibraryOptions, type Plugin, type UserConfig } from 'vite';
+import { buildTsconfigAliases } from './tsconfig-aliases';
 import { createApiDtsFiles } from './typescript';
 import generateDts from './vite.plugin.dts';
 import { emitDtsPlugin } from './vite.plugin.emit-dts';
@@ -63,6 +65,40 @@ export function licenseHeaderPlugin() {
     });
 }
 
+/**
+ * Fails the build when an output chunk statically imports a package that the package.json in `projectDir`
+ * does not declare as a dependency, peer dependency or optional dependency. Dynamic imports are not checked,
+ * they may load optional modules.
+ */
+export function declaredDependenciesPlugin(projectDir: string): Plugin {
+    const pkg = JSON.parse(fs.readFileSync(path.join(projectDir, 'package.json'), 'utf8'));
+    const declared = new Set<string>([
+        pkg.name,
+        ...Object.keys(pkg.dependencies ?? {}),
+        ...Object.keys(pkg.peerDependencies ?? {}),
+        ...Object.keys(pkg.optionalDependencies ?? {})
+    ]);
+    return {
+        name: 'alphatab:declared-dependencies',
+        generateBundle(_options, bundle) {
+            for (const chunk of Object.values(bundle)) {
+                if (chunk.type !== 'chunk') {
+                    continue;
+                }
+                for (const id of chunk.imports) {
+                    if (id in bundle || id.startsWith('.') || path.isAbsolute(id) || isBuiltin(id)) {
+                        continue;
+                    }
+                    const name = id.startsWith('@') ? id.split('/', 2).join('/') : id.split('/', 1)[0];
+                    if (!declared.has(name)) {
+                        this.error(`${chunk.fileName} imports '${id}', but ${pkg.name} does not declare '${name}'`);
+                    }
+                }
+            }
+        }
+    };
+}
+
 export function defineEsmAndCommonJsConfig(entry: string) {
     return defineConfig(({ mode }) => {
         const config = defaultBuildUserConfig();
@@ -83,47 +119,14 @@ export function defineEsmAndCommonJsConfig(entry: string) {
     });
 }
 
-/**
- * Builds Vite `resolve.alias` entries from the project's `tsconfig.json`
- * `compilerOptions.paths`. `tsconfig.base.json` is the single source of truth;
- * `ts.parseJsonConfigFileContent` handles the `extends` chain and the
- * `${configDir}` template substitution.
- */
-function escapeRegExp(input: string): string {
-    return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-export function buildTsconfigAliases(projectDir: string): Array<{ find: RegExp; replacement: string }> {
-    const tsconfigPath = ts.findConfigFile(projectDir, ts.sys.fileExists);
-    if (!tsconfigPath) {
-        return [];
-    }
-    const { config, error } = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
-    if (error || !config) {
-        return [];
-    }
-    const parsed = ts.parseJsonConfigFileContent(config, ts.sys, path.dirname(tsconfigPath));
-    const aliases: Array<{ find: RegExp; replacement: string }> = [];
-    for (const [pattern, targets] of Object.entries(parsed.options.paths ?? {})) {
-        const target = targets?.[0];
-        if (!target) {
-            continue;
-        }
-        if (pattern.endsWith('/*') && target.endsWith('/*')) {
-            aliases.push({
-                find: new RegExp(`^${escapeRegExp(pattern.slice(0, -2))}/(.*)$`),
-                replacement: `${target.slice(0, -2)}/$1`
-            });
-        } else {
-            aliases.push({ find: new RegExp(`^${escapeRegExp(pattern)}$`), replacement: target });
-        }
-    }
-    return aliases;
-}
-
 export function defaultBuildUserConfig(projectDir: string = process.cwd()): UserConfig {
     return {
-        plugins: [licenseHeaderPlugin(), elementStyleUsingPlugin(), stripProfilingPlugin({ enabled: false })],
+        plugins: [
+            licenseHeaderPlugin(),
+            elementStyleUsingPlugin(),
+            stripProfilingPlugin({ enabled: false }),
+            declaredDependenciesPlugin(projectDir)
+        ],
         resolve: {
             tsconfigPaths: true,
             alias: buildTsconfigAliases(projectDir)
@@ -192,9 +195,7 @@ export function addDts(config: UserConfig, projectDir: string, options: DtsRegis
     const srcDir = path.resolve(projectDir, 'src');
     const shouldEmitForChunk = options.shouldEmitForChunk ?? (() => true);
 
-    config.plugins!.push(
-        emitDtsPlugin({ projectDir, tsconfigPath, declarationDir: 'dist/types' })
-    );
+    config.plugins!.push(emitDtsPlugin({ projectDir, tsconfigPath, declarationDir: 'dist/types' }));
 
     const externals = config.build!.rollupOptions!.external! as (string | RegExp)[];
 
@@ -234,13 +235,7 @@ export function addDts(config: UserConfig, projectDir: string, options: DtsRegis
     }
 }
 
-export function umd(
-    config: UserConfig,
-    projectDir: string,
-    name: string,
-    entry: string,
-    withMin: boolean = true
-) {
+export function umd(config: UserConfig, projectDir: string, name: string, entry: string, withMin: boolean = true) {
     const lib = config.build!.lib! as LibraryOptions;
     lib.entry = {
         [name]: path.resolve(projectDir, entry)
@@ -285,13 +280,7 @@ export interface EsmOptions {
     withMin?: boolean;
 }
 
-export function esm(
-    config: UserConfig,
-    projectDir: string,
-    name: string,
-    entry: string,
-    options: EsmOptions = {}
-) {
+export function esm(config: UserConfig, projectDir: string, name: string, entry: string, options: EsmOptions = {}) {
     const { withMin = true } = options;
 
     const lib = config.build!.lib! as LibraryOptions;
@@ -316,6 +305,26 @@ export function esm(
             o.plugins ??= [];
             (o.plugins as OutputPlugin[]).push(min(terserOptions));
         }
+    }
+}
+
+/**
+ * Starts the given entry chunks with a `#!/usr/bin/env node` line so they can be run as package `bin` scripts.
+ */
+export function addHashbang(config: UserConfig, entryNames: string[]) {
+    for (const o of config.build!.rollupOptions!.output as OutputOptions[]) {
+        o.plugins ??= [];
+        (o.plugins as OutputPlugin[]).push({
+            name: 'alphatab:hashbang',
+            renderChunk(code, chunk) {
+                if (!chunk.isEntry || !entryNames.includes(chunk.name)) {
+                    return null;
+                }
+                const ms = new MagicString(code);
+                ms.prepend('#!/usr/bin/env node\n');
+                return { code: ms.toString(), map: ms.generateMap({ hires: true }).toString() };
+            }
+        });
     }
 }
 
