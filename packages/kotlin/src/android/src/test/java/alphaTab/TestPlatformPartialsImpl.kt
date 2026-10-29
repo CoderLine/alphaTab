@@ -289,6 +289,9 @@ class TestPlatformPartials {
             else -> throw ClassCastException("Invalid array type: " + array?.javaClass?.name)
         }
 
+        internal fun <T> createMessageEvent(data: T): alphaTab.core.ecmaScript.MessageEvent<T> =
+            alphaTab.core.ecmaScript.MessageEvent(data)
+
         @Suppress("UNCHECKED_CAST")
         internal fun typedArrayAsUnknownArray(array: Any?): alphaTab.collections.List<Any?> =
             when (array) {

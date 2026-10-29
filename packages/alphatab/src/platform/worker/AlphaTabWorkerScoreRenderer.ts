@@ -22,14 +22,20 @@ import type { Settings } from '@coderline/alphatab/Settings';
  * @internal
  */
 export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
-    private _api: AlphaTabApiBase<T>;
     private _worker!: IAlphaTabRenderingWorker;
     private _width: number = 0;
+
+    /**
+     * The scores sent to the worker, by the id sent along. The worker handles messages in order,
+     * so results arriving for an id mean no results follow for older ids.
+     */
+    private _sentScores = new Map<number, Score>();
+    private _lastScoreId = 0;
+    private _oldestSentScoreId = 1;
 
     public boundsLookup: BoundsLookup | null = null;
 
     public constructor(api: AlphaTabApiBase<T>, worker: IAlphaTabRenderingWorker) {
-        this._api = api;
         this._worker = worker;
         this._worker.postMessage({
             cmd: 'alphaTab.initialize',
@@ -105,9 +111,15 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
                 (this.renderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(data.result);
                 break;
             case 'alphaTab.postRenderFinished':
-                const score = this._api.score;
+                for (let id = this._oldestSentScoreId; id < data.scoreId; id++) {
+                    this._sentScores.delete(id);
+                }
+                this._oldestSentScoreId = Math.max(this._oldestSentScoreId, data.scoreId);
+
+                // the api might already hold a newer score than the one this render was made for
+                const score = this._sentScores.get(data.scoreId);
                 if (score && data.boundsLookup) {
-                    this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, this._api.score!);
+                    this.boundsLookup = BoundsLookup.fromJson(data.boundsLookup, score);
                     this.boundsLookup?.finish();
                 }
                 (this.postRenderFinished as EventEmitter).trigger();
@@ -121,8 +133,13 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
         const jsObject: Map<string, unknown> | null =
             score == null ? null : JsonConverter.scoreToJsObject(Environment.prepareForPostMessage(score));
+        const scoreId = ++this._lastScoreId;
+        if (score) {
+            this._sentScores.set(scoreId, score);
+        }
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
+            scoreId,
             score: jsObject,
             trackIndexes: Environment.prepareForPostMessage(trackIndexes),
             fontSizes: FontSizes.fontSizeLookupTables,
