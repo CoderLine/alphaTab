@@ -15,6 +15,7 @@ import { ScoreHelperNotesBaseGlyph } from '@coderline/alphatab/rendering/glyphs/
 import { type ITieGlyph, TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import type { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
+import type { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
@@ -29,6 +30,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
     private _container: ScoreBeatContainerGlyph;
 
     public readonly checkForOverflow = true;
+    public readonly hasSkylineShape = true;
     private _isMeasured: boolean = false;
 
     public constructor(container: ScoreBeatContainerGlyph) {
@@ -81,7 +83,13 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph implements ITieGly
             return;
         }
         this._isMeasured = true;
-        this.beginMeasure();
+        this.beginMeasure(null);
+        this._paintOrMeasure(0, -this.renderer.y, this.renderer.scoreRenderer.canvas!, true);
+        this.endMeasure();
+    }
+
+    public collectSkylineShape(shape: SkylineShape): void {
+        this.beginMeasure(shape);
         this._paintOrMeasure(0, -this.renderer.y, this.renderer.scoreRenderer.canvas!, true);
         this.endMeasure();
     }

@@ -2,7 +2,7 @@ import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
-import { type BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import type { EffectBand } from '@coderline/alphatab/rendering/EffectBand';
 import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
@@ -205,5 +205,33 @@ describe('EffectPlacementTests', () => {
         // barline, clef, then E flat and D flat (the flats reaching above the staff) each on their own
         expect(heights.length).toBe(4);
         expect(heights[3]).toBeLessThan(heights[2]);
+    });
+
+    it('let-ring-above-tab-bend', async () => {
+        const renderer = await render(`
+            \\staff {tabs}
+            :4 7.3{b (0 4) lr} -.3{lr} 7.3{lr} 7.3{lr}
+        `);
+        const r = firstStaff(renderer).barRenderers[0];
+        const letRing = band(r, 'EffectLetRing', true)!;
+        expect(letRing).toBeTruthy();
+        // the bend (with its "full" label) is the only content above this tab staff (overflow is rounded up)
+        expect(r.contentTopOverflow).toBeGreaterThan(20);
+        expect(letRing.placedMagnitude).toBeGreaterThanOrEqual(r.contentTopOverflow - 1);
+    });
+
+    it('tab-bend-skyline-follows-curve', async () => {
+        // the bend curve starts at the note and only rises at its end: the skyline must not claim the peak height over it
+        const renderer = await render(`
+            \\staff {tabs}
+            :2 7.3{b (0 4)} 7.3
+        `);
+        const r = firstStaff(renderer).barRenderers[0];
+        const note = r.bar.voices[0].beats[0].notes[0];
+        const curveStart = r.getNoteX(note, NoteXPosition.Right);
+        const sky = r.barLocalSkyline.upSky;
+        const peak = sky.maxHeight();
+        expect(peak).toBeGreaterThan(20);
+        expect(sky.maxHeightInRange(curveStart, curveStart + 5)).toBeLessThan(peak / 2);
     });
 });

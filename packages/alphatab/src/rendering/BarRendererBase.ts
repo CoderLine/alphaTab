@@ -23,6 +23,7 @@ import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/Mu
 import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BarLocalSkyline, StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
+import { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
@@ -672,6 +673,11 @@ export class BarRendererBase {
             const tieLeftStaff = t.getBoundingBoxLeft();
             const tieRightStaff = t.getBoundingBoxRight();
 
+            if (t.hasSkylineShape) {
+                this._emitTieShape(t, tieTopOverflow, tieBottom - this.height);
+                continue;
+            }
+
             for (let i = startIndex; i < staffRenderers.length; i++) {
                 const target = staffRenderers[i];
                 if (target.x >= tieRightStaff) {
@@ -706,6 +712,53 @@ export class BarRendererBase {
                     if (tieBottomOverflow > 0) {
                         target.barLocalSkyline.insertPlaced(StaffSide.Bottom, xStart, xEnd, tieBottomOverflow, 0);
                     }
+                }
+            }
+        }
+    }
+
+    private readonly _tieShape: SkylineShape = new SkylineShape();
+
+    /**
+     * The overflow of the tie is registered as a whole on this renderer, the skyline gets the drawn shape
+     * in every renderer of the staff it reaches into.
+     */
+    private _emitTieShape(t: ITieGlyph, topOverflow: number, bottomOverflow: number): void {
+        let changed = false;
+        if (topOverflow > 0 && this.registerOverflowTop(topOverflow)) {
+            changed = true;
+        }
+        if (bottomOverflow > 0 && this.registerOverflowBottom(bottomOverflow)) {
+            changed = true;
+        }
+        if (changed) {
+            this.markTiesDirty();
+        }
+
+        const shape = this._tieShape;
+        shape.clear();
+        t.collectSkylineShape(shape);
+        const staffRenderers = this.staff!.barRenderers;
+        for (let k = 0; k < shape.count; k++) {
+            const left = shape.xStart(k);
+            const right = shape.xEnd(k);
+            const top = shape.top(k);
+            const bottom = shape.bottom(k);
+            for (let i = this.index; i < staffRenderers.length; i++) {
+                const target = staffRenderers[i];
+                if (target.x >= right) {
+                    break;
+                }
+                const xStart = Math.max(target.x, left) - target.x;
+                const xEnd = Math.min(target.x + target.width, right) - target.x;
+                if (xEnd <= xStart) {
+                    continue;
+                }
+                if (top < 0) {
+                    target.barLocalSkyline.insertPlaced(StaffSide.Top, xStart, xEnd, -top, 0);
+                }
+                if (bottom > target.height) {
+                    target.barLocalSkyline.insertPlaced(StaffSide.Bottom, xStart, xEnd, bottom - target.height, 0);
                 }
             }
         }

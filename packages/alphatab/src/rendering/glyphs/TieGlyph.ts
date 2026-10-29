@@ -3,6 +3,7 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
@@ -15,6 +16,16 @@ export interface ITieGlyph {
      * If set, the tie bounds will be requested and the overflow is applied.
      */
     readonly checkForOverflow: boolean;
+    /**
+     * Whether {@link collectSkylineShape} describes the drawn extent, used for the skyline instead of
+     * the bounding box (which then only sizes the overflow).
+     */
+    readonly hasSkylineShape: boolean;
+    /**
+     * Adds the drawn extent to the shape, staff-local x and renderer-local y like the bounding box.
+     * Only valid once the beats are positioned.
+     */
+    collectSkylineShape(shape: SkylineShape): void;
     getBoundingBoxTop(): number;
     getBoundingBoxBottom(): number;
     getBoundingBoxLeft(): number;
@@ -25,6 +36,7 @@ export interface ITieGlyph {
  * @internal
  */
 export abstract class TieGlyph extends Glyph implements ITieGlyph {
+    public readonly hasSkylineShape: boolean = false;
     public tieDirection: BeamDirection = BeamDirection.Up;
     public readonly slurEffectId: string;
     protected isForEnd: boolean;
@@ -42,6 +54,10 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     private _tieHeight: number = 0;
     private _boundingBox?: Bounds;
     private _shouldPaint: boolean = false;
+
+    public collectSkylineShape(_shape: SkylineShape): void {
+        // the bounding box describes a tie closely enough
+    }
 
     public get checkForOverflow() {
         return this._shouldPaint && this._boundingBox !== undefined;
@@ -131,10 +147,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             // padding to shift ties clearly before the first note (slight visual tuning)
             const padding = 2 * firstRendererInStaff!.smuflMetrics.oneStaffSpace;
             this._endX = this.calculateEndX();
-            this._startX = Math.min(
-                firstRendererInStaff!.x + firstRendererInStaff!.beatGlyphsStart,
-                this._endX
-            ) - padding;
+            this._startX =
+                Math.min(firstRendererInStaff!.x + firstRendererInStaff!.beatGlyphsStart, this._endX) - padding;
 
             const startGlyph = startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
             if (startGlyph) {
