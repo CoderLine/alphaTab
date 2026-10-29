@@ -333,7 +333,7 @@ export class Region {
                 this.loopStart += TypeConversions.int16ToUint32(amount.shortAmount) * 32768;
                 break;
             case GenOperators.InitialAttenuation:
-                this.attenuation += amount.shortAmount * 0.1;
+                this.attenuation = amount.shortAmount * 0.1;
                 break;
             case GenOperators.EndloopAddrsCoarseOffset:
                 this.loopEnd += TypeConversions.int16ToUint32(amount.shortAmount) * 32768;

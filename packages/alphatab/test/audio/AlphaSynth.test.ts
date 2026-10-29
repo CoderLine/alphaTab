@@ -19,8 +19,9 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
-import { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
+import { Hydra, HydraGenAmount } from '@coderline/alphatab/synth/soundfont/Hydra';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
+import { GenOperators, Region } from '@coderline/alphatab/synth/synthesis/Region';
 import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
 import { Mdct } from '@coderline/alphatab/synth/vorbis/Mdct';
 import { VorbisDecoder } from '@coderline/alphatab/synth/vorbis/VorbisDecoder';
@@ -521,5 +522,20 @@ describe('AlphaSynthTests', () => {
         expect((tempoChange[0] as TempoChangeEvent).beatsPerMinute).toBe(0);
 
         await testPlaythrough(midi);
+    });
+
+    it('soundfont-attenuation-local-overrides-global', () => {
+        const attenuation = GenOperators.InitialAttenuation as number;
+        const amount = (v: number) =>
+            new HydraGenAmount(ByteBuffer.fromBuffer(new Uint8Array([v & 0xff, (v >> 8) & 0xff])));
+        const globalZone = new Region();
+        globalZone.clear(true);
+        globalZone.operator(attenuation, amount(100));
+        const localZone = new Region(globalZone);
+        expect(localZone.attenuation).toBeCloseTo(10);
+        localZone.operator(attenuation, amount(60));
+        expect(localZone.attenuation).toBeCloseTo(6);
+        localZone.operator(attenuation, amount(0));
+        expect(localZone.attenuation).toBe(0);
     });
 });
