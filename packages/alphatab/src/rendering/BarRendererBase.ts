@@ -8,13 +8,14 @@ import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
+import type { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
 import {
     BeatContainerGlyph,
     type BeatContainerGlyphBase,
     type BeatEffectOverflow
 } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
-import type { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
 import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
@@ -132,14 +133,14 @@ export class BarRendererBase {
         if (!this.bar || !this.bar.nextBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId,this.bar.nextBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId, this.bar.nextBar);
     }
 
     public get previousRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.previousBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId,this.bar.previousBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff!.staffId, this.bar.previousBar);
     }
 
     public scoreRenderer: ScoreRenderer;
@@ -561,7 +562,6 @@ export class BarRendererBase {
         }
     }
 
-
     public afterReverted() {
         this.staff = undefined;
         this.registerMultiSystemSlurs(undefined);
@@ -819,21 +819,44 @@ export class BarRendererBase {
             if (!topOver && !bottomOver) {
                 continue;
             }
-            const xL = g.getBoundingBoxLeft();
-            const xR = g.getBoundingBoxRight();
-            const hasExtent = xR > xL;
             if (topOver) {
                 this.registerOverflowTop(topY * -1);
-                if (hasExtent) {
-                    skyline.insertPlaced(StaffSide.Top, xL, xR, topY * -1, 0);
-                }
             }
             if (bottomOver) {
                 this.registerOverflowBottom(bottomY - rendererBottom);
-                if (hasExtent) {
-                    skyline.insertPlaced(StaffSide.Bottom, xL, xR, bottomY - rendererBottom, 0);
-                }
             }
+            BarRendererBase._insertGlyphSkyline(g, 0, skyline, rendererBottom);
+        }
+    }
+
+    /**
+     * Inserts the extent of the glyph outside the staff into the skyline: per child for glyph groups
+     * (e.g. the accidentals of a key signature), so the group does not claim its full height over its full width.
+     */
+    private static _insertGlyphSkyline(
+        g: Glyph,
+        offsetX: number,
+        skyline: BarLocalSkyline,
+        rendererBottom: number
+    ): void {
+        if (g instanceof GlyphGroup && g.glyphs && g.glyphs.length > 0) {
+            for (const c of g.glyphs) {
+                BarRendererBase._insertGlyphSkyline(c, offsetX + g.x, skyline, rendererBottom);
+            }
+            return;
+        }
+        const xL = offsetX + g.getBoundingBoxLeft();
+        const xR = offsetX + g.getBoundingBoxRight();
+        if (!(xR > xL)) {
+            return;
+        }
+        const topY = g.getBoundingBoxTop();
+        if (topY < 0) {
+            skyline.insertPlaced(StaffSide.Top, xL, xR, topY * -1, 0);
+        }
+        const bottomY = g.getBoundingBoxBottom();
+        if (bottomY > rendererBottom) {
+            skyline.insertPlaced(StaffSide.Bottom, xL, xR, bottomY - rendererBottom, 0);
         }
     }
 

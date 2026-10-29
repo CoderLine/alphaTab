@@ -187,4 +187,23 @@ describe('EffectPlacementTests', () => {
         expect(labels).toBeGreaterThan(0);
         expect(band(staff.barRenderers[0], 'EffectLyrics', false)).toBeTruthy();
     });
+
+    it('key-signature-skyline-per-accidental', async () => {
+        // the flats of A flat major sit at different heights, each takes only its own width
+        const renderer = await render(`
+            \\ks Ab
+            \\staff {score}
+            :1 C5
+        `);
+        const r = firstStaff(renderer).barRenderers[0];
+        const heights: number[] = [];
+        r.preBeatLocalSkyline.upSky.forEachSegment((_xStart, _xEnd, height) => {
+            if (height > 0) {
+                heights.push(height);
+            }
+        });
+        // barline, clef, then E flat and D flat (the flats reaching above the staff) each on their own
+        expect(heights.length).toBe(4);
+        expect(heights[3]).toBeLessThan(heights[2]);
+    });
 });

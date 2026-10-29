@@ -12,7 +12,10 @@ import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSyste
 import { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
 import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
-import { type IStaffDisplayContext, StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
+import {
+    type IStaffDisplayContext,
+    StaffDisplayResolver
+} from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
 
@@ -379,13 +382,15 @@ export class RenderStaff implements IStaffDisplayContext {
 
         const xEnd = last.x + last.width;
         const xStart = xEnd - glyph.width;
-        // the same gap to neighbouring marks horizontally as vertically
         const gap = last.smuflMetrics.oneStaffSpace * 0.5;
-        const clearance = Math.max(
-            this.systemSkyline.upSky.maxHeightInRange(xStart - gap, xEnd + gap),
-            last.staffTopClearance
-        );
-        const top = clearance + gap + glyph.height;
+        const upSky = this.systemSkyline.upSky;
+        let bottom = Math.max(upSky.maxHeightInRange(xStart, xEnd), last.staffTopClearance) + gap;
+        // marks beside it which reach up next to it keep the same gap horizontally
+        const beside = Math.max(upSky.maxHeightInRange(xStart - gap, xStart), upSky.maxHeightInRange(xEnd, xEnd + gap));
+        if (beside > bottom) {
+            bottom = beside + gap;
+        }
+        const top = bottom + glyph.height;
         glyph.x = xStart - last.x;
         glyph.y = -top;
 

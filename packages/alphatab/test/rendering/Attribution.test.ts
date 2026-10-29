@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -9,7 +8,9 @@ import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { Settings } from '@coderline/alphatab/Settings';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { TestPlatform } from 'test/TestPlatform';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
+import { describe, expect, it } from 'vitest';
 
 /**
  * @internal
@@ -413,6 +414,34 @@ describe('AttributionTests', () => {
             }
         }
         expect(neighbours).toBe(1);
+    });
+
+    it('no-gap-to-lower-neighbour', async () => {
+        // a stem top just left of the mark, but lower than the mark: nothing to keep clear of
+        await VisualTestHelper.prepareAlphaSkia();
+        const settings = new Settings();
+        VisualTestHelper.prepareSettingsForTest(settings);
+        const score = ScoreLoader.loadScoreFromBytes(
+            await TestPlatform.loadFile('test-data/musicxml-testsuite/22a-Noteheads.xml'),
+            settings
+        );
+        const run = new AttributionTestRun(settings);
+        run.renderer.width = 1300;
+        run.renderer.renderScore(score, [0]);
+        const owners = run.owners();
+        expect(owners.length).toBe(1);
+        const owner = owners[0];
+        const glyph = owner.attribution!;
+        const gap = owner.smuflMetrics.oneStaffSpace * 0.5;
+        const markLeft = owner.x + glyph.x;
+        const markRight = markLeft + glyph.width;
+        const sky = owner.staff!.systemSkyline.upSky;
+        const markBottom = -(glyph.y + glyph.height);
+        // the skyline includes the mark itself, so look at the neighbourhood only
+        expect(sky.maxHeightInRange(markLeft - gap, markLeft)).toBeGreaterThan(0);
+        expect(sky.maxHeightInRange(markLeft - gap, markLeft)).toBeLessThan(markBottom);
+        expect(markBottom).toBeLessThan(sky.maxHeightInRange(markLeft - gap, markLeft) + gap);
+        expect(markRight).toBeGreaterThan(markLeft);
     });
 
     it('repeat-count-below-mark', async () => {
