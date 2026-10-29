@@ -117,14 +117,6 @@ export class TestPlatform {
      * @target web
      * @partial
      */
-    public static createMessageEvent<T>(data: T): MessageEvent<T> {
-        return new MessageEvent<T>('message', { data });
-    }
-
-    /**
-     * @target web
-     * @partial
-     */
     public static typedArrayAsUnknownArray(array: unknown): unknown[] {
         return array as unknown[];
     }

@@ -266,11 +266,6 @@ static partial class TestPlatform
         }
     }
 
-    internal static AlphaTab.Core.EcmaScript.MessageEvent<T> CreateMessageEvent<T>(T data)
-    {
-        return new AlphaTab.Core.EcmaScript.MessageEvent<T>(data);
-    }
-
     public static IList TypedArrayAsUnknownArray(object? array)
     {
         return array switch

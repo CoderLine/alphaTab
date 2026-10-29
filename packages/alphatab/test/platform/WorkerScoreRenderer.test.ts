@@ -1,3 +1,10 @@
+/**
+ * Tests for the UI side of the worker renderer, connected to an in-process web worker.
+ * Uses the browser MessageEvent, so web-only.
+ *
+ * @target web
+ */
+
 import { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { Beat } from '@coderline/alphatab/model/Beat';
@@ -10,7 +17,6 @@ import type {
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { AlphaTabWorkerScoreRenderer } from '@coderline/alphatab/platform/worker/AlphaTabWorkerScoreRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
-import { TestPlatform } from 'test/TestPlatform';
 import { TestUiFacade } from 'test/visualTests/TestUiFacade';
 import { describe, expect, it } from 'vitest';
 
@@ -39,7 +45,7 @@ class InProcessWorkerEnd implements IAlphaTabRenderingWorker, IAlphaTabWorkerGlo
     public deliverAll(): void {
         while (this.inbox.length > 0) {
             const message = this.inbox.splice(0, 1)[0];
-            const ev = TestPlatform.createMessageEvent<IAlphaTabWorkerMessage>(message);
+            const ev = new MessageEvent<IAlphaTabWorkerMessage>('message', { data: message });
             for (const listener of this._listeners) {
                 listener(ev);
             }
