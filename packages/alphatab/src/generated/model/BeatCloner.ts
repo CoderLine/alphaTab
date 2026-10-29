@@ -66,6 +66,7 @@ export class BeatCloner {
         clone.overrideDisplayDuration = original.overrideDisplayDuration;
         clone.golpe = original.golpe;
         clone.dynamics = original.dynamics;
+        clone.showDynamics = original.showDynamics;
         clone.invertBeamDirection = original.invertBeamDirection;
         clone.preferredBeamDirection = original.preferredBeamDirection;
         clone.isEffectSlurOrigin = original.isEffectSlurOrigin;

@@ -327,7 +327,14 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
                     Assert.fail(message ?: this.message ?: "Sequence length mismatch at index $i")
                     return
                 }
-                Assert.assertEquals(message ?: this.message ?: "Element $i", ei.next(), ai.next())
+                val elementMessage = message ?: this.message ?: "Element $i"
+                val expectedElement = ei.next()
+                val actualElement = ai.next()
+                if (expectedElement is Iterable<*> && expectedElement !is String) {
+                    Expector(actualElement, elementMessage).toEqual(expectedElement)
+                } else {
+                    Assert.assertEquals(elementMessage, expectedElement, actualElement)
+                }
                 i++
             }
         }

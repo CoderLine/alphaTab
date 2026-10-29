@@ -97,7 +97,12 @@ interface MusicXmlHarmonicGroup {
  * @internal
  */
 class StaffContext {
-    public currentDynamics = DynamicValue.F;
+    /**
+     * The dynamics of a direction, shown on the next note of the staff (and of the voice, if given).
+     */
+    public pendingDynamics: DynamicValue | null = null;
+    public pendingDynamicsVoice: string = '';
+    public lastDynamics: DynamicValue | null = null;
     public transpose: number = 0;
     public isExplicitlyBeamed = false;
 }
@@ -283,7 +288,6 @@ export class MusicXmlImporter extends ScoreImporter {
      * Whether the exporter writes the stop of octave shifts before the last shifted note instead of after it.
      */
     private _octaveShiftEndsBeforeLastNote: boolean = false;
-    private _currentDynamics = DynamicValue.F;
 
     public get name(): string {
         return 'MusicXML';
@@ -303,6 +307,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
         this._parseDom(dom);
         this._applySpans();
+        this._applyDynamics();
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
@@ -2263,7 +2268,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'dynamics':
                     const newDynamics = this._parseDynamics(direction);
                     if (newDynamics !== null) {
-                        this._currentDynamics = newDynamics;
+                        const context = this._getStaffContext(staff);
+                        context.pendingDynamics = newDynamics;
+                        context.pendingDynamicsVoice = voice;
                         this._score.stylesheet.hideDynamics = false;
                     }
                     break;
@@ -2653,6 +2660,15 @@ export class MusicXmlImporter extends ScoreImporter {
             beat.addNote(note!);
         } else {
             beat = this._createBeat(staff, masterBar, voiceRaw, note);
+            const context = this._getStaffContext(staff);
+            if (
+                note !== null &&
+                context.pendingDynamics !== null &&
+                (context.pendingDynamicsVoice.length === 0 || context.pendingDynamicsVoice === voiceRaw)
+            ) {
+                this._markDynamics(context, beat, context.pendingDynamics!, false);
+                context.pendingDynamics = null;
+            }
         }
 
         if (note !== null) {
@@ -2995,7 +3011,6 @@ export class MusicXmlImporter extends ScoreImporter {
             // need an empty placeholder beat for the gap
             if (gap > 0) {
                 const placeholder = new Beat();
-                placeholder.dynamics = this._currentDynamics;
                 placeholder.isEmpty = true;
                 placeholder.duration = Duration.TwoHundredFiftySixth; // smallest we have
                 placeholder.overrideDisplayDuration = gap;
@@ -3013,7 +3028,6 @@ export class MusicXmlImporter extends ScoreImporter {
         this._beats.push(newBeat);
         this._harmonicGroups.clear();
         newBeat.isEmpty = false;
-        newBeat.dynamics = this._currentDynamics;
 
         const automations = this._nextBeatAutomations;
         this._nextBeatAutomations = null;
@@ -3516,7 +3530,6 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         const placeholder = new Beat();
-        placeholder.dynamics = this._currentDynamics;
         placeholder.isEmpty = false;
         placeholder.duration = preferredDuration;
         placeholder.overrideDisplayDuration = preferredDurationTicks;
@@ -3710,8 +3723,8 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'dynamics':
                     const dynamics = this._parseDynamics(c);
                     if (dynamics !== null) {
-                        beat.dynamics = dynamics;
-                        this._currentDynamics = dynamics;
+                        this._markDynamics(this._getStaffContext(beat.voice.bar.staff), beat, dynamics, true);
+                        this._score.stylesheet.hideDynamics = false;
                     }
                     break;
                 case 'fermata':
@@ -3745,6 +3758,83 @@ export class MusicXmlImporter extends ScoreImporter {
                 break;
             // case 'continue': no meaning for the link
         }
+    }
+
+    /**
+     * A note-attached marking repeating the previous one of the staff is not shown, as some exporters (e.g. Guitar Pro)
+     * write the dynamics on every note.
+     */
+    private _markDynamics(context: StaffContext, beat: Beat, value: DynamicValue, isNoteAttached: boolean) {
+        beat.dynamics = value;
+        beat.showDynamics = !isNoteAttached || context.lastDynamics !== value;
+        context.lastDynamics = value;
+    }
+
+    /**
+     * Carries the dynamics markings forward in time to all beats of their part, e.g. a single marking for both hands
+     * of a piano. Of markings at the same position, the one on the own staff wins.
+     */
+    private _applyDynamics() {
+        if (this._score.stylesheet.hideDynamics) {
+            return;
+        }
+        for (const track of this._score.tracks) {
+            const markings: Beat[] = [];
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            if (beat.showDynamics !== undefined) {
+                                markings.push(beat);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (const staff of track.staves) {
+                const ordered = markings.slice();
+                ordered.sort((a, b) => {
+                    const position = MusicXmlImporter._comparePosition(a, b);
+                    if (position !== 0) {
+                        return position;
+                    }
+                    return (a.voice.bar.staff === staff ? 1 : 0) - (b.voice.bar.staff === staff ? 1 : 0);
+                });
+
+                // per voice: index of the next marking and the dynamics in effect
+                const nextMarking: number[] = [];
+                const current: DynamicValue[] = [];
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        while (nextMarking.length <= voice.index) {
+                            nextMarking.push(0);
+                            current.push(DynamicValue.F);
+                        }
+                        for (const beat of voice.beats) {
+                            let next = nextMarking[voice.index];
+                            while (
+                                next < ordered.length &&
+                                MusicXmlImporter._comparePosition(ordered[next], beat) <= 0
+                            ) {
+                                current[voice.index] = ordered[next].dynamics;
+                                next++;
+                            }
+                            nextMarking[voice.index] = next;
+                            if (beat.showDynamics === undefined) {
+                                beat.dynamics = current[voice.index];
+                                beat.showDynamics = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static _comparePosition(a: Beat, b: Beat): number {
+        const bar = a.voice.bar.index - b.voice.bar.index;
+        return bar !== 0 ? bar : a.displayStart - b.displayStart;
     }
 
     private _getStaffContext(staff: Staff) {
