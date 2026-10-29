@@ -1008,13 +1008,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 if (h.hasTuplet && tupletDirection === direction) {
                     topY -= this.tupletSize + this.tupletOffset;
                 }
-                const lowestBeat = isRest ? h.beats[0] : h.beatOfLowestNote;
+                const lowestNote = h.lowestNoteInHelper;
+                const lowestBeat = lowestNote ? lowestNote.beat : h.beats[0];
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getLowestNoteY skips content below the notehead.
                     bottomY = this.getFlagBottomY(lowestBeat, tupletDirection) + this.tupletSize + this.tupletOffset;
                 } else if (isRest) {
                     bottomY = this.getRestY(lowestBeat, NoteYPosition.Bottom);
-                } else {
+                } else if (lowestNote) {
                     bottomY = this.voiceContainer.getLowestNoteY(lowestBeat, NoteYPosition.Bottom);
                 }
             } else {
@@ -1022,13 +1023,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 if (h.hasTuplet && tupletDirection === direction) {
                     bottomY += this.tupletSize + this.tupletOffset;
                 }
-                const highestBeat = isRest ? h.beats[0] : h.beatOfHighestNote;
+                const highestNote = h.highestNoteInHelper;
+                const highestBeat = highestNote ? highestNote.beat : h.beats[0];
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getHighestNoteY skips octave dots.
                     topY = this.getFlagTopY(highestBeat, tupletDirection) - this.tupletSize - this.tupletOffset;
                 } else if (isRest) {
                     topY = this.getRestY(highestBeat, NoteYPosition.Top);
-                } else {
+                } else if (highestNote) {
                     topY = this.voiceContainer.getHighestNoteY(highestBeat, NoteYPosition.Top);
                 }
             }
@@ -1287,18 +1289,24 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // 4. let middle elements shift up/down
         if (h.beats.length > 1) {
             // check if highest note shifts bar up or down
+            const highestNote = h.highestNoteInHelper;
+            const lowestNote = h.lowestNoteInHelper;
             if (direction === BeamDirection.Up) {
-                const yNeededForHighestNote = barDrawingShift + this.getFlagTopY(h.beatOfHighestNote, direction);
-                const yGivenByCurrentValues = drawingInfo.calcY(this.getBeatX(h.beatOfHighestNote, BeatXPosition.Stem));
+                if (highestNote) {
+                    const highestBeat = highestNote.beat;
+                    const yNeededForHighestNote = barDrawingShift + this.getFlagTopY(highestBeat, direction);
+                    const yGivenByCurrentValues = drawingInfo.calcY(this.getBeatX(highestBeat, BeatXPosition.Stem));
 
-                const diff = yGivenByCurrentValues - yNeededForHighestNote;
-                if (diff > 0) {
-                    drawingInfo.startY -= diff;
-                    drawingInfo.endY -= diff;
+                    const diff = yGivenByCurrentValues - yNeededForHighestNote;
+                    if (diff > 0) {
+                        drawingInfo.startY -= diff;
+                        drawingInfo.endY -= diff;
+                    }
                 }
-            } else {
-                const yNeededForLowestNote = barDrawingShift + this.getFlagBottomY(h.beatOfLowestNote, direction);
-                const yGivenByCurrentValues = drawingInfo.calcY(this.getBeatX(h.beatOfLowestNote, BeatXPosition.Stem));
+            } else if (lowestNote) {
+                const lowestBeat = lowestNote.beat;
+                const yNeededForLowestNote = barDrawingShift + this.getFlagBottomY(lowestBeat, direction);
+                const yGivenByCurrentValues = drawingInfo.calcY(this.getBeatX(lowestBeat, BeatXPosition.Stem));
 
                 const diff = yNeededForLowestNote - yGivenByCurrentValues;
                 if (diff > 0) {
