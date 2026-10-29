@@ -151,6 +151,15 @@ public class List<T> : Iterable<T> {
         return mapped
     }
 
+    @kotlin.jvm.JvmName("mapToBoolean")
+    internal fun map(transform: (v: T) -> Boolean): BooleanList {
+        val mapped = BooleanList(_data.size)
+        _data.forEachIndexed { index, item ->
+            mapped[index] = transform(item)
+        }
+        return mapped
+    }
+
 
     internal fun reduce(operation: (acc: Double, v: T) -> Double, initial: Double): Double {
         var accumulator = initial

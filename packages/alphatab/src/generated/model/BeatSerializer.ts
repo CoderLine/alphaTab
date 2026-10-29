@@ -94,6 +94,7 @@ export class BeatSerializer {
         o.set("overridedisplayduration", obj.overrideDisplayDuration);
         o.set("golpe", obj.golpe as number);
         o.set("dynamics", obj.dynamics as number);
+        o.set("showdynamics", obj.showDynamics);
         o.set("invertbeamdirection", obj.invertBeamDirection);
         o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
         o.set("beamingmode", obj.beamingMode as number);
@@ -255,6 +256,9 @@ export class BeatSerializer {
                 return true;
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
+                return true;
+            case "showdynamics":
+                obj.showDynamics = v as boolean | undefined;
                 return true;
             case "invertbeamdirection":
                 obj.invertBeamDirection = v! as boolean;

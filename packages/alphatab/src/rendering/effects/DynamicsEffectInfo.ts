@@ -23,6 +23,10 @@ function shouldCreateDynamicsGlyph(beat: Beat): boolean {
         return false;
     }
 
+    if (beat.showDynamics !== undefined) {
+        return beat.showDynamics!;
+    }
+
     const previousBeat = getPreviousDynamicsBeat(beat);
 
     let show: boolean = (beat.voice.index === 0 && !previousBeat) || beat.dynamics !== previousBeat?.dynamics;

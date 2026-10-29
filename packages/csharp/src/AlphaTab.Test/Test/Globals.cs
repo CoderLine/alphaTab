@@ -417,7 +417,15 @@ internal class Expector<T>
                     Assert.Fail(message ?? _message ?? $"Sequence length mismatch at index {i}");
                     return;
                 }
-                Assert.AreEqual(e.Current, a.Current, message ?? _message ?? $"Element {i}");
+                var elementMessage = message ?? _message ?? $"Element {i}";
+                if (e.Current is System.Collections.IEnumerable and not string)
+                {
+                    new Expector<object>(a.Current, elementMessage).ToEqual(e.Current);
+                }
+                else
+                {
+                    Assert.AreEqual(e.Current, a.Current, elementMessage);
+                }
                 i++;
             }
         }

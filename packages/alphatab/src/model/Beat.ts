@@ -674,6 +674,16 @@ export class Beat {
     public dynamics: DynamicValue = DynamicValue.F;
 
     /**
+     * Whether a dynamics marking with the {@link dynamics} of this beat is shown.
+     * @remarks
+     * If not set, a marking is shown where the dynamics change.
+     * Formats encoding the written markings (e.g. MusicXML) set it, as the dynamics in effect can differ
+     * from the shown markings: e.g. a single marking on a piano applies to both staves.
+     * @since 1.9.0
+     */
+    public showDynamics?: boolean;
+
+    /**
      * Gets or sets a value indicating whether the beam direction should be inverted.
      */
     public invertBeamDirection: boolean = false;
@@ -1185,6 +1195,9 @@ export class Beat {
             const cloneBeat: Beat = BeatCloner.clone(this);
             cloneBeat.id = Beat._globalBeatId++;
             cloneBeat.pickStroke = PickStroke.None;
+            if (cloneBeat.showDynamics === true) {
+                cloneBeat.showDynamics = false;
+            }
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
                 const cloneNote: Note = cloneBeat.notes[i];
                 const note: Note = this.notes[i];
