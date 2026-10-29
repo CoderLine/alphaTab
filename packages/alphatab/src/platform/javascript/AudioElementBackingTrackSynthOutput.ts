@@ -7,7 +7,7 @@ import {
 import { Logger } from '@coderline/alphatab/Logger';
 import type { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { WebAudioHelper } from '@coderline/alphatab/platform/javascript/AlphaSynthWebAudioOutputBase';
-import type { IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
+import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import type { ISynthOutputDevice } from '@coderline/alphatab/synth/ISynthOutput';
 
 /**
@@ -30,6 +30,17 @@ export interface IAudioElementBackingTrackSynthOutput extends IBackingTrackSynth
  * @internal
  */
 export class AudioElementBackingTrackSynthOutput implements IAudioElementBackingTrackSynthOutput {
+    /**
+     * Creates a backing track player which plays through a new audio element output.
+     * The player falls back to paused when the browser refuses to start the audio.
+     */
+    public static createPlayer(bufferTimeInMilliseconds: number): BackingTrackPlayer {
+        const output = new AudioElementBackingTrackSynthOutput();
+        const player = new BackingTrackPlayer(output, bufferTimeInMilliseconds);
+        output.playRejected.on(() => player.pause());
+        return player;
+    }
+
     // fake rate
     public readonly sampleRate: number = 44100;
 
@@ -100,6 +111,7 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
                 return;
             }
             Logger.warning('BackingTrack', 'Starting audio playback failed', e);
+            (this.playRejected as EventEmitter).trigger();
         });
         this._updateInterval = window.setInterval(() => {
             this._updatePosition();
@@ -126,6 +138,12 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
     public activate(): void {
         // nobody will call this
     }
+
+    /**
+     * Fired when the browser refuses to start the audio playback, e.g. because of autoplay rules.
+     * Not fired when the play request is interrupted by a pause or source change.
+     */
+    public readonly playRejected: IEventEmitter = new EventEmitter();
 
     public readonly ready: IEventEmitter = new EventEmitter();
     public readonly samplesPlayed: IEventEmitterOfT<number> = new EventEmitterOfT<number>();
