@@ -365,7 +365,7 @@ describe('AlphaSynthTests', () => {
         const exporter = synth.exportAudio(options, midi, [], new Map<number, number>());
 
         const chunk = exporter.render(250);
-        expect(chunk).toBeDefined();
+        expect(chunk).toBeTruthy();
         let peak = 0;
         for (let i = 0; i < chunk!.samples.length; i++) {
             peak = Math.max(peak, Math.abs(chunk!.samples[i]));
