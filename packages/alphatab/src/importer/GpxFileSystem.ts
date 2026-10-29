@@ -1,7 +1,7 @@
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { BitReader } from '@coderline/alphatab/io/BitReader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
-import { EndOfReaderError, type IReadable } from '@coderline/alphatab/io/IReadable';
+import { EndOfReaderError, type IReadable, OverflowError } from '@coderline/alphatab/io/IReadable';
 
 /**
  * this public class represents a file within the GpxFileSystem
@@ -35,10 +35,14 @@ export class GpxFileSystem {
      */
     public files: GpxFile[] = [];
 
+    private _maxDecodingBufferSize: number;
+
     /**
      * Creates a new GpxFileSystem instance
+     * @param maxDecodingBufferSize the maximum allowed size of a decompressed BCFZ container.
      */
-    public constructor() {
+    public constructor(maxDecodingBufferSize: number) {
+        this._maxDecodingBufferSize = maxDecodingBufferSize;
         this.files = [];
         this.fileFilter = _ => {
             return true;
@@ -76,6 +80,9 @@ export class GpxFileSystem {
         const uncompressed: ByteBuffer = ByteBuffer.empty();
         let buffer: Uint8Array;
         const expectedLength: number = this._getInteger(src.readBytes(4), 0);
+        if (expectedLength > this._maxDecodingBufferSize) {
+            throw new OverflowError('GPX container exceeds the configured maxDecodingBufferSize');
+        }
         try {
             // as long we reach our expected length we try to decompress, a EOF might occure.
             while (uncompressed.length < expectedLength) {
@@ -107,8 +114,11 @@ export class GpxFileSystem {
                 throw e;
             }
         }
-        buffer = uncompressed.getBuffer();
         const resultOffset: number = skipHeader ? 4 : 0;
+        if (uncompressed.length < resultOffset) {
+            throw new UnsupportedFormatError('GPX container is truncated');
+        }
+        buffer = uncompressed.getBuffer();
         const resultSize: number = uncompressed.length - resultOffset;
         const result: Uint8Array = new Uint8Array(resultSize);
         const count: number = resultSize;
@@ -159,34 +169,44 @@ export class GpxFileSystem {
                 //    0x90  |    ?     |    4byte | Unknown
                 //    0x94  |   int[]  |  n*4byte | Indices of the sector containing the data (end is marked with 0)
                 // The sectors marked at 0x94 are absolutely positioned ( 1*0x1000 is sector 1, 2*0x1000 is sector 2,...)
+                const dataPointerOffset: number = offset + 0x94;
+                if (dataPointerOffset + 4 > data.length) {
+                    throw new UnsupportedFormatError('GPX file entry is truncated');
+                }
                 const file: GpxFile = new GpxFile();
                 file.fileName = this._getString(data, offset + 0x04, 127);
                 file.fileSize = this._getInteger(data, offset + 0x8c);
+                if (file.fileSize < 0 || file.fileSize > data.length) {
+                    throw new UnsupportedFormatError(`GPX file entry '${file.fileName}' has an invalid size`);
+                }
                 // store file if needed
                 const storeFile: boolean = !this.fileFilter || this.fileFilter(file.fileName);
                 if (storeFile) {
                     this.files.push(file);
                 }
-                // we need to iterate the blocks because we need to move after the last datasector
-                const dataPointerOffset: number = offset + 0x94;
-                let sector: number = 0;
-                // this var is storing the sector index
                 let sectorCount: number = 0;
-                // we're keeping count so we can calculate the offset of the array item
-                // as long we have data blocks we need to iterate them,
                 const fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
                 while (true) {
-                    sector = this._getInteger(data, dataPointerOffset + 4 * sectorCount++);
-                    if (sector !== 0) {
-                        // the next file entry starts after the last data sector so we
-                        // move the offset along
-                        offset = sector * sectorSize;
-                        // write data only if needed
-                        if (storeFile) {
-                            fileData!.write(data, offset, sectorSize);
-                        }
-                    } else {
+                    const pointerOffset: number = dataPointerOffset + 4 * sectorCount++;
+                    if (pointerOffset + 4 > data.length) {
+                        throw new UnsupportedFormatError(
+                            `GPX file entry '${file.fileName}' has an unterminated sector list`
+                        );
+                    }
+                    const sector: number = this._getInteger(data, pointerOffset);
+                    if (sector === 0) {
                         break;
+                    }
+                    const sectorOffset: number = sector * sectorSize;
+                    if (sector < 0 || sectorOffset >= data.length) {
+                        throw new UnsupportedFormatError(
+                            `GPX file entry '${file.fileName}' points to sector ${sector} outside of the container`
+                        );
+                    }
+                    // the next entry follows the furthest data sector
+                    offset = Math.max(offset, sectorOffset);
+                    if (storeFile && fileData!.length < file.fileSize) {
+                        fileData!.write(data, sectorOffset, sectorSize);
                     }
                 }
 
