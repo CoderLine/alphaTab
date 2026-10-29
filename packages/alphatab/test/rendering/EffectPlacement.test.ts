@@ -139,4 +139,52 @@ describe('EffectPlacementTests', () => {
         expect(staff.topOverflow).toBeGreaterThan(spikeHeight);
         expect(staff.y).toBe(0);
     });
+
+    it('lyrics-share-one-baseline', async () => {
+        // low and high notes under the lyrics: the row stays on one baseline
+        const renderer = await render(`
+            \\lyrics "this is my life and more and more of it"
+            \\staff {score}
+            :4 3.3 5.3 7.3 8.3 | 1.1 20.1 20.1 20.1 | 3.6 0.6 3.6 0.6
+        `);
+        const staff = firstStaff(renderer);
+        // the magnitude is the distance to the staff, the same for all bars of the row
+        let magnitude = -1;
+        let checked = 0;
+        for (const r of staff.barRenderers) {
+            const lyrics = band(r, 'EffectLyrics', false)!;
+            expect(lyrics).toBeTruthy();
+            if (checked === 0) {
+                magnitude = lyrics.placedMagnitude;
+            }
+            expect(lyrics.placedMagnitude).toBe(magnitude);
+            checked++;
+        }
+        expect(checked).toBe(3);
+    });
+
+    it('slur-labels-not-in-lyrics-row', async () => {
+        // the lyrics row is below the staff, slide and hammer-on labels above it
+        const renderer = await render(`
+            \\lyrics "this is my life"
+            \\staff {score}
+            :4 10.3 12.3{h} 14.3 7.3{sl} | 9.3 r r r
+        `);
+        const staff = firstStaff(renderer);
+        let labels = 0;
+        for (const r of staff.barRenderers) {
+            for (const b of r.bottomEffects.bands) {
+                expect(b.isEmpty || b.info.effectId === 'EffectLyrics' || b.info.effectId === 'EffectDynamics').toBe(
+                    true
+                );
+            }
+            for (const b of r.topEffects.bands) {
+                if (!b.isEmpty && b.info.effectId !== 'BarNumber') {
+                    labels++;
+                }
+            }
+        }
+        expect(labels).toBeGreaterThan(0);
+        expect(band(staff.barRenderers[0], 'EffectLyrics', false)).toBeTruthy();
+    });
 });
