@@ -3,6 +3,7 @@
  *
  * One axis of {@link ElementDisplay}. The renderer dispatches per-staff
  * on this axis to decide which staves paint the element.
+ * @since 1.9.0
  * @public
  */
 export enum StaffPlacement {
@@ -23,6 +24,7 @@ export enum StaffPlacement {
  *
  * One axis of {@link ElementDisplay}. Independent of
  * {@link StaffPlacement}.
+ * @since 1.9.0
  * @public
  */
 export enum SystemDisplay {
@@ -45,6 +47,7 @@ export enum SystemDisplay {
  * Each axis is independently optional. An `undefined` axis defers to
  * the outer layer in the three-layer resolution chain (per-bar →
  * per-staff → score-wide stylesheet).
+ * @since 1.9.0
  * @record
  * @json
  * @public

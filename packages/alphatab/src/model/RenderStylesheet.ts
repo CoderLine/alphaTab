@@ -82,6 +82,7 @@ export enum TrackNameOrientation {
 
 /**
  * Lists the different places where string tuning information is displayed.
+ * @since 1.9.0
  * @public
  */
 export enum TuningDisplayMode {
@@ -145,6 +146,7 @@ export class RenderStylesheet {
 
     /**
      * The place where tuning information is displayed.
+     * @since 1.9.0
      */
     public tuningDisplayMode: TuningDisplayMode = TuningDisplayMode.Score;
 
@@ -252,6 +254,7 @@ export class RenderStylesheet {
 
     /**
      * Score-wide display configuration for the standard-notation staff.
+     * @since 1.9.0
      */
     public scoreConfig: ScoreStaffConfig = {
         clef: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
@@ -262,6 +265,7 @@ export class RenderStylesheet {
 
     /**
      * Score-wide display configuration for the tablature staff.
+     * @since 1.9.0
      */
     public tabConfig: TabStaffConfig = {
         clef: { isVisible: true, staffPlacement: StaffPlacement.AllStaves, systemDisplay: SystemDisplay.AllSystems },
@@ -273,6 +277,7 @@ export class RenderStylesheet {
 
     /**
      * Score-wide display configuration for the slash staff.
+     * @since 1.9.0
      */
     public slashConfig: SlashStaffConfig = {
         keySignature: { isVisible: false },
@@ -282,6 +287,7 @@ export class RenderStylesheet {
 
     /**
      * Score-wide display configuration for the numbered (jianpu) staff.
+     * @since 1.9.0
      */
     public numberedConfig: NumberedStaffConfig = {
         timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },

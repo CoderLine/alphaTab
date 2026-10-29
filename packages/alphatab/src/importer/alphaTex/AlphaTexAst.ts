@@ -14,6 +14,9 @@ export enum AlphaTexNodeType {
     RParen = 7,
     Colon = 8,
     Asterisk = 9,
+    /**
+     * @since 1.9.0
+     */
     At = 10,
 
     // General Nodes
@@ -127,6 +130,7 @@ export interface AlphaTexComment {
 export interface AlphaTexTokenNode extends AlphaTexAstNode {}
 
 /**
+ * @since 1.9.0
  * @public
  */
 export interface IAlphaTexStringSeparatorNode extends IAlphaTexAstNode {}
@@ -212,6 +216,7 @@ export interface AlphaTexAsteriskTokenNode extends AlphaTexTokenNode {
 }
 
 /**
+ * @since 1.9.0
  * @record
  * @public
  */
@@ -543,6 +548,7 @@ export interface AlphaTexNoteNode extends AlphaTexAstNode {
 
     /**
      * The dot or @ separating the note value and the string for fretted/stringed instruments like guitars.
+     * @since 1.9.0
      */
     noteStringSeparator?: IAlphaTexStringSeparatorNode;
 
