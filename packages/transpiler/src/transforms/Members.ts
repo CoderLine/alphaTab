@@ -275,6 +275,7 @@ export function visitGetAccessor(
             classElement
         );
 
+        visitAccessorDocumentation(state, member, classElement);
         applyPropertyOverride(state, member, classElement);
     } else {
         const signature = state.context.typeChecker.getSignatureFromDeclaration(classElement);
@@ -295,6 +296,7 @@ export function visitGetAccessor(
             tsSymbol: state.context.symbols.getSymbolForDeclaration(classElement)
         };
 
+        visitAccessorDocumentation(state, newProperty, classElement);
         applyPropertyOverride(state, newProperty, classElement);
 
         if (classElement.modifiers) {
@@ -328,6 +330,23 @@ export function visitGetAccessor(
     }
 }
 
+/**
+ * Applies the docs and deprecation of a get or set accessor to the property both accessors share.
+ * Target languages deprecate whole properties, so a deprecation on either accessor deprecates the property.
+ */
+function visitAccessorDocumentation(
+    state: AstTransformer,
+    property: cs.PropertyDeclaration,
+    accessor: ts.GetAccessorDeclaration | ts.SetAccessorDeclaration
+) {
+    property.documentation ??= visitDocumentation(state, accessor.name);
+
+    const firstAccessor = property.tsNode;
+    if (firstAccessor === accessor || !firstAccessor || !ts.getJSDocDeprecatedTag(firstAccessor)) {
+        visitDocumentationAttributes(state.context, state.attributeNames, property, accessor);
+    }
+}
+
 export function visitSetAccessor(
     state: AstTransformer,
     parent: cs.ClassDeclaration,
@@ -345,6 +364,7 @@ export function visitSetAccessor(
         );
         member.setAccessor.valueParameterName = setParamName !== 'value' ? setParamName : undefined;
 
+        visitAccessorDocumentation(state, member, classElement);
         applyPropertyOverride(state, member, classElement);
 
         return member.setAccessor;
@@ -371,6 +391,7 @@ export function visitSetAccessor(
         tsSymbol: state.context.symbols.getSymbolForDeclaration(classElement)
     };
 
+    visitAccessorDocumentation(state, newProperty, classElement);
     applyPropertyOverride(state, newProperty, classElement);
 
     if (classElement.modifiers) {

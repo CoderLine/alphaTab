@@ -63,6 +63,9 @@ public class Accessors
         return this._value * (2.0).toDouble()
     }
     
+    /**
+     * Computed read-only alias: kept here without
+     */
     public val isZero: Boolean
     get(){
         return this._value == 0.0

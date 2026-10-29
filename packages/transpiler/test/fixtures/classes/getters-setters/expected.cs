@@ -41,6 +41,9 @@ namespace AlphaTab
             }
         }
         
+        /// <summary>
+        /// Computed read-only alias: kept here without
+        /// </summary>
         public bool IsZero
         {
             get
