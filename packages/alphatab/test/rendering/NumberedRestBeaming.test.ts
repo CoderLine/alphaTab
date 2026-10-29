@@ -29,15 +29,23 @@ describe('NumberedRestBeaming', () => {
         return errors;
     }
 
-    const staves = ['numbered', 'slash numbered', 'score tabs slash numbered'];
-    const bars = ['r.1', 'r.1 {tu 3} r.1 {tu 3} r.1 {tu 3}', 'r.2 r.2', '3.3.2 r.2'];
-
-    for (const staff of staves) {
+    function expectNoErrors(staff: string): void {
+        const bars = ['r.1', 'r.1 {tu 3} r.1 {tu 3} r.1 {tu 3}', 'r.2 r.2', '3.3.2 r.2'];
         for (const bar of bars) {
-            it(`${staff}: ${bar}`, () => {
-                const errors = render(`\\track \\staff {${staff}} ${bar} | 3.3.4 3.3 3.3 3.3 |`);
-                expect(errors.map(e => e.message)).toEqual([]);
-            });
+            const errors = render(`\\track \\staff {${staff}} ${bar} | 3.3.4 3.3 3.3 3.3 |`);
+            expect(errors.map(e => `${bar}: ${e.message}`).join('\n')).toBe('');
         }
     }
+
+    it('numbered', () => {
+        expectNoErrors('numbered');
+    });
+
+    it('slash-numbered', () => {
+        expectNoErrors('slash numbered');
+    });
+
+    it('score-tabs-slash-numbered', () => {
+        expectNoErrors('score tabs slash numbered');
+    });
 });

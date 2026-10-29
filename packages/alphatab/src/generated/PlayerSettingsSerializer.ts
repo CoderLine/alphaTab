@@ -51,6 +51,16 @@ export class PlayerSettingsSerializer {
         o.set("buffertimeinmilliseconds", obj.bufferTimeInMilliseconds);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: PlayerSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "soundfont": obj.soundFont, "outputmode": obj.outputMode as number, "enableplayer": obj.enablePlayer, "playermode": obj.playerMode as number, "enablecursor": obj.enableCursor, "enableanimatedbeatcursor": obj.enableAnimatedBeatCursor, "enableelementhighlighting": obj.enableElementHighlighting, "enableseektoclick": obj.enableSeekToClick, "enableplaybackrangeselection": obj.enablePlaybackRangeSelection, "resetplaybackrangeonclick": obj.resetPlaybackRangeOnClick, "scrolloffsetx": obj.scrollOffsetX, "scrolloffsety": obj.scrollOffsetY, "scrollmode": obj.scrollMode as number, "scrollspeed": obj.scrollSpeed, "nativebrowsersmoothscroll": obj.nativeBrowserSmoothScroll, "songbookbendduration": obj.songBookBendDuration, "songbookdipduration": obj.songBookDipDuration, "vibrato": VibratoPlaybackSettingsSerializer.toJsObject(obj.vibrato), "slide": SlidePlaybackSettingsSerializer.toJsObject(obj.slide), "playtripletfeel": obj.playTripletFeel, "buffertimeinmilliseconds": obj.bufferTimeInMilliseconds };
+        return o;
+    }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
             /*@target web*/

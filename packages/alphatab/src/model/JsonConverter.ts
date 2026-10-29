@@ -56,7 +56,7 @@ export class JsonConverter {
      * @target web
      */
     public static scoreToJson(score: Score): string {
-        const obj: unknown = JsonConverter.scoreToJsObject(score);
+        const obj: unknown = ScoreSerializer.toJsObject(score);
         return JSON.stringify(obj, JsonConverter._jsonReplacer);
     }
 
@@ -100,7 +100,7 @@ export class JsonConverter {
      * @target web
      */
     public static settingsToJson(settings: Settings): string {
-        const obj: unknown = JsonConverter.settingsToJsObject(settings);
+        const obj: unknown = SettingsSerializer.toJsObject(settings);
         return JSON.stringify(obj, JsonConverter._jsonReplacer);
     }
 

@@ -8,7 +8,7 @@ import ts from 'typescript';
 import createEmitter from './EmitterBase';
 import { createFromJsonMethod } from './Serializer.fromJson';
 import { createSetPropertyMethod } from './Serializer.setProperty';
-import { createToJsonMethod } from './Serializer.toJson';
+import { createToJsObjectMethod, createToJsonMethod } from './Serializer.toJson';
 import { buildTypeSchema, toImportPath } from './TypeSchema';
 
 export default createEmitter('json', (program, input) => {
@@ -51,6 +51,7 @@ export default createEmitter('json', (program, input) => {
             [
                 createFromJsonMethod(input, serializable, importer),
                 createToJsonMethod(input, serializable, importer),
+                createToJsObjectMethod(input, serializable, importer),
                 createSetPropertyMethod(input, serializable, importer)
             ]
         ),

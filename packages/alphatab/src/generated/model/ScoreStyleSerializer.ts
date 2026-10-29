@@ -40,6 +40,30 @@ export class ScoreStyleSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: ScoreStyle | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = {};
+        {
+            const m = new Map<string, unknown>();
+            o["headerandfooter"] = m;
+            for (const [k, v] of obj.headerAndFooter!) {
+                m.set(k.toString(), HeaderFooterStyleSerializer.toJsObject(v));
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
+            o["colors"] = m;
+            for (const [k, v] of obj.colors!) {
+                m.set(k.toString(), Color.toJson(v));
+            }
+        }
+        return o;
+    }
     public static setProperty(obj: ScoreStyle, property: string, v: unknown): boolean {
         switch (property) {
             case "headerandfooter":

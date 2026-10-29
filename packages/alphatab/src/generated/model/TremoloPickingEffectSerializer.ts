@@ -25,6 +25,16 @@ export class TremoloPickingEffectSerializer {
         o.set("style", obj.style as number);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: TremoloPickingEffect | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "marks": obj.marks, "style": obj.style as number };
+        return o;
+    }
     public static setProperty(obj: TremoloPickingEffect, property: string, v: unknown): boolean {
         switch (property) {
             case "marks":

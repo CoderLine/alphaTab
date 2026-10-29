@@ -49,6 +49,27 @@ export class TrackSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Track | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "staves": obj.staves.map(i => StaffSerializer.toJsObject(i)), "playbackinfo": PlaybackInformationSerializer.toJsObject(obj.playbackInfo), "color": Color.toJson(obj.color)!, "name": obj.name, "isvisibleonmultitrack": obj.isVisibleOnMultiTrack, "shortname": obj.shortName, "defaultsystemslayout": obj.defaultSystemsLayout, "systemslayout": obj.systemsLayout };
+        if (obj.lineBreaks !== undefined) {
+            const a: number[] = [];
+            o["linebreaks"] = a;
+            for (const v of obj.lineBreaks!) {
+                a.push(v);
+            }
+        }
+        o["percussionarticulations"] = obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJsObject(i));
+        if (obj.style) {
+            o["style"] = TrackStyleSerializer.toJsObject(obj.style);
+        }
+        return o;
+    }
     public static setProperty(obj: Track, property: string, v: unknown): boolean {
         switch (property) {
             case "staves":

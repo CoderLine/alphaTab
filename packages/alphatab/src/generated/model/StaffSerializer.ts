@@ -61,6 +61,45 @@ export class StaffSerializer {
         o.set("standardnotationlinecount", obj.standardNotationLineCount);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Staff | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "bars": obj.bars.map(i => BarSerializer.toJsObject(i)) };
+        if (obj.chords !== null) {
+            const m = new Map<string, unknown>();
+            o["chords"] = m;
+            for (const [k, v] of obj.chords!) {
+                m.set(k.toString(), ChordSerializer.toJsObject(v));
+            }
+        }
+        o["capo"] = obj.capo;
+        o["transpositionpitch"] = obj.transpositionPitch;
+        o["displaytranspositionpitch"] = obj.displayTranspositionPitch;
+        o["stringtuning"] = TuningSerializer.toJsObject(obj.stringTuning);
+        o["showslash"] = obj.showSlash;
+        o["shownumbered"] = obj.showNumbered;
+        o["showtablature"] = obj.showTablature;
+        o["showstandardnotation"] = obj.showStandardNotation;
+        if (obj.scoreConfig) {
+            o["scoreconfig"] = ScoreStaffConfigSerializer.toJsObject(obj.scoreConfig);
+        }
+        if (obj.tabConfig) {
+            o["tabconfig"] = TabStaffConfigSerializer.toJsObject(obj.tabConfig);
+        }
+        if (obj.slashConfig) {
+            o["slashconfig"] = SlashStaffConfigSerializer.toJsObject(obj.slashConfig);
+        }
+        if (obj.numberedConfig) {
+            o["numberedconfig"] = NumberedStaffConfigSerializer.toJsObject(obj.numberedConfig);
+        }
+        o["ispercussion"] = obj.isPercussion;
+        o["standardnotationlinecount"] = obj.standardNotationLineCount;
+        return o;
+    }
     public static setProperty(obj: Staff, property: string, v: unknown): boolean {
         switch (property) {
             case "bars":

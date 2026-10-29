@@ -29,6 +29,16 @@ export class ChordSerializer {
         o.set("showfingering", obj.showFingering);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Chord | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "name": obj.name, "firstfret": obj.firstFret, "strings": obj.strings, "barrefrets": obj.barreFrets, "showname": obj.showName, "showdiagram": obj.showDiagram, "showfingering": obj.showFingering };
+        return o;
+    }
     public static setProperty(obj: Chord, property: string, v: unknown): boolean {
         switch (property) {
             case "name":

@@ -31,6 +31,23 @@ export class TabBarOverrideSerializer {
         o.set("barnumber", obj.barNumber as number | undefined);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: TabBarOverride | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = {};
+        if (obj.clef) {
+            o["clef"] = ElementDisplaySerializer.toJsObject(obj.clef);
+        }
+        if (obj.timeSignature) {
+            o["timesignature"] = ElementDisplaySerializer.toJsObject(obj.timeSignature);
+        }
+        o["barnumber"] = obj.barNumber as number | undefined;
+        return o;
+    }
     public static setProperty(obj: TabBarOverride, property: string, v: unknown): boolean {
         switch (property) {
             case "barnumber":

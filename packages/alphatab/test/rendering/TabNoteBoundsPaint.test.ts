@@ -34,7 +34,11 @@ describe('TabNoteBoundsPaint', () => {
                         if (beat.notes) {
                             for (const note of beat.notes) {
                                 const b = note.noteHeadBounds;
-                                out.push(note.note.id, b.x, b.y, b.w, b.h);
+                                out.push(note.note.id);
+                                out.push(b.x);
+                                out.push(b.y);
+                                out.push(b.w);
+                                out.push(b.h);
                             }
                         }
                     }
@@ -48,7 +52,7 @@ describe('TabNoteBoundsPaint', () => {
         const lookup = createRenderer(1300).boundsLookup!;
         const chord = lookup.staffSystems[0].bars[0].bars[1].beats[0];
         expect(chord.notes!.length).toBe(2);
-        expect(chord.notes![0].noteHeadBounds.w).not.toBeCloseTo(chord.notes![1].noteHeadBounds.w, 3);
+        expect(Math.abs(chord.notes![0].noteHeadBounds.w - chord.notes![1].noteHeadBounds.w) > 0.001).toBe(true);
     });
 
     it('resize-equals-fresh-render', () => {

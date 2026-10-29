@@ -36,6 +36,27 @@ export class TabStaffConfigSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: TabStaffConfig | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = {};
+        if (obj.clef) {
+            o["clef"] = ElementDisplaySerializer.toJsObject(obj.clef);
+        }
+        if (obj.timeSignature) {
+            o["timesignature"] = ElementDisplaySerializer.toJsObject(obj.timeSignature);
+        }
+        o["barnumber"] = obj.barNumber as number | undefined;
+        o["rhythm"] = obj.rhythm as number | undefined;
+        if (obj.rests) {
+            o["rests"] = ElementDisplaySerializer.toJsObject(obj.rests);
+        }
+        return o;
+    }
     public static setProperty(obj: TabStaffConfig, property: string, v: unknown): boolean {
         switch (property) {
             case "barnumber":

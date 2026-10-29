@@ -30,6 +30,16 @@ export class VibratoPlaybackSettingsSerializer {
         o.set("beatslightamplitude", obj.beatSlightAmplitude);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: VibratoPlaybackSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "notewidelength": obj.noteWideLength, "notewideamplitude": obj.noteWideAmplitude, "noteslightlength": obj.noteSlightLength, "noteslightamplitude": obj.noteSlightAmplitude, "beatwidelength": obj.beatWideLength, "beatwideamplitude": obj.beatWideAmplitude, "beatslightlength": obj.beatSlightLength, "beatslightamplitude": obj.beatSlightAmplitude };
+        return o;
+    }
     public static setProperty(obj: VibratoPlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "notewidelength":

@@ -1259,6 +1259,37 @@ export class Note {
 
     /**
      * @internal
+     * @target web
+     */
+    public toJsObject(o: Record<string, unknown>) {
+        if (this.tieDestination !== null) {
+            o.tiedestinationnoteid = this.tieDestination.id;
+        }
+        if (this.tieOrigin !== null) {
+            o.tieoriginnoteid = this.tieOrigin.id;
+        }
+        if (this.slurDestination !== null) {
+            o.slurdestinationnoteid = this.slurDestination.id;
+        }
+        if (this.slurOrigin !== null) {
+            o.sluroriginnoteid = this.slurOrigin.id;
+        }
+        if (this.hammerPullOrigin !== null) {
+            o.hammerpulloriginnoteid = this.hammerPullOrigin.id;
+        }
+        if (this.hammerPullDestination !== null) {
+            o.hammerpulldestinationnoteid = this.hammerPullDestination.id;
+        }
+        if (this.slideTarget !== null) {
+            o.slidetargetnoteid = this.slideTarget.id;
+        }
+        if (this.slideOrigin !== null) {
+            o.slideoriginnoteid = this.slideOrigin.id;
+        }
+    }
+
+    /**
+     * @internal
      */
     public setProperty(property: string, v: unknown): boolean {
         switch (property) {

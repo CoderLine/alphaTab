@@ -31,6 +31,16 @@ export class PlaybackInformationSerializer {
         o.set("issolo", obj.isSolo);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: PlaybackInformation | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "volume": obj.volume, "balance": obj.balance, "port": obj.port, "program": obj.program, "bank": obj.bank, "primarychannel": obj.primaryChannel, "secondarychannel": obj.secondaryChannel, "ismute": obj.isMute, "issolo": obj.isSolo };
+        return o;
+    }
     public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
         switch (property) {
             case "volume":

@@ -31,6 +31,23 @@ export class SlashBarOverrideSerializer {
         o.set("barnumber", obj.barNumber as number | undefined);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: SlashBarOverride | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = {};
+        if (obj.keySignature) {
+            o["keysignature"] = ElementDisplaySerializer.toJsObject(obj.keySignature);
+        }
+        if (obj.timeSignature) {
+            o["timesignature"] = ElementDisplaySerializer.toJsObject(obj.timeSignature);
+        }
+        o["barnumber"] = obj.barNumber as number | undefined;
+        return o;
+    }
     public static setProperty(obj: SlashBarOverride, property: string, v: unknown): boolean {
         switch (property) {
             case "barnumber":

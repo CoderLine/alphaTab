@@ -25,6 +25,16 @@ export class EngravingStemInfoSerializer {
         o.set("x", obj.x);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: EngravingStemInfo | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "topy": obj.topY, "bottomy": obj.bottomY, "x": obj.x };
+        return o;
+    }
     public static setProperty(obj: EngravingStemInfo, property: string, v: unknown): boolean {
         switch (property) {
             case "topy":

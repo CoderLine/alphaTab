@@ -24,6 +24,16 @@ export class SyncPointDataSerializer {
         o.set("millisecondoffset", obj.millisecondOffset);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: SyncPointData | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "baroccurence": obj.barOccurence, "millisecondoffset": obj.millisecondOffset };
+        return o;
+    }
     public static setProperty(obj: SyncPointData, property: string, v: unknown): boolean {
         switch (property) {
             case "baroccurence":

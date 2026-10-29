@@ -15,15 +15,16 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
  */
 export type IAlphaTabWorkerMessage =
     // main -> worker
-    | { cmd: 'alphaTab.initialize'; settings: Map<string, unknown> }
-    | { cmd: 'alphaTab.updateSettings'; settings: Map<string, unknown> }
+    // settings and score: Map trees, plain-object trees (toJsObject) on web
+    | { cmd: 'alphaTab.initialize'; settings: unknown }
+    | { cmd: 'alphaTab.updateSettings'; settings: unknown }
     | { cmd: 'alphaTab.render'; renderHints: RenderHints | undefined }
     | { cmd: 'alphaTab.resizeRender' }
     | { cmd: 'alphaTab.renderResult'; resultId: string }
     | { cmd: 'alphaTab.setWidth'; width: number }
     | {
           cmd: 'alphaTab.renderScore';
-          score: Map<string, unknown> | null;
+          score: unknown;
           trackIndexes: number[] | null;
           fontSizes: Map<string, FontSizeDefinition>;
           renderHints: RenderHints | undefined;

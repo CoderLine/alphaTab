@@ -25,6 +25,16 @@ export class SlidePlaybackSettingsSerializer {
         o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: SlidePlaybackSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "simpleslidepitchoffset": obj.simpleSlidePitchOffset, "simpleslidedurationratio": obj.simpleSlideDurationRatio, "shiftslidedurationratio": obj.shiftSlideDurationRatio };
+        return o;
+    }
     public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "simpleslidepitchoffset":

@@ -45,6 +45,33 @@ export class RenderingResourcesSerializer {
         o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor)!);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: RenderingResources | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "smuflfontfamilyname": obj.smuflFontFamilyName, "engravingsettings": EngravingSettingsSerializer.toJsObject(obj.engravingSettings) };
+        {
+            const m = new Map<string, unknown>();
+            o["elementfonts"] = m;
+            for (const [k, v] of obj.elementFonts!) {
+                m.set(k.toString(), Font.toJson(v)!);
+            }
+        }
+        o["numberednotationfont"] = Font.toJson(obj.numberedNotationFont)!;
+        o["numberednotationgracefont"] = Font.toJson(obj.numberedNotationGraceFont)!;
+        o["tablaturefont"] = Font.toJson(obj.tablatureFont)!;
+        o["gracefont"] = Font.toJson(obj.graceFont)!;
+        o["stafflinecolor"] = Color.toJson(obj.staffLineColor)!;
+        o["barseparatorcolor"] = Color.toJson(obj.barSeparatorColor)!;
+        o["barnumbercolor"] = Color.toJson(obj.barNumberColor)!;
+        o["mainglyphcolor"] = Color.toJson(obj.mainGlyphColor)!;
+        o["secondaryglyphcolor"] = Color.toJson(obj.secondaryGlyphColor)!;
+        o["scoreinfocolor"] = Color.toJson(obj.scoreInfoColor)!;
+        return o;
+    }
     public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {
         switch (property) {
             case "smuflfontfamilyname":

@@ -26,6 +26,16 @@ export class HeaderFooterStyleSerializer {
         o.set("textalign", obj.textAlign as number);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: HeaderFooterStyle | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "template": obj.template, "isvisible": obj.isVisible, "textalign": obj.textAlign as number };
+        return o;
+    }
     public static setProperty(obj: HeaderFooterStyle, property: string, v: unknown): boolean {
         switch (property) {
             case "template":

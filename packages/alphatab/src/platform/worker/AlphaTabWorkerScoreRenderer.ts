@@ -6,6 +6,8 @@ import {
     type IEventEmitter,
     type IEventEmitterOfT
 } from '@coderline/alphatab/EventEmitter';
+import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
+import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
@@ -50,10 +52,36 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-    private _serializeSettingsForWorker(settings: Settings): Map<string, unknown> {
-        const jsObject = JsonConverter.settingsToJsObject(Environment.prepareForPostMessage(settings))!;
-        // cut out player settings, they are only needed on UI thread side
-        jsObject.delete('player');
+    // player settings are cut out, they are only needed on UI thread side
+    private _serializeSettingsForWorker(settings: Settings): unknown {
+        const unwrapped = Environment.prepareForPostMessage(settings);
+        let jsObject: unknown = null;
+        /*@target web*/
+        jsObject = AlphaTabWorkerScoreRenderer._settingsToJsObject(unwrapped);
+        if (jsObject === null) {
+            const map = JsonConverter.settingsToJsObject(unwrapped)!;
+            map.delete('player');
+            jsObject = map;
+        }
+        return jsObject;
+    }
+
+    /**
+     * @target web
+     */
+    private static _settingsToJsObject(settings: Settings): unknown {
+        const jsObject = SettingsSerializer.toJsObject(settings)!;
+        delete jsObject.player;
+        return jsObject;
+    }
+
+    private _serializeScoreForWorker(score: Score): unknown {
+        let jsObject: unknown = null;
+        /*@target web*/
+        jsObject = ScoreSerializer.toJsObject(score);
+        if (jsObject === null) {
+            jsObject = JsonConverter.scoreToJsObject(score);
+        }
         return jsObject;
     }
 
@@ -128,8 +156,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
-        const jsObject: Map<string, unknown> | null =
-            score == null ? null : JsonConverter.scoreToJsObject(Environment.prepareForPostMessage(score));
+        const jsObject: unknown =
+            score == null ? null : this._serializeScoreForWorker(Environment.prepareForPostMessage(score));
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             score: jsObject,

@@ -24,6 +24,16 @@ export class BendPointSerializer {
         o.set("value", obj.value);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: BendPoint | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "offset": obj.offset, "value": obj.value };
+        return o;
+    }
     public static setProperty(obj: BendPoint, property: string, v: unknown): boolean {
         switch (property) {
             case "offset":

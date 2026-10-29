@@ -34,6 +34,22 @@ export class AutomationSerializer {
         o.set("isvisible", obj.isVisible);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Automation | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "islinear": obj.isLinear, "type": obj.type as number, "value": obj.value };
+        if (obj.syncPointValue) {
+            o["syncpointvalue"] = SyncPointDataSerializer.toJsObject(obj.syncPointValue);
+        }
+        o["ratioposition"] = obj.ratioPosition;
+        o["text"] = obj.text;
+        o["isvisible"] = obj.isVisible;
+        return o;
+    }
     public static setProperty(obj: Automation, property: string, v: unknown): boolean {
         switch (property) {
             case "islinear":

@@ -24,6 +24,16 @@ export class SectionSerializer {
         o.set("text", obj.text);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Section | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "marker": obj.marker, "text": obj.text };
+        return o;
+    }
     public static setProperty(obj: Section, property: string, v: unknown): boolean {
         switch (property) {
             case "marker":

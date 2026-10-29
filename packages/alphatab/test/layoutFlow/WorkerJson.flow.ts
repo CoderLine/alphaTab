@@ -113,6 +113,10 @@ class Table {
         this.rows.push({ step, thread, time, bytes });
     }
 
+    public time(step: string): number {
+        return this.rows.find(r => r.step === step)!.time;
+    }
+
     public print(out: string[]) {
         for (const r of this.rows) {
             const alloc = Number.isNaN(r.bytes) ? '' : AllocationSampler.mb(r.bytes);
@@ -191,6 +195,17 @@ describe('WorkerJson', () => {
         t.add('SettingsSerializer.fromJson (worker update)', 'worker', () =>
             SettingsSerializer.fromJson(target, cloned)
         );
+        const toObj = () => {
+            const o = SettingsSerializer.toJsObject(settings)!;
+            delete o.player;
+            return o;
+        };
+        t.add('SettingsSerializer.toJsObject (minus player)', 'main', toObj);
+        const obj = toObj();
+        cloneRows(t, 'obj', obj);
+        const objCloned = structuredClone(obj);
+        t.add('SettingsSerializer.fromJson (obj)', 'worker', () => SettingsSerializer.fromJson(target, objCloned));
+        t.add('JsonConverter.settingsToJson', 'main', () => JsonConverter.settingsToJson(settings));
         out.push(`  maps=${c.maps} arrays=${c.arrays} entries=${c.entries} wire=${kb(bytes)}`);
         t.print(out);
         console.log(out.join('\n'));
@@ -228,7 +243,15 @@ describe('WorkerJson', () => {
             );
             st.add('JSON.stringify(plain)', 'main', () => JSON.stringify(plainJson));
             const str = JSON.stringify(plainJson);
-            st.add('JsonConverter.scoreToJson (Maps + replacer)', 'main', () => JsonConverter.scoreToJson(score));
+            st.add('ScoreSerializer.toJsObject (object tree)', 'main', () => ScoreSerializer.toJsObject(score));
+            const obj = ScoreSerializer.toJsObject(score);
+            cloneRows(st, 'obj', obj);
+            const objCloned = structuredClone(obj);
+            st.add('ScoreSerializer.fromJson (obj)', 'worker', () => ScoreSerializer.fromJson(new Score(), objCloned));
+            st.add('jsObjectToScore = fromJson + finish (obj)', 'worker', () =>
+                JsonConverter.jsObjectToScore(objCloned, settings)
+            );
+            st.add('JsonConverter.scoreToJson', 'main', () => JsonConverter.scoreToJson(score));
             st.add('string structuredClone (both)', 'both', () => structuredClone(str), false);
             st.add('JSON.parse', 'worker', () => JSON.parse(str));
             out.push(
@@ -236,6 +259,17 @@ describe('WorkerJson', () => {
             );
             out.push('  score:');
             st.print(out);
+            for (const [label, build, tree] of [
+                ['Map', 'scoreToJsObject (Map tree)', 'Map'],
+                ['obj', 'ScoreSerializer.toJsObject (object tree)', 'obj']
+            ]) {
+                const main = st.time(build) + st.time(`${tree}   serialize half`);
+                const worker =
+                    st.time(`${tree}   deserialize half`) + st.time(`jsObjectToScore = fromJson + finish (${tree})`);
+                out.push(
+                    `  hand-off ${label.padEnd(4)} main (build + serialize) ${ms(main).padStart(10)}   worker (deserialize + fromJson + finish) ${ms(worker).padStart(10)}`
+                );
+            }
 
             // midi: main -> synth worker (alphaSynth.loadMidi, per score load)
             const midi = new MidiFile();

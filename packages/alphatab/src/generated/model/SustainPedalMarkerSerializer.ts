@@ -25,6 +25,16 @@ export class SustainPedalMarkerSerializer {
         o.set("pedaltype", obj.pedalType as number);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: SustainPedalMarker | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "ratioposition": obj.ratioPosition, "pedaltype": obj.pedalType as number };
+        return o;
+    }
     public static setProperty(obj: SustainPedalMarker, property: string, v: unknown): boolean {
         switch (property) {
             case "ratioposition":

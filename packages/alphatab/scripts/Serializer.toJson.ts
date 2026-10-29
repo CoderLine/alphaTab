@@ -3,8 +3,31 @@ import * as ts from 'typescript';
 import { findSerializerModule } from './Serializer.common';
 import type { TypeSchema } from './TypeSchema';
 
-function generateToJsonBody(serializable: TypeSchema, importer: (name: string, module: string) => void) {
+/**
+ * The shape a generated `toJson`-style method writes its records in. Records of `@json` types become
+ * `Map`s (`toJson`, all targets) or object literals (`toJsObject`, web only). Map-typed properties stay
+ * `Map`s in both, so their key order survives a structured clone, and `@json_immutable` types use their own
+ * `toJson` in both, because their `fromJson` (e.g. `Font.fromJson`) reads Maps only.
+ */
+interface ToJsonFlavor {
+    readonly method: string;
+    readonly objects: boolean;
+}
+
+const mapFlavor: ToJsonFlavor = { method: 'toJson', objects: false };
+const objectFlavor: ToJsonFlavor = { method: 'toJsObject', objects: true };
+
+function generateToJsonBody(
+    serializable: TypeSchema,
+    importer: (name: string, module: string) => void,
+    flavor: ToJsonFlavor
+) {
     const statements: ts.Statement[] = [];
+    const set = (jsonName: string, value: string) =>
+        flavor.objects ? `o[${JSON.stringify(jsonName)}] = ${value}` : `o.set(${JSON.stringify(jsonName)}, ${value})`;
+    // object flavor: the leading unconditional properties form the object literal, the rest is assigned in order
+    const literal: string[] = [];
+    let inLiteral = flavor.objects;
 
     statements.push(
         createNodeFromSource<ts.IfStatement>(
@@ -17,14 +40,17 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         )
     );
 
-    statements.push(
-        createNodeFromSource<ts.VariableStatement>(
-            `
+    if (!flavor.objects) {
+        statements.push(
+            createNodeFromSource<ts.VariableStatement>(
+                `
             const o = new Map<string, unknown>();
         `,
-            ts.SyntaxKind.VariableStatement
-        )
-    );
+                ts.SyntaxKind.VariableStatement
+            )
+        );
+    }
+    const objectDeclarationIndex = statements.length;
 
     for (const prop of serializable.properties) {
         const fieldName = prop.name;
@@ -33,46 +59,22 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         if (!jsonName || prop.isJsonReadOnly) {
             continue;
         }
+        if (flavor.objects && prop.target && prop.target !== 'web') {
+            continue;
+        }
 
         let propertyStatements: ts.Statement[] = [];
+        let simpleValue: string | null = null;
 
         if (prop.asRaw || prop.type.isPrimitiveType) {
-            propertyStatements.push(
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `
-                    o.set(${JSON.stringify(jsonName)}, obj.${fieldName});
-                `,
-                    ts.SyntaxKind.ExpressionStatement
-                )
-            );
+            simpleValue = `obj.${fieldName}`;
         } else if (prop.type.isEnumType) {
             if (prop.type.isNullable) {
-                propertyStatements.push(
-                    createNodeFromSource<ts.ExpressionStatement>(
-                        `
-                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName} as number|null);
-                    `,
-                        ts.SyntaxKind.ExpressionStatement
-                    )
-                );
+                simpleValue = `obj.${fieldName} as number|null`;
             } else if (prop.type.isOptional) {
-                propertyStatements.push(
-                    createNodeFromSource<ts.ExpressionStatement>(
-                        `
-                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName} as number|undefined);
-                    `,
-                        ts.SyntaxKind.ExpressionStatement
-                    )
-                );
+                simpleValue = `obj.${fieldName} as number|undefined`;
             } else {
-                propertyStatements.push(
-                    createNodeFromSource<ts.ExpressionStatement>(
-                        `
-                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName} as number);
-                    `,
-                        ts.SyntaxKind.ExpressionStatement
-                    )
-                );
+                simpleValue = `obj.${fieldName} as number`;
             }
         } else if (prop.type.isArray) {
             const arrayItemType = prop.type.arrayItemType!;
@@ -83,7 +85,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                     propertyStatements.push(
                         createNodeFromSource<ts.IfStatement>(
                             `if(obj.${fieldName} !== null) {
-                            o.set(${JSON.stringify(jsonName)}, obj.${fieldName}?.map(i => ${itemSerializer}.toJson(i)));
+                            ${set(jsonName, `obj.${fieldName}?.map(i => ${itemSerializer}.${flavor.method}(i))`)};
                         }`,
                             ts.SyntaxKind.IfStatement
                         )
@@ -92,30 +94,16 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                     propertyStatements.push(
                         createNodeFromSource<ts.IfStatement>(
                             `if(obj.${fieldName} !== undefined) {
-                            o.set(${JSON.stringify(jsonName)}, obj.${fieldName}?.map(i => ${itemSerializer}.toJson(i)));
+                            ${set(jsonName, `obj.${fieldName}?.map(i => ${itemSerializer}.${flavor.method}(i))`)};
                         }`,
                             ts.SyntaxKind.IfStatement
                         )
                     );
                 } else {
-                    propertyStatements.push(
-                        createNodeFromSource<ts.ExpressionStatement>(
-                            `
-                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName}.map(i => ${itemSerializer}.toJson(i)));
-                    `,
-                            ts.SyntaxKind.ExpressionStatement
-                        )
-                    );
+                    simpleValue = `obj.${fieldName}.map(i => ${itemSerializer}.${flavor.method}(i))`;
                 }
             } else {
-                propertyStatements.push(
-                    createNodeFromSource<ts.ExpressionStatement>(
-                        `
-                    o.set(${JSON.stringify(jsonName)}, obj.${fieldName});
-                `,
-                        ts.SyntaxKind.ExpressionStatement
-                    )
-                );
+                simpleValue = `obj.${fieldName}`;
             }
         } else if (prop.type.isMap) {
             let serializeBlock: ts.Block;
@@ -123,7 +111,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                     const m = new Map<string, unknown>();
-                    o.set(${JSON.stringify(jsonName)}, m);
+                    ${set(jsonName, `m`)};
                     for(const [k, v] of obj.${fieldName}!) {
                         m.set(k.toString(), v);
                     }
@@ -134,7 +122,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                     const m = new Map<string, unknown>();
-                    o.set(${JSON.stringify(jsonName)}, m);
+                    ${set(jsonName, `m`)};
                     for(const [k, v] of obj.${fieldName}!) {
                         m.set(k.toString(), v as number);
                     }
@@ -146,7 +134,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                     const m = new Map<string, unknown>();
-                    o.set(${JSON.stringify(jsonName)}, m);
+                    ${set(jsonName, `m`)};
                     for(const [k, v] of obj.${fieldName}!) {
                         m.set(k.toString(), ${prop.type.typeArguments![1].typeAsString}.toJson(v)${notNull});
                     }
@@ -157,7 +145,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                         const m = new Map<string, unknown>();
-                        o.set(${JSON.stringify(jsonName)}, m);
+                        ${set(jsonName, `m`)};
                         for(const [k, v] of obj.${fieldName}!) {
                             m.set(k.toString(), v);
                         }
@@ -171,9 +159,9 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                     const m = new Map<string, unknown>();
-                    o.set(${JSON.stringify(jsonName)}, m);
+                    ${set(jsonName, `m`)};
                     for(const [k, v] of obj.${fieldName}!) {
-                        m.set(k.toString(), ${itemSerializer}.toJson(v));
+                        m.set(k.toString(), ${itemSerializer}.${flavor.method}(v));
                     }
                 }`,
                     ts.SyntaxKind.Block
@@ -203,7 +191,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                         const a:${prop.type.typeArguments![0].typeAsString}[] = [];
-                        o.set(${JSON.stringify(jsonName)}, a);
+                        ${set(jsonName, `a`)};
                         for(const v of obj.${fieldName}!) {
                             a.push(v);
                         }
@@ -214,7 +202,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                         const a:number[] = [];
-                        o.set(${JSON.stringify(jsonName)}, a);
+                        ${set(jsonName, `a`)};
                         for(const v of obj.${fieldName}!) {
                             a.push(v as number);
                         }
@@ -247,14 +235,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         } else if (prop.type.isJsonImmutable) {
             importer(prop.type.typeAsString, prop.type.modulePath);
             const notNull = prop.type.isNullable || prop.type.isOptional ? '' : '!';
-            propertyStatements.push(
-                createNodeFromSource<ts.ExpressionStatement>(
-                    `
-                    o.set(${JSON.stringify(jsonName)}, ${prop.type.typeAsString}.toJson(obj.${fieldName})${notNull});
-                `,
-                    ts.SyntaxKind.ExpressionStatement
-                )
-            );
+            simpleValue = `${prop.type.typeAsString}.toJson(obj.${fieldName})${notNull}`;
         } else if (serializable.isStrict) {
             const itemSerializer = `${prop.type.typeAsString}Serializer`;
             importer(itemSerializer, findSerializerModule(prop.type));
@@ -264,21 +245,14 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                     createNodeFromSource<ts.IfStatement>(
                         `
                         if(obj.${fieldName}) {
-                            o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
+                            ${set(jsonName, `${itemSerializer}.${flavor.method}(obj.${fieldName})`)};
                         }
                     `,
                         ts.SyntaxKind.IfStatement
                     )
                 );
             } else {
-                propertyStatements.push(
-                    createNodeFromSource<ts.ExpressionStatement>(
-                        `
-                        o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
-                    `,
-                        ts.SyntaxKind.ExpressionStatement
-                    )
-                );
+                simpleValue = `${itemSerializer}.${flavor.method}(obj.${fieldName})`;
             }
         } else {
             const itemSerializer = `${prop.type.typeAsString}Serializer`;
@@ -291,25 +265,33 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                     createNodeFromSource<ts.IfStatement>(
                         `
                         if(obj.${fieldName}) {
-                            o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
+                            ${set(jsonName, `${itemSerializer}.${flavor.method}(obj.${fieldName})`)};
                         }
                     `,
                         ts.SyntaxKind.IfStatement
                     )
                 );
             } else {
+                simpleValue = `${itemSerializer}.${flavor.method}(obj.${fieldName})`;
+            }
+        }
+
+        if (simpleValue !== null) {
+            if (inLiteral) {
+                literal.push(`${JSON.stringify(jsonName)}: ${simpleValue}`);
+            } else {
                 propertyStatements.push(
                     createNodeFromSource<ts.ExpressionStatement>(
-                        `
-                        o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
-                    `,
+                        `${set(jsonName, simpleValue)};`,
                         ts.SyntaxKind.ExpressionStatement
                     )
                 );
             }
+        } else {
+            inLiteral = false;
         }
 
-        if (prop.target) {
+        if (prop.target && !flavor.objects) {
             propertyStatements = propertyStatements.map(s =>
                 ts.addSyntheticLeadingComment(s, ts.SyntaxKind.MultiLineCommentTrivia, `@target ${prop.target}`, true)
             );
@@ -320,7 +302,21 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
 
     if (serializable.hasToJsonExtension) {
         statements.push(
-            createNodeFromSource<ts.ExpressionStatement>('obj.toJson(o);', ts.SyntaxKind.ExpressionStatement)
+            createNodeFromSource<ts.ExpressionStatement>(
+                `obj.${flavor.method}(o);`,
+                ts.SyntaxKind.ExpressionStatement
+            )
+        );
+    }
+
+    if (flavor.objects) {
+        statements.splice(
+            objectDeclarationIndex,
+            0,
+            createNodeFromSource<ts.VariableStatement>(
+                `const o: Record<string, unknown> = {${literal.join(', ')}};`,
+                ts.SyntaxKind.VariableStatement
+            )
         );
     }
 
@@ -341,5 +337,25 @@ export function createToJsonMethod(
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateToJsonBody(serializable, importer));
+    return setMethodBody(methodDecl, generateToJsonBody(serializable, importer, mapFlavor));
+}
+
+export function createToJsObjectMethod(
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
+    serializable: TypeSchema,
+    importer: (name: string, module: string) => void
+) {
+    const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
+        `public class Serializer {
+            public static toJsObject(obj: ${input.name!.text} | null | undefined): Record<string, unknown> | null {
+            }
+        }`,
+        ts.SyntaxKind.MethodDeclaration
+    );
+    return ts.addSyntheticLeadingComment(
+        setMethodBody(methodDecl, generateToJsonBody(serializable, importer, objectFlavor)),
+        ts.SyntaxKind.MultiLineCommentTrivia,
+        '*\n * @target web\n ',
+        true
+    );
 }

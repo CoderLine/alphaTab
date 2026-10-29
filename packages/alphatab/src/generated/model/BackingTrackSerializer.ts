@@ -22,6 +22,16 @@ export class BackingTrackSerializer {
         const o = new Map<string, unknown>();
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: BackingTrack | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = {};
+        return o;
+    }
     public static setProperty(obj: BackingTrack, property: string, v: unknown): boolean {
         return false;
     }

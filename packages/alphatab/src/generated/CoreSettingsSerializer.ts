@@ -47,6 +47,31 @@ export class CoreSettingsSerializer {
         o.set("includenotebounds", obj.includeNoteBounds);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: CoreSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "scriptfile": obj.scriptFile, "fontdirectory": obj.fontDirectory };
+        if (obj.smuflFontSources !== null) {
+            const m = new Map<string, unknown>();
+            o["smuflfontsources"] = m;
+            for (const [k, v] of obj.smuflFontSources!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o["file"] = obj.file;
+        o["tex"] = obj.tex;
+        o["tracks"] = obj.tracks;
+        o["enablelazyloading"] = obj.enableLazyLoading;
+        o["engine"] = obj.engine;
+        o["loglevel"] = obj.logLevel as number;
+        o["useworkers"] = obj.useWorkers;
+        o["includenotebounds"] = obj.includeNoteBounds;
+        return o;
+    }
     public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {
         switch (property) {
             /*@target web*/

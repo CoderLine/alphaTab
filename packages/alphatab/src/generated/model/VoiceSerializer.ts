@@ -31,6 +31,19 @@ export class VoiceSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Voice | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "id": obj.id, "beats": obj.beats.map(i => BeatSerializer.toJsObject(i)) };
+        if (obj.style) {
+            o["style"] = VoiceStyleSerializer.toJsObject(obj.style);
+        }
+        return o;
+    }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
         switch (property) {
             case "id":

@@ -33,6 +33,16 @@ export class InstrumentArticulationSerializer {
         o.set("outputmidinumber", obj.outputMidiNumber);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: InstrumentArticulation | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "id": obj.id, "elementtype": obj.elementType, "staffline": obj.staffLine, "noteheaddefault": obj.noteHeadDefault as number, "noteheadhalf": obj.noteHeadHalf as number, "noteheadwhole": obj.noteHeadWhole as number, "techniquesymbol": obj.techniqueSymbol as number, "techniquesymbolplacement": obj.techniqueSymbolPlacement as number, "outputmidinumber": obj.outputMidiNumber };
+        return o;
+    }
     public static setProperty(obj: InstrumentArticulation, property: string, v: unknown): boolean {
         switch (property) {
             case "id":

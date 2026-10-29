@@ -25,6 +25,16 @@ export class FermataSerializer {
         o.set("length", obj.length);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Fermata | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "type": obj.type as number, "length": obj.length };
+        return o;
+    }
     public static setProperty(obj: Fermata, property: string, v: unknown): boolean {
         switch (property) {
             case "type":

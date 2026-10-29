@@ -34,6 +34,16 @@ export class SettingsSerializer {
         o.set("exporter", ExporterSettingsSerializer.toJson(obj.exporter));
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Settings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "core": CoreSettingsSerializer.toJsObject(obj.core), "display": DisplaySettingsSerializer.toJsObject(obj.display), "notation": NotationSettingsSerializer.toJsObject(obj.notation), "importer": ImporterSettingsSerializer.toJsObject(obj.importer), "player": PlayerSettingsSerializer.toJsObject(obj.player), "exporter": ExporterSettingsSerializer.toJsObject(obj.exporter) };
+        return o;
+    }
     public static setProperty(obj: Settings, property: string, v: unknown): boolean {
         if (["core", ""].indexOf(property) >= 0) {
             CoreSettingsSerializer.fromJson(obj.core, v as Map<string, unknown>);

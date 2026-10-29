@@ -28,6 +28,20 @@ export class NumberedStaffConfigSerializer {
         o.set("barnumber", obj.barNumber as number | undefined);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: NumberedStaffConfig | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = {};
+        if (obj.timeSignature) {
+            o["timesignature"] = ElementDisplaySerializer.toJsObject(obj.timeSignature);
+        }
+        o["barnumber"] = obj.barNumber as number | undefined;
+        return o;
+    }
     public static setProperty(obj: NumberedStaffConfig, property: string, v: unknown): boolean {
         switch (property) {
             case "barnumber":

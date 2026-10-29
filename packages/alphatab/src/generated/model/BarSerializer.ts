@@ -67,6 +67,31 @@ export class BarSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Bar | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "id": obj.id, "clef": obj.clef as number, "clefottava": obj.clefOttava as number, "voices": obj.voices.map(i => VoiceSerializer.toJsObject(i)), "similemark": obj.simileMark as number, "displayscale": obj.displayScale, "displaywidth": obj.displayWidth, "sustainpedals": obj.sustainPedals.map(i => SustainPedalMarkerSerializer.toJsObject(i)), "barlineleft": obj.barLineLeft as number, "barlineright": obj.barLineRight as number, "keysignature": obj.keySignature as number, "keysignaturetype": obj.keySignatureType as number, "barnumberdisplay": obj.barNumberDisplay as number | undefined };
+        if (obj.scoreDisplay) {
+            o["scoredisplay"] = ScoreBarOverrideSerializer.toJsObject(obj.scoreDisplay);
+        }
+        if (obj.tabDisplay) {
+            o["tabdisplay"] = TabBarOverrideSerializer.toJsObject(obj.tabDisplay);
+        }
+        if (obj.slashDisplay) {
+            o["slashdisplay"] = SlashBarOverrideSerializer.toJsObject(obj.slashDisplay);
+        }
+        if (obj.numberedDisplay) {
+            o["numbereddisplay"] = NumberedBarOverrideSerializer.toJsObject(obj.numberedDisplay);
+        }
+        if (obj.style) {
+            o["style"] = BarStyleSerializer.toJsObject(obj.style);
+        }
+        return o;
+    }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
         switch (property) {
             case "id":

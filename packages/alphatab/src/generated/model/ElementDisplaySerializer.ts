@@ -27,6 +27,16 @@ export class ElementDisplaySerializer {
         o.set("systemdisplay", obj.systemDisplay as number | undefined);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: ElementDisplay | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "isvisible": obj.isVisible, "staffplacement": obj.staffPlacement as number | undefined, "systemdisplay": obj.systemDisplay as number | undefined };
+        return o;
+    }
     public static setProperty(obj: ElementDisplay, property: string, v: unknown): boolean {
         switch (property) {
             case "isvisible":

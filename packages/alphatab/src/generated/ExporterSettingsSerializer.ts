@@ -24,6 +24,16 @@ export class ExporterSettingsSerializer {
         o.set("comments", obj.comments);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: ExporterSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "indent": obj.indent, "comments": obj.comments };
+        return o;
+    }
     public static setProperty(obj: ExporterSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "indent":

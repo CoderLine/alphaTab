@@ -27,6 +27,16 @@ export class ImporterSettingsSerializer {
         o.set("maxdecodingbuffersize", obj.maxDecodingBufferSize);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: ImporterSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "encoding": obj.encoding, "gp3to5encoding": obj.gp3To5encoding, "mergepartgroupsinmusicxml": obj.mergePartGroupsInMusicXml, "beattextaslyrics": obj.beatTextAsLyrics, "maxdecodingbuffersize": obj.maxDecodingBufferSize };
+        return o;
+    }
     public static setProperty(obj: ImporterSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "encoding":

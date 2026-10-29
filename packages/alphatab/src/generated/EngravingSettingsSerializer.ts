@@ -167,6 +167,131 @@ export class EngravingSettingsSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: EngravingSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "musicfontsize": obj.musicFontSize, "onestaffspace": obj.oneStaffSpace, "tablinespacing": obj.tabLineSpacing, "arrowshaftthickness": obj.arrowShaftThickness, "barlineseparation": obj.barlineSeparation, "beamspacing": obj.beamSpacing, "beamthickness": obj.beamThickness, "bracketthickness": obj.bracketThickness, "dashedbarlinedashlength": obj.dashedBarlineDashLength, "dashedbarlinegaplength": obj.dashedBarlineGapLength, "dashedbarlinethickness": obj.dashedBarlineThickness, "hairpinthickness": obj.hairpinThickness, "legerlinethickness": obj.legerLineThickness, "legerlineextension": obj.legerLineExtension, "octavelinethickness": obj.octaveLineThickness, "pedallinethickness": obj.pedalLineThickness, "repeatbarlinedotseparation": obj.repeatBarlineDotSeparation, "repeatendinglinethickness": obj.repeatEndingLineThickness, "slurmidpointthickness": obj.slurMidpointThickness, "stafflinethickness": obj.staffLineThickness, "stemthickness": obj.stemThickness, "thickbarlinethickness": obj.thickBarlineThickness, "thinbarlinethickness": obj.thinBarlineThickness, "thinthickbarlineseparation": obj.thinThickBarlineSeparation, "tiemidpointthickness": obj.tieMidpointThickness, "tupletbracketthickness": obj.tupletBracketThickness };
+        {
+            const m = new Map<string, unknown>();
+            o["stemup"] = m;
+            for (const [k, v] of obj.stemUp!) {
+                m.set(k.toString(), EngravingStemInfoSerializer.toJsObject(v));
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
+            o["stemdown"] = m;
+            for (const [k, v] of obj.stemDown!) {
+                m.set(k.toString(), EngravingStemInfoSerializer.toJsObject(v));
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
+            o["repeatoffsetx"] = m;
+            for (const [k, v] of obj.repeatOffsetX!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o["standardstemlength"] = obj.standardStemLength;
+        {
+            const m = new Map<string, unknown>();
+            o["stemflagoffsets"] = m;
+            for (const [k, v] of obj.stemFlagOffsets!) {
+                m.set(k.toString(), v);
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
+            o["glyphtop"] = m;
+            for (const [k, v] of obj.glyphTop!) {
+                m.set(k.toString(), v);
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
+            o["glyphbottom"] = m;
+            for (const [k, v] of obj.glyphBottom!) {
+                m.set(k.toString(), v);
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
+            o["glyphwidths"] = m;
+            for (const [k, v] of obj.glyphWidths!) {
+                m.set(k.toString(), v);
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
+            o["glyphheights"] = m;
+            for (const [k, v] of obj.glyphHeights!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o["numberedbarrendererbarsize"] = obj.numberedBarRendererBarSize;
+        o["numberedbarrendererbarspacing"] = obj.numberedBarRendererBarSpacing;
+        o["numbereddashglyphpadding"] = obj.numberedDashGlyphPadding;
+        o["numbereddashglyphwidth"] = obj.numberedDashGlyphWidth;
+        o["linerangedglyphdashgap"] = obj.lineRangedGlyphDashGap;
+        o["linerangedglyphdashsize"] = obj.lineRangedGlyphDashSize;
+        o["prenoteeffectpadding"] = obj.preNoteEffectPadding;
+        o["postnoteeffectpadding"] = obj.postNoteEffectPadding;
+        o["onnoteeffectpadding"] = obj.onNoteEffectPadding;
+        o["stringnumbercirclepadding"] = obj.stringNumberCirclePadding;
+        o["rowcontainerpadding"] = obj.rowContainerPadding;
+        o["rowcontainergap"] = obj.rowContainerGap;
+        o["alternateendingspadding"] = obj.alternateEndingsPadding;
+        o["sustainpedallinepadding"] = obj.sustainPedalLinePadding;
+        o["tieheight"] = obj.tieHeight;
+        o["beattimerpadding"] = obj.beatTimerPadding;
+        o["bendnoteheadelementpadding"] = obj.bendNoteHeadElementPadding;
+        o["ghostparenthesiswidth"] = obj.ghostParenthesisWidth;
+        o["ghostparenthesispadding"] = obj.ghostParenthesisPadding;
+        o["brokenbeamwidth"] = obj.brokenBeamWidth;
+        o["tabwhammytextpadding"] = obj.tabWhammyTextPadding;
+        o["tabwhammyperhalfheight"] = obj.tabWhammyPerHalfHeight;
+        o["tabwhammydashsize"] = obj.tabWhammyDashSize;
+        o["songbookwhammydipheight"] = obj.songBookWhammyDipHeight;
+        o["deadslappedlinewidth"] = obj.deadSlappedLineWidth;
+        o["lefthandtabtiewidth"] = obj.leftHandTabTieWidth;
+        o["tabbenddashsize"] = obj.tabBendDashSize;
+        o["tabbendstaffpadding"] = obj.tabBendStaffPadding;
+        o["tabbendpervalueheight"] = obj.tabBendPerValueHeight;
+        o["tabbendlabelpadding"] = obj.tabBendLabelPadding;
+        o["simpleslidewidth"] = obj.simpleSlideWidth;
+        o["simpleslideheight"] = obj.simpleSlideHeight;
+        o["chorddiagrampaddingx"] = obj.chordDiagramPaddingX;
+        o["chorddiagrampaddingy"] = obj.chordDiagramPaddingY;
+        o["chorddiagramstringspacing"] = obj.chordDiagramStringSpacing;
+        o["chorddiagramfretspacing"] = obj.chordDiagramFretSpacing;
+        o["chorddiagramnutheight"] = obj.chordDiagramNutHeight;
+        o["chorddiagramfretheight"] = obj.chordDiagramFretHeight;
+        o["chorddiagramlinewidth"] = obj.chordDiagramLineWidth;
+        o["tripletfeelbracketpadding"] = obj.tripletFeelBracketPadding;
+        o["accidentalpadding"] = obj.accidentalPadding;
+        o["prebeatglyphspacing"] = obj.preBeatGlyphSpacing;
+        o["temponotescale"] = obj.tempoNoteScale;
+        o["tuningglyphcirclenumberscale"] = obj.tuningGlyphCircleNumberScale;
+        o["tuningglyphstringcolumnscale"] = obj.tuningGlyphStringColumnScale;
+        o["tuningglyphstringrowpadding"] = obj.tuningGlyphStringRowPadding;
+        o["directionsscale"] = obj.directionsScale;
+        o["multivoicedisplacednoteheadspacing"] = obj.multiVoiceDisplacedNoteHeadSpacing;
+        o["staffcontentpadding"] = obj.staffContentPadding;
+        o["beatcontentpadding"] = obj.beatContentPadding;
+        o["barlinecontentpadding"] = obj.barlineContentPadding;
+        {
+            const m = new Map<string, unknown>();
+            o["stemflagheight"] = m;
+            for (const [k, v] of obj.stemFlagHeight!) {
+                m.set(k.toString(), v);
+            }
+        }
+        return o;
+    }
     public static setProperty(obj: EngravingSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "musicfontsize":

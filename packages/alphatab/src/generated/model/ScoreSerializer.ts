@@ -52,6 +52,22 @@ export class ScoreSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Score | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "album": obj.album, "artist": obj.artist, "copyright": obj.copyright, "instructions": obj.instructions, "music": obj.music, "notices": obj.notices, "subtitle": obj.subTitle, "title": obj.title, "words": obj.words, "tab": obj.tab, "masterbars": obj.masterBars.map(i => MasterBarSerializer.toJsObject(i)), "tracks": obj.tracks.map(i => TrackSerializer.toJsObject(i)), "defaultsystemslayout": obj.defaultSystemsLayout, "systemslayout": obj.systemsLayout, "stylesheet": RenderStylesheetSerializer.toJsObject(obj.stylesheet) };
+        if (obj.backingTrack) {
+            o["backingtrack"] = BackingTrackSerializer.toJsObject(obj.backingTrack);
+        }
+        if (obj.style) {
+            o["style"] = ScoreStyleSerializer.toJsObject(obj.style);
+        }
+        return o;
+    }
     public static setProperty(obj: Score, property: string, v: unknown): boolean {
         switch (property) {
             case "album":

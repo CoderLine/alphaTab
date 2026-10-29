@@ -76,6 +76,55 @@ export class RenderStylesheetSerializer {
         o.set("numberedconfig", NumberedStaffConfigSerializer.toJson(obj.numberedConfig));
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: RenderStylesheet | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "hidedynamics": obj.hideDynamics, "bracketextendmode": obj.bracketExtendMode as number, "usesystemsignseparator": obj.useSystemSignSeparator, "globaldisplaytuning": obj.globalDisplayTuning, "tuningdisplaymode": obj.tuningDisplayMode as number };
+        if (obj.perTrackDisplayTuning !== null) {
+            const m = new Map<string, unknown>();
+            o["pertrackdisplaytuning"] = m;
+            for (const [k, v] of obj.perTrackDisplayTuning!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o["globaldisplaychorddiagramsontop"] = obj.globalDisplayChordDiagramsOnTop;
+        if (obj.perTrackChordDiagramsOnTop !== null) {
+            const m = new Map<string, unknown>();
+            o["pertrackchorddiagramsontop"] = m;
+            for (const [k, v] of obj.perTrackChordDiagramsOnTop!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o["globaldisplaychorddiagramsinscore"] = obj.globalDisplayChordDiagramsInScore;
+        o["singletracktracknamepolicy"] = obj.singleTrackTrackNamePolicy as number;
+        o["multitracktracknamepolicy"] = obj.multiTrackTrackNamePolicy as number;
+        o["firstsystemtracknamemode"] = obj.firstSystemTrackNameMode as number;
+        o["othersystemstracknamemode"] = obj.otherSystemsTrackNameMode as number;
+        o["firstsystemtracknameorientation"] = obj.firstSystemTrackNameOrientation as number;
+        o["othersystemstracknameorientation"] = obj.otherSystemsTrackNameOrientation as number;
+        o["multitrackmultibarrest"] = obj.multiTrackMultiBarRest;
+        if (obj.perTrackMultiBarRest !== null) {
+            const a: number[] = [];
+            o["pertrackmultibarrest"] = a;
+            for (const v of obj.perTrackMultiBarRest!) {
+                a.push(v);
+            }
+        }
+        o["extendbarlines"] = obj.extendBarLines;
+        o["hideemptystaves"] = obj.hideEmptyStaves;
+        o["hideemptystavesinfirstsystem"] = obj.hideEmptyStavesInFirstSystem;
+        o["showsinglestaffbrackets"] = obj.showSingleStaffBrackets;
+        o["barnumberdisplay"] = obj.barNumberDisplay as number;
+        o["scoreconfig"] = ScoreStaffConfigSerializer.toJsObject(obj.scoreConfig);
+        o["tabconfig"] = TabStaffConfigSerializer.toJsObject(obj.tabConfig);
+        o["slashconfig"] = SlashStaffConfigSerializer.toJsObject(obj.slashConfig);
+        o["numberedconfig"] = NumberedStaffConfigSerializer.toJsObject(obj.numberedConfig);
+        return o;
+    }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
         switch (property) {
             case "hidedynamics":

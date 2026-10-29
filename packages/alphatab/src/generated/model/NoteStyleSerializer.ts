@@ -34,6 +34,23 @@ export class NoteStyleSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: NoteStyle | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "notehead": obj.noteHead as number | undefined, "noteheadcenteronstem": obj.noteHeadCenterOnStem };
+        {
+            const m = new Map<string, unknown>();
+            o["colors"] = m;
+            for (const [k, v] of obj.colors!) {
+                m.set(k.toString(), Color.toJson(v));
+            }
+        }
+        return o;
+    }
     public static setProperty(obj: NoteStyle, property: string, v: unknown): boolean {
         switch (property) {
             case "notehead":

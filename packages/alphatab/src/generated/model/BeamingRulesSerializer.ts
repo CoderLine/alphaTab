@@ -30,6 +30,23 @@ export class BeamingRulesSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: BeamingRules | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = {};
+        {
+            const m = new Map<string, unknown>();
+            o["groups"] = m;
+            for (const [k, v] of obj.groups!) {
+                m.set(k.toString(), v);
+            }
+        }
+        return o;
+    }
     public static setProperty(obj: BeamingRules, property: string, v: unknown): boolean {
         switch (property) {
             case "groups":

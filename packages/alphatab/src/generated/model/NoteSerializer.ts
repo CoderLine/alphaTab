@@ -79,6 +79,52 @@ export class NoteSerializer {
         obj.toJson(o);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Note | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "id": obj.id, "accentuated": obj.accentuated as number, "bendtype": obj.bendType as number, "bendstyle": obj.bendStyle as number, "iscontinuedbend": obj.isContinuedBend };
+        if (obj.bendPoints !== null) {
+            o["bendpoints"] = obj.bendPoints?.map(i => BendPointSerializer.toJsObject(i));
+        }
+        o["fret"] = obj.fret;
+        o["string"] = obj.string;
+        o["showstringnumber"] = obj.showStringNumber;
+        o["octave"] = obj.octave;
+        o["tone"] = obj.tone;
+        o["percussionarticulation"] = obj.percussionArticulation;
+        o["isvisible"] = obj.isVisible;
+        o["islefthandtapped"] = obj.isLeftHandTapped;
+        o["ishammerpullorigin"] = obj.isHammerPullOrigin;
+        o["isslurdestination"] = obj.isSlurDestination;
+        o["harmonictype"] = obj.harmonicType as number;
+        o["harmonicvalue"] = obj.harmonicValue;
+        o["isghost"] = obj.isGhost;
+        o["isletring"] = obj.isLetRing;
+        o["ispalmmute"] = obj.isPalmMute;
+        o["isdead"] = obj.isDead;
+        o["isstaccato"] = obj.isStaccato;
+        o["slideintype"] = obj.slideInType as number;
+        o["slideouttype"] = obj.slideOutType as number;
+        o["vibrato"] = obj.vibrato as number;
+        o["istiedestination"] = obj.isTieDestination;
+        o["lefthandfinger"] = obj.leftHandFinger as number;
+        o["righthandfinger"] = obj.rightHandFinger as number;
+        o["trillvalue"] = obj.trillValue;
+        o["trillspeed"] = obj.trillSpeed as number;
+        o["durationpercent"] = obj.durationPercent;
+        o["accidentalmode"] = obj.accidentalMode as number;
+        o["dynamics"] = obj.dynamics as number;
+        o["ornament"] = obj.ornament as number;
+        if (obj.style) {
+            o["style"] = NoteStyleSerializer.toJsObject(obj.style);
+        }
+        obj.toJsObject(o);
+        return o;
+    }
     public static setProperty(obj: Note, property: string, v: unknown): boolean {
         switch (property) {
             case "id":

@@ -25,6 +25,16 @@ export class TuningSerializer {
         o.set("tunings", obj.tunings);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Tuning | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "isstandard": obj.isStandard, "name": obj.name, "tunings": obj.tunings };
+        return o;
+    }
     public static setProperty(obj: Tuning, property: string, v: unknown): boolean {
         switch (property) {
             case "isstandard":

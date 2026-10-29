@@ -104,6 +104,46 @@ export class BeatSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: Beat | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "id": obj.id, "notes": obj.notes.map(i => NoteSerializer.toJsObject(i)), "isempty": obj.isEmpty, "whammystyle": obj.whammyStyle as number, "ottava": obj.ottava as number, "islegatoorigin": obj.isLegatoOrigin, "duration": obj.duration as number, "automations": obj.automations.map(i => AutomationSerializer.toJsObject(i)), "dots": obj.dots, "fade": obj.fade as number, "lyrics": obj.lyrics, "pop": obj.pop, "slap": obj.slap, "tap": obj.tap, "text": obj.text, "slashed": obj.slashed, "deadslapped": obj.deadSlapped, "restdisplaytone": obj.restDisplayTone, "restdisplayoctave": obj.restDisplayOctave, "brushtype": obj.brushType as number, "brushduration": obj.brushDuration, "tupletdenominator": obj.tupletDenominator, "tupletnumerator": obj.tupletNumerator, "iscontinuedwhammy": obj.isContinuedWhammy, "whammybartype": obj.whammyBarType as number };
+        if (obj.whammyBarPoints !== null) {
+            o["whammybarpoints"] = obj.whammyBarPoints?.map(i => BendPointSerializer.toJsObject(i));
+        }
+        o["vibrato"] = obj.vibrato as number;
+        o["chordid"] = obj.chordId;
+        o["gracetype"] = obj.graceType as number;
+        o["pickstroke"] = obj.pickStroke as number;
+        if (obj.tremoloPicking) {
+            o["tremolopicking"] = TremoloPickingEffectSerializer.toJsObject(obj.tremoloPicking);
+        }
+        o["crescendo"] = obj.crescendo as number;
+        o["displaystart"] = obj.displayStart;
+        o["playbackstart"] = obj.playbackStart;
+        o["displayduration"] = obj.displayDuration;
+        o["playbackduration"] = obj.playbackDuration;
+        o["overridedisplayduration"] = obj.overrideDisplayDuration;
+        o["golpe"] = obj.golpe as number;
+        o["dynamics"] = obj.dynamics as number;
+        o["invertbeamdirection"] = obj.invertBeamDirection;
+        o["preferredbeamdirection"] = obj.preferredBeamDirection as number | null;
+        o["beamingmode"] = obj.beamingMode as number;
+        o["wahpedal"] = obj.wahPedal as number;
+        o["barrefret"] = obj.barreFret;
+        o["barreshape"] = obj.barreShape as number;
+        o["rasgueado"] = obj.rasgueado as number;
+        o["showtimer"] = obj.showTimer;
+        o["timer"] = obj.timer;
+        if (obj.style) {
+            o["style"] = BeatStyleSerializer.toJsObject(obj.style);
+        }
+        return o;
+    }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
         switch (property) {
             case "id":

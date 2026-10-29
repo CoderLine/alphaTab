@@ -73,6 +73,46 @@ export class MasterBarSerializer {
         }
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: MasterBar | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "alternateendings": obj.alternateEndings, "custombarnumbertext": obj.customBarNumberText, "custombarnumber": obj.customBarNumber, "isdoublebar": obj.isDoubleBar, "isrepeatstart": obj.isRepeatStart, "repeatcount": obj.repeatCount, "timesignaturenumerator": obj.timeSignatureNumerator, "timesignaturedenominator": obj.timeSignatureDenominator, "timesignaturecommon": obj.timeSignatureCommon };
+        if (obj.beamingRules) {
+            o["beamingrules"] = BeamingRulesSerializer.toJsObject(obj.beamingRules);
+        }
+        o["isfreetime"] = obj.isFreeTime;
+        o["tripletfeel"] = obj.tripletFeel as number;
+        if (obj.section) {
+            o["section"] = SectionSerializer.toJsObject(obj.section);
+        }
+        o["tempoautomations"] = obj.tempoAutomations.map(i => AutomationSerializer.toJsObject(i));
+        if (obj.syncPoints !== undefined) {
+            o["syncpoints"] = obj.syncPoints?.map(i => AutomationSerializer.toJsObject(i));
+        }
+        if (obj.fermata !== null) {
+            const m = new Map<string, unknown>();
+            o["fermata"] = m;
+            for (const [k, v] of obj.fermata!) {
+                m.set(k.toString(), FermataSerializer.toJsObject(v));
+            }
+        }
+        o["start"] = obj.start;
+        o["isanacrusis"] = obj.isAnacrusis;
+        o["displayscale"] = obj.displayScale;
+        o["displaywidth"] = obj.displayWidth;
+        if (obj.directions !== null) {
+            const a: number[] = [];
+            o["directions"] = a;
+            for (const v of obj.directions!) {
+                a.push(v as number);
+            }
+        }
+        return o;
+    }
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
         switch (property) {
             case "alternateendings":

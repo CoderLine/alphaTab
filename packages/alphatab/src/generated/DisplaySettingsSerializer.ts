@@ -58,6 +58,16 @@ export class DisplaySettingsSerializer {
         o.set("systemslayoutmode", obj.systemsLayoutMode as number);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: DisplaySettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "scale": obj.scale, "stretchforce": obj.stretchForce, "spacingratio": obj.spacingRatio, "layoutmode": obj.layoutMode as number, "staveprofile": obj.staveProfile as number, "barsperrow": obj.barsPerRow, "startbar": obj.startBar, "barcount": obj.barCount, "barcountperpartial": obj.barCountPerPartial, "lastsystemfillthreshold": obj.lastSystemFillThreshold, "resources": RenderingResourcesSerializer.toJsObject(obj.resources), "padding": obj.padding, "firstsystempaddingtop": obj.firstSystemPaddingTop, "systempaddingtop": obj.systemPaddingTop, "systempaddingbottom": obj.systemPaddingBottom, "lastsystempaddingbottom": obj.lastSystemPaddingBottom, "systemlabelpaddingleft": obj.systemLabelPaddingLeft, "systemlabelpaddingright": obj.systemLabelPaddingRight, "accoladebarpaddingright": obj.accoladeBarPaddingRight, "inlinetuningpaddingright": obj.inlineTuningPaddingRight, "firstnotationstaffpaddingtop": obj.firstNotationStaffPaddingTop, "lastnotationstaffpaddingbottom": obj.lastNotationStaffPaddingBottom, "notationstaffpaddingtop": obj.notationStaffPaddingTop, "notationstaffpaddingbottom": obj.notationStaffPaddingBottom, "effectstaffpaddingtop": obj.effectStaffPaddingTop, "effectstaffpaddingbottom": obj.effectStaffPaddingBottom, "firststaffpaddingleft": obj.firstStaffPaddingLeft, "staffpaddingleft": obj.staffPaddingLeft, "effectbandpaddingbottom": obj.effectBandPaddingBottom, "trackstaffpaddingbetween": obj.trackStaffPaddingBetween, "lyriclinespaddingbetween": obj.lyricLinesPaddingBetween, "systemslayoutmode": obj.systemsLayoutMode as number };
+        return o;
+    }
     public static setProperty(obj: DisplaySettings, property: string, v: unknown): boolean {
         switch (property) {
             case "scale":

@@ -43,6 +43,31 @@ export class NotationSettingsSerializer {
         o.set("slurheight", obj.slurHeight);
         return o;
     }
+    /**
+     * @target web
+     */
+    public static toJsObject(obj: NotationSettings | null | undefined): Record<string, unknown> | null {
+        if (!obj) {
+            return null;
+        }
+        const o: Record<string, unknown> = { "notationmode": obj.notationMode as number, "fingeringmode": obj.fingeringMode as number };
+        {
+            const m = new Map<string, unknown>();
+            o["elements"] = m;
+            for (const [k, v] of obj.elements!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o["rhythmmode"] = obj.rhythmMode as number;
+        o["rhythmheight"] = obj.rhythmHeight;
+        o["transpositionpitches"] = obj.transpositionPitches;
+        o["displaytranspositionpitches"] = obj.displayTranspositionPitches;
+        o["smallgracetabnotes"] = obj.smallGraceTabNotes;
+        o["extendbendarrowsontiednotes"] = obj.extendBendArrowsOnTiedNotes;
+        o["extendlineeffectstobeatend"] = obj.extendLineEffectsToBeatEnd;
+        o["slurheight"] = obj.slurHeight;
+        return o;
+    }
     public static setProperty(obj: NotationSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "notationmode":
