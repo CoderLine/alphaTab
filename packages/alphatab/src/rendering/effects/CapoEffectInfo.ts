@@ -16,7 +16,9 @@ export const capoEffectInfo: EffectInfo = {
     hideOnMultiTrack: false,
     sizingMode: EffectBarGlyphSizing.SingleOnBeat,
     shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
-        return beat.index === 0 && beat.voice.bar.index === 0 && beat.voice.bar.staff.capo !== 0;
+        return (
+            beat.voice.index === 0 && beat.index === 0 && beat.voice.bar.index === 0 && beat.voice.bar.staff.capo !== 0
+        );
     },
     createNewGlyph: (renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         return new TextGlyph(

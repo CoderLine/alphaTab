@@ -16,12 +16,12 @@ export const tripletFeelEffectInfo: EffectInfo = {
     hideOnMultiTrack: true,
     sizingMode: EffectBarGlyphSizing.SinglePreBeat,
     shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
+        const masterBar = beat.voice.bar.masterBar;
+        const isFirstBeat = beat.voice.bar.staff.index === 0 && beat.voice.index === 0 && beat.index === 0;
         return (
-            beat.index === 0 &&
-            ((beat.voice.bar.masterBar.index === 0 &&
-                beat.voice.bar.masterBar.tripletFeel !== TripletFeel.NoTripletFeel) ||
-                (beat.voice.bar.masterBar.index > 0 &&
-                    beat.voice.bar.masterBar.tripletFeel !== beat.voice.bar.masterBar.previousMasterBar!.tripletFeel))
+            isFirstBeat &&
+            ((masterBar.index === 0 && masterBar.tripletFeel !== TripletFeel.NoTripletFeel) ||
+                (masterBar.index > 0 && masterBar.tripletFeel !== masterBar.previousMasterBar!.tripletFeel))
         );
     },
     createNewGlyph: (_renderer: BarRendererBase, beat: Beat): EffectGlyph => {
