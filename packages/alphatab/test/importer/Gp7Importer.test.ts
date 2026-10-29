@@ -26,8 +26,6 @@ import { GpifWriter } from '@coderline/alphatab/exporter/GpifWriter';
 import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
-import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
-import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 
 describe('Gp7ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
@@ -882,21 +880,6 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].lyrics).toBe(null);
     });
 
-    function parseMixerGpif(tex: string, channelStrips: string[]): Score {
-        const doc = new XmlDocument();
-        doc.parse(new GpifWriter().writeXml(ScoreLoader.loadAlphaTex(tex)));
-        const tracks = doc.firstElement!.findChildElement('Tracks')!.getElementsByTagName('Track');
-        expect(tracks.length).toBe(channelStrips.length);
-        for (let i = 0; i < tracks.length; i++) {
-            const channelStrip = tracks[i].findChildElement('RSE')!.findChildElement('ChannelStrip')!;
-            channelStrip.findChildElement('Parameters')!.innerText = channelStrips[i];
-        }
-
-        const parser = new GpifParser();
-        parser.parseXml(doc.toFormattedString('', true), new Settings());
-        return parser.score;
-    }
-
     it('track-mixer-roundtrip', () => {
         const score = ScoreLoader.loadAlphaTex(`
             \\track "Full Left" { volume 16 balance 0 } 3.1.4 5.1.4 | 7.1.2
@@ -911,26 +894,39 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('track-mixer-channel-strip', () => {
-        const score = parseMixerGpif(
-            `
-            \\track "A" 1.1.1
-            \\track "B" 1.2.1
-            \\track "C" 1.3.1
-            \\track "D" 1.4.1
-            \\track "E" 1.5.1
-        `,
-            [
-                // pan and volume between the steps of the internal range are rounded down
-                '0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5 0.33 0.71 0.5 0.5 0.5',
-                '0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5 0.999 0.0624 0.5 0.5 0.5',
-                // unreadable values fall back to a centered pan and the Guitar Pro default volume
-                '0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5 left loud 0.5 0.5 0.5',
-                // volume missing
-                '0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5 0.25',
-                // pan and volume missing
-                '0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5'
-            ]
+        const unrelated = '0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 1 0.5';
+        const channelStrips = [
+            // pan and volume between the steps of the internal range are rounded down
+            `${unrelated} 0.33 0.71 0.5 0.5 0.5`,
+            `${unrelated} 0.999 0.0624 0.5 0.5 0.5`,
+            // unreadable values fall back to a centered pan and the Guitar Pro default volume
+            `${unrelated} left loud 0.5 0.5 0.5`,
+            // volume missing
+            `${unrelated} 0.25`,
+            // pan and volume missing
+            unrelated
+        ];
+        const doc = new XmlDocument();
+        doc.parse(
+            new GpifWriter().writeXml(
+                ScoreLoader.loadAlphaTex(`
+                    \\track "A" 1.1.1
+                    \\track "B" 1.2.1
+                    \\track "C" 1.3.1
+                    \\track "D" 1.4.1
+                    \\track "E" 1.5.1
+                `)
+            )
         );
+        const tracks = doc.firstElement!.findChildElement('Tracks')!.getElementsByTagName('Track');
+        expect(tracks.length).toBe(channelStrips.length);
+        for (let i = 0; i < tracks.length; i++) {
+            const channelStrip = tracks[i].findChildElement('RSE')!.findChildElement('ChannelStrip')!;
+            channelStrip.findChildElement('Parameters')!.innerText = channelStrips[i];
+        }
+        const parser = new GpifParser();
+        parser.parseXml(doc.toFormattedString('', true), new Settings());
+        const score = parser.score;
 
         const defaults = new PlaybackInformation();
         expect(score.tracks.map(t => t.playbackInfo.balance)).toEqual([5, 15, 8, 4, defaults.balance]);
@@ -1090,10 +1086,8 @@ describe('Gp7ImporterTest', () => {
         expect(withPartConfiguration.tracks[0].staves[0].showTablature).toBe(true);
 
         // score.gpif alone has no notation visibility: drum tablature stays hidden
-        const entries = new ZipReader(ByteBuffer.fromBuffer(data), Number.MAX_SAFE_INTEGER).read();
-        const gpif = entries.find(e => e.fileName === 'score.gpif')!;
         const parser = new GpifParser();
-        parser.parseXml(IOHelper.toString(gpif.data, 'utf-8'), new Settings());
+        parser.parseXml(GpImporterTestHelper.extractGpif(data), new Settings());
         expect(parser.score.tracks[0].staves[0].isPercussion).toBe(true);
         expect(parser.score.tracks[0].staves[0].showTablature).toBe(false);
     });

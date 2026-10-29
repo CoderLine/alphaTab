@@ -4,27 +4,12 @@ import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '../VisualTes
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import type { Score } from '@coderline/alphatab/model/Score';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { type ILogger, Logger } from '@coderline/alphatab/Logger';
+import { Logger } from '@coderline/alphatab/Logger';
 import { LogLevel } from '@coderline/alphatab/LogLevel';
-
-/**
- * @internal
- */
-class WarningCollectingLogger implements ILogger {
-    public warnings: string[] = [];
-
-    public debug(_category: string, _msg: string, ..._details: unknown[]): void {}
-
-    public warning(_category: string, msg: string, ..._details: unknown[]): void {
-        this.warnings.push(msg);
-    }
-
-    public info(_category: string, _msg: string, ..._details: unknown[]): void {}
-
-    public error(_category: string, _msg: string, ..._details: unknown[]): void {}
-}
+import { WarningCollectingLogger } from 'test/WarningCollectingLogger';
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {
@@ -130,24 +115,29 @@ describe('BrokenRendersTests', () => {
         (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 (16.1 13.3).16 |
     `;
 
-    it('squeezed-legato-slur', () => {
+    function renderSvg(score: Score, width: number): string[] {
         const settings = new Settings();
         settings.core.engine = 'svg';
         settings.core.enableLazyLoading = false;
+        const api = new ScoreRenderer(settings);
+        const results: string[] = [];
+        api.partialRenderFinished.on(e => {
+            if (e.renderResult !== null) {
+                results.push(e.renderResult as string);
+            }
+        });
+        api.error.on(e => {
+            throw e;
+        });
+        api.width = width;
+        api.renderScore(score, [0]);
+        return results;
+    }
 
+    it('squeezed-legato-slur', () => {
         const score = ScoreLoader.loadAlphaTex(squeezedLegatoTex);
-
         for (const width of [400, 300]) {
-            const api = new ScoreRenderer(settings);
-            const results: string[] = [];
-            api.partialRenderFinished.on(e => {
-                if (e.renderResult !== null) {
-                    results.push(e.renderResult as string);
-                }
-            });
-            api.width = width;
-            api.renderScore(score, [0]);
-
+            const results = renderSvg(score, width);
             expect(results.length).toBeGreaterThan(0);
             for (const r of results) {
                 expect(r.includes('NaN'), `NaN in SVG at width ${width}`).toBe(false);
@@ -155,36 +145,14 @@ describe('BrokenRendersTests', () => {
         }
     });
 
-    it('numbered-whole-rest', async () => {
-        await VisualTestHelper.prepareAlphaSkia();
-        const settings = new Settings();
-        settings.core.engine = 'svg';
-        settings.core.enableLazyLoading = false;
-
+    it('numbered-whole-rest', () => {
         for (const tex of [
             '\\staff {numbered} :1 r',
             '\\staff {numbered} :4 C4 D4 E4 F4 | :1 r',
             '\\staff {numbered} \\ts 8 4 :-2 r',
             '\\staff {numbered} \\ts 3 2 :1 {tu 3} r :1 {tu 3} r :1 {tu 3} r'
         ]) {
-            const score = ScoreLoader.loadAlphaTex(tex);
-            const api = new ScoreRenderer(settings);
-            const results: string[] = [];
-            let error: Error | null = null;
-            api.partialRenderFinished.on(e => {
-                if (e.renderResult !== null) {
-                    results.push(e.renderResult as string);
-                }
-            });
-            api.error.on(e => {
-                error = e;
-            });
-            api.width = 1300;
-            api.renderScore(score, [0]);
-
-            // https://github.com/microsoft/TypeScript/issues/61313
-            error = error as Error | null;
-            expect(error, tex).toBeNull();
+            const results = renderSvg(ScoreLoader.loadAlphaTex(tex), 1300);
             expect(results.length, tex).toBeGreaterThan(0);
             for (const r of results) {
                 expect(r.includes('NaN'), `NaN in SVG for ${tex}`).toBe(false);

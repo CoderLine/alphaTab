@@ -1,4 +1,3 @@
-import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -21,14 +20,10 @@ describe('EffectPlacementTests', () => {
         configure?: (settings: Settings, score: Score) => void,
         tracks?: number[]
     ): Promise<ScoreRenderer> {
-        await VisualTestHelper.prepareAlphaSkia();
         const settings = new Settings();
         // skia engine and fonts of the visual references: text sizes take part in the placement
         VisualTestHelper.prepareSettingsForTest(settings);
-        const score = ScoreLoader.loadAlphaTex(tex, settings);
-        if (configure) {
-            configure(settings, score);
-        }
+        const score = await VisualTestHelper.loadTex(tex, settings, configure);
         const renderer = new ScoreRenderer(settings);
         renderer.width = 1300;
         renderer.error.on(e => {

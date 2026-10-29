@@ -42,7 +42,8 @@ namespace AlphaTab
         }
         
         /// <summary>
-        /// Computed read-only alias: kept here without
+        /// Computed read-only alias without JSON tags: the fixture is not run
+        /// through the JSON codegen, the transformer just sees a getter-only property.
         /// </summary>
         public bool IsZero
         {

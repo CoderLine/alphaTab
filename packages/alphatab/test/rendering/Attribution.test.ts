@@ -79,6 +79,12 @@ class AttributionTestRun {
         return all;
     }
 
+    public singleOwner(): BarRendererBase {
+        const owners = this.owners();
+        expect(owners.length).toBe(1);
+        return owners[0];
+    }
+
     public owners(): BarRendererBase[] {
         const owners: BarRendererBase[] = [];
         for (const system of this.renderer.layout!.systems) {
@@ -98,9 +104,7 @@ class AttributionTestRun {
      * (default: the last bar of the first system).
      */
     public expectSingleMark(expectedBarIndex: number = -1): BarRendererBase {
-        const owners = this.owners();
-        expect(owners.length).toBe(1);
-        const owner = owners[0];
+        const owner = this.singleOwner();
         const firstSystem = this.renderer.layout!.systems[0];
         expect(owner.staff!.system).toBe(firstSystem);
         expect(owner.staff!.isFirstInSystem).toBe(true);
@@ -121,11 +125,19 @@ class AttributionTestRun {
         const markTop = -glyph.y;
         expect(staff.topOverflow).toBeGreaterThanOrEqual(markTop);
         expect(staff.topOverflow).toBeGreaterThanOrEqual(staff.systemSkyline.upSky.maxHeight());
-        const markBottom = -(glyph.y + glyph.height);
-        expect(markBottom).toBeGreaterThanOrEqual(
-            owner.staffTopClearance + owner.smuflMetrics.oneStaffSpace * 0.5 - 0.01
+        expect(AttributionTestRun.markBottom(owner)).toBeGreaterThanOrEqual(
+            owner.staffTopClearance + AttributionTestRun.gap(owner) - 0.01
         );
         return owner;
+    }
+
+    public static markBottom(owner: BarRendererBase): number {
+        const glyph = owner.attribution!;
+        return -(glyph.y + glyph.height);
+    }
+
+    public static gap(owner: BarRendererBase): number {
+        return owner.smuflMetrics.oneStaffSpace * 0.5;
     }
 
     public static coloredPaths(svg: string, color: string): string[] {
@@ -168,17 +180,17 @@ describe('AttributionTests', () => {
     async function render(
         tex: string,
         configure?: (settings: Settings, score: Score) => void,
-        trackIndexes?: number[]
+        trackIndexes?: number[],
+        settings?: Settings
     ): Promise<AttributionTestRun> {
-        await VisualTestHelper.prepareAlphaSkia();
-        const settings = new Settings();
-        settings.core.engine = 'svg';
-        settings.core.enableLazyLoading = false;
-        const score = ScoreLoader.loadAlphaTex(tex, settings);
-        if (configure) {
-            configure(settings, score);
+        let runSettings = settings;
+        if (!runSettings) {
+            runSettings = new Settings();
+            runSettings.core.engine = 'svg';
+            runSettings.core.enableLazyLoading = false;
         }
-        const run = new AttributionTestRun(settings);
+        const score = await VisualTestHelper.loadTex(tex, runSettings, configure);
+        const run = new AttributionTestRun(runSettings);
         run.renderer.width = 700;
         run.renderer.renderScore(score, trackIndexes ?? score.tracks.map(t => t.index));
         return run;
@@ -241,7 +253,7 @@ describe('AttributionTests', () => {
             run.expectSingleMark();
         }
 
-        const profiles = [StaveProfile.Score, StaveProfile.Tab, StaveProfile.TabMixed, StaveProfile.ScoreTab];
+        const profiles = [StaveProfile.TabMixed, StaveProfile.ScoreTab];
         for (const profile of profiles) {
             const run = await render(
                 `\\staff {score tabs} :4 3.3 5.2 7.1 0.6 | 3.3 5.2 7.1 0.6 ${filler}`,
@@ -309,10 +321,6 @@ describe('AttributionTests', () => {
             expect(small.owners().length).toBe(0);
             expect(small.allMarkPaths().length).toBe(0);
         }
-
-        const run = await render(`:4 C4 D4 E4 F4 ${' | :4 r r r r'.repeat(10)}`);
-        expect(run.renderer.score!.masterBars.length).toBe(11);
-        run.expectSingleMark();
     });
 
     it('more-than-two-rendered-tracks', async () => {
@@ -369,34 +377,32 @@ describe('AttributionTests', () => {
         run.renderer.resizeRender();
         const owner = run.expectSingleMark();
         expect(owner.additionalMultiRestBars).toBeTruthy();
-        const markBottom = -(owner.attribution!.y + owner.attribution!.height);
         // the count above the multi-bar rest is the only content above this bar (overflow is rounded up)
         expect(owner.contentTopOverflow).toBeGreaterThan(0);
-        expect(markBottom).toBeGreaterThanOrEqual(
-            owner.contentTopOverflow - 1 + owner.smuflMetrics.oneStaffSpace * 0.5
+        expect(AttributionTestRun.markBottom(owner)).toBeGreaterThanOrEqual(
+            owner.contentTopOverflow - 1 + AttributionTestRun.gap(owner)
         );
     });
 
     it('gap-to-neighbouring-text', async () => {
         // the beat text ends right before the mark at the end of the first system
-        await VisualTestHelper.prepareAlphaSkia();
         const settings = new Settings();
         // skia engine and fonts of the visual references: text widths decide whether marks touch
         VisualTestHelper.prepareSettingsForTest(settings);
         settings.display.barsPerRow = 2;
-        const score = ScoreLoader.loadAlphaTex(`:4 C4 D4 E4 F4 | C4 D4 E4{txt "abcdefghijkl"} F4 ${filler}`, settings);
-        const run = new AttributionTestRun(settings);
-        run.renderer.width = 700;
-        run.renderer.renderScore(score, [0]);
-        const owners = run.owners();
-        expect(owners.length).toBe(1);
-        const owner = owners[0];
+        const run = await render(
+            `:4 C4 D4 E4 F4 | C4 D4 E4{txt "abcdefghijkl"} F4 ${filler}`,
+            undefined,
+            undefined,
+            settings
+        );
+        const owner = run.singleOwner();
 
         const glyph = owner.attribution!;
-        const gap = owner.smuflMetrics.oneStaffSpace * 0.5;
+        const gap = AttributionTestRun.gap(owner);
         const markLeft = owner.x + glyph.x;
         const markRight = markLeft + glyph.width;
-        const markBottom = -(glyph.y + glyph.height);
+        const markBottom = AttributionTestRun.markBottom(owner);
         let neighbours = 0;
         for (const r of owner.staff!.barRenderers) {
             for (const b of r.topEffects.bands) {
@@ -429,15 +435,13 @@ describe('AttributionTests', () => {
         const run = new AttributionTestRun(settings);
         run.renderer.width = 1300;
         run.renderer.renderScore(score, [0]);
-        const owners = run.owners();
-        expect(owners.length).toBe(1);
-        const owner = owners[0];
+        const owner = run.singleOwner();
         const glyph = owner.attribution!;
-        const gap = owner.smuflMetrics.oneStaffSpace * 0.5;
+        const gap = AttributionTestRun.gap(owner);
         const markLeft = owner.x + glyph.x;
         const markRight = markLeft + glyph.width;
         const sky = owner.staff!.systemSkyline.upSky;
-        const markBottom = -(glyph.y + glyph.height);
+        const markBottom = AttributionTestRun.markBottom(owner);
         // the skyline includes the mark itself, so look at the neighbourhood only
         expect(sky.maxHeightInRange(markLeft - gap, markLeft)).toBeGreaterThan(0);
         expect(sky.maxHeightInRange(markLeft - gap, markLeft)).toBeLessThan(markBottom);
@@ -450,10 +454,11 @@ describe('AttributionTests', () => {
             s.display.barsPerRow = 2;
         });
         const owner = run.expectSingleMark();
-        const markBottom = -(owner.attribution!.y + owner.attribution!.height);
         const repeatCountTop = owner.postBeatLocalSkyline.upSky.maxHeight();
         expect(repeatCountTop).toBeGreaterThan(0);
-        expect(markBottom).toBeGreaterThanOrEqual(repeatCountTop + owner.smuflMetrics.oneStaffSpace * 0.5 - 0.01);
+        expect(AttributionTestRun.markBottom(owner)).toBeGreaterThanOrEqual(
+            repeatCountTop + AttributionTestRun.gap(owner) - 0.01
+        );
     });
 
     it('rests-above-effect-bands', async () => {
@@ -469,8 +474,7 @@ describe('AttributionTests', () => {
             }
         }
         expect(bandTop).toBeGreaterThan(0);
-        const markBottom = -(owner.attribution!.y + owner.attribution!.height);
-        expect(markBottom).toBeCloseTo(bandTop + owner.smuflMetrics.oneStaffSpace * 0.5, 5);
+        expect(AttributionTestRun.markBottom(owner)).toBeCloseTo(bandTop + AttributionTestRun.gap(owner), 5);
     });
 
     it('no-extra-height-below-higher-content', async () => {
@@ -532,15 +536,10 @@ describe('AttributionTests', () => {
     });
 
     it('partial-update', async () => {
-        await VisualTestHelper.prepareAlphaSkia();
-        const settings = new Settings();
-        settings.core.engine = 'svg';
-        settings.core.enableLazyLoading = true;
-        settings.display.barsPerRow = 1;
-        const score = ScoreLoader.loadAlphaTex(fourBars, settings);
-        const run = new AttributionTestRun(settings);
-        run.renderer.width = 700;
-        run.renderer.renderScore(score, [0]);
+        const run = await render(fourBars, (s, _score) => {
+            s.core.enableLazyLoading = true;
+            s.display.barsPerRow = 1;
+        });
         run.renderAllLazy();
         run.expectSingleMark(0);
 

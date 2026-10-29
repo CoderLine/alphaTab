@@ -10,29 +10,16 @@ import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { AudioElementBackingTrackSynthOutput } from '@coderline/alphatab/platform/javascript/AudioElementBackingTrackSynthOutput';
 import type { BackingTrackPlayer } from '@coderline/alphatab/synth/BackingTrackPlayer';
 import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
+import { WarningCollectingLogger } from 'test/WarningCollectingLogger';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
-class RecordingLogger implements ILogger {
-    public readonly warnings: string[] = [];
-
-    public debug(_category: string, _msg: string, ..._details: unknown[]): void {}
-
-    public warning(category: string, msg: string, ..._details: unknown[]): void {
-        this.warnings.push(`${category}: ${msg}`);
-    }
-
-    public info(_category: string, _msg: string, ..._details: unknown[]): void {}
-
-    public error(_category: string, _msg: string, ..._details: unknown[]): void {}
-}
 
 describe('AudioElementBackingTrackSynthOutputTests', () => {
     let previousLogger: ILogger;
-    let logger: RecordingLogger;
+    let logger: WarningCollectingLogger;
 
     beforeEach(() => {
         previousLogger = Logger.log;
-        logger = new RecordingLogger();
+        logger = new WarningCollectingLogger();
         Logger.log = logger;
         vi.stubGlobal('window', {
             setInterval: () => 1,

@@ -17,6 +17,7 @@ import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
 import type { XmlNode } from '@coderline/alphatab/xml/XmlNode';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
 import { describe, expect, it } from 'vitest';
@@ -39,17 +40,6 @@ describe('Gp7ExporterTest', () => {
 
     function exportGp7(score: Score): Uint8Array {
         return new Gp7Exporter().export(score, null);
-    }
-
-    function extractGpif(data: Uint8Array): string {
-        const settings = new Settings();
-        const entries = new ZipReader(ByteBuffer.fromBuffer(data), settings.importer.maxDecodingBufferSize).read();
-        for (const entry of entries) {
-            if (entry.fileName === 'score.gpif') {
-                return IOHelper.toString(entry.data, settings.importer.encoding);
-            }
-        }
-        throw new Error('No score.gpif in file');
     }
 
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null): Promise<void> {
@@ -170,7 +160,7 @@ describe('Gp7ExporterTest', () => {
         `);
 
         const gpif = new XmlDocument();
-        gpif.parse(extractGpif(exportGp7(score)));
+        gpif.parse(GpImporterTestHelper.extractGpif(exportGp7(score)));
         const scoreNode = gpif.firstElement!.findChildElement('Score')!;
 
         // Guitar Pro reads the layout only from plain text content
@@ -193,7 +183,7 @@ describe('Gp7ExporterTest', () => {
         beats[0].timer = 1621.4;
         beats[1].timer = 3243.6;
 
-        const gpif = extractGpif(exportGp7(score));
+        const gpif = GpImporterTestHelper.extractGpif(exportGp7(score));
 
         expect(gpif).toContain('<Timer>1621</Timer>');
         expect(gpif).toContain('<Timer>3244</Timer>');
@@ -428,12 +418,12 @@ describe('Gp7ExporterTest', () => {
         const before = JsonConverter.scoreToJsObject(score);
 
         // pitched staves need string and fret assigned during export, the input score must not change
-        const first = extractGpif(exportGp7(score));
+        const first = GpImporterTestHelper.extractGpif(exportGp7(score));
         ComparisonHelpers.expectJsonEqual(before, JsonConverter.scoreToJsObject(score), '<score>', null);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].realValue).toBe(60);
 
         // a repeated export must produce the same file
-        const second = extractGpif(exportGp7(score));
+        const second = GpImporterTestHelper.extractGpif(exportGp7(score));
         expect(second).toBe(first);
     });
 
@@ -496,8 +486,10 @@ describe('Gp7ExporterTest', () => {
 
     async function testPitchSpelling(name: string) {
         const data = await TestPlatform.loadFile(`test-data/${name}`);
-        const expected = readNotePitches(extractGpif(data));
-        const actual = readNotePitches(extractGpif(exportGp7(ScoreLoader.loadScoreFromBytes(data))));
+        const expected = readNotePitches(GpImporterTestHelper.extractGpif(data));
+        const actual = readNotePitches(
+            GpImporterTestHelper.extractGpif(exportGp7(ScoreLoader.loadScoreFromBytes(data)))
+        );
 
         expect(actual.length).toBe(expected.length);
         for (let i = 0; i < expected.length; i++) {

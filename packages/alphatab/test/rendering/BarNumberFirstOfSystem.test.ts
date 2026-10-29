@@ -14,6 +14,7 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import type { EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import type { ScoreRendererWrapper } from '@coderline/alphatab/rendering/ScoreRendererWrapper';
+import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
 import { TestUiFacade } from '../visualTests/TestUiFacade';
@@ -33,6 +34,11 @@ interface StaffBarNumbers {
  * @internal
  */
 class BarNumberFirstOfSystemHelper {
+    public static systems(api: AlphaTabApiBase<unknown>): StaffSystem[] {
+        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
+        return (wrapper.instance as unknown as ScoreRenderer).layout!.systems;
+    }
+
     public static createScore(tex: string, display: BarNumberDisplay): Score {
         const settings = new Settings();
         const importer = new AlphaTexImporter();
@@ -54,11 +60,9 @@ class BarNumberFirstOfSystemHelper {
      * Collects the bar numbers which take part in the placement (have an x-range), per visible staff.
      */
     public static collectBarNumbers(api: AlphaTabApiBase<unknown>): StaffBarNumbers[] {
-        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
-        const inner = wrapper.instance as unknown as ScoreRenderer;
         const result: StaffBarNumbers[] = [];
         const range: EffectBandXRange = { xStart: 0, xEnd: 0 };
-        for (const system of inner.layout!.systems) {
+        for (const system of BarNumberFirstOfSystemHelper.systems(api)) {
             for (const group of system.staves) {
                 for (const staff of group.staves) {
                     if (!staff.isVisible) {
@@ -88,10 +92,8 @@ class BarNumberFirstOfSystemHelper {
      * Gets the bar indices of the first bar of every system.
      */
     public static collectSystemStarts(api: AlphaTabApiBase<unknown>): number[] {
-        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
-        const inner = wrapper.instance as unknown as ScoreRenderer;
         const starts: number[] = [];
-        for (const system of inner.layout!.systems) {
+        for (const system of BarNumberFirstOfSystemHelper.systems(api)) {
             starts.push(system.firstBarIndex);
         }
         return starts;
@@ -180,10 +182,8 @@ class BarNumberFirstOfSystemHelper {
      * Gets the bar index of every bar renderer of the first staff (a multi-bar rest is one renderer).
      */
     public static rendererStarts(api: AlphaTabApiBase<unknown>): number[] {
-        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
-        const inner = wrapper.instance as unknown as ScoreRenderer;
         const result: number[] = [];
-        for (const system of inner.layout!.systems) {
+        for (const system of BarNumberFirstOfSystemHelper.systems(api)) {
             for (const renderer of system.staves[0].staves[0].barRenderers) {
                 result.push(renderer.bar.index);
             }
@@ -191,27 +191,9 @@ class BarNumberFirstOfSystemHelper {
         return result;
     }
 
-    /**
-     * Gets the bar indices of the systems starting with a multi-bar rest.
-     */
-    public static multiBarRestSystemStarts(api: AlphaTabApiBase<unknown>): number[] {
-        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
-        const inner = wrapper.instance as unknown as ScoreRenderer;
-        const result: number[] = [];
-        for (const system of inner.layout!.systems) {
-            const first = system.staves[0].staves[0].barRenderers[0];
-            if (first.additionalMultiRestBars) {
-                result.push(first.bar.index);
-            }
-        }
-        return result;
-    }
-
     public static allBars(api: AlphaTabApiBase<unknown>): number[] {
-        const wrapper = api.renderer as unknown as ScoreRendererWrapper;
-        const inner = wrapper.instance as unknown as ScoreRenderer;
         const result: number[] = [];
-        for (const system of inner.layout!.systems) {
+        for (const system of BarNumberFirstOfSystemHelper.systems(api)) {
             for (let i = system.firstBarIndex; i <= system.lastBarIndex; i++) {
                 result.push(i);
             }
@@ -283,7 +265,13 @@ describe('BarNumberFirstOfSystem', () => {
         );
         let restStarts: number[] = [];
         await BarNumberFirstOfSystemHelper.render(score, [500], api => {
-            restStarts = BarNumberFirstOfSystemHelper.multiBarRestSystemStarts(api);
+            restStarts = [];
+            for (const system of BarNumberFirstOfSystemHelper.systems(api)) {
+                const first = system.staves[0].staves[0].barRenderers[0];
+                if (first.additionalMultiRestBars) {
+                    restStarts.push(first.bar.index);
+                }
+            }
             return systemStarts(api);
         });
         expect(restStarts.length).toBeGreaterThan(0);

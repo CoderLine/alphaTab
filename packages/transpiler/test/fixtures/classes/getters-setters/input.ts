@@ -21,9 +21,8 @@ export class Accessors {
     }
 
     /**
-     * Computed read-only alias: kept here without @json_read_only on
-     * purpose because the fixture is not run through the JSON codegen.
-     * The transformer just sees a getter-only property.
+     * Computed read-only alias without JSON tags: the fixture is not run
+     * through the JSON codegen, the transformer just sees a getter-only property.
      */
     public get isZero(): boolean {
         return this._value === 0;

@@ -287,50 +287,31 @@ describe('JsonConverterTest', () => {
         expect(json.has('percussionarticulation')).toBe(false);
     });
 
-    it('null-note-values-load-as-unset', () => {
-        const raw = new Map<string, unknown>();
-        raw.set('fret', null);
-        raw.set('string', null);
-        raw.set('octave', null);
-        raw.set('tone', null);
-        raw.set('percussionarticulation', null);
-
+    function noteFromJson(raw: Map<string, unknown>): Note {
         const note = new Note();
         NoteSerializer.fromJson(note, raw);
-        expect(Number.isNaN(note.fret)).toBe(true);
-        expect(Number.isNaN(note.string)).toBe(true);
+        return note;
+    }
+
+    function expectUnsetPitchAndArticulation(note: Note): void {
         expect(Number.isNaN(note.octave)).toBe(true);
         expect(Number.isNaN(note.tone)).toBe(true);
         expect(Number.isNaN(note.percussionArticulation)).toBe(true);
-    });
+    }
 
-    it('legacy-unset-note-values-load-as-unset', () => {
-        const raw = new Map<string, unknown>();
-        raw.set('fret', -1 as number);
-        raw.set('string', -1 as number);
-        raw.set('octave', -1 as number);
-        raw.set('tone', -1 as number);
-        raw.set('percussionarticulation', -1 as number);
+    it('null-and-legacy-unset-note-values-load-as-unset', () => {
+        const unsetValues: (number | null)[] = [null, -1];
+        for (const unset of unsetValues) {
+            const raw = new Map<string, unknown>();
+            for (const key of ['fret', 'string', 'octave', 'tone', 'percussionarticulation']) {
+                raw.set(key, unset);
+            }
 
-        const note = new Note();
-        NoteSerializer.fromJson(note, raw);
-        expect(Number.isNaN(note.fret)).toBe(true);
-        expect(Number.isNaN(note.string)).toBe(true);
-        expect(Number.isNaN(note.octave)).toBe(true);
-        expect(Number.isNaN(note.tone)).toBe(true);
-        expect(Number.isNaN(note.percussionArticulation)).toBe(true);
-    });
-
-    it('stringed-note-keeps-fret-minus-one', () => {
-        const raw = new Map<string, unknown>();
-        raw.set('fret', -1 as number);
-        raw.set('string', 6 as number);
-
-        const note = new Note();
-        NoteSerializer.fromJson(note, raw);
-        expect(note.fret).toBe(-1);
-        expect(note.string).toBe(6);
-        expect(note.isStringed).toBe(true);
+            const note = noteFromJson(raw);
+            expect(Number.isNaN(note.fret)).toBe(true);
+            expect(Number.isNaN(note.string)).toBe(true);
+            expectUnsetPitchAndArticulation(note);
+        }
     });
 
     it('legacy-stringed-note-keeps-fret-minus-one', () => {
@@ -341,22 +322,20 @@ describe('JsonConverterTest', () => {
         raw.set('tone', -1 as number);
         raw.set('percussionarticulation', -1 as number);
 
-        const note = new Note();
-        NoteSerializer.fromJson(note, raw);
+        const note = noteFromJson(raw);
         expect(note.fret).toBe(-1);
         expect(note.string).toBe(5);
-        expect(Number.isNaN(note.octave)).toBe(true);
-        expect(Number.isNaN(note.tone)).toBe(true);
-        expect(Number.isNaN(note.percussionArticulation)).toBe(true);
+        expectUnsetPitchAndArticulation(note);
     });
 
     it('minus-one-is-kept-without-legacy-keys', () => {
         const raw = new Map<string, unknown>();
+        raw.set('fret', -1 as number);
         raw.set('string', -1 as number);
         raw.set('percussionarticulation', 0 as number);
 
-        const note = new Note();
-        NoteSerializer.fromJson(note, raw);
+        const note = noteFromJson(raw);
+        expect(note.fret).toBe(-1);
         expect(note.string).toBe(-1);
         expect(note.percussionArticulation).toBe(0);
     });

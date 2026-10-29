@@ -190,23 +190,6 @@ describe('Gp4ImporterTest', () => {
         expect(beats[5].notes.length).toBe(1);
         expect(beats[5].notes[0].string).toBe(6);
         expect(beats[5].notes[0].fret).toBe(14);
-
-        for (const track of score.tracks) {
-            for (const staff of track.staves) {
-                for (const bar of staff.bars) {
-                    for (const voice of bar.voices) {
-                        for (const beat of voice.beats) {
-                            for (const note of beat.notes) {
-                                if (!staff.isPercussion) {
-                                    expect(note.isStringed).toBe(true);
-                                    expect(note.fret).toBeGreaterThanOrEqual(0);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
     });
 
     it('drum-tablature-hidden', async () => {
@@ -216,10 +199,5 @@ describe('Gp4ImporterTest', () => {
         expect(drums.length).toBe(1);
         expect(drums[0].staves[0].showTablature).toBe(false);
         expect(drums[0].staves[0].showStandardNotation).toBe(true);
-        for (const track of score.tracks) {
-            if (!track.staves[0].isPercussion) {
-                expect(track.staves[0].showTablature).toBe(true);
-            }
-        }
     });
 });

@@ -265,6 +265,23 @@ export class VisualTestHelper {
         }
     }
 
+    /**
+     * Loads `tex` with `settings` and applies `configure`; alphaSkia and the test fonts are
+     * ready for rendering afterwards.
+     */
+    public static async loadTex(
+        tex: string,
+        settings: Settings,
+        configure?: (settings: Settings, score: Score) => void
+    ): Promise<Score> {
+        await VisualTestHelper.prepareAlphaSkia();
+        const score = ScoreLoader.loadAlphaTex(tex, settings);
+        if (configure) {
+            configure(settings, score);
+        }
+        return score;
+    }
+
     public static async compareVisualResult(
         run: VisualTestRun,
         totalWidth: number,

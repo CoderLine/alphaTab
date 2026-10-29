@@ -545,25 +545,8 @@ describe('Gp5ImporterTest', () => {
     it('out-of-range-midi-port-and-channel', async () => {
         const original = await TestPlatform.loadFile('test-data/guitarpro5/score-info.gp5');
 
-        // track header: flags(1) + name(1+40) + string count(4) + tunings(7*4) + port(4) + channel(4)
-        const trackName = 'Track 1';
-        let namePos = -1;
-        for (let i = 0; i < original.length - trackName.length && namePos === -1; i++) {
-            if (original[i] === trackName.length) {
-                let matches = true;
-                for (let j = 0; j < trackName.length; j++) {
-                    if (original[i + 1 + j] !== trackName.charCodeAt(j)) {
-                        matches = false;
-                        break;
-                    }
-                }
-                if (matches) {
-                    namePos = i;
-                }
-            }
-        }
-        expect(namePos).toBeGreaterThan(0);
-        const portOffset = namePos + 41 + 4 + 28;
+        // int32 port and channel of the first track header
+        const portOffset = 1452;
 
         const variants: [number, number][] = [
             [0, 1],
