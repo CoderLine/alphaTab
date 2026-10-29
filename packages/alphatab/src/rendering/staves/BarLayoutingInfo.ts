@@ -87,11 +87,11 @@ export class BarLayoutingInfo {
     private _beatSizes: Map<number, BarLayoutingInfoBeatSizes> = new Map();
 
     /**
-     * Overlay rods bucketed per visual band. Outer key is a `bandKey` (typically the
-     * band's `NotationElement` stringified). Inner map keyed by `Spring.timePosition`.
+     * Overlay rods bucketed per visual band. Outer key is a `bandKey` identifying one
+     * band row (staff, side and `NotationElement`). Inner map keyed by `Spring.timePosition`.
      * Rods in different bands occupy different vertical tracks and never collide;
      * pair-overlap evaluates each band independently. Same-band, same-timePosition
-     * registrations (lyric-on-score + lyric-on-tab for one beat) max-merge.
+     * registrations max-merge.
      */
     private _overlayRodsByBand: Map<string, Map<number, OverlayRod>> = new Map();
 
@@ -468,7 +468,7 @@ export class BarLayoutingInfo {
 
     /**
      * Registers an overlay rod for a beat into the bucket identified by `bandKey`
-     * (typically `String(band.info.notationElement)`). Same-band, same-timePosition
+     * (one band row: staff, side and notation element). Same-band, same-timePosition
      * duplicates max-merge.
      */
     public addOverlayRod(bandKey: string, timePosition: number, leftExtent: number, rightExtent: number): void {

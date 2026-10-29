@@ -527,17 +527,19 @@ export class BarRendererBase {
 
     public _registerOverlayRods(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
-        this._collectOverlayRods(this.topEffects, info);
-        this._collectOverlayRods(this.bottomEffects, info);
+        // all staves of a master bar share the layouting info; bands of different staves never share a row
+        const staffKey = `${this.bar.staff.track.index}/${this.bar.staff.index}/${this.staff!.staffId}`;
+        this._collectOverlayRods(this.topEffects, info, `${staffKey}/top`);
+        this._collectOverlayRods(this.bottomEffects, info, `${staffKey}/bottom`);
     }
 
-    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo): void {
+    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo, rowKey: string): void {
         for (const band of container.bands) {
             const policy = band.info.overlayRodPolicy;
             if (policy === undefined) {
                 continue;
             }
-            const bandKey = String(band.info.notationElement);
+            const bandKey = `${rowKey}/${band.info.notationElement}`;
             for (const voiceGlyphs of band.glyphsByVoice) {
                 for (const glyph of voiceGlyphs) {
                     if (!glyph.beat || glyph.width <= 0) {

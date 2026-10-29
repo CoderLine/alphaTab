@@ -112,6 +112,26 @@ describe('EffectPlacementTests', () => {
         expect(checked).toBe(3);
     });
 
+    it('beat-text-on-other-staff-does-not-widen-the-bar', async () => {
+        // each text alone fits its 16th; side by side in one row they would need more space
+        const tex = `
+            \\track "A" \\staff {score}
+            :16 c4{txt "crescendo"} d4 e4 f4 c4 d4 e4 f4 c4 d4 e4 f4 c4 d4 e4 f4
+            \\track "B" \\staff {score}
+            :16 c4 d4{txt "dolcissimo"} e4 f4 c4 d4 e4 f4 c4 d4 e4 f4 c4 d4 e4 f4
+        `;
+        const horizontal = (settings: Settings) => {
+            settings.display.layoutMode = LayoutMode.Horizontal;
+        };
+        const secondBeatX = (renderer: ScoreRenderer) => {
+            const r = firstStaff(renderer).barRenderers[0];
+            return r.getBeatX(r.bar.voices[0].beats[1], BeatXPosition.OnNotes);
+        };
+        const alone = secondBeatX(await render(tex, horizontal, [0]));
+        const both = secondBeatX(await render(tex, horizontal, [0, 1]));
+        expect(both).toBeCloseTo(alone, 1);
+    });
+
     it('bracket-spike-reserved-once', async () => {
         // the bar number is placed above the bracket spike; the spike must not add its height again
         const renderer = await render(
