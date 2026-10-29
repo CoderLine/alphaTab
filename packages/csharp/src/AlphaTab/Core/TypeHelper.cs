@@ -99,6 +99,11 @@ namespace AlphaTab.Core
             return list.Any(predicate);
         }
 
+        public static bool Every<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            return list.All(predicate);
+        }
+
         public static IList<T> Splice<T>(this IList<T> data, double start)
         {
             var deleteCount = data.Count - (int)start;

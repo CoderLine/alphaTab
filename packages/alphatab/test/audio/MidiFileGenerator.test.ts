@@ -7,6 +7,7 @@ import { Logger } from '@coderline/alphatab/Logger';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { ControllerType } from '@coderline/alphatab/midi/ControllerType';
 import {
+    type ControlChangeEvent,
     type MidiEvent,
     MidiEventType,
     NoteOnEvent,
@@ -30,8 +31,10 @@ import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import { AlphaSynthWrapper } from '@coderline/alphatab/synth/AlphaSynthWrapper';
+import { AudioExportOptions } from '@coderline/alphatab/synth/IAudioExporter';
 import { PlaybackRange } from '@coderline/alphatab/synth/PlaybackRange';
 import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
+import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import {
     FlatControlChangeEvent,
     type FlatMidiEvent,
@@ -1539,132 +1542,189 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
-    it('fade-in', () => {
-        const tex: string = '3.3.4 3.3.4 { f }';
-        const score: Score = parseTex(tex);
-
-        const info: PlaybackInformation = score.tracks[0].playbackInfo;
-        const expectedEvents: FlatMidiEvent[] = [
-            new FlatControlChangeEvent(960, 0, info.primaryChannel, ControllerType.VolumeCoarse, 0),
-            new FlatControlChangeEvent(960, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 0),
-
-            new FlatControlChangeEvent(1080, 0, info.primaryChannel, ControllerType.VolumeCoarse, 19),
-            new FlatControlChangeEvent(1080, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 19),
-
-            new FlatControlChangeEvent(1200, 0, info.primaryChannel, ControllerType.VolumeCoarse, 38),
-            new FlatControlChangeEvent(1200, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 38),
-
-            new FlatControlChangeEvent(1320, 0, info.primaryChannel, ControllerType.VolumeCoarse, 56),
-            new FlatControlChangeEvent(1320, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 56),
-
-            new FlatControlChangeEvent(1440, 0, info.primaryChannel, ControllerType.VolumeCoarse, 75),
-            new FlatControlChangeEvent(1440, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 75),
-
-            new FlatControlChangeEvent(1560, 0, info.primaryChannel, ControllerType.VolumeCoarse, 94),
-            new FlatControlChangeEvent(1560, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 94),
-
-            new FlatControlChangeEvent(1728, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new FlatControlChangeEvent(1728, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120)
-        ];
-
+    const expressionEvents = (score: Score): FlatMidiEvent[] => {
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
+        return handler.midiEvents.filter(
             e =>
                 e instanceof FlatControlChangeEvent &&
-                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse &&
+                (e as FlatControlChangeEvent).controller === ControllerType.ExpressionControllerCoarse &&
                 e.tick >= MidiUtils.QuarterTime
         );
+    };
 
-        assertEvents(actualNoteEvents, expectedEvents);
+    const expressionOnBothChannels = (info: PlaybackInformation, tick: number, value: number): FlatMidiEvent[] => {
+        return [
+            new FlatControlChangeEvent(tick, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, value),
+            new FlatControlChangeEvent(tick, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, value)
+        ];
+    };
+
+    const generateMidiFile = (score: Score): MidiFile => {
+        const midiFile = new MidiFile();
+        const generator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midiFile));
+        generator.generate();
+        return midiFile;
+    };
+
+    // expression values ("tick:value") and note-ons ("tick:on") of the primary channel in playback order
+    const expressionTimeline = (score: Score, fromTick: number, toTick: number): string[] => {
+        const channel = score.tracks[0].playbackInfo.primaryChannel;
+        const timeline: string[] = [];
+        for (const e of generateMidiFile(score).events) {
+            if (e.tick < fromTick || e.tick > toTick) {
+                continue;
+            }
+            if (e.type === MidiEventType.NoteOn && (e as NoteOnEvent).channel === channel) {
+                timeline.push(`${e.tick}:on`);
+            } else if (
+                e.type === MidiEventType.ControlChange &&
+                (e as ControlChangeEvent).channel === channel &&
+                (e as ControlChangeEvent).controller === ControllerType.ExpressionControllerCoarse
+            ) {
+                timeline.push(`${e.tick}:${(e as ControlChangeEvent).value}`);
+            }
+        }
+        return timeline;
+    };
+
+    it('fade-in', () => {
+        const score: Score = parseTex('3.3.4 3.3.4 { f } 3.3.4');
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const expectedEvents: FlatMidiEvent[] = [
+            ...expressionOnBothChannels(info, 960, 0),
+            ...expressionOnBothChannels(info, 1080, 20),
+            ...expressionOnBothChannels(info, 1200, 40),
+            ...expressionOnBothChannels(info, 1320, 60),
+            ...expressionOnBothChannels(info, 1440, 79),
+            ...expressionOnBothChannels(info, 1560, 99),
+            ...expressionOnBothChannels(info, 1728, 127)
+        ];
+
+        assertEvents(expressionEvents(score), expectedEvents);
     });
 
     it('fade-out', () => {
-        const tex: string = '3.3.4 3.3.4 { fo }';
-        const score: Score = parseTex(tex);
-
+        const score: Score = parseTex('3.3.4 3.3.4 { fo } 3.3.4');
         const info: PlaybackInformation = score.tracks[0].playbackInfo;
         const expectedEvents: FlatMidiEvent[] = [
-            new FlatControlChangeEvent(960, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new FlatControlChangeEvent(960, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-
-            new FlatControlChangeEvent(1080, 0, info.primaryChannel, ControllerType.VolumeCoarse, 101),
-            new FlatControlChangeEvent(1080, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 101),
-
-            new FlatControlChangeEvent(1200, 0, info.primaryChannel, ControllerType.VolumeCoarse, 83),
-            new FlatControlChangeEvent(1200, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 83),
-
-            new FlatControlChangeEvent(1320, 0, info.primaryChannel, ControllerType.VolumeCoarse, 64),
-            new FlatControlChangeEvent(1320, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 64),
-
-            new FlatControlChangeEvent(1440, 0, info.primaryChannel, ControllerType.VolumeCoarse, 45),
-            new FlatControlChangeEvent(1440, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 45),
-
-            new FlatControlChangeEvent(1560, 0, info.primaryChannel, ControllerType.VolumeCoarse, 26),
-            new FlatControlChangeEvent(1560, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 26),
-
-            new FlatControlChangeEvent(1728, 0, info.primaryChannel, ControllerType.VolumeCoarse, 0),
-            new FlatControlChangeEvent(1728, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 0)
+            ...expressionOnBothChannels(info, 960, 127),
+            ...expressionOnBothChannels(info, 1080, 107),
+            ...expressionOnBothChannels(info, 1200, 87),
+            ...expressionOnBothChannels(info, 1320, 67),
+            ...expressionOnBothChannels(info, 1440, 48),
+            ...expressionOnBothChannels(info, 1560, 28),
+            ...expressionOnBothChannels(info, 1728, 0),
+            // restore before the next note
+            ...expressionOnBothChannels(info, 1920, 127)
         ];
 
-        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
-        generator.generate();
-        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
-            e =>
-                e instanceof FlatControlChangeEvent &&
-                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse &&
-                e.tick >= MidiUtils.QuarterTime
-        );
-
-        assertEvents(actualNoteEvents, expectedEvents);
+        assertEvents(expressionEvents(score), expectedEvents);
     });
 
     it('volume-swell', () => {
-        const tex: string = '3.3.4 3.3.4 { vs }';
-        const score: Score = parseTex(tex);
-
+        const score: Score = parseTex('3.3.4 3.3.4 { vs } 3.3.4');
         const info: PlaybackInformation = score.tracks[0].playbackInfo;
         const expectedEvents: FlatMidiEvent[] = [
             // fade-in
-            new FlatControlChangeEvent(960, 0, info.primaryChannel, ControllerType.VolumeCoarse, 0),
-            new FlatControlChangeEvent(960, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 0),
-
-            new FlatControlChangeEvent(1080, 0, info.primaryChannel, ControllerType.VolumeCoarse, 38),
-            new FlatControlChangeEvent(1080, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 38),
-
-            new FlatControlChangeEvent(1200, 0, info.primaryChannel, ControllerType.VolumeCoarse, 75),
-            new FlatControlChangeEvent(1200, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 75),
-
-            new FlatControlChangeEvent(1344, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new FlatControlChangeEvent(1344, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-
+            ...expressionOnBothChannels(info, 960, 0),
+            ...expressionOnBothChannels(info, 1080, 40),
+            ...expressionOnBothChannels(info, 1200, 79),
+            ...expressionOnBothChannels(info, 1344, 127),
             // fade-out
-            new FlatControlChangeEvent(1440, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new FlatControlChangeEvent(1440, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
-
-            new FlatControlChangeEvent(1560, 0, info.primaryChannel, ControllerType.VolumeCoarse, 83),
-            new FlatControlChangeEvent(1560, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 83),
-
-            new FlatControlChangeEvent(1680, 0, info.primaryChannel, ControllerType.VolumeCoarse, 45),
-            new FlatControlChangeEvent(1680, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 45),
-
-            new FlatControlChangeEvent(1824, 0, info.primaryChannel, ControllerType.VolumeCoarse, 0),
-            new FlatControlChangeEvent(1824, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 0)
+            ...expressionOnBothChannels(info, 1440, 127),
+            ...expressionOnBothChannels(info, 1560, 87),
+            ...expressionOnBothChannels(info, 1680, 48),
+            ...expressionOnBothChannels(info, 1824, 0),
+            // restore before the next note
+            ...expressionOnBothChannels(info, 1920, 127)
         ];
 
-        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
-        generator.generate();
-        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
-            e =>
-                e instanceof FlatControlChangeEvent &&
-                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse &&
-                e.tick >= MidiUtils.QuarterTime
-        );
+        assertEvents(expressionEvents(score), expectedEvents);
+    });
 
-        assertEvents(actualNoteEvents, expectedEvents);
+    it('fade-out-into-fade-in', () => {
+        const score: Score = parseTex('3.3.4 { fo } 3.3.4 { f }');
+        expect(expressionTimeline(score, 768, 1080)).toEqual(['768:0', '960:on', '960:0', '1080:20']);
+    });
+
+    it('fade-keeps-volume-automation', () => {
+        const score: Score = parseTex('3.3.4 { volume 8 } 3.3.4 { fo } 3.3.4 { f } 3.3.4 { vs } 3.3.4');
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        new MidiFileGenerator(score, null, handler).generate();
+
+        const volumeEvents = handler.midiEvents
+            .filter(
+                e =>
+                    e instanceof FlatControlChangeEvent &&
+                    (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse
+            )
+            .map(e => e as FlatControlChangeEvent);
+
+        for (const channel of [info.primaryChannel, info.secondaryChannel]) {
+            const channelVolume = volumeEvents.filter(e => e.channel === channel);
+            expect(channelVolume.every(e => e.tick === 0)).toBe(true);
+            expect(channelVolume[channelVolume.length - 1].value).toBe(64);
+        }
+    });
+
+    it('fade-out-restores-after-rest', () => {
+        const score: Score = parseTex('3.3.4 3.3.4 { fo } r.4 3.3.4 | r.1 | 3.3.4 { fo } r.4 r.2 | r.1 | 3.3.4');
+        expect(expressionTimeline(score, 1728, 2880)).toEqual(['1728:0', '2880:127', '2880:on']);
+        expect(expressionTimeline(score, 8448, 15360)).toEqual(['8448:0', '15360:127', '15360:on']);
+    });
+
+    it('fade-out-restores-on-repeat', () => {
+        const score: Score = parseTex('\\ro \\rc 2 3.3.2 3.3.2 { fo } | 5.3.1');
+        expect(expressionTimeline(score, 3456, 3840)).toEqual(['3456:0', '3840:127', '3840:on']);
+        expect(expressionTimeline(score, 7296, 7680)).toEqual(['7296:0', '7680:127', '7680:on']);
+    });
+
+    it('fade-out-restores-on-scottish-triplet-feel', () => {
+        const score: Score = parseTex('\\tf scottish8th 3.3.8 { fo } 3.3.8 3.3.4 3.3.2');
+        expect(expressionTimeline(score, 192, 480)).toEqual(['192:0', '240:127', '240:on']);
+    });
+
+    it('fade-out-audio-after-fade', async () => {
+        const score: Score = parseTex('\\tempo 120 . 3.3.4 { fo } r.4 3.3.4 3.3.4');
+        const midiFile = generateMidiFile(score);
+
+        const synth = new AlphaSynth(new TestOutput(), 500);
+        const options = new AudioExportOptions();
+        options.sampleRate = 44100;
+        options.masterVolume = 1;
+        options.metronomeVolume = 0;
+        options.soundFonts = [await TestPlatform.loadFile('test-data/audio/default.sf2')];
+        const exporter = synth.exportAudio(options, midiFile, [], new Map<number, number>());
+
+        const samplesPerMillisecond = (options.sampleRate / 1000) * SynthConstants.AudioChannels;
+        const samples: number[] = [];
+        while (samples.length < samplesPerMillisecond * 2000) {
+            const chunk = exporter.render(100);
+            if (chunk === undefined) {
+                break;
+            }
+            for (let i = 0; i < chunk.samples.length; i++) {
+                samples.push(chunk.samples[i]);
+            }
+        }
+        const peak = (startMillis: number, endMillis: number) => {
+            let max = 0;
+            for (let i = startMillis * samplesPerMillisecond; i < endMillis * samplesPerMillisecond; i++) {
+                max = Math.max(max, Math.abs(samples[i]));
+            }
+            return max;
+        };
+
+        // at 120bpm one quarter note is 500ms
+        const fadedNote = peak(0, 100);
+        expect(fadedNote).toBeGreaterThan(0.01);
+        // the release of the faded note stays silent during the rest
+        expect(peak(500, 990)).toBeLessThan(fadedNote * 0.01);
+        expect(peak(1000, 1500)).toBeGreaterThan(fadedNote * 0.5);
+        expect(peak(1500, 2000)).toBeGreaterThan(fadedNote * 0.5);
     });
 
     it('ornaments', async () => {
