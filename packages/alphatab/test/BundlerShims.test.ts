@@ -1,7 +1,5 @@
 /** @target web */
 import fs from 'node:fs';
-import { alphaTab } from '@coderline/alphatab-vite';
-import { AlphaTabWebPackPlugin } from '@coderline/alphatab-webpack';
 import { describe, expect, it, vi } from 'vitest';
 
 /**
@@ -12,13 +10,8 @@ describe('BundlerShimTests', () => {
     const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
     const cases = [
-        { subpath: 'vite', target: '@coderline/alphatab-vite', exportName: 'alphaTab', expected: alphaTab },
-        {
-            subpath: 'webpack',
-            target: '@coderline/alphatab-webpack',
-            exportName: 'AlphaTabWebPackPlugin',
-            expected: AlphaTabWebPackPlugin
-        }
+        { subpath: 'vite', target: '@coderline/alphatab-vite', exportName: 'alphaTab' },
+        { subpath: 'webpack', target: '@coderline/alphatab-webpack', exportName: 'AlphaTabWebPackPlugin' }
     ];
 
     for (const c of cases) {
@@ -33,8 +26,12 @@ describe('BundlerShimTests', () => {
 
             const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
             try {
+                // a non-literal specifier: the plugin packages have types only once they are built
+                const target = c.target;
+                const expected = (await import(target))[c.exportName];
+                expect(expected).toBeDefined();
                 const esm = await import(`../bundler/alphaTab.${c.subpath}.mjs`);
-                expect(esm[c.exportName]).toBe(c.expected);
+                expect(esm[c.exportName]).toBe(expected);
 
                 const required: string[] = [];
                 const plugin = {};
