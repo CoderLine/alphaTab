@@ -208,14 +208,11 @@ export class GpifParser {
 
     private _parseDom(dom: XmlDocument): void {
         const root: XmlNode | null = dom.firstElement;
-        if (!root) {
-            return;
-        }
         // the XML uses IDs for referring elements within the
         //  Therefore we do the parsing in 2 steps:
         // - at first we read all model elements and store them by ID in a lookup table
         // - after that we need to join up the information.
-        if (root.localName === 'GPIF') {
+        if (root && root.localName === 'GPIF') {
             this.score = new Score();
             // parse all children
             for (const n of root.childElements()) {

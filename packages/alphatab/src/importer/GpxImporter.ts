@@ -22,7 +22,7 @@ export class GpxImporter extends ScoreImporter {
         // at first we need to load the binary file system
         // from the GPX container
         Logger.debug(this.name, 'Loading GPX filesystem');
-        const fileSystem: GpxFileSystem = new GpxFileSystem();
+        const fileSystem: GpxFileSystem = new GpxFileSystem(this.settings.importer.maxDecodingBufferSize);
         fileSystem.fileFilter = s => {
             return (
                 s.endsWith('score.gpif') ||
