@@ -415,6 +415,9 @@ export class AlphaSynthBase implements IAlphaSynth {
         (this.soundFontLoaded as EventEmitter).trigger();
     }
 
+    /**
+     * @internal
+     */
     protected loadedSoundFonts: Hydra[] = [];
 
     public loadSoundFont(data: Uint8Array, append: boolean): void {
