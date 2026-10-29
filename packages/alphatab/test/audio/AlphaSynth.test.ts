@@ -8,9 +8,12 @@ import {
     type ControlChangeEvent,
     type MidiEvent,
     MidiEventType,
+    NoteOffEvent,
+    NoteOnEvent,
+    ProgramChangeEvent,
     TempoChangeEvent
 } from '@coderline/alphatab/midi/MidiEvent';
-import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFile, MidiFileFormat, MidiTrack } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -340,6 +343,34 @@ describe('AlphaSynthTests', () => {
         await testAudioExport(score, 'export-test', _options => {
             // no settings
         });
+    });
+
+    it('export-with-presets-of-loaded-soundfont', async () => {
+        const synth = new AlphaSynth(new TestOutput(), 50);
+        synth.loadSoundFont(await TestPlatform.loadFile('test-data/audio/default.sf2'), false);
+
+        const midi = new MidiFile();
+        midi.format = MidiFileFormat.MultiTrack;
+        midi.division = 960;
+        const track = new MidiTrack();
+        track.addEvent(new ProgramChangeEvent(0, 0, 0, 24));
+        track.addEvent(new TempoChangeEvent(0, 500000));
+        track.addEvent(new NoteOnEvent(0, 0, 0, 60, 100));
+        track.addEvent(new NoteOffEvent(0, 960, 0, 60, 64));
+        midi.tracks.push(track);
+
+        const options = new AudioExportOptions();
+        options.sampleRate = 44100;
+        options.masterVolume = 1;
+        const exporter = synth.exportAudio(options, midi, [], new Map<number, number>());
+
+        const chunk = exporter.render(250);
+        expect(chunk).toBeDefined();
+        let peak = 0;
+        for (let i = 0; i < chunk!.samples.length; i++) {
+            peak = Math.max(peak, Math.abs(chunk!.samples[i]));
+        }
+        expect(peak).toBeGreaterThan(0);
     });
 
     it('export-silent-with-metronome', async () => {

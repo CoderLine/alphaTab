@@ -30,7 +30,6 @@ import { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerSta
 import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 import { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
-import type { Preset } from '@coderline/alphatab/synth/synthesis/Preset';
 import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
 import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
 
@@ -411,12 +410,12 @@ export class AlphaSynthBase implements IAlphaSynth {
     public resetSoundFonts(): void {
         this.stop();
         this.synthesizer.resetPresets();
-        this._loadedSoundFonts = [];
+        this.loadedSoundFonts = [];
         this.isSoundFontLoaded = false;
         (this.soundFontLoaded as EventEmitter).trigger();
     }
 
-    private _loadedSoundFonts: Hydra[] = [];
+    protected loadedSoundFonts: Hydra[] = [];
 
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this.pause();
@@ -427,9 +426,9 @@ export class AlphaSynthBase implements IAlphaSynth {
             const soundFont: Hydra = new Hydra();
             soundFont.load(input);
             if (!append) {
-                this._loadedSoundFonts = [];
+                this.loadedSoundFonts = [];
             }
-            this._loadedSoundFonts.push(soundFont);
+            this.loadedSoundFonts.push(soundFont);
 
             this.isSoundFontLoaded = true;
             (this.soundFontLoaded as EventEmitter).trigger();
@@ -448,7 +447,7 @@ export class AlphaSynthBase implements IAlphaSynth {
             const programs = this.sequencer.instrumentPrograms;
             const percussionKeys = this.sequencer.percussionKeys;
             let append = false;
-            for (const soundFont of this._loadedSoundFonts) {
+            for (const soundFont of this.loadedSoundFonts) {
                 this.synthesizer.loadPresets(soundFont, programs, percussionKeys, append);
                 append = true;
             }
@@ -746,7 +745,10 @@ export class AlphaSynth extends AlphaSynthBase {
                 exporter.loadSoundFont(f);
             }
         } else {
-            exporter.loadPresets((this.synthesizer as TinySoundFont).presets);
+            // the synthesizer only holds the presets its own song uses
+            for (const soundFont of this.loadedSoundFonts) {
+                exporter.loadHydra(soundFont);
+            }
         }
 
         if (options.playbackRange) {
@@ -804,20 +806,19 @@ export class AlphaSynthAudioExporter implements IAlphaSynthAudioExporter {
         const input: ByteBuffer = ByteBuffer.fromBuffer(data);
         const soundFont: Hydra = new Hydra();
         soundFont.load(input);
+        this.loadHydra(soundFont);
+    }
 
+    /**
+     * Loads the presets used by the exported song from the given sound font.
+     * @param soundFont The parsed sound font.
+     * @internal
+     */
+    public loadHydra(soundFont: Hydra) {
         const programs = this._sequencer.instrumentPrograms;
         const percussionKeys = this._sequencer.percussionKeys;
 
         this._synth.loadPresets(soundFont, programs, percussionKeys, true);
-    }
-
-    /**
-     * Loads the specified presets.
-     * @param presets The presets to use.
-     * @internal
-     */
-    public loadPresets(presets: Preset[] | null) {
-        this._synth.presets = presets;
     }
 
     /**
