@@ -84,7 +84,6 @@ export class AlphaSynthWrapper implements IAlphaSynth {
         if (value) {
             // regsiter to events of new player and forward them to existing listeners
             const newUnregister: (() => void)[] = [];
-            newUnregister.push(value.ready.on(() => (this.ready as EventEmitter).trigger()));
             newUnregister.push(value.readyForPlayback.on(() => (this.readyForPlayback as EventEmitter).trigger()));
             newUnregister.push(value.finished.on(() => (this.finished as EventEmitter).trigger()));
             newUnregister.push(value.soundFontLoaded.on(() => (this.soundFontLoaded as EventEmitter).trigger()));
@@ -128,30 +127,30 @@ export class AlphaSynthWrapper implements IAlphaSynth {
 
             this._instanceEventUnregister = newUnregister;
 
-            // restore state on new player
-            if (this.isReady) {
-                value.masterVolume = this._masterVolume;
-                value.metronomeVolume = this._metronomeVolume;
-                value.countInVolume = this._countInVolume;
-                value.playbackSpeed = this._playbackSpeed;
-                value.isLooping = this._isLooping;
-                value.midiEventsPlayedFilter = this._midiEventsPlayedFilter;
-                (this.ready as EventEmitter).trigger();
-            } else {
-                newUnregister.push(
-                    value.ready.on(() => {
-                        value.masterVolume = this._masterVolume;
-                        value.metronomeVolume = this._metronomeVolume;
-                        value.countInVolume = this._countInVolume;
-                        value.playbackSpeed = this._playbackSpeed;
-                        value.isLooping = this._isLooping;
-                        value.midiEventsPlayedFilter = this._midiEventsPlayedFilter;
-                    })
-                );
+            // players may fire ready on registration when already ready
+            let readyForwarded = false;
+            newUnregister.push(
+                value.ready.on(() => {
+                    readyForwarded = true;
+                    this._onInstanceReady(value);
+                })
+            );
+            if (!readyForwarded && value.isReady) {
+                this._onInstanceReady(value);
             }
         } else {
             this._instanceEventUnregister = undefined;
         }
+    }
+
+    private _onInstanceReady(value: IAlphaSynth) {
+        value.masterVolume = this._masterVolume;
+        value.metronomeVolume = this._metronomeVolume;
+        value.countInVolume = this._countInVolume;
+        value.playbackSpeed = this._playbackSpeed;
+        value.isLooping = this._isLooping;
+        value.midiEventsPlayedFilter = this._midiEventsPlayedFilter;
+        (this.ready as EventEmitter).trigger();
     }
 
     public get output(): ISynthOutput {

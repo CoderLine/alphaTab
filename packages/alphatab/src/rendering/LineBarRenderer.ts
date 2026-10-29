@@ -1031,28 +1031,31 @@ export abstract class LineBarRenderer extends BarRendererBase {
             this.ensureBeamDrawingInfo(h, direction);
             const drawingInfo = h.getDrawingInfo(direction);
             const tupletDirection = this.getTupletBeamDirection(h);
+            // a painted rest helper (numbered notation) has no notes: its single rest bounds the note side
+            const isRest = h.isRestBeamHelper;
             if (direction === BeamDirection.Up) {
+                const lowestBeat = isRest ? h.beats[0] : h.beatOfLowestNote;
                 topY = Math.min(drawingInfo.startY, drawingInfo.endY);
                 if (h.hasTuplet && tupletDirection === direction) {
                     topY -= this.tupletSize + this.tupletOffset;
                 }
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getLowestNoteY skips content below the notehead.
-                    bottomY =
-                        this.getFlagBottomY(h.beatOfLowestNote, tupletDirection) + this.tupletSize + this.tupletOffset;
+                    bottomY = this.getFlagBottomY(lowestBeat, tupletDirection) + this.tupletSize + this.tupletOffset;
                 } else {
-                    bottomY = this.voiceContainer.getLowestNoteY(h.beatOfLowestNote, NoteYPosition.Bottom);
+                    bottomY = this.voiceContainer.getLowestNoteY(lowestBeat, NoteYPosition.Bottom);
                 }
             } else {
+                const highestBeat = isRest ? h.beats[0] : h.beatOfHighestNote;
                 bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
                 if (h.hasTuplet && tupletDirection === direction) {
                     bottomY += this.tupletSize + this.tupletOffset;
                 }
                 if (h.hasTuplet && tupletDirection !== direction) {
                     // Use flag position (matches paintTuplets); getHighestNoteY skips octave dots.
-                    topY = this.getFlagTopY(h.beatOfHighestNote, tupletDirection) - this.tupletSize - this.tupletOffset;
+                    topY = this.getFlagTopY(highestBeat, tupletDirection) - this.tupletSize - this.tupletOffset;
                 } else {
-                    topY = this.voiceContainer.getHighestNoteY(h.beatOfHighestNote, NoteYPosition.Top);
+                    topY = this.voiceContainer.getHighestNoteY(highestBeat, NoteYPosition.Top);
                 }
             }
         }

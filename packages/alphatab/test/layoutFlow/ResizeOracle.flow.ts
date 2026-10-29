@@ -132,9 +132,15 @@ function checkFile(file: string, variant: LayoutVariant): OracleResult {
     }
     const widths = LayoutCorpus.resizeWidths;
     for (let i = 0; i < widths.length; i++) {
-        const resized = h.resize(widths[i]);
-        const fresh = freshRender(file, variant, widths[i]);
-        compare(result, `${variant.name} ${rel} step ${i} (w=${widths[i]})`, fresh, resized);
+        try {
+            const resized = h.resize(widths[i]);
+            const fresh = freshRender(file, variant, widths[i]);
+            compare(result, `${variant.name} ${rel} step ${i} (w=${widths[i]})`, fresh, resized);
+        } catch (e) {
+            result.skipped++;
+            result.report.push(`ERROR ${variant.name} ${rel} step ${i} (w=${widths[i]}): ${(e as Error).message}`);
+            return result;
+        }
     }
     return result;
 }

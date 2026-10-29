@@ -60,6 +60,7 @@ export class LayoutHarness {
     private _byId = new Map<string, CapturedSystem>();
     private _args = new Map<CapturedSystem, RenderFinishedEventArgs>();
     private _ids: string[] = [];
+    private _error: Error | null = null;
 
     public constructor(settings?: Settings) {
         this.settings = settings ?? new Settings();
@@ -70,6 +71,10 @@ export class LayoutHarness {
         this.renderer = new ScoreRenderer(this.settings);
         this.renderer.partialLayoutFinished.on(e => this._onLayout(e));
         this.renderer.partialRenderFinished.on(e => this._onRender(e));
+        // the renderer reports layout exceptions only through this event
+        this.renderer.error.on(e => {
+            this._error ??= e;
+        });
         this.renderer.renderFinished.on(e => {
             if (this._current) {
                 this._current.totalHeight = e.totalHeight;
@@ -94,6 +99,7 @@ export class LayoutHarness {
         this._begin();
         this.renderer.width = width;
         this.renderer.renderScore(score, tracks ?? score.tracks.map(t => t.index));
+        this._throwRenderError();
         return this._end();
     }
 
@@ -101,7 +107,17 @@ export class LayoutHarness {
         this._begin();
         this.renderer.width = width;
         this.renderer.resizeRender();
+        this._throwRenderError();
         return this._end();
+    }
+
+    private _throwRenderError(): void {
+        const error = this._error;
+        if (error) {
+            this._error = null;
+            this._current = null;
+            throw error;
+        }
     }
 
     private _onLayout(e: RenderFinishedEventArgs) {

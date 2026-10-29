@@ -15,6 +15,7 @@ import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import type { ActiveEffectBand } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSystemPlacement';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
@@ -160,6 +161,12 @@ export abstract class ScoreLayout {
     >();
 
     /**
+     * The effects that can create glyphs, by `2 * RenderStaff.index` (top) and `2 * RenderStaff.index + 1`
+     * (bottom): every staff system of a layout has the same staves.
+     */
+    public readonly activeEffects: Map<number, ActiveEffectBand[]> = new Map<number, ActiveEffectBand[]>();
+
+    /**
      * Reused while building the header key of a bar renderer.
      */
     public readonly headerKey: HeaderKey = new HeaderKey();
@@ -218,6 +225,7 @@ export abstract class ScoreLayout {
         this._lazyPartials.clear();
         this.beamingRuleLookups.clear();
         this.headerProfiles.clear();
+        this.activeEffects.clear();
         this._barRendererLookup.clear();
 
         this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;

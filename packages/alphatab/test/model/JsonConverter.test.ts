@@ -1,12 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { LogLevel } from '@coderline/alphatab/LogLevel';
+import { BarStyle, BarSubElement } from '@coderline/alphatab/model/Bar';
+import { BeatStyle, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Color } from '@coderline/alphatab/model/Color';
 import { Font, FontStyle } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import type { Score } from '@coderline/alphatab/model/Score';
+import { NoteStyle, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { TrackStyle, TrackSubElement } from '@coderline/alphatab/model/Track';
+import { VoiceStyle, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { TestPlatform } from 'test/TestPlatform';
@@ -210,5 +217,103 @@ describe('JsonConverterTest', () => {
         expect(settings.display.resources.mainGlyphColor.r).toBe(255);
         expect(settings.display.resources.mainGlyphColor.g).toBe(0);
         expect(settings.display.resources.mainGlyphColor.b).toBe(0);
+    });
+
+    function createScoreWithNullStyleColors(): Score {
+        const importer = new AlphaTexImporter();
+        importer.init(ByteBuffer.fromString('3.3 3.3 | 3.3'), new Settings());
+        const score = importer.readScore();
+        const red = new Color(255, 0, 0, 255);
+
+        score.style = new ScoreStyle();
+        score.style.colors.set(ScoreSubElement.Title, null);
+        score.style.colors.set(ScoreSubElement.SubTitle, red);
+
+        const track = score.tracks[0];
+        track.style = new TrackStyle();
+        track.style.colors.set(TrackSubElement.TrackName, null);
+        track.style.colors.set(TrackSubElement.StringTuning, red);
+
+        const bar = track.staves[0].bars[0];
+        bar.style = new BarStyle();
+        bar.style.colors.set(BarSubElement.StandardNotationStaffLine, null);
+        bar.style.colors.set(BarSubElement.GuitarTabsStaffLine, red);
+
+        const voice = bar.voices[0];
+        voice.style = new VoiceStyle();
+        voice.style.colors.set(VoiceSubElement.Glyphs, null);
+
+        const beat = voice.beats[0];
+        beat.style = new BeatStyle();
+        beat.style.colors.set(BeatSubElement.Effects, null);
+        beat.style.colors.set(BeatSubElement.StandardNotationStem, red);
+
+        const note = beat.notes[0];
+        note.style = new NoteStyle();
+        note.style.colors.set(NoteSubElement.Effects, null);
+        note.style.colors.set(NoteSubElement.GuitarTabFretNumber, red);
+
+        return score;
+    }
+
+    function expectNullStyleColors(score: Score): void {
+        const scoreColors = score.style!.colors;
+        expect(scoreColors.has(ScoreSubElement.Title)).toBe(true);
+        expect(scoreColors.get(ScoreSubElement.Title)).toBe(null);
+        expect(scoreColors.get(ScoreSubElement.SubTitle)!.rgba).toBe('#FF0000');
+        expect(scoreColors.has(ScoreSubElement.Artist)).toBe(false);
+
+        const track = score.tracks[0];
+        const trackColors = track.style!.colors;
+        expect(trackColors.has(TrackSubElement.TrackName)).toBe(true);
+        expect(trackColors.get(TrackSubElement.TrackName)).toBe(null);
+        expect(trackColors.get(TrackSubElement.StringTuning)!.rgba).toBe('#FF0000');
+        expect(trackColors.has(TrackSubElement.BracesAndBrackets)).toBe(false);
+
+        const bar = track.staves[0].bars[0];
+        const barColors = bar.style!.colors;
+        expect(barColors.has(BarSubElement.StandardNotationStaffLine)).toBe(true);
+        expect(barColors.get(BarSubElement.StandardNotationStaffLine)).toBe(null);
+        expect(barColors.get(BarSubElement.GuitarTabsStaffLine)!.rgba).toBe('#FF0000');
+        expect(barColors.has(BarSubElement.SlashStaffLine)).toBe(false);
+
+        const voice = bar.voices[0];
+        const voiceColors = voice.style!.colors;
+        expect(voiceColors.has(VoiceSubElement.Glyphs)).toBe(true);
+        expect(voiceColors.get(VoiceSubElement.Glyphs)).toBe(null);
+
+        const beat = voice.beats[0];
+        const beatColors = beat.style!.colors;
+        expect(beatColors.has(BeatSubElement.Effects)).toBe(true);
+        expect(beatColors.get(BeatSubElement.Effects)).toBe(null);
+        expect(beatColors.get(BeatSubElement.StandardNotationStem)!.rgba).toBe('#FF0000');
+        expect(beatColors.has(BeatSubElement.StandardNotationFlags)).toBe(false);
+
+        const note = beat.notes[0];
+        const noteColors = note.style!.colors;
+        expect(noteColors.has(NoteSubElement.Effects)).toBe(true);
+        expect(noteColors.get(NoteSubElement.Effects)).toBe(null);
+        expect(noteColors.get(NoteSubElement.GuitarTabFretNumber)!.rgba).toBe('#FF0000');
+        expect(noteColors.has(NoteSubElement.StandardNotationNoteHead)).toBe(false);
+    }
+
+    it('style-null-colors-js-object', () => {
+        const expected = createScoreWithNullStyleColors();
+        expectNullStyleColors(expected);
+
+        const actual = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(expected));
+        expectNullStyleColors(actual);
+    });
+
+    /*@target web*/
+    it('style-null-colors-json', () => {
+        const json = JsonConverter.scoreToJson(createScoreWithNullStyleColors());
+        expectNullStyleColors(JsonConverter.jsonToScore(json));
+    });
+
+    /*@target web*/
+    it('style-null-colors-structured-clone', () => {
+        const jsObject = JsonConverter.scoreToJsObject(createScoreWithNullStyleColors());
+        expectNullStyleColors(JsonConverter.jsObjectToScore(structuredClone(jsObject)));
     });
 });

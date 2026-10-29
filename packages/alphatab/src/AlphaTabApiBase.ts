@@ -756,7 +756,6 @@ export class AlphaTabApiBase<TSettings> {
             }
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
             this._onScoreLoaded(score);
-            this.loadMidiForScore();
             this.render(renderHints);
         } else {
             this._tracks = tracks;
@@ -1714,7 +1713,7 @@ export class AlphaTabApiBase<TSettings> {
 
         this._player.instance = newPlayer;
 
-        return false;
+        return true;
     }
 
     /**

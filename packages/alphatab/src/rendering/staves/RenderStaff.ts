@@ -54,7 +54,7 @@ export class RenderStaff implements IStaffDisplayContext {
     public get activeTopEffects(): ActiveEffectBand[] {
         let active = this._activeTopEffects;
         if (active === null) {
-            active = this._activeEffects(this.topEffectInfos);
+            active = this._activeEffects(this.topEffectInfos, this.index * 2);
             this._activeTopEffects = active;
         }
         return active;
@@ -64,13 +64,18 @@ export class RenderStaff implements IStaffDisplayContext {
     public get activeBottomEffects(): ActiveEffectBand[] {
         let active = this._activeBottomEffects;
         if (active === null) {
-            active = this._activeEffects(this.bottomEffectInfos);
+            active = this._activeEffects(this.bottomEffectInfos, this.index * 2 + 1);
             this._activeBottomEffects = active;
         }
         return active;
     }
 
-    private _activeEffects(infos: EffectBandInfo[]): ActiveEffectBand[] {
+    private _activeEffects(infos: EffectBandInfo[], key: number): ActiveEffectBand[] {
+        const shared = this.system.layout.activeEffects;
+        const existing = shared.get(key);
+        if (existing !== undefined) {
+            return existing;
+        }
         const notation = this.system.layout.renderer.settings.notation;
         const active: ActiveEffectBand[] = [];
         for (let i = 0; i < infos.length; i++) {
@@ -83,6 +88,7 @@ export class RenderStaff implements IStaffDisplayContext {
                 active.push(new ActiveEffectBand(effect, infos[i].order ?? i));
             }
         }
+        shared.set(key, active);
         return active;
     }
 

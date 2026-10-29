@@ -127,11 +127,18 @@ export class NoteNumberGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this.paintCentered(cx, cy, canvas, this.width);
+    }
+
+    /**
+     * Paints the note text horizontally centered within the given column width.
+     */
+    public paintCentered(cx: number, cy: number, canvas: ICanvas, columnWidth: number): void {
         if (this.isEmpty) {
             return;
         }
         const textWidth: number = this.noteStringWidth + this._trillNoteStringWidth;
-        const x: number = cx + this.x + (this.width - textWidth) / 2;
+        const x: number = cx + this.x + (columnWidth - textWidth) / 2;
         const y = cy + this.y;
 
         this.paintTrill(x, y, canvas);

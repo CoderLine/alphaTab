@@ -74,7 +74,8 @@ export class TabNoteChordGlyph extends Glyph {
                     pos += n.noteStringWidth / 2;
                     break;
                 case NoteXPosition.Right:
-                    pos += n.width;
+                    // fret numbers are painted centered in the column of the chord
+                    pos += this.width;
                     break;
             }
             return pos;
@@ -205,8 +206,7 @@ export class TabNoteChordGlyph extends Glyph {
             for (let i = 0, j = notes.length; i < j; i++) {
                 const g = notes[i];
                 g.renderer = this.renderer;
-                g.width = w;
-                g.paint(cx, cy, canvas);
+                g.paintCentered(cx, cy, canvas, w);
             }
             canvas.textBaseline = oldBaseLine;
 
