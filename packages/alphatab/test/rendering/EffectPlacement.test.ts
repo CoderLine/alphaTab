@@ -120,7 +120,7 @@ describe('EffectPlacementTests', () => {
             \\track "B" \\staff {score}
             :16 c4 d4{txt "dolcissimo"} e4 f4 c4 d4 e4 f4 c4 d4 e4 f4 c4 d4 e4 f4
         `;
-        const horizontal = (settings: Settings) => {
+        const horizontal = (settings: Settings, _score: Score) => {
             settings.display.layoutMode = LayoutMode.Horizontal;
         };
         const secondBeatX = (renderer: ScoreRenderer) => {
