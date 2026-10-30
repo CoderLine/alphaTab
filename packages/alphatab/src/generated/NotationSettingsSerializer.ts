@@ -4,11 +4,15 @@
 // the code is regenerated.
 // </auto-generated>
 import { NotationSettings } from "@coderline/alphatab/NotationSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { NotationMode } from "@coderline/alphatab/NotationSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { FingeringMode } from "@coderline/alphatab/NotationSettings";
 import { NotationElement } from "@coderline/alphatab/NotationSettings";
 import { TabRhythmMode } from "@coderline/alphatab/NotationSettings";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -17,96 +21,103 @@ export class NotationSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => NotationSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+        NotationSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: NotationSettings | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("notationmode", obj.notationMode as number);
-        o.set("fingeringmode", obj.fingeringMode as number);
-        {
-            const m = new Map<string, unknown>();
-            o.set("elements", m);
-            for (const [k, v] of obj.elements!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("rhythmmode", obj.rhythmMode as number);
-        o.set("rhythmheight", obj.rhythmHeight);
-        o.set("transpositionpitches", obj.transpositionPitches);
-        o.set("displaytranspositionpitches", obj.displayTranspositionPitches);
-        o.set("smallgracetabnotes", obj.smallGraceTabNotes);
-        o.set("extendbendarrowsontiednotes", obj.extendBendArrowsOnTiedNotes);
-        o.set("extendlineeffectstobeatend", obj.extendLineEffectsToBeatEnd);
-        o.set("slurheight", obj.slurHeight);
-        return o;
+    public static read(obj: NotationSettings, r: IObjectReader): void {
+        r.readObject((k, rr) => NotationSettingsSerializer.readProperty(obj, k, rr, false));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: NotationSettings | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "notationmode": obj.notationMode as number, "fingeringmode": obj.fingeringMode as number };
-        {
-            const m = new Map<string, unknown>();
-            o["elements"] = m;
-            for (const [k, v] of obj.elements!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o["rhythmmode"] = obj.rhythmMode as number;
-        o["rhythmheight"] = obj.rhythmHeight;
-        o["transpositionpitches"] = obj.transpositionPitches;
-        o["displaytranspositionpitches"] = obj.displayTranspositionPitches;
-        o["smallgracetabnotes"] = obj.smallGraceTabNotes;
-        o["extendbendarrowsontiednotes"] = obj.extendBendArrowsOnTiedNotes;
-        o["extendlineeffectstobeatend"] = obj.extendLineEffectsToBeatEnd;
-        o["slurheight"] = obj.slurHeight;
-        return o;
-    }
-    public static setProperty(obj: NotationSettings, property: string, v: unknown): boolean {
+    public static readProperty(obj: NotationSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
         switch (property) {
             case "notationmode":
-                obj.notationMode = JsonHelper.parseEnum<NotationMode>(v, NotationMode)!;
+                obj.notationMode = JsonHelper.parseEnum<NotationMode>(r.readValue(), NotationMode)!;
                 return true;
             case "fingeringmode":
-                obj.fingeringMode = JsonHelper.parseEnum<FingeringMode>(v, FingeringMode)!;
+                obj.fingeringMode = JsonHelper.parseEnum<FingeringMode>(r.readValue(), FingeringMode)!;
                 return true;
             case "elements":
-                obj.elements = new Map<NotationElement, boolean>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.elements.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, v as boolean);
-                });
+                NotationSettingsSerializer._readElements(obj, r, flexible);
                 return true;
             case "rhythmmode":
-                obj.rhythmMode = JsonHelper.parseEnum<TabRhythmMode>(v, TabRhythmMode)!;
+                obj.rhythmMode = JsonHelper.parseEnum<TabRhythmMode>(r.readValue(), TabRhythmMode)!;
                 return true;
             case "rhythmheight":
-                obj.rhythmHeight = v! as number;
+                obj.rhythmHeight = r.readNumber();
                 return true;
             case "transpositionpitches":
-                obj.transpositionPitches = v! as number[];
+                obj.transpositionPitches = r.readValue()! as number[];
                 return true;
             case "displaytranspositionpitches":
-                obj.displayTranspositionPitches = v! as number[];
+                obj.displayTranspositionPitches = r.readValue()! as number[];
                 return true;
             case "smallgracetabnotes":
-                obj.smallGraceTabNotes = v! as boolean;
+                obj.smallGraceTabNotes = r.readBoolean();
                 return true;
             case "extendbendarrowsontiednotes":
-                obj.extendBendArrowsOnTiedNotes = v! as boolean;
+                obj.extendBendArrowsOnTiedNotes = r.readBoolean();
                 return true;
             case "extendlineeffectstobeatend":
-                obj.extendLineEffectsToBeatEnd = v! as boolean;
+                obj.extendLineEffectsToBeatEnd = r.readBoolean();
                 return true;
             case "slurheight":
-                obj.slurHeight = v! as number;
+                obj.slurHeight = r.readNumber();
                 return true;
         }
         return false;
+    }
+    private static _readElements(obj: NotationSettings, r: IObjectReader, flexible: boolean): void {
+        obj.elements = new Map<NotationElement, boolean>();
+        r.readObject((k, rr) => {
+            obj.elements.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, rr.readBoolean());
+            return true;
+        });
+    }
+    public static readFlexible(obj: NotationSettings, r: IObjectReader): void {
+        r.readObject((k, rr) => NotationSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: NotationSettings, property: string, r: IObjectReader): boolean {
+        if (NotationSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static toJson(obj: NotationSettings | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        NotationSettingsSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: NotationSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("notationmode");
+        w.writeNumber(obj.notationMode as number);
+        w.prop("fingeringmode");
+        w.writeNumber(obj.fingeringMode as number);
+        w.prop("elements");
+        w.startMap();
+        for (const [k, v] of obj.elements!) {
+            w.prop(k.toString());
+            w.writeBoolean(v);
+        }
+        w.endMap();
+        w.prop("rhythmmode");
+        w.writeNumber(obj.rhythmMode as number);
+        w.prop("rhythmheight");
+        w.writeNumber(obj.rhythmHeight);
+        w.prop("transpositionpitches");
+        w.writeValue(obj.transpositionPitches);
+        w.prop("displaytranspositionpitches");
+        w.writeValue(obj.displayTranspositionPitches);
+        w.prop("smallgracetabnotes");
+        w.writeBoolean(obj.smallGraceTabNotes);
+        w.prop("extendbendarrowsontiednotes");
+        w.writeBoolean(obj.extendBendArrowsOnTiedNotes);
+        w.prop("extendlineeffectstobeatend");
+        w.writeBoolean(obj.extendLineEffectsToBeatEnd);
+        w.prop("slurheight");
+        w.writeNumber(obj.slurHeight);
+        w.endObject();
     }
 }

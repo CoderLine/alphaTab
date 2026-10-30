@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { VibratoPlaybackSettings } from "@coderline/alphatab/PlayerSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,60 +16,76 @@ export class VibratoPlaybackSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => VibratoPlaybackSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+        VibratoPlaybackSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: VibratoPlaybackSettings | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("notewidelength", obj.noteWideLength);
-        o.set("notewideamplitude", obj.noteWideAmplitude);
-        o.set("noteslightlength", obj.noteSlightLength);
-        o.set("noteslightamplitude", obj.noteSlightAmplitude);
-        o.set("beatwidelength", obj.beatWideLength);
-        o.set("beatwideamplitude", obj.beatWideAmplitude);
-        o.set("beatslightlength", obj.beatSlightLength);
-        o.set("beatslightamplitude", obj.beatSlightAmplitude);
-        return o;
+    public static read(obj: VibratoPlaybackSettings, r: IObjectReader): void {
+        r.readObject((k, rr) => VibratoPlaybackSettingsSerializer.readProperty(obj, k, rr, false));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: VibratoPlaybackSettings | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "notewidelength": obj.noteWideLength, "notewideamplitude": obj.noteWideAmplitude, "noteslightlength": obj.noteSlightLength, "noteslightamplitude": obj.noteSlightAmplitude, "beatwidelength": obj.beatWideLength, "beatwideamplitude": obj.beatWideAmplitude, "beatslightlength": obj.beatSlightLength, "beatslightamplitude": obj.beatSlightAmplitude };
-        return o;
-    }
-    public static setProperty(obj: VibratoPlaybackSettings, property: string, v: unknown): boolean {
+    public static readProperty(obj: VibratoPlaybackSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
         switch (property) {
             case "notewidelength":
-                obj.noteWideLength = v! as number;
+                obj.noteWideLength = r.readNumber();
                 return true;
             case "notewideamplitude":
-                obj.noteWideAmplitude = v! as number;
+                obj.noteWideAmplitude = r.readNumber();
                 return true;
             case "noteslightlength":
-                obj.noteSlightLength = v! as number;
+                obj.noteSlightLength = r.readNumber();
                 return true;
             case "noteslightamplitude":
-                obj.noteSlightAmplitude = v! as number;
+                obj.noteSlightAmplitude = r.readNumber();
                 return true;
             case "beatwidelength":
-                obj.beatWideLength = v! as number;
+                obj.beatWideLength = r.readNumber();
                 return true;
             case "beatwideamplitude":
-                obj.beatWideAmplitude = v! as number;
+                obj.beatWideAmplitude = r.readNumber();
                 return true;
             case "beatslightlength":
-                obj.beatSlightLength = v! as number;
+                obj.beatSlightLength = r.readNumber();
                 return true;
             case "beatslightamplitude":
-                obj.beatSlightAmplitude = v! as number;
+                obj.beatSlightAmplitude = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static readFlexible(obj: VibratoPlaybackSettings, r: IObjectReader): void {
+        r.readObject((k, rr) => VibratoPlaybackSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: VibratoPlaybackSettings, property: string, r: IObjectReader): boolean {
+        if (VibratoPlaybackSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static toJson(obj: VibratoPlaybackSettings | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        VibratoPlaybackSettingsSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: VibratoPlaybackSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("notewidelength");
+        w.writeNumber(obj.noteWideLength);
+        w.prop("notewideamplitude");
+        w.writeNumber(obj.noteWideAmplitude);
+        w.prop("noteslightlength");
+        w.writeNumber(obj.noteSlightLength);
+        w.prop("noteslightamplitude");
+        w.writeNumber(obj.noteSlightAmplitude);
+        w.prop("beatwidelength");
+        w.writeNumber(obj.beatWideLength);
+        w.prop("beatwideamplitude");
+        w.writeNumber(obj.beatWideAmplitude);
+        w.prop("beatslightlength");
+        w.writeNumber(obj.beatSlightLength);
+        w.prop("beatslightamplitude");
+        w.writeNumber(obj.beatSlightAmplitude);
+        w.endObject();
     }
 }

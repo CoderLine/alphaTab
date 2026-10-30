@@ -4,16 +4,19 @@
 // the code is regenerated.
 // </auto-generated>
 import { Score } from "@coderline/alphatab/model/Score";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { MasterBar } from "@coderline/alphatab/model/MasterBar";
 import { MasterBarSerializer } from "@coderline/alphatab/generated/model/MasterBarSerializer";
+import { Track } from "@coderline/alphatab/model/Track";
 import { TrackSerializer } from "@coderline/alphatab/generated/model/TrackSerializer";
 import { RenderStylesheetSerializer } from "@coderline/alphatab/generated/model/RenderStylesheetSerializer";
-import { BackingTrackSerializer } from "@coderline/alphatab/generated/model/BackingTrackSerializer";
-import { ScoreStyleSerializer } from "@coderline/alphatab/generated/model/ScoreStyleSerializer";
-import { MasterBar } from "@coderline/alphatab/model/MasterBar";
-import { Track } from "@coderline/alphatab/model/Track";
 import { BackingTrack } from "@coderline/alphatab/model/BackingTrack";
+import { BackingTrackSerializer } from "@coderline/alphatab/generated/model/BackingTrackSerializer";
 import { ScoreStyle } from "@coderline/alphatab/model/Score";
+import { ScoreStyleSerializer } from "@coderline/alphatab/generated/model/ScoreStyleSerializer";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -22,128 +25,152 @@ export class ScoreSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => ScoreSerializer.setProperty(obj, k, v));
+        ScoreSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Score | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("album", obj.album);
-        o.set("artist", obj.artist);
-        o.set("copyright", obj.copyright);
-        o.set("instructions", obj.instructions);
-        o.set("music", obj.music);
-        o.set("notices", obj.notices);
-        o.set("subtitle", obj.subTitle);
-        o.set("title", obj.title);
-        o.set("words", obj.words);
-        o.set("tab", obj.tab);
-        o.set("masterbars", obj.masterBars.map(i => MasterBarSerializer.toJson(i)));
-        o.set("tracks", obj.tracks.map(i => TrackSerializer.toJson(i)));
-        o.set("defaultsystemslayout", obj.defaultSystemsLayout);
-        o.set("systemslayout", obj.systemsLayout);
-        o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet));
-        if (obj.backingTrack) {
-            o.set("backingtrack", BackingTrackSerializer.toJson(obj.backingTrack));
-        }
-        if (obj.style) {
-            o.set("style", ScoreStyleSerializer.toJson(obj.style));
-        }
-        return o;
+    public static read(obj: Score, r: IObjectReader): void {
+        r.readObject((k, rr) => ScoreSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: Score | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "album": obj.album, "artist": obj.artist, "copyright": obj.copyright, "instructions": obj.instructions, "music": obj.music, "notices": obj.notices, "subtitle": obj.subTitle, "title": obj.title, "words": obj.words, "tab": obj.tab, "masterbars": obj.masterBars.map(i => MasterBarSerializer.toJsObject(i)), "tracks": obj.tracks.map(i => TrackSerializer.toJsObject(i)), "defaultsystemslayout": obj.defaultSystemsLayout, "systemslayout": obj.systemsLayout, "stylesheet": RenderStylesheetSerializer.toJsObject(obj.stylesheet) };
-        if (obj.backingTrack) {
-            o["backingtrack"] = BackingTrackSerializer.toJsObject(obj.backingTrack);
-        }
-        if (obj.style) {
-            o["style"] = ScoreStyleSerializer.toJsObject(obj.style);
-        }
-        return o;
-    }
-    public static setProperty(obj: Score, property: string, v: unknown): boolean {
+    public static readProperty(obj: Score, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "album":
-                obj.album = v! as string;
+                obj.album = r.readString();
                 return true;
             case "artist":
-                obj.artist = v! as string;
+                obj.artist = r.readString();
                 return true;
             case "copyright":
-                obj.copyright = v! as string;
+                obj.copyright = r.readString();
                 return true;
             case "instructions":
-                obj.instructions = v! as string;
+                obj.instructions = r.readString();
                 return true;
             case "music":
-                obj.music = v! as string;
+                obj.music = r.readString();
                 return true;
             case "notices":
-                obj.notices = v! as string;
+                obj.notices = r.readString();
                 return true;
             case "subtitle":
-                obj.subTitle = v! as string;
+                obj.subTitle = r.readString();
                 return true;
             case "title":
-                obj.title = v! as string;
+                obj.title = r.readString();
                 return true;
             case "words":
-                obj.words = v! as string;
+                obj.words = r.readString();
                 return true;
             case "tab":
-                obj.tab = v! as string;
+                obj.tab = r.readString();
                 return true;
             case "masterbars":
-                obj.masterBars = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new MasterBar();
-                    MasterBarSerializer.fromJson(i, o);
-                    obj.addMasterBar(i);
-                }
+                ScoreSerializer._readMasterBars(obj, r);
                 return true;
             case "tracks":
-                obj.tracks = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new Track();
-                    TrackSerializer.fromJson(i, o);
-                    obj.addTrack(i);
-                }
+                ScoreSerializer._readTracks(obj, r);
                 return true;
             case "defaultsystemslayout":
-                obj.defaultSystemsLayout = v! as number;
+                obj.defaultSystemsLayout = r.readNumber();
                 return true;
             case "systemslayout":
-                obj.systemsLayout = v! as number[];
+                obj.systemsLayout = r.readValue()! as number[];
                 return true;
             case "stylesheet":
-                RenderStylesheetSerializer.fromJson(obj.stylesheet, v);
+                RenderStylesheetSerializer.read(obj.stylesheet, r);
                 return true;
             case "backingtrack":
-                if (v) {
-                    obj.backingTrack = new BackingTrack();
-                    BackingTrackSerializer.fromJson(obj.backingTrack, v);
+                if (r.isNullish()) {
+                    obj.backingTrack = undefined;
                 }
                 else {
-                    obj.backingTrack = undefined;
+                    obj.backingTrack = new BackingTrack();
+                    BackingTrackSerializer.read(obj.backingTrack, r);
                 }
                 return true;
             case "style":
-                if (v) {
-                    obj.style = new ScoreStyle();
-                    ScoreStyleSerializer.fromJson(obj.style, v);
+                if (r.isNullish()) {
+                    obj.style = undefined;
                 }
                 else {
-                    obj.style = undefined;
+                    obj.style = new ScoreStyle();
+                    ScoreStyleSerializer.read(obj.style, r);
                 }
                 return true;
         }
         return false;
+    }
+    private static _readMasterBars(obj: Score, r: IObjectReader): void {
+        obj.masterBars = [];
+        r.readArray(rr => {
+            const i = new MasterBar();
+            MasterBarSerializer.read(i, rr);
+            obj.addMasterBar(i);
+        });
+    }
+    private static _readTracks(obj: Score, r: IObjectReader): void {
+        obj.tracks = [];
+        r.readArray(rr => {
+            const i = new Track();
+            TrackSerializer.read(i, rr);
+            obj.addTrack(i);
+        });
+    }
+    public static toJson(obj: Score | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        ScoreSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Score | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("album");
+        w.writeString(obj.album);
+        w.prop("artist");
+        w.writeString(obj.artist);
+        w.prop("copyright");
+        w.writeString(obj.copyright);
+        w.prop("instructions");
+        w.writeString(obj.instructions);
+        w.prop("music");
+        w.writeString(obj.music);
+        w.prop("notices");
+        w.writeString(obj.notices);
+        w.prop("subtitle");
+        w.writeString(obj.subTitle);
+        w.prop("title");
+        w.writeString(obj.title);
+        w.prop("words");
+        w.writeString(obj.words);
+        w.prop("tab");
+        w.writeString(obj.tab);
+        w.prop("masterbars");
+        w.startArray(obj.masterBars!.length);
+        for (const i of obj.masterBars!) {
+            MasterBarSerializer.write(i, w);
+        }
+        w.endArray();
+        w.prop("tracks");
+        w.startArray(obj.tracks!.length);
+        for (const i of obj.tracks!) {
+            TrackSerializer.write(i, w);
+        }
+        w.endArray();
+        w.prop("defaultsystemslayout");
+        w.writeNumber(obj.defaultSystemsLayout);
+        w.prop("systemslayout");
+        w.writeValue(obj.systemsLayout);
+        w.prop("stylesheet");
+        RenderStylesheetSerializer.write(obj.stylesheet, w);
+        if (obj.backingTrack) {
+            w.prop("backingtrack");
+            BackingTrackSerializer.write(obj.backingTrack, w);
+        }
+        if (obj.style) {
+            w.prop("style");
+            ScoreStyleSerializer.write(obj.style, w);
+        }
+        w.endObject();
     }
 }

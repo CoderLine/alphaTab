@@ -4,9 +4,13 @@
 // the code is regenerated.
 // </auto-generated>
 import { BarStyle } from "@coderline/alphatab/model/Bar";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { BarSubElement } from "@coderline/alphatab/model/Bar";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Color } from "@coderline/alphatab/model/Color";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -15,48 +19,44 @@ export class BarStyleSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BarStyleSerializer.setProperty(obj, k, v));
+        BarStyleSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: BarStyle | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        {
-            const m = new Map<string, unknown>();
-            o.set("colors", m);
-            for (const [k, v] of obj.colors!) {
-                m.set(k.toString(), Color.toJson(v));
-            }
-        }
-        return o;
+    public static read(obj: BarStyle, r: IObjectReader): void {
+        r.readObject((k, rr) => BarStyleSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: BarStyle | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = {};
-        {
-            const m = new Map<string, unknown>();
-            o["colors"] = m;
-            for (const [k, v] of obj.colors!) {
-                m.set(k.toString(), Color.toJson(v));
-            }
-        }
-        return o;
-    }
-    public static setProperty(obj: BarStyle, property: string, v: unknown): boolean {
+    public static readProperty(obj: BarStyle, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "colors":
-                obj.colors = new Map<BarSubElement, Color | null>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.colors.set(JsonHelper.parseEnum<BarSubElement>(k, BarSubElement)!, Color.fromJson(v));
-                });
+                BarStyleSerializer._readColors(obj, r);
                 return true;
         }
         return false;
+    }
+    private static _readColors(obj: BarStyle, r: IObjectReader): void {
+        obj.colors = new Map<BarSubElement, Color | null>();
+        r.readObject((k, rr) => {
+            obj.colors.set(JsonHelper.parseEnum<BarSubElement>(k, BarSubElement)!, Color.fromJson(rr.readValue()));
+            return true;
+        });
+    }
+    public static toJson(obj: BarStyle | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        BarStyleSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: BarStyle | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("colors");
+        w.startMap();
+        for (const [k, v] of obj.colors!) {
+            w.prop(k.toString());
+            w.writeValue(Color.toJson(v));
+        }
+        w.endMap();
+        w.endObject();
     }
 }

@@ -4,11 +4,14 @@
 // the code is regenerated.
 // </auto-generated>
 import { Voice } from "@coderline/alphatab/model/Voice";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { BeatSerializer } from "@coderline/alphatab/generated/model/BeatSerializer";
-import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { Beat } from "@coderline/alphatab/model/Beat";
+import { BeatSerializer } from "@coderline/alphatab/generated/model/BeatSerializer";
 import { VoiceStyle } from "@coderline/alphatab/model/Voice";
+import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -17,56 +20,62 @@ export class VoiceSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => VoiceSerializer.setProperty(obj, k, v));
+        VoiceSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Voice | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("id", obj.id);
-        o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i)));
-        if (obj.style) {
-            o.set("style", VoiceStyleSerializer.toJson(obj.style));
-        }
-        return o;
+    public static read(obj: Voice, r: IObjectReader): void {
+        r.readObject((k, rr) => VoiceSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: Voice | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "id": obj.id, "beats": obj.beats.map(i => BeatSerializer.toJsObject(i)) };
-        if (obj.style) {
-            o["style"] = VoiceStyleSerializer.toJsObject(obj.style);
-        }
-        return o;
-    }
-    public static setProperty(obj: Voice, property: string, v: unknown): boolean {
+    public static readProperty(obj: Voice, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "id":
-                obj.id = v! as number;
+                obj.id = r.readNumber();
                 return true;
             case "beats":
-                obj.beats = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new Beat();
-                    BeatSerializer.fromJson(i, o);
-                    obj.addBeat(i);
-                }
+                VoiceSerializer._readBeats(obj, r);
                 return true;
             case "style":
-                if (v) {
-                    obj.style = new VoiceStyle();
-                    VoiceStyleSerializer.fromJson(obj.style, v);
+                if (r.isNullish()) {
+                    obj.style = undefined;
                 }
                 else {
-                    obj.style = undefined;
+                    obj.style = new VoiceStyle();
+                    VoiceStyleSerializer.read(obj.style, r);
                 }
                 return true;
         }
         return false;
+    }
+    private static _readBeats(obj: Voice, r: IObjectReader): void {
+        obj.beats = [];
+        r.readArray(rr => {
+            const i = new Beat();
+            BeatSerializer.read(i, rr);
+            obj.addBeat(i);
+        });
+    }
+    public static toJson(obj: Voice | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        VoiceSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Voice | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("id");
+        w.writeNumber(obj.id);
+        w.prop("beats");
+        w.startArray(obj.beats!.length);
+        for (const i of obj.beats!) {
+            BeatSerializer.write(i, w);
+        }
+        w.endArray();
+        if (obj.style) {
+            w.prop("style");
+            VoiceStyleSerializer.write(obj.style, w);
+        }
+        w.endObject();
     }
 }

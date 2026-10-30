@@ -4,25 +4,26 @@
 // the code is regenerated.
 // </auto-generated>
 import { Beat } from "@coderline/alphatab/model/Beat";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { NoteSerializer } from "@coderline/alphatab/generated/model/NoteSerializer";
-import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
-import { BendPointSerializer } from "@coderline/alphatab/generated/model/BendPointSerializer";
-import { TremoloPickingEffectSerializer } from "@coderline/alphatab/generated/model/TremoloPickingEffectSerializer";
-import { BeatStyleSerializer } from "@coderline/alphatab/generated/model/BeatStyleSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { Note } from "@coderline/alphatab/model/Note";
+import { NoteSerializer } from "@coderline/alphatab/generated/model/NoteSerializer";
 import { BendStyle } from "@coderline/alphatab/model/BendStyle";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Ottavia } from "@coderline/alphatab/model/Ottavia";
 import { Duration } from "@coderline/alphatab/model/Duration";
 import { Automation } from "@coderline/alphatab/model/Automation";
+import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
 import { FadeType } from "@coderline/alphatab/model/FadeType";
 import { BrushType } from "@coderline/alphatab/model/BrushType";
 import { WhammyType } from "@coderline/alphatab/model/WhammyType";
 import { BendPoint } from "@coderline/alphatab/model/BendPoint";
+import { BendPointSerializer } from "@coderline/alphatab/generated/model/BendPointSerializer";
 import { VibratoType } from "@coderline/alphatab/model/VibratoType";
 import { GraceType } from "@coderline/alphatab/model/GraceType";
 import { PickStroke } from "@coderline/alphatab/model/PickStroke";
 import { TremoloPickingEffect } from "@coderline/alphatab/model/TremoloPickingEffect";
+import { TremoloPickingEffectSerializer } from "@coderline/alphatab/generated/model/TremoloPickingEffectSerializer";
 import { CrescendoType } from "@coderline/alphatab/model/CrescendoType";
 import { GolpeType } from "@coderline/alphatab/model/GolpeType";
 import { DynamicValue } from "@coderline/alphatab/model/DynamicValue";
@@ -32,6 +33,9 @@ import { WahPedal } from "@coderline/alphatab/model/WahPedal";
 import { BarreShape } from "@coderline/alphatab/model/BarreShape";
 import { Rasgueado } from "@coderline/alphatab/model/Rasgueado";
 import { BeatStyle } from "@coderline/alphatab/model/Beat";
+import { BeatStyleSerializer } from "@coderline/alphatab/generated/model/BeatStyleSerializer";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -40,316 +44,343 @@ export class BeatSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BeatSerializer.setProperty(obj, k, v));
+        BeatSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Beat | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("id", obj.id);
-        o.set("notes", obj.notes.map(i => NoteSerializer.toJson(i)));
-        o.set("isempty", obj.isEmpty);
-        o.set("whammystyle", obj.whammyStyle as number);
-        o.set("ottava", obj.ottava as number);
-        o.set("islegatoorigin", obj.isLegatoOrigin);
-        o.set("duration", obj.duration as number);
-        o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i)));
-        o.set("dots", obj.dots);
-        o.set("fade", obj.fade as number);
-        o.set("lyrics", obj.lyrics);
-        o.set("pop", obj.pop);
-        o.set("slap", obj.slap);
-        o.set("tap", obj.tap);
-        o.set("text", obj.text);
-        o.set("slashed", obj.slashed);
-        o.set("deadslapped", obj.deadSlapped);
-        if (!Number.isNaN(obj.restDisplayTone)) {
-            o.set("restdisplaytone", obj.restDisplayTone);
-        }
-        if (!Number.isNaN(obj.restDisplayOctave)) {
-            o.set("restdisplayoctave", obj.restDisplayOctave);
-        }
-        o.set("brushtype", obj.brushType as number);
-        o.set("brushduration", obj.brushDuration);
-        o.set("tupletdenominator", obj.tupletDenominator);
-        o.set("tupletnumerator", obj.tupletNumerator);
-        o.set("iscontinuedwhammy", obj.isContinuedWhammy);
-        o.set("whammybartype", obj.whammyBarType as number);
-        if (obj.whammyBarPoints !== null) {
-            o.set("whammybarpoints", obj.whammyBarPoints?.map(i => BendPointSerializer.toJson(i)));
-        }
-        o.set("vibrato", obj.vibrato as number);
-        o.set("chordid", obj.chordId);
-        o.set("gracetype", obj.graceType as number);
-        o.set("pickstroke", obj.pickStroke as number);
-        if (obj.tremoloPicking) {
-            o.set("tremolopicking", TremoloPickingEffectSerializer.toJson(obj.tremoloPicking));
-        }
-        o.set("crescendo", obj.crescendo as number);
-        o.set("displaystart", obj.displayStart);
-        o.set("playbackstart", obj.playbackStart);
-        o.set("displayduration", obj.displayDuration);
-        o.set("playbackduration", obj.playbackDuration);
-        o.set("overridedisplayduration", obj.overrideDisplayDuration);
-        o.set("golpe", obj.golpe as number);
-        o.set("dynamics", obj.dynamics as number);
-        o.set("showdynamics", obj.showDynamics);
-        o.set("invertbeamdirection", obj.invertBeamDirection);
-        o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
-        o.set("beamingmode", obj.beamingMode as number);
-        o.set("wahpedal", obj.wahPedal as number);
-        o.set("barrefret", obj.barreFret);
-        o.set("barreshape", obj.barreShape as number);
-        o.set("rasgueado", obj.rasgueado as number);
-        o.set("showtimer", obj.showTimer);
-        o.set("timer", obj.timer);
-        if (obj.style) {
-            o.set("style", BeatStyleSerializer.toJson(obj.style));
-        }
-        return o;
+    public static read(obj: Beat, r: IObjectReader): void {
+        r.readObject((k, rr) => BeatSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: Beat | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "id": obj.id, "notes": obj.notes.map(i => NoteSerializer.toJsObject(i)), "isempty": obj.isEmpty, "whammystyle": obj.whammyStyle as number, "ottava": obj.ottava as number, "islegatoorigin": obj.isLegatoOrigin, "duration": obj.duration as number, "automations": obj.automations.map(i => AutomationSerializer.toJsObject(i)), "dots": obj.dots, "fade": obj.fade as number, "lyrics": obj.lyrics, "pop": obj.pop, "slap": obj.slap, "tap": obj.tap, "text": obj.text, "slashed": obj.slashed, "deadslapped": obj.deadSlapped };
-        if (!Number.isNaN(obj.restDisplayTone)) {
-            o["restdisplaytone"] = obj.restDisplayTone;
-        }
-        if (!Number.isNaN(obj.restDisplayOctave)) {
-            o["restdisplayoctave"] = obj.restDisplayOctave;
-        }
-        o["brushtype"] = obj.brushType as number;
-        o["brushduration"] = obj.brushDuration;
-        o["tupletdenominator"] = obj.tupletDenominator;
-        o["tupletnumerator"] = obj.tupletNumerator;
-        o["iscontinuedwhammy"] = obj.isContinuedWhammy;
-        o["whammybartype"] = obj.whammyBarType as number;
-        if (obj.whammyBarPoints !== null) {
-            o["whammybarpoints"] = obj.whammyBarPoints?.map(i => BendPointSerializer.toJsObject(i));
-        }
-        o["vibrato"] = obj.vibrato as number;
-        o["chordid"] = obj.chordId;
-        o["gracetype"] = obj.graceType as number;
-        o["pickstroke"] = obj.pickStroke as number;
-        if (obj.tremoloPicking) {
-            o["tremolopicking"] = TremoloPickingEffectSerializer.toJsObject(obj.tremoloPicking);
-        }
-        o["crescendo"] = obj.crescendo as number;
-        o["displaystart"] = obj.displayStart;
-        o["playbackstart"] = obj.playbackStart;
-        o["displayduration"] = obj.displayDuration;
-        o["playbackduration"] = obj.playbackDuration;
-        o["overridedisplayduration"] = obj.overrideDisplayDuration;
-        o["golpe"] = obj.golpe as number;
-        o["dynamics"] = obj.dynamics as number;
-        o["showdynamics"] = obj.showDynamics;
-        o["invertbeamdirection"] = obj.invertBeamDirection;
-        o["preferredbeamdirection"] = obj.preferredBeamDirection as number | null;
-        o["beamingmode"] = obj.beamingMode as number;
-        o["wahpedal"] = obj.wahPedal as number;
-        o["barrefret"] = obj.barreFret;
-        o["barreshape"] = obj.barreShape as number;
-        o["rasgueado"] = obj.rasgueado as number;
-        o["showtimer"] = obj.showTimer;
-        o["timer"] = obj.timer;
-        if (obj.style) {
-            o["style"] = BeatStyleSerializer.toJsObject(obj.style);
-        }
-        return o;
-    }
-    public static setProperty(obj: Beat, property: string, v: unknown): boolean {
+    public static readProperty(obj: Beat, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "id":
-                obj.id = v! as number;
+                obj.id = r.readNumber();
                 return true;
             case "notes":
-                obj.notes = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new Note();
-                    NoteSerializer.fromJson(i, o);
-                    obj.addNote(i);
-                }
+                BeatSerializer._readNotes(obj, r);
                 return true;
             case "isempty":
-                obj.isEmpty = v! as boolean;
+                obj.isEmpty = r.readBoolean();
                 return true;
             case "whammystyle":
-                obj.whammyStyle = JsonHelper.parseEnum<BendStyle>(v, BendStyle)!;
+                obj.whammyStyle = JsonHelper.parseEnum<BendStyle>(r.readValue(), BendStyle)!;
                 return true;
             case "ottava":
-                obj.ottava = JsonHelper.parseEnum<Ottavia>(v, Ottavia)!;
+                obj.ottava = JsonHelper.parseEnum<Ottavia>(r.readValue(), Ottavia)!;
                 return true;
             case "islegatoorigin":
-                obj.isLegatoOrigin = v! as boolean;
+                obj.isLegatoOrigin = r.readBoolean();
                 return true;
             case "duration":
-                obj.duration = JsonHelper.parseEnum<Duration>(v, Duration)!;
+                obj.duration = JsonHelper.parseEnum<Duration>(r.readValue(), Duration)!;
                 return true;
             case "automations":
-                obj.automations = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new Automation();
-                    AutomationSerializer.fromJson(i, o);
-                    obj.automations.push(i);
-                }
+                BeatSerializer._readAutomations(obj, r);
                 return true;
             case "dots":
-                obj.dots = v! as number;
+                obj.dots = r.readNumber();
                 return true;
             case "fadein":
-                obj.fadeIn = v! as boolean;
+                obj.fadeIn = r.readBoolean();
                 return true;
             case "fade":
-                obj.fade = JsonHelper.parseEnum<FadeType>(v, FadeType)!;
+                obj.fade = JsonHelper.parseEnum<FadeType>(r.readValue(), FadeType)!;
                 return true;
             case "lyrics":
-                obj.lyrics = v as string[] | null;
+                obj.lyrics = r.readValue() as string[] | null;
                 return true;
             case "pop":
-                obj.pop = v! as boolean;
+                obj.pop = r.readBoolean();
                 return true;
             case "slap":
-                obj.slap = v! as boolean;
+                obj.slap = r.readBoolean();
                 return true;
             case "tap":
-                obj.tap = v! as boolean;
+                obj.tap = r.readBoolean();
                 return true;
             case "text":
-                obj.text = v as string | null;
+                obj.text = r.readValue() as string | null;
                 return true;
             case "slashed":
-                obj.slashed = v! as boolean;
+                obj.slashed = r.readBoolean();
                 return true;
             case "deadslapped":
-                obj.deadSlapped = v! as boolean;
+                obj.deadSlapped = r.readBoolean();
                 return true;
             case "restdisplaytone":
-                obj.restDisplayTone = v === null || v === undefined ? Number.NaN : (v as number);
+                obj.restDisplayTone = r.isNullish() ? Number.NaN : r.readNumber();
                 return true;
             case "restdisplayoctave":
-                obj.restDisplayOctave = v === null || v === undefined ? Number.NaN : (v as number);
+                obj.restDisplayOctave = r.isNullish() ? Number.NaN : r.readNumber();
                 return true;
             case "brushtype":
-                obj.brushType = JsonHelper.parseEnum<BrushType>(v, BrushType)!;
+                obj.brushType = JsonHelper.parseEnum<BrushType>(r.readValue(), BrushType)!;
                 return true;
             case "brushduration":
-                obj.brushDuration = v! as number;
+                obj.brushDuration = r.readNumber();
                 return true;
             case "tupletdenominator":
-                obj.tupletDenominator = v! as number;
+                obj.tupletDenominator = r.readNumber();
                 return true;
             case "tupletnumerator":
-                obj.tupletNumerator = v! as number;
+                obj.tupletNumerator = r.readNumber();
                 return true;
             case "iscontinuedwhammy":
-                obj.isContinuedWhammy = v! as boolean;
+                obj.isContinuedWhammy = r.readBoolean();
                 return true;
             case "whammybartype":
-                obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(v, WhammyType)!;
+                obj.whammyBarType = JsonHelper.parseEnum<WhammyType>(r.readValue(), WhammyType)!;
                 return true;
             case "whammybarpoints":
-                if (v) {
-                    obj.whammyBarPoints = [];
-                    for (const o of (v as (Map<string, unknown> | null)[])) {
-                        const i = new BendPoint();
-                        BendPointSerializer.fromJson(i, o);
-                        obj.addWhammyBarPoint(i);
-                    }
-                }
+                BeatSerializer._readWhammyBarPoints(obj, r);
                 return true;
             case "vibrato":
-                obj.vibrato = JsonHelper.parseEnum<VibratoType>(v, VibratoType)!;
+                obj.vibrato = JsonHelper.parseEnum<VibratoType>(r.readValue(), VibratoType)!;
                 return true;
             case "chordid":
-                obj.chordId = v as string | null;
+                obj.chordId = r.readValue() as string | null;
                 return true;
             case "gracetype":
-                obj.graceType = JsonHelper.parseEnum<GraceType>(v, GraceType)!;
+                obj.graceType = JsonHelper.parseEnum<GraceType>(r.readValue(), GraceType)!;
                 return true;
             case "pickstroke":
-                obj.pickStroke = JsonHelper.parseEnum<PickStroke>(v, PickStroke)!;
+                obj.pickStroke = JsonHelper.parseEnum<PickStroke>(r.readValue(), PickStroke)!;
                 return true;
             case "tremolopicking":
-                if (v) {
-                    obj.tremoloPicking = new TremoloPickingEffect();
-                    TremoloPickingEffectSerializer.fromJson(obj.tremoloPicking, v);
+                if (r.isNullish()) {
+                    obj.tremoloPicking = undefined;
                 }
                 else {
-                    obj.tremoloPicking = undefined;
+                    obj.tremoloPicking = new TremoloPickingEffect();
+                    TremoloPickingEffectSerializer.read(obj.tremoloPicking, r);
                 }
                 return true;
             case "tremolospeed":
-                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration) ?? null;
+                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(r.readValue(), Duration) ?? null;
                 return true;
             case "crescendo":
-                obj.crescendo = JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!;
+                obj.crescendo = JsonHelper.parseEnum<CrescendoType>(r.readValue(), CrescendoType)!;
                 return true;
             case "displaystart":
-                obj.displayStart = v! as number;
+                obj.displayStart = r.readNumber();
                 return true;
             case "playbackstart":
-                obj.playbackStart = v! as number;
+                obj.playbackStart = r.readNumber();
                 return true;
             case "displayduration":
-                obj.displayDuration = v! as number;
+                obj.displayDuration = r.readNumber();
                 return true;
             case "playbackduration":
-                obj.playbackDuration = v! as number;
+                obj.playbackDuration = r.readNumber();
                 return true;
             case "overridedisplayduration":
-                obj.overrideDisplayDuration = v as number | undefined;
+                obj.overrideDisplayDuration = r.readValue() as number | undefined;
                 return true;
             case "golpe":
-                obj.golpe = JsonHelper.parseEnum<GolpeType>(v, GolpeType)!;
+                obj.golpe = JsonHelper.parseEnum<GolpeType>(r.readValue(), GolpeType)!;
                 return true;
             case "dynamics":
-                obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
+                obj.dynamics = JsonHelper.parseEnum<DynamicValue>(r.readValue(), DynamicValue)!;
                 return true;
             case "showdynamics":
-                obj.showDynamics = v as boolean | undefined;
+                obj.showDynamics = r.readValue() as boolean | undefined;
                 return true;
             case "invertbeamdirection":
-                obj.invertBeamDirection = v! as boolean;
+                obj.invertBeamDirection = r.readBoolean();
                 return true;
             case "preferredbeamdirection":
-                obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(v, BeamDirection) ?? null;
+                obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(r.readValue(), BeamDirection) ?? null;
                 return true;
             case "beamingmode":
-                obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!;
+                obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(r.readValue(), BeatBeamingMode)!;
                 return true;
             case "wahpedal":
-                obj.wahPedal = JsonHelper.parseEnum<WahPedal>(v, WahPedal)!;
+                obj.wahPedal = JsonHelper.parseEnum<WahPedal>(r.readValue(), WahPedal)!;
                 return true;
             case "barrefret":
-                obj.barreFret = v! as number;
+                obj.barreFret = r.readNumber();
                 return true;
             case "barreshape":
-                obj.barreShape = JsonHelper.parseEnum<BarreShape>(v, BarreShape)!;
+                obj.barreShape = JsonHelper.parseEnum<BarreShape>(r.readValue(), BarreShape)!;
                 return true;
             case "rasgueado":
-                obj.rasgueado = JsonHelper.parseEnum<Rasgueado>(v, Rasgueado)!;
+                obj.rasgueado = JsonHelper.parseEnum<Rasgueado>(r.readValue(), Rasgueado)!;
                 return true;
             case "showtimer":
-                obj.showTimer = v! as boolean;
+                obj.showTimer = r.readBoolean();
                 return true;
             case "timer":
-                obj.timer = v as number | null;
+                obj.timer = r.readValue() as number | null;
                 return true;
             case "style":
-                if (v) {
-                    obj.style = new BeatStyle();
-                    BeatStyleSerializer.fromJson(obj.style, v);
+                if (r.isNullish()) {
+                    obj.style = undefined;
                 }
                 else {
-                    obj.style = undefined;
+                    obj.style = new BeatStyle();
+                    BeatStyleSerializer.read(obj.style, r);
                 }
                 return true;
         }
         return false;
+    }
+    private static _readNotes(obj: Beat, r: IObjectReader): void {
+        obj.notes = [];
+        r.readArray(rr => {
+            const i = new Note();
+            NoteSerializer.read(i, rr);
+            obj.addNote(i);
+        });
+    }
+    private static _readAutomations(obj: Beat, r: IObjectReader): void {
+        obj.automations = [];
+        r.readArray(rr => {
+            const i = new Automation();
+            AutomationSerializer.read(i, rr);
+            obj.automations.push(i);
+        });
+    }
+    private static _readWhammyBarPoints(obj: Beat, r: IObjectReader): void {
+        if (!r.isNullish()) {
+            obj.whammyBarPoints = [];
+            r.readArray(rr => {
+                const i = new BendPoint();
+                BendPointSerializer.read(i, rr);
+                obj.addWhammyBarPoint(i);
+            });
+        }
+    }
+    public static toJson(obj: Beat | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        BeatSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Beat | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("id");
+        w.writeNumber(obj.id);
+        w.prop("notes");
+        w.startArray(obj.notes!.length);
+        for (const i of obj.notes!) {
+            NoteSerializer.write(i, w);
+        }
+        w.endArray();
+        w.prop("isempty");
+        w.writeBoolean(obj.isEmpty);
+        w.prop("whammystyle");
+        w.writeNumber(obj.whammyStyle as number);
+        w.prop("ottava");
+        w.writeNumber(obj.ottava as number);
+        w.prop("islegatoorigin");
+        w.writeBoolean(obj.isLegatoOrigin);
+        w.prop("duration");
+        w.writeNumber(obj.duration as number);
+        w.prop("automations");
+        w.startArray(obj.automations!.length);
+        for (const i of obj.automations!) {
+            AutomationSerializer.write(i, w);
+        }
+        w.endArray();
+        w.prop("dots");
+        w.writeNumber(obj.dots);
+        w.prop("fade");
+        w.writeNumber(obj.fade as number);
+        w.prop("lyrics");
+        w.writeValue(obj.lyrics);
+        w.prop("pop");
+        w.writeBoolean(obj.pop);
+        w.prop("slap");
+        w.writeBoolean(obj.slap);
+        w.prop("tap");
+        w.writeBoolean(obj.tap);
+        w.prop("text");
+        w.writeValue(obj.text);
+        w.prop("slashed");
+        w.writeBoolean(obj.slashed);
+        w.prop("deadslapped");
+        w.writeBoolean(obj.deadSlapped);
+        if (!Number.isNaN(obj.restDisplayTone)) {
+            w.prop("restdisplaytone");
+            w.writeNumber(obj.restDisplayTone);
+        }
+        if (!Number.isNaN(obj.restDisplayOctave)) {
+            w.prop("restdisplayoctave");
+            w.writeNumber(obj.restDisplayOctave);
+        }
+        w.prop("brushtype");
+        w.writeNumber(obj.brushType as number);
+        w.prop("brushduration");
+        w.writeNumber(obj.brushDuration);
+        w.prop("tupletdenominator");
+        w.writeNumber(obj.tupletDenominator);
+        w.prop("tupletnumerator");
+        w.writeNumber(obj.tupletNumerator);
+        w.prop("iscontinuedwhammy");
+        w.writeBoolean(obj.isContinuedWhammy);
+        w.prop("whammybartype");
+        w.writeNumber(obj.whammyBarType as number);
+        if (obj.whammyBarPoints !== null) {
+            w.prop("whammybarpoints");
+            w.startArray(obj.whammyBarPoints!.length);
+            for (const i of obj.whammyBarPoints!) {
+                BendPointSerializer.write(i, w);
+            }
+            w.endArray();
+        }
+        w.prop("vibrato");
+        w.writeNumber(obj.vibrato as number);
+        w.prop("chordid");
+        w.writeValue(obj.chordId);
+        w.prop("gracetype");
+        w.writeNumber(obj.graceType as number);
+        w.prop("pickstroke");
+        w.writeNumber(obj.pickStroke as number);
+        if (obj.tremoloPicking) {
+            w.prop("tremolopicking");
+            TremoloPickingEffectSerializer.write(obj.tremoloPicking, w);
+        }
+        w.prop("crescendo");
+        w.writeNumber(obj.crescendo as number);
+        w.prop("displaystart");
+        w.writeNumber(obj.displayStart);
+        w.prop("playbackstart");
+        w.writeNumber(obj.playbackStart);
+        w.prop("displayduration");
+        w.writeNumber(obj.displayDuration);
+        w.prop("playbackduration");
+        w.writeNumber(obj.playbackDuration);
+        w.prop("overridedisplayduration");
+        w.writeValue(obj.overrideDisplayDuration);
+        w.prop("golpe");
+        w.writeNumber(obj.golpe as number);
+        w.prop("dynamics");
+        w.writeNumber(obj.dynamics as number);
+        w.prop("showdynamics");
+        w.writeValue(obj.showDynamics);
+        w.prop("invertbeamdirection");
+        w.writeBoolean(obj.invertBeamDirection);
+        w.prop("preferredbeamdirection");
+        w.writeValue(obj.preferredBeamDirection as number | null);
+        w.prop("beamingmode");
+        w.writeNumber(obj.beamingMode as number);
+        w.prop("wahpedal");
+        w.writeNumber(obj.wahPedal as number);
+        w.prop("barrefret");
+        w.writeNumber(obj.barreFret);
+        w.prop("barreshape");
+        w.writeNumber(obj.barreShape as number);
+        w.prop("rasgueado");
+        w.writeNumber(obj.rasgueado as number);
+        w.prop("showtimer");
+        w.writeBoolean(obj.showTimer);
+        w.prop("timer");
+        w.writeValue(obj.timer);
+        if (obj.style) {
+            w.prop("style");
+            BeatStyleSerializer.write(obj.style, w);
+        }
+        w.endObject();
     }
 }

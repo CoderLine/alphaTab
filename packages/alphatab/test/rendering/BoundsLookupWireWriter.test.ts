@@ -1,7 +1,6 @@
 /** @target web */
 import fs from 'node:fs';
 import path from 'node:path';
-import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Logger } from '@coderline/alphatab/Logger';
@@ -202,7 +201,7 @@ describe('BoundsLookupWireWriter', () => {
         };
 
         const objects = new ScoreRenderer(settings);
-        send({ cmd: 'alphaTab.initialize', settings: SettingsSerializer.toJsObject(settings) });
+        send({ cmd: 'alphaTab.initialize', settings: JsonConverter.settingsToJsObject(settings) });
         send({ cmd: 'alphaTab.setWidth', width: 1300 });
         send({
             cmd: 'alphaTab.renderScore',

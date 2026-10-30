@@ -815,24 +815,30 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
     }
 
     private _filterOutDefaultValues(scoreJson: Map<string, unknown>) {
-        const masterBars = scoreJson.get('masterbars') as Map<string, unknown>[];
-        for (const masterBar of masterBars) {
-            ScoreSerializerPlugin._sanitizeJson(masterBar, this._defaultMasterBarJson, 'MasterBar');
+        for (const masterBar of scoreJson.get('masterbars') as unknown[]) {
+            ScoreSerializerPlugin._sanitizeJson(
+                masterBar as Map<string, unknown>,
+                this._defaultMasterBarJson,
+                'MasterBar'
+            );
         }
 
-        const tracks = scoreJson.get('tracks') as Map<string, unknown>[];
-        for (const track of tracks) {
-            const staves = track.get('staves') as Map<string, unknown>[];
-            for (const staff of staves) {
-                const bars = staff.get('bars') as Map<string, unknown>[];
-                for (const bar of bars) {
-                    const voices = bar.get('voices') as Map<string, unknown>[];
-                    for (const voice of voices) {
-                        const beats = voice.get('beats') as Map<string, unknown>[];
-                        for (const beat of beats) {
-                            const notes = beat.get('notes') as Map<string, unknown>[];
-                            for (const note of notes) {
-                                ScoreSerializerPlugin._sanitizeJson(note, this._defaultNoteJson, 'Note');
+        for (const trackItem of scoreJson.get('tracks') as unknown[]) {
+            const track = trackItem as Map<string, unknown>;
+            for (const staffItem of track.get('staves') as unknown[]) {
+                const staff = staffItem as Map<string, unknown>;
+                for (const barItem of staff.get('bars') as unknown[]) {
+                    const bar = barItem as Map<string, unknown>;
+                    for (const voiceItem of bar.get('voices') as unknown[]) {
+                        const voice = voiceItem as Map<string, unknown>;
+                        for (const beatItem of voice.get('beats') as unknown[]) {
+                            const beat = beatItem as Map<string, unknown>;
+                            for (const note of beat.get('notes') as unknown[]) {
+                                ScoreSerializerPlugin._sanitizeJson(
+                                    note as Map<string, unknown>,
+                                    this._defaultNoteJson,
+                                    'Note'
+                                );
                             }
                             ScoreSerializerPlugin._sanitizeJson(beat, this._defaultBeatJson, 'Beat');
                         }

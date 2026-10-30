@@ -4,8 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { Fermata } from "@coderline/alphatab/model/Fermata";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { FermataType } from "@coderline/alphatab/model/Fermata";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -14,36 +18,37 @@ export class FermataSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => FermataSerializer.setProperty(obj, k, v));
+        FermataSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Fermata | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("type", obj.type as number);
-        o.set("length", obj.length);
-        return o;
+    public static read(obj: Fermata, r: IObjectReader): void {
+        r.readObject((k, rr) => FermataSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: Fermata | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "type": obj.type as number, "length": obj.length };
-        return o;
-    }
-    public static setProperty(obj: Fermata, property: string, v: unknown): boolean {
+    public static readProperty(obj: Fermata, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "type":
-                obj.type = JsonHelper.parseEnum<FermataType>(v, FermataType)!;
+                obj.type = JsonHelper.parseEnum<FermataType>(r.readValue(), FermataType)!;
                 return true;
             case "length":
-                obj.length = v! as number;
+                obj.length = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: Fermata | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        FermataSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Fermata | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("type");
+        w.writeNumber(obj.type as number);
+        w.prop("length");
+        w.writeNumber(obj.length);
+        w.endObject();
     }
 }

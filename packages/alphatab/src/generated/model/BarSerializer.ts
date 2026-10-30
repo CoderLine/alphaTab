@@ -4,24 +4,28 @@
 // the code is regenerated.
 // </auto-generated>
 import { Bar } from "@coderline/alphatab/model/Bar";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { VoiceSerializer } from "@coderline/alphatab/generated/model/VoiceSerializer";
-import { SustainPedalMarkerSerializer } from "@coderline/alphatab/generated/model/SustainPedalMarkerSerializer";
-import { ScoreBarOverrideSerializer } from "@coderline/alphatab/generated/model/ScoreBarOverrideSerializer";
-import { TabBarOverrideSerializer } from "@coderline/alphatab/generated/model/TabBarOverrideSerializer";
-import { SlashBarOverrideSerializer } from "@coderline/alphatab/generated/model/SlashBarOverrideSerializer";
-import { NumberedBarOverrideSerializer } from "@coderline/alphatab/generated/model/NumberedBarOverrideSerializer";
-import { BarStyleSerializer } from "@coderline/alphatab/generated/model/BarStyleSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { Clef } from "@coderline/alphatab/model/Clef";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Ottavia } from "@coderline/alphatab/model/Ottavia";
 import { Voice } from "@coderline/alphatab/model/Voice";
+import { VoiceSerializer } from "@coderline/alphatab/generated/model/VoiceSerializer";
 import { SimileMark } from "@coderline/alphatab/model/SimileMark";
 import { SustainPedalMarker } from "@coderline/alphatab/model/Bar";
+import { SustainPedalMarkerSerializer } from "@coderline/alphatab/generated/model/SustainPedalMarkerSerializer";
 import { BarLineStyle } from "@coderline/alphatab/model/Bar";
 import { KeySignature } from "@coderline/alphatab/model/KeySignature";
 import { KeySignatureType } from "@coderline/alphatab/model/KeySignatureType";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
+import { ScoreBarOverrideSerializer } from "@coderline/alphatab/generated/model/ScoreBarOverrideSerializer";
+import { TabBarOverrideSerializer } from "@coderline/alphatab/generated/model/TabBarOverrideSerializer";
+import { SlashBarOverrideSerializer } from "@coderline/alphatab/generated/model/SlashBarOverrideSerializer";
+import { NumberedBarOverrideSerializer } from "@coderline/alphatab/generated/model/NumberedBarOverrideSerializer";
 import { BarStyle } from "@coderline/alphatab/model/Bar";
+import { BarStyleSerializer } from "@coderline/alphatab/generated/model/BarStyleSerializer";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -30,165 +34,181 @@ export class BarSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BarSerializer.setProperty(obj, k, v));
+        BarSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Bar | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("id", obj.id);
-        o.set("clef", obj.clef as number);
-        o.set("clefottava", obj.clefOttava as number);
-        o.set("voices", obj.voices.map(i => VoiceSerializer.toJson(i)));
-        o.set("similemark", obj.simileMark as number);
-        o.set("displayscale", obj.displayScale);
-        o.set("displaywidth", obj.displayWidth);
-        o.set("sustainpedals", obj.sustainPedals.map(i => SustainPedalMarkerSerializer.toJson(i)));
-        o.set("barlineleft", obj.barLineLeft as number);
-        o.set("barlineright", obj.barLineRight as number);
-        o.set("keysignature", obj.keySignature as number);
-        o.set("keysignaturetype", obj.keySignatureType as number);
-        o.set("barnumberdisplay", obj.barNumberDisplay as number | undefined);
-        if (obj.scoreDisplay) {
-            o.set("scoredisplay", ScoreBarOverrideSerializer.toJson(obj.scoreDisplay));
-        }
-        if (obj.tabDisplay) {
-            o.set("tabdisplay", TabBarOverrideSerializer.toJson(obj.tabDisplay));
-        }
-        if (obj.slashDisplay) {
-            o.set("slashdisplay", SlashBarOverrideSerializer.toJson(obj.slashDisplay));
-        }
-        if (obj.numberedDisplay) {
-            o.set("numbereddisplay", NumberedBarOverrideSerializer.toJson(obj.numberedDisplay));
-        }
-        if (obj.style) {
-            o.set("style", BarStyleSerializer.toJson(obj.style));
-        }
-        return o;
+    public static read(obj: Bar, r: IObjectReader): void {
+        r.readObject((k, rr) => BarSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: Bar | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "id": obj.id, "clef": obj.clef as number, "clefottava": obj.clefOttava as number, "voices": obj.voices.map(i => VoiceSerializer.toJsObject(i)), "similemark": obj.simileMark as number, "displayscale": obj.displayScale, "displaywidth": obj.displayWidth, "sustainpedals": obj.sustainPedals.map(i => SustainPedalMarkerSerializer.toJsObject(i)), "barlineleft": obj.barLineLeft as number, "barlineright": obj.barLineRight as number, "keysignature": obj.keySignature as number, "keysignaturetype": obj.keySignatureType as number, "barnumberdisplay": obj.barNumberDisplay as number | undefined };
-        if (obj.scoreDisplay) {
-            o["scoredisplay"] = ScoreBarOverrideSerializer.toJsObject(obj.scoreDisplay);
-        }
-        if (obj.tabDisplay) {
-            o["tabdisplay"] = TabBarOverrideSerializer.toJsObject(obj.tabDisplay);
-        }
-        if (obj.slashDisplay) {
-            o["slashdisplay"] = SlashBarOverrideSerializer.toJsObject(obj.slashDisplay);
-        }
-        if (obj.numberedDisplay) {
-            o["numbereddisplay"] = NumberedBarOverrideSerializer.toJsObject(obj.numberedDisplay);
-        }
-        if (obj.style) {
-            o["style"] = BarStyleSerializer.toJsObject(obj.style);
-        }
-        return o;
-    }
-    public static setProperty(obj: Bar, property: string, v: unknown): boolean {
+    public static readProperty(obj: Bar, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "id":
-                obj.id = v! as number;
+                obj.id = r.readNumber();
                 return true;
             case "clef":
-                obj.clef = JsonHelper.parseEnum<Clef>(v, Clef)!;
+                obj.clef = JsonHelper.parseEnum<Clef>(r.readValue(), Clef)!;
                 return true;
             case "clefottava":
-                obj.clefOttava = JsonHelper.parseEnum<Ottavia>(v, Ottavia)!;
+                obj.clefOttava = JsonHelper.parseEnum<Ottavia>(r.readValue(), Ottavia)!;
                 return true;
             case "voices":
-                obj.voices = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new Voice();
-                    VoiceSerializer.fromJson(i, o);
-                    obj.addVoice(i);
-                }
+                BarSerializer._readVoices(obj, r);
                 return true;
             case "similemark":
-                obj.simileMark = JsonHelper.parseEnum<SimileMark>(v, SimileMark)!;
+                obj.simileMark = JsonHelper.parseEnum<SimileMark>(r.readValue(), SimileMark)!;
                 return true;
             case "displayscale":
-                obj.displayScale = v! as number;
+                obj.displayScale = r.readNumber();
                 return true;
             case "displaywidth":
-                obj.displayWidth = v! as number;
+                obj.displayWidth = r.readNumber();
                 return true;
             case "sustainpedals":
-                obj.sustainPedals = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new SustainPedalMarker();
-                    SustainPedalMarkerSerializer.fromJson(i, o);
-                    obj.sustainPedals.push(i);
-                }
+                BarSerializer._readSustainPedals(obj, r);
                 return true;
             case "barlineleft":
-                obj.barLineLeft = JsonHelper.parseEnum<BarLineStyle>(v, BarLineStyle)!;
+                obj.barLineLeft = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
                 return true;
             case "barlineright":
-                obj.barLineRight = JsonHelper.parseEnum<BarLineStyle>(v, BarLineStyle)!;
+                obj.barLineRight = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
                 return true;
             case "keysignature":
-                obj.keySignature = JsonHelper.parseEnum<KeySignature>(v, KeySignature)!;
+                obj.keySignature = JsonHelper.parseEnum<KeySignature>(r.readValue(), KeySignature)!;
                 return true;
             case "keysignaturetype":
-                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
+                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(r.readValue(), KeySignatureType)!;
                 return true;
             case "barnumberdisplay":
-                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay);
+                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
             case "scoredisplay":
-                if (v) {
-                    obj.scoreDisplay = {};
-                    ScoreBarOverrideSerializer.fromJson(obj.scoreDisplay, v);
+                if (r.isNullish()) {
+                    obj.scoreDisplay = undefined;
                 }
                 else {
-                    obj.scoreDisplay = undefined;
+                    obj.scoreDisplay = {};
+                    ScoreBarOverrideSerializer.readFlexible(obj.scoreDisplay, r);
                 }
                 return true;
             case "tabdisplay":
-                if (v) {
-                    obj.tabDisplay = {};
-                    TabBarOverrideSerializer.fromJson(obj.tabDisplay, v);
+                if (r.isNullish()) {
+                    obj.tabDisplay = undefined;
                 }
                 else {
-                    obj.tabDisplay = undefined;
+                    obj.tabDisplay = {};
+                    TabBarOverrideSerializer.readFlexible(obj.tabDisplay, r);
                 }
                 return true;
             case "slashdisplay":
-                if (v) {
-                    obj.slashDisplay = {};
-                    SlashBarOverrideSerializer.fromJson(obj.slashDisplay, v);
+                if (r.isNullish()) {
+                    obj.slashDisplay = undefined;
                 }
                 else {
-                    obj.slashDisplay = undefined;
+                    obj.slashDisplay = {};
+                    SlashBarOverrideSerializer.readFlexible(obj.slashDisplay, r);
                 }
                 return true;
             case "numbereddisplay":
-                if (v) {
-                    obj.numberedDisplay = {};
-                    NumberedBarOverrideSerializer.fromJson(obj.numberedDisplay, v);
+                if (r.isNullish()) {
+                    obj.numberedDisplay = undefined;
                 }
                 else {
-                    obj.numberedDisplay = undefined;
+                    obj.numberedDisplay = {};
+                    NumberedBarOverrideSerializer.readFlexible(obj.numberedDisplay, r);
                 }
                 return true;
             case "style":
-                if (v) {
-                    obj.style = new BarStyle();
-                    BarStyleSerializer.fromJson(obj.style, v);
+                if (r.isNullish()) {
+                    obj.style = undefined;
                 }
                 else {
-                    obj.style = undefined;
+                    obj.style = new BarStyle();
+                    BarStyleSerializer.read(obj.style, r);
                 }
                 return true;
         }
         return false;
+    }
+    private static _readVoices(obj: Bar, r: IObjectReader): void {
+        obj.voices = [];
+        r.readArray(rr => {
+            const i = new Voice();
+            VoiceSerializer.read(i, rr);
+            obj.addVoice(i);
+        });
+    }
+    private static _readSustainPedals(obj: Bar, r: IObjectReader): void {
+        obj.sustainPedals = [];
+        r.readArray(rr => {
+            const i = new SustainPedalMarker();
+            SustainPedalMarkerSerializer.read(i, rr);
+            obj.sustainPedals.push(i);
+        });
+    }
+    public static toJson(obj: Bar | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        BarSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Bar | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("id");
+        w.writeNumber(obj.id);
+        w.prop("clef");
+        w.writeNumber(obj.clef as number);
+        w.prop("clefottava");
+        w.writeNumber(obj.clefOttava as number);
+        w.prop("voices");
+        w.startArray(obj.voices!.length);
+        for (const i of obj.voices!) {
+            VoiceSerializer.write(i, w);
+        }
+        w.endArray();
+        w.prop("similemark");
+        w.writeNumber(obj.simileMark as number);
+        w.prop("displayscale");
+        w.writeNumber(obj.displayScale);
+        w.prop("displaywidth");
+        w.writeNumber(obj.displayWidth);
+        w.prop("sustainpedals");
+        w.startArray(obj.sustainPedals!.length);
+        for (const i of obj.sustainPedals!) {
+            SustainPedalMarkerSerializer.write(i, w);
+        }
+        w.endArray();
+        w.prop("barlineleft");
+        w.writeNumber(obj.barLineLeft as number);
+        w.prop("barlineright");
+        w.writeNumber(obj.barLineRight as number);
+        w.prop("keysignature");
+        w.writeNumber(obj.keySignature as number);
+        w.prop("keysignaturetype");
+        w.writeNumber(obj.keySignatureType as number);
+        w.prop("barnumberdisplay");
+        w.writeValue(obj.barNumberDisplay as number | undefined);
+        if (obj.scoreDisplay) {
+            w.prop("scoredisplay");
+            ScoreBarOverrideSerializer.write(obj.scoreDisplay, w);
+        }
+        if (obj.tabDisplay) {
+            w.prop("tabdisplay");
+            TabBarOverrideSerializer.write(obj.tabDisplay, w);
+        }
+        if (obj.slashDisplay) {
+            w.prop("slashdisplay");
+            SlashBarOverrideSerializer.write(obj.slashDisplay, w);
+        }
+        if (obj.numberedDisplay) {
+            w.prop("numbereddisplay");
+            NumberedBarOverrideSerializer.write(obj.numberedDisplay, w);
+        }
+        if (obj.style) {
+            w.prop("style");
+            BarStyleSerializer.write(obj.style, w);
+        }
+        w.endObject();
     }
 }

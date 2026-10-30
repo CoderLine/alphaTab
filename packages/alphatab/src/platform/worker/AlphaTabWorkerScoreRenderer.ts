@@ -6,8 +6,8 @@ import {
     type IEventEmitter,
     type IEventEmitterOfT
 } from '@coderline/alphatab/EventEmitter';
-import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { PlainObjectWriter } from '@coderline/alphatab/io/PlainObjectWriter';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { FontSizes } from '@coderline/alphatab/platform/svg/FontSizes';
@@ -15,6 +15,7 @@ import type {
     IAlphaTabRenderingWorker,
     IAlphaTabWorkerMessage
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { WorkerScoreEncoding } from '@coderline/alphatab/platform/worker/WorkerScoreEncoding';
 import type { IScoreRenderer, RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
@@ -26,6 +27,12 @@ import type { Settings } from '@coderline/alphatab/Settings';
  */
 export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     private _worker!: IAlphaTabRenderingWorker;
+    /**
+     * The buffer size for the next binary score: the size of the last one plus headroom, because the writer grows the
+     * buffer as soon as the worst-case size of the next value does not fit.
+     * @target web
+     */
+    private _binaryScoreCapacity: number = 65536;
     private _width: number = 0;
     private _isResizeInFlight: boolean = false;
     private _isResizePending: boolean = false;
@@ -79,18 +86,10 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
      * @target web
      */
     private static _settingsToJsObject(settings: Settings): unknown {
-        const jsObject = SettingsSerializer.toJsObject(settings)!;
+        const writer = new PlainObjectWriter();
+        SettingsSerializer.write(settings, writer);
+        const jsObject = writer.result as Record<string, unknown>;
         delete jsObject.player;
-        return jsObject;
-    }
-
-    private _serializeScoreForWorker(score: Score): unknown {
-        let jsObject: unknown = null;
-        /*@target web*/
-        jsObject = ScoreSerializer.toJsObject(score);
-        if (jsObject === null) {
-            jsObject = JsonConverter.scoreToJsObject(score);
-        }
         return jsObject;
     }
 
@@ -202,20 +201,52 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     public renderScore(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
-        const jsObject: unknown =
-            score == null ? null : this._serializeScoreForWorker(Environment.prepareForPostMessage(score));
         const scoreId = ++this._lastScoreId;
         if (score) {
             this._sentScores.set(scoreId, score);
         }
+        const unwrapped = score == null ? null : Environment.prepareForPostMessage(score);
+        /*@target web*/
+        if (this._postBinaryScore(scoreId, unwrapped, trackIndexes, renderHints)) {
+            return;
+        }
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             scoreId,
-            score: jsObject,
+            score: unwrapped == null ? null : JsonConverter.scoreToJsObject(unwrapped),
             trackIndexes: Environment.prepareForPostMessage(trackIndexes),
             fontSizes: FontSizes.fontSizeLookupTables,
             renderHints
         });
+    }
+
+    /**
+     * Posts a score as one transferred MessagePack buffer; a null score is left to the caller.
+     * @target web
+     */
+    private _postBinaryScore(
+        scoreId: number,
+        score: Score | null,
+        trackIndexes: number[] | null,
+        renderHints: RenderHints | undefined
+    ): boolean {
+        if (!score) {
+            return false;
+        }
+        const data = WorkerScoreEncoding.encode(score, this._binaryScoreCapacity);
+        this._binaryScoreCapacity = Math.max(65536, data.byteLength + (data.byteLength >> 3));
+        (this._worker as unknown as Worker).postMessage(
+            {
+                cmd: 'alphaTab.renderScore',
+                scoreId,
+                score: data,
+                trackIndexes: Environment.prepareForPostMessage(trackIndexes),
+                fontSizes: FontSizes.fontSizeLookupTables,
+                renderHints
+            },
+            [data.buffer]
+        );
+        return true;
     }
 
     public readonly preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();

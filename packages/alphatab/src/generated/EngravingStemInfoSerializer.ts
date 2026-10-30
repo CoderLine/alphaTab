@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { EngravingStemInfo } from "@coderline/alphatab/EngravingSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,40 +16,51 @@ export class EngravingStemInfoSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => EngravingStemInfoSerializer.setProperty(obj, k.toLowerCase(), v));
+        EngravingStemInfoSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: EngravingStemInfo | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("topy", obj.topY);
-        o.set("bottomy", obj.bottomY);
-        o.set("x", obj.x);
-        return o;
+    public static read(obj: EngravingStemInfo, r: IObjectReader): void {
+        r.readObject((k, rr) => EngravingStemInfoSerializer.readProperty(obj, k, rr, false));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: EngravingStemInfo | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "topy": obj.topY, "bottomy": obj.bottomY, "x": obj.x };
-        return o;
-    }
-    public static setProperty(obj: EngravingStemInfo, property: string, v: unknown): boolean {
+    public static readProperty(obj: EngravingStemInfo, property: string, r: IObjectReader, flexible: boolean): boolean {
         switch (property) {
             case "topy":
-                obj.topY = v! as number;
+                obj.topY = r.readNumber();
                 return true;
             case "bottomy":
-                obj.bottomY = v! as number;
+                obj.bottomY = r.readNumber();
                 return true;
             case "x":
-                obj.x = v! as number;
+                obj.x = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static readFlexible(obj: EngravingStemInfo, r: IObjectReader): void {
+        r.readObject((k, rr) => EngravingStemInfoSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: EngravingStemInfo, property: string, r: IObjectReader): boolean {
+        if (EngravingStemInfoSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static toJson(obj: EngravingStemInfo | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        EngravingStemInfoSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: EngravingStemInfo | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("topy");
+        w.writeNumber(obj.topY);
+        w.prop("bottomy");
+        w.writeNumber(obj.bottomY);
+        w.prop("x");
+        w.writeNumber(obj.x);
+        w.endObject();
     }
 }

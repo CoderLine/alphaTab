@@ -4,8 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { HeaderFooterStyle } from "@coderline/alphatab/model/Score";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { TextAlign } from "@coderline/alphatab/platform/ICanvas";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -14,40 +18,42 @@ export class HeaderFooterStyleSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => HeaderFooterStyleSerializer.setProperty(obj, k, v));
+        HeaderFooterStyleSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: HeaderFooterStyle | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("template", obj.template);
-        o.set("isvisible", obj.isVisible);
-        o.set("textalign", obj.textAlign as number);
-        return o;
+    public static read(obj: HeaderFooterStyle, r: IObjectReader): void {
+        r.readObject((k, rr) => HeaderFooterStyleSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: HeaderFooterStyle | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "template": obj.template, "isvisible": obj.isVisible, "textalign": obj.textAlign as number };
-        return o;
-    }
-    public static setProperty(obj: HeaderFooterStyle, property: string, v: unknown): boolean {
+    public static readProperty(obj: HeaderFooterStyle, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "template":
-                obj.template = v! as string;
+                obj.template = r.readString();
                 return true;
             case "isvisible":
-                obj.isVisible = v as boolean | undefined;
+                obj.isVisible = r.readValue() as boolean | undefined;
                 return true;
             case "textalign":
-                obj.textAlign = JsonHelper.parseEnum<TextAlign>(v, TextAlign)!;
+                obj.textAlign = JsonHelper.parseEnum<TextAlign>(r.readValue(), TextAlign)!;
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: HeaderFooterStyle | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        HeaderFooterStyleSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: HeaderFooterStyle | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("template");
+        w.writeString(obj.template);
+        w.prop("isvisible");
+        w.writeValue(obj.isVisible);
+        w.prop("textalign");
+        w.writeNumber(obj.textAlign as number);
+        w.endObject();
     }
 }

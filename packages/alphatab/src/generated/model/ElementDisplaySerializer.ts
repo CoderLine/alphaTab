@@ -4,9 +4,13 @@
 // the code is regenerated.
 // </auto-generated>
 import { ElementDisplay } from "@coderline/alphatab/model/ElementDisplay";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { StaffPlacement } from "@coderline/alphatab/model/ElementDisplay";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { SystemDisplay } from "@coderline/alphatab/model/ElementDisplay";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -15,40 +19,51 @@ export class ElementDisplaySerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => ElementDisplaySerializer.setProperty(obj, k.toLowerCase(), v));
+        ElementDisplaySerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: ElementDisplay | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("isvisible", obj.isVisible);
-        o.set("staffplacement", obj.staffPlacement as number | undefined);
-        o.set("systemdisplay", obj.systemDisplay as number | undefined);
-        return o;
+    public static read(obj: ElementDisplay, r: IObjectReader): void {
+        r.readObject((k, rr) => ElementDisplaySerializer.readProperty(obj, k, rr, false));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: ElementDisplay | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "isvisible": obj.isVisible, "staffplacement": obj.staffPlacement as number | undefined, "systemdisplay": obj.systemDisplay as number | undefined };
-        return o;
-    }
-    public static setProperty(obj: ElementDisplay, property: string, v: unknown): boolean {
+    public static readProperty(obj: ElementDisplay, property: string, r: IObjectReader, flexible: boolean): boolean {
         switch (property) {
             case "isvisible":
-                obj.isVisible = v as boolean | undefined;
+                obj.isVisible = r.readValue() as boolean | undefined;
                 return true;
             case "staffplacement":
-                obj.staffPlacement = JsonHelper.parseEnum<StaffPlacement>(v, StaffPlacement);
+                obj.staffPlacement = JsonHelper.parseEnum<StaffPlacement>(r.readValue(), StaffPlacement);
                 return true;
             case "systemdisplay":
-                obj.systemDisplay = JsonHelper.parseEnum<SystemDisplay>(v, SystemDisplay);
+                obj.systemDisplay = JsonHelper.parseEnum<SystemDisplay>(r.readValue(), SystemDisplay);
                 return true;
         }
         return false;
+    }
+    public static readFlexible(obj: ElementDisplay, r: IObjectReader): void {
+        r.readObject((k, rr) => ElementDisplaySerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: ElementDisplay, property: string, r: IObjectReader): boolean {
+        if (ElementDisplaySerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static toJson(obj: ElementDisplay | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        ElementDisplaySerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: ElementDisplay | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("isvisible");
+        w.writeValue(obj.isVisible);
+        w.prop("staffplacement");
+        w.writeValue(obj.staffPlacement as number | undefined);
+        w.prop("systemdisplay");
+        w.writeValue(obj.systemDisplay as number | undefined);
+        w.endObject();
     }
 }

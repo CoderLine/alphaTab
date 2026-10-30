@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlaybackInformation } from "@coderline/alphatab/model/PlaybackInformation";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,64 +16,72 @@ export class PlaybackInformationSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => PlaybackInformationSerializer.setProperty(obj, k, v));
+        PlaybackInformationSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: PlaybackInformation | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("volume", obj.volume);
-        o.set("balance", obj.balance);
-        o.set("port", obj.port);
-        o.set("program", obj.program);
-        o.set("bank", obj.bank);
-        o.set("primarychannel", obj.primaryChannel);
-        o.set("secondarychannel", obj.secondaryChannel);
-        o.set("ismute", obj.isMute);
-        o.set("issolo", obj.isSolo);
-        return o;
+    public static read(obj: PlaybackInformation, r: IObjectReader): void {
+        r.readObject((k, rr) => PlaybackInformationSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: PlaybackInformation | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "volume": obj.volume, "balance": obj.balance, "port": obj.port, "program": obj.program, "bank": obj.bank, "primarychannel": obj.primaryChannel, "secondarychannel": obj.secondaryChannel, "ismute": obj.isMute, "issolo": obj.isSolo };
-        return o;
-    }
-    public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
+    public static readProperty(obj: PlaybackInformation, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "volume":
-                obj.volume = v! as number;
+                obj.volume = r.readNumber();
                 return true;
             case "balance":
-                obj.balance = v! as number;
+                obj.balance = r.readNumber();
                 return true;
             case "port":
-                obj.port = v! as number;
+                obj.port = r.readNumber();
                 return true;
             case "program":
-                obj.program = v! as number;
+                obj.program = r.readNumber();
                 return true;
             case "bank":
-                obj.bank = v! as number;
+                obj.bank = r.readNumber();
                 return true;
             case "primarychannel":
-                obj.primaryChannel = v! as number;
+                obj.primaryChannel = r.readNumber();
                 return true;
             case "secondarychannel":
-                obj.secondaryChannel = v! as number;
+                obj.secondaryChannel = r.readNumber();
                 return true;
             case "ismute":
-                obj.isMute = v! as boolean;
+                obj.isMute = r.readBoolean();
                 return true;
             case "issolo":
-                obj.isSolo = v! as boolean;
+                obj.isSolo = r.readBoolean();
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: PlaybackInformation | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        PlaybackInformationSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: PlaybackInformation | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("volume");
+        w.writeNumber(obj.volume);
+        w.prop("balance");
+        w.writeNumber(obj.balance);
+        w.prop("port");
+        w.writeNumber(obj.port);
+        w.prop("program");
+        w.writeNumber(obj.program);
+        w.prop("bank");
+        w.writeNumber(obj.bank);
+        w.prop("primarychannel");
+        w.writeNumber(obj.primaryChannel);
+        w.prop("secondarychannel");
+        w.writeNumber(obj.secondaryChannel);
+        w.prop("ismute");
+        w.writeBoolean(obj.isMute);
+        w.prop("issolo");
+        w.writeBoolean(obj.isSolo);
+        w.endObject();
     }
 }

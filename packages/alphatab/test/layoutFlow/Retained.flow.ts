@@ -10,6 +10,7 @@ import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMi
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
+import { PlainObjectWriter } from '@coderline/alphatab/io/PlainObjectWriter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -287,7 +288,9 @@ describe('Retained', () => {
                 writer = null;
                 out.push(`    worker: wire writer buffers ${mb(before - heap())} (instead of the bounds lookup)`);
             }
-            let jsObject: unknown = ScoreSerializer.toJsObject(score);
+            const plainWriter = new PlainObjectWriter();
+            ScoreSerializer.write(score, plainWriter);
+            let jsObject: unknown = plainWriter.result;
             t = heap();
             let workerScore: Score | null = JsonConverter.jsObjectToScore(jsObject, h.settings);
             jsObject = null;

@@ -4,10 +4,14 @@
 // the code is regenerated.
 // </auto-generated>
 import { TabStaffConfig } from "@coderline/alphatab/model/StaffConfigs";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { ElementDisplaySerializer } from "@coderline/alphatab/generated/model/ElementDisplaySerializer";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { TabRhythmMode } from "@coderline/alphatab/NotationSettings";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -16,86 +20,115 @@ export class TabStaffConfigSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => TabStaffConfigSerializer.setProperty(obj, k.toLowerCase(), v));
+        TabStaffConfigSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: TabStaffConfig | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        if (obj.clef) {
-            o.set("clef", ElementDisplaySerializer.toJson(obj.clef));
-        }
-        if (obj.timeSignature) {
-            o.set("timesignature", ElementDisplaySerializer.toJson(obj.timeSignature));
-        }
-        o.set("barnumber", obj.barNumber as number | undefined);
-        o.set("rhythm", obj.rhythm as number | undefined);
-        if (obj.rests) {
-            o.set("rests", ElementDisplaySerializer.toJson(obj.rests));
-        }
-        return o;
+    public static read(obj: TabStaffConfig, r: IObjectReader): void {
+        r.readObject((k, rr) => TabStaffConfigSerializer.readProperty(obj, k, rr, false));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: TabStaffConfig | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = {};
-        if (obj.clef) {
-            o["clef"] = ElementDisplaySerializer.toJsObject(obj.clef);
-        }
-        if (obj.timeSignature) {
-            o["timesignature"] = ElementDisplaySerializer.toJsObject(obj.timeSignature);
-        }
-        o["barnumber"] = obj.barNumber as number | undefined;
-        o["rhythm"] = obj.rhythm as number | undefined;
-        if (obj.rests) {
-            o["rests"] = ElementDisplaySerializer.toJsObject(obj.rests);
-        }
-        return o;
-    }
-    public static setProperty(obj: TabStaffConfig, property: string, v: unknown): boolean {
+    public static readProperty(obj: TabStaffConfig, property: string, r: IObjectReader, flexible: boolean): boolean {
         switch (property) {
+            case "clef":
+                if (r.isNullish()) {
+                    obj.clef = undefined;
+                }
+                else {
+                    obj.clef = {};
+                    ElementDisplaySerializer.read(obj.clef, r);
+                }
+                return true;
+            case "timesignature":
+                if (r.isNullish()) {
+                    obj.timeSignature = undefined;
+                }
+                else {
+                    obj.timeSignature = {};
+                    ElementDisplaySerializer.read(obj.timeSignature, r);
+                }
+                return true;
             case "barnumber":
-                obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay);
+                obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
             case "rhythm":
-                obj.rhythm = JsonHelper.parseEnum<TabRhythmMode>(v, TabRhythmMode);
+                obj.rhythm = JsonHelper.parseEnum<TabRhythmMode>(r.readValue(), TabRhythmMode);
+                return true;
+            case "rests":
+                if (r.isNullish()) {
+                    obj.rests = undefined;
+                }
+                else {
+                    obj.rests = {};
+                    ElementDisplaySerializer.read(obj.rests, r);
+                }
                 return true;
         }
+        return false;
+    }
+    public static readFlexible(obj: TabStaffConfig, r: IObjectReader): void {
+        r.readObject((k, rr) => TabStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: TabStaffConfig, property: string, r: IObjectReader): boolean {
+        if (["clef", "timesignature", "rests"].indexOf(property) < 0 && TabStaffConfigSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
         if (["clef"].indexOf(property) >= 0) {
-            if (v) {
-                obj.clef = {};
-                ElementDisplaySerializer.fromJson(obj.clef, v as Map<string, unknown>);
+            if (r.isNullish()) {
+                obj.clef = undefined;
             }
             else {
-                obj.clef = undefined;
+                obj.clef = {};
+                ElementDisplaySerializer.readFlexible(obj.clef, r);
             }
             return true;
         }
         if (["timesignature"].indexOf(property) >= 0) {
-            if (v) {
-                obj.timeSignature = {};
-                ElementDisplaySerializer.fromJson(obj.timeSignature, v as Map<string, unknown>);
+            if (r.isNullish()) {
+                obj.timeSignature = undefined;
             }
             else {
-                obj.timeSignature = undefined;
+                obj.timeSignature = {};
+                ElementDisplaySerializer.readFlexible(obj.timeSignature, r);
             }
             return true;
         }
         if (["rests"].indexOf(property) >= 0) {
-            if (v) {
-                obj.rests = {};
-                ElementDisplaySerializer.fromJson(obj.rests, v as Map<string, unknown>);
+            if (r.isNullish()) {
+                obj.rests = undefined;
             }
             else {
-                obj.rests = undefined;
+                obj.rests = {};
+                ElementDisplaySerializer.readFlexible(obj.rests, r);
             }
             return true;
         }
         return false;
+    }
+    public static toJson(obj: TabStaffConfig | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        TabStaffConfigSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: TabStaffConfig | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        if (obj.clef) {
+            w.prop("clef");
+            ElementDisplaySerializer.write(obj.clef, w);
+        }
+        if (obj.timeSignature) {
+            w.prop("timesignature");
+            ElementDisplaySerializer.write(obj.timeSignature, w);
+        }
+        w.prop("barnumber");
+        w.writeValue(obj.barNumber as number | undefined);
+        w.prop("rhythm");
+        w.writeValue(obj.rhythm as number | undefined);
+        if (obj.rests) {
+            w.prop("rests");
+            ElementDisplaySerializer.write(obj.rests, w);
+        }
+        w.endObject();
     }
 }

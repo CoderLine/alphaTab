@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { BendPoint } from "@coderline/alphatab/model/BendPoint";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,36 +16,37 @@ export class BendPointSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BendPointSerializer.setProperty(obj, k, v));
+        BendPointSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: BendPoint | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("offset", obj.offset);
-        o.set("value", obj.value);
-        return o;
+    public static read(obj: BendPoint, r: IObjectReader): void {
+        r.readObject((k, rr) => BendPointSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: BendPoint | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "offset": obj.offset, "value": obj.value };
-        return o;
-    }
-    public static setProperty(obj: BendPoint, property: string, v: unknown): boolean {
+    public static readProperty(obj: BendPoint, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "offset":
-                obj.offset = v! as number;
+                obj.offset = r.readNumber();
                 return true;
             case "value":
-                obj.value = v! as number;
+                obj.value = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: BendPoint | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        BendPointSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: BendPoint | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("offset");
+        w.writeNumber(obj.offset);
+        w.prop("value");
+        w.writeNumber(obj.value);
+        w.endObject();
     }
 }

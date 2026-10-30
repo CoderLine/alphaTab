@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { SyncPointData } from "@coderline/alphatab/model/Automation";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,36 +16,37 @@ export class SyncPointDataSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SyncPointDataSerializer.setProperty(obj, k, v));
+        SyncPointDataSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: SyncPointData | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("baroccurence", obj.barOccurence);
-        o.set("millisecondoffset", obj.millisecondOffset);
-        return o;
+    public static read(obj: SyncPointData, r: IObjectReader): void {
+        r.readObject((k, rr) => SyncPointDataSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: SyncPointData | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "baroccurence": obj.barOccurence, "millisecondoffset": obj.millisecondOffset };
-        return o;
-    }
-    public static setProperty(obj: SyncPointData, property: string, v: unknown): boolean {
+    public static readProperty(obj: SyncPointData, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "baroccurence":
-                obj.barOccurence = v! as number;
+                obj.barOccurence = r.readNumber();
                 return true;
             case "millisecondoffset":
-                obj.millisecondOffset = v! as number;
+                obj.millisecondOffset = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: SyncPointData | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        SyncPointDataSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: SyncPointData | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("baroccurence");
+        w.writeNumber(obj.barOccurence);
+        w.prop("millisecondoffset");
+        w.writeNumber(obj.millisecondOffset);
+        w.endObject();
     }
 }

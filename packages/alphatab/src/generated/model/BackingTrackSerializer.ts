@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { BackingTrack } from "@coderline/alphatab/model/BackingTrack";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,26 +16,25 @@ export class BackingTrackSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BackingTrackSerializer.setProperty(obj, k, v));
+        BackingTrackSerializer.read(obj, new MapObjectReader(m));
+    }
+    public static read(obj: BackingTrack, r: IObjectReader): void {
+        r.readObject((k, rr) => BackingTrackSerializer.readProperty(obj, k, rr));
+    }
+    public static readProperty(obj: BackingTrack, property: string, r: IObjectReader): boolean {
+        return false;
     }
     public static toJson(obj: BackingTrack | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        return o;
+        const w = new MapObjectWriter();
+        BackingTrackSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: BackingTrack | null | undefined): Record<string, unknown> | null {
+    public static write(obj: BackingTrack | null | undefined, w: IObjectWriter): void {
         if (!obj) {
-            return null;
+            w.writeNull();
+            return;
         }
-        const o: Record<string, unknown> = {};
-        return o;
-    }
-    public static setProperty(obj: BackingTrack, property: string, v: unknown): boolean {
-        return false;
+        w.startObject();
+        w.endObject();
     }
 }

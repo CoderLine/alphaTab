@@ -4,18 +4,20 @@ import path from 'node:path';
 import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { PlainObjectWriter } from '@coderline/alphatab/io/PlainObjectWriter';
 import { Color } from '@coderline/alphatab/model/Color';
 import { Font, FontStyle } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
+import { WorkerScoreEncoding } from '@coderline/alphatab/platform/worker/WorkerScoreEncoding';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
 import { ComparisonHelpers } from './ComparisonHelpers';
 
 /**
- * The web-only object serializers (`toJsObject`) against the Map serializers (`toJson`): the worker hand-off
- * must decode to the same model and the public JSON strings must stay byte-identical.
+ * The web-only plain-object writer and binary worker formats against the Map serializers (`toJson`): the worker
+ * hand-offs must decode to the same model and the public JSON strings must stay byte-identical.
  */
 describe('JsonConverterJsObjectTest', () => {
     const scoreExtensions = /\.(gp|gp[3-5]|gpx|xml|musicxml|mxml|mxl|cap|capx|json)$/i;
@@ -52,9 +54,15 @@ describe('JsonConverterJsObjectTest', () => {
         }
     }
 
+    function plain(write: (w: PlainObjectWriter) => void): Record<string, unknown> {
+        const w = new PlainObjectWriter();
+        write(w);
+        return w.result as Record<string, unknown>;
+    }
+
     function expectSameAsMapPath(score: Score, name: string) {
         const mapObject = JsonConverter.scoreToJsObject(score);
-        const plainObject = ScoreSerializer.toJsObject(score);
+        const plainObject = plain(w => ScoreSerializer.write(score, w));
 
         expect(JsonConverter.scoreToJson(score), name).toBe(mapPathJson(mapObject));
 
@@ -68,9 +76,12 @@ describe('JsonConverterJsObjectTest', () => {
             null
         );
         // unlike expectJsonEqual, sensitive to key and Map entry order and to ids
-        expect(mapPathJson(JsonConverter.scoreToJsObject(fromPlain)), name).toBe(
-            mapPathJson(JsonConverter.scoreToJsObject(fromMap))
-        );
+        const expected = mapPathJson(JsonConverter.scoreToJsObject(fromMap));
+        expect(mapPathJson(JsonConverter.scoreToJsObject(fromPlain)), name).toBe(expected);
+
+        // the binary worker hand-off
+        const decoded = WorkerScoreEncoding.decode(WorkerScoreEncoding.encode(score, 1024), settings);
+        expect(mapPathJson(JsonConverter.scoreToJsObject(decoded)), `${name} MessagePack`).toBe(expected);
     }
 
     const root = 'test-data';
@@ -107,7 +118,7 @@ describe('JsonConverterJsObjectTest', () => {
     it('settings', () => {
         for (const settings of [new Settings(), customizedSettings()]) {
             const mapObject = JsonConverter.settingsToJsObject(settings);
-            const plainObject = SettingsSerializer.toJsObject(settings);
+            const plainObject = plain(w => SettingsSerializer.write(settings, w));
 
             expect(JsonConverter.settingsToJson(settings)).toBe(mapPathJson(mapObject));
 
@@ -121,7 +132,7 @@ describe('JsonConverterJsObjectTest', () => {
 
     it('records-are-objects', () => {
         const score = tryLoad('test-data/guitarpro7/hammer.gp')!;
-        const plainObject = ScoreSerializer.toJsObject(score)!;
+        const plainObject = plain(w => ScoreSerializer.write(score, w));
         expect(plainObject).not.toBeInstanceOf(Map);
         const track = (plainObject.tracks as unknown[])[0];
         expect(track).not.toBeInstanceOf(Map);

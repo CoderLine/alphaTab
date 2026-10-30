@@ -4,8 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { SustainPedalMarker } from "@coderline/alphatab/model/Bar";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { SustainPedalMarkerType } from "@coderline/alphatab/model/Bar";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -14,36 +18,37 @@ export class SustainPedalMarkerSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SustainPedalMarkerSerializer.setProperty(obj, k, v));
+        SustainPedalMarkerSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: SustainPedalMarker | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("ratioposition", obj.ratioPosition);
-        o.set("pedaltype", obj.pedalType as number);
-        return o;
+    public static read(obj: SustainPedalMarker, r: IObjectReader): void {
+        r.readObject((k, rr) => SustainPedalMarkerSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: SustainPedalMarker | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "ratioposition": obj.ratioPosition, "pedaltype": obj.pedalType as number };
-        return o;
-    }
-    public static setProperty(obj: SustainPedalMarker, property: string, v: unknown): boolean {
+    public static readProperty(obj: SustainPedalMarker, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "ratioposition":
-                obj.ratioPosition = v! as number;
+                obj.ratioPosition = r.readNumber();
                 return true;
             case "pedaltype":
-                obj.pedalType = JsonHelper.parseEnum<SustainPedalMarkerType>(v, SustainPedalMarkerType)!;
+                obj.pedalType = JsonHelper.parseEnum<SustainPedalMarkerType>(r.readValue(), SustainPedalMarkerType)!;
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: SustainPedalMarker | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        SustainPedalMarkerSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: SustainPedalMarker | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("ratioposition");
+        w.writeNumber(obj.ratioPosition);
+        w.prop("pedaltype");
+        w.writeNumber(obj.pedalType as number);
+        w.endObject();
     }
 }

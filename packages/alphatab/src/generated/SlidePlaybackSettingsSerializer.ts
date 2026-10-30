@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { SlidePlaybackSettings } from "@coderline/alphatab/PlayerSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,40 +16,51 @@ export class SlidePlaybackSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SlidePlaybackSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+        SlidePlaybackSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: SlidePlaybackSettings | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("simpleslidepitchoffset", obj.simpleSlidePitchOffset);
-        o.set("simpleslidedurationratio", obj.simpleSlideDurationRatio);
-        o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio);
-        return o;
+    public static read(obj: SlidePlaybackSettings, r: IObjectReader): void {
+        r.readObject((k, rr) => SlidePlaybackSettingsSerializer.readProperty(obj, k, rr, false));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: SlidePlaybackSettings | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "simpleslidepitchoffset": obj.simpleSlidePitchOffset, "simpleslidedurationratio": obj.simpleSlideDurationRatio, "shiftslidedurationratio": obj.shiftSlideDurationRatio };
-        return o;
-    }
-    public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
+    public static readProperty(obj: SlidePlaybackSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
         switch (property) {
             case "simpleslidepitchoffset":
-                obj.simpleSlidePitchOffset = v! as number;
+                obj.simpleSlidePitchOffset = r.readNumber();
                 return true;
             case "simpleslidedurationratio":
-                obj.simpleSlideDurationRatio = v! as number;
+                obj.simpleSlideDurationRatio = r.readNumber();
                 return true;
             case "shiftslidedurationratio":
-                obj.shiftSlideDurationRatio = v! as number;
+                obj.shiftSlideDurationRatio = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static readFlexible(obj: SlidePlaybackSettings, r: IObjectReader): void {
+        r.readObject((k, rr) => SlidePlaybackSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: SlidePlaybackSettings, property: string, r: IObjectReader): boolean {
+        if (SlidePlaybackSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static toJson(obj: SlidePlaybackSettings | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        SlidePlaybackSettingsSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: SlidePlaybackSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("simpleslidepitchoffset");
+        w.writeNumber(obj.simpleSlidePitchOffset);
+        w.prop("simpleslidedurationratio");
+        w.writeNumber(obj.simpleSlideDurationRatio);
+        w.prop("shiftslidedurationratio");
+        w.writeNumber(obj.shiftSlideDurationRatio);
+        w.endObject();
     }
 }

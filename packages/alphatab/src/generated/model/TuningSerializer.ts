@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { Tuning } from "@coderline/alphatab/model/Tuning";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,40 +16,42 @@ export class TuningSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => TuningSerializer.setProperty(obj, k, v));
+        TuningSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Tuning | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("isstandard", obj.isStandard);
-        o.set("name", obj.name);
-        o.set("tunings", obj.tunings);
-        return o;
+    public static read(obj: Tuning, r: IObjectReader): void {
+        r.readObject((k, rr) => TuningSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: Tuning | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "isstandard": obj.isStandard, "name": obj.name, "tunings": obj.tunings };
-        return o;
-    }
-    public static setProperty(obj: Tuning, property: string, v: unknown): boolean {
+    public static readProperty(obj: Tuning, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "isstandard":
-                obj.isStandard = v! as boolean;
+                obj.isStandard = r.readBoolean();
                 return true;
             case "name":
-                obj.name = v! as string;
+                obj.name = r.readString();
                 return true;
             case "tunings":
-                obj.tunings = v! as number[];
+                obj.tunings = r.readValue()! as number[];
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: Tuning | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        TuningSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Tuning | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("isstandard");
+        w.writeBoolean(obj.isStandard);
+        w.prop("name");
+        w.writeString(obj.name);
+        w.prop("tunings");
+        w.writeValue(obj.tunings);
+        w.endObject();
     }
 }

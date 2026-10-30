@@ -4,9 +4,13 @@
 // the code is regenerated.
 // </auto-generated>
 import { InstrumentArticulation } from "@coderline/alphatab/model/InstrumentArticulation";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { TechniqueSymbolPlacement } from "@coderline/alphatab/model/InstrumentArticulation";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -15,64 +19,72 @@ export class InstrumentArticulationSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => InstrumentArticulationSerializer.setProperty(obj, k, v));
+        InstrumentArticulationSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: InstrumentArticulation | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("id", obj.id);
-        o.set("elementtype", obj.elementType);
-        o.set("staffline", obj.staffLine);
-        o.set("noteheaddefault", obj.noteHeadDefault as number);
-        o.set("noteheadhalf", obj.noteHeadHalf as number);
-        o.set("noteheadwhole", obj.noteHeadWhole as number);
-        o.set("techniquesymbol", obj.techniqueSymbol as number);
-        o.set("techniquesymbolplacement", obj.techniqueSymbolPlacement as number);
-        o.set("outputmidinumber", obj.outputMidiNumber);
-        return o;
+    public static read(obj: InstrumentArticulation, r: IObjectReader): void {
+        r.readObject((k, rr) => InstrumentArticulationSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: InstrumentArticulation | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "id": obj.id, "elementtype": obj.elementType, "staffline": obj.staffLine, "noteheaddefault": obj.noteHeadDefault as number, "noteheadhalf": obj.noteHeadHalf as number, "noteheadwhole": obj.noteHeadWhole as number, "techniquesymbol": obj.techniqueSymbol as number, "techniquesymbolplacement": obj.techniqueSymbolPlacement as number, "outputmidinumber": obj.outputMidiNumber };
-        return o;
-    }
-    public static setProperty(obj: InstrumentArticulation, property: string, v: unknown): boolean {
+    public static readProperty(obj: InstrumentArticulation, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "id":
-                obj.id = v! as number;
+                obj.id = r.readNumber();
                 return true;
             case "elementtype":
-                obj.elementType = v! as string;
+                obj.elementType = r.readString();
                 return true;
             case "staffline":
-                obj.staffLine = v! as number;
+                obj.staffLine = r.readNumber();
                 return true;
             case "noteheaddefault":
-                obj.noteHeadDefault = JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol)!;
+                obj.noteHeadDefault = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
             case "noteheadhalf":
-                obj.noteHeadHalf = JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol)!;
+                obj.noteHeadHalf = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
             case "noteheadwhole":
-                obj.noteHeadWhole = JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol)!;
+                obj.noteHeadWhole = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
             case "techniquesymbol":
-                obj.techniqueSymbol = JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol)!;
+                obj.techniqueSymbol = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
             case "techniquesymbolplacement":
-                obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TechniqueSymbolPlacement>(v, TechniqueSymbolPlacement)!;
+                obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TechniqueSymbolPlacement>(r.readValue(), TechniqueSymbolPlacement)!;
                 return true;
             case "outputmidinumber":
-                obj.outputMidiNumber = v! as number;
+                obj.outputMidiNumber = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: InstrumentArticulation | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        InstrumentArticulationSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: InstrumentArticulation | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("id");
+        w.writeNumber(obj.id);
+        w.prop("elementtype");
+        w.writeString(obj.elementType);
+        w.prop("staffline");
+        w.writeNumber(obj.staffLine);
+        w.prop("noteheaddefault");
+        w.writeNumber(obj.noteHeadDefault as number);
+        w.prop("noteheadhalf");
+        w.writeNumber(obj.noteHeadHalf as number);
+        w.prop("noteheadwhole");
+        w.writeNumber(obj.noteHeadWhole as number);
+        w.prop("techniquesymbol");
+        w.writeNumber(obj.techniqueSymbol as number);
+        w.prop("techniquesymbolplacement");
+        w.writeNumber(obj.techniqueSymbolPlacement as number);
+        w.prop("outputmidinumber");
+        w.writeNumber(obj.outputMidiNumber);
+        w.endObject();
     }
 }

@@ -15,7 +15,8 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
  */
 export type IAlphaTabWorkerMessage =
     // main -> worker
-    // settings and score: Map trees, plain-object trees (toJsObject) on web
+    // settings: Map trees, plain-object trees (PlainObjectWriter) on web
+    // score: a Map tree, on web a MessagePack Uint8Array (WorkerScoreEncoding) sent in the transfer list
     | { cmd: 'alphaTab.initialize'; settings: unknown }
     | { cmd: 'alphaTab.updateSettings'; settings: unknown }
     | { cmd: 'alphaTab.render'; renderHints: RenderHints | undefined }

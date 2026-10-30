@@ -2,6 +2,7 @@ import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabEr
 import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
+import { PlainObjectWriter } from '@coderline/alphatab/io/PlainObjectWriter';
 import type { ControllerType } from '@coderline/alphatab/midi/ControllerType';
 import {
     AlphaTabMetronomeEvent,
@@ -56,8 +57,9 @@ export class JsonConverter {
      * @target web
      */
     public static scoreToJson(score: Score): string {
-        const obj: unknown = ScoreSerializer.toJsObject(score);
-        return JSON.stringify(obj, JsonConverter._jsonReplacer);
+        const writer = new PlainObjectWriter();
+        ScoreSerializer.write(score, writer);
+        return JSON.stringify(writer.result, JsonConverter._jsonReplacer);
     }
 
     /**
@@ -76,7 +78,7 @@ export class JsonConverter {
      * @param score The score object to serialize
      * @returns A serialized score object without ciruclar dependencies that can be used for further serializations.
      */
-    public static scoreToJsObject(score: Score): Map<string, unknown>|null {
+    public static scoreToJsObject(score: Score): Map<string, unknown> | null {
         return ScoreSerializer.toJson(score);
     }
 
@@ -100,8 +102,9 @@ export class JsonConverter {
      * @target web
      */
     public static settingsToJson(settings: Settings): string {
-        const obj: unknown = SettingsSerializer.toJsObject(settings);
-        return JSON.stringify(obj, JsonConverter._jsonReplacer);
+        const writer = new PlainObjectWriter();
+        SettingsSerializer.write(settings, writer);
+        return JSON.stringify(writer.result, JsonConverter._jsonReplacer);
     }
 
     /**

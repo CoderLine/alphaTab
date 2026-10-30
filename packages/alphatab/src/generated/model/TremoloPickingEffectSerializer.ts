@@ -4,8 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { TremoloPickingEffect } from "@coderline/alphatab/model/TremoloPickingEffect";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { TremoloPickingStyle } from "@coderline/alphatab/model/TremoloPickingEffect";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -14,36 +18,37 @@ export class TremoloPickingEffectSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => TremoloPickingEffectSerializer.setProperty(obj, k, v));
+        TremoloPickingEffectSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: TremoloPickingEffect | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("marks", obj.marks);
-        o.set("style", obj.style as number);
-        return o;
+    public static read(obj: TremoloPickingEffect, r: IObjectReader): void {
+        r.readObject((k, rr) => TremoloPickingEffectSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: TremoloPickingEffect | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "marks": obj.marks, "style": obj.style as number };
-        return o;
-    }
-    public static setProperty(obj: TremoloPickingEffect, property: string, v: unknown): boolean {
+    public static readProperty(obj: TremoloPickingEffect, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "marks":
-                obj.marks = v! as number;
+                obj.marks = r.readNumber();
                 return true;
             case "style":
-                obj.style = JsonHelper.parseEnum<TremoloPickingStyle>(v, TremoloPickingStyle)!;
+                obj.style = JsonHelper.parseEnum<TremoloPickingStyle>(r.readValue(), TremoloPickingStyle)!;
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: TremoloPickingEffect | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        TremoloPickingEffectSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: TremoloPickingEffect | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("marks");
+        w.writeNumber(obj.marks);
+        w.prop("style");
+        w.writeNumber(obj.style as number);
+        w.endObject();
     }
 }

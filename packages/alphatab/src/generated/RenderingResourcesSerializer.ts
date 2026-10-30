@@ -4,11 +4,15 @@
 // the code is regenerated.
 // </auto-generated>
 import { RenderingResources } from "@coderline/alphatab/RenderingResources";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { EngravingSettingsSerializer } from "@coderline/alphatab/generated/EngravingSettingsSerializer";
 import { Font } from "@coderline/alphatab/model/Font";
-import { Color } from "@coderline/alphatab/model/Color";
 import { NotationElement } from "@coderline/alphatab/NotationSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { Color } from "@coderline/alphatab/model/Color";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -17,142 +21,152 @@ export class RenderingResourcesSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => RenderingResourcesSerializer.setProperty(obj, k.toLowerCase(), v));
+        RenderingResourcesSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: RenderingResources | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("smuflfontfamilyname", obj.smuflFontFamilyName);
-        o.set("engravingsettings", EngravingSettingsSerializer.toJson(obj.engravingSettings));
-        {
-            const m = new Map<string, unknown>();
-            o.set("elementfonts", m);
-            for (const [k, v] of obj.elementFonts!) {
-                m.set(k.toString(), Font.toJson(v)!);
-            }
-        }
-        o.set("numberednotationfont", Font.toJson(obj.numberedNotationFont)!);
-        o.set("numberednotationgracefont", Font.toJson(obj.numberedNotationGraceFont)!);
-        o.set("tablaturefont", Font.toJson(obj.tablatureFont)!);
-        o.set("gracefont", Font.toJson(obj.graceFont)!);
-        o.set("stafflinecolor", Color.toJson(obj.staffLineColor)!);
-        o.set("barseparatorcolor", Color.toJson(obj.barSeparatorColor)!);
-        o.set("barnumbercolor", Color.toJson(obj.barNumberColor)!);
-        o.set("mainglyphcolor", Color.toJson(obj.mainGlyphColor)!);
-        o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor)!);
-        o.set("scoreinfocolor", Color.toJson(obj.scoreInfoColor)!);
-        return o;
+    public static read(obj: RenderingResources, r: IObjectReader): void {
+        r.readObject((k, rr) => RenderingResourcesSerializer.readProperty(obj, k, rr, false));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: RenderingResources | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "smuflfontfamilyname": obj.smuflFontFamilyName, "engravingsettings": EngravingSettingsSerializer.toJsObject(obj.engravingSettings) };
-        {
-            const m = new Map<string, unknown>();
-            o["elementfonts"] = m;
-            for (const [k, v] of obj.elementFonts!) {
-                m.set(k.toString(), Font.toJson(v)!);
-            }
-        }
-        o["numberednotationfont"] = Font.toJson(obj.numberedNotationFont)!;
-        o["numberednotationgracefont"] = Font.toJson(obj.numberedNotationGraceFont)!;
-        o["tablaturefont"] = Font.toJson(obj.tablatureFont)!;
-        o["gracefont"] = Font.toJson(obj.graceFont)!;
-        o["stafflinecolor"] = Color.toJson(obj.staffLineColor)!;
-        o["barseparatorcolor"] = Color.toJson(obj.barSeparatorColor)!;
-        o["barnumbercolor"] = Color.toJson(obj.barNumberColor)!;
-        o["mainglyphcolor"] = Color.toJson(obj.mainGlyphColor)!;
-        o["secondaryglyphcolor"] = Color.toJson(obj.secondaryGlyphColor)!;
-        o["scoreinfocolor"] = Color.toJson(obj.scoreInfoColor)!;
-        return o;
-    }
-    public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {
+    public static readProperty(obj: RenderingResources, property: string, r: IObjectReader, flexible: boolean): boolean {
         switch (property) {
             case "smuflfontfamilyname":
-                obj.smuflFontFamilyName = v as string | undefined;
+                obj.smuflFontFamilyName = r.readValue() as string | undefined;
+                return true;
+            case "engravingsettings":
+                EngravingSettingsSerializer.read(obj.engravingSettings, r);
                 return true;
             case "copyrightfont":
-                obj.copyrightFont = Font.fromJson(v)!;
+                obj.copyrightFont = Font.fromJson(r.readValue())!;
                 return true;
             case "titlefont":
-                obj.titleFont = Font.fromJson(v)!;
+                obj.titleFont = Font.fromJson(r.readValue())!;
                 return true;
             case "subtitlefont":
-                obj.subTitleFont = Font.fromJson(v)!;
+                obj.subTitleFont = Font.fromJson(r.readValue())!;
                 return true;
             case "wordsfont":
-                obj.wordsFont = Font.fromJson(v)!;
+                obj.wordsFont = Font.fromJson(r.readValue())!;
                 return true;
             case "timerfont":
-                obj.timerFont = Font.fromJson(v)!;
+                obj.timerFont = Font.fromJson(r.readValue())!;
                 return true;
             case "directionsfont":
-                obj.directionsFont = Font.fromJson(v)!;
+                obj.directionsFont = Font.fromJson(r.readValue())!;
                 return true;
             case "fretboardnumberfont":
-                obj.fretboardNumberFont = Font.fromJson(v)!;
+                obj.fretboardNumberFont = Font.fromJson(r.readValue())!;
                 return true;
             case "fingeringfont":
-                obj.fingeringFont = Font.fromJson(v)!;
+                obj.fingeringFont = Font.fromJson(r.readValue())!;
                 return true;
             case "inlinefingeringfont":
-                obj.inlineFingeringFont = Font.fromJson(v)!;
+                obj.inlineFingeringFont = Font.fromJson(r.readValue())!;
                 return true;
             case "markerfont":
-                obj.markerFont = Font.fromJson(v)!;
+                obj.markerFont = Font.fromJson(r.readValue())!;
                 return true;
             case "effectfont":
-                obj.effectFont = Font.fromJson(v)!;
+                obj.effectFont = Font.fromJson(r.readValue())!;
                 return true;
             case "barnumberfont":
-                obj.barNumberFont = Font.fromJson(v)!;
+                obj.barNumberFont = Font.fromJson(r.readValue())!;
                 return true;
             case "elementfonts":
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.elementFonts.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, Font.fromJson(v)!);
-                });
+                RenderingResourcesSerializer._readElementFonts(obj, r, flexible);
                 return true;
             case "numberednotationfont":
-                obj.numberedNotationFont = Font.fromJson(v)!;
+                obj.numberedNotationFont = Font.fromJson(r.readValue())!;
                 return true;
             case "numberednotationgracefont":
-                obj.numberedNotationGraceFont = Font.fromJson(v)!;
+                obj.numberedNotationGraceFont = Font.fromJson(r.readValue())!;
                 return true;
             case "tablaturefont":
-                obj.tablatureFont = Font.fromJson(v)!;
+                obj.tablatureFont = Font.fromJson(r.readValue())!;
                 return true;
             case "gracefont":
-                obj.graceFont = Font.fromJson(v)!;
+                obj.graceFont = Font.fromJson(r.readValue())!;
                 return true;
             case "stafflinecolor":
-                obj.staffLineColor = Color.fromJson(v)!;
+                obj.staffLineColor = Color.fromJson(r.readValue())!;
                 return true;
             case "barseparatorcolor":
-                obj.barSeparatorColor = Color.fromJson(v)!;
+                obj.barSeparatorColor = Color.fromJson(r.readValue())!;
                 return true;
             case "barnumbercolor":
-                obj.barNumberColor = Color.fromJson(v)!;
+                obj.barNumberColor = Color.fromJson(r.readValue())!;
                 return true;
             case "mainglyphcolor":
-                obj.mainGlyphColor = Color.fromJson(v)!;
+                obj.mainGlyphColor = Color.fromJson(r.readValue())!;
                 return true;
             case "secondaryglyphcolor":
-                obj.secondaryGlyphColor = Color.fromJson(v)!;
+                obj.secondaryGlyphColor = Color.fromJson(r.readValue())!;
                 return true;
             case "scoreinfocolor":
-                obj.scoreInfoColor = Color.fromJson(v)!;
+                obj.scoreInfoColor = Color.fromJson(r.readValue())!;
                 return true;
         }
+        return false;
+    }
+    private static _readElementFonts(obj: RenderingResources, r: IObjectReader, flexible: boolean): void {
+        r.readObject((k, rr) => {
+            obj.elementFonts.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, Font.fromJson(rr.readValue())!);
+            return true;
+        });
+    }
+    public static readFlexible(obj: RenderingResources, r: IObjectReader): void {
+        r.readObject((k, rr) => RenderingResourcesSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: RenderingResources, property: string, r: IObjectReader): boolean {
+        if (["engravingsettings"].indexOf(property) < 0 && RenderingResourcesSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
         if (["engravingsettings"].indexOf(property) >= 0) {
-            EngravingSettingsSerializer.fromJson(obj.engravingSettings, v as Map<string, unknown>);
+            EngravingSettingsSerializer.readFlexible(obj.engravingSettings, r);
             return true;
         }
         return false;
+    }
+    public static toJson(obj: RenderingResources | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        RenderingResourcesSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: RenderingResources | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("smuflfontfamilyname");
+        w.writeValue(obj.smuflFontFamilyName);
+        w.prop("engravingsettings");
+        EngravingSettingsSerializer.write(obj.engravingSettings, w);
+        w.prop("elementfonts");
+        w.startMap();
+        for (const [k, v] of obj.elementFonts!) {
+            w.prop(k.toString());
+            w.writeValue(Font.toJson(v));
+        }
+        w.endMap();
+        w.prop("numberednotationfont");
+        w.writeValue(Font.toJson(obj.numberedNotationFont));
+        w.prop("numberednotationgracefont");
+        w.writeValue(Font.toJson(obj.numberedNotationGraceFont));
+        w.prop("tablaturefont");
+        w.writeValue(Font.toJson(obj.tablatureFont));
+        w.prop("gracefont");
+        w.writeValue(Font.toJson(obj.graceFont));
+        w.prop("stafflinecolor");
+        w.writeValue(Color.toJson(obj.staffLineColor));
+        w.prop("barseparatorcolor");
+        w.writeValue(Color.toJson(obj.barSeparatorColor));
+        w.prop("barnumbercolor");
+        w.writeValue(Color.toJson(obj.barNumberColor));
+        w.prop("mainglyphcolor");
+        w.writeValue(Color.toJson(obj.mainGlyphColor));
+        w.prop("secondaryglyphcolor");
+        w.writeValue(Color.toJson(obj.secondaryGlyphColor));
+        w.prop("scoreinfocolor");
+        w.writeValue(Color.toJson(obj.scoreInfoColor));
+        w.endObject();
     }
 }

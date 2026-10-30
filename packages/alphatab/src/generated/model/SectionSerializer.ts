@@ -4,7 +4,10 @@
 // the code is regenerated.
 // </auto-generated>
 import { Section } from "@coderline/alphatab/model/Section";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -13,36 +16,37 @@ export class SectionSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SectionSerializer.setProperty(obj, k, v));
+        SectionSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Section | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("marker", obj.marker);
-        o.set("text", obj.text);
-        return o;
+    public static read(obj: Section, r: IObjectReader): void {
+        r.readObject((k, rr) => SectionSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: Section | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "marker": obj.marker, "text": obj.text };
-        return o;
-    }
-    public static setProperty(obj: Section, property: string, v: unknown): boolean {
+    public static readProperty(obj: Section, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "marker":
-                obj.marker = v! as string;
+                obj.marker = r.readString();
                 return true;
             case "text":
-                obj.text = v! as string;
+                obj.text = r.readString();
                 return true;
         }
         return false;
+    }
+    public static toJson(obj: Section | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        SectionSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Section | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("marker");
+        w.writeString(obj.marker);
+        w.prop("text");
+        w.writeString(obj.text);
+        w.endObject();
     }
 }

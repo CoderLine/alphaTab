@@ -4,17 +4,21 @@
 // the code is regenerated.
 // </auto-generated>
 import { RenderStylesheet } from "@coderline/alphatab/model/RenderStylesheet";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { ScoreStaffConfigSerializer } from "@coderline/alphatab/generated/model/ScoreStaffConfigSerializer";
-import { TabStaffConfigSerializer } from "@coderline/alphatab/generated/model/TabStaffConfigSerializer";
-import { SlashStaffConfigSerializer } from "@coderline/alphatab/generated/model/SlashStaffConfigSerializer";
-import { NumberedStaffConfigSerializer } from "@coderline/alphatab/generated/model/NumberedStaffConfigSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { TuningDisplayMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameOrientation } from "@coderline/alphatab/model/RenderStylesheet";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
+import { ScoreStaffConfigSerializer } from "@coderline/alphatab/generated/model/ScoreStaffConfigSerializer";
+import { TabStaffConfigSerializer } from "@coderline/alphatab/generated/model/TabStaffConfigSerializer";
+import { SlashStaffConfigSerializer } from "@coderline/alphatab/generated/model/SlashStaffConfigSerializer";
+import { NumberedStaffConfigSerializer } from "@coderline/alphatab/generated/model/NumberedStaffConfigSerializer";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -23,195 +27,191 @@ export class RenderStylesheetSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => RenderStylesheetSerializer.setProperty(obj, k, v));
+        RenderStylesheetSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: RenderStylesheet | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("hidedynamics", obj.hideDynamics);
-        o.set("bracketextendmode", obj.bracketExtendMode as number);
-        o.set("usesystemsignseparator", obj.useSystemSignSeparator);
-        o.set("globaldisplaytuning", obj.globalDisplayTuning);
-        o.set("tuningdisplaymode", obj.tuningDisplayMode as number);
-        if (obj.perTrackDisplayTuning !== null) {
-            const m = new Map<string, unknown>();
-            o.set("pertrackdisplaytuning", m);
-            for (const [k, v] of obj.perTrackDisplayTuning!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("globaldisplaychorddiagramsontop", obj.globalDisplayChordDiagramsOnTop);
-        if (obj.perTrackChordDiagramsOnTop !== null) {
-            const m = new Map<string, unknown>();
-            o.set("pertrackchorddiagramsontop", m);
-            for (const [k, v] of obj.perTrackChordDiagramsOnTop!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("globaldisplaychorddiagramsinscore", obj.globalDisplayChordDiagramsInScore);
-        o.set("singletracktracknamepolicy", obj.singleTrackTrackNamePolicy as number);
-        o.set("multitracktracknamepolicy", obj.multiTrackTrackNamePolicy as number);
-        o.set("firstsystemtracknamemode", obj.firstSystemTrackNameMode as number);
-        o.set("othersystemstracknamemode", obj.otherSystemsTrackNameMode as number);
-        o.set("firstsystemtracknameorientation", obj.firstSystemTrackNameOrientation as number);
-        o.set("othersystemstracknameorientation", obj.otherSystemsTrackNameOrientation as number);
-        o.set("multitrackmultibarrest", obj.multiTrackMultiBarRest);
-        if (obj.perTrackMultiBarRest !== null) {
-            const a: number[] = [];
-            o.set("pertrackmultibarrest", a);
-            for (const v of obj.perTrackMultiBarRest!) {
-                a.push(v);
-            }
-        }
-        o.set("extendbarlines", obj.extendBarLines);
-        o.set("hideemptystaves", obj.hideEmptyStaves);
-        o.set("hideemptystavesinfirstsystem", obj.hideEmptyStavesInFirstSystem);
-        o.set("showsinglestaffbrackets", obj.showSingleStaffBrackets);
-        o.set("barnumberdisplay", obj.barNumberDisplay as number);
-        o.set("scoreconfig", ScoreStaffConfigSerializer.toJson(obj.scoreConfig));
-        o.set("tabconfig", TabStaffConfigSerializer.toJson(obj.tabConfig));
-        o.set("slashconfig", SlashStaffConfigSerializer.toJson(obj.slashConfig));
-        o.set("numberedconfig", NumberedStaffConfigSerializer.toJson(obj.numberedConfig));
-        return o;
+    public static read(obj: RenderStylesheet, r: IObjectReader): void {
+        r.readObject((k, rr) => RenderStylesheetSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: RenderStylesheet | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = { "hidedynamics": obj.hideDynamics, "bracketextendmode": obj.bracketExtendMode as number, "usesystemsignseparator": obj.useSystemSignSeparator, "globaldisplaytuning": obj.globalDisplayTuning, "tuningdisplaymode": obj.tuningDisplayMode as number };
-        if (obj.perTrackDisplayTuning !== null) {
-            const m = new Map<string, unknown>();
-            o["pertrackdisplaytuning"] = m;
-            for (const [k, v] of obj.perTrackDisplayTuning!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o["globaldisplaychorddiagramsontop"] = obj.globalDisplayChordDiagramsOnTop;
-        if (obj.perTrackChordDiagramsOnTop !== null) {
-            const m = new Map<string, unknown>();
-            o["pertrackchorddiagramsontop"] = m;
-            for (const [k, v] of obj.perTrackChordDiagramsOnTop!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o["globaldisplaychorddiagramsinscore"] = obj.globalDisplayChordDiagramsInScore;
-        o["singletracktracknamepolicy"] = obj.singleTrackTrackNamePolicy as number;
-        o["multitracktracknamepolicy"] = obj.multiTrackTrackNamePolicy as number;
-        o["firstsystemtracknamemode"] = obj.firstSystemTrackNameMode as number;
-        o["othersystemstracknamemode"] = obj.otherSystemsTrackNameMode as number;
-        o["firstsystemtracknameorientation"] = obj.firstSystemTrackNameOrientation as number;
-        o["othersystemstracknameorientation"] = obj.otherSystemsTrackNameOrientation as number;
-        o["multitrackmultibarrest"] = obj.multiTrackMultiBarRest;
-        if (obj.perTrackMultiBarRest !== null) {
-            const a: number[] = [];
-            o["pertrackmultibarrest"] = a;
-            for (const v of obj.perTrackMultiBarRest!) {
-                a.push(v);
-            }
-        }
-        o["extendbarlines"] = obj.extendBarLines;
-        o["hideemptystaves"] = obj.hideEmptyStaves;
-        o["hideemptystavesinfirstsystem"] = obj.hideEmptyStavesInFirstSystem;
-        o["showsinglestaffbrackets"] = obj.showSingleStaffBrackets;
-        o["barnumberdisplay"] = obj.barNumberDisplay as number;
-        o["scoreconfig"] = ScoreStaffConfigSerializer.toJsObject(obj.scoreConfig);
-        o["tabconfig"] = TabStaffConfigSerializer.toJsObject(obj.tabConfig);
-        o["slashconfig"] = SlashStaffConfigSerializer.toJsObject(obj.slashConfig);
-        o["numberedconfig"] = NumberedStaffConfigSerializer.toJsObject(obj.numberedConfig);
-        return o;
-    }
-    public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
+    public static readProperty(obj: RenderStylesheet, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "hidedynamics":
-                obj.hideDynamics = v! as boolean;
+                obj.hideDynamics = r.readBoolean();
                 return true;
             case "bracketextendmode":
-                obj.bracketExtendMode = JsonHelper.parseEnum<BracketExtendMode>(v, BracketExtendMode)!;
+                obj.bracketExtendMode = JsonHelper.parseEnum<BracketExtendMode>(r.readValue(), BracketExtendMode)!;
                 return true;
             case "usesystemsignseparator":
-                obj.useSystemSignSeparator = v! as boolean;
+                obj.useSystemSignSeparator = r.readBoolean();
                 return true;
             case "globaldisplaytuning":
-                obj.globalDisplayTuning = v! as boolean;
+                obj.globalDisplayTuning = r.readBoolean();
                 return true;
             case "tuningdisplaymode":
-                obj.tuningDisplayMode = JsonHelper.parseEnum<TuningDisplayMode>(v, TuningDisplayMode)!;
+                obj.tuningDisplayMode = JsonHelper.parseEnum<TuningDisplayMode>(r.readValue(), TuningDisplayMode)!;
                 return true;
             case "pertrackdisplaytuning":
-                obj.perTrackDisplayTuning = new Map<number, boolean>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.perTrackDisplayTuning!.set(Number.parseInt(k), v as boolean);
-                });
+                RenderStylesheetSerializer._readPerTrackDisplayTuning(obj, r);
                 return true;
             case "globaldisplaychorddiagramsontop":
-                obj.globalDisplayChordDiagramsOnTop = v! as boolean;
+                obj.globalDisplayChordDiagramsOnTop = r.readBoolean();
                 return true;
             case "pertrackchorddiagramsontop":
-                obj.perTrackChordDiagramsOnTop = new Map<number, boolean>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.perTrackChordDiagramsOnTop!.set(Number.parseInt(k), v as boolean);
-                });
+                RenderStylesheetSerializer._readPerTrackChordDiagramsOnTop(obj, r);
                 return true;
             case "globaldisplaychorddiagramsinscore":
-                obj.globalDisplayChordDiagramsInScore = v! as boolean;
+                obj.globalDisplayChordDiagramsInScore = r.readBoolean();
                 return true;
             case "singletracktracknamepolicy":
-                obj.singleTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;
+                obj.singleTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(r.readValue(), TrackNamePolicy)!;
                 return true;
             case "multitracktracknamepolicy":
-                obj.multiTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;
+                obj.multiTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(r.readValue(), TrackNamePolicy)!;
                 return true;
             case "firstsystemtracknamemode":
-                obj.firstSystemTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(v, TrackNameMode)!;
+                obj.firstSystemTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(r.readValue(), TrackNameMode)!;
                 return true;
             case "othersystemstracknamemode":
-                obj.otherSystemsTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(v, TrackNameMode)!;
+                obj.otherSystemsTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(r.readValue(), TrackNameMode)!;
                 return true;
             case "firstsystemtracknameorientation":
-                obj.firstSystemTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
+                obj.firstSystemTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(r.readValue(), TrackNameOrientation)!;
                 return true;
             case "othersystemstracknameorientation":
-                obj.otherSystemsTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
+                obj.otherSystemsTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(r.readValue(), TrackNameOrientation)!;
                 return true;
             case "multitrackmultibarrest":
-                obj.multiTrackMultiBarRest = v! as boolean;
+                obj.multiTrackMultiBarRest = r.readBoolean();
                 return true;
             case "pertrackmultibarrest":
-                obj.perTrackMultiBarRest = new Set<number>(v as number[]);
+                obj.perTrackMultiBarRest = new Set<number>(r.readValue() as number[]);
                 return true;
             case "extendbarlines":
-                obj.extendBarLines = v! as boolean;
+                obj.extendBarLines = r.readBoolean();
                 return true;
             case "hideemptystaves":
-                obj.hideEmptyStaves = v! as boolean;
+                obj.hideEmptyStaves = r.readBoolean();
                 return true;
             case "hideemptystavesinfirstsystem":
-                obj.hideEmptyStavesInFirstSystem = v! as boolean;
+                obj.hideEmptyStavesInFirstSystem = r.readBoolean();
                 return true;
             case "showsinglestaffbrackets":
-                obj.showSingleStaffBrackets = v! as boolean;
+                obj.showSingleStaffBrackets = r.readBoolean();
                 return true;
             case "barnumberdisplay":
-                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay)!;
+                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay)!;
                 return true;
             case "scoreconfig":
-                ScoreStaffConfigSerializer.fromJson(obj.scoreConfig, v);
+                ScoreStaffConfigSerializer.readFlexible(obj.scoreConfig, r);
                 return true;
             case "tabconfig":
-                TabStaffConfigSerializer.fromJson(obj.tabConfig, v);
+                TabStaffConfigSerializer.readFlexible(obj.tabConfig, r);
                 return true;
             case "slashconfig":
-                SlashStaffConfigSerializer.fromJson(obj.slashConfig, v);
+                SlashStaffConfigSerializer.readFlexible(obj.slashConfig, r);
                 return true;
             case "numberedconfig":
-                NumberedStaffConfigSerializer.fromJson(obj.numberedConfig, v);
+                NumberedStaffConfigSerializer.readFlexible(obj.numberedConfig, r);
                 return true;
         }
         return false;
+    }
+    private static _readPerTrackDisplayTuning(obj: RenderStylesheet, r: IObjectReader): void {
+        obj.perTrackDisplayTuning = new Map<number, boolean>();
+        r.readObject((k, rr) => {
+            obj.perTrackDisplayTuning!.set(Number.parseInt(k), rr.readBoolean());
+            return true;
+        });
+    }
+    private static _readPerTrackChordDiagramsOnTop(obj: RenderStylesheet, r: IObjectReader): void {
+        obj.perTrackChordDiagramsOnTop = new Map<number, boolean>();
+        r.readObject((k, rr) => {
+            obj.perTrackChordDiagramsOnTop!.set(Number.parseInt(k), rr.readBoolean());
+            return true;
+        });
+    }
+    public static toJson(obj: RenderStylesheet | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        RenderStylesheetSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: RenderStylesheet | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("hidedynamics");
+        w.writeBoolean(obj.hideDynamics);
+        w.prop("bracketextendmode");
+        w.writeNumber(obj.bracketExtendMode as number);
+        w.prop("usesystemsignseparator");
+        w.writeBoolean(obj.useSystemSignSeparator);
+        w.prop("globaldisplaytuning");
+        w.writeBoolean(obj.globalDisplayTuning);
+        w.prop("tuningdisplaymode");
+        w.writeNumber(obj.tuningDisplayMode as number);
+        if (obj.perTrackDisplayTuning !== null) {
+            w.prop("pertrackdisplaytuning");
+            w.startMap();
+            for (const [k, v] of obj.perTrackDisplayTuning!) {
+                w.prop(k.toString());
+                w.writeBoolean(v);
+            }
+            w.endMap();
+        }
+        w.prop("globaldisplaychorddiagramsontop");
+        w.writeBoolean(obj.globalDisplayChordDiagramsOnTop);
+        if (obj.perTrackChordDiagramsOnTop !== null) {
+            w.prop("pertrackchorddiagramsontop");
+            w.startMap();
+            for (const [k, v] of obj.perTrackChordDiagramsOnTop!) {
+                w.prop(k.toString());
+                w.writeBoolean(v);
+            }
+            w.endMap();
+        }
+        w.prop("globaldisplaychorddiagramsinscore");
+        w.writeBoolean(obj.globalDisplayChordDiagramsInScore);
+        w.prop("singletracktracknamepolicy");
+        w.writeNumber(obj.singleTrackTrackNamePolicy as number);
+        w.prop("multitracktracknamepolicy");
+        w.writeNumber(obj.multiTrackTrackNamePolicy as number);
+        w.prop("firstsystemtracknamemode");
+        w.writeNumber(obj.firstSystemTrackNameMode as number);
+        w.prop("othersystemstracknamemode");
+        w.writeNumber(obj.otherSystemsTrackNameMode as number);
+        w.prop("firstsystemtracknameorientation");
+        w.writeNumber(obj.firstSystemTrackNameOrientation as number);
+        w.prop("othersystemstracknameorientation");
+        w.writeNumber(obj.otherSystemsTrackNameOrientation as number);
+        w.prop("multitrackmultibarrest");
+        w.writeBoolean(obj.multiTrackMultiBarRest);
+        if (obj.perTrackMultiBarRest !== null) {
+            const a: number[] = [];
+            for (const v of obj.perTrackMultiBarRest!) {
+                a.push(v);
+            }
+            w.prop("pertrackmultibarrest");
+            w.writeValue(a);
+        }
+        w.prop("extendbarlines");
+        w.writeBoolean(obj.extendBarLines);
+        w.prop("hideemptystaves");
+        w.writeBoolean(obj.hideEmptyStaves);
+        w.prop("hideemptystavesinfirstsystem");
+        w.writeBoolean(obj.hideEmptyStavesInFirstSystem);
+        w.prop("showsinglestaffbrackets");
+        w.writeBoolean(obj.showSingleStaffBrackets);
+        w.prop("barnumberdisplay");
+        w.writeNumber(obj.barNumberDisplay as number);
+        w.prop("scoreconfig");
+        ScoreStaffConfigSerializer.write(obj.scoreConfig, w);
+        w.prop("tabconfig");
+        TabStaffConfigSerializer.write(obj.tabConfig, w);
+        w.prop("slashconfig");
+        SlashStaffConfigSerializer.write(obj.slashConfig, w);
+        w.prop("numberedconfig");
+        NumberedStaffConfigSerializer.write(obj.numberedConfig, w);
+        w.endObject();
     }
 }

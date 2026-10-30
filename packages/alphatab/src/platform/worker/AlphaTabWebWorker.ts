@@ -1,5 +1,6 @@
 import { Environment } from '@coderline/alphatab/Environment';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
 import { Logger } from '@coderline/alphatab/Logger';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -8,10 +9,11 @@ import type {
     IAlphaTabWorkerGlobalScope,
     IAlphaTabWorkerMessage
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { WorkerScoreEncoding } from '@coderline/alphatab/platform/worker/WorkerScoreEncoding';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
-import type { Settings } from '@coderline/alphatab/Settings';
+import { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
@@ -42,7 +44,8 @@ export class AlphaTabWebWorker {
         }
         switch (data.cmd) {
             case 'alphaTab.initialize':
-                const settings: Settings = JsonConverter.jsObjectToSettings(data.settings);
+                const settings = new Settings();
+                SettingsSerializer.read(settings, new MapObjectReader(data.settings));
                 Logger.logLevel = settings.core.logLevel;
                 this._renderer = new ScoreRenderer(settings);
                 /*@target web*/
@@ -94,14 +97,21 @@ export class AlphaTabWebWorker {
                 this._scoreId = data.scoreId;
                 this._updateFontSizes(data.fontSizes);
                 const renderHints = data.renderHints;
-                const score =
-                    data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
+                const score = data.score == null ? null : this._deserializeScore(data.score);
                 this._renderMultiple(score, data.trackIndexes, renderHints);
                 break;
             case 'alphaTab.updateSettings':
                 this._updateSettings(data.settings);
                 break;
         }
+    }
+
+    private _deserializeScore(data: unknown): Score {
+        /*@target web*/
+        if (data instanceof Uint8Array) {
+            return WorkerScoreEncoding.decode(data, this._renderer.settings);
+        }
+        return JsonConverter.jsObjectToScore(data, this._renderer.settings);
     }
 
     private _postRenderFinished(): void {
@@ -148,7 +158,7 @@ export class AlphaTabWebWorker {
     }
 
     private _updateSettings(json: unknown): void {
-        SettingsSerializer.fromJson(this._renderer.settings, json);
+        SettingsSerializer.read(this._renderer.settings, new MapObjectReader(json));
     }
 
     private _renderMultiple(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {

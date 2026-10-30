@@ -9,6 +9,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import v8 from 'node:v8';
 import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
+import { PlainObjectWriter } from '@coderline/alphatab/io/PlainObjectWriter';
+import { MessagePackObjectReader } from '@coderline/alphatab/io/MessagePackObjectReader';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { AlphaSynthMidiFileHandler } from '@coderline/alphatab/midi/AlphaSynthMidiFileHandler';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
@@ -17,11 +19,126 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { Score } from '@coderline/alphatab/model/Score';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
+import { WorkerScoreEncoding } from '@coderline/alphatab/platform/worker/WorkerScoreEncoding';
 import { Settings } from '@coderline/alphatab/Settings';
+import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
+import { MessagePackObjectWriter } from '@coderline/alphatab/io/MessagePackObjectWriter';
+import { AlphaTabWebWorker } from '@coderline/alphatab/platform/worker/AlphaTabWebWorker';
+import type {
+    IAlphaTabRenderingWorker,
+    IAlphaTabWorkerMessage
+} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { AlphaTabWorkerScoreRenderer } from '@coderline/alphatab/platform/worker/AlphaTabWorkerScoreRenderer';
+import vm from 'node:vm';
 import { describe, it } from 'vitest';
 import { AllocationSampler } from './AllocationSampler';
 import { LayoutCorpus } from './LayoutCorpus';
 import { LayoutHarness } from './LayoutHarness';
+
+v8.setFlagsFromString('--expose-gc');
+const gc = vm.runInNewContext('gc') as () => void;
+
+/** Bytes kept alive per value produced by `create`, from the heap growth while holding `count` of them. */
+function retainedPerValue(create: () => unknown, count: number = 16): number {
+    const heapUsed = () => {
+        for (let i = 0; i < 4; i++) {
+            gc();
+        }
+        return process.memoryUsage().heapUsed;
+    };
+    const held: unknown[] = [];
+    const before = heapUsed();
+    for (let i = 0; i < count; i++) {
+        held.push(create());
+    }
+    const after = heapUsed();
+    if (held.length !== count) {
+        throw new Error('unreachable');
+    }
+    return (after - before) / count;
+}
+
+/** Deep equality of plain objects, Maps, arrays and primitives. */
+function jsObjectEquals(a: unknown, b: unknown): boolean {
+    if (a === b) {
+        return true;
+    }
+    if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
+        return false;
+    }
+    if (a instanceof Map) {
+        if (!(b instanceof Map) || a.size !== b.size) {
+            return false;
+        }
+        for (const k of a.keys()) {
+            if (!b.has(k) || !jsObjectEquals(a.get(k), b.get(k))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (Array.isArray(a)) {
+        if (!Array.isArray(b) || a.length !== b.length) {
+            return false;
+        }
+        for (let i = 0; i < a.length; i++) {
+            if (!jsObjectEquals(a[i], b[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    const ao = a as Record<string, unknown>;
+    const bo = b as Record<string, unknown>;
+    const keys = Object.keys(ao);
+    if (keys.length !== Object.keys(bo).length) {
+        return false;
+    }
+    for (const k of keys) {
+        if (!Object.prototype.hasOwnProperty.call(bo, k) || !jsObjectEquals(ao[k], bo[k])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function bytesEqual(a: Uint8Array, b: Uint8Array): boolean {
+    if (a.length !== b.length) {
+        return false;
+    }
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/** The main-thread renderer connected to an in-process AlphaTabWebWorker; every message is structured-cloned. */
+function inProcessWorker(settings: Settings) {
+    let handler: ((e: MessageEvent<IAlphaTabWorkerMessage>) => void) | null = null;
+    const worker = {
+        posts: 0,
+        postMessage(message: IAlphaTabWorkerMessage, transfer?: Transferable[]) {
+            worker.posts++;
+            handler!({ data: structuredClone(message, { transfer }) } as MessageEvent<IAlphaTabWorkerMessage>);
+        },
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        terminate: () => {}
+    };
+    new AlphaTabWebWorker({
+        postMessage: () => {},
+        addEventListener: (_, h) => {
+            handler = h;
+        },
+        removeEventListener: () => {}
+    });
+    const api = { settings } as unknown as AlphaTabApiBase<unknown>;
+    const renderer = new AlphaTabWorkerScoreRenderer<unknown>(api, worker as unknown as IAlphaTabRenderingWorker);
+    return { renderer, worker };
+}
 
 function median(values: number[]) {
     const sorted = values.slice().sort((a, b) => a - b);
@@ -196,11 +313,13 @@ describe('WorkerJson', () => {
             SettingsSerializer.fromJson(target, cloned)
         );
         const toObj = () => {
-            const o = SettingsSerializer.toJsObject(settings)!;
+            const w = new PlainObjectWriter();
+            SettingsSerializer.write(settings, w);
+            const o = w.result as Record<string, unknown>;
             delete o.player;
             return o;
         };
-        t.add('SettingsSerializer.toJsObject (minus player)', 'main', toObj);
+        t.add('SettingsSerializer.write to plain objects (minus player)', 'main', toObj);
         const obj = toObj();
         cloneRows(t, 'obj', obj);
         const objCloned = structuredClone(obj);
@@ -208,6 +327,71 @@ describe('WorkerJson', () => {
         t.add('JsonConverter.settingsToJson', 'main', () => JsonConverter.settingsToJson(settings));
         out.push(`  maps=${c.maps} arrays=${c.arrays} entries=${c.entries} wire=${kb(bytes)}`);
         t.print(out);
+        console.log(out.join('\n'));
+        lines.push(...out, '');
+    });
+
+    it('settings-resize-sync', () => {
+        const out: string[] = [
+            '## settings sync per resize in worker mode (default settings; main + clone + worker unless noted)'
+        ];
+        const settings = new Settings();
+        const t = new Table(runs);
+        const { renderer, worker } = inProcessWorker(settings);
+        t.add('renderer.updateSettings (production path)', 'both', () => renderer.updateSettings(settings));
+
+        const toPlain = () => {
+            const w = new PlainObjectWriter();
+            SettingsSerializer.write(settings, w);
+            const o = w.result as Record<string, unknown>;
+            delete o.player;
+            return o;
+        };
+        const target = new Settings();
+        const plainObject = toPlain();
+        const plainCloned = structuredClone(plainObject);
+        t.add('plain: write (minus player)', 'main', toPlain);
+        t.add('plain: structuredClone', 'both', () => structuredClone(plainObject));
+        t.add('plain: SettingsSerializer.read (strict)', 'worker', () =>
+            SettingsSerializer.read(target, new MapObjectReader(plainCloned))
+        );
+
+        const toBytes = () => {
+            const w = new MessagePackObjectWriter(4096);
+            SettingsSerializer.write(settings, w);
+            return w.toUint8Array();
+        };
+        const bytes = toBytes();
+        t.add('msgpack: write (with player)', 'main', toBytes);
+        t.add('msgpack: post with transfer', 'both', () => {
+            const b = toBytes();
+            structuredClone({ settings: b }, { transfer: [b.buffer] });
+        });
+        t.add('msgpack: SettingsSerializer.read (strict)', 'worker', () =>
+            SettingsSerializer.read(target, new MessagePackObjectReader(bytes))
+        );
+        t.add('msgpack: write + transfer + read', 'both', () => {
+            const b = toBytes();
+            const m = structuredClone({ settings: b }, { transfer: [b.buffer] });
+            SettingsSerializer.read(target, new MessagePackObjectReader(m.settings));
+        });
+
+        const cachedPlain = toPlain();
+        t.add('only when changed, plain: write + deep compare', 'main', () => {
+            if (!jsObjectEquals(cachedPlain, toPlain())) {
+                throw new Error('unexpected difference');
+            }
+        });
+        const cachedBytes = toBytes();
+        t.add('only when changed, msgpack: write + byte compare', 'main', () => {
+            if (!bytesEqual(cachedBytes, toBytes())) {
+                throw new Error('unexpected difference');
+            }
+        });
+        t.print(out);
+        out.push(
+            `  sizes: msgpack ${bytes.byteLength} bytes; posts ${worker.posts}; retained cache: plain object ${kb(retainedPerValue(toPlain))}, msgpack bytes ${kb(retainedPerValue(toBytes))}`
+        );
         console.log(out.join('\n'));
         lines.push(...out, '');
     });
@@ -243,25 +427,47 @@ describe('WorkerJson', () => {
             );
             st.add('JSON.stringify(plain)', 'main', () => JSON.stringify(plainJson));
             const str = JSON.stringify(plainJson);
-            st.add('ScoreSerializer.toJsObject (object tree)', 'main', () => ScoreSerializer.toJsObject(score));
-            const obj = ScoreSerializer.toJsObject(score);
+            const toPlain = () => {
+                const w = new PlainObjectWriter();
+                ScoreSerializer.write(score, w);
+                return w.result;
+            };
+            st.add('ScoreSerializer.write to plain objects (object tree)', 'main', toPlain);
+            const obj = toPlain();
             cloneRows(st, 'obj', obj);
             const objCloned = structuredClone(obj);
             st.add('ScoreSerializer.fromJson (obj)', 'worker', () => ScoreSerializer.fromJson(new Score(), objCloned));
             st.add('jsObjectToScore = fromJson + finish (obj)', 'worker', () =>
                 JsonConverter.jsObjectToScore(objCloned, settings)
             );
+            // the binary hand-off (WorkerScoreEncoding), transferred instead of cloned
+            const binarySizes: string[] = [];
+            const name = 'MessagePack';
+            let capacity = 65536;
+            const write = () => WorkerScoreEncoding.encode(score, capacity);
+            st.add(`${name} write, growing buffer`, 'main', write);
+            const data = write();
+            capacity = data.byteLength;
+            binarySizes.push(`${name.toLowerCase()}=${kb(data.byteLength)}`);
+            st.add(`${name} write, capacity of the last score`, 'main', write);
+            st.add(`${name} read (ScoreSerializer.read)`, 'worker', () =>
+                ScoreSerializer.read(new Score(), new MessagePackObjectReader(data))
+            );
+            st.add(`${name} read + finish`, 'worker', () => WorkerScoreEncoding.decode(data, settings));
             st.add('JsonConverter.scoreToJson', 'main', () => JsonConverter.scoreToJson(score));
             st.add('string structuredClone (both)', 'both', () => structuredClone(str), false);
             st.add('JSON.parse', 'worker', () => JSON.parse(str));
             out.push(
-                `  maps=${c.maps} arrays=${c.arrays} entries=${c.entries} wire(Map)=${kb(mapBytes)} wire(plain)=${kb(plainBytes)} json=${kb(str.length)}`
+                `  maps=${c.maps} arrays=${c.arrays} entries=${c.entries} wire(Map)=${kb(mapBytes)} wire(plain)=${kb(plainBytes)} json=${kb(str.length)} ${binarySizes.join(' ')}`
             );
             out.push('  score:');
             st.print(out);
+            out.push(
+                `  hand-off ${name.padEnd(11)} main (write) ${ms(st.time(`${name} write, capacity of the last score`)).padStart(10)}   worker (read + finish) ${ms(st.time(`${name} read + finish`)).padStart(10)}`
+            );
             for (const [label, build, tree] of [
                 ['Map', 'scoreToJsObject (Map tree)', 'Map'],
-                ['obj', 'ScoreSerializer.toJsObject (object tree)', 'obj']
+                ['obj', 'ScoreSerializer.write to plain objects (object tree)', 'obj']
             ]) {
                 const main = st.time(build) + st.time(`${tree}   serialize half`);
                 const worker =

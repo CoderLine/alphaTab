@@ -4,8 +4,12 @@
 // the code is regenerated.
 // </auto-generated>
 import { BeamingRules } from "@coderline/alphatab/model/MasterBar";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import { Duration } from "@coderline/alphatab/model/Duration";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
@@ -14,48 +18,44 @@ export class BeamingRulesSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BeamingRulesSerializer.setProperty(obj, k, v));
+        BeamingRulesSerializer.read(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: BeamingRules | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        {
-            const m = new Map<string, unknown>();
-            o.set("groups", m);
-            for (const [k, v] of obj.groups!) {
-                m.set(k.toString(), v);
-            }
-        }
-        return o;
+    public static read(obj: BeamingRules, r: IObjectReader): void {
+        r.readObject((k, rr) => BeamingRulesSerializer.readProperty(obj, k, rr));
     }
-    /**
-     * @target web
-     */
-    public static toJsObject(obj: BeamingRules | null | undefined): Record<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o: Record<string, unknown> = {};
-        {
-            const m = new Map<string, unknown>();
-            o["groups"] = m;
-            for (const [k, v] of obj.groups!) {
-                m.set(k.toString(), v);
-            }
-        }
-        return o;
-    }
-    public static setProperty(obj: BeamingRules, property: string, v: unknown): boolean {
+    public static readProperty(obj: BeamingRules, property: string, r: IObjectReader): boolean {
         switch (property) {
             case "groups":
-                obj.groups = new Map<Duration, number[]>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.groups.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number[]);
-                });
+                BeamingRulesSerializer._readGroups(obj, r);
                 return true;
         }
         return false;
+    }
+    private static _readGroups(obj: BeamingRules, r: IObjectReader): void {
+        obj.groups = new Map<Duration, number[]>();
+        r.readObject((k, rr) => {
+            obj.groups.set(JsonHelper.parseEnum<Duration>(k, Duration)!, rr.readValue()! as number[]);
+            return true;
+        });
+    }
+    public static toJson(obj: BeamingRules | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        BeamingRulesSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: BeamingRules | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject();
+        w.prop("groups");
+        w.startMap();
+        for (const [k, v] of obj.groups!) {
+            w.prop(k.toString());
+            w.writeValue(v);
+        }
+        w.endMap();
+        w.endObject();
     }
 }
