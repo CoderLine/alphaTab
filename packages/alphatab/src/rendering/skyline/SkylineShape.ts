@@ -8,12 +8,12 @@
  */
 export class SkylineShape {
     /** The minimal width of the steps lines and curves are split into. */
-    private static readonly _minStepWidth: number = 2;
+    private static readonly _minStepWidth: number = 8;
     /**
      * How much more a step may claim vertically than the stroke it covers, unless the step would get narrower
      * than {@link _minStepWidth}.
      */
-    private static readonly _maxStepRise: number = 1;
+    private static readonly _maxStepRise: number = 3;
 
     private _xStarts: number[] = [];
     private _xEnds: number[] = [];

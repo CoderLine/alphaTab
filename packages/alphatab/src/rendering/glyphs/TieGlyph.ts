@@ -260,6 +260,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         } else {
             TieGlyph.paintTie(
                 canvas,
+                this.renderer.scoreRenderer.layout!.tiePaintControlPoints,
                 1,
                 cx + this._startX,
                 cy + rendererY + this._startY,
@@ -492,8 +493,12 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         return true;
     }
 
+    /**
+     * @param cps scratch for the tie geometry, see {@link newControlPoints}.
+     */
     public static paintTie(
         canvas: ICanvas,
+        cps: number[],
         scale: number,
         x1: number,
         y1: number,
@@ -503,7 +508,6 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         offset: number /*= 22*/,
         size: number /*= 4*/
     ): void {
-        let cps = TieGlyph.newControlPoints();
         if (!TieGlyph._computeBezierControlPoints(cps, scale, x1, y1, x2, y2, down, offset, size)) {
             cps = [];
         }

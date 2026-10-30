@@ -179,7 +179,8 @@ export class NumberedKeySignatureGlyph extends EffectGlyph {
         const previousColor = ElementStyleHelper.applyBar(
             canvas,
             BarSubElement.NumberedKeySignature,
-            this.renderer.bar
+            this.renderer.bar,
+            true
         );
         try {
             const res = this.renderer.resources;

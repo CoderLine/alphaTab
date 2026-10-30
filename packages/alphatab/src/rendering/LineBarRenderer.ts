@@ -9,6 +9,7 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { TupletGroup } from '@coderline/alphatab/model/TupletGroup';
+import { VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
@@ -298,7 +299,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         const res = this.resources;
         const oldAlign: TextAlign = canvas.textAlign;
         const oldBaseLine = canvas.textBaseline;
-        canvas.color = h.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
+        ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, h.voice, true);
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Middle;
         let s: MusicFontSymbol[];
@@ -572,7 +573,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         flagsElement: BeatSubElement,
         beamsElement: BeatSubElement
     ): void {
-        canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
+        ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, h.voice!, true);
         if (this.shouldPaintBeamingHelper(h)) {
             if (this.drawBeamHelperAsFlags(h)) {
                 this.paintFlag(cx, cy, canvas, h, flagsElement);

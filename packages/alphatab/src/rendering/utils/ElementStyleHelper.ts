@@ -55,7 +55,7 @@ export class ElementStyleHelper {
     }
 
     private static _scoreDefaultColor(res: RenderingResources, _element: ScoreSubElement) {
-        const defaultColor: Color = res.mainGlyphColor;
+        const defaultColor: Color = res.scoreInfoColor;
 
         return defaultColor;
     }
@@ -180,10 +180,10 @@ export class ElementStyleHelper {
     private static _trackDefaultColor(res: RenderingResources, element: TrackSubElement) {
         let defaultColor: Color = res.mainGlyphColor;
         switch (element) {
-            case TrackSubElement.TrackName:
             case TrackSubElement.SystemSeparator:
             case TrackSubElement.StringTuning:
                 break;
+            case TrackSubElement.TrackName:
             case TrackSubElement.BracesAndBrackets:
                 defaultColor = res.barSeparatorColor;
                 break;

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
@@ -201,6 +202,53 @@ describe('GeneralTests', () => {
                 bars[3].style = new BarStyle();
                 bars[3].style.colors.set(BarSubElement.GuitarTabsBarLines, Color.fromJson('#00AA00')!);
                 bars[3].voices[1].style = new VoiceStyle();
+            }
+        );
+    });
+
+    it('colors-voice-cascade', async () => {
+        const flagsAndBeams = ':8 0.6{dy f} 3.6 0.5 2.5 :16 0.6 3.6 0.5 2.5 :8 0.6 r';
+        const tuplet = ':8 0.6{tu 3 dy mf} 3.6{tu 3} 0.5{tu 3} :8 2.5 2.5 :4 0.6 3.6';
+        const overriddenTuplet = ':8 0.6{tu 3 dy ff} 3.6{tu 3} 0.5{tu 3} :8 2.5 2.5 :4 0.6 3.6';
+        const voice2 = ':2 0.1 3.1{dy p}';
+        const settings = new Settings();
+        settings.notation.rhythmMode = TabRhythmMode.ShowWithBars;
+        await VisualTestHelper.runVisualTestTex(
+            `\\track \\staff {score tabs slash numbered} \\voice ${flagsAndBeams} | ${tuplet} | ${overriddenTuplet} \\voice ${voice2} | ${voice2} | ${voice2}`,
+            'test-data/visual-tests/general/colors-voice-cascade.png',
+            settings,
+            o => {
+                const bars = o.score.tracks[0].staves[0].bars;
+
+                // stems, beams, flags, tuplets and effects follow the voice colour; bar elements such as the
+                // numbered key signature and the bar number keep their default colours
+                for (const b of bars) {
+                    b.voices[0].style = new VoiceStyle();
+                    b.voices[0].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#0000DD')!);
+                    b.voices[1].style = new VoiceStyle();
+                    b.voices[1].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#00AA00')!);
+                }
+
+                // the entries of a beat win over the voice colour
+                const overridden: BeatSubElement[] = [
+                    BeatSubElement.StandardNotationStem,
+                    BeatSubElement.StandardNotationBeams,
+                    BeatSubElement.StandardNotationTuplet,
+                    BeatSubElement.GuitarTabStem,
+                    BeatSubElement.GuitarTabBeams,
+                    BeatSubElement.GuitarTabTuplet,
+                    BeatSubElement.SlashStem,
+                    BeatSubElement.SlashBeams,
+                    BeatSubElement.SlashTuplet,
+                    BeatSubElement.NumberedDuration,
+                    BeatSubElement.NumberedTuplet,
+                    BeatSubElement.Effects
+                ];
+                const beat = bars[2].voices[0].beats[0];
+                beat.style = new BeatStyle();
+                for (const element of overridden) {
+                    beat.style.colors.set(element, Color.fromJson('#DD0000')!);
+                }
             }
         );
     });

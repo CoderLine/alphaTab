@@ -575,13 +575,17 @@ export class BarRendererBase {
         row: number,
         rowCount: number
     ): void {
-        for (const band of container.bands) {
+        const bands = container.bands;
+        for (let i = 0; i < bands.length; i++) {
+            const band = bands[i];
             const policy = band.info.overlayRodPolicy;
             if (policy === undefined) {
                 continue;
             }
             const bandKey = band.info.notationElement * rowCount + row;
-            for (const glyph of band.glyphs) {
+            const glyphs = band.glyphs;
+            for (let j = 0; j < glyphs.length; j++) {
+                const glyph = glyphs[j];
                 if (!glyph.beat || glyph.width <= 0) {
                     continue;
                 }

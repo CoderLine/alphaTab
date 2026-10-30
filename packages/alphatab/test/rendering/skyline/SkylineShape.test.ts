@@ -67,8 +67,8 @@ describe('SkylineShapeTests', () => {
         const shape = new SkylineShape();
         shape.addBendCurve(10, 40, 50, 0, 1);
         SkylineShapeFixtures.expectBendCurveCovered(shape, 10, 40, 50, 0, 1);
-        // one box per pixel of rise at most, joined where they would be narrower than 2px
-        expect(shape.count).toBeLessThanOrEqual(40);
+        // one box per 3px of rise at most, joined where they would be narrower than 8px
+        expect(shape.count).toBeLessThanOrEqual(14);
         expect(shape.count).toBeGreaterThan(1);
     });
 
@@ -76,21 +76,31 @@ describe('SkylineShapeTests', () => {
         const shape = new SkylineShape();
         shape.addBendCurve(10, -20, 30, 25, 1.5);
         SkylineShapeFixtures.expectBendCurveCovered(shape, 10, -20, 30, 25, 1.5);
-        expect(shape.count).toBeLessThanOrEqual(45);
+        expect(shape.count).toBeLessThanOrEqual(15);
     });
 
     it('covers-shallow-line', () => {
         const shape = new SkylineShape();
         shape.addLine(0, 0, 40, -5, 1);
         SkylineShapeFixtures.expectLineCovered(shape, 0, 0, 40, -5, 1);
-        expect(shape.count).toBe(5);
+        expect(shape.count).toBe(2);
+    });
+
+    it('line-steps-claim-at-most-3px-more-than-the-stroke', () => {
+        const shape = new SkylineShape();
+        shape.addLine(0, 0, 60, -9, 1);
+        SkylineShapeFixtures.expectLineCovered(shape, 0, 0, 60, -9, 1);
+        expect(shape.count).toBe(3);
+        for (let i = 0; i < shape.count; i++) {
+            expect(shape.bottom(i) - shape.top(i)).toBeCloseTo(4, 9);
+        }
     });
 
     it('covers-steep-line', () => {
         const shape = new SkylineShape();
         shape.addLine(4, 30, 0, 0, 1);
         SkylineShapeFixtures.expectLineCovered(shape, 4, 30, 0, 0, 1);
-        expect(shape.count).toBe(2);
+        expect(shape.count).toBe(1);
     });
 
     it('horizontal-line-is-one-box', () => {

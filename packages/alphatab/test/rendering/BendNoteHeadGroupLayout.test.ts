@@ -103,4 +103,22 @@ describe('BendNoteHeadGroupLayout', () => {
         BendNoteHeadGroupLayoutHelper.expectRepeatable(withAccidental);
         BendNoteHeadGroupLayoutHelper.expectRepeatable(withoutAccidental);
     });
+
+    it('accidental-space-without-parenthesis', async () => {
+        // a fresh bar per group: the bar's accidental state decides whether the accidental is shown
+        const r1 = await BendNoteHeadGroupLayoutHelper.renderFirstScoreBar(tex);
+        const plainWithAccidental = BendNoteHeadGroupLayoutHelper.layoutRepeatedly(r1, 61, false);
+        const r2 = await BendNoteHeadGroupLayoutHelper.renderFirstScoreBar(tex);
+        const plainWithoutAccidental = BendNoteHeadGroupLayoutHelper.layoutRepeatedly(r2, 62, false);
+        const r3 = await BendNoteHeadGroupLayoutHelper.renderFirstScoreBar(tex);
+        const parenthesisWithAccidental = BendNoteHeadGroupLayoutHelper.layoutRepeatedly(r3, 61, true);
+        const r4 = await BendNoteHeadGroupLayoutHelper.renderFirstScoreBar(tex);
+        const parenthesisWithoutAccidental = BendNoteHeadGroupLayoutHelper.layoutRepeatedly(r4, 62, true);
+        // the accidental moves the note head by the same amount with and without parenthesis
+        expect(parenthesisWithAccidental[1]).toBeGreaterThan(parenthesisWithoutAccidental[1]);
+        expect(plainWithAccidental[1] - plainWithoutAccidental[1]).toBeCloseTo(
+            parenthesisWithAccidental[1] - parenthesisWithoutAccidental[1],
+            6
+        );
+    });
 });

@@ -76,6 +76,8 @@ export abstract class ScoreLayout {
 
     /** Scratch for the geometry of the tie being laid out, see {@link TieGlyph.newControlPoints}. */
     public readonly tieControlPoints: number[] = TieGlyph.newControlPoints();
+    /** Scratch for the geometry of the tie being painted, see {@link TieGlyph.paintTie}. */
+    public readonly tiePaintControlPoints: number[] = TieGlyph.newControlPoints();
 
     public readonly effectPlacement: EffectSystemPlacement;
 

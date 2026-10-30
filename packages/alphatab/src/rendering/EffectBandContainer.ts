@@ -1,11 +1,12 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
-import type { Voice } from '@coderline/alphatab/model/Voice';
+import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBand, type EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import type { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
  * An effect of a staff that can create glyphs there: its notation element is visible and it is
@@ -143,9 +144,8 @@ export class EffectBandContainer {
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas) {
-        const resources = this._renderer.resources;
         for (const effectBand of this._bands) {
-            canvas.color = effectBand.voice.index === 0 ? resources.mainGlyphColor : resources.secondaryGlyphColor;
+            ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, effectBand.voice, true);
             if (!effectBand.isEmpty) {
                 effectBand.paint(cx, cy, canvas);
             }
@@ -158,11 +158,10 @@ export class EffectBandContainer {
      * Paints the bands which have glyphs left of the bar start.
      */
     public paintLeftOverhang(cx: number, cy: number, canvas: ICanvas) {
-        const resources = this._renderer.resources;
         const range = EffectBandContainer._overhangRangeScratch;
         for (const effectBand of this._bands) {
             if (effectBand.computeLocalXRange(range) && effectBand.x + range.xStart < 0) {
-                canvas.color = effectBand.voice.index === 0 ? resources.mainGlyphColor : resources.secondaryGlyphColor;
+                ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, effectBand.voice, true);
                 effectBand.paint(cx, cy, canvas);
             }
         }
