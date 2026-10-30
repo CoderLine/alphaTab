@@ -9,6 +9,8 @@ import { LogLevel } from '@coderline/alphatab/LogLevel';
 import type { Score } from '@coderline/alphatab/model/Score';
 import type { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
+import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
 import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
 import { Settings } from '@coderline/alphatab/Settings';
 
@@ -91,6 +93,18 @@ export class LayoutHarness {
                 this._current.totalHeight = e.totalHeight;
             }
         });
+    }
+
+    /**
+     * The bounds of the last render or resize: the renderer's lookup, or with {@link boundsWire} the
+     * lookup decoded from the wire data like on the main thread.
+     */
+    public boundsLookup(score: Score): BoundsLookup | null {
+        if (!this.boundsWire) {
+            return this.renderer.boundsLookup;
+        }
+        const data = this.boundsWire.encode();
+        return data ? BoundsLookupWire.decode(data, score) : null;
     }
 
     /** The ids of the partials registered by the last render or resize. */

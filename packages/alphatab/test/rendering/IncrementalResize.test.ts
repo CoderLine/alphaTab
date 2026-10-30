@@ -112,4 +112,8 @@ describe('IncrementalResize', () => {
     it('multi-track-hidden-empty-staves', async () => {
         await checkSequence('test-data/audio/full-song.gp5', true, 60);
     });
+
+    it('whammy-bar-helper-notes', async () => {
+        await checkSequence('test-data/visual-tests/effects-and-annotations/tremolo-bar.gp', false, -1);
+    });
 });

@@ -498,20 +498,21 @@ export class Font {
     }
 
     public static fromJson(v: unknown): Font | undefined {
+        if (v === null || v === undefined) {
+            return undefined;
+        }
+
         if (v instanceof Font) {
             return v;
         }
 
         switch (typeof v) {
-            case 'undefined':
-                return undefined;
             case 'object': {
-                const m = v as Map<string, unknown>;
-                const families = m.get('families') as string[];
+                const families = JsonHelper.getValue(v, 'families') as string[];
                 // tslint:disable-next-line: no-unnecessary-type-assertion
-                const size = m.get('size')! as number;
-                const style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
-                const weight = JsonHelper.parseEnum<FontWeight>(m.get('weight'), FontWeight)!;
+                const size = JsonHelper.getValue(v, 'size')! as number;
+                const style = JsonHelper.parseEnum<FontStyle>(JsonHelper.getValue(v, 'style'), FontStyle)!;
+                const weight = JsonHelper.parseEnum<FontWeight>(JsonHelper.getValue(v, 'weight'), FontWeight)!;
                 return Font.withFamilyList(families, size, style, weight);
             }
             case 'string': {

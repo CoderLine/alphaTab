@@ -262,11 +262,13 @@ export abstract class ScoreLayout {
         );
 
         const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
-        if (firstChangedMasterBar !== undefined && previousReferenceMinDuration === this.referenceMinDuration) {
-            if (this.doUpdateForBars(renderHints!)) {
+        if (firstChangedMasterBar !== undefined) {
+            if (previousReferenceMinDuration === this.referenceMinDuration && this.doUpdateForBars(renderHints!)) {
                 this._logCompressedBars();
                 return;
             }
+            // the renderer kept the bounds of the previous render for a partial update
+            this.renderer.boundsWriter.begin(false);
         }
 
         this._lazyPartials.clear();

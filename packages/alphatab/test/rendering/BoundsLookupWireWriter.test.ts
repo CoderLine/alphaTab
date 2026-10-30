@@ -149,6 +149,25 @@ describe('BoundsLookupWireWriter', () => {
         expectSameData('after partial update', writer.encode(), full);
     });
 
+    it('partial-update-falling-back-to-full-layout', () => {
+        const settings = createSettings(LayoutMode.Horizontal, true, 1);
+        const score = ScoreLoader.loadScoreFromBytes(
+            new Uint8Array(fs.readFileSync(path.join(process.cwd(), LayoutCorpus.referenceScores[0].file))),
+            settings
+        );
+        const renderer = new ScoreRenderer(settings);
+        const writer = new BoundsLookupWireWriter();
+        renderer.boundsWriter = writer;
+        const tracks = score.tracks.map(t => t.index);
+        renderer.width = 1300;
+        renderer.renderScore(score, tracks);
+        const full = writer.encode()!;
+        expect(BoundsLookupWire.decode(full, score).staffSystems.length).toBe(1);
+
+        renderer.renderScore(score, tracks, { firstChangedMasterBar: score.masterBars.length >> 1 });
+        expectSameData('after partial update', writer.encode(), full);
+    });
+
     it('web-worker-posts-wire', () => {
         const settings = createSettings(LayoutMode.Page, true, 1);
         const score = ScoreLoader.loadScoreFromBytes(

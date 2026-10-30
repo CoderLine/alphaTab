@@ -7,7 +7,7 @@ import type { TypeSchema } from './TypeSchema';
  * The shape a generated `toJson`-style method writes its records in. Records of `@json` types become
  * `Map`s (`toJson`, all targets) or object literals (`toJsObject`, web only). Map-typed properties stay
  * `Map`s in both, so their key order survives a structured clone, and `@json_immutable` types use their own
- * `toJson` in both, because their `fromJson` (e.g. `Font.fromJson`) reads Maps only.
+ * `toJson` in both.
  */
 interface ToJsonFlavor {
     readonly method: string;

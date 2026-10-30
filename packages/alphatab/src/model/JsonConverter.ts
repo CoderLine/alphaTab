@@ -44,7 +44,7 @@ export class JsonConverter {
             return o;
         }
         if (ArrayBuffer.isView(v)) {
-            return Array.apply([], [v]);
+            return Array.from(v as unknown as ArrayLike<number>);
         }
         return v;
     }

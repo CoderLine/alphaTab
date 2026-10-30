@@ -102,4 +102,8 @@ describe('FontTests', () => {
             '12px "With \'SingleQuote\'", "With \\"DoubleQuote\\"", Arial'
         );
     });
+
+    it('fromJson-null', () => {
+        expect(Font.fromJson(null)).toBeUndefined();
+    });
 });

@@ -256,6 +256,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(this.container as ScoreBeatContainerGlyph);
             this._whammy = whammy;
             whammy.renderer = this.renderer;
+            whammy.createHelperNotes();
             whammy.doLayout();
             this.container.addTie(whammy);
         }

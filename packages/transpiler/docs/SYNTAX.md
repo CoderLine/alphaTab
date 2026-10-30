@@ -170,7 +170,7 @@ alphaTab ships hand-written C# and Kotlin implementations of a **subset** of the
 | `Int16Array` | ⚠️ partial | Same as `Uint8Array` |
 | `Int32Array` | ⚠️ partial | Same as `Uint8Array` |
 | `Float32Array` | ⚠️ partial | Same as `Uint8Array` |
-| `Float64Array` | ⚠️ partial | Same as `Uint8Array` |
+| `Float64Array` | ❌ no | No runtime class |
 | `ArrayBuffer` | ⚠️ partial | `byteLength` only |
 | `DataView` | ⚠️ partial | `getInt16()`, `getFloat32()` only |
 | `Error` | ⚠️ partial | Construction + `message`; maps to `Exception` / `Throwable` |

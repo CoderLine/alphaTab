@@ -58,8 +58,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         this._endGlyph?.doMultiVoiceLayout();
     }
 
-    public override doLayout(): void {
-        this.isMeasured = false;
+    /**
+     * Creates the helper note heads; called once, before the first {@link doLayout}. {@link doLayout}
+     * runs again on every finalize pass and only lays out the existing note heads.
+     */
+    public createHelperNotes(): void {
         const sr = this.renderer as ScoreBarRenderer;
         const whammyMode: NotationMode = sr.settings.notation.notationMode;
         switch (this._beat.whammyBarType) {
@@ -131,7 +134,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             case WhammyType.Predive:
                 break;
         }
+    }
 
+    public override doLayout(): void {
+        this.isMeasured = false;
         super.doLayout();
         this.width = this.width / 2;
     }

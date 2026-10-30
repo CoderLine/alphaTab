@@ -240,7 +240,7 @@ describe('BarLayoutingInfoHeaderRods', () => {
 
     it('a header with only the start spacing is fully empty space', () => {
         const info = new BarLayoutingInfo();
-        info.addHeaderRod(0, 0, 1);
+        info.addHeaderRod(0, 0, 1, 0);
         info.addHeaderRod(100, 0, 6, 6);
         expect(info.preBeatTrailingSpace).toBeCloseTo(6, 8);
     });
@@ -261,7 +261,7 @@ describe('BarLayoutingInfoMinimumWidths', () => {
     function gaps(info: BarLayoutingInfo, force: number, barEnd: number): number[] {
         const positions = info.buildOnTimePositions(force);
         const x: number[] = [];
-        for (const v of positions.values()) {
+        for (const v of positions) {
             x.push(v);
         }
         x.push(barEnd);

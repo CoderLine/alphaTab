@@ -21,7 +21,8 @@ export interface IBoundsLookupWriter {
     /**
      * Starts the lookup of a render.
      * @param partialUpdate Whether to keep the staff systems of the previous render (if there was one) for a
-     * partial update, which removes the rebuilt range via {@link clearFromMasterBar}.
+     * partial update, which removes the rebuilt range via {@link clearFromMasterBar}. When the layout lays out
+     * all systems instead, it calls {@link begin} again without partial update before the first staff system.
      */
     begin(partialUpdate: boolean): void;
 

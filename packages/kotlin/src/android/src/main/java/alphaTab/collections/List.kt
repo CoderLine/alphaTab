@@ -210,17 +210,11 @@ public class List<T> : Iterable<T> {
         if (actualStart < 0) {
             actualStart += _data.size
         }
+        val deleteEnd = actualStart + maxOf(deleteCount.toInt(), 0)
 
-        val remove = if (deleteCount > 0) List(
-            ArrayListWithRemoveRange(
-                _data.subList(
-                    start.toInt(),
-                    _data.size
-                )
-            )
-        ) else List()
-        _data.removeRange(start.toInt(), (start + deleteCount).toInt())
-        _data.addAll(start.toInt(), newElements.toList())
+        val remove = List(ArrayListWithRemoveRange(_data.subList(actualStart, deleteEnd)))
+        _data.removeRange(actualStart, deleteEnd)
+        _data.addAll(actualStart, newElements.toList())
         return remove
     }
 
@@ -229,17 +223,11 @@ public class List<T> : Iterable<T> {
         if (actualStart < 0) {
             actualStart += _data.size
         }
+        val deleteEnd = actualStart + maxOf(deleteCount.toInt(), 0)
 
-        val remove = if (deleteCount > 0) List(
-            ArrayListWithRemoveRange(
-                _data.subList(
-                    start.toInt(),
-                    _data.size
-                )
-            )
-        ) else List()
-        _data.removeRange(start.toInt(), (start + deleteCount).toInt())
-        _data.addAll(start.toInt(), newElements.toList())
+        val remove = List(ArrayListWithRemoveRange(_data.subList(actualStart, deleteEnd)))
+        _data.removeRange(actualStart, deleteEnd)
+        _data.addAll(actualStart, newElements.toList())
         return remove
     }
 

@@ -312,7 +312,7 @@ describe('LayoutTests', () => {
                     new VisualTestRun(1300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-0-1300.png'),
                     new VisualTestRun(600, 'test-data/visual-tests/layout/multi-system-slur-scale-down-1-600.png'),
                     new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-2-300.png'),
-                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-3-700.png')
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-3-300.png')
                 ];
             }
         );

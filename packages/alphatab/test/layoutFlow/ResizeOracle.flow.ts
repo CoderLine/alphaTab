@@ -2,11 +2,11 @@
 // Resize to width W must produce the same systems as a fresh render at width W.
 // Run: npm run test-layout-flow -- ResizeOracle
 // Filters: LAYOUT_FLOW_FILE, LAYOUT_FLOW_VARIANT. LAYOUT_FLOW_DUMP=1 writes the first differing svg pair per case.
+// LAYOUT_FLOW_WORKER_BOUNDS=1 compares the bounds decoded from the wire data the web worker sends.
 import fs from 'node:fs';
 import path from 'node:path';
 import { Settings } from '@coderline/alphatab/Settings';
 import type { Score } from '@coderline/alphatab/model/Score';
-import type { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { describe, it } from 'vitest';
 import { BoundsDump } from './BoundsDump';
 import { LayoutCorpus, type LayoutVariant } from './LayoutCorpus';
@@ -18,10 +18,8 @@ class OracleResult {
     public geometryDiffs: number = 0;
     public paintDiffs: number = 0;
     public boundsDiffs: number = 0;
-    public knownBoundsDiffs: number = 0;
     public skipped: number = 0;
     public report: string[] = [];
-    public known: string[] = [];
 
     public add(o: OracleResult) {
         this.cases += o.cases;
@@ -29,8 +27,6 @@ class OracleResult {
         this.geometryDiffs += o.geometryDiffs;
         this.paintDiffs += o.paintDiffs;
         this.boundsDiffs += o.boundsDiffs;
-        this.knownBoundsDiffs += o.knownBoundsDiffs;
-        this.known.push(...o.known);
         this.skipped += o.skipped;
         this.report.push(...o.report);
     }
@@ -40,7 +36,7 @@ class OracleResult {
         return (
             `cases=${this.cases} equal=${ok} breakDiffs=${this.breakDiffs} ` +
             `geometryDiffs=${this.geometryDiffs} paintOnlyDiffs=${this.paintDiffs} ` +
-            `boundsOnlyDiffs=${this.boundsDiffs} knownBoundsDiffs=${this.knownBoundsDiffs} skipped=${this.skipped}`
+            `boundsOnlyDiffs=${this.boundsDiffs} skipped=${this.skipped}`
         );
     }
 }
@@ -50,52 +46,12 @@ function near(a: number, b: number) {
     return Math.abs(a - b) < 1e-6;
 }
 
-function beats(bar: number, counts: number[], firstBeat: number = 0): string[] {
-    const keys: string[] = [];
-    for (let i = 0; i < counts.length; i++) {
-        for (let e = i === 0 ? firstBeat : 0; e < counts[i]; e++) {
-            keys.push(`t0s0b${bar + i}v0e${e}`);
-        }
-    }
-    return keys;
-}
-
-/**
- * N38: the visual width of these beats grows with every resize. Cases whose bounds differ only in
- * these widths are listed as known baseline differences instead of being counted.
- */
-const knownBeatWidthDifferences = new Map<string, Set<string>>([
-    ['effects-and-annotations/tremolo-bar.gp', new Set<string>(beats(3, [3, 6, 6], 1))],
-    ['general/colors.gp', new Set<string>(['t0s0b0v0e0'])],
-    [
-        'notation-legend/notation-legend.gp',
-        new Set<string>(['t0s0b101v0e0', ...beats(102, [3, 6, 6, 4, 4], 1), 't0s0b121v0e0'])
-    ]
-]);
-
-function knownBeatWidths(file: string): Set<string> | null {
-    for (const [suffix, keys] of knownBeatWidthDifferences) {
-        if (file.replace(/\\/g, '/').endsWith(suffix)) {
-            return keys;
-        }
-    }
-    return null;
-}
-
 interface OraclePass {
     pass: CapturedPass;
     bounds: BoundsDump;
-    lookup: BoundsLookup | null;
-    score: Score;
 }
 
-function compare(
-    result: OracleResult,
-    label: string,
-    knownWidths: Set<string> | null,
-    freshPass: OraclePass,
-    resizedPass: OraclePass
-) {
+function compare(result: OracleResult, label: string, freshPass: OraclePass, resizedPass: OraclePass) {
     const fresh = freshPass.pass;
     const resized = resizedPass.pass;
     result.cases++;
@@ -162,19 +118,8 @@ function compare(
         const boundsNote = bounds === null ? '' : `; BOUNDS ${bounds}`;
         result.report.push(`${label}: PAINT ${paint}/${fresh.systems.length} systems differ${boundsNote}`);
     } else if (bounds !== null) {
-        const masked =
-            knownWidths !== null &&
-            BoundsDump.firstDifference(
-                BoundsDump.of(freshPass.lookup, freshPass.score, knownWidths),
-                BoundsDump.of(resizedPass.lookup, resizedPass.score, knownWidths)
-            ) === null;
-        if (masked) {
-            result.knownBoundsDiffs++;
-            result.known.push(`${label}: ${bounds}`);
-        } else {
-            result.boundsDiffs++;
-            result.report.push(`${label}: BOUNDS ${bounds}`);
-        }
+        result.boundsDiffs++;
+        result.report.push(`${label}: BOUNDS ${bounds}`);
     }
 }
 
@@ -188,8 +133,11 @@ function createSettings(variant: LayoutVariant): Settings {
 }
 
 function capture(h: LayoutHarness, score: Score, pass: CapturedPass): OraclePass {
-    const lookup = h.renderer.boundsLookup;
-    return { pass, bounds: BoundsDump.of(lookup, score), lookup, score };
+    const lookup = h.boundsLookup(score);
+    if (!lookup) {
+        throw new Error('no bounds lookup');
+    }
+    return { pass, bounds: BoundsDump.of(lookup, score) };
 }
 
 function freshRender(file: string, variant: LayoutVariant, width: number): OraclePass {
@@ -220,12 +168,11 @@ function checkFile(file: string, variant: LayoutVariant, widths: number[], name:
         result.report.push(`SKIP ${variant.name} ${rel}: ${(e as Error).message}`);
         return result;
     }
-    const knownWidths = knownBeatWidths(file);
     for (let i = 0; i < widths.length; i++) {
         try {
             const resized = capture(h, score, h.resize(widths[i]));
             const fresh = freshRender(file, variant, widths[i]);
-            compare(result, `${name} ${rel} step ${i} (w=${widths[i]})`, knownWidths, fresh, resized);
+            compare(result, `${name} ${rel} step ${i} (w=${widths[i]})`, fresh, resized);
         } catch (e) {
             result.skipped++;
             result.report.push(`ERROR ${name} ${rel} step ${i} (w=${widths[i]}): ${(e as Error).message}`);
@@ -273,8 +220,7 @@ describe('ResizeOracle', () => {
         console.log(summary[summary.length - 1]);
         total.add(dragTotal);
         const out = path.join(LayoutCorpus.outDir(root), 'resize-oracle.txt');
-        const known = ['', `known baseline bounds differences (${total.known.length}):`, ...total.known];
-        fs.writeFileSync(out, [...summary, '', ...total.report, ...known].join('\n'));
+        fs.writeFileSync(out, [...summary, '', ...total.report].join('\n'));
         console.log(`report written to ${out}`);
     });
 });

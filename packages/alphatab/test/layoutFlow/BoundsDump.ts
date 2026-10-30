@@ -42,12 +42,11 @@ export class BoundsDump {
         return true;
     }
 
-    private static _b(b: Bounds | undefined, maskWidth: boolean = false): string {
+    private static _b(b: Bounds | undefined): string {
         if (!b) {
             return 'none';
         }
-        const w = maskWidth ? '*' : BoundsDump._n(b.w);
-        return `${BoundsDump._n(b.x)},${BoundsDump._n(b.y)},${w},${BoundsDump._n(b.h)}`;
+        return `${BoundsDump._n(b.x)},${BoundsDump._n(b.y)},${BoundsDump._n(b.w)},${BoundsDump._n(b.h)}`;
     }
 
     /** The key of a beat as {@link of} prints it, e.g. `t0s0b3v0e1`. */
@@ -56,14 +55,7 @@ export class BoundsDump {
         return `t${v.bar.staff.track.index}s${v.bar.staff.index}b${v.bar.index}v${v.index}e${beat.index}`;
     }
 
-    /**
-     * @param maskedBeatWidths Beats (by {@link beatKey}) whose visual width is left out.
-     */
-    public static of(
-        lookup: BoundsLookup | null,
-        score: Score,
-        maskedBeatWidths: Set<string> | null = null
-    ): BoundsDump {
+    public static of(lookup: BoundsLookup | null, score: Score): BoundsDump {
         const d = new BoundsDump();
         if (!lookup) {
             d.lookups.push('no lookup');
@@ -105,11 +97,9 @@ export class BoundsDump {
                                 ? ''
                                 : ' MODEL';
                         const eLinks = e.barBounds === b ? '' : ' LINK';
-                        const key = BoundsDump.beatKey(beat);
-                        const masked = maskedBeatWidths !== null && maskedBeatWidths.has(key);
                         lines.push(
-                            `   beat ${key} x=${BoundsDump._n(e.onNotesX)} ` +
-                                `v=${BoundsDump._b(e.visualBounds, masked)} r=${BoundsDump._b(e.realBounds)}${eModelOk}${eLinks}`
+                            `   beat ${BoundsDump.beatKey(beat)} x=${BoundsDump._n(e.onNotesX)} ` +
+                                `v=${BoundsDump._b(e.visualBounds)} r=${BoundsDump._b(e.realBounds)}${eModelOk}${eLinks}`
                         );
                         if (e.notes) {
                             for (const n of e.notes) {

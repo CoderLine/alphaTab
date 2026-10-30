@@ -9,7 +9,7 @@ import { LogLevel } from '@coderline/alphatab/LogLevel';
 import { BarStyle, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { BeatStyle, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Color } from '@coderline/alphatab/model/Color';
-import { Font, FontStyle } from '@coderline/alphatab/model/Font';
+import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { Note, NoteStyle, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
@@ -361,6 +361,41 @@ describe('JsonConverterTest', () => {
         const settings = new Settings();
         settings.fillFromJson(json);
         expect(settings.display.resources.effectFont.size).toBe(13);
+    });
+
+    /*@target web*/
+    it('settings-fonts-via-json', () => {
+        const expected = new Settings();
+        expected.display.resources.elementFonts.set(
+            NotationElement.ScoreTitle,
+            Font.withFamilyList(['Title'], 33, FontStyle.Italic, FontWeight.Bold)
+        );
+        expected.display.resources.tablatureFont = Font.withFamilyList(['Tab'], 21, FontStyle.Italic, FontWeight.Bold);
+
+        const actual = JsonConverter.jsonToSettings(JsonConverter.settingsToJson(expected));
+
+        expect(actual.display.resources.titleFont.toCssString()).toBe('bold italic 33px Title');
+        expect(actual.display.resources.tablatureFont.toCssString()).toBe('bold italic 21px Tab');
+        ComparisonHelpers.expectJsonEqual(
+            JsonConverter.settingsToJsObject(expected),
+            JsonConverter.settingsToJsObject(actual),
+            '',
+            null
+        );
+    });
+
+    /*@target web*/
+    it('settings-font-from-object', () => {
+        const json: SettingsJson = {
+            display: {
+                resources: {
+                    titleFont: { families: ['Title'], size: 40, style: 'Italic', weight: FontWeight.Bold }
+                }
+            }
+        };
+        const settings = new Settings();
+        settings.fillFromJson(json);
+        expect(settings.display.resources.titleFont.toCssString()).toBe('bold italic 40px Title');
     });
 
     const unsetNoteTex = '\\track "P" \\staff {score} C4.4 D4 r r | \\track "G" 3.3.4 5.2 r r';

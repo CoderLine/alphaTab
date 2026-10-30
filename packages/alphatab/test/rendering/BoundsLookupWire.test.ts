@@ -11,7 +11,6 @@ import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
-import { LayoutCorpus } from '../layoutFlow/LayoutCorpus';
 
 // The worker hands the bounds lookup to the main thread as BoundsLookupWire; the result must equal
 // the public toJson/fromJson round trip.
@@ -23,8 +22,27 @@ describe('BoundsLookupWire', () => {
         { includeNoteBounds: true, scale: 1.25 }
     ];
 
+    // The format is structural: every model index (track, staff, bar, voice, beat, note), the system and
+    // master bar nesting, beats listed on several staves and beats with and without note bounds.
+    // These scores cover all of them, which `coverage` checks.
+    const files = [
+        // one staff as score, tab, slash and numbered notation: each beat listed several times; chords, voices
+        { file: 'test-data/visual-tests/general/colors.gp', firstTrackOnly: false },
+        // several tracks per master bar over several systems
+        { file: 'test-data/visual-tests/layout/multi-track.gp', firstTrackOnly: false },
+        // tracks with several staves each
+        { file: 'test-data/visual-tests/layout/brackets-braces-staves.gp', firstTrackOnly: false },
+        // a grand staff over several systems
+        { file: 'test-data/visual-tests/special-tracks/grand-staff.gp', firstTrackOnly: false },
+        // rests and chords in several voices
+        { file: 'test-data/visual-tests/music-notation/rest-collisions.gp', firstTrackOnly: false },
+        // master bars collapsed into multi-bar rests (only when the other tracks are not shown)
+        { file: 'test-data/visual-tests/layout/multibar-rest.gp', firstTrackOnly: true }
+    ];
+
     function renderLookup(
         file: string,
+        firstTrackOnly: boolean,
         includeNoteBounds: boolean,
         scale: number
     ): { score: Score; lookup: BoundsLookup } | null {
@@ -43,10 +61,7 @@ describe('BoundsLookupWire', () => {
         }
         const renderer = new ScoreRenderer(settings);
         renderer.width = 1300;
-        renderer.renderScore(
-            score,
-            score.tracks.map(t => t.index)
-        );
+        renderer.renderScore(score, firstTrackOnly ? [0] : score.tracks.map(t => t.index));
         return renderer.boundsLookup ? { score, lookup: renderer.boundsLookup } : null;
     }
 
@@ -101,21 +116,49 @@ describe('BoundsLookupWire', () => {
         return out;
     }
 
-    function countNoteBounds(lookup: BoundsLookup): number {
-        let count = 0;
+    function coverage(score: Score, lookup: BoundsLookup, covered: Set<string>) {
+        if (lookup.staffSystems.length > 1) {
+            covered.add('several systems');
+        }
+        let masterBars = 0;
         for (const system of lookup.staffSystems) {
+            masterBars += system.bars.length;
             for (const masterBar of system.bars) {
+                if (!masterBar.isFirstOfLine) {
+                    covered.add('master bar not first of line');
+                }
                 for (const bar of masterBar.bars) {
+                    if (bar.bar.staff.track.index > 0) {
+                        covered.add('track index');
+                    }
+                    if (bar.bar.staff.index > 0) {
+                        covered.add('staff index');
+                    }
                     for (const beat of bar.beats) {
-                        count += beat.notes?.length ?? 0;
+                        if (beat.beat.voice.index > 0) {
+                            covered.add('voice index');
+                        }
+                        if (lookup.findBeats(beat.beat)!.length > 1) {
+                            covered.add('beat on several staves');
+                        }
+                        if (!beat.notes) {
+                            covered.add('beat without note bounds');
+                        } else if (beat.notes.length > 0) {
+                            covered.add('note bounds');
+                            if (beat.notes.some(n => n.note.index > 0)) {
+                                covered.add('note index');
+                            }
+                        }
                     }
                 }
             }
         }
-        return count;
+        if (masterBars < score.masterBars.length) {
+            covered.add('multi-bar rest');
+        }
     }
 
-    function expectSameAsJson(label: string, score: Score, lookup: BoundsLookup): number {
+    function expectSameAsJson(label: string, score: Score, lookup: BoundsLookup, covered: Set<string>) {
         const viaJson = BoundsLookup.fromJson(lookup.toJson(), score)!;
         viaJson.finish();
         const viaWire = BoundsLookupWire.decode(structuredClone(BoundsLookupWire.encode(lookup)), score);
@@ -129,7 +172,7 @@ describe('BoundsLookupWire', () => {
                 expect.fail(`${label}: value ${i} differs: ${String(actual[i])} vs ${String(expected[i])}`);
             }
         }
-        return countNoteBounds(viaWire);
+        coverage(score, viaWire, covered);
     }
 
     it('empty-lookup', () => {
@@ -140,18 +183,28 @@ describe('BoundsLookupWire', () => {
 
     for (const c of configurations) {
         it(`corpus-notes-${c.includeNoteBounds}-scale-${c.scale}`, () => {
-            let checked = 0;
-            let noteBounds = 0;
-            for (const file of LayoutCorpus.files(process.cwd())) {
-                const rendered = renderLookup(file, c.includeNoteBounds, c.scale);
-                if (!rendered) {
-                    continue;
-                }
-                noteBounds += expectSameAsJson(path.relative(process.cwd(), file), rendered.score, rendered.lookup);
-                checked++;
+            const covered = new Set<string>();
+            for (const f of files) {
+                const file = path.join(process.cwd(), f.file);
+                const rendered = renderLookup(file, f.firstTrackOnly, c.includeNoteBounds, c.scale);
+                expect(rendered, f.file).not.toBeNull();
+                expectSameAsJson(f.file, rendered!.score, rendered!.lookup, covered);
             }
-            expect(checked).toBeGreaterThan(100);
-            expect(noteBounds > 0).toBe(c.includeNoteBounds);
+            const expected = [
+                'beat on several staves',
+                'beat without note bounds',
+                'master bar not first of line',
+                'multi-bar rest',
+                'several systems',
+                'staff index',
+                'track index',
+                'voice index'
+            ];
+            if (c.includeNoteBounds) {
+                expected.push('note bounds');
+                expected.push('note index');
+            }
+            expect(Array.from(covered).sort()).toEqual(expected.sort());
         });
     }
 });
