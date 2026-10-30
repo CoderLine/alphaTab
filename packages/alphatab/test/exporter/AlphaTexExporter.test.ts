@@ -3,6 +3,8 @@ import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter'
 import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
@@ -56,6 +58,51 @@ describe('AlphaTexExporterTest', () => {
                 `<${fileName}>${unwrapped.toString()}\n${errorLines.join('\n')}${error.stack}\n Tex:\n${exported}`
             );
         }
+    }
+
+    /**
+     * Compares the drum instruments of all percussion staves, which the general round trip comparison ignores.
+     */
+    async function testPercussionRoundTrip(name: string, expectedGraceNotes: number): Promise<void> {
+        const expected = (await loadScore(name))!;
+        ComparisonHelpers.alphaTexExportRoundtripPrepare(expected);
+        const actual = ScoreLoader.loadAlphaTex(exportAlphaTex(expected));
+
+        let graceNotes = 0;
+        for (const expectedTrack of expected.tracks) {
+            const expectedStaff = expectedTrack.staves[0];
+            if (!expectedStaff.isPercussion) {
+                continue;
+            }
+            const actualStaff = actual.tracks[expectedTrack.index].staves[0];
+            expect(actualStaff.isPercussion).toBe(true);
+            for (const expectedBar of expectedStaff.bars) {
+                const actualBar = actualStaff.bars[expectedBar.index];
+                for (const expectedVoice of expectedBar.voices) {
+                    if (expectedVoice.isEmpty) {
+                        continue;
+                    }
+                    const actualVoice = actualBar.voices[expectedVoice.index];
+                    expect(actualVoice.beats.length).toBe(expectedVoice.beats.length);
+                    for (const expectedBeat of expectedVoice.beats) {
+                        const actualBeat = actualVoice.beats[expectedBeat.index];
+                        expect(actualBeat.graceType).toBe(expectedBeat.graceType);
+                        expect(actualBeat.notes.length).toBe(expectedBeat.notes.length);
+                        for (const expectedNote of expectedBeat.notes) {
+                            const actualNote = actualBeat.notes[expectedNote.index];
+                            expect(actualNote.isPercussion).toBe(true);
+                            expect(PercussionMapper.getArticulation(actualNote)!.outputMidiNumber).toBe(
+                                PercussionMapper.getArticulation(expectedNote)!.outputMidiNumber
+                            );
+                            if (expectedBeat.graceType !== GraceType.None) {
+                                graceNotes++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        expect(graceNotes).toBe(expectedGraceNotes);
     }
 
     async function testRoundTripFolderEqual(name: string, ignoredFiles?: string[]): Promise<void> {
@@ -179,12 +226,24 @@ describe('AlphaTexExporterTest', () => {
         await testRoundTripFolderEqual('visual-tests/special-tracks');
     });
 
+    it('gp4-to-alphaTex', async () => {
+        await testRoundTripEqual(`guitarpro4/fade-to-black.gp4`);
+    });
+
     it('gp5-to-alphaTex', async () => {
         await testRoundTripEqual(`conversion/full-song.gp5`);
     });
 
     it('gp5-articulation', async () => {
         await testRoundTripEqual(`guitarpro5/percussion-all.gp5`);
+    });
+
+    it('gp4-percussion-grace-notes', async () => {
+        await testPercussionRoundTrip('guitarpro4/fade-to-black.gp4', 4);
+    });
+
+    it('gp5-percussion-grace-notes', async () => {
+        await testPercussionRoundTrip('guitarpro5/canon.gp5', 2);
     });
 
     it('gp6-to-alphaTex', async () => {

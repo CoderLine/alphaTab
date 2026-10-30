@@ -1487,7 +1487,7 @@ export class Gp3To5Importer extends ScoreImporter {
         let swapAccidentals = false;
         if (this._versionNumber >= 500) {
             if ((flags & 0x01) !== 0) {
-                newNote.durationPercent = IOHelper.readFloat64BE(this.data);
+                newNote.durationPercent = IOHelper.readFloat64LE(this.data);
             }
             const flags2: number = this.data.readByte();
             swapAccidentals = (flags2 & 0x02) !== 0;
@@ -1502,14 +1502,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
 
         if (bar.staff.isPercussion) {
-            const midi = Gp3To5Importer._gp5PercussionInstrumentMap.has(newNote.fret)
-                ? Gp3To5Importer._gp5PercussionInstrumentMap.get(newNote.fret)!
-                : newNote.fret;
-            const knownArticulation = PercussionMapper.getArticulationById(midi);
-            if (knownArticulation !== null) {
-                newNote.percussionArticulation = bar.staff.track.getOrRegisterPercussionArticulation(knownArticulation);
-            }
-            newNote.fret = Number.NaN;
+            Gp3To5Importer._fretToPercussionArticulation(bar.staff, newNote);
         }
         if (swapAccidentals) {
             const accidental = ModelUtils.computeAccidental(
@@ -1613,6 +1606,20 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
+    /**
+     * Converts the fret of a note on a percussion staff, which Guitar Pro uses as the drum key, into the articulation.
+     */
+    private static _fretToPercussionArticulation(staff: Staff, note: Note): void {
+        const midi = Gp3To5Importer._gp5PercussionInstrumentMap.has(note.fret)
+            ? Gp3To5Importer._gp5PercussionInstrumentMap.get(note.fret)!
+            : note.fret;
+        const knownArticulation = PercussionMapper.getArticulationById(midi);
+        if (knownArticulation !== null) {
+            note.percussionArticulation = staff.track.getOrRegisterPercussionArticulation(knownArticulation);
+        }
+        note.fret = Number.NaN;
+    }
+
     private _readFret(staff: Staff, note: Note): void {
         const fret = IOHelper.readSInt8(this.data);
         // Guitar Pro shows a negative fret on a stringed staff as a dead note
@@ -1629,6 +1636,9 @@ export class Gp3To5Importer extends ScoreImporter {
         const graceNote: Note = new Note();
         graceNote.string = note.string;
         this._readFret(voice.bar.staff, graceNote);
+        if (voice.bar.staff.isPercussion) {
+            Gp3To5Importer._fretToPercussionArticulation(voice.bar.staff, graceNote);
+        }
         graceBeat.duration = Duration.ThirtySecond;
         graceBeat.dynamics = this.toDynamicValue(IOHelper.readSInt8(this.data));
         const transition: number = IOHelper.readSInt8(this.data);

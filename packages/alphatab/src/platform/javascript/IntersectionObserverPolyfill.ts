@@ -11,8 +11,8 @@ export class IntersectionObserverPolyfill {
     public constructor(callback: IntersectionObserverCallback) {
         this._callback = callback;
 
-        window.addEventListener('resize', () => this._check, true);
-        document.addEventListener('scroll', () => this._check, true);
+        window.addEventListener('resize', () => this._check(), true);
+        document.addEventListener('scroll', () => this._check(), true);
     }
 
     private _check() {

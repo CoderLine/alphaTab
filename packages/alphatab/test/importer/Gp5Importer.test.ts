@@ -5,6 +5,7 @@ import { EndOfReaderError, OverflowError } from '@coderline/alphatab/io/IReadabl
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
@@ -210,6 +211,36 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[7].name).toBe('Track 8');
         expect(score.tracks[8].name).toBe('Percussion');
     });
+
+    it('note-duration-percent', async () => {
+        const otherEffects = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/other-effects.gp5')
+        ).readScore();
+        const beats = otherEffects.tracks[0].staves[0].bars[0].voices[0].beats;
+        expect(beats[0].notes[0].durationPercent).toBe(0.75);
+        expect(beats[1].notes[0].durationPercent).toBe(0.5);
+
+        const canon = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5')).readScore();
+        expect(canon.tracks[0].staves[0].bars[24].voices[0].beats[1].notes[0].durationPercent).toBe(0.75);
+        expect(canon.tracks[2].staves[0].bars[12].voices[0].beats[1].notes[0].durationPercent).toBe(2);
+        expect(canon.tracks[3].staves[0].bars[144].voices[0].beats[0].notes[0].durationPercent).toBeCloseTo(2 / 3, 12);
+        expect(canon.tracks[0].staves[0].bars[24].voices[0].beats[0].notes[0].durationPercent).toBe(1);
+    });
+
+    it('percussion-grace-notes', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5');
+        const score: Score = reader.readScore();
+        const beats = score.tracks[4].staves[0].bars[18].voices[0].beats;
+
+        // flam: the grace note stores the drum key as fret like the main note
+        expect(beats[2].graceType).toBe(GraceType.BeforeBeat);
+        expect(beats[2].notes.length).toBe(1);
+        expect(beats[2].notes[0].isPercussion).toBe(true);
+        expect(beats[2].notes[0].isStringed).toBe(false);
+        expect(PercussionMapper.getArticulation(beats[2].notes[0])!.outputMidiNumber).toBe(38);
+        expect(PercussionMapper.getArticulation(beats[3].notes[0])!.outputMidiNumber).toBe(38);
+    });
+
     it('beat-text-lyrics', async () => {
         const settings = new Settings();
         settings.importer.beatTextAsLyrics = true;

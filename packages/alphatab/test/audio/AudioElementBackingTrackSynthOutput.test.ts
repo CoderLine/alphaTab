@@ -5,6 +5,7 @@
  * @target web
  */
 
+import { LogLevel } from '@coderline/alphatab/LogLevel';
 import { type ILogger, Logger } from '@coderline/alphatab/Logger';
 import { MidiFile } from '@coderline/alphatab/midi/MidiFile';
 import { AudioElementBackingTrackSynthOutput } from '@coderline/alphatab/platform/javascript/AudioElementBackingTrackSynthOutput';
@@ -13,14 +14,47 @@ import { PlayerState } from '@coderline/alphatab/synth/PlayerState';
 import { WarningCollectingLogger } from 'test/WarningCollectingLogger';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+/**
+ * Rejects every play request with the given error and lets tests wait until the output handled them.
+ */
+class RejectedPlayRequests {
+    private readonly _error: DOMException;
+    private readonly _requests: Promise<void>[] = [];
+
+    public constructor(error: DOMException) {
+        this._error = error;
+    }
+
+    public readonly play = (): Promise<void> => {
+        const request = Promise.reject(this._error);
+        this._requests.push(request);
+        return request;
+    };
+
+    /**
+     * Resolves after the rejection handlers the output attached to the requests made so far have run,
+     * as handlers of one promise run in the order they were attached.
+     */
+    public async handled(): Promise<void> {
+        expect(this._requests.length).toBeGreaterThan(0);
+        for (const request of this._requests) {
+            await request.catch(() => {});
+        }
+    }
+}
+
 describe('AudioElementBackingTrackSynthOutputTests', () => {
     let previousLogger: ILogger;
+    let previousLogLevel: LogLevel;
     let logger: WarningCollectingLogger;
 
     beforeEach(() => {
         previousLogger = Logger.log;
+        previousLogLevel = Logger.logLevel;
         logger = new WarningCollectingLogger();
         Logger.log = logger;
+        // other test files in the same worker may have lowered the global log level
+        Logger.logLevel = LogLevel.Info;
         vi.stubGlobal('window', {
             setInterval: () => 1,
             clearInterval: () => {}
@@ -29,6 +63,7 @@ describe('AudioElementBackingTrackSynthOutputTests', () => {
 
     afterEach(() => {
         Logger.log = previousLogger;
+        Logger.logLevel = previousLogLevel;
         vi.unstubAllGlobals();
     });
 
@@ -41,18 +76,15 @@ describe('AudioElementBackingTrackSynthOutputTests', () => {
         return output;
     }
 
-    async function settle() {
-        await new Promise(resolve => setTimeout(resolve, 0));
-    }
-
     it('interrupted-play-is-silent', async () => {
-        const output = createOutput(() =>
-            Promise.reject(new DOMException('The play() request was interrupted by a call to pause().', 'AbortError'))
+        const requests = new RejectedPlayRequests(
+            new DOMException('The play() request was interrupted by a call to pause().', 'AbortError')
         );
+        const output = createOutput(requests.play);
 
         output.play();
         output.pause();
-        await settle();
+        await requests.handled();
 
         expect(logger.warnings).toEqual([]);
     });
@@ -76,14 +108,15 @@ describe('AudioElementBackingTrackSynthOutputTests', () => {
     }
 
     it('rejected-play-pauses-player', async () => {
-        const player = createPlayer(() =>
-            Promise.reject(new DOMException('play() failed because the user did not interact.', 'NotAllowedError'))
+        const requests = new RejectedPlayRequests(
+            new DOMException('play() failed because the user did not interact.', 'NotAllowedError')
         );
+        const player = createPlayer(requests.play);
         const states: PlayerState[] = [];
         player.stateChanged.on(e => states.push(e.state));
 
         expect(player.play()).toBe(true);
-        await settle();
+        await requests.handled();
 
         // the first entry is the state replayed on subscription
         expect(states).toEqual([PlayerState.Paused, PlayerState.Playing, PlayerState.Paused]);
@@ -91,23 +124,25 @@ describe('AudioElementBackingTrackSynthOutputTests', () => {
     });
 
     it('interrupted-play-keeps-player-state', async () => {
-        const player = createPlayer(() =>
-            Promise.reject(new DOMException('The play() request was interrupted by a new load request.', 'AbortError'))
+        const requests = new RejectedPlayRequests(
+            new DOMException('The play() request was interrupted by a new load request.', 'AbortError')
         );
+        const player = createPlayer(requests.play);
 
         player.play();
-        await settle();
+        await requests.handled();
 
         expect(player.state).toBe(PlayerState.Playing);
     });
 
     it('failed-play-is-logged', async () => {
-        const output = createOutput(() =>
-            Promise.reject(new DOMException('play() failed because the user did not interact.', 'NotAllowedError'))
+        const requests = new RejectedPlayRequests(
+            new DOMException('play() failed because the user did not interact.', 'NotAllowedError')
         );
+        const output = createOutput(requests.play);
 
         output.play();
-        await settle();
+        await requests.handled();
 
         expect(logger.warnings).toEqual(['BackingTrack: Starting audio playback failed']);
     });

@@ -28,6 +28,12 @@ export class IOHelper {
         return TypeConversions.bytesToFloat64LE(bits);
     }
 
+    public static readFloat64LE(readable: IReadable): number {
+        const bits = new Uint8Array(8);
+        readable.read(bits, 0, bits.length);
+        return TypeConversions.bytesToFloat64LE(bits);
+    }
+
     public static readInt32LE(input: IReadable): number {
         const ch1: number = input.readByte();
         const ch2: number = input.readByte();
