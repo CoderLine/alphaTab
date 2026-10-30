@@ -159,8 +159,6 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
     public override doLayout(): void {
         super.doLayout();
 
-        this._calculateAndRegisterOverflow();
-
         let value: number = 0;
         for (const note of this._notes) {
             const renderPoints: TabBendRenderPoint[] = this._renderPoints.get(note.id)!;
@@ -208,23 +206,208 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             }
             return a.realValue - b.realValue;
         });
+
+        const canvas = this.renderer.scoreRenderer.canvas!;
+        canvas.font = this.renderer.resources.tablatureFont;
+        const labelHeight = canvas.measureText('full').height;
+        const labelTop = this._arrangeLabels(labelHeight);
+        this._calculateAndRegisterOverflow(labelHeight, labelTop);
     }
 
-    private _calculateAndRegisterOverflow() {
-        const res = this.renderer.resources;
+    private _calculateAndRegisterOverflow(labelHeight: number, labelTop: number) {
         const smufl = this.renderer.smuflMetrics;
         let bendHeight: number = this._maxBendValue * smufl.tabBendPerValueHeight;
 
         bendHeight += smufl.tabBendStaffPadding;
 
         // account for space
-        const canvas = this.renderer.scoreRenderer.canvas!;
-        canvas.font = res.tablatureFont;
-        const size = canvas.measureText('full');
-        bendHeight += size.height + res.engravingSettings.tabBendLabelPadding;
+        bendHeight += labelHeight + smufl.tabBendLabelPadding;
+
+        const stackedHeight = smufl.tabBendStaffPadding + labelTop;
+        if (stackedHeight > bendHeight) {
+            bendHeight = stackedHeight;
+        }
 
         this._bendHeight = bendHeight;
         this.renderer.registerOverflowTop(bendHeight);
+    }
+
+    /**
+     * Merges and stacks the value labels of the bends on this beat. Labels are grouped by the height their arrows
+     * point to: the pre-bend height, the middle height of bend-releases, and the end heights of bends and releases
+     * (separately for bends continued on tied notes). Within a group a label is shown once per value, different
+     * values are stacked with the highest value on top. Custom bends and holds are not grouped.
+     * @returns the top of the highest stacked label above the bend reference line (0 if nothing is stacked).
+     */
+    private _arrangeLabels(labelHeight: number): number {
+        if (this._notes.length < 2) {
+            return 0;
+        }
+
+        const smufl = this.renderer.smuflMetrics;
+        const perValueHeight = smufl.tabBendPerValueHeight;
+        const extendOnTiedNotes = this.renderer.settings.notation.extendBendArrowsOnTiedNotes;
+
+        const points: TabBendRenderPoint[] = [];
+        const groups: number[] = [];
+        const ends: (Beat | null)[] = [];
+        const heights: number[] = [];
+        const values: number[] = [];
+
+        // highest string first (notes are sorted by ascending string): of merged labels the one of the highest
+        // string is shown
+        for (let i = this._notes.length - 1; i >= 0; i--) {
+            const note = this._notes[i];
+            const renderPoints = this._renderPoints.get(note.id)!;
+            const endBeat = TabBendGlyph._bendEndBeat(note, extendOnTiedNotes);
+            let preBend: TabBendRenderPoint | null = null;
+            let middle: TabBendRenderPoint | null = null;
+            let endFrom: TabBendRenderPoint | null = null;
+            let end: TabBendRenderPoint | null = null;
+            let isRelease = false;
+            switch (note.bendType) {
+                case BendType.Bend:
+                    endFrom = renderPoints[0];
+                    end = renderPoints[1];
+                    break;
+                case BendType.Release:
+                    endFrom = renderPoints[0];
+                    end = renderPoints[1];
+                    isRelease = true;
+                    break;
+                case BendType.BendRelease:
+                    middle = renderPoints[1];
+                    endFrom = renderPoints[1];
+                    end = renderPoints[2];
+                    isRelease = true;
+                    break;
+                case BendType.Prebend:
+                    preBend = renderPoints[0];
+                    break;
+                case BendType.PrebendBend:
+                    preBend = renderPoints[0];
+                    endFrom = renderPoints[0];
+                    end = renderPoints[1];
+                    break;
+                case BendType.PrebendRelease:
+                    preBend = renderPoints[0];
+                    endFrom = renderPoints[0];
+                    end = renderPoints[1];
+                    isRelease = true;
+                    break;
+            }
+
+            // the pre-bend arrow is not drawn on tied notes (_paintBendLines)
+            if (preBend && !note.isTieDestination) {
+                points.push(preBend);
+                groups.push(TabBendGlyph._labelGroupPreBend);
+                ends.push(null);
+                heights.push(perValueHeight * preBend.lineValue + smufl.tabBendLabelPadding);
+                values.push(preBend.value);
+            }
+            if (middle) {
+                points.push(middle);
+                groups.push(TabBendGlyph._labelGroupMiddle);
+                ends.push(endBeat);
+                heights.push(perValueHeight * middle.lineValue + smufl.tabBendLabelPadding);
+                values.push(middle.value);
+            }
+            if (end && endFrom && end.value !== 0 && end.value !== endFrom.value) {
+                points.push(end);
+                ends.push(endBeat);
+                values.push(end.value);
+                if (isRelease) {
+                    groups.push(
+                        note.isTieOrigin ? TabBendGlyph._labelGroupReleaseContinued : TabBendGlyph._labelGroupRelease
+                    );
+                    // the label sits on the upper third of the release arrow (_paintBendLineValueText)
+                    const y1 = perValueHeight * endFrom.lineValue;
+                    const y2 = perValueHeight * end.lineValue;
+                    heights.push(y1 - Math.abs(y1 - y2) / 3);
+                } else {
+                    groups.push(
+                        note.isTieOrigin ? TabBendGlyph._labelGroupBendContinued : TabBendGlyph._labelGroupBend
+                    );
+                    heights.push(perValueHeight * end.lineValue + smufl.tabBendLabelPadding);
+                }
+            }
+        }
+
+        const rowHeight = labelHeight + smufl.tabBendLabelPadding;
+        let labelTop = 0;
+        const done: boolean[] = [];
+        for (let i = 0; i < points.length; i++) {
+            done.push(false);
+        }
+        for (let i = 0; i < points.length; i++) {
+            if (done[i]) {
+                continue;
+            }
+
+            const members: number[] = [i];
+            let baseHeight = heights[i];
+            for (let j = i + 1; j < points.length; j++) {
+                if (!done[j] && groups[j] === groups[i] && ends[j] === ends[i]) {
+                    members.push(j);
+                    done[j] = true;
+                    if (heights[j] > baseHeight) {
+                        baseHeight = heights[j];
+                    }
+                }
+            }
+
+            const distinctValues: number[] = [];
+            for (const m of members) {
+                if (distinctValues.indexOf(values[m]) === -1) {
+                    distinctValues.push(values[m]);
+                }
+            }
+            distinctValues.sort((a, b) => a - b);
+
+            const shown: number[] = [];
+            for (const m of members) {
+                const point = points[m];
+                const value = values[m];
+                if (shown.indexOf(value) !== -1) {
+                    point.isLabelMerged = true;
+                    point.labelShift = 0;
+                    continue;
+                }
+                shown.push(value);
+                point.isLabelMerged = false;
+                const row = distinctValues.indexOf(value);
+                point.labelShift = baseHeight - heights[m] + row * rowHeight;
+                if (point.labelShift > 0) {
+                    const top = heights[m] + point.labelShift + labelHeight;
+                    if (top > labelTop) {
+                        labelTop = top;
+                    }
+                }
+            }
+        }
+
+        return labelTop;
+    }
+
+    private static readonly _labelGroupPreBend = 0;
+    private static readonly _labelGroupMiddle = 1;
+    private static readonly _labelGroupBend = 2;
+    private static readonly _labelGroupBendContinued = 3;
+    private static readonly _labelGroupRelease = 4;
+    private static readonly _labelGroupReleaseContinued = 5;
+
+    /**
+     * The beat on which the bend arrow of the given note ends, following the tie chain like {@link _resolvePaintRange}.
+     */
+    private static _bendEndBeat(note: Note, extendOnTiedNotes: boolean): Beat {
+        let endNote = note;
+        while (endNote.isTieOrigin) {
+            endNote = endNote.tieDestination!;
+            if (endNote.hasBend || !extendOnTiedNotes || endNote.vibrato !== VibratoType.None) {
+                break;
+            }
+        }
+        return endNote.beat;
     }
 
     private _createRenderingPoints(note: Note): TabBendRenderPoint[] {
@@ -609,8 +792,12 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             }
 
             if (bendValueText !== '') {
-                const textY = up ? y2 : y1 + (Math.abs(y2 - y1) * 1) / 3;
+                // also for merged labels: the next 'grad.' label is measured with this font (_paintBendLineSlurText)
                 canvas.font = font;
+                if (secondPt.isLabelMerged) {
+                    return;
+                }
+                const textY = (up ? y2 : y1 + (Math.abs(y2 - y1) * 1) / 3) - secondPt.labelShift;
                 const size = canvas.measureText(bendValueText);
                 const textX = x2 - size.width / 2;
                 if (this._shape) {

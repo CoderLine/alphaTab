@@ -76,6 +76,24 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/bends.gp');
     });
 
+    it('bends-multi-note', async () => {
+        // labels of the bends of one beat: equal values at the same height are drawn once, different values
+        // are stacked with the highest value on top, also where the lower string bends higher (bars 2, 6, 10);
+        // bars 1-4 bends, bars 5-8 bend-releases, bars 9-12 pre-bends
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track \\staff {tabs}
+            :1 (7.3{b (0 4)} 8.2{b (0 4)}) | (7.3{b (0 4)} 8.2{b (0 2)}) |
+            (7.4{b (0 4)} 7.3{b (0 2)} 8.2{b (0 4)}) | (7.3{b (0 2)} 8.2{b (0 6)}) |
+            (7.3{b (0 4 0)} 8.2{b (0 4 0)}) | (7.3{b (0 4 0)} 8.2{b (0 2 0)}) |
+            (7.3{b (0 4 2)} 8.2{b (0 4 1)}) | (7.3{b (0 4 2)} 8.2{b (0 2 1)}) |
+            (7.3{b (4 4)} 8.2{b (4 4)}) | (7.3{b (4 4)} 8.2{b (2 2)}) |
+            (7.3{b (2 6)} 8.2{b (4 6)}) | (7.3{b (4 0)} 8.2{b (2 0)})
+        `,
+            'test-data/visual-tests/effects-and-annotations/bends-multi-note.png'
+        );
+    });
+
     it('tremolo-bar', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tremolo-bar.gp');
     });
