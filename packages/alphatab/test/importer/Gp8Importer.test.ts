@@ -13,7 +13,7 @@ import {
     TrackNamePolicy,
     TuningDisplayMode
 } from '@coderline/alphatab/model/RenderStylesheet';
-import { ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Settings } from '@coderline/alphatab/Settings';
@@ -516,6 +516,45 @@ describe('Gp8ImporterTest', () => {
         const score = reader.readScore();
         expect(score.masterBars.length).toBe(100);
         expect(score.tracks.length).toBe(3);
+    });
+
+    /**
+     * Expects all percussion notes on a string of their staff and at most one note per string and beat.
+     * @returns the number of checked notes
+     */
+    function checkPercussionStrings(score: Score): number {
+        let notes = 0;
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+                if (!staff.isPercussion) {
+                    continue;
+                }
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            const strings = new Set<number>();
+                            for (const note of beat.notes) {
+                                expect(note.string).toBeGreaterThanOrEqual(1);
+                                expect(note.string).toBeLessThanOrEqual(staff.tuning.length);
+                                expect(strings.has(note.string)).toBe(false);
+                                strings.add(note.string);
+                                expect(beat.getNoteOnString(note.string)).toBe(note);
+                                notes++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return notes;
+    }
+
+    it('percussion-strings-out-of-range', async () => {
+        // both files store drum notes on strings 0, -1, -3 and 7 of a 6 string staff
+        const faulty = (await prepareImporterWithFile('guitarpro8/faulty.gp')).readScore();
+        expect(checkPercussionStrings(faulty)).toBe(772);
+        const orphan = (await prepareImporterWithFile('guitarpro8/orphan-tempo-automation.gp')).readScore();
+        expect(checkPercussionStrings(orphan)).toBe(1301);
     });
 
     it('tuning-before-staff', async () =>{

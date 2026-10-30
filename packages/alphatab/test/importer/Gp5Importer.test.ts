@@ -5,6 +5,7 @@ import { EndOfReaderError, OverflowError } from '@coderline/alphatab/io/IReadabl
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
@@ -149,6 +150,23 @@ describe('Gp5ImporterTest', () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/serenade.gp5');
         reader.readScore();
         // only Check reading
+    });
+
+    it('empty-voice-placeholder', async () => {
+        // the file stores a dotted quarter on the empty beat of the empty bar
+        const serenade = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/serenade.gp5')).readScore();
+        const emptyBar = serenade.tracks[3].staves[0].bars[69].voices[0];
+        expect(emptyBar.isEmpty).toBe(true);
+        expect(emptyBar.beats.length).toBe(1);
+        expect(emptyBar.beats[0].duration).toBe(Duration.Quarter);
+        expect(emptyBar.beats[0].dots).toBe(0);
+
+        // the file stores a sixteenth on the empty beat of the empty second voice
+        const nightwish = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/nightwish.gp5')).readScore();
+        const emptyVoice = nightwish.tracks[10].staves[0].bars[53].voices[1];
+        expect(emptyVoice.isEmpty).toBe(true);
+        expect(emptyVoice.beats.length).toBe(1);
+        expect(emptyVoice.beats[0].duration).toBe(Duration.Quarter);
     });
 
     it('strings', async () => {

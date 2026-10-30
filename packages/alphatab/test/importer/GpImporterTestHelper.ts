@@ -350,6 +350,13 @@ export class GpImporterTestHelper {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].rightHandFinger).toBe(
             Fingers.LittleFinger
         );
+        // each note has a finger on one hand only
+        for (let i = 0; i < 5; i++) {
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[i].notes[0].rightHandFinger).toBe(Fingers.Unknown);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[i + 5].notes[0].leftHandFinger).toBe(
+                Fingers.Unknown
+            );
+        }
     }
 
     public static checkStroke(score: Score): void {

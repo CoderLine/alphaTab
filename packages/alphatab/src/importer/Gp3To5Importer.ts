@@ -19,7 +19,7 @@ import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
-import type { Fingers } from '@coderline/alphatab/model/Fingers';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
@@ -851,6 +851,21 @@ export class Gp3To5Importer extends ScoreImporter {
         for (let i: number = 0; i < beatCount; i++) {
             this.readBeat(track, bar, newVoice);
         }
+
+        if (newVoice.beats.length === 1 && newVoice.beats[0].isEmpty) {
+            Gp3To5Importer._resetPlaceholderRhythm(newVoice.beats[0]);
+        }
+    }
+
+    /**
+     * Guitar Pro keeps an arbitrary rhythm on the single empty beat of an empty voice.
+     * This gives it the rhythm of the placeholder beat other importers create for empty voices.
+     */
+    private static _resetPlaceholderRhythm(beat: Beat) {
+        beat.duration = Duration.Quarter;
+        beat.dots = 0;
+        beat.tupletNumerator = -1;
+        beat.tupletDenominator = -1;
     }
 
     /**
@@ -1289,6 +1304,26 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
+    /**
+     * Guitar Pro stores -1 for a hand without fingering.
+     */
+    private static _toFinger(value: number): Fingers {
+        switch (value) {
+            case 0:
+                return Fingers.Thumb;
+            case 1:
+                return Fingers.IndexFinger;
+            case 2:
+                return Fingers.MiddleFinger;
+            case 3:
+                return Fingers.AnnularFinger;
+            case 4:
+                return Fingers.LittleFinger;
+            default:
+                return Fingers.Unknown;
+        }
+    }
+
     private static _toStrokeValue(value: number): number {
         switch (value) {
             case 1:
@@ -1481,8 +1516,8 @@ export class Gp3To5Importer extends ScoreImporter {
             this._readFret(bar.staff, newNote);
         }
         if ((flags & 0x80) !== 0) {
-            newNote.leftHandFinger = IOHelper.readSInt8(this.data) as Fingers;
-            newNote.rightHandFinger = IOHelper.readSInt8(this.data) as Fingers;
+            newNote.leftHandFinger = Gp3To5Importer._toFinger(IOHelper.readSInt8(this.data));
+            newNote.rightHandFinger = Gp3To5Importer._toFinger(IOHelper.readSInt8(this.data));
         }
         let swapAccidentals = false;
         if (this._versionNumber >= 500) {

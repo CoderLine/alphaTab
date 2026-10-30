@@ -3737,6 +3737,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return properties;
     }
 
+    /**
+     * The beat which precedes the given beat in the written alphaTex of its voice. Empty voices are written
+     * without beats, an importer continues with the state of the beat written before them.
+     */
+    private static _previousWrittenBeat(beat: Beat): Beat | null {
+        let previous = beat.previousBeat;
+        while (previous !== null && previous.voice.isEmpty) {
+            previous = previous.previousBeat;
+        }
+        return previous;
+    }
+
     public buildBeatEffects(beat: Beat): AlphaTexPropertyNode[] {
         const properties: AlphaTexPropertyNode[] = [];
 
@@ -3884,7 +3896,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 break;
         }
 
-        if ((beat.voice.bar.index === 0 && beat.index === 0) || beat.dynamics !== beat.previousBeat?.dynamics) {
+        const previousWrittenBeat = AlphaTex1LanguageHandler._previousWrittenBeat(beat);
+        if (previousWrittenBeat === null || beat.dynamics !== previousWrittenBeat.dynamics) {
             Atnf.prop(
                 properties,
                 'dy',

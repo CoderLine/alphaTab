@@ -452,7 +452,7 @@
       // Bar 73 Metadata
       \simile none
         // Bar 73 / Voice 1 contents
-        1.1.8{dy mf beam Up}
+        1.1.8{beam Up}
         2.1.8{beam Up}
         3.1.8{beam Up}
         4.1.8{beam Up}
@@ -1065,7 +1065,7 @@
       // Bar 73 Metadata
       \simile none
         // Bar 73 / Voice 2 contents
-        3.3.4{dy mf beam Down}
+        3.3.4{beam Down}
         4.3.4{beam Down}
         r.8{beam Down}
         5.3.8{beam Down}
@@ -1115,7 +1115,7 @@
       // Bar 94 / Voice 2 no contents
       |
         // Bar 95 / Voice 2 contents
-        3.3{lf 4}.4{dy mf beam Down}
+        3.3{lf 4}.4{beam Down}
         4.3{lf 4}.4{beam Down}
         r.8{beam Down}
         5.3{lf 5}.8{beam Down}
@@ -1391,7 +1391,7 @@
       // Bar 94 / Voice 3 no contents
       |
         // Bar 95 / Voice 3 contents
-        r.4{dy mf beam Down}
+        r.4{beam Down}
         r.4{beam Down}
         0.6.4{beam Down}
         1.6{lf 2}.4{beam Down}

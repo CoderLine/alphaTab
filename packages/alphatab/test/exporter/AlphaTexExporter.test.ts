@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
@@ -246,12 +247,39 @@ describe('AlphaTexExporterTest', () => {
         await testPercussionRoundTrip('guitarpro5/canon.gp5', 2);
     });
 
+    it('gp5-empty-voices', async () => {
+        // alphaTex has no note duration percent
+        await testRoundTripEqual('guitarpro5/nightwish.gp5', ['durationpercent']);
+        await testRoundTripEqual('guitarpro5/serenade.gp5');
+    });
+
+    it('dynamics-after-empty-bar', () => {
+        const score = ScoreLoader.loadAlphaTex('C4{dy pp}.4 C4 C4 C4 | | C4{dy f}.4 C4 C4 C4');
+        const exported = exportAlphaTex(score);
+        const reimported = ScoreLoader.loadAlphaTex(exported);
+
+        const bars = reimported.tracks[0].staves[0].bars;
+        expect(bars[1].isEmpty).toBe(true);
+        expect(bars[2].voices[0].beats[0].dynamics).toBe(DynamicValue.F);
+        ComparisonHelpers.alphaTexExportRoundtripEqual('dynamics-after-empty-bar', reimported, score);
+    });
+
     it('gp6-to-alphaTex', async () => {
         await testRoundTripEqual(`conversion/full-song.gpx`);
     });
 
     it('gp7-to-alphaTex', async () => {
         await testRoundTripEqual(`conversion/full-song.gp`);
+    });
+
+    it('gp-fingering', async () => {
+        await testRoundTripEqual('guitarpro4/fingering.gp4');
+        await testRoundTripEqual('guitarpro5/fingering.gp5');
+    });
+
+    it('gp8-percussion-strings-out-of-range', async () => {
+        await testRoundTripEqual('guitarpro8/faulty.gp');
+        await testRoundTripEqual('guitarpro8/orphan-tempo-automation.gp');
     });
 
     it('accidental-mode-only-when-needed', () => {
