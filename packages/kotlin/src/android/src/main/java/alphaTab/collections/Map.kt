@@ -74,13 +74,13 @@ public open class Map<TKey, TValue>:
     @Suppress("UNCHECKED_CAST")
     public fun has(key: TKey): Boolean {
         return findEntryInternal(key as Any?,
-            { entry, k -> entry.key == (k as TKey) }) >= 0
+            { entry, k -> sameValueZero(entry.key, k) }) >= 0
     }
 
     @Suppress("UNCHECKED_CAST")
     public fun get(key: TKey): TValue? {
         val i = findEntryInternal(key as Any?,
-            { entry, k -> entry.key == (k as TKey) })
+            { entry, k -> sameValueZero(entry.key, k) })
         if (i >= 0) {
             return entries[i].value
         }
@@ -97,12 +97,12 @@ public open class Map<TKey, TValue>:
             key as Any?, value as Any?,
             { entry, k -> entry.key = k as TKey },
             { entry, v -> entry.value = v as TValue },
-            { entry, k -> entry.key == (k as TKey) }
+            { entry, k -> sameValueZero(entry.key, k) }
         )
     }
 
     public fun delete(key: TKey) {
-        deleteInternal(key.hashCode())
+        deleteInternal(key as Any?, { entry, k -> sameValueZero(entry.key, k) })
     }
 
     private var _values: ValueCollection<TKey, TValue>? = null

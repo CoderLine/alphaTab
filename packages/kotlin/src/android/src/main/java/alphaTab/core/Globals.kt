@@ -250,12 +250,78 @@ internal fun String.toIntOrNaN(): Double {
     return Double.NaN
 }
 
+/**
+ * Parses like ECMAScript `parseInt`: leading whitespace and an optional sign are skipped,
+ * the longest prefix of digits of the radix is parsed, and NaN is returned if there is none.
+ * A radix of 0 means 10, or 16 for a `0x` prefix.
+ */
 internal fun String.toIntOrNaN(radix: Double): Double {
-    try {
-        return Integer.parseInt(this.trim(), radix.toInt()).toDouble();
-    } catch (e: Throwable) {
+    var r = radix.toInt()
+    var i = 0
+    while (i < this.length && isEcmaScriptWhiteSpace(this[i])) {
+        i++
     }
-    return Double.NaN
+
+    var sign = 1.0
+    if (i < this.length && (this[i] == '+' || this[i] == '-')) {
+        if (this[i] == '-') {
+            sign = -1.0
+        }
+        i++
+    }
+
+    var stripPrefix = true
+    if (r != 0) {
+        if (r < 2 || r > 36) {
+            return Double.NaN
+        }
+        stripPrefix = r == 16
+    } else {
+        r = 10
+    }
+
+    if (stripPrefix && i + 1 < this.length && this[i] == '0' && (this[i + 1] == 'x' || this[i + 1] == 'X')) {
+        i += 2
+        r = 16
+    }
+
+    val start = i
+    var value = 0.0
+    while (i < this.length) {
+        val digit = asciiDigitValue(this[i])
+        if (digit >= r) {
+            break
+        }
+        value = value * r + digit
+        i++
+    }
+
+    if (i == start) {
+        return Double.NaN
+    }
+
+    // beyond 2^53 only the decimal conversion rounds like ECMAScript
+    if (r == 10 && i - start > 15) {
+        value = this.substring(start, i).toDouble()
+    }
+
+    return sign * value
+}
+
+private fun asciiDigitValue(c: Char): Int {
+    return when (c) {
+        in '0'..'9' -> c - '0'
+        in 'a'..'z' -> c - 'a' + 10
+        in 'A'..'Z' -> c - 'A' + 10
+        else -> Int.MAX_VALUE
+    }
+}
+
+private fun isEcmaScriptWhiteSpace(c: Char): Boolean {
+    return when (c) {
+        '\t', '\n', '\u000B', '\u000C', '\r', '\u2028', '\u2029', '\uFEFF' -> true
+        else -> Character.getType(c) == Character.SPACE_SEPARATOR.toInt()
+    }
 }
 
 

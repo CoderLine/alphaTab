@@ -72,6 +72,37 @@ export class ComparisonHelpers {
         }
     }
 
+    /**
+     * Guitar Pro 6 stores some pitches twice, the other formats once: octave and tone next to string and fret
+     * of stringed notes, and the MIDI number as fret next to the articulation of percussion notes.
+     * This clears the second value wherever both describe the same pitch.
+     */
+    public static removeRedundantPitches(score: Score) {
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            for (const note of beat.notes) {
+                                if (note.isPercussion) {
+                                    if (note.fret === note.realValueWithoutHarmonic) {
+                                        note.fret = Number.NaN;
+                                    }
+                                } else if (
+                                    note.isStringed &&
+                                    note.octave * 12 + note.tone === note.fret + note.stringTuning
+                                ) {
+                                    note.octave = Number.NaN;
+                                    note.tone = Number.NaN;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public static alphaTexExportRoundtripPrepare(expected: Score) {
         // the exporter will clear out empty voices and bars, to have correct assertions we do that before
         ModelUtils.trimEmptyBarsAtEnd(expected);
@@ -94,15 +125,16 @@ export class ComparisonHelpers {
     ) {
         ComparisonHelpers.simplifyAccidentalModes(expected);
         ComparisonHelpers.simplifyAccidentalModes(actual);
-        const expectedJson = JsonConverter.scoreToJsObject(expected);
-        const actualJson = JsonConverter.scoreToJsObject(actual);
-
-        const ignorePaths: RegExp[] = [/^.*stringtuning\.isstandard$/i, /^.*masterbars.*\.fermata$/i];
-
+        ComparisonHelpers.removeRedundantPitches(expected);
+        ComparisonHelpers.removeRedundantPitches(actual);
         ComparisonHelpers._removeEmptyVoices(expected);
         // ignore instrument automation on first beat
         ComparisonHelpers._removeInitialAutomations(expected);
         ComparisonHelpers._removeInitialAutomations(actual);
+        const expectedJson = JsonConverter.scoreToJsObject(expected);
+        const actualJson = JsonConverter.scoreToJsObject(actual);
+
+        const ignorePaths: RegExp[] = [/^.*stringtuning\.isstandard$/i, /^.*masterbars.*\.fermata$/i];
 
         ignoreKeys = ignoreKeys ?? [];
         ignoreKeys.push(
@@ -177,7 +209,10 @@ export class ComparisonHelpers {
                 }
                 break;
             case 'number':
-                if (Math.abs((actual as number) - (expected as number)) >= 0.000001) {
+                if (
+                    Number.isNaN(actual as number) !== Number.isNaN(expected as number) ||
+                    Math.abs((actual as number) - (expected as number)) >= 0.000001
+                ) {
                     throw new Error(
                         `Number mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
                     );
@@ -238,17 +273,9 @@ export class ComparisonHelpers {
                                     ignoredKeyLookup.add(k);
                                 }
                             }
-                            // unset (NaN) numbers are not serialized, a number without counterpart compares like NaN
-                            const expectedKeys = Array.from(expectedMap.keys()).filter(
-                                k =>
-                                    !ignoredKeyLookup.has(k) &&
-                                    (actualMap.has(k) || typeof expectedMap.get(k) !== 'number')
-                            );
-                            const actualKeys = Array.from(actualMap.keys()).filter(
-                                k =>
-                                    !ignoredKeyLookup.has(k) &&
-                                    (expectedMap.has(k) || typeof actualMap.get(k) !== 'number')
-                            );
+                            // unset (NaN) numbers are not serialized: a number on one side only is a key mismatch
+                            const expectedKeys = Array.from(expectedMap.keys()).filter(k => !ignoredKeyLookup.has(k));
+                            const actualKeys = Array.from(actualMap.keys()).filter(k => !ignoredKeyLookup.has(k));
                             expectedKeys.sort();
                             actualKeys.sort();
 
