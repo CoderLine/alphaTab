@@ -10,11 +10,20 @@ import type { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { BoundsLookup } from '@coderline/alphatab/rendering/utils/BoundsLookup';
 import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
 import { Settings } from '@coderline/alphatab/Settings';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 // The worker hands the bounds lookup to the main thread as BoundsLookupWire; the result must equal
 // the public toJson/fromJson round trip.
 describe('BoundsLookupWire', () => {
+    let previousLogLevel = LogLevel.Info;
+    beforeAll(() => {
+        previousLogLevel = Logger.logLevel;
+        Logger.logLevel = LogLevel.None;
+    });
+    afterAll(() => {
+        Logger.logLevel = previousLogLevel;
+    });
+
     const configurations = [
         { includeNoteBounds: false, scale: 1 },
         { includeNoteBounds: true, scale: 1 },
@@ -52,7 +61,6 @@ describe('BoundsLookupWire', () => {
         settings.core.includeNoteBounds = includeNoteBounds;
         settings.core.logLevel = LogLevel.None;
         settings.display.scale = scale;
-        Logger.logLevel = LogLevel.None;
         let score: Score;
         try {
             score = ScoreLoader.loadScoreFromBytes(new Uint8Array(fs.readFileSync(file)), settings);

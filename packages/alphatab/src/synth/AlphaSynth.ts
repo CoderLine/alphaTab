@@ -234,14 +234,14 @@ export class AlphaSynthBase implements IAlphaSynth {
             return null;
         });
 
-        Logger.debug('AlphaSynth', 'Creating output');
+        Logger.trace('AlphaSynth', 'Creating output');
         this._output = output;
 
-        Logger.debug('AlphaSynth', 'Creating synthesizer');
+        Logger.trace('AlphaSynth', 'Creating synthesizer');
         this.synthesizer = synthesizer;
         this.sequencer = new MidiFileSequencer(this.synthesizer);
 
-        Logger.debug('AlphaSynth', 'Opening output');
+        Logger.trace('AlphaSynth', 'Opening output');
         this.output.ready.on(() => {
             this.isReady = true;
             (this.ready as EventEmitter).trigger();
@@ -333,7 +333,7 @@ export class AlphaSynthBase implements IAlphaSynth {
 
     private _playInternal() {
         if (this.sequencer.isPlayingOneTimeMidi) {
-            Logger.debug('AlphaSynth', 'Cancelling one time midi');
+            Logger.trace('AlphaSynth', 'Cancelling one time midi');
             this._stopOneTimeMidi();
         }
 
@@ -557,7 +557,7 @@ export class AlphaSynthBase implements IAlphaSynth {
                 } else if (this.synthesizer.activeVoiceCount > 0) {
                     // smooth stop
                     if (!this._synthStopping) {
-                        Logger.debug('AlphaSynth', 'Signaling synth to stop all voices (all samples played)');
+                        Logger.trace('AlphaSynth', 'Signaling synth to stop all voices (all samples played)');
                         this.synthesizer.noteOffAll(true);
                         this._synthStopping = true;
                     }
@@ -571,7 +571,7 @@ export class AlphaSynthBase implements IAlphaSynth {
                 // the output still has to play some samples, signal the synth to stop
                 // to eventually bring the voices down to 0 and stop playing
                 if (!this._synthStopping) {
-                    Logger.debug('AlphaSynth', 'Signaling synth to stop all voices (not all samples played)');
+                    Logger.trace('AlphaSynth', 'Signaling synth to stop all voices (not all samples played)');
                     this.synthesizer.noteOffAll(true);
                     this._synthStopping = true;
                 }
@@ -617,12 +617,17 @@ export class AlphaSynthBase implements IAlphaSynth {
 
         this._tickPosition = args.currentTick;
 
-        const mode = this.sequencer.isPlayingMain ? 'main' : this.sequencer.isPlayingCountIn ? 'count-in' : 'one-time';
-
-        Logger.debug(
-            'AlphaSynth',
-            `Position changed: (time: ${args.currentTime}/${args.endTime}, tick: ${args.currentTick}/${args.endTick}, Active Voices: ${this.synthesizer.activeVoiceCount} (${mode}), Tempo original: ${this.sequencer.currentTempo}, Tempo modified: ${this.sequencer.modifiedTempo})`
-        );
+        if (Logger.isTraceEnabled) {
+            const mode = this.sequencer.isPlayingMain
+                ? 'main'
+                : this.sequencer.isPlayingCountIn
+                  ? 'count-in'
+                  : 'one-time';
+            Logger.trace(
+                'AlphaSynth',
+                `Position changed: (time: ${args.currentTime}/${args.endTime}, tick: ${args.currentTick}/${args.endTick}, Active Voices: ${this.synthesizer.activeVoiceCount} (${mode}), Tempo original: ${this.sequencer.currentTempo}, Tempo modified: ${this.sequencer.modifiedTempo})`
+            );
+        }
 
         if (this.sequencer.isPlayingMain) {
             this._currentPosition = args;

@@ -806,7 +806,7 @@ export class AlphaTabApiBase<TSettings> {
                 null
             );
             this.uiFacade.rootContainerBecameVisible.on(() => {
-                Logger.debug('Rendering', 'AlphaTab container became visible, doing autosizing', null);
+                Logger.debug('Rendering', 'AlphaTab container became visible, doing autosizing');
                 this.triggerResize();
             });
         } else {
@@ -1749,7 +1749,7 @@ export class AlphaTabApiBase<TSettings> {
 
         const score = this.score!;
 
-        Logger.debug('AlphaTab', 'Generating Midi');
+        Logger.trace('AlphaTab', 'Generating Midi');
         const midiFile: MidiFile = new MidiFile();
         const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
         const generator: MidiFileGenerator = new MidiFileGenerator(score, this.settings, handler);

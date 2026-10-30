@@ -135,6 +135,7 @@ export interface CoreSettingsJson {
      * The log level to use within alphaTab
      * @remarks
      * AlphaTab internally does quite a bit of logging for debugging and informational purposes. The log level of alphaTab can be controlled via this setting.
+     * The published JavaScript files do not contain the messages of the `trace` level; they are only written when running alphaTab from its TypeScript sources and on .NET and Android.
      * @defaultValue `LogLevel.Info`
      * @category Core
      * @since 0.9.6

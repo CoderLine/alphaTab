@@ -20,13 +20,13 @@ export class CapellaImporter extends ScoreImporter {
     }
 
     public readScore(): Score {
-        Logger.debug(this.name, 'Loading ZIP entries');
+        Logger.trace(this.name, 'Loading ZIP entries');
         const fileSystem: ZipReader = new ZipReader(this.data, this.settings.importer.maxDecodingBufferSize);
         let entries: ZipEntry[];
         let xml: string | null = null;
         entries = fileSystem.read();
 
-        Logger.debug(this.name, 'Zip entries loaded');
+        Logger.trace(this.name, 'Zip entries loaded');
         if (entries.length > 0) {
             for (const entry of entries) {
                 switch (entry.fileName) {
@@ -44,11 +44,11 @@ export class CapellaImporter extends ScoreImporter {
             throw new UnsupportedFormatError('No valid capella file');
         }
 
-        Logger.debug(this.name, 'Start Parsing score.xml');
+        Logger.trace(this.name, 'Start Parsing score.xml');
         try {
             const capellaParser: CapellaParser = new CapellaParser();
             capellaParser.parseXml(xml, this.settings);
-            Logger.debug(this.name, 'score.xml parsed');
+            Logger.trace(this.name, 'score.xml parsed');
             const score: Score = capellaParser.score;
             return score;
         } catch (e) {

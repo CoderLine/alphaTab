@@ -135,7 +135,7 @@ export class ScoreRenderer implements IScoreRenderer {
         try {
             const layout = this.layout;
             if (layout) {
-                Logger.debug('Rendering', `Request render of lazy partial ${resultId}`);
+                Logger.trace('Rendering', `Request render of lazy partial ${resultId}`);
                 layout.renderLazyPartial(resultId);
             } else {
                 Logger.warning('Rendering', `Request render of lazy partial ${resultId} ignored, no layout exists`);
@@ -181,17 +181,17 @@ export class ScoreRenderer implements IScoreRenderer {
             Logger.debug('Rendering', 'Clearing rendered tracks because no score or tracks are set');
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
             this._renderedTracks = null;
-            Logger.debug('Rendering', 'Clearing finished');
+            Logger.trace('Rendering', 'Clearing finished');
         } else {
             Logger.debug('Rendering', `Rendering ${this.tracks.length} tracks`);
             for (let i: number = 0; i < this.tracks.length; i++) {
                 const track: Track = this.tracks[i];
-                Logger.debug('Rendering', `Track ${i}: ${track.name}`);
+                Logger.trace('Rendering', `Track ${i}: ${track.name}`);
             }
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
             this._recreateLayout();
             this._layoutAndRender(renderHints);
-            Logger.debug('Rendering', 'Rendering finished');
+            Logger.trace('Rendering', 'Rendering finished');
         }
         return true;
     }
@@ -200,7 +200,7 @@ export class ScoreRenderer implements IScoreRenderer {
         Profiler.begin('resize.total');
         let finished = false;
         if (this._recreateLayout() || this._recreateCanvas() || this._renderedTracks !== this.tracks || !this.tracks) {
-            Logger.debug('Rendering', 'Starting full rerendering due to layout or canvas change', null);
+            Logger.debug('Rendering', 'Starting full rerendering due to layout or canvas change');
             finished = this._renderProfiled();
         } else if (this.layout!.supportsResize) {
             Logger.debug('Rendering', 'Starting optimized rerendering for resize');
@@ -212,9 +212,9 @@ export class ScoreRenderer implements IScoreRenderer {
             Profiler.end('resize.layoutResize');
             finished = true;
         } else {
-            Logger.debug('Rendering', 'Current layout does not support dynamic resizing, nothing was done', null);
+            Logger.debug('Rendering', 'Current layout does not support dynamic resizing, nothing was done');
         }
-        Logger.debug('Rendering', 'Resize finished');
+        Logger.trace('Rendering', 'Resize finished');
         Profiler.end('resize.total');
         if (finished) {
             this._notifyRenderFinished();
@@ -222,11 +222,7 @@ export class ScoreRenderer implements IScoreRenderer {
     }
 
     private _layoutAndRender(renderHints?: RenderHints): void {
-        Logger.debug(
-            'Rendering',
-            `Rendering at scale ${this.settings.display.scale} with layout ${this.layout!.name}`,
-            null
-        );
+        Logger.debug('Rendering', `Rendering at scale ${this.settings.display.scale} with layout ${this.layout!.name}`);
         Profiler.begin('render.layoutAndRender');
         this.layout!.layoutAndRender(renderHints);
         Profiler.end('render.layoutAndRender');

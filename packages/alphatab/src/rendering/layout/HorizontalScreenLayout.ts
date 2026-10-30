@@ -167,10 +167,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
                 canvas.color = this.renderer.settings.display.resources.mainGlyphColor;
                 canvas.textAlign = TextAlign.Left;
-                Logger.debug(
+                Logger.trace(
                     this.name,
-                    `Rendering partial from bar ${partial.masterBars[0].index} to ${partial.masterBars[partial.masterBars.length - 1].index}`,
-                    null
+                    `Rendering partial from bar ${partial.masterBars[0].index} to ${partial.masterBars[partial.masterBars.length - 1].index}`
                 );
                 this._system!.paintPartial(
                     -renderX,
@@ -217,10 +216,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
 
         partials.push(currentPartial);
-        Logger.debug(
+        Logger.trace(
             this.name,
-            `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
-            null
+            `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`
         );
 
         // start new partial

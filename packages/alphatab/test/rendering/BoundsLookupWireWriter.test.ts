@@ -17,12 +17,21 @@ import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLookupWire';
 import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
 import { Settings } from '@coderline/alphatab/Settings';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { LayoutCorpus } from '../layoutFlow/LayoutCorpus';
 
 // The web worker writes the bounds directly in wire format; that must equal the encoded lookup a
 // renderer builds without a worker, after every kind of render.
 describe('BoundsLookupWireWriter', () => {
+    let previousLogLevel = LogLevel.Info;
+    beforeAll(() => {
+        previousLogLevel = Logger.logLevel;
+        Logger.logLevel = LogLevel.None;
+    });
+    afterAll(() => {
+        Logger.logLevel = previousLogLevel;
+    });
+
     const configurations = [
         { layoutMode: LayoutMode.Page, includeNoteBounds: false, scale: 1 },
         { layoutMode: LayoutMode.Page, includeNoteBounds: true, scale: 1 },
@@ -40,7 +49,6 @@ describe('BoundsLookupWireWriter', () => {
         settings.core.logLevel = LogLevel.None;
         settings.display.scale = scale;
         settings.display.layoutMode = layoutMode;
-        Logger.logLevel = LogLevel.None;
         return settings;
     }
 

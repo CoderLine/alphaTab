@@ -14,19 +14,24 @@ describe('NumberedRestBeaming', () => {
         const settings = new Settings();
         settings.core.engine = 'svg';
         settings.core.logLevel = LogLevel.None;
+        const previousLogLevel = Logger.logLevel;
         Logger.logLevel = LogLevel.None;
-        const importer = new AlphaTexImporter();
-        importer.initFromString(tex, settings);
-        const score = importer.readScore();
+        try {
+            const importer = new AlphaTexImporter();
+            importer.initFromString(tex, settings);
+            const score = importer.readScore();
 
-        const errors: Error[] = [];
-        const renderer = new ScoreRenderer(settings);
-        renderer.error.on(e => {
-            errors.push(e);
-        });
-        renderer.width = 1300;
-        renderer.renderScore(score, [0]);
-        return errors;
+            const errors: Error[] = [];
+            const renderer = new ScoreRenderer(settings);
+            renderer.error.on(e => {
+                errors.push(e);
+            });
+            renderer.width = 1300;
+            renderer.renderScore(score, [0]);
+            return errors;
+        } finally {
+            Logger.logLevel = previousLogLevel;
+        }
     }
 
     function expectNoErrors(staff: string): void {

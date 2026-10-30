@@ -153,7 +153,7 @@ export class MidiFileGenerator {
             this._generateTrack(track);
         }
 
-        Logger.debug('Midi', 'Begin midi generation');
+        Logger.trace('Midi', 'Begin midi generation');
 
         this.syncPoints = [];
         let masterBarDuration = 0;
@@ -192,7 +192,7 @@ export class MidiFileGenerator {
             }
         );
 
-        Logger.debug('Midi', 'Midi generation done');
+        Logger.trace('Midi', 'Midi generation done');
     }
 
     private _detectTickShift() {

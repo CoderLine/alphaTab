@@ -447,7 +447,7 @@ export abstract class ScoreLayout {
     }
 
     private _createScoreInfoGlyphs(): void {
-        Logger.debug('ScoreLayout', 'Creating score info glyphs');
+        Logger.trace('ScoreLayout', 'Creating score info glyphs');
         const settings = this.renderer.settings;
         const score: Score = this.renderer.score!;
         this.headerGlyphs = new Map<ScoreSubElement, TextGlyph>();

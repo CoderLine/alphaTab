@@ -36,7 +36,7 @@ import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 import { TestOutput } from 'test/audio/TestOutput';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { LayoutCorpus } from '../layoutFlow/LayoutCorpus';
 
 /**
@@ -99,6 +99,15 @@ class LoopbackWorkerScope implements IAlphaTabWorkerGlobalScope<IAlphaSynthWorke
 // The synth worker receives the midi as MidiFileWire; the result must equal the public
 // midiFileToJsObject/jsObjectToMidiFile round trip.
 describe('MidiFileWire', () => {
+    let previousLogLevel = LogLevel.Info;
+    beforeAll(() => {
+        previousLogLevel = Logger.logLevel;
+        Logger.logLevel = LogLevel.None;
+    });
+    afterAll(() => {
+        Logger.logLevel = previousLogLevel;
+    });
+
     function generate(score: Score, settings: Settings): MidiFile {
         const midi = new MidiFile();
         new MidiFileGenerator(score, settings, new AlphaSynthMidiFileHandler(midi)).generate();
@@ -164,7 +173,6 @@ describe('MidiFileWire', () => {
     });
 
     it('corpus', () => {
-        Logger.logLevel = LogLevel.None;
         let compared = 0;
         let events = 0;
         for (const file of LayoutCorpus.files(process.cwd())) {

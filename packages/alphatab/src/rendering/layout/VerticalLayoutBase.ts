@@ -258,7 +258,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     }
 
     private _layoutAndRenderScoreInfo(y: number, totalHeight: number = -1): number {
-        Logger.debug(this.name, 'Layouting score info');
+        Logger.trace(this.name, 'Layouting score info');
 
         const e = new RenderFinishedEventArgs();
         e.x = 0;
@@ -520,7 +520,7 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _fitAndPaintSystem(system: StaffSystem, y: number, totalHeight: number): number {
         this._systems.push(system);
         this._fitSystem(system);
-        Logger.debug(this.name, `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`, null);
+        Logger.trace(this.name, `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`);
         return this._paintSystem(system, totalHeight === -1 ? y : totalHeight);
     }
 

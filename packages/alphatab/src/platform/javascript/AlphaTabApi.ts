@@ -290,7 +290,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
             );
         };
         request.onprogress = e => {
-            Logger.debug('AlphaSynth', `Soundfont downloading: ${e.loaded}/${e.total} bytes`);
+            Logger.trace('AlphaSynth', `Soundfont downloading: ${e.loaded}/${e.total} bytes`);
             const args = new ProgressEventArgs(e.loaded, e.total);
             (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(args);
             this.uiFacade.triggerEvent(this.container, 'soundFontLoad', args);

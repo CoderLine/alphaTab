@@ -215,7 +215,7 @@ export class MidiFileSequencer {
         this._mainState.currentTime = finalTime;
 
         const duration: number = Date.now() - start;
-        Logger.debug('Sequencer', `Silent seek finished in ${duration}ms (main)`);
+        Logger.trace('Sequencer', `Silent seek finished in ${duration}ms (main)`);
     }
 
     public loadOneTimeMidi(midiFile: MidiFile): void {
