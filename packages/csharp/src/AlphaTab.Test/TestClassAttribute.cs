@@ -1,5 +1,7 @@
 ﻿﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // ReSharper disable once CheckNamespace
@@ -18,14 +20,19 @@ public class TestClassAttribute : Microsoft.VisualStudio.TestTools.UnitTesting.T
 
 public class TestMethodAttribute : Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute
 {
-    public TestMethodAttribute(string displayName) : base(displayName)
+    public TestMethodAttribute(
+        string displayName,
+        [CallerFilePath] string callerFilePath = "",
+        [CallerLineNumber] int callerLineNumber = -1
+    ) : base(callerFilePath, callerLineNumber)
     {
+        DisplayName = displayName;
     }
 
-    public override TestResult[] Execute(ITestMethod testMethod)
+    public override async Task<TestResult[]> ExecuteAsync(ITestMethod testMethod)
     {
         TestMethodAccessor.CurrentTest = testMethod;
-        var result = base.Execute(testMethod);
+        var result = await base.ExecuteAsync(testMethod);
         TestMethodAccessor.CurrentTest = null;
         return result;
     }
