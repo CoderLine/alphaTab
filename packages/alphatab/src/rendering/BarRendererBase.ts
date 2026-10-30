@@ -561,19 +561,26 @@ export class BarRendererBase {
 
     private _registerOverlayRods(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
-        // all staves of a master bar share the layouting info; bands of different staves never share a row
-        const staffKey = `${this.bar.staff.track.index}/${this.bar.staff.index}/${this.staff!.staffId}`;
-        this._collectOverlayRods(this.topEffects, info, `${staffKey}/top`);
-        this._collectOverlayRods(this.bottomEffects, info, `${staffKey}/bottom`);
+        // all staves of a master bar share the layouting info; bands of different staves never share a row.
+        // A row is one side of one staff of the system, a band key one notation element in a row.
+        const staff = this.staff!;
+        const rowCount = staff.system.allStaves.length * 2;
+        this._collectOverlayRods(this.topEffects, info, staff.index * 2, rowCount);
+        this._collectOverlayRods(this.bottomEffects, info, staff.index * 2 + 1, rowCount);
     }
 
-    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo, rowKey: string): void {
+    private _collectOverlayRods(
+        container: EffectBandContainer,
+        info: BarLayoutingInfo,
+        row: number,
+        rowCount: number
+    ): void {
         for (const band of container.bands) {
             const policy = band.info.overlayRodPolicy;
             if (policy === undefined) {
                 continue;
             }
-            const bandKey = `${rowKey}/${band.info.notationElement}`;
+            const bandKey = band.info.notationElement * rowCount + row;
             for (const glyph of band.glyphs) {
                 if (!glyph.beat || glyph.width <= 0) {
                     continue;

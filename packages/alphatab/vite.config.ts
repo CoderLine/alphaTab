@@ -82,8 +82,14 @@ const preserveClassDeclarationsPlugin = (): Plugin => ({
     }
 });
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
     const config = defaultBuildUserConfig(__dirname);
+    if (command === 'build') {
+        // Rolldown's own TypeScript transform replaces enum member reads with their values across modules
+        // and drops enums nothing else references; Vite's per-file oxc transform cannot see other modules.
+        // The dev server does not bundle and needs Vite's transform.
+        config.oxc = false;
+    }
     config.plugins!.push(
         viteStaticCopy({
             // `stripBase` flattens so files land directly under `font/` and

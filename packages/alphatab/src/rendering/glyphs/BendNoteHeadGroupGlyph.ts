@@ -106,10 +106,15 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             x += this._preNoteParenthesis!.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
         }
         if (!this._accidentals.isEmpty) {
-            x += this._accidentals.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
-            this._accidentals.x = x;
             this._accidentals.renderer = this.renderer;
             this._accidentals.doLayout();
+            // the helper notes of bends and whammys (no parenthesis) keep the space of one more accidental
+            // group in front of their accidentals, the pre-bend notes do not
+            if (!this._showParenthesis) {
+                x += this._accidentals.width;
+            }
+            x += this.renderer.smuflMetrics.bendNoteHeadElementPadding;
+            this._accidentals.x = x;
             x += this._accidentals.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
         }
         this.noteStartX = x;

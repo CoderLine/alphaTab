@@ -222,12 +222,10 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
 
         if (own) {
-            own.topLedgerLineTrimRight = sharesTop ? ownTrim : 0;
-            own.bottomLedgerLineTrimRight = sharesBottom ? ownTrim : 0;
+            own.setLedgerLineTrimsRight(sharesTop ? ownTrim : 0, sharesBottom ? ownTrim : 0);
         }
         if (other) {
-            other.topLedgerLineTrimLeft = sharesTop ? otherTrim : 0;
-            other.bottomLedgerLineTrimLeft = sharesBottom ? otherTrim : 0;
+            other.setLedgerLineTrimsLeft(sharesTop ? otherTrim : 0, sharesBottom ? otherTrim : 0);
         }
     }
 

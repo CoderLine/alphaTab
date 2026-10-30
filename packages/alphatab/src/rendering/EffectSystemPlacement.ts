@@ -150,15 +150,21 @@ export class EffectSystemPlacement {
         return Math.max(0, Math.ceil(max - contentOverflow));
     }
 
-    /** Sort by precomputed {@link EffectBand.sortKey} (placementCategory, order desc, voice, renderer). */
+    /**
+     * Stable sort by precomputed {@link EffectBand.sortKey} (placementCategory, order desc, voice, renderer).
+     * An in-place insertion sort: `sort` copies the list into a temporary store on every call.
+     */
     private static _sortByPriority(bands: EffectBand[]): void {
-        if (bands.length > 1) {
-            bands.sort(EffectSystemPlacement._compareSortKey);
+        for (let i = 1, n = bands.length; i < n; i++) {
+            const band = bands[i];
+            const key = band.sortKey;
+            let j = i - 1;
+            while (j >= 0 && bands[j].sortKey > key) {
+                bands[j + 1] = bands[j];
+                j--;
+            }
+            bands[j + 1] = band;
         }
-    }
-
-    private static _compareSortKey(a: EffectBand, b: EffectBand): number {
-        return a.sortKey - b.sortKey;
     }
 
     private _placeSide(

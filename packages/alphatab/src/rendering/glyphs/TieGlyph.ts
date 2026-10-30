@@ -327,9 +327,13 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
      * by the bounding box (x, y, w, h).
      */
     public static newControlPoints(): number[] {
-        const cps: number[] = [];
-        for (let i = 0; i < 18; i++) {
-            cps.push(0);
+        // the fractional literal makes JS engines store the list as doubles from the start, so the
+        // fractional coordinates written into it do not reallocate it (`fill` would make it an integer list again)
+        const cps: number[] = [
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
+        ];
+        for (let i = 0; i < cps.length; i++) {
+            cps[i] = 0;
         }
         return cps;
     }

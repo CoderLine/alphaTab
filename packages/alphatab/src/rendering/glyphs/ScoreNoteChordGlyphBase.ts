@@ -329,6 +329,17 @@ export class ScoreChordNoteHeadInfo {
 }
 
 /**
+ * How much the ledger lines above (top) or below (bottom) the staff are shortened on the left or right side.
+ * @internal
+ */
+export class LedgerLineTrims {
+    public topLeft: number = 0;
+    public topRight: number = 0;
+    public bottomLeft: number = 0;
+    public bottomRight: number = 0;
+}
+
+/**
  * @internal
  */
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
@@ -349,18 +360,55 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
     public noteStartX: number = 0;
 
-    public hasTopLedgerLines: boolean = false;
-    public hasBottomLedgerLines: boolean = false;
+    public get hasTopLedgerLines(): boolean {
+        if (!this.minStepsNote) {
+            return false;
+        }
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        return scoreRenderer.getLineY(-1) >= scoreRenderer.getLineY(this.minStepsNote!.steps / 2);
+    }
+
+    public get hasBottomLedgerLines(): boolean {
+        if (!this.minStepsNote) {
+            return false;
+        }
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        return (
+            scoreRenderer.getLineY(scoreRenderer.drawnLineCount) <= scoreRenderer.getLineY(this.maxStepsNote!.steps / 2)
+        );
+    }
 
     /**
-     * How much the ledger lines above (top) or below (bottom) the staff are shortened on the left or right
-     * side, to keep them apart from the ledger lines of the neighbouring beat (Behind Bars, p. 26:
-     * ledger lines of adjacent notes should not join up, they may be slightly shortened in cramped conditions).
+     * How much the ledger lines are shortened to keep them apart from the ledger lines of the neighbouring
+     * beat (Behind Bars, p. 26: ledger lines of adjacent notes should not join up, they may be slightly
+     * shortened in cramped conditions). `null` while no ledger line was shortened.
      */
-    public topLedgerLineTrimLeft: number = 0;
-    public topLedgerLineTrimRight: number = 0;
-    public bottomLedgerLineTrimLeft: number = 0;
-    public bottomLedgerLineTrimRight: number = 0;
+    private _ledgerLineTrims: LedgerLineTrims | null = null;
+
+    public setLedgerLineTrimsLeft(top: number, bottom: number): void {
+        const trims = this._ensureLedgerLineTrims(top, bottom);
+        if (trims) {
+            trims.topLeft = top;
+            trims.bottomLeft = bottom;
+        }
+    }
+
+    public setLedgerLineTrimsRight(top: number, bottom: number): void {
+        const trims = this._ensureLedgerLineTrims(top, bottom);
+        if (trims) {
+            trims.topRight = top;
+            trims.bottomRight = bottom;
+        }
+    }
+
+    private _ensureLedgerLineTrims(top: number, bottom: number): LedgerLineTrims | null {
+        let trims = this._ledgerLineTrims;
+        if (!trims && (top !== 0 || bottom !== 0)) {
+            trims = new LedgerLineTrims();
+            this._ledgerLineTrims = trims;
+        }
+        return trims;
+    }
 
     /**
      * How far the ledger lines reach beyond the note heads on each side (before shortening).
@@ -517,25 +565,10 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         this._updateSizes(noteGroup);
 
-        this._updateLedgerLineSides();
-
         if (info) {
             this._noteGroup = noteGroup;
             this._noteHeadInfo = info;
         }
-    }
-
-    private _updateLedgerLineSides() {
-        if (!this.minStepsNote) {
-            this.hasTopLedgerLines = false;
-            this.hasBottomLedgerLines = false;
-            return;
-        }
-        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        this.hasTopLedgerLines = scoreRenderer.getLineY(-1) >= scoreRenderer.getLineY(this.minStepsNote!.steps / 2);
-        this.hasBottomLedgerLines =
-            scoreRenderer.getLineY(scoreRenderer.drawnLineCount) <=
-            scoreRenderer.getLineY(this.maxStepsNote!.steps / 2);
     }
 
     private _updateSizes(noteGroup: ScoreChordNoteHeadGroup) {
@@ -721,13 +754,18 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             const maxNoteLineY = scoreRenderer.getLineY(this.maxStepsNote!.steps / 2);
 
             const lineYOffset = (this.renderer.smuflMetrics.legerLineThickness * scale) / 2;
+            const trims = this._ledgerLineTrims;
+            const topTrimLeft = trims ? trims.topLeft : 0;
+            const topTrimRight = trims ? trims.topRight : 0;
+            const bottomTrimLeft = trims ? trims.bottomLeft : 0;
+            const bottomTrimRight = trims ? trims.bottomRight : 0;
 
             let y = firstTopLedgerY;
             while (y >= minNoteLineY) {
                 canvas.fillRect(
-                    cx - lineExtension + this.noteStartX + this.topLedgerLineTrimLeft,
+                    cx - lineExtension + this.noteStartX + topTrimLeft,
                     cy + y - lineYOffset,
-                    lineWidth - this.topLedgerLineTrimLeft - this.topLedgerLineTrimRight,
+                    lineWidth - topTrimLeft - topTrimRight,
                     this.renderer.smuflMetrics.legerLineThickness * scale
                 );
                 y -= lineSpacing;
@@ -736,9 +774,9 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             y = firstBottomLedgerY;
             while (y <= maxNoteLineY) {
                 canvas.fillRect(
-                    cx - lineExtension + this.noteStartX + this.bottomLedgerLineTrimLeft,
+                    cx - lineExtension + this.noteStartX + bottomTrimLeft,
                     cy + y - lineYOffset,
-                    lineWidth - this.bottomLedgerLineTrimLeft - this.bottomLedgerLineTrimRight,
+                    lineWidth - bottomTrimLeft - bottomTrimRight,
                     this.renderer.smuflMetrics.legerLineThickness * scale
                 );
                 y += lineSpacing;

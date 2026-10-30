@@ -35,10 +35,13 @@ export class SkylineShape {
     }
 
     public clear(): void {
-        this._xStarts.splice(0, this._xStarts.length);
-        this._xEnds.splice(0, this._xEnds.length);
-        this._tops.splice(0, this._tops.length);
-        this._bottoms.splice(0, this._bottoms.length);
+        // pop() keeps the backing stores for the next shape (splice allocates the removed part)
+        while (this._xStarts.length > 0) {
+            this._xStarts.pop();
+            this._xEnds.pop();
+            this._tops.pop();
+            this._bottoms.pop();
+        }
     }
 
     public addBox(left: number, top: number, right: number, bottom: number): void {

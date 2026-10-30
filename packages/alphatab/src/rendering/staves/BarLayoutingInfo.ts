@@ -103,13 +103,13 @@ export class BarLayoutingInfo implements IHeaderRodSink {
      * pair-overlap evaluates each band independently. Same-band, same-timePosition
      * registrations max-merge.
      */
-    private _overlayRodsByBand: Map<string, Map<number, OverlayRod>> = new Map();
+    private _overlayRodsByBand: Map<number, Map<number, OverlayRod>> = new Map();
 
     /**
      * Per-band time-sorted view of {@link _overlayRodsByBand}. Maintained on insert
      * via the same insertion-sort {@link addSpring} uses on {@link _timeSortedSprings}.
      */
-    private _timeSortedOverlayRodsByBand: Map<string, OverlayRod[]> = new Map();
+    private _timeSortedOverlayRodsByBand: Map<number, OverlayRod[]> = new Map();
 
     // the duration reference of the spacing formula, shared by all bars of a layout,
     // or lowered by the bar's own springs when no reference was given
@@ -467,7 +467,7 @@ export class BarLayoutingInfo implements IHeaderRodSink {
      * (one band row: staff, side and notation element). Same-band, same-timePosition
      * duplicates max-merge.
      */
-    public addOverlayRod(bandKey: string, timePosition: number, leftExtent: number, rightExtent: number): void {
+    public addOverlayRod(bandKey: number, timePosition: number, leftExtent: number, rightExtent: number): void {
         this.version++;
         let bandMap = this._overlayRodsByBand.get(bandKey);
         let bandSorted = this._timeSortedOverlayRodsByBand.get(bandKey);
