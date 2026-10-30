@@ -65,6 +65,7 @@ function createDepsOptimizer(config: ResolvedConfig) {
     };
     const depsOptimizer: DepsOptimizer = {
         async init() {},
+        initState: 'initialized',
         metadata,
         registerMissingImport: notImplemented,
         run: notImplemented,
