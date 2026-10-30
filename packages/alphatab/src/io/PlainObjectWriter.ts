@@ -1,5 +1,6 @@
 /** @target web */
 import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
+import type { RecordFields } from '@coderline/alphatab/io/RecordFields';
 
 /**
  * Builds plain objects for records and `Map`s for maps, so that map keys keep their order through a structured
@@ -14,6 +15,8 @@ export class PlainObjectWriter implements IObjectWriter {
     private _parentObjects: (Record<string, unknown> | null)[] = [];
     private _parentMaps: (Map<string, unknown> | null)[] = [];
     private _parentArrays: (unknown[] | null)[] = [];
+    private _fields: RecordFields | null = null;
+    private _parentFields: (RecordFields | null)[] = [];
     private _key: string = '';
 
     /**
@@ -48,13 +51,16 @@ export class PlainObjectWriter implements IObjectWriter {
         this._array = this._parentArrays.pop() ?? null;
     }
 
-    public startObject(): void {
+    public startObject(fields: RecordFields): void {
+        this._parentFields.push(this._fields);
+        this._fields = fields;
         const o: Record<string, unknown> = {};
         this._add(o);
         this._push(o, null, null);
     }
 
     public endObject(): void {
+        this._fields = this._parentFields.pop() ?? null;
         this._pop();
     }
 
@@ -82,8 +88,38 @@ export class PlainObjectWriter implements IObjectWriter {
         this._key = name;
     }
 
-    public field(_id: number, name: string): void {
-        this._key = name;
+    public field(id: number): void {
+        this._key = this._fields!.names[id];
+    }
+
+    public numberField(id: number, v: number): void {
+        this.field(id);
+        this.writeNumber(v);
+    }
+
+    public booleanField(id: number, v: boolean): void {
+        this.field(id);
+        this.writeBoolean(v);
+    }
+
+    public stringField(id: number, v: string): void {
+        this.field(id);
+        this.writeString(v);
+    }
+
+    public valueField(id: number, v: unknown): void {
+        this.field(id);
+        this.writeValue(v);
+    }
+
+    public arrayField(id: number, length: number): void {
+        this.field(id);
+        this.startArray(length);
+    }
+
+    public mapField(id: number): void {
+        this.field(id);
+        this.startMap();
     }
 
     public writeNumber(v: number): void {

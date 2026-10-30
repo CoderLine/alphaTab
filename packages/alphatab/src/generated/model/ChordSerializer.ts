@@ -5,99 +5,54 @@
 // </auto-generated>
 import { Chord } from "@coderline/alphatab/model/Chord";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class ChordSerializer {
-    public static fromJson(obj: Chord, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        ChordSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Chord, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ChordSerializer._readField(obj, id, rr) : ChordSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Chord, property: string, r: IObjectReader): boolean {
-        const id = ChordSerializer._fieldId(property);
-        return id >= 0 ? ChordSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "name":
-                return 0;
-            case "firstfret":
-                return 1;
-            case "strings":
-                return 2;
-            case "barrefrets":
-                return 3;
-            case "showname":
-                return 4;
-            case "showdiagram":
-                return 5;
-            case "showfingering":
-                return 6;
-        }
-        return -1;
-    }
-    private static _readField(obj: Chord, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.name = r.readString();
-                return true;
-            case 1:
-                obj.firstFret = r.readNumber();
-                return true;
-            case 2:
-                obj.strings = r.readValue()! as number[];
-                return true;
-            case 3:
-                obj.barreFrets = r.readValue()! as number[];
-                return true;
-            case 4:
-                obj.showName = r.readBoolean();
-                return true;
-            case 5:
-                obj.showDiagram = r.readBoolean();
-                return true;
-            case 6:
-                obj.showFingering = r.readBoolean();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: Chord | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        ChordSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["name", "firstfret", "strings", "barrefrets", "showname", "showdiagram", "showfingering"]);
+    public static read(obj: Chord, reader: IObjectReader): void {
+        reader.readRecord(ChordSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.name = r.readString();
+                    return true;
+                case 1:
+                    obj.firstFret = r.readNumber();
+                    return true;
+                case 2:
+                    obj.strings = r.readValue()! as number[];
+                    return true;
+                case 3:
+                    obj.barreFrets = r.readValue()! as number[];
+                    return true;
+                case 4:
+                    obj.showName = r.readBoolean();
+                    return true;
+                case 5:
+                    obj.showDiagram = r.readBoolean();
+                    return true;
+                case 6:
+                    obj.showFingering = r.readBoolean();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: Chord | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "name");
-        w.writeString(obj.name);
-        w.field(1, "firstfret");
-        w.writeNumber(obj.firstFret);
-        w.field(2, "strings");
-        w.writeValue(obj.strings);
-        w.field(3, "barrefrets");
-        w.writeValue(obj.barreFrets);
-        w.field(4, "showname");
-        w.writeBoolean(obj.showName);
-        w.field(5, "showdiagram");
-        w.writeBoolean(obj.showDiagram);
-        w.field(6, "showfingering");
-        w.writeBoolean(obj.showFingering);
+        w.startObject(ChordSerializer._fields);
+        w.stringField(0, obj.name);
+        w.numberField(1, obj.firstFret);
+        w.valueField(2, obj.strings);
+        w.valueField(3, obj.barreFrets);
+        w.booleanField(4, obj.showName);
+        w.booleanField(5, obj.showDiagram);
+        w.booleanField(6, obj.showFingering);
         w.endObject();
     }
 }

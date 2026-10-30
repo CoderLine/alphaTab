@@ -5,7 +5,7 @@
 // </auto-generated>
 import { Bar } from "@coderline/alphatab/model/Bar";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { Clef } from "@coderline/alphatab/model/Clef";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Ottavia } from "@coderline/alphatab/model/Ottavia";
@@ -25,156 +25,101 @@ import { NumberedBarOverrideSerializer } from "@coderline/alphatab/generated/mod
 import { BarStyle } from "@coderline/alphatab/model/Bar";
 import { BarStyleSerializer } from "@coderline/alphatab/generated/model/BarStyleSerializer";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class BarSerializer {
-    public static fromJson(obj: Bar, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        BarSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Bar, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? BarSerializer._readField(obj, id, rr) : BarSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Bar, property: string, r: IObjectReader): boolean {
-        const id = BarSerializer._fieldId(property);
-        return id >= 0 ? BarSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "id":
-                return 0;
-            case "clef":
-                return 1;
-            case "clefottava":
-                return 2;
-            case "voices":
-                return 3;
-            case "similemark":
-                return 4;
-            case "displayscale":
-                return 5;
-            case "displaywidth":
-                return 6;
-            case "sustainpedals":
-                return 7;
-            case "barlineleft":
-                return 8;
-            case "barlineright":
-                return 9;
-            case "keysignature":
-                return 10;
-            case "keysignaturetype":
-                return 11;
-            case "barnumberdisplay":
-                return 12;
-            case "scoredisplay":
-                return 13;
-            case "tabdisplay":
-                return 14;
-            case "slashdisplay":
-                return 15;
-            case "numbereddisplay":
-                return 16;
-            case "style":
-                return 17;
-        }
-        return -1;
-    }
-    private static _readField(obj: Bar, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.id = r.readNumber();
-                return true;
-            case 1:
-                obj.clef = JsonHelper.parseEnum<Clef>(r.readValue(), Clef)!;
-                return true;
-            case 2:
-                obj.clefOttava = JsonHelper.parseEnum<Ottavia>(r.readValue(), Ottavia)!;
-                return true;
-            case 3:
-                BarSerializer._readVoices(obj, r);
-                return true;
-            case 4:
-                obj.simileMark = JsonHelper.parseEnum<SimileMark>(r.readValue(), SimileMark)!;
-                return true;
-            case 5:
-                obj.displayScale = r.readNumber();
-                return true;
-            case 6:
-                obj.displayWidth = r.readNumber();
-                return true;
-            case 7:
-                BarSerializer._readSustainPedals(obj, r);
-                return true;
-            case 8:
-                obj.barLineLeft = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
-                return true;
-            case 9:
-                obj.barLineRight = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
-                return true;
-            case 10:
-                obj.keySignature = JsonHelper.parseEnum<KeySignature>(r.readValue(), KeySignature)!;
-                return true;
-            case 11:
-                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(r.readValue(), KeySignatureType)!;
-                return true;
-            case 12:
-                obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
-                return true;
-            case 13:
-                if (r.isNullish()) {
-                    obj.scoreDisplay = undefined;
-                }
-                else {
-                    obj.scoreDisplay = {};
-                    ScoreBarOverrideSerializer.readFlexible(obj.scoreDisplay, r);
-                }
-                return true;
-            case 14:
-                if (r.isNullish()) {
-                    obj.tabDisplay = undefined;
-                }
-                else {
-                    obj.tabDisplay = {};
-                    TabBarOverrideSerializer.readFlexible(obj.tabDisplay, r);
-                }
-                return true;
-            case 15:
-                if (r.isNullish()) {
-                    obj.slashDisplay = undefined;
-                }
-                else {
-                    obj.slashDisplay = {};
-                    SlashBarOverrideSerializer.readFlexible(obj.slashDisplay, r);
-                }
-                return true;
-            case 16:
-                if (r.isNullish()) {
-                    obj.numberedDisplay = undefined;
-                }
-                else {
-                    obj.numberedDisplay = {};
-                    NumberedBarOverrideSerializer.readFlexible(obj.numberedDisplay, r);
-                }
-                return true;
-            case 17:
-                if (r.isNullish()) {
-                    obj.style = undefined;
-                }
-                else {
-                    obj.style = new BarStyle();
-                    BarStyleSerializer.read(obj.style, r);
-                }
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["id", "clef", "clefottava", "voices", "similemark", "displayscale", "displaywidth", "sustainpedals", "barlineleft", "barlineright", "keysignature", "keysignaturetype", "barnumberdisplay", "scoredisplay", "tabdisplay", "slashdisplay", "numbereddisplay", "style"]);
+    public static read(obj: Bar, reader: IObjectReader): void {
+        reader.readRecord(BarSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.id = r.readNumber();
+                    return true;
+                case 1:
+                    obj.clef = JsonHelper.parseEnum<Clef>(r.readValue(), Clef)!;
+                    return true;
+                case 2:
+                    obj.clefOttava = JsonHelper.parseEnum<Ottavia>(r.readValue(), Ottavia)!;
+                    return true;
+                case 3:
+                    BarSerializer._readVoices(obj, r);
+                    return true;
+                case 4:
+                    obj.simileMark = JsonHelper.parseEnum<SimileMark>(r.readValue(), SimileMark)!;
+                    return true;
+                case 5:
+                    obj.displayScale = r.readNumber();
+                    return true;
+                case 6:
+                    obj.displayWidth = r.readNumber();
+                    return true;
+                case 7:
+                    BarSerializer._readSustainPedals(obj, r);
+                    return true;
+                case 8:
+                    obj.barLineLeft = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
+                    return true;
+                case 9:
+                    obj.barLineRight = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
+                    return true;
+                case 10:
+                    obj.keySignature = JsonHelper.parseEnum<KeySignature>(r.readValue(), KeySignature)!;
+                    return true;
+                case 11:
+                    obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(r.readValue(), KeySignatureType)!;
+                    return true;
+                case 12:
+                    obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
+                    return true;
+                case 13:
+                    if (r.isNullish()) {
+                        obj.scoreDisplay = undefined;
+                    }
+                    else {
+                        obj.scoreDisplay = {};
+                        ScoreBarOverrideSerializer.readFlexible(obj.scoreDisplay, r);
+                    }
+                    return true;
+                case 14:
+                    if (r.isNullish()) {
+                        obj.tabDisplay = undefined;
+                    }
+                    else {
+                        obj.tabDisplay = {};
+                        TabBarOverrideSerializer.readFlexible(obj.tabDisplay, r);
+                    }
+                    return true;
+                case 15:
+                    if (r.isNullish()) {
+                        obj.slashDisplay = undefined;
+                    }
+                    else {
+                        obj.slashDisplay = {};
+                        SlashBarOverrideSerializer.readFlexible(obj.slashDisplay, r);
+                    }
+                    return true;
+                case 16:
+                    if (r.isNullish()) {
+                        obj.numberedDisplay = undefined;
+                    }
+                    else {
+                        obj.numberedDisplay = {};
+                        NumberedBarOverrideSerializer.readFlexible(obj.numberedDisplay, r);
+                    }
+                    return true;
+                case 17:
+                    if (r.isNullish()) {
+                        obj.style = undefined;
+                    }
+                    else {
+                        obj.style = new BarStyle();
+                        BarStyleSerializer.read(obj.style, r);
+                    }
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readVoices(obj: Bar, r: IObjectReader): void {
         obj.voices = [];
@@ -192,69 +137,51 @@ export class BarSerializer {
             obj.sustainPedals.push(i);
         });
     }
-    public static toJson(obj: Bar | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        BarSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: Bar | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "id");
-        w.writeNumber(obj.id);
-        w.field(1, "clef");
-        w.writeNumber(obj.clef as number);
-        w.field(2, "clefottava");
-        w.writeNumber(obj.clefOttava as number);
-        w.field(3, "voices");
-        w.startArray(obj.voices!.length);
+        w.startObject(BarSerializer._fields);
+        w.numberField(0, obj.id);
+        w.numberField(1, obj.clef as number);
+        w.numberField(2, obj.clefOttava as number);
+        w.arrayField(3, obj.voices!.length);
         for (const i of obj.voices!) {
             VoiceSerializer.write(i, w);
         }
         w.endArray();
-        w.field(4, "similemark");
-        w.writeNumber(obj.simileMark as number);
-        w.field(5, "displayscale");
-        w.writeNumber(obj.displayScale);
-        w.field(6, "displaywidth");
-        w.writeNumber(obj.displayWidth);
-        w.field(7, "sustainpedals");
-        w.startArray(obj.sustainPedals!.length);
+        w.numberField(4, obj.simileMark as number);
+        w.numberField(5, obj.displayScale);
+        w.numberField(6, obj.displayWidth);
+        w.arrayField(7, obj.sustainPedals!.length);
         for (const i of obj.sustainPedals!) {
             SustainPedalMarkerSerializer.write(i, w);
         }
         w.endArray();
-        w.field(8, "barlineleft");
-        w.writeNumber(obj.barLineLeft as number);
-        w.field(9, "barlineright");
-        w.writeNumber(obj.barLineRight as number);
-        w.field(10, "keysignature");
-        w.writeNumber(obj.keySignature as number);
-        w.field(11, "keysignaturetype");
-        w.writeNumber(obj.keySignatureType as number);
-        w.field(12, "barnumberdisplay");
-        w.writeValue(obj.barNumberDisplay as number | undefined);
+        w.numberField(8, obj.barLineLeft as number);
+        w.numberField(9, obj.barLineRight as number);
+        w.numberField(10, obj.keySignature as number);
+        w.numberField(11, obj.keySignatureType as number);
+        w.valueField(12, obj.barNumberDisplay as number | undefined);
         if (obj.scoreDisplay) {
-            w.field(13, "scoredisplay");
+            w.field(13);
             ScoreBarOverrideSerializer.write(obj.scoreDisplay, w);
         }
         if (obj.tabDisplay) {
-            w.field(14, "tabdisplay");
+            w.field(14);
             TabBarOverrideSerializer.write(obj.tabDisplay, w);
         }
         if (obj.slashDisplay) {
-            w.field(15, "slashdisplay");
+            w.field(15);
             SlashBarOverrideSerializer.write(obj.slashDisplay, w);
         }
         if (obj.numberedDisplay) {
-            w.field(16, "numbereddisplay");
+            w.field(16);
             NumberedBarOverrideSerializer.write(obj.numberedDisplay, w);
         }
         if (obj.style) {
-            w.field(17, "style");
+            w.field(17);
             BarStyleSerializer.write(obj.style, w);
         }
         w.endObject();

@@ -5,7 +5,7 @@
 // </auto-generated>
 import { MasterBar } from "@coderline/alphatab/model/MasterBar";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { KeySignature } from "@coderline/alphatab/model/KeySignature";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { KeySignatureType } from "@coderline/alphatab/model/KeySignatureType";
@@ -20,165 +20,100 @@ import { Fermata } from "@coderline/alphatab/model/Fermata";
 import { FermataSerializer } from "@coderline/alphatab/generated/model/FermataSerializer";
 import { Direction } from "@coderline/alphatab/model/Direction";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class MasterBarSerializer {
-    public static fromJson(obj: MasterBar, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        MasterBarSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: MasterBar, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? MasterBarSerializer._readField(obj, id, rr) : MasterBarSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: MasterBar, property: string, r: IObjectReader): boolean {
-        const id = MasterBarSerializer._fieldId(property);
-        return id >= 0 ? MasterBarSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "alternateendings":
-                return 0;
-            case "custombarnumbertext":
-                return 1;
-            case "custombarnumber":
-                return 2;
-            case "keysignature":
-                return 3;
-            case "keysignaturetype":
-                return 4;
-            case "isdoublebar":
-                return 5;
-            case "isrepeatstart":
-                return 6;
-            case "repeatcount":
-                return 7;
-            case "timesignaturenumerator":
-                return 8;
-            case "timesignaturedenominator":
-                return 9;
-            case "timesignaturecommon":
-                return 10;
-            case "beamingrules":
-                return 11;
-            case "isfreetime":
-                return 12;
-            case "tripletfeel":
-                return 13;
-            case "section":
-                return 14;
-            case "tempoautomations":
-                return 15;
-            case "syncpoints":
-                return 16;
-            case "fermata":
-                return 17;
-            case "start":
-                return 18;
-            case "isanacrusis":
-                return 19;
-            case "displayscale":
-                return 20;
-            case "displaywidth":
-                return 21;
-            case "directions":
-                return 22;
-        }
-        return -1;
-    }
-    private static _readField(obj: MasterBar, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.alternateEndings = r.readNumber();
-                return true;
-            case 1:
-                obj.customBarNumberText = r.readValue() as string | undefined;
-                return true;
-            case 2:
-                obj.customBarNumber = r.readValue() as number | undefined;
-                return true;
-            case 3:
-                obj.keySignature = JsonHelper.parseEnum<KeySignature>(r.readValue(), KeySignature)!;
-                return true;
-            case 4:
-                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(r.readValue(), KeySignatureType)!;
-                return true;
-            case 5:
-                obj.isDoubleBar = r.readBoolean();
-                return true;
-            case 6:
-                obj.isRepeatStart = r.readBoolean();
-                return true;
-            case 7:
-                obj.repeatCount = r.readNumber();
-                return true;
-            case 8:
-                obj.timeSignatureNumerator = r.readNumber();
-                return true;
-            case 9:
-                obj.timeSignatureDenominator = r.readNumber();
-                return true;
-            case 10:
-                obj.timeSignatureCommon = r.readBoolean();
-                return true;
-            case 11:
-                if (r.isNullish()) {
-                    obj.beamingRules = undefined;
-                }
-                else {
-                    obj.beamingRules = new BeamingRules();
-                    BeamingRulesSerializer.read(obj.beamingRules, r);
-                }
-                return true;
-            case 12:
-                obj.isFreeTime = r.readBoolean();
-                return true;
-            case 13:
-                obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(r.readValue(), TripletFeel)!;
-                return true;
-            case 14:
-                if (r.isNullish()) {
-                    obj.section = null;
-                }
-                else {
-                    obj.section = new Section();
-                    SectionSerializer.read(obj.section, r);
-                }
-                return true;
-            case 15:
-                MasterBarSerializer._readTempoAutomations(obj, r);
-                return true;
-            case 16:
-                MasterBarSerializer._readSyncPoints(obj, r);
-                return true;
-            case 17:
-                MasterBarSerializer._readFermata(obj, r);
-                return true;
-            case 18:
-                obj.start = r.readNumber();
-                return true;
-            case 19:
-                obj.isAnacrusis = r.readBoolean();
-                return true;
-            case 20:
-                obj.displayScale = r.readNumber();
-                return true;
-            case 21:
-                obj.displayWidth = r.readNumber();
-                return true;
-            case 22:
-                for (const i of (r.readValue() as number[])) {
-                    obj.addDirection(JsonHelper.parseEnum<Direction>(i, Direction)!);
-                }
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["alternateendings", "custombarnumbertext", "custombarnumber", "keysignature", "keysignaturetype", "isdoublebar", "isrepeatstart", "repeatcount", "timesignaturenumerator", "timesignaturedenominator", "timesignaturecommon", "beamingrules", "isfreetime", "tripletfeel", "section", "tempoautomations", "syncpoints", "fermata", "start", "isanacrusis", "displayscale", "displaywidth", "directions"]);
+    public static read(obj: MasterBar, reader: IObjectReader): void {
+        reader.readRecord(MasterBarSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.alternateEndings = r.readNumber();
+                    return true;
+                case 1:
+                    obj.customBarNumberText = r.readValue() as string | undefined;
+                    return true;
+                case 2:
+                    obj.customBarNumber = r.readValue() as number | undefined;
+                    return true;
+                case 3:
+                    obj.keySignature = JsonHelper.parseEnum<KeySignature>(r.readValue(), KeySignature)!;
+                    return true;
+                case 4:
+                    obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(r.readValue(), KeySignatureType)!;
+                    return true;
+                case 5:
+                    obj.isDoubleBar = r.readBoolean();
+                    return true;
+                case 6:
+                    obj.isRepeatStart = r.readBoolean();
+                    return true;
+                case 7:
+                    obj.repeatCount = r.readNumber();
+                    return true;
+                case 8:
+                    obj.timeSignatureNumerator = r.readNumber();
+                    return true;
+                case 9:
+                    obj.timeSignatureDenominator = r.readNumber();
+                    return true;
+                case 10:
+                    obj.timeSignatureCommon = r.readBoolean();
+                    return true;
+                case 11:
+                    if (r.isNullish()) {
+                        obj.beamingRules = undefined;
+                    }
+                    else {
+                        obj.beamingRules = new BeamingRules();
+                        BeamingRulesSerializer.read(obj.beamingRules, r);
+                    }
+                    return true;
+                case 12:
+                    obj.isFreeTime = r.readBoolean();
+                    return true;
+                case 13:
+                    obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(r.readValue(), TripletFeel)!;
+                    return true;
+                case 14:
+                    if (r.isNullish()) {
+                        obj.section = null;
+                    }
+                    else {
+                        obj.section = new Section();
+                        SectionSerializer.read(obj.section, r);
+                    }
+                    return true;
+                case 15:
+                    MasterBarSerializer._readTempoAutomations(obj, r);
+                    return true;
+                case 16:
+                    MasterBarSerializer._readSyncPoints(obj, r);
+                    return true;
+                case 17:
+                    MasterBarSerializer._readFermata(obj, r);
+                    return true;
+                case 18:
+                    obj.start = r.readNumber();
+                    return true;
+                case 19:
+                    obj.isAnacrusis = r.readBoolean();
+                    return true;
+                case 20:
+                    obj.displayScale = r.readNumber();
+                    return true;
+                case 21:
+                    obj.displayWidth = r.readNumber();
+                    return true;
+                case 22:
+                    for (const i of (r.readValue() as number[])) {
+                        obj.addDirection(JsonHelper.parseEnum<Direction>(i, Direction)!);
+                    }
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readTempoAutomations(obj: MasterBar, r: IObjectReader): void {
         obj.tempoAutomations = [];
@@ -207,85 +142,61 @@ export class MasterBarSerializer {
             return true;
         });
     }
-    public static toJson(obj: MasterBar | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        MasterBarSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: MasterBar | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "alternateendings");
-        w.writeNumber(obj.alternateEndings);
-        w.field(1, "custombarnumbertext");
-        w.writeValue(obj.customBarNumberText);
-        w.field(2, "custombarnumber");
-        w.writeValue(obj.customBarNumber);
-        w.field(5, "isdoublebar");
-        w.writeBoolean(obj.isDoubleBar);
-        w.field(6, "isrepeatstart");
-        w.writeBoolean(obj.isRepeatStart);
-        w.field(7, "repeatcount");
-        w.writeNumber(obj.repeatCount);
-        w.field(8, "timesignaturenumerator");
-        w.writeNumber(obj.timeSignatureNumerator);
-        w.field(9, "timesignaturedenominator");
-        w.writeNumber(obj.timeSignatureDenominator);
-        w.field(10, "timesignaturecommon");
-        w.writeBoolean(obj.timeSignatureCommon);
+        w.startObject(MasterBarSerializer._fields);
+        w.numberField(0, obj.alternateEndings);
+        w.valueField(1, obj.customBarNumberText);
+        w.valueField(2, obj.customBarNumber);
+        w.booleanField(5, obj.isDoubleBar);
+        w.booleanField(6, obj.isRepeatStart);
+        w.numberField(7, obj.repeatCount);
+        w.numberField(8, obj.timeSignatureNumerator);
+        w.numberField(9, obj.timeSignatureDenominator);
+        w.booleanField(10, obj.timeSignatureCommon);
         if (obj.beamingRules) {
-            w.field(11, "beamingrules");
+            w.field(11);
             BeamingRulesSerializer.write(obj.beamingRules, w);
         }
-        w.field(12, "isfreetime");
-        w.writeBoolean(obj.isFreeTime);
-        w.field(13, "tripletfeel");
-        w.writeNumber(obj.tripletFeel as number);
+        w.booleanField(12, obj.isFreeTime);
+        w.numberField(13, obj.tripletFeel as number);
         if (obj.section) {
-            w.field(14, "section");
+            w.field(14);
             SectionSerializer.write(obj.section, w);
         }
-        w.field(15, "tempoautomations");
-        w.startArray(obj.tempoAutomations!.length);
+        w.arrayField(15, obj.tempoAutomations!.length);
         for (const i of obj.tempoAutomations!) {
             AutomationSerializer.write(i, w);
         }
         w.endArray();
         if (obj.syncPoints !== undefined) {
-            w.field(16, "syncpoints");
-            w.startArray(obj.syncPoints!.length);
+            w.arrayField(16, obj.syncPoints!.length);
             for (const i of obj.syncPoints!) {
                 AutomationSerializer.write(i, w);
             }
             w.endArray();
         }
         if (obj.fermata !== null) {
-            w.field(17, "fermata");
-            w.startMap();
+            w.mapField(17);
             for (const [k, v] of obj.fermata!) {
                 w.prop(k.toString());
                 FermataSerializer.write(v, w);
             }
             w.endMap();
         }
-        w.field(18, "start");
-        w.writeNumber(obj.start);
-        w.field(19, "isanacrusis");
-        w.writeBoolean(obj.isAnacrusis);
-        w.field(20, "displayscale");
-        w.writeNumber(obj.displayScale);
-        w.field(21, "displaywidth");
-        w.writeNumber(obj.displayWidth);
+        w.numberField(18, obj.start);
+        w.booleanField(19, obj.isAnacrusis);
+        w.numberField(20, obj.displayScale);
+        w.numberField(21, obj.displayWidth);
         if (obj.directions !== null) {
             const a: number[] = [];
             for (const v of obj.directions!) {
                 a.push(v as number);
             }
-            w.field(22, "directions");
-            w.writeValue(a);
+            w.valueField(22, a);
         }
         w.endObject();
     }

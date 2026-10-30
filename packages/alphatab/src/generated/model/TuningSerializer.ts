@@ -5,71 +5,38 @@
 // </auto-generated>
 import { Tuning } from "@coderline/alphatab/model/Tuning";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class TuningSerializer {
-    public static fromJson(obj: Tuning, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        TuningSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Tuning, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? TuningSerializer._readField(obj, id, rr) : TuningSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Tuning, property: string, r: IObjectReader): boolean {
-        const id = TuningSerializer._fieldId(property);
-        return id >= 0 ? TuningSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "isstandard":
-                return 0;
-            case "name":
-                return 1;
-            case "tunings":
-                return 2;
-        }
-        return -1;
-    }
-    private static _readField(obj: Tuning, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.isStandard = r.readBoolean();
-                return true;
-            case 1:
-                obj.name = r.readString();
-                return true;
-            case 2:
-                obj.tunings = r.readValue()! as number[];
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: Tuning | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        TuningSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["isstandard", "name", "tunings"]);
+    public static read(obj: Tuning, reader: IObjectReader): void {
+        reader.readRecord(TuningSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.isStandard = r.readBoolean();
+                    return true;
+                case 1:
+                    obj.name = r.readString();
+                    return true;
+                case 2:
+                    obj.tunings = r.readValue()! as number[];
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: Tuning | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "isstandard");
-        w.writeBoolean(obj.isStandard);
-        w.field(1, "name");
-        w.writeString(obj.name);
-        w.field(2, "tunings");
-        w.writeValue(obj.tunings);
+        w.startObject(TuningSerializer._fields);
+        w.booleanField(0, obj.isStandard);
+        w.stringField(1, obj.name);
+        w.valueField(2, obj.tunings);
         w.endObject();
     }
 }

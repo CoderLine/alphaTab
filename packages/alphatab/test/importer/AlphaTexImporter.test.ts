@@ -1,3 +1,4 @@
+import { TestPlatform } from 'test/TestPlatform';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { TremoloPickingEffectSerializer } from '@coderline/alphatab/generated/model/TremoloPickingEffectSerializer';
 import { AlphaTexDiagnosticCode, AlphaTexStaffNoteKind } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
@@ -2648,7 +2649,7 @@ describe('AlphaTexImporterTest', () => {
         function test(tex: string) {
             const score = parseTex(tex);
             const beat = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
-            const serialized = TremoloPickingEffectSerializer.toJson(beat.tremoloPicking!);
+            const serialized = TestPlatform.toJson(w => TremoloPickingEffectSerializer.write(beat.tremoloPicking!, w));
             expect(serialized).toMatchSnapshot();
             testExportRoundtrip(score);
         }

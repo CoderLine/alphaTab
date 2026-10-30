@@ -5,42 +5,22 @@
 // </auto-generated>
 import { SlashBarOverride } from "@coderline/alphatab/model/BarOverrides";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ElementDisplaySerializer } from "@coderline/alphatab/generated/model/ElementDisplaySerializer";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class SlashBarOverrideSerializer {
-    public static fromJson(obj: SlashBarOverride, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        SlashBarOverrideSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: SlashBarOverride, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, rr, false) : SlashBarOverrideSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["keysignature", "timesignature", "barnumber"]);
+    public static read(obj: SlashBarOverride, reader: IObjectReader): void {
+        reader.readRecord(SlashBarOverrideSerializer._fields, (id, k, rr) => SlashBarOverrideSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: SlashBarOverride, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = SlashBarOverrideSerializer._fieldId(property);
+        const id = SlashBarOverrideSerializer._fields.idOf(property);
         return id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "keysignature":
-                return 0;
-            case "timesignature":
-                return 1;
-            case "barnumber":
-                return 2;
-        }
-        return -1;
     }
     private static _readField(obj: SlashBarOverride, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -69,7 +49,7 @@ export class SlashBarOverrideSerializer {
         return false;
     }
     public static readFlexible(obj: SlashBarOverride, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, rr, false) : SlashBarOverrideSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, rr, false) : SlashBarOverrideSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: SlashBarOverride, property: string, r: IObjectReader): boolean {
         if (["keysignature", "timesignature"].indexOf(property) < 0 && SlashBarOverrideSerializer.readProperty(obj, property, r, true)) {
@@ -97,27 +77,21 @@ export class SlashBarOverrideSerializer {
         }
         return false;
     }
-    public static toJson(obj: SlashBarOverride | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        SlashBarOverrideSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: SlashBarOverride | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
+        w.startObject(SlashBarOverrideSerializer._fields);
         if (obj.keySignature) {
-            w.field(0, "keysignature");
+            w.field(0);
             ElementDisplaySerializer.write(obj.keySignature, w);
         }
         if (obj.timeSignature) {
-            w.field(1, "timesignature");
+            w.field(1);
             ElementDisplaySerializer.write(obj.timeSignature, w);
         }
-        w.field(2, "barnumber");
-        w.writeValue(obj.barNumber as number | undefined);
+        w.valueField(2, obj.barNumber as number | undefined);
         w.endObject();
     }
 }

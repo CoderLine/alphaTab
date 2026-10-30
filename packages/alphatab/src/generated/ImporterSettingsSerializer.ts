@@ -5,43 +5,19 @@
 // </auto-generated>
 import { ImporterSettings } from "@coderline/alphatab/ImporterSettings";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class ImporterSettingsSerializer {
-    public static fromJson(obj: ImporterSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        ImporterSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: ImporterSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ImporterSettingsSerializer._readField(obj, id, rr, false) : ImporterSettingsSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["encoding", "gp3to5encoding", "mergepartgroupsinmusicxml", "beattextaslyrics", "maxdecodingbuffersize"]);
+    public static read(obj: ImporterSettings, reader: IObjectReader): void {
+        reader.readRecord(ImporterSettingsSerializer._fields, (id, k, rr) => ImporterSettingsSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: ImporterSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = ImporterSettingsSerializer._fieldId(property);
+        const id = ImporterSettingsSerializer._fields.idOf(property);
         return id >= 0 ? ImporterSettingsSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "encoding":
-                return 0;
-            case "gp3to5encoding":
-                return 1;
-            case "mergepartgroupsinmusicxml":
-                return 2;
-            case "beattextaslyrics":
-                return 3;
-            case "maxdecodingbuffersize":
-                return 4;
-        }
-        return -1;
     }
     private static _readField(obj: ImporterSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -64,7 +40,7 @@ export class ImporterSettingsSerializer {
         return false;
     }
     public static readFlexible(obj: ImporterSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ImporterSettingsSerializer._readField(obj, id, rr, false) : ImporterSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? ImporterSettingsSerializer._readField(obj, id, rr, false) : ImporterSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ImporterSettings, property: string, r: IObjectReader): boolean {
         if (ImporterSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -72,27 +48,17 @@ export class ImporterSettingsSerializer {
         }
         return false;
     }
-    public static toJson(obj: ImporterSettings | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        ImporterSettingsSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: ImporterSettings | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "encoding");
-        w.writeString(obj.encoding);
-        w.field(1, "gp3to5encoding");
-        w.writeString(obj.gp3To5encoding);
-        w.field(2, "mergepartgroupsinmusicxml");
-        w.writeBoolean(obj.mergePartGroupsInMusicXml);
-        w.field(3, "beattextaslyrics");
-        w.writeBoolean(obj.beatTextAsLyrics);
-        w.field(4, "maxdecodingbuffersize");
-        w.writeNumber(obj.maxDecodingBufferSize);
+        w.startObject(ImporterSettingsSerializer._fields);
+        w.stringField(0, obj.encoding);
+        w.stringField(1, obj.gp3To5encoding);
+        w.booleanField(2, obj.mergePartGroupsInMusicXml);
+        w.booleanField(3, obj.beatTextAsLyrics);
+        w.numberField(4, obj.maxDecodingBufferSize);
         w.endObject();
     }
 }

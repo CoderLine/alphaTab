@@ -5,42 +5,22 @@
 // </auto-generated>
 import { ElementDisplay } from "@coderline/alphatab/model/ElementDisplay";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { StaffPlacement } from "@coderline/alphatab/model/ElementDisplay";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { SystemDisplay } from "@coderline/alphatab/model/ElementDisplay";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class ElementDisplaySerializer {
-    public static fromJson(obj: ElementDisplay, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        ElementDisplaySerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: ElementDisplay, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ElementDisplaySerializer._readField(obj, id, rr, false) : ElementDisplaySerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["isvisible", "staffplacement", "systemdisplay"]);
+    public static read(obj: ElementDisplay, reader: IObjectReader): void {
+        reader.readRecord(ElementDisplaySerializer._fields, (id, k, rr) => ElementDisplaySerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: ElementDisplay, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = ElementDisplaySerializer._fieldId(property);
+        const id = ElementDisplaySerializer._fields.idOf(property);
         return id >= 0 ? ElementDisplaySerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "isvisible":
-                return 0;
-            case "staffplacement":
-                return 1;
-            case "systemdisplay":
-                return 2;
-        }
-        return -1;
     }
     private static _readField(obj: ElementDisplay, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -57,7 +37,7 @@ export class ElementDisplaySerializer {
         return false;
     }
     public static readFlexible(obj: ElementDisplay, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ElementDisplaySerializer._readField(obj, id, rr, false) : ElementDisplaySerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? ElementDisplaySerializer._readField(obj, id, rr, false) : ElementDisplaySerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ElementDisplay, property: string, r: IObjectReader): boolean {
         if (ElementDisplaySerializer.readProperty(obj, property, r, true)) {
@@ -65,23 +45,15 @@ export class ElementDisplaySerializer {
         }
         return false;
     }
-    public static toJson(obj: ElementDisplay | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        ElementDisplaySerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: ElementDisplay | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "isvisible");
-        w.writeValue(obj.isVisible);
-        w.field(1, "staffplacement");
-        w.writeValue(obj.staffPlacement as number | undefined);
-        w.field(2, "systemdisplay");
-        w.writeValue(obj.systemDisplay as number | undefined);
+        w.startObject(ElementDisplaySerializer._fields);
+        w.valueField(0, obj.isVisible);
+        w.valueField(1, obj.staffPlacement as number | undefined);
+        w.valueField(2, obj.systemDisplay as number | undefined);
         w.endObject();
     }
 }

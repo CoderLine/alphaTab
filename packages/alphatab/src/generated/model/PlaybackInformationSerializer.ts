@@ -5,113 +5,62 @@
 // </auto-generated>
 import { PlaybackInformation } from "@coderline/alphatab/model/PlaybackInformation";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class PlaybackInformationSerializer {
-    public static fromJson(obj: PlaybackInformation, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        PlaybackInformationSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: PlaybackInformation, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? PlaybackInformationSerializer._readField(obj, id, rr) : PlaybackInformationSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: PlaybackInformation, property: string, r: IObjectReader): boolean {
-        const id = PlaybackInformationSerializer._fieldId(property);
-        return id >= 0 ? PlaybackInformationSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "volume":
-                return 0;
-            case "balance":
-                return 1;
-            case "port":
-                return 2;
-            case "program":
-                return 3;
-            case "bank":
-                return 4;
-            case "primarychannel":
-                return 5;
-            case "secondarychannel":
-                return 6;
-            case "ismute":
-                return 7;
-            case "issolo":
-                return 8;
-        }
-        return -1;
-    }
-    private static _readField(obj: PlaybackInformation, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.volume = r.readNumber();
-                return true;
-            case 1:
-                obj.balance = r.readNumber();
-                return true;
-            case 2:
-                obj.port = r.readNumber();
-                return true;
-            case 3:
-                obj.program = r.readNumber();
-                return true;
-            case 4:
-                obj.bank = r.readNumber();
-                return true;
-            case 5:
-                obj.primaryChannel = r.readNumber();
-                return true;
-            case 6:
-                obj.secondaryChannel = r.readNumber();
-                return true;
-            case 7:
-                obj.isMute = r.readBoolean();
-                return true;
-            case 8:
-                obj.isSolo = r.readBoolean();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: PlaybackInformation | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        PlaybackInformationSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["volume", "balance", "port", "program", "bank", "primarychannel", "secondarychannel", "ismute", "issolo"]);
+    public static read(obj: PlaybackInformation, reader: IObjectReader): void {
+        reader.readRecord(PlaybackInformationSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.volume = r.readNumber();
+                    return true;
+                case 1:
+                    obj.balance = r.readNumber();
+                    return true;
+                case 2:
+                    obj.port = r.readNumber();
+                    return true;
+                case 3:
+                    obj.program = r.readNumber();
+                    return true;
+                case 4:
+                    obj.bank = r.readNumber();
+                    return true;
+                case 5:
+                    obj.primaryChannel = r.readNumber();
+                    return true;
+                case 6:
+                    obj.secondaryChannel = r.readNumber();
+                    return true;
+                case 7:
+                    obj.isMute = r.readBoolean();
+                    return true;
+                case 8:
+                    obj.isSolo = r.readBoolean();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: PlaybackInformation | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "volume");
-        w.writeNumber(obj.volume);
-        w.field(1, "balance");
-        w.writeNumber(obj.balance);
-        w.field(2, "port");
-        w.writeNumber(obj.port);
-        w.field(3, "program");
-        w.writeNumber(obj.program);
-        w.field(4, "bank");
-        w.writeNumber(obj.bank);
-        w.field(5, "primarychannel");
-        w.writeNumber(obj.primaryChannel);
-        w.field(6, "secondarychannel");
-        w.writeNumber(obj.secondaryChannel);
-        w.field(7, "ismute");
-        w.writeBoolean(obj.isMute);
-        w.field(8, "issolo");
-        w.writeBoolean(obj.isSolo);
+        w.startObject(PlaybackInformationSerializer._fields);
+        w.numberField(0, obj.volume);
+        w.numberField(1, obj.balance);
+        w.numberField(2, obj.port);
+        w.numberField(3, obj.program);
+        w.numberField(4, obj.bank);
+        w.numberField(5, obj.primaryChannel);
+        w.numberField(6, obj.secondaryChannel);
+        w.booleanField(7, obj.isMute);
+        w.booleanField(8, obj.isSolo);
         w.endObject();
     }
 }

@@ -5,46 +5,24 @@
 // </auto-generated>
 import { BackingTrack } from "@coderline/alphatab/model/BackingTrack";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class BackingTrackSerializer {
-    public static fromJson(obj: BackingTrack, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        BackingTrackSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: BackingTrack, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? BackingTrackSerializer._readField(obj, id, rr) : BackingTrackSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: BackingTrack, property: string, r: IObjectReader): boolean {
-        const id = BackingTrackSerializer._fieldId(property);
-        return id >= 0 ? BackingTrackSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        return -1;
-    }
-    private static _readField(obj: BackingTrack, id: number, r: IObjectReader): boolean {
-        return false;
-    }
-    public static toJson(obj: BackingTrack | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        BackingTrackSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields([]);
+    public static read(obj: BackingTrack, reader: IObjectReader): void {
+        reader.readRecord(BackingTrackSerializer._fields, (id, k, r) => {
+            return false;
+        });
     }
     public static write(obj: BackingTrack | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
+        w.startObject(BackingTrackSerializer._fields);
         w.endObject();
     }
 }

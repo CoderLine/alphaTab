@@ -5,7 +5,7 @@
 // </auto-generated>
 import { Note } from "@coderline/alphatab/model/Note";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { AccentuationType } from "@coderline/alphatab/model/AccentuationType";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { BendType } from "@coderline/alphatab/model/BendType";
@@ -24,228 +24,135 @@ import { NoteOrnament } from "@coderline/alphatab/model/NoteOrnament";
 import { NoteStyle } from "@coderline/alphatab/model/Note";
 import { NoteStyleSerializer } from "@coderline/alphatab/generated/model/NoteStyleSerializer";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class NoteSerializer {
-    public static fromJson(obj: Note, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        NoteSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Note, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? NoteSerializer._readField(obj, id, rr) : NoteSerializer.readProperty(obj, k, rr));
+    private static readonly _fields: RecordFields = new RecordFields(["id", "accentuated", "bendtype", "bendstyle", "iscontinuedbend", "bendpoints", "fret", "string", "showstringnumber", "octave", "tone", "percussionarticulation", "isvisible", "islefthandtapped", "ishammerpullorigin", "isslurdestination", "harmonictype", "harmonicvalue", "isghost", "isletring", "ispalmmute", "isdead", "isstaccato", "slideintype", "slideouttype", "vibrato", "istiedestination", "lefthandfinger", "righthandfinger", "trillvalue", "trillspeed", "istrillstart", "durationpercent", "accidentalmode", "dynamics", "ornament", "style"]);
+    public static read(obj: Note, reader: IObjectReader): void {
+        reader.readRecord(NoteSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.id = r.readNumber();
+                    return true;
+                case 1:
+                    obj.accentuated = JsonHelper.parseEnum<AccentuationType>(r.readValue(), AccentuationType)!;
+                    return true;
+                case 2:
+                    obj.bendType = JsonHelper.parseEnum<BendType>(r.readValue(), BendType)!;
+                    return true;
+                case 3:
+                    obj.bendStyle = JsonHelper.parseEnum<BendStyle>(r.readValue(), BendStyle)!;
+                    return true;
+                case 4:
+                    obj.isContinuedBend = r.readBoolean();
+                    return true;
+                case 5:
+                    NoteSerializer._readBendPoints(obj, r);
+                    return true;
+                case 6:
+                    obj.fret = r.isNullish() ? Number.NaN : r.readNumber();
+                    return true;
+                case 7:
+                    obj.string = r.isNullish() ? Number.NaN : r.readNumber();
+                    return true;
+                case 8:
+                    obj.showStringNumber = r.readBoolean();
+                    return true;
+                case 9:
+                    obj.octave = r.isNullish() ? Number.NaN : r.readNumber();
+                    return true;
+                case 10:
+                    obj.tone = r.isNullish() ? Number.NaN : r.readNumber();
+                    return true;
+                case 11:
+                    obj.percussionArticulation = r.isNullish() ? Number.NaN : r.readNumber();
+                    return true;
+                case 12:
+                    obj.isVisible = r.readBoolean();
+                    return true;
+                case 13:
+                    obj.isLeftHandTapped = r.readBoolean();
+                    return true;
+                case 14:
+                    obj.isHammerPullOrigin = r.readBoolean();
+                    return true;
+                case 15:
+                    obj.isSlurDestination = r.readBoolean();
+                    return true;
+                case 16:
+                    obj.harmonicType = JsonHelper.parseEnum<HarmonicType>(r.readValue(), HarmonicType)!;
+                    return true;
+                case 17:
+                    obj.harmonicValue = r.readNumber();
+                    return true;
+                case 18:
+                    obj.isGhost = r.readBoolean();
+                    return true;
+                case 19:
+                    obj.isLetRing = r.readBoolean();
+                    return true;
+                case 20:
+                    obj.isPalmMute = r.readBoolean();
+                    return true;
+                case 21:
+                    obj.isDead = r.readBoolean();
+                    return true;
+                case 22:
+                    obj.isStaccato = r.readBoolean();
+                    return true;
+                case 23:
+                    obj.slideInType = JsonHelper.parseEnum<SlideInType>(r.readValue(), SlideInType)!;
+                    return true;
+                case 24:
+                    obj.slideOutType = JsonHelper.parseEnum<SlideOutType>(r.readValue(), SlideOutType)!;
+                    return true;
+                case 25:
+                    obj.vibrato = JsonHelper.parseEnum<VibratoType>(r.readValue(), VibratoType)!;
+                    return true;
+                case 26:
+                    obj.isTieDestination = r.readBoolean();
+                    return true;
+                case 27:
+                    obj.leftHandFinger = JsonHelper.parseEnum<Fingers>(r.readValue(), Fingers)!;
+                    return true;
+                case 28:
+                    obj.rightHandFinger = JsonHelper.parseEnum<Fingers>(r.readValue(), Fingers)!;
+                    return true;
+                case 29:
+                    obj.trillValue = r.readNumber();
+                    return true;
+                case 30:
+                    obj.trillSpeed = JsonHelper.parseEnum<Duration>(r.readValue(), Duration)!;
+                    return true;
+                case 31:
+                    obj.isTrillStart = r.readBoolean();
+                    return true;
+                case 32:
+                    obj.durationPercent = r.readNumber();
+                    return true;
+                case 33:
+                    obj.accidentalMode = JsonHelper.parseEnum<NoteAccidentalMode>(r.readValue(), NoteAccidentalMode)!;
+                    return true;
+                case 34:
+                    obj.dynamics = JsonHelper.parseEnum<DynamicValue>(r.readValue(), DynamicValue)!;
+                    return true;
+                case 35:
+                    obj.ornament = JsonHelper.parseEnum<NoteOrnament>(r.readValue(), NoteOrnament)!;
+                    return true;
+                case 36:
+                    if (r.isNullish()) {
+                        obj.style = undefined;
+                    }
+                    else {
+                        obj.style = new NoteStyle();
+                        NoteStyleSerializer.read(obj.style, r);
+                    }
+                    return true;
+            }
+            return id < 0 ? obj.setProperty(k, r) : false;
+        });
         obj.afterFromJson();
-    }
-    public static readProperty(obj: Note, property: string, r: IObjectReader): boolean {
-        const id = NoteSerializer._fieldId(property);
-        return id >= 0 ? NoteSerializer._readField(obj, id, r) : obj.setProperty(property, r);
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "id":
-                return 0;
-            case "accentuated":
-                return 1;
-            case "bendtype":
-                return 2;
-            case "bendstyle":
-                return 3;
-            case "iscontinuedbend":
-                return 4;
-            case "bendpoints":
-                return 5;
-            case "fret":
-                return 6;
-            case "string":
-                return 7;
-            case "showstringnumber":
-                return 8;
-            case "octave":
-                return 9;
-            case "tone":
-                return 10;
-            case "percussionarticulation":
-                return 11;
-            case "isvisible":
-                return 12;
-            case "islefthandtapped":
-                return 13;
-            case "ishammerpullorigin":
-                return 14;
-            case "isslurdestination":
-                return 15;
-            case "harmonictype":
-                return 16;
-            case "harmonicvalue":
-                return 17;
-            case "isghost":
-                return 18;
-            case "isletring":
-                return 19;
-            case "ispalmmute":
-                return 20;
-            case "isdead":
-                return 21;
-            case "isstaccato":
-                return 22;
-            case "slideintype":
-                return 23;
-            case "slideouttype":
-                return 24;
-            case "vibrato":
-                return 25;
-            case "istiedestination":
-                return 26;
-            case "lefthandfinger":
-                return 27;
-            case "righthandfinger":
-                return 28;
-            case "trillvalue":
-                return 29;
-            case "trillspeed":
-                return 30;
-            case "istrillstart":
-                return 31;
-            case "durationpercent":
-                return 32;
-            case "accidentalmode":
-                return 33;
-            case "dynamics":
-                return 34;
-            case "ornament":
-                return 35;
-            case "style":
-                return 36;
-        }
-        return -1;
-    }
-    private static _readField(obj: Note, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.id = r.readNumber();
-                return true;
-            case 1:
-                obj.accentuated = JsonHelper.parseEnum<AccentuationType>(r.readValue(), AccentuationType)!;
-                return true;
-            case 2:
-                obj.bendType = JsonHelper.parseEnum<BendType>(r.readValue(), BendType)!;
-                return true;
-            case 3:
-                obj.bendStyle = JsonHelper.parseEnum<BendStyle>(r.readValue(), BendStyle)!;
-                return true;
-            case 4:
-                obj.isContinuedBend = r.readBoolean();
-                return true;
-            case 5:
-                NoteSerializer._readBendPoints(obj, r);
-                return true;
-            case 6:
-                obj.fret = r.isNullish() ? Number.NaN : r.readNumber();
-                return true;
-            case 7:
-                obj.string = r.isNullish() ? Number.NaN : r.readNumber();
-                return true;
-            case 8:
-                obj.showStringNumber = r.readBoolean();
-                return true;
-            case 9:
-                obj.octave = r.isNullish() ? Number.NaN : r.readNumber();
-                return true;
-            case 10:
-                obj.tone = r.isNullish() ? Number.NaN : r.readNumber();
-                return true;
-            case 11:
-                obj.percussionArticulation = r.isNullish() ? Number.NaN : r.readNumber();
-                return true;
-            case 12:
-                obj.isVisible = r.readBoolean();
-                return true;
-            case 13:
-                obj.isLeftHandTapped = r.readBoolean();
-                return true;
-            case 14:
-                obj.isHammerPullOrigin = r.readBoolean();
-                return true;
-            case 15:
-                obj.isSlurDestination = r.readBoolean();
-                return true;
-            case 16:
-                obj.harmonicType = JsonHelper.parseEnum<HarmonicType>(r.readValue(), HarmonicType)!;
-                return true;
-            case 17:
-                obj.harmonicValue = r.readNumber();
-                return true;
-            case 18:
-                obj.isGhost = r.readBoolean();
-                return true;
-            case 19:
-                obj.isLetRing = r.readBoolean();
-                return true;
-            case 20:
-                obj.isPalmMute = r.readBoolean();
-                return true;
-            case 21:
-                obj.isDead = r.readBoolean();
-                return true;
-            case 22:
-                obj.isStaccato = r.readBoolean();
-                return true;
-            case 23:
-                obj.slideInType = JsonHelper.parseEnum<SlideInType>(r.readValue(), SlideInType)!;
-                return true;
-            case 24:
-                obj.slideOutType = JsonHelper.parseEnum<SlideOutType>(r.readValue(), SlideOutType)!;
-                return true;
-            case 25:
-                obj.vibrato = JsonHelper.parseEnum<VibratoType>(r.readValue(), VibratoType)!;
-                return true;
-            case 26:
-                obj.isTieDestination = r.readBoolean();
-                return true;
-            case 27:
-                obj.leftHandFinger = JsonHelper.parseEnum<Fingers>(r.readValue(), Fingers)!;
-                return true;
-            case 28:
-                obj.rightHandFinger = JsonHelper.parseEnum<Fingers>(r.readValue(), Fingers)!;
-                return true;
-            case 29:
-                obj.trillValue = r.readNumber();
-                return true;
-            case 30:
-                obj.trillSpeed = JsonHelper.parseEnum<Duration>(r.readValue(), Duration)!;
-                return true;
-            case 31:
-                obj.isTrillStart = r.readBoolean();
-                return true;
-            case 32:
-                obj.durationPercent = r.readNumber();
-                return true;
-            case 33:
-                obj.accidentalMode = JsonHelper.parseEnum<NoteAccidentalMode>(r.readValue(), NoteAccidentalMode)!;
-                return true;
-            case 34:
-                obj.dynamics = JsonHelper.parseEnum<DynamicValue>(r.readValue(), DynamicValue)!;
-                return true;
-            case 35:
-                obj.ornament = JsonHelper.parseEnum<NoteOrnament>(r.readValue(), NoteOrnament)!;
-                return true;
-            case 36:
-                if (r.isNullish()) {
-                    obj.style = undefined;
-                }
-                else {
-                    obj.style = new NoteStyle();
-                    NoteStyleSerializer.read(obj.style, r);
-                }
-                return true;
-        }
-        return false;
     }
     private static _readBendPoints(obj: Note, r: IObjectReader): void {
         if (!r.isNullish()) {
@@ -257,107 +164,66 @@ export class NoteSerializer {
             });
         }
     }
-    public static toJson(obj: Note | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        NoteSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: Note | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "id");
-        w.writeNumber(obj.id);
-        w.field(1, "accentuated");
-        w.writeNumber(obj.accentuated as number);
-        w.field(2, "bendtype");
-        w.writeNumber(obj.bendType as number);
-        w.field(3, "bendstyle");
-        w.writeNumber(obj.bendStyle as number);
-        w.field(4, "iscontinuedbend");
-        w.writeBoolean(obj.isContinuedBend);
+        w.startObject(NoteSerializer._fields);
+        w.numberField(0, obj.id);
+        w.numberField(1, obj.accentuated as number);
+        w.numberField(2, obj.bendType as number);
+        w.numberField(3, obj.bendStyle as number);
+        w.booleanField(4, obj.isContinuedBend);
         if (obj.bendPoints !== null) {
-            w.field(5, "bendpoints");
-            w.startArray(obj.bendPoints!.length);
+            w.arrayField(5, obj.bendPoints!.length);
             for (const i of obj.bendPoints!) {
                 BendPointSerializer.write(i, w);
             }
             w.endArray();
         }
         if (!Number.isNaN(obj.fret)) {
-            w.field(6, "fret");
-            w.writeNumber(obj.fret);
+            w.numberField(6, obj.fret);
         }
         if (!Number.isNaN(obj.string)) {
-            w.field(7, "string");
-            w.writeNumber(obj.string);
+            w.numberField(7, obj.string);
         }
-        w.field(8, "showstringnumber");
-        w.writeBoolean(obj.showStringNumber);
+        w.booleanField(8, obj.showStringNumber);
         if (!Number.isNaN(obj.octave)) {
-            w.field(9, "octave");
-            w.writeNumber(obj.octave);
+            w.numberField(9, obj.octave);
         }
         if (!Number.isNaN(obj.tone)) {
-            w.field(10, "tone");
-            w.writeNumber(obj.tone);
+            w.numberField(10, obj.tone);
         }
         if (!Number.isNaN(obj.percussionArticulation)) {
-            w.field(11, "percussionarticulation");
-            w.writeNumber(obj.percussionArticulation);
+            w.numberField(11, obj.percussionArticulation);
         }
-        w.field(12, "isvisible");
-        w.writeBoolean(obj.isVisible);
-        w.field(13, "islefthandtapped");
-        w.writeBoolean(obj.isLeftHandTapped);
-        w.field(14, "ishammerpullorigin");
-        w.writeBoolean(obj.isHammerPullOrigin);
-        w.field(15, "isslurdestination");
-        w.writeBoolean(obj.isSlurDestination);
-        w.field(16, "harmonictype");
-        w.writeNumber(obj.harmonicType as number);
-        w.field(17, "harmonicvalue");
-        w.writeNumber(obj.harmonicValue);
-        w.field(18, "isghost");
-        w.writeBoolean(obj.isGhost);
-        w.field(19, "isletring");
-        w.writeBoolean(obj.isLetRing);
-        w.field(20, "ispalmmute");
-        w.writeBoolean(obj.isPalmMute);
-        w.field(21, "isdead");
-        w.writeBoolean(obj.isDead);
-        w.field(22, "isstaccato");
-        w.writeBoolean(obj.isStaccato);
-        w.field(23, "slideintype");
-        w.writeNumber(obj.slideInType as number);
-        w.field(24, "slideouttype");
-        w.writeNumber(obj.slideOutType as number);
-        w.field(25, "vibrato");
-        w.writeNumber(obj.vibrato as number);
-        w.field(26, "istiedestination");
-        w.writeBoolean(obj.isTieDestination);
-        w.field(27, "lefthandfinger");
-        w.writeNumber(obj.leftHandFinger as number);
-        w.field(28, "righthandfinger");
-        w.writeNumber(obj.rightHandFinger as number);
-        w.field(29, "trillvalue");
-        w.writeNumber(obj.trillValue);
-        w.field(30, "trillspeed");
-        w.writeNumber(obj.trillSpeed as number);
-        w.field(31, "istrillstart");
-        w.writeBoolean(obj.isTrillStart);
-        w.field(32, "durationpercent");
-        w.writeNumber(obj.durationPercent);
-        w.field(33, "accidentalmode");
-        w.writeNumber(obj.accidentalMode as number);
-        w.field(34, "dynamics");
-        w.writeNumber(obj.dynamics as number);
-        w.field(35, "ornament");
-        w.writeNumber(obj.ornament as number);
+        w.booleanField(12, obj.isVisible);
+        w.booleanField(13, obj.isLeftHandTapped);
+        w.booleanField(14, obj.isHammerPullOrigin);
+        w.booleanField(15, obj.isSlurDestination);
+        w.numberField(16, obj.harmonicType as number);
+        w.numberField(17, obj.harmonicValue);
+        w.booleanField(18, obj.isGhost);
+        w.booleanField(19, obj.isLetRing);
+        w.booleanField(20, obj.isPalmMute);
+        w.booleanField(21, obj.isDead);
+        w.booleanField(22, obj.isStaccato);
+        w.numberField(23, obj.slideInType as number);
+        w.numberField(24, obj.slideOutType as number);
+        w.numberField(25, obj.vibrato as number);
+        w.booleanField(26, obj.isTieDestination);
+        w.numberField(27, obj.leftHandFinger as number);
+        w.numberField(28, obj.rightHandFinger as number);
+        w.numberField(29, obj.trillValue);
+        w.numberField(30, obj.trillSpeed as number);
+        w.booleanField(31, obj.isTrillStart);
+        w.numberField(32, obj.durationPercent);
+        w.numberField(33, obj.accidentalMode as number);
+        w.numberField(34, obj.dynamics as number);
+        w.numberField(35, obj.ornament as number);
         if (obj.style) {
-            w.field(36, "style");
+            w.field(36);
             NoteStyleSerializer.write(obj.style, w);
         }
         obj.toJson(w);

@@ -1,6 +1,7 @@
 /** @target web */
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
+import type { RecordFields } from '@coderline/alphatab/io/RecordFields';
 
 /**
  * The application-specific extension type (MessagePack spec, "ext format family") used for `undefined`,
@@ -101,7 +102,7 @@ export class MessagePackObjectWriter implements IObjectWriter {
         this._view.setUint32(header + 1, count);
     }
 
-    public startObject(): void {
+    public startObject(_fields: RecordFields): void {
         this._startMap();
     }
 
@@ -147,7 +148,7 @@ export class MessagePackObjectWriter implements IObjectWriter {
         this._writeString(name);
     }
 
-    public field(id: number, _name: string): void {
+    public field(id: number): void {
         this._count++;
         this._ensure(2);
         if (id <= 0x7f) {
@@ -166,6 +167,36 @@ export class MessagePackObjectWriter implements IObjectWriter {
         if (this._header === -1) {
             this._count--;
         }
+    }
+
+    public numberField(id: number, v: number): void {
+        this.field(id);
+        this.writeNumber(v);
+    }
+
+    public booleanField(id: number, v: boolean): void {
+        this.field(id);
+        this.writeBoolean(v);
+    }
+
+    public stringField(id: number, v: string): void {
+        this.field(id);
+        this.writeString(v);
+    }
+
+    public valueField(id: number, v: unknown): void {
+        this.field(id);
+        this.writeValue(v);
+    }
+
+    public arrayField(id: number, length: number): void {
+        this.field(id);
+        this.startArray(length);
+    }
+
+    public mapField(id: number): void {
+        this.field(id);
+        this.startMap();
     }
 
     public writeNumber(v: number): void {
@@ -420,13 +451,13 @@ export class MessagePackObjectWriter implements IObjectWriter {
                 } else if (ArrayBuffer.isView(v)) {
                     throw new AlphaTabError(AlphaTabErrorType.General, 'Only Uint8Array can be written as MessagePack');
                 } else {
-                    this.startObject();
+                    this.startMap();
                     const o = v as Record<string, unknown>;
                     for (const k in o) {
                         this.prop(k);
                         this.writeValue(o[k]);
                     }
-                    this.endObject();
+                    this.endMap();
                 }
                 return;
         }

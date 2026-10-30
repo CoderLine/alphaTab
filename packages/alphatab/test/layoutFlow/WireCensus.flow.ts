@@ -12,6 +12,7 @@ import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter'
 import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
+import type { RecordFields } from '@coderline/alphatab/io/RecordFields';
 import { MessagePackObjectWriter } from '@coderline/alphatab/io/MessagePackObjectWriter';
 import { PlainObjectWriter } from '@coderline/alphatab/io/PlainObjectWriter';
 import { Logger } from '@coderline/alphatab/Logger';
@@ -187,10 +188,13 @@ class CensusWriter implements IObjectWriter {
         this._frames.push({ cls: this._cls, isRecord: isRecord && cls === this._cls, pendingKey: null, keyBytes: 0 });
     }
 
-    public startObject(): void {
-        this._container(true, () => this.inner.startObject());
+    private _fields: RecordFields[] = [];
+    public startObject(fields: RecordFields): void {
+        this._fields.push(fields);
+        this._container(true, () => this.inner.startObject(fields));
     }
     public endObject(): void {
+        this._fields.pop();
         this._frames.pop();
         this.inner.endObject();
     }
@@ -222,8 +226,8 @@ class CensusWriter implements IObjectWriter {
         this._key(name, () => this.inner.prop(name));
     }
 
-    public field(id: number, name: string): void {
-        this._key(name, () => this.inner.field(id, name));
+    public field(id: number): void {
+        this._key(this._fields[this._fields.length - 1].names[id], () => this.inner.field(id));
     }
 
     private _key(name: string, write: () => void) {
@@ -239,6 +243,36 @@ class CensusWriter implements IObjectWriter {
             f.keyBytes = bytes;
         }
     }
+    public numberField(id: number, v: number): void {
+        this.field(id);
+        this.writeNumber(v);
+    }
+
+    public booleanField(id: number, v: boolean): void {
+        this.field(id);
+        this.writeBoolean(v);
+    }
+
+    public stringField(id: number, v: string): void {
+        this.field(id);
+        this.writeString(v);
+    }
+
+    public valueField(id: number, v: unknown): void {
+        this.field(id);
+        this.writeValue(v);
+    }
+
+    public arrayField(id: number, length: number): void {
+        this.field(id);
+        this.startArray(length);
+    }
+
+    public mapField(id: number): void {
+        this.field(id);
+        this.startMap();
+    }
+
     public writeNumber(v: number): void {
         this._primitive('number', v, () => this.inner.writeNumber(v));
     }
@@ -280,15 +314,19 @@ class RecordingWriter implements IObjectWriter {
         }
         this._key = null;
     }
-    public startObject(): void {
+    private _fields: RecordFields[] = [];
+    public startObject(fields: RecordFields): void {
+        this._fields.push(fields);
         this._key = null;
         this._depth++;
     }
     public endObject(): void {
+        this._fields.pop();
         this._depth--;
     }
     public startMap(): void {
-        this.startObject();
+        this._key = null;
+        this._depth++;
     }
     public endMap(): void {
         this._depth--;
@@ -306,9 +344,39 @@ class RecordingWriter implements IObjectWriter {
     public prop(name: string): void {
         this._key = name;
     }
-    public field(_id: number, name: string): void {
-        this._key = name;
+    public field(id: number): void {
+        this._key = this._fields[this._fields.length - 1].names[id];
     }
+    public numberField(id: number, v: number): void {
+        this.field(id);
+        this.writeNumber(v);
+    }
+
+    public booleanField(id: number, v: boolean): void {
+        this.field(id);
+        this.writeBoolean(v);
+    }
+
+    public stringField(id: number, v: string): void {
+        this.field(id);
+        this.writeString(v);
+    }
+
+    public valueField(id: number, v: unknown): void {
+        this.field(id);
+        this.writeValue(v);
+    }
+
+    public arrayField(id: number, length: number): void {
+        this.field(id);
+        this.startArray(length);
+    }
+
+    public mapField(id: number): void {
+        this.field(id);
+        this.startMap();
+    }
+
     public writeNumber(v: number): void {
         this._set(v);
     }

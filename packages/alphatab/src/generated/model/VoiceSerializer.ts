@@ -5,63 +5,38 @@
 // </auto-generated>
 import { Voice } from "@coderline/alphatab/model/Voice";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { Beat } from "@coderline/alphatab/model/Beat";
 import { BeatSerializer } from "@coderline/alphatab/generated/model/BeatSerializer";
 import { VoiceStyle } from "@coderline/alphatab/model/Voice";
 import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class VoiceSerializer {
-    public static fromJson(obj: Voice, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        VoiceSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Voice, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? VoiceSerializer._readField(obj, id, rr) : VoiceSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Voice, property: string, r: IObjectReader): boolean {
-        const id = VoiceSerializer._fieldId(property);
-        return id >= 0 ? VoiceSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "id":
-                return 0;
-            case "beats":
-                return 1;
-            case "style":
-                return 2;
-        }
-        return -1;
-    }
-    private static _readField(obj: Voice, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.id = r.readNumber();
-                return true;
-            case 1:
-                VoiceSerializer._readBeats(obj, r);
-                return true;
-            case 2:
-                if (r.isNullish()) {
-                    obj.style = undefined;
-                }
-                else {
-                    obj.style = new VoiceStyle();
-                    VoiceStyleSerializer.read(obj.style, r);
-                }
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["id", "beats", "style"]);
+    public static read(obj: Voice, reader: IObjectReader): void {
+        reader.readRecord(VoiceSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.id = r.readNumber();
+                    return true;
+                case 1:
+                    VoiceSerializer._readBeats(obj, r);
+                    return true;
+                case 2:
+                    if (r.isNullish()) {
+                        obj.style = undefined;
+                    }
+                    else {
+                        obj.style = new VoiceStyle();
+                        VoiceStyleSerializer.read(obj.style, r);
+                    }
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readBeats(obj: Voice, r: IObjectReader): void {
         obj.beats = [];
@@ -71,27 +46,20 @@ export class VoiceSerializer {
             obj.addBeat(i);
         });
     }
-    public static toJson(obj: Voice | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        VoiceSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: Voice | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "id");
-        w.writeNumber(obj.id);
-        w.field(1, "beats");
-        w.startArray(obj.beats!.length);
+        w.startObject(VoiceSerializer._fields);
+        w.numberField(0, obj.id);
+        w.arrayField(1, obj.beats!.length);
         for (const i of obj.beats!) {
             BeatSerializer.write(i, w);
         }
         w.endArray();
         if (obj.style) {
-            w.field(2, "style");
+            w.field(2);
             VoiceStyleSerializer.write(obj.style, w);
         }
         w.endObject();

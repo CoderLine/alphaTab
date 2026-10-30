@@ -241,13 +241,16 @@ function createFlexibleMethods(className: string, serializable: TypeSchema, impo
             `if (${names}.indexOf(property) >= 0) {\n${nestedRead(prop, importer, type.isOptional ? 'undefined' : 'null', 'flexible')}\nreturn true;\n}`
         ];
         if (prop.partialNames) {
-            const readProperty = isStrictType(type) ? 'readProperty' : 'readFlexibleProperty';
+            if (isStrictType(type)) {
+                // strict classes resolve keys only through the fields their read method passes to the reader
+                throw new Error(`@json_partial_names is only supported on non-strict types: ${className}.${prop.name}`);
+            }
             const create = isNullableOrOptional(type)
                 ? `if (!${field}) {\n${field} = ${constructExpr(type, importer)};\n}\n`
                 : '';
             const target = isNullableOrOptional(type) ? `${field}!` : field;
             code.push(
-                `for (const c of ${names}) {\nif (property.indexOf(c) === 0) {\n${create}if (${itemSerializer}.${readProperty}(${target}, property.substring(c.length), r)) {\nreturn true;\n}\n}\n}`
+                `for (const c of ${names}) {\nif (property.indexOf(c) === 0) {\n${create}if (${itemSerializer}.readFlexibleProperty(${target}, property.substring(c.length), r)) {\nreturn true;\n}\n}\n}`
             );
         }
         body.push(wrapTarget(prop, code.join('\n')));
@@ -255,7 +258,7 @@ function createFlexibleMethods(className: string, serializable: TypeSchema, impo
 
     return `
     public static readFlexible(obj: ${className}, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ${serializer}._readField(obj, id, rr, false) : ${serializer}.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? ${serializer}._readField(obj, id, rr, false) : ${serializer}.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ${className}, property: string, r: IObjectReader): boolean {
         ${body.join('\n')}
@@ -265,7 +268,7 @@ function createFlexibleMethods(className: string, serializable: TypeSchema, impo
 
 export function createReadMethods(className: string, serializable: TypeSchema, importer: Importer): string {
     importer('IObjectReader', '@coderline/alphatab/io/IObjectReader', true);
-    importer('MapObjectReader', '@coderline/alphatab/io/MapObjectReader');
+    importer('RecordFields', '@coderline/alphatab/io/RecordFields');
     const serializer = `${className}Serializer`;
 
     if (!serializable.isStrict && (serializable.hasAfterFromJsonExtension || serializable.hasSetPropertyExtension)) {
@@ -275,7 +278,7 @@ export function createReadMethods(className: string, serializable: TypeSchema, i
     const flexibleArg = serializable.isStrict ? '' : ', false';
     const flexibleParam = serializable.isStrict ? '' : ', flexible: boolean';
     const flexiblePass = serializable.isStrict ? '' : ', flexible';
-    const idCases: string[] = [];
+    const names: string[] = [];
     const fieldCases: string[] = [];
     // A closure in _readField would make V8 allocate a context on every call, so properties read through
     // closures get their own method.
@@ -292,39 +295,51 @@ export function createReadMethods(className: string, serializable: TypeSchema, i
             );
             code = `${serializer}.${helper}(obj, r${flexiblePass});`;
         }
-        idCases.push(caseClause(prop, JSON.stringify(primaryJsonName(prop)), `return ${id};`));
+        names.push(primaryJsonName(prop)!);
         fieldCases.push(caseClause(prop, String(id), `${code}\nreturn true;`));
     }
 
     const after = serializable.hasAfterFromJsonExtension ? '\nobj.afterFromJson();' : '';
-    const fallback = serializable.hasSetPropertyExtension ? 'obj.setProperty(property, r)' : 'false';
-    const idSwitch = idCases.length > 0 ? `switch (property) {\n${idCases.join('\n')}\n}` : '';
     const fieldSwitch = fieldCases.length > 0 ? `switch (id) {\n${fieldCases.join('\n')}\n}` : '';
 
-    return `
+    // strict classes read fields only in read, so the switch is its handler; non-strict ones also read them through
+    // readProperty and readFlexible (user input with partial names, see createFlexibleMethods)
+    const hookFallback = serializable.hasSetPropertyExtension ? 'id < 0 ? obj.setProperty(k, r) : false' : 'false';
+    const readHandler = serializable.isStrict
+        ? `(id, k, r) => {\n${fieldSwitch}\nreturn ${hookFallback};\n}`
+        : `(id, k, rr) => ${serializer}._readField(obj, id, rr${flexibleArg})`;
+    const readField = serializable.isStrict
+        ? ''
+        : `
+    private static _readField(obj: ${className}, id: number, r: IObjectReader${flexibleParam}): boolean {
+        ${fieldSwitch}
+        return false;
+    }`;
+    const readProperty = serializable.isStrict
+        ? ''
+        : `
+    public static readProperty(obj: ${className}, property: string, r: IObjectReader${flexibleParam}): boolean {
+        const id = ${serializer}._fields.idOf(property);
+        return id >= 0 ? ${serializer}._readField(obj, id, r${flexiblePass}) : false;
+    }`;
+
+    if (serializable.isJsonRoot) {
+        importer('MapObjectReader', '@coderline/alphatab/io/MapObjectReader');
+    }
+    const wrapper =
+        !serializable.isJsonRoot
+            ? ''
+            : `
     public static fromJson(obj: ${className}, m: unknown): void {
         if (!m) {
             return;
         }
         ${serializer}.${serializable.isStrict ? 'read' : 'readFlexible'}(obj, new MapObjectReader(m));
-    }
-    public static read(obj: ${className}, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ${serializer}._readField(obj, id, rr${flexibleArg}) : ${serializer}.readProperty(obj, k, rr${flexibleArg}));${after}
-    }
-    public static readProperty(obj: ${className}, property: string, r: IObjectReader${flexibleParam}): boolean {
-        const id = ${serializer}._fieldId(property);
-        return id >= 0 ? ${serializer}._readField(obj, id, r${flexiblePass}) : ${fallback};
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        ${idSwitch}
-        return -1;
-    }
-    private static _readField(obj: ${className}, id: number, r: IObjectReader${flexibleParam}): boolean {
-        ${fieldSwitch}
-        return false;
-    }
+    }`;
+    return `
+    private static readonly _fields: RecordFields = new RecordFields(${JSON.stringify(names)});${wrapper}
+    public static read(obj: ${className}, reader: IObjectReader): void {
+        reader.readRecord(${serializer}._fields, ${readHandler});${after}
+    }${readProperty}${readField}
     ${helpers.join('\n')}${serializable.isStrict ? '' : createFlexibleMethods(className, serializable, importer)}`;
 }

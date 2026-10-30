@@ -5,44 +5,22 @@
 // </auto-generated>
 import { ScoreStaffConfig } from "@coderline/alphatab/model/StaffConfigs";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ElementDisplaySerializer } from "@coderline/alphatab/generated/model/ElementDisplaySerializer";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class ScoreStaffConfigSerializer {
-    public static fromJson(obj: ScoreStaffConfig, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        ScoreStaffConfigSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: ScoreStaffConfig, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ScoreStaffConfigSerializer._readField(obj, id, rr, false) : ScoreStaffConfigSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["clef", "keysignature", "timesignature", "barnumber"]);
+    public static read(obj: ScoreStaffConfig, reader: IObjectReader): void {
+        reader.readRecord(ScoreStaffConfigSerializer._fields, (id, k, rr) => ScoreStaffConfigSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: ScoreStaffConfig, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = ScoreStaffConfigSerializer._fieldId(property);
+        const id = ScoreStaffConfigSerializer._fields.idOf(property);
         return id >= 0 ? ScoreStaffConfigSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "clef":
-                return 0;
-            case "keysignature":
-                return 1;
-            case "timesignature":
-                return 2;
-            case "barnumber":
-                return 3;
-        }
-        return -1;
     }
     private static _readField(obj: ScoreStaffConfig, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -80,7 +58,7 @@ export class ScoreStaffConfigSerializer {
         return false;
     }
     public static readFlexible(obj: ScoreStaffConfig, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ScoreStaffConfigSerializer._readField(obj, id, rr, false) : ScoreStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? ScoreStaffConfigSerializer._readField(obj, id, rr, false) : ScoreStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ScoreStaffConfig, property: string, r: IObjectReader): boolean {
         if (["clef", "keysignature", "timesignature"].indexOf(property) < 0 && ScoreStaffConfigSerializer.readProperty(obj, property, r, true)) {
@@ -118,31 +96,25 @@ export class ScoreStaffConfigSerializer {
         }
         return false;
     }
-    public static toJson(obj: ScoreStaffConfig | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        ScoreStaffConfigSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: ScoreStaffConfig | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
+        w.startObject(ScoreStaffConfigSerializer._fields);
         if (obj.clef) {
-            w.field(0, "clef");
+            w.field(0);
             ElementDisplaySerializer.write(obj.clef, w);
         }
         if (obj.keySignature) {
-            w.field(1, "keysignature");
+            w.field(1);
             ElementDisplaySerializer.write(obj.keySignature, w);
         }
         if (obj.timeSignature) {
-            w.field(2, "timesignature");
+            w.field(2);
             ElementDisplaySerializer.write(obj.timeSignature, w);
         }
-        w.field(3, "barnumber");
-        w.writeValue(obj.barNumber as number | undefined);
+        w.valueField(3, obj.barNumber as number | undefined);
         w.endObject();
     }
 }

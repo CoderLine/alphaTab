@@ -5,40 +5,22 @@
 // </auto-generated>
 import { NumberedStaffConfig } from "@coderline/alphatab/model/StaffConfigs";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ElementDisplaySerializer } from "@coderline/alphatab/generated/model/ElementDisplaySerializer";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class NumberedStaffConfigSerializer {
-    public static fromJson(obj: NumberedStaffConfig, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        NumberedStaffConfigSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: NumberedStaffConfig, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? NumberedStaffConfigSerializer._readField(obj, id, rr, false) : NumberedStaffConfigSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["timesignature", "barnumber"]);
+    public static read(obj: NumberedStaffConfig, reader: IObjectReader): void {
+        reader.readRecord(NumberedStaffConfigSerializer._fields, (id, k, rr) => NumberedStaffConfigSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: NumberedStaffConfig, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = NumberedStaffConfigSerializer._fieldId(property);
+        const id = NumberedStaffConfigSerializer._fields.idOf(property);
         return id >= 0 ? NumberedStaffConfigSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "timesignature":
-                return 0;
-            case "barnumber":
-                return 1;
-        }
-        return -1;
     }
     private static _readField(obj: NumberedStaffConfig, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -58,7 +40,7 @@ export class NumberedStaffConfigSerializer {
         return false;
     }
     public static readFlexible(obj: NumberedStaffConfig, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? NumberedStaffConfigSerializer._readField(obj, id, rr, false) : NumberedStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? NumberedStaffConfigSerializer._readField(obj, id, rr, false) : NumberedStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: NumberedStaffConfig, property: string, r: IObjectReader): boolean {
         if (["timesignature"].indexOf(property) < 0 && NumberedStaffConfigSerializer.readProperty(obj, property, r, true)) {
@@ -76,23 +58,17 @@ export class NumberedStaffConfigSerializer {
         }
         return false;
     }
-    public static toJson(obj: NumberedStaffConfig | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        NumberedStaffConfigSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: NumberedStaffConfig | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
+        w.startObject(NumberedStaffConfigSerializer._fields);
         if (obj.timeSignature) {
-            w.field(0, "timesignature");
+            w.field(0);
             ElementDisplaySerializer.write(obj.timeSignature, w);
         }
-        w.field(1, "barnumber");
-        w.writeValue(obj.barNumber as number | undefined);
+        w.valueField(1, obj.barNumber as number | undefined);
         w.endObject();
     }
 }

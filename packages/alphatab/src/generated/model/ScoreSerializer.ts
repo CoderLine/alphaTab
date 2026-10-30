@@ -5,7 +5,7 @@
 // </auto-generated>
 import { Score } from "@coderline/alphatab/model/Score";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { MasterBar } from "@coderline/alphatab/model/MasterBar";
 import { MasterBarSerializer } from "@coderline/alphatab/generated/model/MasterBarSerializer";
 import { Track } from "@coderline/alphatab/model/Track";
@@ -15,134 +15,89 @@ import { BackingTrack } from "@coderline/alphatab/model/BackingTrack";
 import { BackingTrackSerializer } from "@coderline/alphatab/generated/model/BackingTrackSerializer";
 import { ScoreStyle } from "@coderline/alphatab/model/Score";
 import { ScoreStyleSerializer } from "@coderline/alphatab/generated/model/ScoreStyleSerializer";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class ScoreSerializer {
+    private static readonly _fields: RecordFields = new RecordFields(["album", "artist", "copyright", "instructions", "music", "notices", "subtitle", "title", "words", "tab", "masterbars", "tracks", "defaultsystemslayout", "systemslayout", "stylesheet", "backingtrack", "style"]);
     public static fromJson(obj: Score, m: unknown): void {
         if (!m) {
             return;
         }
         ScoreSerializer.read(obj, new MapObjectReader(m));
     }
-    public static read(obj: Score, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ScoreSerializer._readField(obj, id, rr) : ScoreSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Score, property: string, r: IObjectReader): boolean {
-        const id = ScoreSerializer._fieldId(property);
-        return id >= 0 ? ScoreSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "album":
-                return 0;
-            case "artist":
-                return 1;
-            case "copyright":
-                return 2;
-            case "instructions":
-                return 3;
-            case "music":
-                return 4;
-            case "notices":
-                return 5;
-            case "subtitle":
-                return 6;
-            case "title":
-                return 7;
-            case "words":
-                return 8;
-            case "tab":
-                return 9;
-            case "masterbars":
-                return 10;
-            case "tracks":
-                return 11;
-            case "defaultsystemslayout":
-                return 12;
-            case "systemslayout":
-                return 13;
-            case "stylesheet":
-                return 14;
-            case "backingtrack":
-                return 15;
-            case "style":
-                return 16;
-        }
-        return -1;
-    }
-    private static _readField(obj: Score, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.album = r.readString();
-                return true;
-            case 1:
-                obj.artist = r.readString();
-                return true;
-            case 2:
-                obj.copyright = r.readString();
-                return true;
-            case 3:
-                obj.instructions = r.readString();
-                return true;
-            case 4:
-                obj.music = r.readString();
-                return true;
-            case 5:
-                obj.notices = r.readString();
-                return true;
-            case 6:
-                obj.subTitle = r.readString();
-                return true;
-            case 7:
-                obj.title = r.readString();
-                return true;
-            case 8:
-                obj.words = r.readString();
-                return true;
-            case 9:
-                obj.tab = r.readString();
-                return true;
-            case 10:
-                ScoreSerializer._readMasterBars(obj, r);
-                return true;
-            case 11:
-                ScoreSerializer._readTracks(obj, r);
-                return true;
-            case 12:
-                obj.defaultSystemsLayout = r.readNumber();
-                return true;
-            case 13:
-                obj.systemsLayout = r.readValue()! as number[];
-                return true;
-            case 14:
-                RenderStylesheetSerializer.read(obj.stylesheet, r);
-                return true;
-            case 15:
-                if (r.isNullish()) {
-                    obj.backingTrack = undefined;
-                }
-                else {
-                    obj.backingTrack = new BackingTrack();
-                    BackingTrackSerializer.read(obj.backingTrack, r);
-                }
-                return true;
-            case 16:
-                if (r.isNullish()) {
-                    obj.style = undefined;
-                }
-                else {
-                    obj.style = new ScoreStyle();
-                    ScoreStyleSerializer.read(obj.style, r);
-                }
-                return true;
-        }
-        return false;
+    public static read(obj: Score, reader: IObjectReader): void {
+        reader.readRecord(ScoreSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.album = r.readString();
+                    return true;
+                case 1:
+                    obj.artist = r.readString();
+                    return true;
+                case 2:
+                    obj.copyright = r.readString();
+                    return true;
+                case 3:
+                    obj.instructions = r.readString();
+                    return true;
+                case 4:
+                    obj.music = r.readString();
+                    return true;
+                case 5:
+                    obj.notices = r.readString();
+                    return true;
+                case 6:
+                    obj.subTitle = r.readString();
+                    return true;
+                case 7:
+                    obj.title = r.readString();
+                    return true;
+                case 8:
+                    obj.words = r.readString();
+                    return true;
+                case 9:
+                    obj.tab = r.readString();
+                    return true;
+                case 10:
+                    ScoreSerializer._readMasterBars(obj, r);
+                    return true;
+                case 11:
+                    ScoreSerializer._readTracks(obj, r);
+                    return true;
+                case 12:
+                    obj.defaultSystemsLayout = r.readNumber();
+                    return true;
+                case 13:
+                    obj.systemsLayout = r.readValue()! as number[];
+                    return true;
+                case 14:
+                    RenderStylesheetSerializer.read(obj.stylesheet, r);
+                    return true;
+                case 15:
+                    if (r.isNullish()) {
+                        obj.backingTrack = undefined;
+                    }
+                    else {
+                        obj.backingTrack = new BackingTrack();
+                        BackingTrackSerializer.read(obj.backingTrack, r);
+                    }
+                    return true;
+                case 16:
+                    if (r.isNullish()) {
+                        obj.style = undefined;
+                    }
+                    else {
+                        obj.style = new ScoreStyle();
+                        ScoreStyleSerializer.read(obj.style, r);
+                    }
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readMasterBars(obj: Score, r: IObjectReader): void {
         obj.masterBars = [];
@@ -170,51 +125,37 @@ export class ScoreSerializer {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "album");
-        w.writeString(obj.album);
-        w.field(1, "artist");
-        w.writeString(obj.artist);
-        w.field(2, "copyright");
-        w.writeString(obj.copyright);
-        w.field(3, "instructions");
-        w.writeString(obj.instructions);
-        w.field(4, "music");
-        w.writeString(obj.music);
-        w.field(5, "notices");
-        w.writeString(obj.notices);
-        w.field(6, "subtitle");
-        w.writeString(obj.subTitle);
-        w.field(7, "title");
-        w.writeString(obj.title);
-        w.field(8, "words");
-        w.writeString(obj.words);
-        w.field(9, "tab");
-        w.writeString(obj.tab);
-        w.field(10, "masterbars");
-        w.startArray(obj.masterBars!.length);
+        w.startObject(ScoreSerializer._fields);
+        w.stringField(0, obj.album);
+        w.stringField(1, obj.artist);
+        w.stringField(2, obj.copyright);
+        w.stringField(3, obj.instructions);
+        w.stringField(4, obj.music);
+        w.stringField(5, obj.notices);
+        w.stringField(6, obj.subTitle);
+        w.stringField(7, obj.title);
+        w.stringField(8, obj.words);
+        w.stringField(9, obj.tab);
+        w.arrayField(10, obj.masterBars!.length);
         for (const i of obj.masterBars!) {
             MasterBarSerializer.write(i, w);
         }
         w.endArray();
-        w.field(11, "tracks");
-        w.startArray(obj.tracks!.length);
+        w.arrayField(11, obj.tracks!.length);
         for (const i of obj.tracks!) {
             TrackSerializer.write(i, w);
         }
         w.endArray();
-        w.field(12, "defaultsystemslayout");
-        w.writeNumber(obj.defaultSystemsLayout);
-        w.field(13, "systemslayout");
-        w.writeValue(obj.systemsLayout);
-        w.field(14, "stylesheet");
+        w.numberField(12, obj.defaultSystemsLayout);
+        w.valueField(13, obj.systemsLayout);
+        w.field(14);
         RenderStylesheetSerializer.write(obj.stylesheet, w);
         if (obj.backingTrack) {
-            w.field(15, "backingtrack");
+            w.field(15);
             BackingTrackSerializer.write(obj.backingTrack, w);
         }
         if (obj.style) {
-            w.field(16, "style");
+            w.field(16);
             ScoreStyleSerializer.write(obj.style, w);
         }
         w.endObject();

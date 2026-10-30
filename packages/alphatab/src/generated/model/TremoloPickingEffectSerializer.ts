@@ -5,66 +5,36 @@
 // </auto-generated>
 import { TremoloPickingEffect } from "@coderline/alphatab/model/TremoloPickingEffect";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { TremoloPickingStyle } from "@coderline/alphatab/model/TremoloPickingEffect";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class TremoloPickingEffectSerializer {
-    public static fromJson(obj: TremoloPickingEffect, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        TremoloPickingEffectSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: TremoloPickingEffect, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? TremoloPickingEffectSerializer._readField(obj, id, rr) : TremoloPickingEffectSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: TremoloPickingEffect, property: string, r: IObjectReader): boolean {
-        const id = TremoloPickingEffectSerializer._fieldId(property);
-        return id >= 0 ? TremoloPickingEffectSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "marks":
-                return 0;
-            case "style":
-                return 1;
-        }
-        return -1;
-    }
-    private static _readField(obj: TremoloPickingEffect, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.marks = r.readNumber();
-                return true;
-            case 1:
-                obj.style = JsonHelper.parseEnum<TremoloPickingStyle>(r.readValue(), TremoloPickingStyle)!;
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: TremoloPickingEffect | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        TremoloPickingEffectSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["marks", "style"]);
+    public static read(obj: TremoloPickingEffect, reader: IObjectReader): void {
+        reader.readRecord(TremoloPickingEffectSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.marks = r.readNumber();
+                    return true;
+                case 1:
+                    obj.style = JsonHelper.parseEnum<TremoloPickingStyle>(r.readValue(), TremoloPickingStyle)!;
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: TremoloPickingEffect | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "marks");
-        w.writeNumber(obj.marks);
-        w.field(1, "style");
-        w.writeNumber(obj.style as number);
+        w.startObject(TremoloPickingEffectSerializer._fields);
+        w.numberField(0, obj.marks);
+        w.numberField(1, obj.style as number);
         w.endObject();
     }
 }

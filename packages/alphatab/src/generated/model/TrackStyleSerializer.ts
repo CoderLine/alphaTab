@@ -5,46 +5,25 @@
 // </auto-generated>
 import { TrackStyle } from "@coderline/alphatab/model/Track";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { TrackSubElement } from "@coderline/alphatab/model/Track";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Color } from "@coderline/alphatab/model/Color";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class TrackStyleSerializer {
-    public static fromJson(obj: TrackStyle, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        TrackStyleSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: TrackStyle, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? TrackStyleSerializer._readField(obj, id, rr) : TrackStyleSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: TrackStyle, property: string, r: IObjectReader): boolean {
-        const id = TrackStyleSerializer._fieldId(property);
-        return id >= 0 ? TrackStyleSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "colors":
-                return 0;
-        }
-        return -1;
-    }
-    private static _readField(obj: TrackStyle, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                TrackStyleSerializer._readColors(obj, r);
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["colors"]);
+    public static read(obj: TrackStyle, reader: IObjectReader): void {
+        reader.readRecord(TrackStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    TrackStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readColors(obj: TrackStyle, r: IObjectReader): void {
         obj.colors = new Map<TrackSubElement, Color | null>();
@@ -53,19 +32,13 @@ export class TrackStyleSerializer {
             return true;
         });
     }
-    public static toJson(obj: TrackStyle | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        TrackStyleSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: TrackStyle | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "colors");
-        w.startMap();
+        w.startObject(TrackStyleSerializer._fields);
+        w.mapField(0);
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());
             w.writeValue(Color.toJson(v));

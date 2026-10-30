@@ -1,6 +1,8 @@
 /** @target web */
 import type { IObjectReader } from '@coderline/alphatab/io/IObjectReader';
 import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
+import { MapObjectWriter } from '@coderline/alphatab/io/MapObjectWriter';
 import { MessagePackObjectReader } from '@coderline/alphatab/io/MessagePackObjectReader';
 import { MessagePackObjectWriter } from '@coderline/alphatab/io/MessagePackObjectWriter';
 import { describe, expect, it } from 'vitest';
@@ -64,12 +66,18 @@ describe('SerializerRoundTripTests', () => {
         return obj;
     }
 
+    function toJson(c: SerializerFillCase, obj: unknown) {
+        const w = new MapObjectWriter();
+        c.write(obj, w);
+        return w.result as Map<string, unknown>;
+    }
+
     function check(c: SerializerFillCase) {
         const obj = filled(c);
-        const expected = c.serializer.toJson(obj)!;
+        const expected = toJson(c, obj);
 
         // every written property differs from its default
-        const defaults = c.serializer.toJson(c.create())!;
+        const defaults = toJson(c, c.create());
         const unfilled = SerializerFill.unfilled.get(c.name) ?? [];
         for (const [k, v] of expected) {
             if (unfilled.indexOf(k) < 0) {
@@ -81,23 +89,23 @@ describe('SerializerRoundTripTests', () => {
 
         // Map tree
         const fromMap = c.create();
-        c.serializer.fromJson(fromMap, expected);
-        expectSame(c.serializer.toJson(fromMap), expected, `${c.name} (Map)`);
+        c.fromJson(fromMap, new MapObjectReader(expected));
+        expectSame(toJson(c, fromMap), expected, `${c.name} (Map)`);
 
         // JSON text
         const fromJson = c.create();
-        c.serializer.fromJson(fromJson, JSON.parse(JSON.stringify(expected, mapReplacer)));
-        expect(JSON.stringify(c.serializer.toJson(fromJson), mapReplacer), `${c.name} (JSON)`).toBe(
+        c.fromJson(fromJson, new MapObjectReader(JSON.parse(JSON.stringify(expected, mapReplacer))));
+        expect(JSON.stringify(toJson(c, fromJson), mapReplacer), `${c.name} (JSON)`).toBe(
             JSON.stringify(expected, mapReplacer)
         );
 
         for (const format of formats) {
             const w = format.writer(64);
-            c.serializer.write(obj, w);
+            c.write(obj, w);
             const data = w.toUint8Array();
             const fromBinary = c.create();
-            c.serializer.read(fromBinary, format.reader(data));
-            expectSame(c.serializer.toJson(fromBinary), expected, `${c.name} (${format.name})`);
+            c.read(fromBinary, format.reader(data));
+            expectSame(toJson(c, fromBinary), expected, `${c.name} (${format.name})`);
 
             // every field is keyed by its id
             const tree = format.reader(data).readValue() as Map<string, unknown>;

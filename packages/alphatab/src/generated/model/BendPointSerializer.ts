@@ -5,64 +5,34 @@
 // </auto-generated>
 import { BendPoint } from "@coderline/alphatab/model/BendPoint";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class BendPointSerializer {
-    public static fromJson(obj: BendPoint, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        BendPointSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: BendPoint, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? BendPointSerializer._readField(obj, id, rr) : BendPointSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: BendPoint, property: string, r: IObjectReader): boolean {
-        const id = BendPointSerializer._fieldId(property);
-        return id >= 0 ? BendPointSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "offset":
-                return 0;
-            case "value":
-                return 1;
-        }
-        return -1;
-    }
-    private static _readField(obj: BendPoint, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.offset = r.readNumber();
-                return true;
-            case 1:
-                obj.value = r.readNumber();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: BendPoint | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        BendPointSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["offset", "value"]);
+    public static read(obj: BendPoint, reader: IObjectReader): void {
+        reader.readRecord(BendPointSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.offset = r.readNumber();
+                    return true;
+                case 1:
+                    obj.value = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: BendPoint | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "offset");
-        w.writeNumber(obj.offset);
-        w.field(1, "value");
-        w.writeNumber(obj.value);
+        w.startObject(BendPointSerializer._fields);
+        w.numberField(0, obj.offset);
+        w.numberField(1, obj.value);
         w.endObject();
     }
 }

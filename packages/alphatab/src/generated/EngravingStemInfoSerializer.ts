@@ -5,39 +5,19 @@
 // </auto-generated>
 import { EngravingStemInfo } from "@coderline/alphatab/EngravingSettings";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class EngravingStemInfoSerializer {
-    public static fromJson(obj: EngravingStemInfo, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        EngravingStemInfoSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: EngravingStemInfo, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? EngravingStemInfoSerializer._readField(obj, id, rr, false) : EngravingStemInfoSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["topy", "bottomy", "x"]);
+    public static read(obj: EngravingStemInfo, reader: IObjectReader): void {
+        reader.readRecord(EngravingStemInfoSerializer._fields, (id, k, rr) => EngravingStemInfoSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: EngravingStemInfo, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = EngravingStemInfoSerializer._fieldId(property);
+        const id = EngravingStemInfoSerializer._fields.idOf(property);
         return id >= 0 ? EngravingStemInfoSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "topy":
-                return 0;
-            case "bottomy":
-                return 1;
-            case "x":
-                return 2;
-        }
-        return -1;
     }
     private static _readField(obj: EngravingStemInfo, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -54,7 +34,7 @@ export class EngravingStemInfoSerializer {
         return false;
     }
     public static readFlexible(obj: EngravingStemInfo, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? EngravingStemInfoSerializer._readField(obj, id, rr, false) : EngravingStemInfoSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? EngravingStemInfoSerializer._readField(obj, id, rr, false) : EngravingStemInfoSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: EngravingStemInfo, property: string, r: IObjectReader): boolean {
         if (EngravingStemInfoSerializer.readProperty(obj, property, r, true)) {
@@ -62,23 +42,15 @@ export class EngravingStemInfoSerializer {
         }
         return false;
     }
-    public static toJson(obj: EngravingStemInfo | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        EngravingStemInfoSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: EngravingStemInfo | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "topy");
-        w.writeNumber(obj.topY);
-        w.field(1, "bottomy");
-        w.writeNumber(obj.bottomY);
-        w.field(2, "x");
-        w.writeNumber(obj.x);
+        w.startObject(EngravingStemInfoSerializer._fields);
+        w.numberField(0, obj.topY);
+        w.numberField(1, obj.bottomY);
+        w.numberField(2, obj.x);
         w.endObject();
     }
 }

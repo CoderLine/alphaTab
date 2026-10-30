@@ -2,6 +2,7 @@
 import { AlphaTabError } from '@coderline/alphatab/AlphaTabError';
 import type { IObjectReader } from '@coderline/alphatab/io/IObjectReader';
 import { MessagePackObjectReader } from '@coderline/alphatab/io/MessagePackObjectReader';
+import { RecordFields } from '@coderline/alphatab/io/RecordFields';
 import { MessagePackObjectWriter } from '@coderline/alphatab/io/MessagePackObjectWriter';
 import { describe, expect, it } from 'vitest';
 
@@ -16,6 +17,9 @@ function fromHex(s: string): Uint8Array {
 }
 
 describe('MessagePackObjectIOTests', () => {
+    // MessagePack writes field ids only, the keys are not needed
+    const noFields = new RecordFields([]);
+
     function encode(value: Map<string, unknown>, initialCapacity: number = 16): Uint8Array {
         const w = new MessagePackObjectWriter(initialCapacity);
         w.writeValue(value);
@@ -98,14 +102,14 @@ describe('MessagePackObjectIOTests', () => {
 
     it('typed-reads-of-other-types', () => {
         const w = new MessagePackObjectWriter(64);
-        w.startObject();
+        w.startMap();
         w.prop('n');
         w.writeNumber(null as unknown as number);
         w.prop('b');
         w.writeBoolean(undefined as unknown as boolean);
         w.prop('s');
         w.writeString(null as unknown as string);
-        w.endObject();
+        w.endMap();
         const r = new MessagePackObjectReader(w.toUint8Array());
         const values: unknown[] = [];
         r.readObject((k, rr) => {
@@ -156,12 +160,52 @@ describe('MessagePackObjectIOTests', () => {
         expect(read).toBe(42);
     });
 
+    it('typed-field-calls-write-field-and-value', () => {
+        const separate = new MessagePackObjectWriter(16);
+        separate.startObject(noFields);
+        separate.field(1);
+        separate.writeNumber(1.5);
+        separate.field(2);
+        separate.writeBoolean(true);
+        separate.field(3);
+        separate.writeString('x');
+        separate.field(4);
+        separate.writeValue(null);
+        separate.field(5);
+        separate.startArray(1);
+        separate.writeNumber(7);
+        separate.endArray();
+        separate.field(200);
+        separate.startMap();
+        separate.prop('k');
+        separate.writeNumber(8);
+        separate.endMap();
+        separate.endObject();
+
+        const typed = new MessagePackObjectWriter(16);
+        typed.startObject(noFields);
+        typed.numberField(1, 1.5);
+        typed.booleanField(2, true);
+        typed.stringField(3, 'x');
+        typed.valueField(4, null);
+        typed.arrayField(5, 1);
+        typed.writeNumber(7);
+        typed.endArray();
+        typed.mapField(200);
+        typed.prop('k');
+        typed.writeNumber(8);
+        typed.endMap();
+        typed.endObject();
+
+        expect(hex(typed.toUint8Array())).toBe(hex(separate.toUint8Array()));
+    });
+
     it('field-ids', () => {
         const w = new MessagePackObjectWriter(16);
-        w.startObject();
-        w.field(5, 'five');
+        w.startObject(noFields);
+        w.field(5);
         w.writeNumber(1);
-        w.field(200, 'twohundred');
+        w.field(200);
         w.writeBoolean(true);
         w.prop('n');
         w.writeString('x');
@@ -171,7 +215,7 @@ describe('MessagePackObjectIOTests', () => {
         expect(hex(data)).toBe('de 00 03 05 01 cc c8 c3 a1 6e a1 78');
 
         const entries: string[] = [];
-        new MessagePackObjectReader(data).readRecord((id, name, r) => {
+        new MessagePackObjectReader(data).readRecord(null, (id, name, r) => {
             entries.push(`${id}:${name}=${String(r.readValue())}`);
             return true;
         });
@@ -189,20 +233,20 @@ describe('MessagePackObjectIOTests', () => {
 
     it('unconsumed-fields-are-skipped', () => {
         const w = new MessagePackObjectWriter(16);
-        w.startObject();
-        w.field(0, 'skipped');
+        w.startObject(noFields);
+        w.field(0);
         w.writeValue(new Map<string, unknown>([['a', [1, 'x']]]));
-        w.field(1, 'read');
+        w.field(1);
         w.writeNumber(42);
         w.prop('skippedByName');
         w.writeString('text');
-        w.field(2, 'last');
+        w.field(2);
         w.writeBoolean(true);
         w.endObject();
         const seen: number[] = [];
         let read = 0;
         let last = false;
-        new MessagePackObjectReader(w.toUint8Array()).readRecord((id, _name, r) => {
+        new MessagePackObjectReader(w.toUint8Array()).readRecord(null, (id, _name, r) => {
             seen.push(id);
             if (id === 1) {
                 read = r.readNumber();
@@ -220,8 +264,10 @@ describe('MessagePackObjectIOTests', () => {
     });
 
     it('truncated-field-id', () => {
-        expect(() => new MessagePackObjectReader(fromHex('81 cc')).readRecord(() => true)).toThrow(AlphaTabError);
-        expect(() => new MessagePackObjectReader(fromHex('81 05')).readRecord(() => false)).toThrow(AlphaTabError);
+        expect(() => new MessagePackObjectReader(fromHex('81 cc')).readRecord(null, () => true)).toThrow(AlphaTabError);
+        expect(() => new MessagePackObjectReader(fromHex('81 05')).readRecord(null, () => false)).toThrow(
+            AlphaTabError
+        );
     });
 
     it('spec-example', () => {

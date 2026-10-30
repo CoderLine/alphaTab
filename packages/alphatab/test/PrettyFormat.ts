@@ -788,13 +788,13 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
         defaultNote.index = -1;
 
         this._defaultScoreJson = ScoreSerializer.toJson(defaultScore)!;
-        this._defaultMasterBarJson = MasterBarSerializer.toJson(defaultMasterBar)!;
-        this._defaultTrackJson = TrackSerializer.toJson(defaultTrack)!;
-        this._defaultStaffJson = StaffSerializer.toJson(defaultStaff)!;
-        this._defaultBarJson = BarSerializer.toJson(defaultBar)!;
-        this._defaultVoiceJson = VoiceSerializer.toJson(defaultVoice)!;
-        this._defaultBeatJson = BeatSerializer.toJson(defaultBeat)!;
-        this._defaultNoteJson = NoteSerializer.toJson(defaultNote)!;
+        this._defaultMasterBarJson = TestPlatform.toJson(w => MasterBarSerializer.write(defaultMasterBar, w));
+        this._defaultTrackJson = TestPlatform.toJson(w => TrackSerializer.write(defaultTrack, w));
+        this._defaultStaffJson = TestPlatform.toJson(w => StaffSerializer.write(defaultStaff, w));
+        this._defaultBarJson = TestPlatform.toJson(w => BarSerializer.write(defaultBar, w));
+        this._defaultVoiceJson = TestPlatform.toJson(w => VoiceSerializer.write(defaultVoice, w));
+        this._defaultBeatJson = TestPlatform.toJson(w => BeatSerializer.write(defaultBeat, w));
+        this._defaultNoteJson = TestPlatform.toJson(w => NoteSerializer.write(defaultNote, w));
     }
 
     public serialize(
@@ -879,7 +879,9 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                             isEqual = (v as string) === (dv as string);
                             break;
                         case 'number':
-                            isEqual = (v as number) === (dv as number) || (Number.isNaN(v as number) && Number.isNaN(dv as number));
+                            isEqual =
+                                (v as number) === (dv as number) ||
+                                (Number.isNaN(v as number) && Number.isNaN(dv as number));
                             break;
                         case 'bigint':
                             isEqual = (v as bigint) === (dv as bigint);

@@ -5,7 +5,7 @@
 // </auto-generated>
 import { Track } from "@coderline/alphatab/model/Track";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { Staff } from "@coderline/alphatab/model/Staff";
 import { StaffSerializer } from "@coderline/alphatab/generated/model/StaffSerializer";
 import { PlaybackInformationSerializer } from "@coderline/alphatab/generated/model/PlaybackInformationSerializer";
@@ -15,99 +15,58 @@ import { InstrumentArticulationSerializer } from "@coderline/alphatab/generated/
 import { TrackStyle } from "@coderline/alphatab/model/Track";
 import { TrackStyleSerializer } from "@coderline/alphatab/generated/model/TrackStyleSerializer";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class TrackSerializer {
-    public static fromJson(obj: Track, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        TrackSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Track, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? TrackSerializer._readField(obj, id, rr) : TrackSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Track, property: string, r: IObjectReader): boolean {
-        const id = TrackSerializer._fieldId(property);
-        return id >= 0 ? TrackSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "staves":
-                return 0;
-            case "playbackinfo":
-                return 1;
-            case "color":
-                return 2;
-            case "name":
-                return 3;
-            case "isvisibleonmultitrack":
-                return 4;
-            case "shortname":
-                return 5;
-            case "defaultsystemslayout":
-                return 6;
-            case "systemslayout":
-                return 7;
-            case "linebreaks":
-                return 8;
-            case "percussionarticulations":
-                return 9;
-            case "style":
-                return 10;
-        }
-        return -1;
-    }
-    private static _readField(obj: Track, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                TrackSerializer._readStaves(obj, r);
-                return true;
-            case 1:
-                PlaybackInformationSerializer.read(obj.playbackInfo, r);
-                return true;
-            case 2:
-                obj.color = Color.fromJson(r.readValue())!;
-                return true;
-            case 3:
-                obj.name = r.readString();
-                return true;
-            case 4:
-                obj.isVisibleOnMultiTrack = r.readBoolean();
-                return true;
-            case 5:
-                obj.shortName = r.readString();
-                return true;
-            case 6:
-                obj.defaultSystemsLayout = r.readNumber();
-                return true;
-            case 7:
-                obj.systemsLayout = r.readValue()! as number[];
-                return true;
-            case 8:
-                for (const i of (r.readValue() as number[])) {
-                    obj.addLineBreaks(i);
-                }
-                return true;
-            case 9:
-                TrackSerializer._readPercussionArticulations(obj, r);
-                return true;
-            case 10:
-                if (r.isNullish()) {
-                    obj.style = undefined;
-                }
-                else {
-                    obj.style = new TrackStyle();
-                    TrackStyleSerializer.read(obj.style, r);
-                }
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["staves", "playbackinfo", "color", "name", "isvisibleonmultitrack", "shortname", "defaultsystemslayout", "systemslayout", "linebreaks", "percussionarticulations", "style"]);
+    public static read(obj: Track, reader: IObjectReader): void {
+        reader.readRecord(TrackSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    TrackSerializer._readStaves(obj, r);
+                    return true;
+                case 1:
+                    PlaybackInformationSerializer.read(obj.playbackInfo, r);
+                    return true;
+                case 2:
+                    obj.color = Color.fromJson(r.readValue())!;
+                    return true;
+                case 3:
+                    obj.name = r.readString();
+                    return true;
+                case 4:
+                    obj.isVisibleOnMultiTrack = r.readBoolean();
+                    return true;
+                case 5:
+                    obj.shortName = r.readString();
+                    return true;
+                case 6:
+                    obj.defaultSystemsLayout = r.readNumber();
+                    return true;
+                case 7:
+                    obj.systemsLayout = r.readValue()! as number[];
+                    return true;
+                case 8:
+                    for (const i of (r.readValue() as number[])) {
+                        obj.addLineBreaks(i);
+                    }
+                    return true;
+                case 9:
+                    TrackSerializer._readPercussionArticulations(obj, r);
+                    return true;
+                case 10:
+                    if (r.isNullish()) {
+                        obj.style = undefined;
+                    }
+                    else {
+                        obj.style = new TrackStyle();
+                        TrackStyleSerializer.read(obj.style, r);
+                    }
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readStaves(obj: Track, r: IObjectReader): void {
         obj.staves = [];
@@ -125,53 +84,39 @@ export class TrackSerializer {
             obj.percussionArticulations.push(i);
         });
     }
-    public static toJson(obj: Track | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        TrackSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: Track | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "staves");
-        w.startArray(obj.staves!.length);
+        w.startObject(TrackSerializer._fields);
+        w.arrayField(0, obj.staves!.length);
         for (const i of obj.staves!) {
             StaffSerializer.write(i, w);
         }
         w.endArray();
-        w.field(1, "playbackinfo");
+        w.field(1);
         PlaybackInformationSerializer.write(obj.playbackInfo, w);
-        w.field(2, "color");
-        w.writeValue(Color.toJson(obj.color));
-        w.field(3, "name");
-        w.writeString(obj.name);
-        w.field(4, "isvisibleonmultitrack");
-        w.writeBoolean(obj.isVisibleOnMultiTrack);
-        w.field(5, "shortname");
-        w.writeString(obj.shortName);
-        w.field(6, "defaultsystemslayout");
-        w.writeNumber(obj.defaultSystemsLayout);
-        w.field(7, "systemslayout");
-        w.writeValue(obj.systemsLayout);
+        w.valueField(2, Color.toJson(obj.color));
+        w.stringField(3, obj.name);
+        w.booleanField(4, obj.isVisibleOnMultiTrack);
+        w.stringField(5, obj.shortName);
+        w.numberField(6, obj.defaultSystemsLayout);
+        w.valueField(7, obj.systemsLayout);
         if (obj.lineBreaks !== undefined) {
             const a: number[] = [];
             for (const v of obj.lineBreaks!) {
                 a.push(v);
             }
-            w.field(8, "linebreaks");
-            w.writeValue(a);
+            w.valueField(8, a);
         }
-        w.field(9, "percussionarticulations");
-        w.startArray(obj.percussionArticulations!.length);
+        w.arrayField(9, obj.percussionArticulations!.length);
         for (const i of obj.percussionArticulations!) {
             InstrumentArticulationSerializer.write(i, w);
         }
         w.endArray();
         if (obj.style) {
-            w.field(10, "style");
+            w.field(10);
             TrackStyleSerializer.write(obj.style, w);
         }
         w.endObject();

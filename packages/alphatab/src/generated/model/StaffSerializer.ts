@@ -5,7 +5,7 @@
 // </auto-generated>
 import { Staff } from "@coderline/alphatab/model/Staff";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { Bar } from "@coderline/alphatab/model/Bar";
 import { BarSerializer } from "@coderline/alphatab/generated/model/BarSerializer";
 import { Chord } from "@coderline/alphatab/model/Chord";
@@ -16,140 +16,89 @@ import { TabStaffConfigSerializer } from "@coderline/alphatab/generated/model/Ta
 import { SlashStaffConfigSerializer } from "@coderline/alphatab/generated/model/SlashStaffConfigSerializer";
 import { NumberedStaffConfigSerializer } from "@coderline/alphatab/generated/model/NumberedStaffConfigSerializer";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class StaffSerializer {
-    public static fromJson(obj: Staff, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        StaffSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Staff, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? StaffSerializer._readField(obj, id, rr) : StaffSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Staff, property: string, r: IObjectReader): boolean {
-        const id = StaffSerializer._fieldId(property);
-        return id >= 0 ? StaffSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "bars":
-                return 0;
-            case "chords":
-                return 1;
-            case "capo":
-                return 2;
-            case "transpositionpitch":
-                return 3;
-            case "displaytranspositionpitch":
-                return 4;
-            case "stringtuning":
-                return 5;
-            case "showslash":
-                return 6;
-            case "shownumbered":
-                return 7;
-            case "showtablature":
-                return 8;
-            case "showstandardnotation":
-                return 9;
-            case "scoreconfig":
-                return 10;
-            case "tabconfig":
-                return 11;
-            case "slashconfig":
-                return 12;
-            case "numberedconfig":
-                return 13;
-            case "ispercussion":
-                return 14;
-            case "standardnotationlinecount":
-                return 15;
-        }
-        return -1;
-    }
-    private static _readField(obj: Staff, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                StaffSerializer._readBars(obj, r);
-                return true;
-            case 1:
-                StaffSerializer._readChords(obj, r);
-                return true;
-            case 2:
-                obj.capo = r.readNumber();
-                return true;
-            case 3:
-                obj.transpositionPitch = r.readNumber();
-                return true;
-            case 4:
-                obj.displayTranspositionPitch = r.readNumber();
-                return true;
-            case 5:
-                TuningSerializer.read(obj.stringTuning, r);
-                return true;
-            case 6:
-                obj.showSlash = r.readBoolean();
-                return true;
-            case 7:
-                obj.showNumbered = r.readBoolean();
-                return true;
-            case 8:
-                obj.showTablature = r.readBoolean();
-                return true;
-            case 9:
-                obj.showStandardNotation = r.readBoolean();
-                return true;
-            case 10:
-                if (r.isNullish()) {
-                    obj.scoreConfig = undefined;
-                }
-                else {
-                    obj.scoreConfig = {};
-                    ScoreStaffConfigSerializer.readFlexible(obj.scoreConfig, r);
-                }
-                return true;
-            case 11:
-                if (r.isNullish()) {
-                    obj.tabConfig = undefined;
-                }
-                else {
-                    obj.tabConfig = {};
-                    TabStaffConfigSerializer.readFlexible(obj.tabConfig, r);
-                }
-                return true;
-            case 12:
-                if (r.isNullish()) {
-                    obj.slashConfig = undefined;
-                }
-                else {
-                    obj.slashConfig = {};
-                    SlashStaffConfigSerializer.readFlexible(obj.slashConfig, r);
-                }
-                return true;
-            case 13:
-                if (r.isNullish()) {
-                    obj.numberedConfig = undefined;
-                }
-                else {
-                    obj.numberedConfig = {};
-                    NumberedStaffConfigSerializer.readFlexible(obj.numberedConfig, r);
-                }
-                return true;
-            case 14:
-                obj.isPercussion = r.readBoolean();
-                return true;
-            case 15:
-                obj.standardNotationLineCount = r.readNumber();
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["bars", "chords", "capo", "transpositionpitch", "displaytranspositionpitch", "stringtuning", "showslash", "shownumbered", "showtablature", "showstandardnotation", "scoreconfig", "tabconfig", "slashconfig", "numberedconfig", "ispercussion", "standardnotationlinecount"]);
+    public static read(obj: Staff, reader: IObjectReader): void {
+        reader.readRecord(StaffSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    StaffSerializer._readBars(obj, r);
+                    return true;
+                case 1:
+                    StaffSerializer._readChords(obj, r);
+                    return true;
+                case 2:
+                    obj.capo = r.readNumber();
+                    return true;
+                case 3:
+                    obj.transpositionPitch = r.readNumber();
+                    return true;
+                case 4:
+                    obj.displayTranspositionPitch = r.readNumber();
+                    return true;
+                case 5:
+                    TuningSerializer.read(obj.stringTuning, r);
+                    return true;
+                case 6:
+                    obj.showSlash = r.readBoolean();
+                    return true;
+                case 7:
+                    obj.showNumbered = r.readBoolean();
+                    return true;
+                case 8:
+                    obj.showTablature = r.readBoolean();
+                    return true;
+                case 9:
+                    obj.showStandardNotation = r.readBoolean();
+                    return true;
+                case 10:
+                    if (r.isNullish()) {
+                        obj.scoreConfig = undefined;
+                    }
+                    else {
+                        obj.scoreConfig = {};
+                        ScoreStaffConfigSerializer.readFlexible(obj.scoreConfig, r);
+                    }
+                    return true;
+                case 11:
+                    if (r.isNullish()) {
+                        obj.tabConfig = undefined;
+                    }
+                    else {
+                        obj.tabConfig = {};
+                        TabStaffConfigSerializer.readFlexible(obj.tabConfig, r);
+                    }
+                    return true;
+                case 12:
+                    if (r.isNullish()) {
+                        obj.slashConfig = undefined;
+                    }
+                    else {
+                        obj.slashConfig = {};
+                        SlashStaffConfigSerializer.readFlexible(obj.slashConfig, r);
+                    }
+                    return true;
+                case 13:
+                    if (r.isNullish()) {
+                        obj.numberedConfig = undefined;
+                    }
+                    else {
+                        obj.numberedConfig = {};
+                        NumberedStaffConfigSerializer.readFlexible(obj.numberedConfig, r);
+                    }
+                    return true;
+                case 14:
+                    obj.isPercussion = r.readBoolean();
+                    return true;
+                case 15:
+                    obj.standardNotationLineCount = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readBars(obj: Staff, r: IObjectReader): void {
         obj.bars = [];
@@ -168,68 +117,52 @@ export class StaffSerializer {
             return true;
         });
     }
-    public static toJson(obj: Staff | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        StaffSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: Staff | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "bars");
-        w.startArray(obj.bars!.length);
+        w.startObject(StaffSerializer._fields);
+        w.arrayField(0, obj.bars!.length);
         for (const i of obj.bars!) {
             BarSerializer.write(i, w);
         }
         w.endArray();
         if (obj.chords !== null) {
-            w.field(1, "chords");
-            w.startMap();
+            w.mapField(1);
             for (const [k, v] of obj.chords!) {
                 w.prop(k.toString());
                 ChordSerializer.write(v, w);
             }
             w.endMap();
         }
-        w.field(2, "capo");
-        w.writeNumber(obj.capo);
-        w.field(3, "transpositionpitch");
-        w.writeNumber(obj.transpositionPitch);
-        w.field(4, "displaytranspositionpitch");
-        w.writeNumber(obj.displayTranspositionPitch);
-        w.field(5, "stringtuning");
+        w.numberField(2, obj.capo);
+        w.numberField(3, obj.transpositionPitch);
+        w.numberField(4, obj.displayTranspositionPitch);
+        w.field(5);
         TuningSerializer.write(obj.stringTuning, w);
-        w.field(6, "showslash");
-        w.writeBoolean(obj.showSlash);
-        w.field(7, "shownumbered");
-        w.writeBoolean(obj.showNumbered);
-        w.field(8, "showtablature");
-        w.writeBoolean(obj.showTablature);
-        w.field(9, "showstandardnotation");
-        w.writeBoolean(obj.showStandardNotation);
+        w.booleanField(6, obj.showSlash);
+        w.booleanField(7, obj.showNumbered);
+        w.booleanField(8, obj.showTablature);
+        w.booleanField(9, obj.showStandardNotation);
         if (obj.scoreConfig) {
-            w.field(10, "scoreconfig");
+            w.field(10);
             ScoreStaffConfigSerializer.write(obj.scoreConfig, w);
         }
         if (obj.tabConfig) {
-            w.field(11, "tabconfig");
+            w.field(11);
             TabStaffConfigSerializer.write(obj.tabConfig, w);
         }
         if (obj.slashConfig) {
-            w.field(12, "slashconfig");
+            w.field(12);
             SlashStaffConfigSerializer.write(obj.slashConfig, w);
         }
         if (obj.numberedConfig) {
-            w.field(13, "numberedconfig");
+            w.field(13);
             NumberedStaffConfigSerializer.write(obj.numberedConfig, w);
         }
-        w.field(14, "ispercussion");
-        w.writeBoolean(obj.isPercussion);
-        w.field(15, "standardnotationlinecount");
-        w.writeNumber(obj.standardNotationLineCount);
+        w.booleanField(14, obj.isPercussion);
+        w.numberField(15, obj.standardNotationLineCount);
         w.endObject();
     }
 }

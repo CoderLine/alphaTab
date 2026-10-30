@@ -5,49 +5,19 @@
 // </auto-generated>
 import { VibratoPlaybackSettings } from "@coderline/alphatab/PlayerSettings";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class VibratoPlaybackSettingsSerializer {
-    public static fromJson(obj: VibratoPlaybackSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        VibratoPlaybackSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: VibratoPlaybackSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? VibratoPlaybackSettingsSerializer._readField(obj, id, rr, false) : VibratoPlaybackSettingsSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["notewidelength", "notewideamplitude", "noteslightlength", "noteslightamplitude", "beatwidelength", "beatwideamplitude", "beatslightlength", "beatslightamplitude"]);
+    public static read(obj: VibratoPlaybackSettings, reader: IObjectReader): void {
+        reader.readRecord(VibratoPlaybackSettingsSerializer._fields, (id, k, rr) => VibratoPlaybackSettingsSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: VibratoPlaybackSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = VibratoPlaybackSettingsSerializer._fieldId(property);
+        const id = VibratoPlaybackSettingsSerializer._fields.idOf(property);
         return id >= 0 ? VibratoPlaybackSettingsSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "notewidelength":
-                return 0;
-            case "notewideamplitude":
-                return 1;
-            case "noteslightlength":
-                return 2;
-            case "noteslightamplitude":
-                return 3;
-            case "beatwidelength":
-                return 4;
-            case "beatwideamplitude":
-                return 5;
-            case "beatslightlength":
-                return 6;
-            case "beatslightamplitude":
-                return 7;
-        }
-        return -1;
     }
     private static _readField(obj: VibratoPlaybackSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -79,7 +49,7 @@ export class VibratoPlaybackSettingsSerializer {
         return false;
     }
     public static readFlexible(obj: VibratoPlaybackSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? VibratoPlaybackSettingsSerializer._readField(obj, id, rr, false) : VibratoPlaybackSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? VibratoPlaybackSettingsSerializer._readField(obj, id, rr, false) : VibratoPlaybackSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: VibratoPlaybackSettings, property: string, r: IObjectReader): boolean {
         if (VibratoPlaybackSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -87,33 +57,20 @@ export class VibratoPlaybackSettingsSerializer {
         }
         return false;
     }
-    public static toJson(obj: VibratoPlaybackSettings | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        VibratoPlaybackSettingsSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: VibratoPlaybackSettings | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "notewidelength");
-        w.writeNumber(obj.noteWideLength);
-        w.field(1, "notewideamplitude");
-        w.writeNumber(obj.noteWideAmplitude);
-        w.field(2, "noteslightlength");
-        w.writeNumber(obj.noteSlightLength);
-        w.field(3, "noteslightamplitude");
-        w.writeNumber(obj.noteSlightAmplitude);
-        w.field(4, "beatwidelength");
-        w.writeNumber(obj.beatWideLength);
-        w.field(5, "beatwideamplitude");
-        w.writeNumber(obj.beatWideAmplitude);
-        w.field(6, "beatslightlength");
-        w.writeNumber(obj.beatSlightLength);
-        w.field(7, "beatslightamplitude");
-        w.writeNumber(obj.beatSlightAmplitude);
+        w.startObject(VibratoPlaybackSettingsSerializer._fields);
+        w.numberField(0, obj.noteWideLength);
+        w.numberField(1, obj.noteWideAmplitude);
+        w.numberField(2, obj.noteSlightLength);
+        w.numberField(3, obj.noteSlightAmplitude);
+        w.numberField(4, obj.beatWideLength);
+        w.numberField(5, obj.beatWideAmplitude);
+        w.numberField(6, obj.beatSlightLength);
+        w.numberField(7, obj.beatSlightAmplitude);
         w.endObject();
     }
 }

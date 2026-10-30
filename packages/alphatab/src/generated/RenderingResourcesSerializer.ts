@@ -5,88 +5,24 @@
 // </auto-generated>
 import { RenderingResources } from "@coderline/alphatab/RenderingResources";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { EngravingSettingsSerializer } from "@coderline/alphatab/generated/EngravingSettingsSerializer";
 import { Font } from "@coderline/alphatab/model/Font";
 import { NotationElement } from "@coderline/alphatab/NotationSettings";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Color } from "@coderline/alphatab/model/Color";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class RenderingResourcesSerializer {
-    public static fromJson(obj: RenderingResources, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        RenderingResourcesSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: RenderingResources, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? RenderingResourcesSerializer._readField(obj, id, rr, false) : RenderingResourcesSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["smuflfontfamilyname", "engravingsettings", "copyrightfont", "titlefont", "subtitlefont", "wordsfont", "timerfont", "directionsfont", "fretboardnumberfont", "fingeringfont", "inlinefingeringfont", "markerfont", "effectfont", "barnumberfont", "elementfonts", "numberednotationfont", "numberednotationgracefont", "tablaturefont", "gracefont", "stafflinecolor", "barseparatorcolor", "barnumbercolor", "mainglyphcolor", "secondaryglyphcolor", "scoreinfocolor"]);
+    public static read(obj: RenderingResources, reader: IObjectReader): void {
+        reader.readRecord(RenderingResourcesSerializer._fields, (id, k, rr) => RenderingResourcesSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: RenderingResources, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = RenderingResourcesSerializer._fieldId(property);
+        const id = RenderingResourcesSerializer._fields.idOf(property);
         return id >= 0 ? RenderingResourcesSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "smuflfontfamilyname":
-                return 0;
-            case "engravingsettings":
-                return 1;
-            case "copyrightfont":
-                return 2;
-            case "titlefont":
-                return 3;
-            case "subtitlefont":
-                return 4;
-            case "wordsfont":
-                return 5;
-            case "timerfont":
-                return 6;
-            case "directionsfont":
-                return 7;
-            case "fretboardnumberfont":
-                return 8;
-            case "fingeringfont":
-                return 9;
-            case "inlinefingeringfont":
-                return 10;
-            case "markerfont":
-                return 11;
-            case "effectfont":
-                return 12;
-            case "barnumberfont":
-                return 13;
-            case "elementfonts":
-                return 14;
-            case "numberednotationfont":
-                return 15;
-            case "numberednotationgracefont":
-                return 16;
-            case "tablaturefont":
-                return 17;
-            case "gracefont":
-                return 18;
-            case "stafflinecolor":
-                return 19;
-            case "barseparatorcolor":
-                return 20;
-            case "barnumbercolor":
-                return 21;
-            case "mainglyphcolor":
-                return 22;
-            case "secondaryglyphcolor":
-                return 23;
-            case "scoreinfocolor":
-                return 24;
-        }
-        return -1;
     }
     private static _readField(obj: RenderingResources, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -175,7 +111,7 @@ export class RenderingResourcesSerializer {
         });
     }
     public static readFlexible(obj: RenderingResources, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? RenderingResourcesSerializer._readField(obj, id, rr, false) : RenderingResourcesSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? RenderingResourcesSerializer._readField(obj, id, rr, false) : RenderingResourcesSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: RenderingResources, property: string, r: IObjectReader): boolean {
         if (["engravingsettings"].indexOf(property) < 0 && RenderingResourcesSerializer.readProperty(obj, property, r, true)) {
@@ -187,48 +123,31 @@ export class RenderingResourcesSerializer {
         }
         return false;
     }
-    public static toJson(obj: RenderingResources | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        RenderingResourcesSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: RenderingResources | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "smuflfontfamilyname");
-        w.writeValue(obj.smuflFontFamilyName);
-        w.field(1, "engravingsettings");
+        w.startObject(RenderingResourcesSerializer._fields);
+        w.valueField(0, obj.smuflFontFamilyName);
+        w.field(1);
         EngravingSettingsSerializer.write(obj.engravingSettings, w);
-        w.field(14, "elementfonts");
-        w.startMap();
+        w.mapField(14);
         for (const [k, v] of obj.elementFonts!) {
             w.prop(k.toString());
             w.writeValue(Font.toJson(v));
         }
         w.endMap();
-        w.field(15, "numberednotationfont");
-        w.writeValue(Font.toJson(obj.numberedNotationFont));
-        w.field(16, "numberednotationgracefont");
-        w.writeValue(Font.toJson(obj.numberedNotationGraceFont));
-        w.field(17, "tablaturefont");
-        w.writeValue(Font.toJson(obj.tablatureFont));
-        w.field(18, "gracefont");
-        w.writeValue(Font.toJson(obj.graceFont));
-        w.field(19, "stafflinecolor");
-        w.writeValue(Color.toJson(obj.staffLineColor));
-        w.field(20, "barseparatorcolor");
-        w.writeValue(Color.toJson(obj.barSeparatorColor));
-        w.field(21, "barnumbercolor");
-        w.writeValue(Color.toJson(obj.barNumberColor));
-        w.field(22, "mainglyphcolor");
-        w.writeValue(Color.toJson(obj.mainGlyphColor));
-        w.field(23, "secondaryglyphcolor");
-        w.writeValue(Color.toJson(obj.secondaryGlyphColor));
-        w.field(24, "scoreinfocolor");
-        w.writeValue(Color.toJson(obj.scoreInfoColor));
+        w.valueField(15, Font.toJson(obj.numberedNotationFont));
+        w.valueField(16, Font.toJson(obj.numberedNotationGraceFont));
+        w.valueField(17, Font.toJson(obj.tablatureFont));
+        w.valueField(18, Font.toJson(obj.graceFont));
+        w.valueField(19, Color.toJson(obj.staffLineColor));
+        w.valueField(20, Color.toJson(obj.barSeparatorColor));
+        w.valueField(21, Color.toJson(obj.barNumberColor));
+        w.valueField(22, Color.toJson(obj.mainGlyphColor));
+        w.valueField(23, Color.toJson(obj.secondaryGlyphColor));
+        w.valueField(24, Color.toJson(obj.scoreInfoColor));
         w.endObject();
     }
 }

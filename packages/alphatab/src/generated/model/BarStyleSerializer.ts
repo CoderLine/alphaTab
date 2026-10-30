@@ -5,46 +5,25 @@
 // </auto-generated>
 import { BarStyle } from "@coderline/alphatab/model/Bar";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { BarSubElement } from "@coderline/alphatab/model/Bar";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Color } from "@coderline/alphatab/model/Color";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class BarStyleSerializer {
-    public static fromJson(obj: BarStyle, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        BarStyleSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: BarStyle, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? BarStyleSerializer._readField(obj, id, rr) : BarStyleSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: BarStyle, property: string, r: IObjectReader): boolean {
-        const id = BarStyleSerializer._fieldId(property);
-        return id >= 0 ? BarStyleSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "colors":
-                return 0;
-        }
-        return -1;
-    }
-    private static _readField(obj: BarStyle, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                BarStyleSerializer._readColors(obj, r);
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["colors"]);
+    public static read(obj: BarStyle, reader: IObjectReader): void {
+        reader.readRecord(BarStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    BarStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readColors(obj: BarStyle, r: IObjectReader): void {
         obj.colors = new Map<BarSubElement, Color | null>();
@@ -53,19 +32,13 @@ export class BarStyleSerializer {
             return true;
         });
     }
-    public static toJson(obj: BarStyle | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        BarStyleSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: BarStyle | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "colors");
-        w.startMap();
+        w.startObject(BarStyleSerializer._fields);
+        w.mapField(0);
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());
             w.writeValue(Color.toJson(v));

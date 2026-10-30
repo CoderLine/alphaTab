@@ -1,3 +1,5 @@
+import type { RecordFields } from '@coderline/alphatab/io/RecordFields';
+
 /**
  * A forward-only reader for the JSON-like object model of the generated serializers, positioned on one value.
  * Every read and {@link skip} consumes the current value.
@@ -23,12 +25,13 @@ export interface IObjectReader {
      */
     readObject(handler: (name: string, r: IObjectReader) => boolean): void;
     /**
-     * Reads a record like {@link readObject}. Realisations that keep the ids of {@link IObjectWriter.field} pass
-     * them for these entries.
-     * @param handler Receives the field id and an empty key, or -1 and the key for entries with a key; returns
+     * Reads a record like {@link readObject}, passing the field id of every entry that is one of the given fields:
+     * entries written with {@link IObjectWriter.field}, or keys of the fields.
+     * @param fields The fields whose keys are matched, or null to pass every key-only entry with id -1.
+     * @param handler Receives the field id (or -1) and the key (empty for entries written as id only); returns
      * whether it consumed the value.
      */
-    readRecord(handler: (id: number, name: string, r: IObjectReader) => boolean): void;
+    readRecord(fields: RecordFields | null, handler: (id: number, name: string, r: IObjectReader) => boolean): void;
     /**
      * Reads an array by calling the handler for every element with the reader positioned on the element.
      */

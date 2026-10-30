@@ -1,3 +1,4 @@
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
 import { describe, expect, it } from 'vitest';
 import { NoteSerializer } from '@coderline/alphatab/generated/model/NoteSerializer';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
@@ -418,7 +419,7 @@ describe('JsonConverterTest', () => {
     }
 
     it('unset-note-values-are-not-written', () => {
-        const json = NoteSerializer.toJson(new Note())!;
+        const json = TestPlatform.toJson(w => NoteSerializer.write(new Note(), w));
         expect(json.has('fret')).toBe(false);
         expect(json.has('string')).toBe(false);
         expect(json.has('octave')).toBe(false);
@@ -428,7 +429,7 @@ describe('JsonConverterTest', () => {
 
     function noteFromJson(raw: Map<string, unknown>): Note {
         const note = new Note();
-        NoteSerializer.fromJson(note, raw);
+        NoteSerializer.read(note, new MapObjectReader(raw));
         return note;
     }
 

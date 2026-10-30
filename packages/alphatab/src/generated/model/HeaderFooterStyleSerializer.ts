@@ -5,73 +5,40 @@
 // </auto-generated>
 import { HeaderFooterStyle } from "@coderline/alphatab/model/Score";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { TextAlign } from "@coderline/alphatab/platform/ICanvas";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class HeaderFooterStyleSerializer {
-    public static fromJson(obj: HeaderFooterStyle, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        HeaderFooterStyleSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: HeaderFooterStyle, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? HeaderFooterStyleSerializer._readField(obj, id, rr) : HeaderFooterStyleSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: HeaderFooterStyle, property: string, r: IObjectReader): boolean {
-        const id = HeaderFooterStyleSerializer._fieldId(property);
-        return id >= 0 ? HeaderFooterStyleSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "template":
-                return 0;
-            case "isvisible":
-                return 1;
-            case "textalign":
-                return 2;
-        }
-        return -1;
-    }
-    private static _readField(obj: HeaderFooterStyle, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.template = r.readString();
-                return true;
-            case 1:
-                obj.isVisible = r.readValue() as boolean | undefined;
-                return true;
-            case 2:
-                obj.textAlign = JsonHelper.parseEnum<TextAlign>(r.readValue(), TextAlign)!;
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: HeaderFooterStyle | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        HeaderFooterStyleSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["template", "isvisible", "textalign"]);
+    public static read(obj: HeaderFooterStyle, reader: IObjectReader): void {
+        reader.readRecord(HeaderFooterStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.template = r.readString();
+                    return true;
+                case 1:
+                    obj.isVisible = r.readValue() as boolean | undefined;
+                    return true;
+                case 2:
+                    obj.textAlign = JsonHelper.parseEnum<TextAlign>(r.readValue(), TextAlign)!;
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: HeaderFooterStyle | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "template");
-        w.writeString(obj.template);
-        w.field(1, "isvisible");
-        w.writeValue(obj.isVisible);
-        w.field(2, "textalign");
-        w.writeNumber(obj.textAlign as number);
+        w.startObject(HeaderFooterStyleSerializer._fields);
+        w.stringField(0, obj.template);
+        w.valueField(1, obj.isVisible);
+        w.numberField(2, obj.textAlign as number);
         w.endObject();
     }
 }

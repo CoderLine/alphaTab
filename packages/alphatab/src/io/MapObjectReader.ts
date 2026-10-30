@@ -1,5 +1,6 @@
 import type { IObjectReader } from '@coderline/alphatab/io/IObjectReader';
 import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
+import type { RecordFields } from '@coderline/alphatab/io/RecordFields';
 
 /**
  * Reads a tree of `Map<string, unknown>` and arrays, on web also plain objects (e.g. from `JSON.parse`).
@@ -10,6 +11,7 @@ export class MapObjectReader implements IObjectReader {
     private _value: unknown;
     private _handler: ((name: string, r: IObjectReader) => boolean) | null = null;
     private _recordHandler: ((id: number, name: string, r: IObjectReader) => boolean) | null = null;
+    private _recordFields: RecordFields | null = null;
     // one callback for all maps and records, the handler of the container being read is in _handler or _recordHandler
     private readonly _entry: (v: unknown, k: string) => void;
     private readonly _recordEntry: (v: unknown, k: string) => void;
@@ -22,7 +24,8 @@ export class MapObjectReader implements IObjectReader {
         };
         this._recordEntry = (v, k) => {
             this._value = v;
-            this._recordHandler!(-1, k, this);
+            const fields = this._recordFields;
+            this._recordHandler!(fields !== null ? fields.idOf(k) : -1, k, this);
         };
     }
 
@@ -74,28 +77,37 @@ export class MapObjectReader implements IObjectReader {
         return true;
     }
 
-    public readRecord(handler: (id: number, name: string, r: IObjectReader) => boolean): void {
+    public readRecord(
+        fields: RecordFields | null,
+        handler: (id: number, name: string, r: IObjectReader) => boolean
+    ): void {
         /*@target web*/
-        if (this._readPlainRecord(handler)) {
+        if (this._readPlainRecord(fields, handler)) {
             return;
         }
         const parent = this._recordHandler;
+        const parentFields = this._recordFields;
         this._recordHandler = handler;
+        this._recordFields = fields;
         JsonHelper.forEach(this._value, this._recordEntry);
         this._recordHandler = parent;
+        this._recordFields = parentFields;
     }
 
     /**
      * @target web
      */
-    private _readPlainRecord(handler: (id: number, name: string, r: IObjectReader) => boolean): boolean {
+    private _readPlainRecord(
+        fields: RecordFields | null,
+        handler: (id: number, name: string, r: IObjectReader) => boolean
+    ): boolean {
         const v = this._value;
         if (v instanceof Map || typeof v !== 'object' || v === null) {
             return false;
         }
         for (const k in v) {
             this._value = (v as Record<string, unknown>)[k];
-            handler(-1, k, this);
+            handler(fields !== null ? fields.idOf(k) : -1, k, this);
         }
         return true;
     }

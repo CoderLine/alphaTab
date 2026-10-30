@@ -5,60 +5,24 @@
 // </auto-generated>
 import { NotationSettings } from "@coderline/alphatab/NotationSettings";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { NotationMode } from "@coderline/alphatab/NotationSettings";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { FingeringMode } from "@coderline/alphatab/NotationSettings";
 import { NotationElement } from "@coderline/alphatab/NotationSettings";
 import { TabRhythmMode } from "@coderline/alphatab/NotationSettings";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class NotationSettingsSerializer {
-    public static fromJson(obj: NotationSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        NotationSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: NotationSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? NotationSettingsSerializer._readField(obj, id, rr, false) : NotationSettingsSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["notationmode", "fingeringmode", "elements", "rhythmmode", "rhythmheight", "transpositionpitches", "displaytranspositionpitches", "smallgracetabnotes", "extendbendarrowsontiednotes", "extendlineeffectstobeatend", "slurheight"]);
+    public static read(obj: NotationSettings, reader: IObjectReader): void {
+        reader.readRecord(NotationSettingsSerializer._fields, (id, k, rr) => NotationSettingsSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: NotationSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = NotationSettingsSerializer._fieldId(property);
+        const id = NotationSettingsSerializer._fields.idOf(property);
         return id >= 0 ? NotationSettingsSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "notationmode":
-                return 0;
-            case "fingeringmode":
-                return 1;
-            case "elements":
-                return 2;
-            case "rhythmmode":
-                return 3;
-            case "rhythmheight":
-                return 4;
-            case "transpositionpitches":
-                return 5;
-            case "displaytranspositionpitches":
-                return 6;
-            case "smallgracetabnotes":
-                return 7;
-            case "extendbendarrowsontiednotes":
-                return 8;
-            case "extendlineeffectstobeatend":
-                return 9;
-            case "slurheight":
-                return 10;
-        }
-        return -1;
     }
     private static _readField(obj: NotationSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -106,7 +70,7 @@ export class NotationSettingsSerializer {
         });
     }
     public static readFlexible(obj: NotationSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? NotationSettingsSerializer._readField(obj, id, rr, false) : NotationSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? NotationSettingsSerializer._readField(obj, id, rr, false) : NotationSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: NotationSettings, property: string, r: IObjectReader): boolean {
         if (NotationSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -114,44 +78,28 @@ export class NotationSettingsSerializer {
         }
         return false;
     }
-    public static toJson(obj: NotationSettings | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        NotationSettingsSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: NotationSettings | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "notationmode");
-        w.writeNumber(obj.notationMode as number);
-        w.field(1, "fingeringmode");
-        w.writeNumber(obj.fingeringMode as number);
-        w.field(2, "elements");
-        w.startMap();
+        w.startObject(NotationSettingsSerializer._fields);
+        w.numberField(0, obj.notationMode as number);
+        w.numberField(1, obj.fingeringMode as number);
+        w.mapField(2);
         for (const [k, v] of obj.elements!) {
             w.prop(k.toString());
             w.writeBoolean(v);
         }
         w.endMap();
-        w.field(3, "rhythmmode");
-        w.writeNumber(obj.rhythmMode as number);
-        w.field(4, "rhythmheight");
-        w.writeNumber(obj.rhythmHeight);
-        w.field(5, "transpositionpitches");
-        w.writeValue(obj.transpositionPitches);
-        w.field(6, "displaytranspositionpitches");
-        w.writeValue(obj.displayTranspositionPitches);
-        w.field(7, "smallgracetabnotes");
-        w.writeBoolean(obj.smallGraceTabNotes);
-        w.field(8, "extendbendarrowsontiednotes");
-        w.writeBoolean(obj.extendBendArrowsOnTiedNotes);
-        w.field(9, "extendlineeffectstobeatend");
-        w.writeBoolean(obj.extendLineEffectsToBeatEnd);
-        w.field(10, "slurheight");
-        w.writeNumber(obj.slurHeight);
+        w.numberField(3, obj.rhythmMode as number);
+        w.numberField(4, obj.rhythmHeight);
+        w.valueField(5, obj.transpositionPitches);
+        w.valueField(6, obj.displayTranspositionPitches);
+        w.booleanField(7, obj.smallGraceTabNotes);
+        w.booleanField(8, obj.extendBendArrowsOnTiedNotes);
+        w.booleanField(9, obj.extendLineEffectsToBeatEnd);
+        w.numberField(10, obj.slurHeight);
         w.endObject();
     }
 }

@@ -5,64 +5,34 @@
 // </auto-generated>
 import { Section } from "@coderline/alphatab/model/Section";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class SectionSerializer {
-    public static fromJson(obj: Section, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        SectionSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Section, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? SectionSerializer._readField(obj, id, rr) : SectionSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Section, property: string, r: IObjectReader): boolean {
-        const id = SectionSerializer._fieldId(property);
-        return id >= 0 ? SectionSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "marker":
-                return 0;
-            case "text":
-                return 1;
-        }
-        return -1;
-    }
-    private static _readField(obj: Section, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.marker = r.readString();
-                return true;
-            case 1:
-                obj.text = r.readString();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: Section | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        SectionSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["marker", "text"]);
+    public static read(obj: Section, reader: IObjectReader): void {
+        reader.readRecord(SectionSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.marker = r.readString();
+                    return true;
+                case 1:
+                    obj.text = r.readString();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: Section | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "marker");
-        w.writeString(obj.marker);
-        w.field(1, "text");
-        w.writeString(obj.text);
+        w.startObject(SectionSerializer._fields);
+        w.stringField(0, obj.marker);
+        w.stringField(1, obj.text);
         w.endObject();
     }
 }

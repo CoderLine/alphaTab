@@ -1,4 +1,6 @@
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
+import { MapObjectWriter } from '@coderline/alphatab/io/MapObjectWriter';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -7,6 +9,15 @@ import path from 'node:path';
  * @internal
  */
 export class TestPlatform {
+    /**
+     * The Map tree that a generated serializer writes, as `JsonConverter.scoreToJsObject` builds it for scores.
+     */
+    public static toJson(write: (w: IObjectWriter) => void): Map<string, unknown> {
+        const w = new MapObjectWriter();
+        write(w);
+        return w.result as Map<string, unknown>;
+    }
+
     /**
      * @target web
      * @partial

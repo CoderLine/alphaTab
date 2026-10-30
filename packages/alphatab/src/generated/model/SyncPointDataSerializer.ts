@@ -5,64 +5,34 @@
 // </auto-generated>
 import { SyncPointData } from "@coderline/alphatab/model/Automation";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class SyncPointDataSerializer {
-    public static fromJson(obj: SyncPointData, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        SyncPointDataSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: SyncPointData, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? SyncPointDataSerializer._readField(obj, id, rr) : SyncPointDataSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: SyncPointData, property: string, r: IObjectReader): boolean {
-        const id = SyncPointDataSerializer._fieldId(property);
-        return id >= 0 ? SyncPointDataSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "baroccurence":
-                return 0;
-            case "millisecondoffset":
-                return 1;
-        }
-        return -1;
-    }
-    private static _readField(obj: SyncPointData, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.barOccurence = r.readNumber();
-                return true;
-            case 1:
-                obj.millisecondOffset = r.readNumber();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: SyncPointData | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        SyncPointDataSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["baroccurence", "millisecondoffset"]);
+    public static read(obj: SyncPointData, reader: IObjectReader): void {
+        reader.readRecord(SyncPointDataSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.barOccurence = r.readNumber();
+                    return true;
+                case 1:
+                    obj.millisecondOffset = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: SyncPointData | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "baroccurence");
-        w.writeNumber(obj.barOccurence);
-        w.field(1, "millisecondoffset");
-        w.writeNumber(obj.millisecondOffset);
+        w.startObject(SyncPointDataSerializer._fields);
+        w.numberField(0, obj.barOccurence);
+        w.numberField(1, obj.millisecondOffset);
         w.endObject();
     }
 }

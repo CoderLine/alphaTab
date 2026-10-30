@@ -36,7 +36,8 @@ export function buildTypeSchema(program: ts.Program, input: ts.ClassDeclaration 
         hasToJsonExtension: false,
         hasSetPropertyExtension: false,
         hasAfterFromJsonExtension: false,
-        isRecord: !!ts.getJSDocTags(input).find(t => t.tagName.text === 'record')
+        isRecord: !!ts.getJSDocTags(input).find(t => t.tagName.text === 'record'),
+        isJsonRoot: !!ts.getJSDocTags(input).find(t => t.tagName.text === 'json_root')
     };
 
     const accessorHasSetter = (cls: ts.ClassDeclaration | ts.InterfaceDeclaration, name: string): boolean =>
@@ -461,6 +462,10 @@ export interface TypeSchema {
     hasSetPropertyExtension: boolean;
     hasAfterFromJsonExtension: boolean;
     isRecord: boolean;
+    /**
+     * Whether the class gets `toJson`/`fromJson` (`@json_root`): the classes the hand-written code converts on their own.
+     */
+    isJsonRoot: boolean;
     properties: TypeProperty[];
 }
 

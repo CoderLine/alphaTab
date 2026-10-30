@@ -5,57 +5,32 @@
 // </auto-generated>
 import { NoteStyle } from "@coderline/alphatab/model/Note";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { NoteSubElement } from "@coderline/alphatab/model/Note";
 import { Color } from "@coderline/alphatab/model/Color";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class NoteStyleSerializer {
-    public static fromJson(obj: NoteStyle, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        NoteStyleSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: NoteStyle, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? NoteStyleSerializer._readField(obj, id, rr) : NoteStyleSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: NoteStyle, property: string, r: IObjectReader): boolean {
-        const id = NoteStyleSerializer._fieldId(property);
-        return id >= 0 ? NoteStyleSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "notehead":
-                return 0;
-            case "noteheadcenteronstem":
-                return 1;
-            case "colors":
-                return 2;
-        }
-        return -1;
-    }
-    private static _readField(obj: NoteStyle, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.noteHead = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol);
-                return true;
-            case 1:
-                obj.noteHeadCenterOnStem = r.readValue() as boolean | undefined;
-                return true;
-            case 2:
-                NoteStyleSerializer._readColors(obj, r);
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["notehead", "noteheadcenteronstem", "colors"]);
+    public static read(obj: NoteStyle, reader: IObjectReader): void {
+        reader.readRecord(NoteStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.noteHead = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol);
+                    return true;
+                case 1:
+                    obj.noteHeadCenterOnStem = r.readValue() as boolean | undefined;
+                    return true;
+                case 2:
+                    NoteStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readColors(obj: NoteStyle, r: IObjectReader): void {
         obj.colors = new Map<NoteSubElement, Color | null>();
@@ -64,23 +39,15 @@ export class NoteStyleSerializer {
             return true;
         });
     }
-    public static toJson(obj: NoteStyle | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        NoteStyleSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: NoteStyle | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "notehead");
-        w.writeValue(obj.noteHead as number | undefined);
-        w.field(1, "noteheadcenteronstem");
-        w.writeValue(obj.noteHeadCenterOnStem);
-        w.field(2, "colors");
-        w.startMap();
+        w.startObject(NoteStyleSerializer._fields);
+        w.valueField(0, obj.noteHead as number | undefined);
+        w.valueField(1, obj.noteHeadCenterOnStem);
+        w.mapField(2);
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());
             w.writeValue(Color.toJson(v));

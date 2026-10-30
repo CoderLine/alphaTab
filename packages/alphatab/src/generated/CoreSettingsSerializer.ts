@@ -5,64 +5,22 @@
 // </auto-generated>
 import { CoreSettings } from "@coderline/alphatab/CoreSettings";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { FontFileFormat } from "@coderline/alphatab/CoreSettings";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { LogLevel } from "@coderline/alphatab/LogLevel";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class CoreSettingsSerializer {
-    public static fromJson(obj: CoreSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        CoreSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
-    }
-    public static read(obj: CoreSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? CoreSettingsSerializer._readField(obj, id, rr, false) : CoreSettingsSerializer.readProperty(obj, k, rr, false));
+    private static readonly _fields: RecordFields = new RecordFields(["scriptfile", "fontdirectory", "smuflfontsources", "file", "tex", "tracks", "enablelazyloading", "engine", "loglevel", "useworkers", "includenotebounds"]);
+    public static read(obj: CoreSettings, reader: IObjectReader): void {
+        reader.readRecord(CoreSettingsSerializer._fields, (id, k, rr) => CoreSettingsSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: CoreSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = CoreSettingsSerializer._fieldId(property);
+        const id = CoreSettingsSerializer._fields.idOf(property);
         return id >= 0 ? CoreSettingsSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            /*@target web*/
-            case "scriptfile":
-                return 0;
-            /*@target web*/
-            case "fontdirectory":
-                return 1;
-            /*@target web*/
-            case "smuflfontsources":
-                return 2;
-            /*@target web*/
-            case "file":
-                return 3;
-            /*@target web*/
-            case "tex":
-                return 4;
-            /*@target web*/
-            case "tracks":
-                return 5;
-            case "enablelazyloading":
-                return 6;
-            case "engine":
-                return 7;
-            case "loglevel":
-                return 8;
-            case "useworkers":
-                return 9;
-            case "includenotebounds":
-                return 10;
-        }
-        return -1;
     }
     private static _readField(obj: CoreSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -119,7 +77,7 @@ export class CoreSettingsSerializer {
         });
     }
     public static readFlexible(obj: CoreSettings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? CoreSettingsSerializer._readField(obj, id, rr, false) : CoreSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? CoreSettingsSerializer._readField(obj, id, rr, false) : CoreSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: CoreSettings, property: string, r: IObjectReader): boolean {
         if (CoreSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -127,32 +85,24 @@ export class CoreSettingsSerializer {
         }
         return false;
     }
-    public static toJson(obj: CoreSettings | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        CoreSettingsSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: CoreSettings | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
+        w.startObject(CoreSettingsSerializer._fields);
         /*@target web*/
         {
-            w.field(0, "scriptfile");
-            w.writeValue(obj.scriptFile);
+            w.valueField(0, obj.scriptFile);
         }
         /*@target web*/
         {
-            w.field(1, "fontdirectory");
-            w.writeValue(obj.fontDirectory);
+            w.valueField(1, obj.fontDirectory);
         }
         /*@target web*/
         {
             if (obj.smuflFontSources !== null) {
-                w.field(2, "smuflfontsources");
-                w.startMap();
+                w.mapField(2);
                 for (const [k, v] of obj.smuflFontSources!) {
                     w.prop(k.toString());
                     w.writeString(v);
@@ -162,29 +112,21 @@ export class CoreSettingsSerializer {
         }
         /*@target web*/
         {
-            w.field(3, "file");
-            w.writeValue(obj.file);
+            w.valueField(3, obj.file);
         }
         /*@target web*/
         {
-            w.field(4, "tex");
-            w.writeBoolean(obj.tex);
+            w.booleanField(4, obj.tex);
         }
         /*@target web*/
         {
-            w.field(5, "tracks");
-            w.writeValue(obj.tracks);
+            w.valueField(5, obj.tracks);
         }
-        w.field(6, "enablelazyloading");
-        w.writeBoolean(obj.enableLazyLoading);
-        w.field(7, "engine");
-        w.writeString(obj.engine);
-        w.field(8, "loglevel");
-        w.writeNumber(obj.logLevel as number);
-        w.field(9, "useworkers");
-        w.writeBoolean(obj.useWorkers);
-        w.field(10, "includenotebounds");
-        w.writeBoolean(obj.includeNoteBounds);
+        w.booleanField(6, obj.enableLazyLoading);
+        w.stringField(7, obj.engine);
+        w.numberField(8, obj.logLevel as number);
+        w.booleanField(9, obj.useWorkers);
+        w.booleanField(10, obj.includeNoteBounds);
         w.endObject();
     }
 }

@@ -5,46 +5,25 @@
 // </auto-generated>
 import { BeatStyle } from "@coderline/alphatab/model/Beat";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { BeatSubElement } from "@coderline/alphatab/model/Beat";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Color } from "@coderline/alphatab/model/Color";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class BeatStyleSerializer {
-    public static fromJson(obj: BeatStyle, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        BeatStyleSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: BeatStyle, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? BeatStyleSerializer._readField(obj, id, rr) : BeatStyleSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: BeatStyle, property: string, r: IObjectReader): boolean {
-        const id = BeatStyleSerializer._fieldId(property);
-        return id >= 0 ? BeatStyleSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "colors":
-                return 0;
-        }
-        return -1;
-    }
-    private static _readField(obj: BeatStyle, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                BeatStyleSerializer._readColors(obj, r);
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["colors"]);
+    public static read(obj: BeatStyle, reader: IObjectReader): void {
+        reader.readRecord(BeatStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    BeatStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readColors(obj: BeatStyle, r: IObjectReader): void {
         obj.colors = new Map<BeatSubElement, Color | null>();
@@ -53,19 +32,13 @@ export class BeatStyleSerializer {
             return true;
         });
     }
-    public static toJson(obj: BeatStyle | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        BeatStyleSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: BeatStyle | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "colors");
-        w.startMap();
+        w.startObject(BeatStyleSerializer._fields);
+        w.mapField(0);
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());
             w.writeValue(Color.toJson(v));

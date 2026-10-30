@@ -5,116 +5,65 @@
 // </auto-generated>
 import { InstrumentArticulation } from "@coderline/alphatab/model/InstrumentArticulation";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { TechniqueSymbolPlacement } from "@coderline/alphatab/model/InstrumentArticulation";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class InstrumentArticulationSerializer {
-    public static fromJson(obj: InstrumentArticulation, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        InstrumentArticulationSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: InstrumentArticulation, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? InstrumentArticulationSerializer._readField(obj, id, rr) : InstrumentArticulationSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: InstrumentArticulation, property: string, r: IObjectReader): boolean {
-        const id = InstrumentArticulationSerializer._fieldId(property);
-        return id >= 0 ? InstrumentArticulationSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "id":
-                return 0;
-            case "elementtype":
-                return 1;
-            case "staffline":
-                return 2;
-            case "noteheaddefault":
-                return 3;
-            case "noteheadhalf":
-                return 4;
-            case "noteheadwhole":
-                return 5;
-            case "techniquesymbol":
-                return 6;
-            case "techniquesymbolplacement":
-                return 7;
-            case "outputmidinumber":
-                return 8;
-        }
-        return -1;
-    }
-    private static _readField(obj: InstrumentArticulation, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.id = r.readNumber();
-                return true;
-            case 1:
-                obj.elementType = r.readString();
-                return true;
-            case 2:
-                obj.staffLine = r.readNumber();
-                return true;
-            case 3:
-                obj.noteHeadDefault = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
-                return true;
-            case 4:
-                obj.noteHeadHalf = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
-                return true;
-            case 5:
-                obj.noteHeadWhole = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
-                return true;
-            case 6:
-                obj.techniqueSymbol = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
-                return true;
-            case 7:
-                obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TechniqueSymbolPlacement>(r.readValue(), TechniqueSymbolPlacement)!;
-                return true;
-            case 8:
-                obj.outputMidiNumber = r.readNumber();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: InstrumentArticulation | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        InstrumentArticulationSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["id", "elementtype", "staffline", "noteheaddefault", "noteheadhalf", "noteheadwhole", "techniquesymbol", "techniquesymbolplacement", "outputmidinumber"]);
+    public static read(obj: InstrumentArticulation, reader: IObjectReader): void {
+        reader.readRecord(InstrumentArticulationSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.id = r.readNumber();
+                    return true;
+                case 1:
+                    obj.elementType = r.readString();
+                    return true;
+                case 2:
+                    obj.staffLine = r.readNumber();
+                    return true;
+                case 3:
+                    obj.noteHeadDefault = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
+                    return true;
+                case 4:
+                    obj.noteHeadHalf = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
+                    return true;
+                case 5:
+                    obj.noteHeadWhole = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
+                    return true;
+                case 6:
+                    obj.techniqueSymbol = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
+                    return true;
+                case 7:
+                    obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TechniqueSymbolPlacement>(r.readValue(), TechniqueSymbolPlacement)!;
+                    return true;
+                case 8:
+                    obj.outputMidiNumber = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: InstrumentArticulation | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "id");
-        w.writeNumber(obj.id);
-        w.field(1, "elementtype");
-        w.writeString(obj.elementType);
-        w.field(2, "staffline");
-        w.writeNumber(obj.staffLine);
-        w.field(3, "noteheaddefault");
-        w.writeNumber(obj.noteHeadDefault as number);
-        w.field(4, "noteheadhalf");
-        w.writeNumber(obj.noteHeadHalf as number);
-        w.field(5, "noteheadwhole");
-        w.writeNumber(obj.noteHeadWhole as number);
-        w.field(6, "techniquesymbol");
-        w.writeNumber(obj.techniqueSymbol as number);
-        w.field(7, "techniquesymbolplacement");
-        w.writeNumber(obj.techniqueSymbolPlacement as number);
-        w.field(8, "outputmidinumber");
-        w.writeNumber(obj.outputMidiNumber);
+        w.startObject(InstrumentArticulationSerializer._fields);
+        w.numberField(0, obj.id);
+        w.stringField(1, obj.elementType);
+        w.numberField(2, obj.staffLine);
+        w.numberField(3, obj.noteHeadDefault as number);
+        w.numberField(4, obj.noteHeadHalf as number);
+        w.numberField(5, obj.noteHeadWhole as number);
+        w.numberField(6, obj.techniqueSymbol as number);
+        w.numberField(7, obj.techniqueSymbolPlacement as number);
+        w.numberField(8, obj.outputMidiNumber);
         w.endObject();
     }
 }

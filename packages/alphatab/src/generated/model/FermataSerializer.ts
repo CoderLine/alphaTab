@@ -5,66 +5,36 @@
 // </auto-generated>
 import { Fermata } from "@coderline/alphatab/model/Fermata";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { FermataType } from "@coderline/alphatab/model/Fermata";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class FermataSerializer {
-    public static fromJson(obj: Fermata, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        FermataSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Fermata, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? FermataSerializer._readField(obj, id, rr) : FermataSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Fermata, property: string, r: IObjectReader): boolean {
-        const id = FermataSerializer._fieldId(property);
-        return id >= 0 ? FermataSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "type":
-                return 0;
-            case "length":
-                return 1;
-        }
-        return -1;
-    }
-    private static _readField(obj: Fermata, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.type = JsonHelper.parseEnum<FermataType>(r.readValue(), FermataType)!;
-                return true;
-            case 1:
-                obj.length = r.readNumber();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: Fermata | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        FermataSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["type", "length"]);
+    public static read(obj: Fermata, reader: IObjectReader): void {
+        reader.readRecord(FermataSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.type = JsonHelper.parseEnum<FermataType>(r.readValue(), FermataType)!;
+                    return true;
+                case 1:
+                    obj.length = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: Fermata | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "type");
-        w.writeNumber(obj.type as number);
-        w.field(1, "length");
-        w.writeNumber(obj.length);
+        w.startObject(FermataSerializer._fields);
+        w.numberField(0, obj.type as number);
+        w.numberField(1, obj.length);
         w.endObject();
     }
 }

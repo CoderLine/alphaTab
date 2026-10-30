@@ -5,53 +5,30 @@
 // </auto-generated>
 import { ScoreStyle } from "@coderline/alphatab/model/Score";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ScoreSubElement } from "@coderline/alphatab/model/Score";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { HeaderFooterStyle } from "@coderline/alphatab/model/Score";
 import { HeaderFooterStyleSerializer } from "@coderline/alphatab/generated/model/HeaderFooterStyleSerializer";
 import { Color } from "@coderline/alphatab/model/Color";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class ScoreStyleSerializer {
-    public static fromJson(obj: ScoreStyle, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        ScoreStyleSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: ScoreStyle, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? ScoreStyleSerializer._readField(obj, id, rr) : ScoreStyleSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: ScoreStyle, property: string, r: IObjectReader): boolean {
-        const id = ScoreStyleSerializer._fieldId(property);
-        return id >= 0 ? ScoreStyleSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "headerandfooter":
-                return 0;
-            case "colors":
-                return 1;
-        }
-        return -1;
-    }
-    private static _readField(obj: ScoreStyle, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                ScoreStyleSerializer._readHeaderAndFooter(obj, r);
-                return true;
-            case 1:
-                ScoreStyleSerializer._readColors(obj, r);
-                return true;
-        }
-        return false;
+    private static readonly _fields: RecordFields = new RecordFields(["headerandfooter", "colors"]);
+    public static read(obj: ScoreStyle, reader: IObjectReader): void {
+        reader.readRecord(ScoreStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    ScoreStyleSerializer._readHeaderAndFooter(obj, r);
+                    return true;
+                case 1:
+                    ScoreStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
     }
     private static _readHeaderAndFooter(obj: ScoreStyle, r: IObjectReader): void {
         obj.headerAndFooter = new Map<ScoreSubElement, HeaderFooterStyle>();
@@ -69,26 +46,19 @@ export class ScoreStyleSerializer {
             return true;
         });
     }
-    public static toJson(obj: ScoreStyle | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        ScoreStyleSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
-    }
     public static write(obj: ScoreStyle | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "headerandfooter");
-        w.startMap();
+        w.startObject(ScoreStyleSerializer._fields);
+        w.mapField(0);
         for (const [k, v] of obj.headerAndFooter!) {
             w.prop(k.toString());
             HeaderFooterStyleSerializer.write(v, w);
         }
         w.endMap();
-        w.field(1, "colors");
-        w.startMap();
+        w.mapField(1);
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());
             w.writeValue(Color.toJson(v));

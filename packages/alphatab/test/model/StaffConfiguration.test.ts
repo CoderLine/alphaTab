@@ -1,3 +1,5 @@
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
+import { TestPlatform } from 'test/TestPlatform';
 import { describe, expect, it } from 'vitest';
 import { BarSerializer } from '@coderline/alphatab/generated/model/BarSerializer';
 import { RenderStylesheetSerializer } from '@coderline/alphatab/generated/model/RenderStylesheetSerializer';
@@ -147,23 +149,23 @@ describe('Bar.barNumberDisplay shim (ADR-006 §2)', () => {
 
 describe('JSON round-trip for the new staff-config surface', () => {
     function roundtripStylesheet(rs: RenderStylesheet): RenderStylesheet {
-        const out = RenderStylesheetSerializer.toJson(rs)!;
+        const out = TestPlatform.toJson(w => RenderStylesheetSerializer.write(rs, w));
         const result = new RenderStylesheet();
-        RenderStylesheetSerializer.fromJson(result, out);
+        RenderStylesheetSerializer.read(result, new MapObjectReader(out));
         return result;
     }
 
     function roundtripStaff(staff: Staff): Staff {
-        const out = StaffSerializer.toJson(staff)!;
+        const out = TestPlatform.toJson(w => StaffSerializer.write(staff, w));
         const result = new Staff();
-        StaffSerializer.fromJson(result, out);
+        StaffSerializer.read(result, new MapObjectReader(out));
         return result;
     }
 
     function roundtripBar(bar: Bar): Bar {
-        const out = BarSerializer.toJson(bar)!;
+        const out = TestPlatform.toJson(w => BarSerializer.write(bar, w));
         const result = new Bar();
-        BarSerializer.fromJson(result, out);
+        BarSerializer.read(result, new MapObjectReader(out));
         return result;
     }
 

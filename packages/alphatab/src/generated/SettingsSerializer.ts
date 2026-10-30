@@ -5,51 +5,33 @@
 // </auto-generated>
 import { Settings } from "@coderline/alphatab/Settings";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { CoreSettingsSerializer } from "@coderline/alphatab/generated/CoreSettingsSerializer";
 import { DisplaySettingsSerializer } from "@coderline/alphatab/generated/DisplaySettingsSerializer";
 import { NotationSettingsSerializer } from "@coderline/alphatab/generated/NotationSettingsSerializer";
 import { ImporterSettingsSerializer } from "@coderline/alphatab/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@coderline/alphatab/generated/PlayerSettingsSerializer";
 import { ExporterSettingsSerializer } from "@coderline/alphatab/generated/ExporterSettingsSerializer";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class SettingsSerializer {
+    private static readonly _fields: RecordFields = new RecordFields(["core", "display", "notation", "importer", "player", "exporter"]);
     public static fromJson(obj: Settings, m: unknown): void {
         if (!m) {
             return;
         }
         SettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static read(obj: Settings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? SettingsSerializer._readField(obj, id, rr, false) : SettingsSerializer.readProperty(obj, k, rr, false));
+    public static read(obj: Settings, reader: IObjectReader): void {
+        reader.readRecord(SettingsSerializer._fields, (id, k, rr) => SettingsSerializer._readField(obj, id, rr, false));
     }
     public static readProperty(obj: Settings, property: string, r: IObjectReader, flexible: boolean): boolean {
-        const id = SettingsSerializer._fieldId(property);
+        const id = SettingsSerializer._fields.idOf(property);
         return id >= 0 ? SettingsSerializer._readField(obj, id, r, flexible) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "core":
-                return 0;
-            case "display":
-                return 1;
-            case "notation":
-                return 2;
-            case "importer":
-                return 3;
-            case "player":
-                return 4;
-            case "exporter":
-                return 5;
-        }
-        return -1;
     }
     private static _readField(obj: Settings, id: number, r: IObjectReader, flexible: boolean): boolean {
         switch (id) {
@@ -75,7 +57,7 @@ export class SettingsSerializer {
         return false;
     }
     public static readFlexible(obj: Settings, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? SettingsSerializer._readField(obj, id, rr, false) : SettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord(null, (id, k, rr) => id >= 0 ? SettingsSerializer._readField(obj, id, rr, false) : SettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: Settings, property: string, r: IObjectReader): boolean {
         if (["core", "display", "notation", "importer", "player", "exporter"].indexOf(property) < 0 && SettingsSerializer.readProperty(obj, property, r, true)) {
@@ -159,18 +141,18 @@ export class SettingsSerializer {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "core");
+        w.startObject(SettingsSerializer._fields);
+        w.field(0);
         CoreSettingsSerializer.write(obj.core, w);
-        w.field(1, "display");
+        w.field(1);
         DisplaySettingsSerializer.write(obj.display, w);
-        w.field(2, "notation");
+        w.field(2);
         NotationSettingsSerializer.write(obj.notation, w);
-        w.field(3, "importer");
+        w.field(3);
         ImporterSettingsSerializer.write(obj.importer, w);
-        w.field(4, "player");
+        w.field(4);
         PlayerSettingsSerializer.write(obj.player, w);
-        w.field(5, "exporter");
+        w.field(5);
         ExporterSettingsSerializer.write(obj.exporter, w);
         w.endObject();
     }

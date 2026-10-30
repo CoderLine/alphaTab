@@ -1,4 +1,5 @@
 import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
+import type { RecordFields } from '@coderline/alphatab/io/RecordFields';
 
 /**
  * Builds a tree of `Map<string, unknown>` (records and maps) and arrays. Values written with
@@ -10,6 +11,8 @@ export class MapObjectWriter implements IObjectWriter {
     private _array: unknown[] | null = null;
     private _parentMaps: (Map<string, unknown> | null)[] = [];
     private _parentArrays: (unknown[] | null)[] = [];
+    private _fields: RecordFields | null = null;
+    private _parentFields: (RecordFields | null)[] = [];
     private _key: string = '';
 
     /**
@@ -39,18 +42,21 @@ export class MapObjectWriter implements IObjectWriter {
         this._array = this._parentArrays.pop() ?? null;
     }
 
-    public startObject(): void {
-        const m = new Map<string, unknown>();
-        this._add(m);
-        this._push(m, null);
+    public startObject(fields: RecordFields): void {
+        this._parentFields.push(this._fields);
+        this._fields = fields;
+        this.startMap();
     }
 
     public endObject(): void {
+        this._fields = this._parentFields.pop() ?? null;
         this._pop();
     }
 
     public startMap(): void {
-        this.startObject();
+        const m = new Map<string, unknown>();
+        this._add(m);
+        this._push(m, null);
     }
 
     public endMap(): void {
@@ -71,8 +77,38 @@ export class MapObjectWriter implements IObjectWriter {
         this._key = name;
     }
 
-    public field(_id: number, name: string): void {
-        this._key = name;
+    public field(id: number): void {
+        this._key = this._fields!.names[id];
+    }
+
+    public numberField(id: number, v: number): void {
+        this.field(id);
+        this.writeNumber(v);
+    }
+
+    public booleanField(id: number, v: boolean): void {
+        this.field(id);
+        this.writeBoolean(v);
+    }
+
+    public stringField(id: number, v: string): void {
+        this.field(id);
+        this.writeString(v);
+    }
+
+    public valueField(id: number, v: unknown): void {
+        this.field(id);
+        this.writeValue(v);
+    }
+
+    public arrayField(id: number, length: number): void {
+        this.field(id);
+        this.startArray(length);
+    }
+
+    public mapField(id: number): void {
+        this.field(id);
+        this.startMap();
     }
 
     public writeNumber(v: number): void {

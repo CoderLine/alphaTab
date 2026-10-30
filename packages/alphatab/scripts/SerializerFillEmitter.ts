@@ -186,7 +186,10 @@ export default function emit(program: ts.Program, _diagnostics: ts.Diagnostic[])
             const serializer = `${className}Serializer`;
             importer(serializer, findSerializerModule({ modulePath, typeAsString: className } as TypeWithNullableInfo));
             const create = ts.isInterfaceDeclaration(stmt) ? '({})' : `new ${className}()`;
-            cases.push(`{ name: '${className}', serializer: ${serializer}, create: () => ${create} as unknown, fill: (o: unknown) => SerializerFill.fill${className}(o as ${className}) }`);
+            const fromJson = schema.isStrict ? 'read' : 'readFlexible';
+            cases.push(
+                `{ name: '${className}', write: (o: unknown, w: IObjectWriter) => ${serializer}.write(o as ${className}, w), read: (o: unknown, r: IObjectReader) => ${serializer}.read(o as ${className}, r), fromJson: (o: unknown, r: IObjectReader) => ${serializer}.${fromJson}(o as ${className}, r), create: () => ${create} as unknown, fill: (o: unknown) => SerializerFill.fill${className}(o as ${className}) }`
+            );
             const unfilled: string[] = [];
             const body: string[] = [];
             for (const prop of schema.properties) {
@@ -221,12 +224,12 @@ ${Array.from(imports.entries())
  */
 export interface SerializerFillCase {
     name: string;
-    serializer: {
-        toJson(obj: any): Map<string, unknown> | null;
-        fromJson(obj: any, m: unknown): void;
-        write(obj: any, w: IObjectWriter): void;
-        read(obj: any, r: IObjectReader): void;
-    };
+    write(obj: unknown, w: IObjectWriter): void;
+    read(obj: unknown, r: IObjectReader): void;
+    /**
+     * Reads like the JSON conversion of the class: user-input keys on non-strict classes.
+     */
+    fromJson(obj: unknown, r: IObjectReader): void;
     create(): unknown;
     fill(obj: unknown): void;
 }

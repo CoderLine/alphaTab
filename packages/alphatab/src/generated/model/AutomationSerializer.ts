@@ -5,111 +5,67 @@
 // </auto-generated>
 import { Automation } from "@coderline/alphatab/model/Automation";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
-import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { AutomationType } from "@coderline/alphatab/model/Automation";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { SyncPointData } from "@coderline/alphatab/model/Automation";
 import { SyncPointDataSerializer } from "@coderline/alphatab/generated/model/SyncPointDataSerializer";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
-import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class AutomationSerializer {
-    public static fromJson(obj: Automation, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        AutomationSerializer.read(obj, new MapObjectReader(m));
-    }
-    public static read(obj: Automation, r: IObjectReader): void {
-        r.readRecord((id, k, rr) => id >= 0 ? AutomationSerializer._readField(obj, id, rr) : AutomationSerializer.readProperty(obj, k, rr));
-    }
-    public static readProperty(obj: Automation, property: string, r: IObjectReader): boolean {
-        const id = AutomationSerializer._fieldId(property);
-        return id >= 0 ? AutomationSerializer._readField(obj, id, r) : false;
-    }
-    /**
-     * The id of the field with the given key, or -1.
-     */
-    private static _fieldId(property: string): number {
-        switch (property) {
-            case "islinear":
-                return 0;
-            case "type":
-                return 1;
-            case "value":
-                return 2;
-            case "syncpointvalue":
-                return 3;
-            case "ratioposition":
-                return 4;
-            case "text":
-                return 5;
-            case "isvisible":
-                return 6;
-        }
-        return -1;
-    }
-    private static _readField(obj: Automation, id: number, r: IObjectReader): boolean {
-        switch (id) {
-            case 0:
-                obj.isLinear = r.readBoolean();
-                return true;
-            case 1:
-                obj.type = JsonHelper.parseEnum<AutomationType>(r.readValue(), AutomationType)!;
-                return true;
-            case 2:
-                obj.value = r.readNumber();
-                return true;
-            case 3:
-                if (r.isNullish()) {
-                    obj.syncPointValue = undefined;
-                }
-                else {
-                    obj.syncPointValue = new SyncPointData();
-                    SyncPointDataSerializer.read(obj.syncPointValue, r);
-                }
-                return true;
-            case 4:
-                obj.ratioPosition = r.readNumber();
-                return true;
-            case 5:
-                obj.text = r.readString();
-                return true;
-            case 6:
-                obj.isVisible = r.readBoolean();
-                return true;
-        }
-        return false;
-    }
-    public static toJson(obj: Automation | null | undefined): Map<string, unknown> | null {
-        const w = new MapObjectWriter();
-        AutomationSerializer.write(obj, w);
-        return w.result as Map<string, unknown> | null;
+    private static readonly _fields: RecordFields = new RecordFields(["islinear", "type", "value", "syncpointvalue", "ratioposition", "text", "isvisible"]);
+    public static read(obj: Automation, reader: IObjectReader): void {
+        reader.readRecord(AutomationSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.isLinear = r.readBoolean();
+                    return true;
+                case 1:
+                    obj.type = JsonHelper.parseEnum<AutomationType>(r.readValue(), AutomationType)!;
+                    return true;
+                case 2:
+                    obj.value = r.readNumber();
+                    return true;
+                case 3:
+                    if (r.isNullish()) {
+                        obj.syncPointValue = undefined;
+                    }
+                    else {
+                        obj.syncPointValue = new SyncPointData();
+                        SyncPointDataSerializer.read(obj.syncPointValue, r);
+                    }
+                    return true;
+                case 4:
+                    obj.ratioPosition = r.readNumber();
+                    return true;
+                case 5:
+                    obj.text = r.readString();
+                    return true;
+                case 6:
+                    obj.isVisible = r.readBoolean();
+                    return true;
+            }
+            return false;
+        });
     }
     public static write(obj: Automation | null | undefined, w: IObjectWriter): void {
         if (!obj) {
             w.writeNull();
             return;
         }
-        w.startObject();
-        w.field(0, "islinear");
-        w.writeBoolean(obj.isLinear);
-        w.field(1, "type");
-        w.writeNumber(obj.type as number);
-        w.field(2, "value");
-        w.writeNumber(obj.value);
+        w.startObject(AutomationSerializer._fields);
+        w.booleanField(0, obj.isLinear);
+        w.numberField(1, obj.type as number);
+        w.numberField(2, obj.value);
         if (obj.syncPointValue) {
-            w.field(3, "syncpointvalue");
+            w.field(3);
             SyncPointDataSerializer.write(obj.syncPointValue, w);
         }
-        w.field(4, "ratioposition");
-        w.writeNumber(obj.ratioPosition);
-        w.field(5, "text");
-        w.writeString(obj.text);
-        w.field(6, "isvisible");
-        w.writeBoolean(obj.isVisible);
+        w.numberField(4, obj.ratioPosition);
+        w.stringField(5, obj.text);
+        w.booleanField(6, obj.isVisible);
         w.endObject();
     }
 }
