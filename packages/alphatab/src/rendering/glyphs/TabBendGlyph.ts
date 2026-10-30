@@ -477,7 +477,7 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
                 const arrowOffset = isUp ? 3 : -3;
 
                 if (this._shape) {
-                    this._shape.addBezier(x1, y1, (x1 + x2) / 2, y1, x2, y1, x2, y2 + arrowOffset, canvas.lineWidth);
+                    this._shape.addBendCurve(x1, y1, x2, y2 + arrowOffset, canvas.lineWidth);
                     return;
                 }
                 // draw bezier line from first to second point

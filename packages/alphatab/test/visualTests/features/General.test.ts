@@ -174,6 +174,37 @@ describe('GeneralTests', () => {
         );
     });
 
+    it('colors-partial-bar-style', async () => {
+        const voice1 = ':4 0.6 3.6 0.5 2.5';
+        const voice2 = ':2 0.1 3.1';
+        const settings = new Settings();
+        // a barline colour distinct from the glyph colour keeps the default barline colour recognisable
+        settings.display.resources.barSeparatorColor = Color.fromJson('#0080C0')!;
+        await VisualTestHelper.runVisualTestTex(
+            `\\defaultBarNumberDisplay allBars \\track \\staff {score tabs} \\voice ${[voice1, voice1, voice1, voice1].join(' | ')} \\voice ${[voice2, voice2, voice2, voice2].join(' | ')}`,
+            'test-data/visual-tests/general/colors-partial-bar-style.png',
+            settings,
+            o => {
+                const bars = o.score.tracks[0].staves[0].bars;
+
+                // only staff lines coloured: barlines and bar number keep their default colours
+                bars[1].style = new BarStyle();
+                bars[1].style.colors.set(BarSubElement.StandardNotationStaffLine, Color.fromJson('#DD0000')!);
+                bars[1].style.colors.set(BarSubElement.GuitarTabsStaffLine, Color.fromJson('#DD0000')!);
+
+                // only the bar number coloured: staff lines, ledger lines and barlines keep their default colours
+                bars[2].style = new BarStyle();
+                bars[2].style.colors.set(BarSubElement.StandardNotationBarNumber, Color.fromJson('#00AA00')!);
+
+                // only the tab barline coloured, and a voice style without entries: the standard notation
+                // barline and the second voice keep their default colours
+                bars[3].style = new BarStyle();
+                bars[3].style.colors.set(BarSubElement.GuitarTabsBarLines, Color.fromJson('#00AA00')!);
+                bars[3].voices[1].style = new VoiceStyle();
+            }
+        );
+    });
+
     it('color-performance', async () => {
         // warm-up
         for (let i = 0; i < 5; i++) {

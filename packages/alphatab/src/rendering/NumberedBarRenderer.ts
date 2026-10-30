@@ -344,11 +344,21 @@ export class NumberedBarRenderer extends LineBarRenderer {
             // we want a glyph on every quarter tick
 
             if (b.duration < Duration.Quarter) {
+                // numbered notation never extends a rest with dashes: every further quarter repeats the 0
+                const repeatRest = b.isRest && !b.isEmpty;
                 const endTick = b.displayStart + b.displayDuration;
                 let dashTick = b.displayStart + MidiUtils.QuarterTime;
                 while (dashTick < endTick) {
                     const isFullTick = endTick - dashTick >= MidiUtils.QuarterTime;
-                    if (isFullTick) {
+                    if (isFullTick && repeatRest) {
+                        const restNumber = new NumberedNoteBeatContainerGlyphBase(
+                            b,
+                            absoluteStart + dashTick,
+                            MidiUtils.QuarterTime
+                        );
+                        this.addBeatGlyph(restNumber);
+                        mainContainer.addNotes(restNumber);
+                    } else if (isFullTick) {
                         const dash = new NumberedDashBeatContainerGlyph(v.index, absoluteStart + dashTick);
                         this.addBeatGlyph(dash);
                         mainContainer.addDash(dash);

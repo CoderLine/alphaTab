@@ -40,8 +40,9 @@ export class NumberedNoteBeatContainerGlyphBase extends NumberedBeatContainerGly
     }
 
     private static _ticksToBarCount(displayDuration: number): number {
-        // we know that displayDuration < MidiUtils.QuarterTime, otherwise this glyph is not created
-        if (displayDuration >= MidiUtils.toTicks(Duration.Eighth)) {
+        if (displayDuration >= MidiUtils.QuarterTime) {
+            return 0;
+        } else if (displayDuration >= MidiUtils.toTicks(Duration.Eighth)) {
             return 1;
         } else if (displayDuration >= MidiUtils.toTicks(Duration.Sixteenth)) {
             return 2;

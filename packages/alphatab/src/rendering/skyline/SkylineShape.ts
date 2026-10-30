@@ -1,13 +1,19 @@
 /**
- * The drawn extent of a glyph as a list of narrow boxes, for the skyline placement of glyphs whose
+ * The drawn extent of a glyph as a list of boxes, for the skyline placement of glyphs whose
  * bounding box would claim far more area than they cover (slanted lines, curves).
+ * Lines and curves are split into steps whose boxes cover the drawn stroke, so the shape never claims less
+ * than what is drawn.
  * Coordinates follow the {@link ITieGlyph} convention: staff-local x, renderer-local y.
  * @internal
  */
 export class SkylineShape {
-    /** The width of the x-steps lines and curves are split into. */
-    private static readonly _stepWidth: number = 2;
-    private static readonly _curveSteps: number = 16;
+    /** The minimal width of the steps lines and curves are split into. */
+    private static readonly _minStepWidth: number = 2;
+    /**
+     * How much more a step may claim vertically than the stroke it covers, unless the step would get narrower
+     * than {@link _minStepWidth}.
+     */
+    private static readonly _maxStepRise: number = 1;
 
     private _xStarts: number[] = [];
     private _xEnds: number[] = [];
@@ -60,7 +66,7 @@ export class SkylineShape {
     }
 
     /**
-     * Adds a straight line of the given thickness, split into narrow x-steps.
+     * Adds a straight line of the given thickness.
      */
     public addLine(x1: number, y1: number, x2: number, y2: number, thickness: number): void {
         if (x2 < x1) {
@@ -69,44 +75,49 @@ export class SkylineShape {
         }
         const half = thickness / 2;
         const dx = x2 - x1;
-        const steps = Math.max(1, Math.ceil(dx / SkylineShape._stepWidth));
+        const dy = y2 - y1;
+        const steps = Math.max(
+            1,
+            Math.min(Math.ceil(dx / SkylineShape._minStepWidth), Math.ceil(Math.abs(dy) / SkylineShape._maxStepRise))
+        );
         for (let i = 0; i < steps; i++) {
             const xa = x1 + (dx * i) / steps;
             const xb = x1 + (dx * (i + 1)) / steps;
-            const ya = y1 + ((y2 - y1) * i) / steps;
-            const yb = y1 + ((y2 - y1) * (i + 1)) / steps;
+            const ya = y1 + (dy * i) / steps;
+            const yb = y1 + (dy * (i + 1)) / steps;
             this.addBox(xa - half, Math.min(ya, yb) - half, xb + half, Math.max(ya, yb) + half);
         }
     }
 
     /**
-     * Adds a cubic bezier curve of the given thickness as a sequence of straight lines.
+     * Adds the cubic bezier curve from (x1, y1) to (x2, y2) with the control points ((x1 + x2) / 2, y1) and
+     * (x2, y1), of the given thickness: it leaves the start horizontally and reaches the end vertically.
      */
-    public addBezier(
-        x1: number,
-        y1: number,
-        cp1X: number,
-        cp1Y: number,
-        cp2X: number,
-        cp2Y: number,
-        x2: number,
-        y2: number,
-        thickness: number
-    ): void {
-        let previousX = x1;
-        let previousY = y1;
-        for (let i = 1; i <= SkylineShape._curveSteps; i++) {
-            const t = i / SkylineShape._curveSteps;
-            const mt = 1 - t;
-            const a = mt * mt * mt;
-            const b = 3 * mt * mt * t;
-            const c = 3 * mt * t * t;
-            const d = t * t * t;
-            const x = a * x1 + b * cp1X + c * cp2X + d * x2;
-            const y = a * y1 + b * cp1Y + c * cp2Y + d * y2;
-            this.addLine(previousX, previousY, x, y, thickness);
-            previousX = x;
-            previousY = y;
+    public addBendCurve(x1: number, y1: number, x2: number, y2: number, thickness: number): void {
+        // With the curve parameter t and s = t³ the curve is y = y1 + dy * s and
+        // x = x1 + dx * (1.5 * s^(1/3) - 0.5 * s). Both change monotonically, so the ends of a step are its
+        // extremes. The steps rise equally and are joined while narrower than the minimal step width.
+        const half = thickness / 2;
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const steps = Math.max(1, Math.ceil(Math.abs(dy) / SkylineShape._maxStepRise));
+        let startX = x1;
+        let startY = y1;
+        for (let i = 1; i <= steps; i++) {
+            const s = i / steps;
+            const x = i === steps ? x2 : x1 + dx * (1.5 * Math.pow(s, 1 / 3) - 0.5 * s);
+            if (i < steps && Math.abs(x - startX) < SkylineShape._minStepWidth) {
+                continue;
+            }
+            const y = i === steps ? y2 : y1 + dy * s;
+            this.addBox(
+                Math.min(startX, x) - half,
+                Math.min(startY, y) - half,
+                Math.max(startX, x) + half,
+                Math.max(startY, y) + half
+            );
+            startX = x;
+            startY = y;
         }
     }
 }
