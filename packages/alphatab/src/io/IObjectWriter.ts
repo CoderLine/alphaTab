@@ -26,6 +26,13 @@ export interface IObjectWriter {
      * Sets the key of the next value within a record or map.
      */
     prop(name: string): void;
+    /**
+     * Sets the key of the next value within a record to one of its generated fields. Realisations write either
+     * the name or the id; ids are only meaningful to the readers of the same generator output.
+     * @param id The field's id, unique within its class.
+     * @param name The field's key.
+     */
+    field(id: number, name: string): void;
     writeNumber(v: number): void;
     writeBoolean(v: boolean): void;
     writeString(v: string): void;

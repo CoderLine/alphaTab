@@ -19,30 +19,52 @@ export class ImporterSettingsSerializer {
         ImporterSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: ImporterSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => ImporterSettingsSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? ImporterSettingsSerializer._readField(obj, id, rr, false) : ImporterSettingsSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: ImporterSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = ImporterSettingsSerializer._fieldId(property);
+        return id >= 0 ? ImporterSettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "encoding":
+                return 0;
+            case "gp3to5encoding":
+                return 1;
+            case "mergepartgroupsinmusicxml":
+                return 2;
+            case "beattextaslyrics":
+                return 3;
+            case "maxdecodingbuffersize":
+                return 4;
+        }
+        return -1;
+    }
+    private static _readField(obj: ImporterSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 obj.encoding = r.readString();
                 return true;
-            case "gp3to5encoding":
+            case 1:
                 obj.gp3To5encoding = r.readString();
                 return true;
-            case "mergepartgroupsinmusicxml":
+            case 2:
                 obj.mergePartGroupsInMusicXml = r.readBoolean();
                 return true;
-            case "beattextaslyrics":
+            case 3:
                 obj.beatTextAsLyrics = r.readBoolean();
                 return true;
-            case "maxdecodingbuffersize":
+            case 4:
                 obj.maxDecodingBufferSize = r.readNumber();
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: ImporterSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => ImporterSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? ImporterSettingsSerializer._readField(obj, id, rr, false) : ImporterSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ImporterSettings, property: string, r: IObjectReader): boolean {
         if (ImporterSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -61,15 +83,15 @@ export class ImporterSettingsSerializer {
             return;
         }
         w.startObject();
-        w.prop("encoding");
+        w.field(0, "encoding");
         w.writeString(obj.encoding);
-        w.prop("gp3to5encoding");
+        w.field(1, "gp3to5encoding");
         w.writeString(obj.gp3To5encoding);
-        w.prop("mergepartgroupsinmusicxml");
+        w.field(2, "mergepartgroupsinmusicxml");
         w.writeBoolean(obj.mergePartGroupsInMusicXml);
-        w.prop("beattextaslyrics");
+        w.field(3, "beattextaslyrics");
         w.writeBoolean(obj.beatTextAsLyrics);
-        w.prop("maxdecodingbuffersize");
+        w.field(4, "maxdecodingbuffersize");
         w.writeNumber(obj.maxDecodingBufferSize);
         w.endObject();
     }

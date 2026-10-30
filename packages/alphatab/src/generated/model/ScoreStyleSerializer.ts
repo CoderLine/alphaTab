@@ -24,14 +24,30 @@ export class ScoreStyleSerializer {
         ScoreStyleSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: ScoreStyle, r: IObjectReader): void {
-        r.readObject((k, rr) => ScoreStyleSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? ScoreStyleSerializer._readField(obj, id, rr) : ScoreStyleSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: ScoreStyle, property: string, r: IObjectReader): boolean {
+        const id = ScoreStyleSerializer._fieldId(property);
+        return id >= 0 ? ScoreStyleSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "headerandfooter":
+                return 0;
+            case "colors":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: ScoreStyle, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 ScoreStyleSerializer._readHeaderAndFooter(obj, r);
                 return true;
-            case "colors":
+            case 1:
                 ScoreStyleSerializer._readColors(obj, r);
                 return true;
         }
@@ -64,14 +80,14 @@ export class ScoreStyleSerializer {
             return;
         }
         w.startObject();
-        w.prop("headerandfooter");
+        w.field(0, "headerandfooter");
         w.startMap();
         for (const [k, v] of obj.headerAndFooter!) {
             w.prop(k.toString());
             HeaderFooterStyleSerializer.write(v, w);
         }
         w.endMap();
-        w.prop("colors");
+        w.field(1, "colors");
         w.startMap();
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());

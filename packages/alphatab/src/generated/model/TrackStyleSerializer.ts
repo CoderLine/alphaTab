@@ -22,11 +22,25 @@ export class TrackStyleSerializer {
         TrackStyleSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: TrackStyle, r: IObjectReader): void {
-        r.readObject((k, rr) => TrackStyleSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? TrackStyleSerializer._readField(obj, id, rr) : TrackStyleSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: TrackStyle, property: string, r: IObjectReader): boolean {
+        const id = TrackStyleSerializer._fieldId(property);
+        return id >= 0 ? TrackStyleSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "colors":
+                return 0;
+        }
+        return -1;
+    }
+    private static _readField(obj: TrackStyle, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 TrackStyleSerializer._readColors(obj, r);
                 return true;
         }
@@ -50,7 +64,7 @@ export class TrackStyleSerializer {
             return;
         }
         w.startObject();
-        w.prop("colors");
+        w.field(0, "colors");
         w.startMap();
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());

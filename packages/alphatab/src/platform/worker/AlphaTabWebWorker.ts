@@ -96,9 +96,7 @@ export class AlphaTabWebWorker {
             case 'alphaTab.renderScore':
                 this._scoreId = data.scoreId;
                 this._updateFontSizes(data.fontSizes);
-                const renderHints = data.renderHints;
-                const score = data.score == null ? null : this._deserializeScore(data.score);
-                this._renderMultiple(score, data.trackIndexes, renderHints);
+                this._renderScore(data.score, data.trackIndexes, data.renderHints);
                 break;
             case 'alphaTab.updateSettings':
                 this._updateSettings(data.settings);
@@ -161,8 +159,9 @@ export class AlphaTabWebWorker {
         SettingsSerializer.read(this._renderer.settings, new MapObjectReader(json));
     }
 
-    private _renderMultiple(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
+    private _renderScore(data: unknown, trackIndexes: number[] | null, renderHints?: RenderHints): void {
         try {
+            const score = data == null ? null : this._deserializeScore(data);
             this._renderer.renderScore(score, trackIndexes, renderHints);
         } catch (e) {
             this._error(e as Error);

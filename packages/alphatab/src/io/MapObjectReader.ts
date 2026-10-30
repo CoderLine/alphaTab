@@ -9,14 +9,20 @@ import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
 export class MapObjectReader implements IObjectReader {
     private _value: unknown;
     private _handler: ((name: string, r: IObjectReader) => boolean) | null = null;
-    // one callback for all records, the handler of the record being read is in _handler
+    private _recordHandler: ((id: number, name: string, r: IObjectReader) => boolean) | null = null;
+    // one callback for all maps and records, the handler of the container being read is in _handler or _recordHandler
     private readonly _entry: (v: unknown, k: string) => void;
+    private readonly _recordEntry: (v: unknown, k: string) => void;
 
     public constructor(value: unknown) {
         this._value = value;
         this._entry = (v, k) => {
             this._value = v;
             this._handler!(k, this);
+        };
+        this._recordEntry = (v, k) => {
+            this._value = v;
+            this._recordHandler!(-1, k, this);
         };
     }
 
@@ -64,6 +70,32 @@ export class MapObjectReader implements IObjectReader {
         for (const k in v) {
             this._value = (v as Record<string, unknown>)[k];
             handler(k, this);
+        }
+        return true;
+    }
+
+    public readRecord(handler: (id: number, name: string, r: IObjectReader) => boolean): void {
+        /*@target web*/
+        if (this._readPlainRecord(handler)) {
+            return;
+        }
+        const parent = this._recordHandler;
+        this._recordHandler = handler;
+        JsonHelper.forEach(this._value, this._recordEntry);
+        this._recordHandler = parent;
+    }
+
+    /**
+     * @target web
+     */
+    private _readPlainRecord(handler: (id: number, name: string, r: IObjectReader) => boolean): boolean {
+        const v = this._value;
+        if (v instanceof Map || typeof v !== 'object' || v === null) {
+            return false;
+        }
+        for (const k in v) {
+            this._value = (v as Record<string, unknown>)[k];
+            handler(-1, k, this);
         }
         return true;
     }

@@ -19,17 +19,35 @@ export class TuningSerializer {
         TuningSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: Tuning, r: IObjectReader): void {
-        r.readObject((k, rr) => TuningSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? TuningSerializer._readField(obj, id, rr) : TuningSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: Tuning, property: string, r: IObjectReader): boolean {
+        const id = TuningSerializer._fieldId(property);
+        return id >= 0 ? TuningSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "isstandard":
+                return 0;
+            case "name":
+                return 1;
+            case "tunings":
+                return 2;
+        }
+        return -1;
+    }
+    private static _readField(obj: Tuning, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.isStandard = r.readBoolean();
                 return true;
-            case "name":
+            case 1:
                 obj.name = r.readString();
                 return true;
-            case "tunings":
+            case 2:
                 obj.tunings = r.readValue()! as number[];
                 return true;
         }
@@ -46,11 +64,11 @@ export class TuningSerializer {
             return;
         }
         w.startObject();
-        w.prop("isstandard");
+        w.field(0, "isstandard");
         w.writeBoolean(obj.isStandard);
-        w.prop("name");
+        w.field(1, "name");
         w.writeString(obj.name);
-        w.prop("tunings");
+        w.field(2, "tunings");
         w.writeValue(obj.tunings);
         w.endObject();
     }

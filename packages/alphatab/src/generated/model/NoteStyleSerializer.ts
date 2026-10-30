@@ -23,17 +23,35 @@ export class NoteStyleSerializer {
         NoteStyleSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: NoteStyle, r: IObjectReader): void {
-        r.readObject((k, rr) => NoteStyleSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? NoteStyleSerializer._readField(obj, id, rr) : NoteStyleSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: NoteStyle, property: string, r: IObjectReader): boolean {
+        const id = NoteStyleSerializer._fieldId(property);
+        return id >= 0 ? NoteStyleSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "notehead":
+                return 0;
+            case "noteheadcenteronstem":
+                return 1;
+            case "colors":
+                return 2;
+        }
+        return -1;
+    }
+    private static _readField(obj: NoteStyle, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.noteHead = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol);
                 return true;
-            case "noteheadcenteronstem":
+            case 1:
                 obj.noteHeadCenterOnStem = r.readValue() as boolean | undefined;
                 return true;
-            case "colors":
+            case 2:
                 NoteStyleSerializer._readColors(obj, r);
                 return true;
         }
@@ -57,11 +75,11 @@ export class NoteStyleSerializer {
             return;
         }
         w.startObject();
-        w.prop("notehead");
+        w.field(0, "notehead");
         w.writeValue(obj.noteHead as number | undefined);
-        w.prop("noteheadcenteronstem");
+        w.field(1, "noteheadcenteronstem");
         w.writeValue(obj.noteHeadCenterOnStem);
-        w.prop("colors");
+        w.field(2, "colors");
         w.startMap();
         for (const [k, v] of obj.colors!) {
             w.prop(k.toString());

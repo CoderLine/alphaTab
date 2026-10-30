@@ -21,14 +21,30 @@ export class SustainPedalMarkerSerializer {
         SustainPedalMarkerSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: SustainPedalMarker, r: IObjectReader): void {
-        r.readObject((k, rr) => SustainPedalMarkerSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? SustainPedalMarkerSerializer._readField(obj, id, rr) : SustainPedalMarkerSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: SustainPedalMarker, property: string, r: IObjectReader): boolean {
+        const id = SustainPedalMarkerSerializer._fieldId(property);
+        return id >= 0 ? SustainPedalMarkerSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "ratioposition":
+                return 0;
+            case "pedaltype":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: SustainPedalMarker, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.ratioPosition = r.readNumber();
                 return true;
-            case "pedaltype":
+            case 1:
                 obj.pedalType = JsonHelper.parseEnum<SustainPedalMarkerType>(r.readValue(), SustainPedalMarkerType)!;
                 return true;
         }
@@ -45,9 +61,9 @@ export class SustainPedalMarkerSerializer {
             return;
         }
         w.startObject();
-        w.prop("ratioposition");
+        w.field(0, "ratioposition");
         w.writeNumber(obj.ratioPosition);
-        w.prop("pedaltype");
+        w.field(1, "pedaltype");
         w.writeNumber(obj.pedalType as number);
         w.endObject();
     }

@@ -25,33 +25,57 @@ export class SettingsSerializer {
         SettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: Settings, r: IObjectReader): void {
-        r.readObject((k, rr) => SettingsSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? SettingsSerializer._readField(obj, id, rr, false) : SettingsSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: Settings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = SettingsSerializer._fieldId(property);
+        return id >= 0 ? SettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "core":
+                return 0;
+            case "display":
+                return 1;
+            case "notation":
+                return 2;
+            case "importer":
+                return 3;
+            case "player":
+                return 4;
+            case "exporter":
+                return 5;
+        }
+        return -1;
+    }
+    private static _readField(obj: Settings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 CoreSettingsSerializer.read(obj.core, r);
                 return true;
-            case "display":
+            case 1:
                 DisplaySettingsSerializer.read(obj.display, r);
                 return true;
-            case "notation":
+            case 2:
                 NotationSettingsSerializer.read(obj.notation, r);
                 return true;
-            case "importer":
+            case 3:
                 ImporterSettingsSerializer.read(obj.importer, r);
                 return true;
-            case "player":
+            case 4:
                 PlayerSettingsSerializer.read(obj.player, r);
                 return true;
-            case "exporter":
+            case 5:
                 ExporterSettingsSerializer.read(obj.exporter, r);
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: Settings, r: IObjectReader): void {
-        r.readObject((k, rr) => SettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? SettingsSerializer._readField(obj, id, rr, false) : SettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: Settings, property: string, r: IObjectReader): boolean {
         if (["core", "display", "notation", "importer", "player", "exporter"].indexOf(property) < 0 && SettingsSerializer.readProperty(obj, property, r, true)) {
@@ -136,17 +160,17 @@ export class SettingsSerializer {
             return;
         }
         w.startObject();
-        w.prop("core");
+        w.field(0, "core");
         CoreSettingsSerializer.write(obj.core, w);
-        w.prop("display");
+        w.field(1, "display");
         DisplaySettingsSerializer.write(obj.display, w);
-        w.prop("notation");
+        w.field(2, "notation");
         NotationSettingsSerializer.write(obj.notation, w);
-        w.prop("importer");
+        w.field(3, "importer");
         ImporterSettingsSerializer.write(obj.importer, w);
-        w.prop("player");
+        w.field(4, "player");
         PlayerSettingsSerializer.write(obj.player, w);
-        w.prop("exporter");
+        w.field(5, "exporter");
         ExporterSettingsSerializer.write(obj.exporter, w);
         w.endObject();
     }

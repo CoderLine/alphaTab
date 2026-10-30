@@ -11,7 +11,8 @@ import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
 export const messagePackUndefinedExtType = 0;
 
 /**
- * Writes the object model as MessagePack (https://github.com/msgpack/msgpack/blob/master/spec.md): records and
+ * Writes the object model as MessagePack (https://github.com/msgpack/msgpack/blob/master/spec.md): records as
+ * maps keyed by field id (positive fixint or uint 8) and by string for entries written with {@link prop},
  * maps as maps with string keys, arrays, integers in the 32-bit ranges as the smallest int format, other
  * numbers as float 32 when lossless and float 64 otherwise, strings as UTF-8 str, `Uint8Array` as bin and
  * `undefined` as the extension type {@link messagePackUndefinedExtType}.
@@ -144,6 +145,18 @@ export class MessagePackObjectWriter implements IObjectWriter {
     public prop(name: string): void {
         this._count++;
         this._writeString(name);
+    }
+
+    public field(id: number, _name: string): void {
+        this._count++;
+        this._ensure(2);
+        if (id <= 0x7f) {
+            this._buffer[this._position++] = id;
+        } else {
+            this._buffer[this._position] = 0xcc;
+            this._buffer[this._position + 1] = id;
+            this._position += 2;
+        }
     }
 
     /**

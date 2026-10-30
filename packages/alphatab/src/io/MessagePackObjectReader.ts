@@ -4,8 +4,9 @@ import type { IObjectReader } from '@coderline/alphatab/io/IObjectReader';
 import { messagePackUndefinedExtType } from '@coderline/alphatab/io/MessagePackObjectWriter';
 
 /**
- * Reads MessagePack as written by {@link MessagePackObjectWriter}. Typed reads of a value with another format
- * return the value as {@link IObjectReader.readValue} does. Maps are read as `Map<string, unknown>` by
+ * Reads MessagePack as written by {@link MessagePackObjectWriter}. Integer keys of maps are passed as field ids
+ * by {@link IObjectReader.readRecord}, so records must be read by the generator output that wrote them. Typed
+ * reads of a value with another format return the value as {@link IObjectReader.readValue} does. Maps are read as `Map<string, unknown>` by
  * {@link IObjectReader.readValue} (non-string keys converted with `String`), bin as a copied `Uint8Array`.
  * Extension types other than {@link messagePackUndefinedExtType} are not supported.
  * @target web
@@ -332,6 +333,37 @@ export class MessagePackObjectReader implements IObjectReader {
             const key = this._readKey();
             this._consumed = false;
             handler(key, this);
+            if (!this._consumed) {
+                this.skip();
+            }
+        }
+        this._consumed = true;
+    }
+
+    public readRecord(handler: (id: number, name: string, r: IObjectReader) => boolean): void {
+        const count = this._containerHeader(true);
+        if (count < 0) {
+            this.skip();
+            return;
+        }
+        const buffer = this._buffer;
+        for (let i = 0; i < count; i++) {
+            const p = this._position;
+            const b = buffer[p];
+            let id = -1;
+            if (b <= 0x7f) {
+                id = b;
+                this._position = p + 1;
+            } else if (b === 0xcc) {
+                if (p + 2 > buffer.length) {
+                    throw this._error('unexpected end of data');
+                }
+                id = buffer[p + 1];
+                this._position = p + 2;
+            }
+            const name = id >= 0 ? '' : this._readKey();
+            this._consumed = false;
+            handler(id, name, this);
             if (!this._consumed) {
                 this.skip();
             }

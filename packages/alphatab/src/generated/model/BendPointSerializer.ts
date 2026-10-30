@@ -19,14 +19,30 @@ export class BendPointSerializer {
         BendPointSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: BendPoint, r: IObjectReader): void {
-        r.readObject((k, rr) => BendPointSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? BendPointSerializer._readField(obj, id, rr) : BendPointSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: BendPoint, property: string, r: IObjectReader): boolean {
+        const id = BendPointSerializer._fieldId(property);
+        return id >= 0 ? BendPointSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "offset":
+                return 0;
+            case "value":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: BendPoint, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.offset = r.readNumber();
                 return true;
-            case "value":
+            case 1:
                 obj.value = r.readNumber();
                 return true;
         }
@@ -43,9 +59,9 @@ export class BendPointSerializer {
             return;
         }
         w.startObject();
-        w.prop("offset");
+        w.field(0, "offset");
         w.writeNumber(obj.offset);
-        w.prop("value");
+        w.field(1, "value");
         w.writeNumber(obj.value);
         w.endObject();
     }

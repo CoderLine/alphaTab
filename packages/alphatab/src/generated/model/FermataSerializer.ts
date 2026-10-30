@@ -21,14 +21,30 @@ export class FermataSerializer {
         FermataSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: Fermata, r: IObjectReader): void {
-        r.readObject((k, rr) => FermataSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? FermataSerializer._readField(obj, id, rr) : FermataSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: Fermata, property: string, r: IObjectReader): boolean {
+        const id = FermataSerializer._fieldId(property);
+        return id >= 0 ? FermataSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "type":
+                return 0;
+            case "length":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: Fermata, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.type = JsonHelper.parseEnum<FermataType>(r.readValue(), FermataType)!;
                 return true;
-            case "length":
+            case 1:
                 obj.length = r.readNumber();
                 return true;
         }
@@ -45,9 +61,9 @@ export class FermataSerializer {
             return;
         }
         w.startObject();
-        w.prop("type");
+        w.field(0, "type");
         w.writeNumber(obj.type as number);
-        w.prop("length");
+        w.field(1, "length");
         w.writeNumber(obj.length);
         w.endObject();
     }

@@ -23,17 +23,35 @@ export class VoiceSerializer {
         VoiceSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: Voice, r: IObjectReader): void {
-        r.readObject((k, rr) => VoiceSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? VoiceSerializer._readField(obj, id, rr) : VoiceSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: Voice, property: string, r: IObjectReader): boolean {
+        const id = VoiceSerializer._fieldId(property);
+        return id >= 0 ? VoiceSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "id":
+                return 0;
+            case "beats":
+                return 1;
+            case "style":
+                return 2;
+        }
+        return -1;
+    }
+    private static _readField(obj: Voice, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.id = r.readNumber();
                 return true;
-            case "beats":
+            case 1:
                 VoiceSerializer._readBeats(obj, r);
                 return true;
-            case "style":
+            case 2:
                 if (r.isNullish()) {
                     obj.style = undefined;
                 }
@@ -64,16 +82,16 @@ export class VoiceSerializer {
             return;
         }
         w.startObject();
-        w.prop("id");
+        w.field(0, "id");
         w.writeNumber(obj.id);
-        w.prop("beats");
+        w.field(1, "beats");
         w.startArray(obj.beats!.length);
         for (const i of obj.beats!) {
             BeatSerializer.write(i, w);
         }
         w.endArray();
         if (obj.style) {
-            w.prop("style");
+            w.field(2, "style");
             VoiceStyleSerializer.write(obj.style, w);
         }
         w.endObject();

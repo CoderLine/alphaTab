@@ -71,6 +71,10 @@ export class MapObjectWriter implements IObjectWriter {
         this._key = name;
     }
 
+    public field(_id: number, name: string): void {
+        this._key = name;
+    }
+
     public writeNumber(v: number): void {
         this._add(v);
     }

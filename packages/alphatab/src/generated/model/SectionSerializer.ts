@@ -19,14 +19,30 @@ export class SectionSerializer {
         SectionSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: Section, r: IObjectReader): void {
-        r.readObject((k, rr) => SectionSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? SectionSerializer._readField(obj, id, rr) : SectionSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: Section, property: string, r: IObjectReader): boolean {
+        const id = SectionSerializer._fieldId(property);
+        return id >= 0 ? SectionSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "marker":
+                return 0;
+            case "text":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: Section, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.marker = r.readString();
                 return true;
-            case "text":
+            case 1:
                 obj.text = r.readString();
                 return true;
         }
@@ -43,9 +59,9 @@ export class SectionSerializer {
             return;
         }
         w.startObject();
-        w.prop("marker");
+        w.field(0, "marker");
         w.writeString(obj.marker);
-        w.prop("text");
+        w.field(1, "text");
         w.writeString(obj.text);
         w.endObject();
     }

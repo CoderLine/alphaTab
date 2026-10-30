@@ -7,6 +7,7 @@ import {
     jsonAddMethod,
     primaryJsonName,
     printTypeNode,
+    serializedFields,
     wrapTarget
 } from './Serializer.common';
 import type { TypeProperty, TypeSchema, TypeWithNullableInfo } from './TypeSchema';
@@ -208,9 +209,8 @@ function propertyRead(serializable: TypeSchema, prop: TypeProperty, importer: Im
     return nestedRead(prop, importer, type.isOptional ? 'undefined' : 'null', 'canonical');
 }
 
-function caseClause(prop: TypeProperty, code: string): string {
-    const key = JSON.stringify(primaryJsonName(prop));
-    return `${prop.target ? '/*@target web*/\n' : ''}case ${key}:\n${code}\nreturn true;`;
+function caseClause(prop: TypeProperty, label: string, code: string): string {
+    return `${prop.target ? '/*@target web*/\n' : ''}case ${label}:\n${code}`;
 }
 
 /**
@@ -255,7 +255,7 @@ function createFlexibleMethods(className: string, serializable: TypeSchema, impo
 
     return `
     public static readFlexible(obj: ${className}, r: IObjectReader): void {
-        r.readObject((k, rr) => ${serializer}.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? ${serializer}._readField(obj, id, rr, false) : ${serializer}.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ${className}, property: string, r: IObjectReader): boolean {
         ${body.join('\n')}
@@ -274,14 +274,15 @@ export function createReadMethods(className: string, serializable: TypeSchema, i
 
     const flexibleArg = serializable.isStrict ? '' : ', false';
     const flexibleParam = serializable.isStrict ? '' : ', flexible: boolean';
-    const cases: string[] = [];
-    // A closure in readProperty would make V8 allocate a context on every call, so properties read through
+    const flexiblePass = serializable.isStrict ? '' : ', flexible';
+    const idCases: string[] = [];
+    const fieldCases: string[] = [];
+    // A closure in _readField would make V8 allocate a context on every call, so properties read through
     // closures get their own method.
     const helpers: string[] = [];
-    for (const prop of serializable.properties) {
-        if (primaryJsonName(prop) === undefined) {
-            continue;
-        }
+    const fields = serializedFields(serializable);
+    for (let id = 0; id < fields.length; id++) {
+        const prop = fields[id];
         let code = propertyRead(serializable, prop, importer);
         if (code.includes('=>')) {
             const helper = `_read${prop.name.charAt(0).toUpperCase()}${prop.name.substring(1)}`;
@@ -289,14 +290,16 @@ export function createReadMethods(className: string, serializable: TypeSchema, i
             helpers.push(
                 `${target}private static ${helper}(obj: ${className}, r: IObjectReader${flexibleParam}): void {\n${code}\n}`
             );
-            code = `${serializer}.${helper}(obj, r${serializable.isStrict ? '' : ', flexible'});`;
+            code = `${serializer}.${helper}(obj, r${flexiblePass});`;
         }
-        cases.push(caseClause(prop, code));
+        idCases.push(caseClause(prop, JSON.stringify(primaryJsonName(prop)), `return ${id};`));
+        fieldCases.push(caseClause(prop, String(id), `${code}\nreturn true;`));
     }
 
     const after = serializable.hasAfterFromJsonExtension ? '\nobj.afterFromJson();' : '';
-    const fallback = serializable.hasSetPropertyExtension ? 'return obj.setProperty(property, r);' : 'return false;';
-    const switchCode = cases.length > 0 ? `switch (property) {\n${cases.join('\n')}\n}` : '';
+    const fallback = serializable.hasSetPropertyExtension ? 'obj.setProperty(property, r)' : 'false';
+    const idSwitch = idCases.length > 0 ? `switch (property) {\n${idCases.join('\n')}\n}` : '';
+    const fieldSwitch = fieldCases.length > 0 ? `switch (id) {\n${fieldCases.join('\n')}\n}` : '';
 
     return `
     public static fromJson(obj: ${className}, m: unknown): void {
@@ -306,11 +309,22 @@ export function createReadMethods(className: string, serializable: TypeSchema, i
         ${serializer}.${serializable.isStrict ? 'read' : 'readFlexible'}(obj, new MapObjectReader(m));
     }
     public static read(obj: ${className}, r: IObjectReader): void {
-        r.readObject((k, rr) => ${serializer}.readProperty(obj, k, rr${flexibleArg}));${after}
+        r.readRecord((id, k, rr) => id >= 0 ? ${serializer}._readField(obj, id, rr${flexibleArg}) : ${serializer}.readProperty(obj, k, rr${flexibleArg}));${after}
     }
     public static readProperty(obj: ${className}, property: string, r: IObjectReader${flexibleParam}): boolean {
-        ${switchCode}
-        ${fallback}
+        const id = ${serializer}._fieldId(property);
+        return id >= 0 ? ${serializer}._readField(obj, id, r${flexiblePass}) : ${fallback};
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
+        ${idSwitch}
+        return -1;
+    }
+    private static _readField(obj: ${className}, id: number, r: IObjectReader${flexibleParam}): boolean {
+        ${fieldSwitch}
+        return false;
     }
     ${helpers.join('\n')}${serializable.isStrict ? '' : createFlexibleMethods(className, serializable, importer)}`;
 }

@@ -19,21 +19,37 @@ export class ExporterSettingsSerializer {
         ExporterSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: ExporterSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => ExporterSettingsSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? ExporterSettingsSerializer._readField(obj, id, rr, false) : ExporterSettingsSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: ExporterSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = ExporterSettingsSerializer._fieldId(property);
+        return id >= 0 ? ExporterSettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "indent":
+                return 0;
+            case "comments":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: ExporterSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 obj.indent = r.readNumber();
                 return true;
-            case "comments":
+            case 1:
                 obj.comments = r.readBoolean();
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: ExporterSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => ExporterSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? ExporterSettingsSerializer._readField(obj, id, rr, false) : ExporterSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ExporterSettings, property: string, r: IObjectReader): boolean {
         if (ExporterSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -52,9 +68,9 @@ export class ExporterSettingsSerializer {
             return;
         }
         w.startObject();
-        w.prop("indent");
+        w.field(0, "indent");
         w.writeNumber(obj.indent);
-        w.prop("comments");
+        w.field(1, "comments");
         w.writeBoolean(obj.comments);
         w.endObject();
     }

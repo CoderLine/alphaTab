@@ -19,35 +19,65 @@ export class PlaybackInformationSerializer {
         PlaybackInformationSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: PlaybackInformation, r: IObjectReader): void {
-        r.readObject((k, rr) => PlaybackInformationSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? PlaybackInformationSerializer._readField(obj, id, rr) : PlaybackInformationSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: PlaybackInformation, property: string, r: IObjectReader): boolean {
+        const id = PlaybackInformationSerializer._fieldId(property);
+        return id >= 0 ? PlaybackInformationSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "volume":
+                return 0;
+            case "balance":
+                return 1;
+            case "port":
+                return 2;
+            case "program":
+                return 3;
+            case "bank":
+                return 4;
+            case "primarychannel":
+                return 5;
+            case "secondarychannel":
+                return 6;
+            case "ismute":
+                return 7;
+            case "issolo":
+                return 8;
+        }
+        return -1;
+    }
+    private static _readField(obj: PlaybackInformation, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.volume = r.readNumber();
                 return true;
-            case "balance":
+            case 1:
                 obj.balance = r.readNumber();
                 return true;
-            case "port":
+            case 2:
                 obj.port = r.readNumber();
                 return true;
-            case "program":
+            case 3:
                 obj.program = r.readNumber();
                 return true;
-            case "bank":
+            case 4:
                 obj.bank = r.readNumber();
                 return true;
-            case "primarychannel":
+            case 5:
                 obj.primaryChannel = r.readNumber();
                 return true;
-            case "secondarychannel":
+            case 6:
                 obj.secondaryChannel = r.readNumber();
                 return true;
-            case "ismute":
+            case 7:
                 obj.isMute = r.readBoolean();
                 return true;
-            case "issolo":
+            case 8:
                 obj.isSolo = r.readBoolean();
                 return true;
         }
@@ -64,23 +94,23 @@ export class PlaybackInformationSerializer {
             return;
         }
         w.startObject();
-        w.prop("volume");
+        w.field(0, "volume");
         w.writeNumber(obj.volume);
-        w.prop("balance");
+        w.field(1, "balance");
         w.writeNumber(obj.balance);
-        w.prop("port");
+        w.field(2, "port");
         w.writeNumber(obj.port);
-        w.prop("program");
+        w.field(3, "program");
         w.writeNumber(obj.program);
-        w.prop("bank");
+        w.field(4, "bank");
         w.writeNumber(obj.bank);
-        w.prop("primarychannel");
+        w.field(5, "primarychannel");
         w.writeNumber(obj.primaryChannel);
-        w.prop("secondarychannel");
+        w.field(6, "secondarychannel");
         w.writeNumber(obj.secondaryChannel);
-        w.prop("ismute");
+        w.field(7, "ismute");
         w.writeBoolean(obj.isMute);
-        w.prop("issolo");
+        w.field(8, "issolo");
         w.writeBoolean(obj.isSolo);
         w.endObject();
     }

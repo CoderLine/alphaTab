@@ -23,11 +23,33 @@ export class TabStaffConfigSerializer {
         TabStaffConfigSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: TabStaffConfig, r: IObjectReader): void {
-        r.readObject((k, rr) => TabStaffConfigSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? TabStaffConfigSerializer._readField(obj, id, rr, false) : TabStaffConfigSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: TabStaffConfig, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = TabStaffConfigSerializer._fieldId(property);
+        return id >= 0 ? TabStaffConfigSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "clef":
+                return 0;
+            case "timesignature":
+                return 1;
+            case "barnumber":
+                return 2;
+            case "rhythm":
+                return 3;
+            case "rests":
+                return 4;
+        }
+        return -1;
+    }
+    private static _readField(obj: TabStaffConfig, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 if (r.isNullish()) {
                     obj.clef = undefined;
                 }
@@ -36,7 +58,7 @@ export class TabStaffConfigSerializer {
                     ElementDisplaySerializer.read(obj.clef, r);
                 }
                 return true;
-            case "timesignature":
+            case 1:
                 if (r.isNullish()) {
                     obj.timeSignature = undefined;
                 }
@@ -45,13 +67,13 @@ export class TabStaffConfigSerializer {
                     ElementDisplaySerializer.read(obj.timeSignature, r);
                 }
                 return true;
-            case "barnumber":
+            case 2:
                 obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
-            case "rhythm":
+            case 3:
                 obj.rhythm = JsonHelper.parseEnum<TabRhythmMode>(r.readValue(), TabRhythmMode);
                 return true;
-            case "rests":
+            case 4:
                 if (r.isNullish()) {
                     obj.rests = undefined;
                 }
@@ -64,7 +86,7 @@ export class TabStaffConfigSerializer {
         return false;
     }
     public static readFlexible(obj: TabStaffConfig, r: IObjectReader): void {
-        r.readObject((k, rr) => TabStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? TabStaffConfigSerializer._readField(obj, id, rr, false) : TabStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: TabStaffConfig, property: string, r: IObjectReader): boolean {
         if (["clef", "timesignature", "rests"].indexOf(property) < 0 && TabStaffConfigSerializer.readProperty(obj, property, r, true)) {
@@ -114,19 +136,19 @@ export class TabStaffConfigSerializer {
         }
         w.startObject();
         if (obj.clef) {
-            w.prop("clef");
+            w.field(0, "clef");
             ElementDisplaySerializer.write(obj.clef, w);
         }
         if (obj.timeSignature) {
-            w.prop("timesignature");
+            w.field(1, "timesignature");
             ElementDisplaySerializer.write(obj.timeSignature, w);
         }
-        w.prop("barnumber");
+        w.field(2, "barnumber");
         w.writeValue(obj.barNumber as number | undefined);
-        w.prop("rhythm");
+        w.field(3, "rhythm");
         w.writeValue(obj.rhythm as number | undefined);
         if (obj.rests) {
-            w.prop("rests");
+            w.field(4, "rests");
             ElementDisplaySerializer.write(obj.rests, w);
         }
         w.endObject();

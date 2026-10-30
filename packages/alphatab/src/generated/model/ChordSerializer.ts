@@ -19,29 +19,55 @@ export class ChordSerializer {
         ChordSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: Chord, r: IObjectReader): void {
-        r.readObject((k, rr) => ChordSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? ChordSerializer._readField(obj, id, rr) : ChordSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: Chord, property: string, r: IObjectReader): boolean {
+        const id = ChordSerializer._fieldId(property);
+        return id >= 0 ? ChordSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "name":
+                return 0;
+            case "firstfret":
+                return 1;
+            case "strings":
+                return 2;
+            case "barrefrets":
+                return 3;
+            case "showname":
+                return 4;
+            case "showdiagram":
+                return 5;
+            case "showfingering":
+                return 6;
+        }
+        return -1;
+    }
+    private static _readField(obj: Chord, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.name = r.readString();
                 return true;
-            case "firstfret":
+            case 1:
                 obj.firstFret = r.readNumber();
                 return true;
-            case "strings":
+            case 2:
                 obj.strings = r.readValue()! as number[];
                 return true;
-            case "barrefrets":
+            case 3:
                 obj.barreFrets = r.readValue()! as number[];
                 return true;
-            case "showname":
+            case 4:
                 obj.showName = r.readBoolean();
                 return true;
-            case "showdiagram":
+            case 5:
                 obj.showDiagram = r.readBoolean();
                 return true;
-            case "showfingering":
+            case 6:
                 obj.showFingering = r.readBoolean();
                 return true;
         }
@@ -58,19 +84,19 @@ export class ChordSerializer {
             return;
         }
         w.startObject();
-        w.prop("name");
+        w.field(0, "name");
         w.writeString(obj.name);
-        w.prop("firstfret");
+        w.field(1, "firstfret");
         w.writeNumber(obj.firstFret);
-        w.prop("strings");
+        w.field(2, "strings");
         w.writeValue(obj.strings);
-        w.prop("barrefrets");
+        w.field(3, "barrefrets");
         w.writeValue(obj.barreFrets);
-        w.prop("showname");
+        w.field(4, "showname");
         w.writeBoolean(obj.showName);
-        w.prop("showdiagram");
+        w.field(5, "showdiagram");
         w.writeBoolean(obj.showDiagram);
-        w.prop("showfingering");
+        w.field(6, "showfingering");
         w.writeBoolean(obj.showFingering);
         w.endObject();
     }

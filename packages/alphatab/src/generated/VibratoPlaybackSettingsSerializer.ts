@@ -19,39 +19,67 @@ export class VibratoPlaybackSettingsSerializer {
         VibratoPlaybackSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: VibratoPlaybackSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => VibratoPlaybackSettingsSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? VibratoPlaybackSettingsSerializer._readField(obj, id, rr, false) : VibratoPlaybackSettingsSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: VibratoPlaybackSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = VibratoPlaybackSettingsSerializer._fieldId(property);
+        return id >= 0 ? VibratoPlaybackSettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "notewidelength":
+                return 0;
+            case "notewideamplitude":
+                return 1;
+            case "noteslightlength":
+                return 2;
+            case "noteslightamplitude":
+                return 3;
+            case "beatwidelength":
+                return 4;
+            case "beatwideamplitude":
+                return 5;
+            case "beatslightlength":
+                return 6;
+            case "beatslightamplitude":
+                return 7;
+        }
+        return -1;
+    }
+    private static _readField(obj: VibratoPlaybackSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 obj.noteWideLength = r.readNumber();
                 return true;
-            case "notewideamplitude":
+            case 1:
                 obj.noteWideAmplitude = r.readNumber();
                 return true;
-            case "noteslightlength":
+            case 2:
                 obj.noteSlightLength = r.readNumber();
                 return true;
-            case "noteslightamplitude":
+            case 3:
                 obj.noteSlightAmplitude = r.readNumber();
                 return true;
-            case "beatwidelength":
+            case 4:
                 obj.beatWideLength = r.readNumber();
                 return true;
-            case "beatwideamplitude":
+            case 5:
                 obj.beatWideAmplitude = r.readNumber();
                 return true;
-            case "beatslightlength":
+            case 6:
                 obj.beatSlightLength = r.readNumber();
                 return true;
-            case "beatslightamplitude":
+            case 7:
                 obj.beatSlightAmplitude = r.readNumber();
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: VibratoPlaybackSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => VibratoPlaybackSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? VibratoPlaybackSettingsSerializer._readField(obj, id, rr, false) : VibratoPlaybackSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: VibratoPlaybackSettings, property: string, r: IObjectReader): boolean {
         if (VibratoPlaybackSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -70,21 +98,21 @@ export class VibratoPlaybackSettingsSerializer {
             return;
         }
         w.startObject();
-        w.prop("notewidelength");
+        w.field(0, "notewidelength");
         w.writeNumber(obj.noteWideLength);
-        w.prop("notewideamplitude");
+        w.field(1, "notewideamplitude");
         w.writeNumber(obj.noteWideAmplitude);
-        w.prop("noteslightlength");
+        w.field(2, "noteslightlength");
         w.writeNumber(obj.noteSlightLength);
-        w.prop("noteslightamplitude");
+        w.field(3, "noteslightamplitude");
         w.writeNumber(obj.noteSlightAmplitude);
-        w.prop("beatwidelength");
+        w.field(4, "beatwidelength");
         w.writeNumber(obj.beatWideLength);
-        w.prop("beatwideamplitude");
+        w.field(5, "beatwideamplitude");
         w.writeNumber(obj.beatWideAmplitude);
-        w.prop("beatslightlength");
+        w.field(6, "beatslightlength");
         w.writeNumber(obj.beatSlightLength);
-        w.prop("beatslightamplitude");
+        w.field(7, "beatslightamplitude");
         w.writeNumber(obj.beatSlightAmplitude);
         w.endObject();
     }

@@ -19,9 +19,19 @@ export class BackingTrackSerializer {
         BackingTrackSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: BackingTrack, r: IObjectReader): void {
-        r.readObject((k, rr) => BackingTrackSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? BackingTrackSerializer._readField(obj, id, rr) : BackingTrackSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: BackingTrack, property: string, r: IObjectReader): boolean {
+        const id = BackingTrackSerializer._fieldId(property);
+        return id >= 0 ? BackingTrackSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
+        return -1;
+    }
+    private static _readField(obj: BackingTrack, id: number, r: IObjectReader): boolean {
         return false;
     }
     public static toJson(obj: BackingTrack | null | undefined): Map<string, unknown> | null {

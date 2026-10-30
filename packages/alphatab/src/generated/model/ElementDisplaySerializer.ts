@@ -22,24 +22,42 @@ export class ElementDisplaySerializer {
         ElementDisplaySerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: ElementDisplay, r: IObjectReader): void {
-        r.readObject((k, rr) => ElementDisplaySerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? ElementDisplaySerializer._readField(obj, id, rr, false) : ElementDisplaySerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: ElementDisplay, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = ElementDisplaySerializer._fieldId(property);
+        return id >= 0 ? ElementDisplaySerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "isvisible":
+                return 0;
+            case "staffplacement":
+                return 1;
+            case "systemdisplay":
+                return 2;
+        }
+        return -1;
+    }
+    private static _readField(obj: ElementDisplay, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 obj.isVisible = r.readValue() as boolean | undefined;
                 return true;
-            case "staffplacement":
+            case 1:
                 obj.staffPlacement = JsonHelper.parseEnum<StaffPlacement>(r.readValue(), StaffPlacement);
                 return true;
-            case "systemdisplay":
+            case 2:
                 obj.systemDisplay = JsonHelper.parseEnum<SystemDisplay>(r.readValue(), SystemDisplay);
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: ElementDisplay, r: IObjectReader): void {
-        r.readObject((k, rr) => ElementDisplaySerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? ElementDisplaySerializer._readField(obj, id, rr, false) : ElementDisplaySerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: ElementDisplay, property: string, r: IObjectReader): boolean {
         if (ElementDisplaySerializer.readProperty(obj, property, r, true)) {
@@ -58,11 +76,11 @@ export class ElementDisplaySerializer {
             return;
         }
         w.startObject();
-        w.prop("isvisible");
+        w.field(0, "isvisible");
         w.writeValue(obj.isVisible);
-        w.prop("staffplacement");
+        w.field(1, "staffplacement");
         w.writeValue(obj.staffPlacement as number | undefined);
-        w.prop("systemdisplay");
+        w.field(2, "systemdisplay");
         w.writeValue(obj.systemDisplay as number | undefined);
         w.endObject();
     }

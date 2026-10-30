@@ -23,6 +23,13 @@ export interface IObjectReader {
      */
     readObject(handler: (name: string, r: IObjectReader) => boolean): void;
     /**
+     * Reads a record like {@link readObject}. Realisations that keep the ids of {@link IObjectWriter.field} pass
+     * them for these entries.
+     * @param handler Receives the field id and an empty key, or -1 and the key for entries with a key; returns
+     * whether it consumed the value.
+     */
+    readRecord(handler: (id: number, name: string, r: IObjectReader) => boolean): void;
+    /**
      * Reads an array by calling the handler for every element with the reader positioned on the element.
      */
     readArray(handler: (r: IObjectReader) => void): void;

@@ -19,24 +19,42 @@ export class EngravingStemInfoSerializer {
         EngravingStemInfoSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: EngravingStemInfo, r: IObjectReader): void {
-        r.readObject((k, rr) => EngravingStemInfoSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? EngravingStemInfoSerializer._readField(obj, id, rr, false) : EngravingStemInfoSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: EngravingStemInfo, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = EngravingStemInfoSerializer._fieldId(property);
+        return id >= 0 ? EngravingStemInfoSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "topy":
+                return 0;
+            case "bottomy":
+                return 1;
+            case "x":
+                return 2;
+        }
+        return -1;
+    }
+    private static _readField(obj: EngravingStemInfo, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 obj.topY = r.readNumber();
                 return true;
-            case "bottomy":
+            case 1:
                 obj.bottomY = r.readNumber();
                 return true;
-            case "x":
+            case 2:
                 obj.x = r.readNumber();
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: EngravingStemInfo, r: IObjectReader): void {
-        r.readObject((k, rr) => EngravingStemInfoSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? EngravingStemInfoSerializer._readField(obj, id, rr, false) : EngravingStemInfoSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: EngravingStemInfo, property: string, r: IObjectReader): boolean {
         if (EngravingStemInfoSerializer.readProperty(obj, property, r, true)) {
@@ -55,11 +73,11 @@ export class EngravingStemInfoSerializer {
             return;
         }
         w.startObject();
-        w.prop("topy");
+        w.field(0, "topy");
         w.writeNumber(obj.topY);
-        w.prop("bottomy");
+        w.field(1, "bottomy");
         w.writeNumber(obj.bottomY);
-        w.prop("x");
+        w.field(2, "x");
         w.writeNumber(obj.x);
         w.endObject();
     }

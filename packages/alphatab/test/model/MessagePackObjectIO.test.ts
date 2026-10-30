@@ -156,6 +156,74 @@ describe('MessagePackObjectIOTests', () => {
         expect(read).toBe(42);
     });
 
+    it('field-ids', () => {
+        const w = new MessagePackObjectWriter(16);
+        w.startObject();
+        w.field(5, 'five');
+        w.writeNumber(1);
+        w.field(200, 'twohundred');
+        w.writeBoolean(true);
+        w.prop('n');
+        w.writeString('x');
+        w.endObject();
+        const data = w.toUint8Array();
+        // ids as positive fixint and uint 8 keys, names as str keys
+        expect(hex(data)).toBe('de 00 03 05 01 cc c8 c3 a1 6e a1 78');
+
+        const entries: string[] = [];
+        new MessagePackObjectReader(data).readRecord((id, name, r) => {
+            entries.push(`${id}:${name}=${String(r.readValue())}`);
+            return true;
+        });
+        expect(entries).toEqual(['5:=1', '200:=true', '-1:n=x']);
+
+        // readers without field ids see them as keys
+        expect(new MessagePackObjectReader(data).readValue()).toEqual(
+            new Map<string, unknown>([
+                ['5', 1],
+                ['200', true],
+                ['n', 'x']
+            ])
+        );
+    });
+
+    it('unconsumed-fields-are-skipped', () => {
+        const w = new MessagePackObjectWriter(16);
+        w.startObject();
+        w.field(0, 'skipped');
+        w.writeValue(new Map<string, unknown>([['a', [1, 'x']]]));
+        w.field(1, 'read');
+        w.writeNumber(42);
+        w.prop('skippedByName');
+        w.writeString('text');
+        w.field(2, 'last');
+        w.writeBoolean(true);
+        w.endObject();
+        const seen: number[] = [];
+        let read = 0;
+        let last = false;
+        new MessagePackObjectReader(w.toUint8Array()).readRecord((id, _name, r) => {
+            seen.push(id);
+            if (id === 1) {
+                read = r.readNumber();
+                return true;
+            }
+            if (id === 2) {
+                last = r.readBoolean();
+                return true;
+            }
+            return false;
+        });
+        expect(seen).toEqual([0, 1, -1, 2]);
+        expect(read).toBe(42);
+        expect(last).toBe(true);
+    });
+
+    it('truncated-field-id', () => {
+        expect(() => new MessagePackObjectReader(fromHex('81 cc')).readRecord(() => true)).toThrow(AlphaTabError);
+        expect(() => new MessagePackObjectReader(fromHex('81 05')).readRecord(() => false)).toThrow(AlphaTabError);
+    });
+
     it('spec-example', () => {
         // {"compact": true, "schema": 0} from msgpack.org; maps are written with a map 16 header
         const w = new MessagePackObjectWriter(16);

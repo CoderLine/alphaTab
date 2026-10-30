@@ -25,91 +25,155 @@ export class PlayerSettingsSerializer {
         PlayerSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: PlayerSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => PlayerSettingsSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? PlayerSettingsSerializer._readField(obj, id, rr, false) : PlayerSettingsSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: PlayerSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = PlayerSettingsSerializer._fieldId(property);
+        return id >= 0 ? PlayerSettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             /*@target web*/
             case "soundfont":
+                return 0;
+            /*@target web*/
+            case "scrollelement":
+                return 1;
+            /*@target web*/
+            case "outputmode":
+                return 2;
+            case "enableplayer":
+                return 3;
+            case "playermode":
+                return 4;
+            case "enablecursor":
+                return 5;
+            case "enableanimatedbeatcursor":
+                return 6;
+            case "enableelementhighlighting":
+                return 7;
+            case "enableuserinteraction":
+                return 8;
+            case "enableseektoclick":
+                return 9;
+            case "enableplaybackrangeselection":
+                return 10;
+            case "resetplaybackrangeonclick":
+                return 11;
+            case "scrolloffsetx":
+                return 12;
+            case "scrolloffsety":
+                return 13;
+            case "scrollmode":
+                return 14;
+            case "scrollspeed":
+                return 15;
+            /*@target web*/
+            case "nativebrowsersmoothscroll":
+                return 16;
+            case "songbookbendduration":
+                return 17;
+            case "songbookdipduration":
+                return 18;
+            case "vibrato":
+                return 19;
+            case "slide":
+                return 20;
+            case "playtripletfeel":
+                return 21;
+            case "buffertimeinmilliseconds":
+                return 22;
+            case "positionupdateintervalinmilliseconds":
+                return 23;
+        }
+        return -1;
+    }
+    private static _readField(obj: PlayerSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            /*@target web*/
+            case 0:
                 obj.soundFont = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "scrollelement":
+            case 1:
                 obj.scrollElement = r.readValue()! as string | HTMLElement;
                 return true;
             /*@target web*/
-            case "outputmode":
+            case 2:
                 obj.outputMode = JsonHelper.parseEnum<PlayerOutputMode>(r.readValue(), PlayerOutputMode)!;
                 return true;
-            case "enableplayer":
+            case 3:
                 obj.enablePlayer = r.readBoolean();
                 return true;
-            case "playermode":
+            case 4:
                 obj.playerMode = JsonHelper.parseEnum<PlayerMode>(r.readValue(), PlayerMode)!;
                 return true;
-            case "enablecursor":
+            case 5:
                 obj.enableCursor = r.readBoolean();
                 return true;
-            case "enableanimatedbeatcursor":
+            case 6:
                 obj.enableAnimatedBeatCursor = r.readBoolean();
                 return true;
-            case "enableelementhighlighting":
+            case 7:
                 obj.enableElementHighlighting = r.readBoolean();
                 return true;
-            case "enableuserinteraction":
+            case 8:
                 obj.enableUserInteraction = r.readBoolean();
                 return true;
-            case "enableseektoclick":
+            case 9:
                 obj.enableSeekToClick = r.readBoolean();
                 return true;
-            case "enableplaybackrangeselection":
+            case 10:
                 obj.enablePlaybackRangeSelection = r.readBoolean();
                 return true;
-            case "resetplaybackrangeonclick":
+            case 11:
                 obj.resetPlaybackRangeOnClick = r.readBoolean();
                 return true;
-            case "scrolloffsetx":
+            case 12:
                 obj.scrollOffsetX = r.readNumber();
                 return true;
-            case "scrolloffsety":
+            case 13:
                 obj.scrollOffsetY = r.readNumber();
                 return true;
-            case "scrollmode":
+            case 14:
                 obj.scrollMode = JsonHelper.parseEnum<ScrollMode>(r.readValue(), ScrollMode)!;
                 return true;
-            case "scrollspeed":
+            case 15:
                 obj.scrollSpeed = r.readNumber();
                 return true;
             /*@target web*/
-            case "nativebrowsersmoothscroll":
+            case 16:
                 obj.nativeBrowserSmoothScroll = r.readBoolean();
                 return true;
-            case "songbookbendduration":
+            case 17:
                 obj.songBookBendDuration = r.readNumber();
                 return true;
-            case "songbookdipduration":
+            case 18:
                 obj.songBookDipDuration = r.readNumber();
                 return true;
-            case "vibrato":
+            case 19:
                 VibratoPlaybackSettingsSerializer.read(obj.vibrato, r);
                 return true;
-            case "slide":
+            case 20:
                 SlidePlaybackSettingsSerializer.read(obj.slide, r);
                 return true;
-            case "playtripletfeel":
+            case 21:
                 obj.playTripletFeel = r.readBoolean();
                 return true;
-            case "buffertimeinmilliseconds":
+            case 22:
                 obj.bufferTimeInMilliseconds = r.readNumber();
                 return true;
-            case "positionupdateintervalinmilliseconds":
+            case 23:
                 obj.positionUpdateIntervalInMilliseconds = r.readNumber();
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: PlayerSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => PlayerSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? PlayerSettingsSerializer._readField(obj, id, rr, false) : PlayerSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: PlayerSettings, property: string, r: IObjectReader): boolean {
         if (["vibrato", "slide"].indexOf(property) < 0 && PlayerSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -152,56 +216,56 @@ export class PlayerSettingsSerializer {
         w.startObject();
         /*@target web*/
         {
-            w.prop("soundfont");
+            w.field(0, "soundfont");
             w.writeValue(obj.soundFont);
         }
         /*@target web*/
         {
-            w.prop("outputmode");
+            w.field(2, "outputmode");
             w.writeNumber(obj.outputMode as number);
         }
-        w.prop("enableplayer");
+        w.field(3, "enableplayer");
         w.writeBoolean(obj.enablePlayer);
-        w.prop("playermode");
+        w.field(4, "playermode");
         w.writeNumber(obj.playerMode as number);
-        w.prop("enablecursor");
+        w.field(5, "enablecursor");
         w.writeBoolean(obj.enableCursor);
-        w.prop("enableanimatedbeatcursor");
+        w.field(6, "enableanimatedbeatcursor");
         w.writeBoolean(obj.enableAnimatedBeatCursor);
-        w.prop("enableelementhighlighting");
+        w.field(7, "enableelementhighlighting");
         w.writeBoolean(obj.enableElementHighlighting);
-        w.prop("enableseektoclick");
+        w.field(9, "enableseektoclick");
         w.writeBoolean(obj.enableSeekToClick);
-        w.prop("enableplaybackrangeselection");
+        w.field(10, "enableplaybackrangeselection");
         w.writeBoolean(obj.enablePlaybackRangeSelection);
-        w.prop("resetplaybackrangeonclick");
+        w.field(11, "resetplaybackrangeonclick");
         w.writeBoolean(obj.resetPlaybackRangeOnClick);
-        w.prop("scrolloffsetx");
+        w.field(12, "scrolloffsetx");
         w.writeNumber(obj.scrollOffsetX);
-        w.prop("scrolloffsety");
+        w.field(13, "scrolloffsety");
         w.writeNumber(obj.scrollOffsetY);
-        w.prop("scrollmode");
+        w.field(14, "scrollmode");
         w.writeNumber(obj.scrollMode as number);
-        w.prop("scrollspeed");
+        w.field(15, "scrollspeed");
         w.writeNumber(obj.scrollSpeed);
         /*@target web*/
         {
-            w.prop("nativebrowsersmoothscroll");
+            w.field(16, "nativebrowsersmoothscroll");
             w.writeBoolean(obj.nativeBrowserSmoothScroll);
         }
-        w.prop("songbookbendduration");
+        w.field(17, "songbookbendduration");
         w.writeNumber(obj.songBookBendDuration);
-        w.prop("songbookdipduration");
+        w.field(18, "songbookdipduration");
         w.writeNumber(obj.songBookDipDuration);
-        w.prop("vibrato");
+        w.field(19, "vibrato");
         VibratoPlaybackSettingsSerializer.write(obj.vibrato, w);
-        w.prop("slide");
+        w.field(20, "slide");
         SlidePlaybackSettingsSerializer.write(obj.slide, w);
-        w.prop("playtripletfeel");
+        w.field(21, "playtripletfeel");
         w.writeBoolean(obj.playTripletFeel);
-        w.prop("buffertimeinmilliseconds");
+        w.field(22, "buffertimeinmilliseconds");
         w.writeNumber(obj.bufferTimeInMilliseconds);
-        w.prop("positionupdateintervalinmilliseconds");
+        w.field(23, "positionupdateintervalinmilliseconds");
         w.writeNumber(obj.positionUpdateIntervalInMilliseconds);
         w.endObject();
     }

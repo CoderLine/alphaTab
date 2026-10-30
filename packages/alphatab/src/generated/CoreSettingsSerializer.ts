@@ -22,47 +22,87 @@ export class CoreSettingsSerializer {
         CoreSettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: CoreSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => CoreSettingsSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? CoreSettingsSerializer._readField(obj, id, rr, false) : CoreSettingsSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: CoreSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = CoreSettingsSerializer._fieldId(property);
+        return id >= 0 ? CoreSettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             /*@target web*/
             case "scriptfile":
+                return 0;
+            /*@target web*/
+            case "fontdirectory":
+                return 1;
+            /*@target web*/
+            case "smuflfontsources":
+                return 2;
+            /*@target web*/
+            case "file":
+                return 3;
+            /*@target web*/
+            case "tex":
+                return 4;
+            /*@target web*/
+            case "tracks":
+                return 5;
+            case "enablelazyloading":
+                return 6;
+            case "engine":
+                return 7;
+            case "loglevel":
+                return 8;
+            case "useworkers":
+                return 9;
+            case "includenotebounds":
+                return 10;
+        }
+        return -1;
+    }
+    private static _readField(obj: CoreSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            /*@target web*/
+            case 0:
                 obj.scriptFile = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "fontdirectory":
+            case 1:
                 obj.fontDirectory = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "smuflfontsources":
+            case 2:
                 CoreSettingsSerializer._readSmuflFontSources(obj, r, flexible);
                 return true;
             /*@target web*/
-            case "file":
+            case 3:
                 obj.file = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "tex":
+            case 4:
                 obj.tex = r.readBoolean();
                 return true;
             /*@target web*/
-            case "tracks":
+            case 5:
                 obj.tracks = r.readValue() as number | number[] | "all" | null;
                 return true;
-            case "enablelazyloading":
+            case 6:
                 obj.enableLazyLoading = r.readBoolean();
                 return true;
-            case "engine":
+            case 7:
                 obj.engine = r.readString();
                 return true;
-            case "loglevel":
+            case 8:
                 obj.logLevel = JsonHelper.parseEnum<LogLevel>(r.readValue(), LogLevel)!;
                 return true;
-            case "useworkers":
+            case 9:
                 obj.useWorkers = r.readBoolean();
                 return true;
-            case "includenotebounds":
+            case 10:
                 obj.includeNoteBounds = r.readBoolean();
                 return true;
         }
@@ -79,7 +119,7 @@ export class CoreSettingsSerializer {
         });
     }
     public static readFlexible(obj: CoreSettings, r: IObjectReader): void {
-        r.readObject((k, rr) => CoreSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? CoreSettingsSerializer._readField(obj, id, rr, false) : CoreSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: CoreSettings, property: string, r: IObjectReader): boolean {
         if (CoreSettingsSerializer.readProperty(obj, property, r, true)) {
@@ -100,18 +140,18 @@ export class CoreSettingsSerializer {
         w.startObject();
         /*@target web*/
         {
-            w.prop("scriptfile");
+            w.field(0, "scriptfile");
             w.writeValue(obj.scriptFile);
         }
         /*@target web*/
         {
-            w.prop("fontdirectory");
+            w.field(1, "fontdirectory");
             w.writeValue(obj.fontDirectory);
         }
         /*@target web*/
         {
             if (obj.smuflFontSources !== null) {
-                w.prop("smuflfontsources");
+                w.field(2, "smuflfontsources");
                 w.startMap();
                 for (const [k, v] of obj.smuflFontSources!) {
                     w.prop(k.toString());
@@ -122,28 +162,28 @@ export class CoreSettingsSerializer {
         }
         /*@target web*/
         {
-            w.prop("file");
+            w.field(3, "file");
             w.writeValue(obj.file);
         }
         /*@target web*/
         {
-            w.prop("tex");
+            w.field(4, "tex");
             w.writeBoolean(obj.tex);
         }
         /*@target web*/
         {
-            w.prop("tracks");
+            w.field(5, "tracks");
             w.writeValue(obj.tracks);
         }
-        w.prop("enablelazyloading");
+        w.field(6, "enablelazyloading");
         w.writeBoolean(obj.enableLazyLoading);
-        w.prop("engine");
+        w.field(7, "engine");
         w.writeString(obj.engine);
-        w.prop("loglevel");
+        w.field(8, "loglevel");
         w.writeNumber(obj.logLevel as number);
-        w.prop("useworkers");
+        w.field(9, "useworkers");
         w.writeBoolean(obj.useWorkers);
-        w.prop("includenotebounds");
+        w.field(10, "includenotebounds");
         w.writeBoolean(obj.includeNoteBounds);
         w.endObject();
     }

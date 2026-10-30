@@ -30,86 +30,150 @@ export class RenderStylesheetSerializer {
         RenderStylesheetSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: RenderStylesheet, r: IObjectReader): void {
-        r.readObject((k, rr) => RenderStylesheetSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? RenderStylesheetSerializer._readField(obj, id, rr) : RenderStylesheetSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: RenderStylesheet, property: string, r: IObjectReader): boolean {
+        const id = RenderStylesheetSerializer._fieldId(property);
+        return id >= 0 ? RenderStylesheetSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "hidedynamics":
+                return 0;
+            case "bracketextendmode":
+                return 1;
+            case "usesystemsignseparator":
+                return 2;
+            case "globaldisplaytuning":
+                return 3;
+            case "tuningdisplaymode":
+                return 4;
+            case "pertrackdisplaytuning":
+                return 5;
+            case "globaldisplaychorddiagramsontop":
+                return 6;
+            case "pertrackchorddiagramsontop":
+                return 7;
+            case "globaldisplaychorddiagramsinscore":
+                return 8;
+            case "singletracktracknamepolicy":
+                return 9;
+            case "multitracktracknamepolicy":
+                return 10;
+            case "firstsystemtracknamemode":
+                return 11;
+            case "othersystemstracknamemode":
+                return 12;
+            case "firstsystemtracknameorientation":
+                return 13;
+            case "othersystemstracknameorientation":
+                return 14;
+            case "multitrackmultibarrest":
+                return 15;
+            case "pertrackmultibarrest":
+                return 16;
+            case "extendbarlines":
+                return 17;
+            case "hideemptystaves":
+                return 18;
+            case "hideemptystavesinfirstsystem":
+                return 19;
+            case "showsinglestaffbrackets":
+                return 20;
+            case "barnumberdisplay":
+                return 21;
+            case "scoreconfig":
+                return 22;
+            case "tabconfig":
+                return 23;
+            case "slashconfig":
+                return 24;
+            case "numberedconfig":
+                return 25;
+        }
+        return -1;
+    }
+    private static _readField(obj: RenderStylesheet, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.hideDynamics = r.readBoolean();
                 return true;
-            case "bracketextendmode":
+            case 1:
                 obj.bracketExtendMode = JsonHelper.parseEnum<BracketExtendMode>(r.readValue(), BracketExtendMode)!;
                 return true;
-            case "usesystemsignseparator":
+            case 2:
                 obj.useSystemSignSeparator = r.readBoolean();
                 return true;
-            case "globaldisplaytuning":
+            case 3:
                 obj.globalDisplayTuning = r.readBoolean();
                 return true;
-            case "tuningdisplaymode":
+            case 4:
                 obj.tuningDisplayMode = JsonHelper.parseEnum<TuningDisplayMode>(r.readValue(), TuningDisplayMode)!;
                 return true;
-            case "pertrackdisplaytuning":
+            case 5:
                 RenderStylesheetSerializer._readPerTrackDisplayTuning(obj, r);
                 return true;
-            case "globaldisplaychorddiagramsontop":
+            case 6:
                 obj.globalDisplayChordDiagramsOnTop = r.readBoolean();
                 return true;
-            case "pertrackchorddiagramsontop":
+            case 7:
                 RenderStylesheetSerializer._readPerTrackChordDiagramsOnTop(obj, r);
                 return true;
-            case "globaldisplaychorddiagramsinscore":
+            case 8:
                 obj.globalDisplayChordDiagramsInScore = r.readBoolean();
                 return true;
-            case "singletracktracknamepolicy":
+            case 9:
                 obj.singleTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(r.readValue(), TrackNamePolicy)!;
                 return true;
-            case "multitracktracknamepolicy":
+            case 10:
                 obj.multiTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(r.readValue(), TrackNamePolicy)!;
                 return true;
-            case "firstsystemtracknamemode":
+            case 11:
                 obj.firstSystemTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(r.readValue(), TrackNameMode)!;
                 return true;
-            case "othersystemstracknamemode":
+            case 12:
                 obj.otherSystemsTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(r.readValue(), TrackNameMode)!;
                 return true;
-            case "firstsystemtracknameorientation":
+            case 13:
                 obj.firstSystemTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(r.readValue(), TrackNameOrientation)!;
                 return true;
-            case "othersystemstracknameorientation":
+            case 14:
                 obj.otherSystemsTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(r.readValue(), TrackNameOrientation)!;
                 return true;
-            case "multitrackmultibarrest":
+            case 15:
                 obj.multiTrackMultiBarRest = r.readBoolean();
                 return true;
-            case "pertrackmultibarrest":
+            case 16:
                 obj.perTrackMultiBarRest = new Set<number>(r.readValue() as number[]);
                 return true;
-            case "extendbarlines":
+            case 17:
                 obj.extendBarLines = r.readBoolean();
                 return true;
-            case "hideemptystaves":
+            case 18:
                 obj.hideEmptyStaves = r.readBoolean();
                 return true;
-            case "hideemptystavesinfirstsystem":
+            case 19:
                 obj.hideEmptyStavesInFirstSystem = r.readBoolean();
                 return true;
-            case "showsinglestaffbrackets":
+            case 20:
                 obj.showSingleStaffBrackets = r.readBoolean();
                 return true;
-            case "barnumberdisplay":
+            case 21:
                 obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay)!;
                 return true;
-            case "scoreconfig":
+            case 22:
                 ScoreStaffConfigSerializer.readFlexible(obj.scoreConfig, r);
                 return true;
-            case "tabconfig":
+            case 23:
                 TabStaffConfigSerializer.readFlexible(obj.tabConfig, r);
                 return true;
-            case "slashconfig":
+            case 24:
                 SlashStaffConfigSerializer.readFlexible(obj.slashConfig, r);
                 return true;
-            case "numberedconfig":
+            case 25:
                 NumberedStaffConfigSerializer.readFlexible(obj.numberedConfig, r);
                 return true;
         }
@@ -140,18 +204,18 @@ export class RenderStylesheetSerializer {
             return;
         }
         w.startObject();
-        w.prop("hidedynamics");
+        w.field(0, "hidedynamics");
         w.writeBoolean(obj.hideDynamics);
-        w.prop("bracketextendmode");
+        w.field(1, "bracketextendmode");
         w.writeNumber(obj.bracketExtendMode as number);
-        w.prop("usesystemsignseparator");
+        w.field(2, "usesystemsignseparator");
         w.writeBoolean(obj.useSystemSignSeparator);
-        w.prop("globaldisplaytuning");
+        w.field(3, "globaldisplaytuning");
         w.writeBoolean(obj.globalDisplayTuning);
-        w.prop("tuningdisplaymode");
+        w.field(4, "tuningdisplaymode");
         w.writeNumber(obj.tuningDisplayMode as number);
         if (obj.perTrackDisplayTuning !== null) {
-            w.prop("pertrackdisplaytuning");
+            w.field(5, "pertrackdisplaytuning");
             w.startMap();
             for (const [k, v] of obj.perTrackDisplayTuning!) {
                 w.prop(k.toString());
@@ -159,10 +223,10 @@ export class RenderStylesheetSerializer {
             }
             w.endMap();
         }
-        w.prop("globaldisplaychorddiagramsontop");
+        w.field(6, "globaldisplaychorddiagramsontop");
         w.writeBoolean(obj.globalDisplayChordDiagramsOnTop);
         if (obj.perTrackChordDiagramsOnTop !== null) {
-            w.prop("pertrackchorddiagramsontop");
+            w.field(7, "pertrackchorddiagramsontop");
             w.startMap();
             for (const [k, v] of obj.perTrackChordDiagramsOnTop!) {
                 w.prop(k.toString());
@@ -170,47 +234,47 @@ export class RenderStylesheetSerializer {
             }
             w.endMap();
         }
-        w.prop("globaldisplaychorddiagramsinscore");
+        w.field(8, "globaldisplaychorddiagramsinscore");
         w.writeBoolean(obj.globalDisplayChordDiagramsInScore);
-        w.prop("singletracktracknamepolicy");
+        w.field(9, "singletracktracknamepolicy");
         w.writeNumber(obj.singleTrackTrackNamePolicy as number);
-        w.prop("multitracktracknamepolicy");
+        w.field(10, "multitracktracknamepolicy");
         w.writeNumber(obj.multiTrackTrackNamePolicy as number);
-        w.prop("firstsystemtracknamemode");
+        w.field(11, "firstsystemtracknamemode");
         w.writeNumber(obj.firstSystemTrackNameMode as number);
-        w.prop("othersystemstracknamemode");
+        w.field(12, "othersystemstracknamemode");
         w.writeNumber(obj.otherSystemsTrackNameMode as number);
-        w.prop("firstsystemtracknameorientation");
+        w.field(13, "firstsystemtracknameorientation");
         w.writeNumber(obj.firstSystemTrackNameOrientation as number);
-        w.prop("othersystemstracknameorientation");
+        w.field(14, "othersystemstracknameorientation");
         w.writeNumber(obj.otherSystemsTrackNameOrientation as number);
-        w.prop("multitrackmultibarrest");
+        w.field(15, "multitrackmultibarrest");
         w.writeBoolean(obj.multiTrackMultiBarRest);
         if (obj.perTrackMultiBarRest !== null) {
             const a: number[] = [];
             for (const v of obj.perTrackMultiBarRest!) {
                 a.push(v);
             }
-            w.prop("pertrackmultibarrest");
+            w.field(16, "pertrackmultibarrest");
             w.writeValue(a);
         }
-        w.prop("extendbarlines");
+        w.field(17, "extendbarlines");
         w.writeBoolean(obj.extendBarLines);
-        w.prop("hideemptystaves");
+        w.field(18, "hideemptystaves");
         w.writeBoolean(obj.hideEmptyStaves);
-        w.prop("hideemptystavesinfirstsystem");
+        w.field(19, "hideemptystavesinfirstsystem");
         w.writeBoolean(obj.hideEmptyStavesInFirstSystem);
-        w.prop("showsinglestaffbrackets");
+        w.field(20, "showsinglestaffbrackets");
         w.writeBoolean(obj.showSingleStaffBrackets);
-        w.prop("barnumberdisplay");
+        w.field(21, "barnumberdisplay");
         w.writeNumber(obj.barNumberDisplay as number);
-        w.prop("scoreconfig");
+        w.field(22, "scoreconfig");
         ScoreStaffConfigSerializer.write(obj.scoreConfig, w);
-        w.prop("tabconfig");
+        w.field(23, "tabconfig");
         TabStaffConfigSerializer.write(obj.tabConfig, w);
-        w.prop("slashconfig");
+        w.field(24, "slashconfig");
         SlashStaffConfigSerializer.write(obj.slashConfig, w);
-        w.prop("numberedconfig");
+        w.field(25, "numberedconfig");
         NumberedStaffConfigSerializer.write(obj.numberedConfig, w);
         w.endObject();
     }

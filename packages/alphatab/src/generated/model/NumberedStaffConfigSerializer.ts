@@ -22,11 +22,27 @@ export class NumberedStaffConfigSerializer {
         NumberedStaffConfigSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: NumberedStaffConfig, r: IObjectReader): void {
-        r.readObject((k, rr) => NumberedStaffConfigSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? NumberedStaffConfigSerializer._readField(obj, id, rr, false) : NumberedStaffConfigSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: NumberedStaffConfig, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = NumberedStaffConfigSerializer._fieldId(property);
+        return id >= 0 ? NumberedStaffConfigSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "timesignature":
+                return 0;
+            case "barnumber":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: NumberedStaffConfig, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 if (r.isNullish()) {
                     obj.timeSignature = undefined;
                 }
@@ -35,14 +51,14 @@ export class NumberedStaffConfigSerializer {
                     ElementDisplaySerializer.read(obj.timeSignature, r);
                 }
                 return true;
-            case "barnumber":
+            case 1:
                 obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: NumberedStaffConfig, r: IObjectReader): void {
-        r.readObject((k, rr) => NumberedStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? NumberedStaffConfigSerializer._readField(obj, id, rr, false) : NumberedStaffConfigSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: NumberedStaffConfig, property: string, r: IObjectReader): boolean {
         if (["timesignature"].indexOf(property) < 0 && NumberedStaffConfigSerializer.readProperty(obj, property, r, true)) {
@@ -72,10 +88,10 @@ export class NumberedStaffConfigSerializer {
         }
         w.startObject();
         if (obj.timeSignature) {
-            w.prop("timesignature");
+            w.field(0, "timesignature");
             ElementDisplaySerializer.write(obj.timeSignature, w);
         }
-        w.prop("barnumber");
+        w.field(1, "barnumber");
         w.writeValue(obj.barNumber as number | undefined);
         w.endObject();
     }

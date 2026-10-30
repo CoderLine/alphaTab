@@ -4,10 +4,10 @@ import path from 'node:path';
 import type { AlphaTabApiBase } from '@coderline/alphatab/AlphaTabApiBase';
 import { ScoreSerializer } from '@coderline/alphatab/generated/model/ScoreSerializer';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
-import { MessagePackObjectReader } from '@coderline/alphatab/io/MessagePackObjectReader';
+import { MessagePackObjectWriter } from '@coderline/alphatab/io/MessagePackObjectWriter';
 import { LogLevel } from '@coderline/alphatab/LogLevel';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import { Score } from '@coderline/alphatab/model/Score';
+import type { Score } from '@coderline/alphatab/model/Score';
 import { AlphaTabWebWorker } from '@coderline/alphatab/platform/worker/AlphaTabWebWorker';
 import type {
     IAlphaTabRenderingWorker,
@@ -15,6 +15,8 @@ import type {
     IAlphaTabWorkerMessage
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { AlphaTabWorkerScoreRenderer } from '@coderline/alphatab/platform/worker/AlphaTabWorkerScoreRenderer';
+import { WorkerScoreEncoding } from '@coderline/alphatab/platform/worker/WorkerScoreEncoding';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
 import { LayoutCorpus } from '../layoutFlow/LayoutCorpus';
@@ -104,9 +106,7 @@ describe('WorkerBinaryScoreTests', () => {
         expect(data).toBeInstanceOf(Uint8Array);
         expect(message.transfer).toEqual([data.buffer]);
 
-        const decoded = new Score();
-        ScoreSerializer.read(decoded, new MessagePackObjectReader(data));
-        decoded.finish(settings);
+        const decoded = WorkerScoreEncoding.decode(data, settings);
         expect(JsonConverter.scoreToJson(decoded)).toBe(JsonConverter.scoreToJson(score));
 
         // the worker renders the same as from the Map tree that C# and Kotlin send
@@ -132,5 +132,67 @@ describe('WorkerBinaryScoreTests', () => {
                     .boundsLookup
             );
         expect(bounds(fromBinary)).toEqual(bounds(fromObjects));
+    });
+
+    function loadReferenceScore(settings: Settings): Score {
+        return ScoreLoader.loadScoreFromBytes(
+            new Uint8Array(fs.readFileSync(path.join(process.cwd(), LayoutCorpus.referenceScores[0].file))),
+            settings
+        );
+    }
+
+    /**
+     * Scores as other builds write them: with field ids of other generator output, and without the format as
+     * builds before field ids sent them.
+     */
+    function scoresOfOtherBuilds(score: Score): Uint8Array[] {
+        const otherFormat = new MessagePackObjectWriter(1024);
+        otherFormat.startArray(2);
+        otherFormat.writeNumber(1);
+        ScoreSerializer.write(score, otherFormat);
+        otherFormat.endArray();
+        const noFormat = new MessagePackObjectWriter(1024);
+        ScoreSerializer.write(score, noFormat);
+        return [otherFormat.toUint8Array(), noFormat.toUint8Array()];
+    }
+
+    function expectOtherBuildError(error: unknown) {
+        expect(error).toBeInstanceOf(AlphaTabError);
+        expect((error as AlphaTabError).type).toBe(AlphaTabErrorType.Format);
+        expect((error as AlphaTabError).message).toContain('another alphaTab build');
+    }
+
+    it('score-of-another-build-is-rejected', () => {
+        const settings = new Settings();
+        settings.core.logLevel = LogLevel.None;
+        const score = loadReferenceScore(settings);
+        for (const data of scoresOfOtherBuilds(score)) {
+            let error: unknown = null;
+            try {
+                WorkerScoreEncoding.decode(data, settings);
+            } catch (e) {
+                error = e;
+            }
+            expectOtherBuildError(error);
+        }
+    });
+
+    it('decoding-errors-are-reported', () => {
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        settings.core.logLevel = LogLevel.None;
+        const score = loadReferenceScore(settings);
+        for (const data of scoresOfOtherBuilds(score)) {
+            const posted = postFromMainThread(settings, score).map(p =>
+                p.message.cmd === 'alphaTab.renderScore'
+                    ? { message: { ...p.message, score: data }, transfer: [data.buffer] }
+                    : p
+            );
+            const received = runWorker(posted);
+            const error = received.find(m => m.cmd === 'alphaTab.error') as { error: Error } | undefined;
+            expect(error).toBeDefined();
+            expectOtherBuildError(error!.error);
+            expect(received.some(m => m.cmd === 'alphaTab.renderFinished')).toBe(false);
+        }
     });
 });

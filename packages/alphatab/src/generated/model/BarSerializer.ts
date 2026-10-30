@@ -37,50 +37,98 @@ export class BarSerializer {
         BarSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: Bar, r: IObjectReader): void {
-        r.readObject((k, rr) => BarSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? BarSerializer._readField(obj, id, rr) : BarSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: Bar, property: string, r: IObjectReader): boolean {
+        const id = BarSerializer._fieldId(property);
+        return id >= 0 ? BarSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "id":
+                return 0;
+            case "clef":
+                return 1;
+            case "clefottava":
+                return 2;
+            case "voices":
+                return 3;
+            case "similemark":
+                return 4;
+            case "displayscale":
+                return 5;
+            case "displaywidth":
+                return 6;
+            case "sustainpedals":
+                return 7;
+            case "barlineleft":
+                return 8;
+            case "barlineright":
+                return 9;
+            case "keysignature":
+                return 10;
+            case "keysignaturetype":
+                return 11;
+            case "barnumberdisplay":
+                return 12;
+            case "scoredisplay":
+                return 13;
+            case "tabdisplay":
+                return 14;
+            case "slashdisplay":
+                return 15;
+            case "numbereddisplay":
+                return 16;
+            case "style":
+                return 17;
+        }
+        return -1;
+    }
+    private static _readField(obj: Bar, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.id = r.readNumber();
                 return true;
-            case "clef":
+            case 1:
                 obj.clef = JsonHelper.parseEnum<Clef>(r.readValue(), Clef)!;
                 return true;
-            case "clefottava":
+            case 2:
                 obj.clefOttava = JsonHelper.parseEnum<Ottavia>(r.readValue(), Ottavia)!;
                 return true;
-            case "voices":
+            case 3:
                 BarSerializer._readVoices(obj, r);
                 return true;
-            case "similemark":
+            case 4:
                 obj.simileMark = JsonHelper.parseEnum<SimileMark>(r.readValue(), SimileMark)!;
                 return true;
-            case "displayscale":
+            case 5:
                 obj.displayScale = r.readNumber();
                 return true;
-            case "displaywidth":
+            case 6:
                 obj.displayWidth = r.readNumber();
                 return true;
-            case "sustainpedals":
+            case 7:
                 BarSerializer._readSustainPedals(obj, r);
                 return true;
-            case "barlineleft":
+            case 8:
                 obj.barLineLeft = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
                 return true;
-            case "barlineright":
+            case 9:
                 obj.barLineRight = JsonHelper.parseEnum<BarLineStyle>(r.readValue(), BarLineStyle)!;
                 return true;
-            case "keysignature":
+            case 10:
                 obj.keySignature = JsonHelper.parseEnum<KeySignature>(r.readValue(), KeySignature)!;
                 return true;
-            case "keysignaturetype":
+            case 11:
                 obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(r.readValue(), KeySignatureType)!;
                 return true;
-            case "barnumberdisplay":
+            case 12:
                 obj.barNumberDisplay = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
-            case "scoredisplay":
+            case 13:
                 if (r.isNullish()) {
                     obj.scoreDisplay = undefined;
                 }
@@ -89,7 +137,7 @@ export class BarSerializer {
                     ScoreBarOverrideSerializer.readFlexible(obj.scoreDisplay, r);
                 }
                 return true;
-            case "tabdisplay":
+            case 14:
                 if (r.isNullish()) {
                     obj.tabDisplay = undefined;
                 }
@@ -98,7 +146,7 @@ export class BarSerializer {
                     TabBarOverrideSerializer.readFlexible(obj.tabDisplay, r);
                 }
                 return true;
-            case "slashdisplay":
+            case 15:
                 if (r.isNullish()) {
                     obj.slashDisplay = undefined;
                 }
@@ -107,7 +155,7 @@ export class BarSerializer {
                     SlashBarOverrideSerializer.readFlexible(obj.slashDisplay, r);
                 }
                 return true;
-            case "numbereddisplay":
+            case 16:
                 if (r.isNullish()) {
                     obj.numberedDisplay = undefined;
                 }
@@ -116,7 +164,7 @@ export class BarSerializer {
                     NumberedBarOverrideSerializer.readFlexible(obj.numberedDisplay, r);
                 }
                 return true;
-            case "style":
+            case 17:
                 if (r.isNullish()) {
                     obj.style = undefined;
                 }
@@ -155,58 +203,58 @@ export class BarSerializer {
             return;
         }
         w.startObject();
-        w.prop("id");
+        w.field(0, "id");
         w.writeNumber(obj.id);
-        w.prop("clef");
+        w.field(1, "clef");
         w.writeNumber(obj.clef as number);
-        w.prop("clefottava");
+        w.field(2, "clefottava");
         w.writeNumber(obj.clefOttava as number);
-        w.prop("voices");
+        w.field(3, "voices");
         w.startArray(obj.voices!.length);
         for (const i of obj.voices!) {
             VoiceSerializer.write(i, w);
         }
         w.endArray();
-        w.prop("similemark");
+        w.field(4, "similemark");
         w.writeNumber(obj.simileMark as number);
-        w.prop("displayscale");
+        w.field(5, "displayscale");
         w.writeNumber(obj.displayScale);
-        w.prop("displaywidth");
+        w.field(6, "displaywidth");
         w.writeNumber(obj.displayWidth);
-        w.prop("sustainpedals");
+        w.field(7, "sustainpedals");
         w.startArray(obj.sustainPedals!.length);
         for (const i of obj.sustainPedals!) {
             SustainPedalMarkerSerializer.write(i, w);
         }
         w.endArray();
-        w.prop("barlineleft");
+        w.field(8, "barlineleft");
         w.writeNumber(obj.barLineLeft as number);
-        w.prop("barlineright");
+        w.field(9, "barlineright");
         w.writeNumber(obj.barLineRight as number);
-        w.prop("keysignature");
+        w.field(10, "keysignature");
         w.writeNumber(obj.keySignature as number);
-        w.prop("keysignaturetype");
+        w.field(11, "keysignaturetype");
         w.writeNumber(obj.keySignatureType as number);
-        w.prop("barnumberdisplay");
+        w.field(12, "barnumberdisplay");
         w.writeValue(obj.barNumberDisplay as number | undefined);
         if (obj.scoreDisplay) {
-            w.prop("scoredisplay");
+            w.field(13, "scoredisplay");
             ScoreBarOverrideSerializer.write(obj.scoreDisplay, w);
         }
         if (obj.tabDisplay) {
-            w.prop("tabdisplay");
+            w.field(14, "tabdisplay");
             TabBarOverrideSerializer.write(obj.tabDisplay, w);
         }
         if (obj.slashDisplay) {
-            w.prop("slashdisplay");
+            w.field(15, "slashdisplay");
             SlashBarOverrideSerializer.write(obj.slashDisplay, w);
         }
         if (obj.numberedDisplay) {
-            w.prop("numbereddisplay");
+            w.field(16, "numbereddisplay");
             NumberedBarOverrideSerializer.write(obj.numberedDisplay, w);
         }
         if (obj.style) {
-            w.prop("style");
+            w.field(17, "style");
             BarStyleSerializer.write(obj.style, w);
         }
         w.endObject();

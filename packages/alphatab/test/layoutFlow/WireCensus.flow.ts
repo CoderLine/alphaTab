@@ -219,8 +219,16 @@ class CensusWriter implements IObjectWriter {
         this.inner.endArray();
     }
     public prop(name: string): void {
+        this._key(name, () => this.inner.prop(name));
+    }
+
+    public field(id: number, name: string): void {
+        this._key(name, () => this.inner.field(id, name));
+    }
+
+    private _key(name: string, write: () => void) {
         const start = this._pos;
-        this.inner.prop(name);
+        write();
         const bytes = this._pos - start;
         const t = this._tally(this._cls);
         t.keyBytes += bytes;
@@ -296,6 +304,9 @@ class RecordingWriter implements IObjectWriter {
         this._depth--;
     }
     public prop(name: string): void {
+        this._key = name;
+    }
+    public field(_id: number, name: string): void {
         this._key = name;
     }
     public writeNumber(v: number): void {
@@ -423,8 +434,10 @@ describe('WireCensus', () => {
 
                 const importMs = timed(Math.min(runs, 5), load);
                 const importAlloc = AllocationSampler.measure(load).totalBytes;
-                const writeMs = timed(runs, () => WorkerScoreEncoding.encode(score, data.byteLength));
-                const decode = () => WorkerScoreEncoding.decode(data, settings);
+                const writeMs = timed(runs, () => WorkerScoreEncoding.encode(score, data.byteLength + 16));
+                // the census covers the score record, the hand-off adds the format in front of it
+                const encoded = WorkerScoreEncoding.encode(score, data.byteLength + 16);
+                const decode = () => WorkerScoreEncoding.decode(encoded, settings);
                 const readMs = timed(runs, decode);
                 const readAlloc = AllocationSampler.measure(decode).totalBytes;
 

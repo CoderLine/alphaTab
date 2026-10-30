@@ -22,35 +22,65 @@ export class InstrumentArticulationSerializer {
         InstrumentArticulationSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: InstrumentArticulation, r: IObjectReader): void {
-        r.readObject((k, rr) => InstrumentArticulationSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? InstrumentArticulationSerializer._readField(obj, id, rr) : InstrumentArticulationSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: InstrumentArticulation, property: string, r: IObjectReader): boolean {
+        const id = InstrumentArticulationSerializer._fieldId(property);
+        return id >= 0 ? InstrumentArticulationSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "id":
+                return 0;
+            case "elementtype":
+                return 1;
+            case "staffline":
+                return 2;
+            case "noteheaddefault":
+                return 3;
+            case "noteheadhalf":
+                return 4;
+            case "noteheadwhole":
+                return 5;
+            case "techniquesymbol":
+                return 6;
+            case "techniquesymbolplacement":
+                return 7;
+            case "outputmidinumber":
+                return 8;
+        }
+        return -1;
+    }
+    private static _readField(obj: InstrumentArticulation, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.id = r.readNumber();
                 return true;
-            case "elementtype":
+            case 1:
                 obj.elementType = r.readString();
                 return true;
-            case "staffline":
+            case 2:
                 obj.staffLine = r.readNumber();
                 return true;
-            case "noteheaddefault":
+            case 3:
                 obj.noteHeadDefault = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
-            case "noteheadhalf":
+            case 4:
                 obj.noteHeadHalf = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
-            case "noteheadwhole":
+            case 5:
                 obj.noteHeadWhole = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
-            case "techniquesymbol":
+            case 6:
                 obj.techniqueSymbol = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol)!;
                 return true;
-            case "techniquesymbolplacement":
+            case 7:
                 obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TechniqueSymbolPlacement>(r.readValue(), TechniqueSymbolPlacement)!;
                 return true;
-            case "outputmidinumber":
+            case 8:
                 obj.outputMidiNumber = r.readNumber();
                 return true;
         }
@@ -67,23 +97,23 @@ export class InstrumentArticulationSerializer {
             return;
         }
         w.startObject();
-        w.prop("id");
+        w.field(0, "id");
         w.writeNumber(obj.id);
-        w.prop("elementtype");
+        w.field(1, "elementtype");
         w.writeString(obj.elementType);
-        w.prop("staffline");
+        w.field(2, "staffline");
         w.writeNumber(obj.staffLine);
-        w.prop("noteheaddefault");
+        w.field(3, "noteheaddefault");
         w.writeNumber(obj.noteHeadDefault as number);
-        w.prop("noteheadhalf");
+        w.field(4, "noteheadhalf");
         w.writeNumber(obj.noteHeadHalf as number);
-        w.prop("noteheadwhole");
+        w.field(5, "noteheadwhole");
         w.writeNumber(obj.noteHeadWhole as number);
-        w.prop("techniquesymbol");
+        w.field(6, "techniquesymbol");
         w.writeNumber(obj.techniqueSymbol as number);
-        w.prop("techniquesymbolplacement");
+        w.field(7, "techniquesymbolplacement");
         w.writeNumber(obj.techniqueSymbolPlacement as number);
-        w.prop("outputmidinumber");
+        w.field(8, "outputmidinumber");
         w.writeNumber(obj.outputMidiNumber);
         w.endObject();
     }

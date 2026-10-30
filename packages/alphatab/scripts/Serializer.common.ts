@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import type { TypeProperty, TypeWithNullableInfo } from './TypeSchema';
+import type { TypeProperty, TypeSchema, TypeWithNullableInfo } from './TypeSchema';
 
 export function findSerializerModule(type: TypeWithNullableInfo) {
     const module = type.modulePath;
@@ -55,3 +55,17 @@ export function wrapTarget(prop: TypeProperty, code: string): string {
     }
     return `/*@target web*/\n{\n${code}\n}`;
 }
+
+/**
+ * The fields of a class that have a key, in declaration order. A field's id is its index in this list. Binary
+ * realisations write the id instead of the key, so both ends of a hand-off must come from the same generator
+ * output.
+ */
+export function serializedFields(serializable: TypeSchema): TypeProperty[] {
+    const fields = serializable.properties.filter(p => primaryJsonName(p) !== undefined);
+    if (fields.length > 256) {
+        throw new Error(`Field ids are written as one byte, ${fields.length} fields are too many`);
+    }
+    return fields;
+}
+

@@ -4,6 +4,7 @@ import {
     isNullableOrOptional,
     isPrimitiveForSerialization,
     primaryJsonName,
+    serializedFields,
     wrapTarget
 } from './Serializer.common';
 import type { TypeProperty, TypeSchema, TypeWithNullableInfo } from './TypeSchema';
@@ -53,30 +54,29 @@ function mapValueWrite(valueType: TypeWithNullableInfo, importer: Importer): str
     return `${itemSerializer}.write(v, w);`;
 }
 
-function propertyWrite(serializable: TypeSchema, prop: TypeProperty, importer: Importer): string | null {
-    const jsonName = primaryJsonName(prop);
-    if (!jsonName || prop.isJsonReadOnly) {
+function propertyWrite(serializable: TypeSchema, prop: TypeProperty, id: number, importer: Importer): string | null {
+    if (prop.isJsonReadOnly) {
         return null;
     }
 
-    const key = JSON.stringify(jsonName);
+    const key = `w.field(${id}, ${JSON.stringify(primaryJsonName(prop))});`;
     const field = `obj.${prop.name}`;
     const type = prop.type;
 
     if (prop.isUnsetAsNaN) {
-        return `if (!Number.isNaN(${field})) {\nw.prop(${key});\nw.writeNumber(${field});\n}`;
+        return `if (!Number.isNaN(${field})) {\n${key}\nw.writeNumber(${field});\n}`;
     }
     if (prop.asRaw || type.isPrimitiveType || type.isTypedArray) {
-        return `w.prop(${key});\n${writeValueCall(type, field)}`;
+        return `${key}\n${writeValueCall(type, field)}`;
     }
     if (type.isEnumType) {
         if (type.isNullable) {
-            return `w.prop(${key});\nw.writeValue(${field} as number | null);`;
+            return `${key}\nw.writeValue(${field} as number | null);`;
         }
         if (type.isOptional) {
-            return `w.prop(${key});\nw.writeValue(${field} as number | undefined);`;
+            return `${key}\nw.writeValue(${field} as number | undefined);`;
         }
-        return `w.prop(${key});\nw.writeNumber(${field} as number);`;
+        return `${key}\nw.writeNumber(${field} as number);`;
     }
     if (type.isArray) {
         const itemType = type.arrayItemType!;
@@ -86,17 +86,17 @@ function propertyWrite(serializable: TypeSchema, prop: TypeProperty, importer: I
             return nullGuard(
                 type,
                 field,
-                `w.prop(${key});\nw.startArray(${field}!.length);\nfor (const i of ${field}!) {\n${itemSerializer}.write(i, w);\n}\nw.endArray();`
+                `${key}\nw.startArray(${field}!.length);\nfor (const i of ${field}!) {\n${itemSerializer}.write(i, w);\n}\nw.endArray();`
             );
         }
-        return `w.prop(${key});\nw.writeValue(${field});`;
+        return `${key}\nw.writeValue(${field});`;
     }
     if (type.isMap) {
         const valueWrite = mapValueWrite(type.typeArguments![1], importer);
         return nullGuard(
             type,
             field,
-            `w.prop(${key});\nw.startMap();\nfor (const [k, v] of ${field}!) {\nw.prop(k.toString());\n${valueWrite}\n}\nw.endMap();`
+            `${key}\nw.startMap();\nfor (const [k, v] of ${field}!) {\nw.prop(k.toString());\n${valueWrite}\n}\nw.endMap();`
         );
     }
     if (type.isSet) {
@@ -111,16 +111,16 @@ function propertyWrite(serializable: TypeSchema, prop: TypeProperty, importer: I
                 `only Set<Primitive> and Set<Enum> sets are supported, extend if needed! Found ${type.typeAsString}`
             );
         }
-        return nullGuard(type, field, `${collect}\nw.prop(${key});\nw.writeValue(a);`);
+        return nullGuard(type, field, `${collect}\n${key}\nw.writeValue(a);`);
     }
     if (type.isJsonImmutable) {
         importer(type.typeAsString, type.modulePath);
-        return `w.prop(${key});\nw.writeValue(${type.typeAsString}.toJson(${field}));`;
+        return `${key}\nw.writeValue(${type.typeAsString}.toJson(${field}));`;
     }
 
     const itemSerializer = `${type.typeAsString}Serializer`;
     importer(itemSerializer, findSerializerModule(type));
-    const write = `w.prop(${key});\n${itemSerializer}.write(${field}, w);`;
+    const write = `${key}\n${itemSerializer}.write(${field}, w);`;
     // non-strict (settings) containers write unset non-record children as null
     const skipUnset = serializable.isStrict ? isNullableOrOptional(type) : type.isRecord && isNullableOrOptional(type);
     return skipUnset ? `if (${field}) {\n${write}\n}` : write;
@@ -131,8 +131,10 @@ export function createWriteMethods(className: string, serializable: TypeSchema, 
     importer('MapObjectWriter', '@coderline/alphatab/io/MapObjectWriter');
 
     const body: string[] = [];
-    for (const prop of serializable.properties) {
-        const code = propertyWrite(serializable, prop, importer);
+    const fields = serializedFields(serializable);
+    for (let id = 0; id < fields.length; id++) {
+        const prop = fields[id];
+        const code = propertyWrite(serializable, prop, id, importer);
         if (code !== null) {
             body.push(wrapTarget(prop, code));
         }

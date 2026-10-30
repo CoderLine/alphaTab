@@ -19,14 +19,30 @@ export class SyncPointDataSerializer {
         SyncPointDataSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: SyncPointData, r: IObjectReader): void {
-        r.readObject((k, rr) => SyncPointDataSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? SyncPointDataSerializer._readField(obj, id, rr) : SyncPointDataSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: SyncPointData, property: string, r: IObjectReader): boolean {
+        const id = SyncPointDataSerializer._fieldId(property);
+        return id >= 0 ? SyncPointDataSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "baroccurence":
+                return 0;
+            case "millisecondoffset":
+                return 1;
+        }
+        return -1;
+    }
+    private static _readField(obj: SyncPointData, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.barOccurence = r.readNumber();
                 return true;
-            case "millisecondoffset":
+            case 1:
                 obj.millisecondOffset = r.readNumber();
                 return true;
         }
@@ -43,9 +59,9 @@ export class SyncPointDataSerializer {
             return;
         }
         w.startObject();
-        w.prop("baroccurence");
+        w.field(0, "baroccurence");
         w.writeNumber(obj.barOccurence);
-        w.prop("millisecondoffset");
+        w.field(1, "millisecondoffset");
         w.writeNumber(obj.millisecondOffset);
         w.endObject();
     }

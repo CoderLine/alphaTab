@@ -22,11 +22,29 @@ export class SlashBarOverrideSerializer {
         SlashBarOverrideSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: SlashBarOverride, r: IObjectReader): void {
-        r.readObject((k, rr) => SlashBarOverrideSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, rr, false) : SlashBarOverrideSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: SlashBarOverride, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = SlashBarOverrideSerializer._fieldId(property);
+        return id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "keysignature":
+                return 0;
+            case "timesignature":
+                return 1;
+            case "barnumber":
+                return 2;
+        }
+        return -1;
+    }
+    private static _readField(obj: SlashBarOverride, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 if (r.isNullish()) {
                     obj.keySignature = undefined;
                 }
@@ -35,7 +53,7 @@ export class SlashBarOverrideSerializer {
                     ElementDisplaySerializer.read(obj.keySignature, r);
                 }
                 return true;
-            case "timesignature":
+            case 1:
                 if (r.isNullish()) {
                     obj.timeSignature = undefined;
                 }
@@ -44,14 +62,14 @@ export class SlashBarOverrideSerializer {
                     ElementDisplaySerializer.read(obj.timeSignature, r);
                 }
                 return true;
-            case "barnumber":
+            case 2:
                 obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: SlashBarOverride, r: IObjectReader): void {
-        r.readObject((k, rr) => SlashBarOverrideSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, rr, false) : SlashBarOverrideSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: SlashBarOverride, property: string, r: IObjectReader): boolean {
         if (["keysignature", "timesignature"].indexOf(property) < 0 && SlashBarOverrideSerializer.readProperty(obj, property, r, true)) {
@@ -91,14 +109,14 @@ export class SlashBarOverrideSerializer {
         }
         w.startObject();
         if (obj.keySignature) {
-            w.prop("keysignature");
+            w.field(0, "keysignature");
             ElementDisplaySerializer.write(obj.keySignature, w);
         }
         if (obj.timeSignature) {
-            w.prop("timesignature");
+            w.field(1, "timesignature");
             ElementDisplaySerializer.write(obj.timeSignature, w);
         }
-        w.prop("barnumber");
+        w.field(2, "barnumber");
         w.writeValue(obj.barNumber as number | undefined);
         w.endObject();
     }

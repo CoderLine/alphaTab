@@ -24,114 +24,192 @@ export class DisplaySettingsSerializer {
         DisplaySettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
     public static read(obj: DisplaySettings, r: IObjectReader): void {
-        r.readObject((k, rr) => DisplaySettingsSerializer.readProperty(obj, k, rr, false));
+        r.readRecord((id, k, rr) => id >= 0 ? DisplaySettingsSerializer._readField(obj, id, rr, false) : DisplaySettingsSerializer.readProperty(obj, k, rr, false));
     }
     public static readProperty(obj: DisplaySettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = DisplaySettingsSerializer._fieldId(property);
+        return id >= 0 ? DisplaySettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "scale":
+                return 0;
+            case "stretchforce":
+                return 1;
+            case "spacingratio":
+                return 2;
+            case "layoutmode":
+                return 3;
+            case "staveprofile":
+                return 4;
+            case "barsperrow":
+                return 5;
+            case "startbar":
+                return 6;
+            case "barcount":
+                return 7;
+            case "barcountperpartial":
+                return 8;
+            case "lastsystemfillthreshold":
+                return 9;
+            case "justifylastsystem":
+                return 10;
+            case "resources":
+                return 11;
+            case "padding":
+                return 12;
+            case "firstsystempaddingtop":
+                return 13;
+            case "systempaddingtop":
+                return 14;
+            case "systempaddingbottom":
+                return 15;
+            case "lastsystempaddingbottom":
+                return 16;
+            case "systemlabelpaddingleft":
+                return 17;
+            case "systemlabelpaddingright":
+                return 18;
+            case "accoladebarpaddingright":
+                return 19;
+            case "inlinetuningpaddingright":
+                return 20;
+            case "firstnotationstaffpaddingtop":
+                return 21;
+            case "lastnotationstaffpaddingbottom":
+                return 22;
+            case "notationstaffpaddingtop":
+                return 23;
+            case "notationstaffpaddingbottom":
+                return 24;
+            case "effectstaffpaddingtop":
+                return 25;
+            case "effectstaffpaddingbottom":
+                return 26;
+            case "firststaffpaddingleft":
+                return 27;
+            case "staffpaddingleft":
+                return 28;
+            case "effectbandpaddingbottom":
+                return 29;
+            case "trackstaffpaddingbetween":
+                return 30;
+            case "lyriclinespaddingbetween":
+                return 31;
+            case "systemslayoutmode":
+                return 32;
+        }
+        return -1;
+    }
+    private static _readField(obj: DisplaySettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
                 obj.scale = r.readNumber();
                 return true;
-            case "stretchforce":
+            case 1:
                 obj.stretchForce = r.readNumber();
                 return true;
-            case "spacingratio":
+            case 2:
                 obj.spacingRatio = r.readNumber();
                 return true;
-            case "layoutmode":
+            case 3:
                 obj.layoutMode = JsonHelper.parseEnum<LayoutMode>(r.readValue(), LayoutMode)!;
                 return true;
-            case "staveprofile":
+            case 4:
                 obj.staveProfile = JsonHelper.parseEnum<StaveProfile>(r.readValue(), StaveProfile)!;
                 return true;
-            case "barsperrow":
+            case 5:
                 obj.barsPerRow = r.readNumber();
                 return true;
-            case "startbar":
+            case 6:
                 obj.startBar = r.readNumber();
                 return true;
-            case "barcount":
+            case 7:
                 obj.barCount = r.readNumber();
                 return true;
-            case "barcountperpartial":
+            case 8:
                 obj.barCountPerPartial = r.readNumber();
                 return true;
-            case "lastsystemfillthreshold":
+            case 9:
                 obj.lastSystemFillThreshold = r.readNumber();
                 return true;
-            case "justifylastsystem":
+            case 10:
                 obj.justifyLastSystem = r.readBoolean();
                 return true;
-            case "resources":
+            case 11:
                 RenderingResourcesSerializer.read(obj.resources, r);
                 return true;
-            case "padding":
+            case 12:
                 obj.padding = r.readValue()! as number[];
                 return true;
-            case "firstsystempaddingtop":
+            case 13:
                 obj.firstSystemPaddingTop = r.readNumber();
                 return true;
-            case "systempaddingtop":
+            case 14:
                 obj.systemPaddingTop = r.readNumber();
                 return true;
-            case "systempaddingbottom":
+            case 15:
                 obj.systemPaddingBottom = r.readNumber();
                 return true;
-            case "lastsystempaddingbottom":
+            case 16:
                 obj.lastSystemPaddingBottom = r.readNumber();
                 return true;
-            case "systemlabelpaddingleft":
+            case 17:
                 obj.systemLabelPaddingLeft = r.readNumber();
                 return true;
-            case "systemlabelpaddingright":
+            case 18:
                 obj.systemLabelPaddingRight = r.readNumber();
                 return true;
-            case "accoladebarpaddingright":
+            case 19:
                 obj.accoladeBarPaddingRight = r.readNumber();
                 return true;
-            case "inlinetuningpaddingright":
+            case 20:
                 obj.inlineTuningPaddingRight = r.readNumber();
                 return true;
-            case "firstnotationstaffpaddingtop":
+            case 21:
                 obj.firstNotationStaffPaddingTop = r.readNumber();
                 return true;
-            case "lastnotationstaffpaddingbottom":
+            case 22:
                 obj.lastNotationStaffPaddingBottom = r.readNumber();
                 return true;
-            case "notationstaffpaddingtop":
+            case 23:
                 obj.notationStaffPaddingTop = r.readNumber();
                 return true;
-            case "notationstaffpaddingbottom":
+            case 24:
                 obj.notationStaffPaddingBottom = r.readNumber();
                 return true;
-            case "effectstaffpaddingtop":
+            case 25:
                 obj.effectStaffPaddingTop = r.readNumber();
                 return true;
-            case "effectstaffpaddingbottom":
+            case 26:
                 obj.effectStaffPaddingBottom = r.readNumber();
                 return true;
-            case "firststaffpaddingleft":
+            case 27:
                 obj.firstStaffPaddingLeft = r.readNumber();
                 return true;
-            case "staffpaddingleft":
+            case 28:
                 obj.staffPaddingLeft = r.readNumber();
                 return true;
-            case "effectbandpaddingbottom":
+            case 29:
                 obj.effectBandPaddingBottom = r.readNumber();
                 return true;
-            case "trackstaffpaddingbetween":
+            case 30:
                 obj.trackStaffPaddingBetween = r.readNumber();
                 return true;
-            case "lyriclinespaddingbetween":
+            case 31:
                 obj.lyricLinesPaddingBetween = r.readNumber();
                 return true;
-            case "systemslayoutmode":
+            case 32:
                 obj.systemsLayoutMode = JsonHelper.parseEnum<SystemsLayoutMode>(r.readValue(), SystemsLayoutMode)!;
                 return true;
         }
         return false;
     }
     public static readFlexible(obj: DisplaySettings, r: IObjectReader): void {
-        r.readObject((k, rr) => DisplaySettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+        r.readRecord((id, k, rr) => id >= 0 ? DisplaySettingsSerializer._readField(obj, id, rr, false) : DisplaySettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
     }
     public static readFlexibleProperty(obj: DisplaySettings, property: string, r: IObjectReader): boolean {
         if (["resources"].indexOf(property) < 0 && DisplaySettingsSerializer.readProperty(obj, property, r, true)) {
@@ -161,69 +239,69 @@ export class DisplaySettingsSerializer {
             return;
         }
         w.startObject();
-        w.prop("scale");
+        w.field(0, "scale");
         w.writeNumber(obj.scale);
-        w.prop("stretchforce");
+        w.field(1, "stretchforce");
         w.writeNumber(obj.stretchForce);
-        w.prop("spacingratio");
+        w.field(2, "spacingratio");
         w.writeNumber(obj.spacingRatio);
-        w.prop("layoutmode");
+        w.field(3, "layoutmode");
         w.writeNumber(obj.layoutMode as number);
-        w.prop("staveprofile");
+        w.field(4, "staveprofile");
         w.writeNumber(obj.staveProfile as number);
-        w.prop("barsperrow");
+        w.field(5, "barsperrow");
         w.writeNumber(obj.barsPerRow);
-        w.prop("startbar");
+        w.field(6, "startbar");
         w.writeNumber(obj.startBar);
-        w.prop("barcount");
+        w.field(7, "barcount");
         w.writeNumber(obj.barCount);
-        w.prop("barcountperpartial");
+        w.field(8, "barcountperpartial");
         w.writeNumber(obj.barCountPerPartial);
-        w.prop("lastsystemfillthreshold");
+        w.field(9, "lastsystemfillthreshold");
         w.writeNumber(obj.lastSystemFillThreshold);
-        w.prop("resources");
+        w.field(11, "resources");
         RenderingResourcesSerializer.write(obj.resources, w);
-        w.prop("padding");
+        w.field(12, "padding");
         w.writeValue(obj.padding);
-        w.prop("firstsystempaddingtop");
+        w.field(13, "firstsystempaddingtop");
         w.writeNumber(obj.firstSystemPaddingTop);
-        w.prop("systempaddingtop");
+        w.field(14, "systempaddingtop");
         w.writeNumber(obj.systemPaddingTop);
-        w.prop("systempaddingbottom");
+        w.field(15, "systempaddingbottom");
         w.writeNumber(obj.systemPaddingBottom);
-        w.prop("lastsystempaddingbottom");
+        w.field(16, "lastsystempaddingbottom");
         w.writeNumber(obj.lastSystemPaddingBottom);
-        w.prop("systemlabelpaddingleft");
+        w.field(17, "systemlabelpaddingleft");
         w.writeNumber(obj.systemLabelPaddingLeft);
-        w.prop("systemlabelpaddingright");
+        w.field(18, "systemlabelpaddingright");
         w.writeNumber(obj.systemLabelPaddingRight);
-        w.prop("accoladebarpaddingright");
+        w.field(19, "accoladebarpaddingright");
         w.writeNumber(obj.accoladeBarPaddingRight);
-        w.prop("inlinetuningpaddingright");
+        w.field(20, "inlinetuningpaddingright");
         w.writeNumber(obj.inlineTuningPaddingRight);
-        w.prop("firstnotationstaffpaddingtop");
+        w.field(21, "firstnotationstaffpaddingtop");
         w.writeNumber(obj.firstNotationStaffPaddingTop);
-        w.prop("lastnotationstaffpaddingbottom");
+        w.field(22, "lastnotationstaffpaddingbottom");
         w.writeNumber(obj.lastNotationStaffPaddingBottom);
-        w.prop("notationstaffpaddingtop");
+        w.field(23, "notationstaffpaddingtop");
         w.writeNumber(obj.notationStaffPaddingTop);
-        w.prop("notationstaffpaddingbottom");
+        w.field(24, "notationstaffpaddingbottom");
         w.writeNumber(obj.notationStaffPaddingBottom);
-        w.prop("effectstaffpaddingtop");
+        w.field(25, "effectstaffpaddingtop");
         w.writeNumber(obj.effectStaffPaddingTop);
-        w.prop("effectstaffpaddingbottom");
+        w.field(26, "effectstaffpaddingbottom");
         w.writeNumber(obj.effectStaffPaddingBottom);
-        w.prop("firststaffpaddingleft");
+        w.field(27, "firststaffpaddingleft");
         w.writeNumber(obj.firstStaffPaddingLeft);
-        w.prop("staffpaddingleft");
+        w.field(28, "staffpaddingleft");
         w.writeNumber(obj.staffPaddingLeft);
-        w.prop("effectbandpaddingbottom");
+        w.field(29, "effectbandpaddingbottom");
         w.writeNumber(obj.effectBandPaddingBottom);
-        w.prop("trackstaffpaddingbetween");
+        w.field(30, "trackstaffpaddingbetween");
         w.writeNumber(obj.trackStaffPaddingBetween);
-        w.prop("lyriclinespaddingbetween");
+        w.field(31, "lyriclinespaddingbetween");
         w.writeNumber(obj.lyricLinesPaddingBetween);
-        w.prop("systemslayoutmode");
+        w.field(32, "systemslayoutmode");
         w.writeNumber(obj.systemsLayoutMode as number);
         w.endObject();
     }

@@ -21,11 +21,25 @@ export class BeamingRulesSerializer {
         BeamingRulesSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: BeamingRules, r: IObjectReader): void {
-        r.readObject((k, rr) => BeamingRulesSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? BeamingRulesSerializer._readField(obj, id, rr) : BeamingRulesSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: BeamingRules, property: string, r: IObjectReader): boolean {
+        const id = BeamingRulesSerializer._fieldId(property);
+        return id >= 0 ? BeamingRulesSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "groups":
+                return 0;
+        }
+        return -1;
+    }
+    private static _readField(obj: BeamingRules, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 BeamingRulesSerializer._readGroups(obj, r);
                 return true;
         }
@@ -49,7 +63,7 @@ export class BeamingRulesSerializer {
             return;
         }
         w.startObject();
-        w.prop("groups");
+        w.field(0, "groups");
         w.startMap();
         for (const [k, v] of obj.groups!) {
             w.prop(k.toString());

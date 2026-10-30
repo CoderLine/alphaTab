@@ -21,17 +21,35 @@ export class HeaderFooterStyleSerializer {
         HeaderFooterStyleSerializer.read(obj, new MapObjectReader(m));
     }
     public static read(obj: HeaderFooterStyle, r: IObjectReader): void {
-        r.readObject((k, rr) => HeaderFooterStyleSerializer.readProperty(obj, k, rr));
+        r.readRecord((id, k, rr) => id >= 0 ? HeaderFooterStyleSerializer._readField(obj, id, rr) : HeaderFooterStyleSerializer.readProperty(obj, k, rr));
     }
     public static readProperty(obj: HeaderFooterStyle, property: string, r: IObjectReader): boolean {
+        const id = HeaderFooterStyleSerializer._fieldId(property);
+        return id >= 0 ? HeaderFooterStyleSerializer._readField(obj, id, r) : false;
+    }
+    /**
+     * The id of the field with the given key, or -1.
+     */
+    private static _fieldId(property: string): number {
         switch (property) {
             case "template":
+                return 0;
+            case "isvisible":
+                return 1;
+            case "textalign":
+                return 2;
+        }
+        return -1;
+    }
+    private static _readField(obj: HeaderFooterStyle, id: number, r: IObjectReader): boolean {
+        switch (id) {
+            case 0:
                 obj.template = r.readString();
                 return true;
-            case "isvisible":
+            case 1:
                 obj.isVisible = r.readValue() as boolean | undefined;
                 return true;
-            case "textalign":
+            case 2:
                 obj.textAlign = JsonHelper.parseEnum<TextAlign>(r.readValue(), TextAlign)!;
                 return true;
         }
@@ -48,11 +66,11 @@ export class HeaderFooterStyleSerializer {
             return;
         }
         w.startObject();
-        w.prop("template");
+        w.field(0, "template");
         w.writeString(obj.template);
-        w.prop("isvisible");
+        w.field(1, "isvisible");
         w.writeValue(obj.isVisible);
-        w.prop("textalign");
+        w.field(2, "textalign");
         w.writeNumber(obj.textAlign as number);
         w.endObject();
     }
