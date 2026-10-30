@@ -1,4 +1,5 @@
 import type { Note } from '@coderline/alphatab/model/Note';
+import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -274,6 +275,12 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     }
 
     protected abstract shouldDrawBendSlur(): boolean;
+
+    /**
+     * The voice the tie or slur starts in. Its voice colour applies to every piece of the tie, including the
+     * continuations on later systems.
+     */
+    public abstract get voice(): Voice;
 
     public getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
         return this.renderer.smuflMetrics.tieHeight;
@@ -633,6 +640,10 @@ export abstract class NoteTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
+    public override get voice(): Voice {
+        return this.startNote.beat.voice;
+    }
+
     protected get isLeftHandTap() {
         return this.startNote === this.endNote;
     }
@@ -748,6 +759,10 @@ export class ContinuationTieGlyph extends TieGlyph {
     public constructor(startTie: TieGlyph) {
         super(startTie.slurEffectId, false);
         this._startTie = startTie;
+    }
+
+    public override get voice(): Voice {
+        return this._startTie.voice;
     }
 
     protected override lookupStartBeatRenderer() {

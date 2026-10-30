@@ -800,7 +800,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         if (!player) {
-            Logger.error('Player', 'Player requires webworkers and web audio api, browser unsupported', null);
+            Logger.error('Player', 'Player requires webworkers and web audio api, browser unsupported');
         } else {
             player.ready.on(() => {
                 if (this._api.settings.player.soundFont) {

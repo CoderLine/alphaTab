@@ -167,9 +167,12 @@ export class ElementStyleHelper {
         return ElementStyleHelper._apply<VoiceSubElement>(canvas, element, voice.style, defaultColor, forceDefault);
     }
 
-    public static trackColor(res: RenderingResources, element: TrackSubElement, track: Track): Color | undefined {
-        const defaultColor = ElementStyleHelper._trackDefaultColor(res, element);
-
+    /**
+     * The colour of the track style entry for the element, `defaultColor` for a `null` entry and `undefined`
+     * without an entry.
+     * @param defaultColor The colour the element has without a style where it is painted.
+     */
+    public static trackColor(element: TrackSubElement, track: Track, defaultColor: Color): Color | undefined {
         if (track.style && track.style!.colors.has(element)) {
             return track.style!.colors.get(element) ?? defaultColor;
         }

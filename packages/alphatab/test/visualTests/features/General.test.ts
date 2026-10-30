@@ -253,6 +253,43 @@ describe('GeneralTests', () => {
         );
     });
 
+    it('colors-multi-system-slur', async () => {
+        // every piece of a slur over several systems takes the colour of its voice: the first voice is
+        // styled blue, the second voice keeps its default colour
+        const settings = new Settings();
+        settings.display.barsPerRow = 1;
+        await VisualTestHelper.runVisualTestTex(
+            '\\track \\staff {score} \\voice :1 3.3{slur s1} | 3.3 | 3.3 | 3.3{slur s1} \\voice :1 5.1{slur s2} | 5.1 | 5.1 | 5.1{slur s2}',
+            'test-data/visual-tests/general/colors-multi-system-slur.png',
+            settings,
+            o => {
+                for (const b of o.score.tracks[0].staves[0].bars) {
+                    b.voices[0].style = new VoiceStyle();
+                    b.voices[0].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#0000DD')!);
+                }
+            }
+        );
+    });
+
+    it('colors-tab-bend', async () => {
+        // the bends of several notes on one beat take the voice colour like single bends: bar 1 shows the
+        // default colours of both voices, bar 2 a blue first voice and a green second voice
+        const voice1 = ':4 3.3{b (0 4)} (3.3{b (0 4)} 5.2{b (0 4)}) (3.3{b (0 4)} 5.2{b (0 4)} 5.1{b (0 4)}) r';
+        const voice2 = ':4 r r r (7.5{b (0 4)} 7.4{b (0 4)})';
+        await VisualTestHelper.runVisualTestTex(
+            `\\track \\staff {tabs} \\voice ${voice1} | ${voice1} \\voice ${voice2} | ${voice2}`,
+            'test-data/visual-tests/general/colors-tab-bend.png',
+            undefined,
+            o => {
+                const bar = o.score.tracks[0].staves[0].bars[1];
+                bar.voices[0].style = new VoiceStyle();
+                bar.voices[0].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#0000DD')!);
+                bar.voices[1].style = new VoiceStyle();
+                bar.voices[1].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#00AA00')!);
+            }
+        );
+    });
+
     it('color-performance', async () => {
         // warm-up
         for (let i = 0; i < 5; i++) {

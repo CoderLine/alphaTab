@@ -37,8 +37,7 @@ export class FontLoadingChecker {
         const failCounterId: number = window.setInterval(() => {
             Logger.warning(
                 'Rendering',
-                `Could not load font '${this._families[0]}' within ${(failCounter + 1) * 5} seconds`,
-                null
+                `Could not load font '${this._families[0]}' within ${(failCounter + 1) * 5} seconds`
             );
 
             // try loading next font if there are more than 1 left

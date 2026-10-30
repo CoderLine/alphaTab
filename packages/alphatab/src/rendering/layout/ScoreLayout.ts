@@ -510,9 +510,9 @@ export abstract class ScoreLayout {
                         const trackLabel = stavesWithTuning.length > 1 ? staff.track.name : '';
                         const item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
                         item.colorOverride = ElementStyleHelper.trackColor(
-                            res,
                             TrackSubElement.StringTuning,
-                            staff.track
+                            staff.track,
+                            res.scoreInfoColor
                         );
                         item.renderer = fakeBarRenderer;
                         item.doLayout();

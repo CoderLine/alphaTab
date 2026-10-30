@@ -2,7 +2,6 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BendStyle } from '@coderline/alphatab/model/BendStyle';
 import { BendType } from '@coderline/alphatab/model/BendType';
-import type { Color } from '@coderline/alphatab/model/Color';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
@@ -260,10 +259,6 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const color: Color = canvas.color;
-        if (this._notes.length > 1) {
-            canvas.color = this.renderer.resources.secondaryGlyphColor;
-        }
         for (const note of this._notes) {
             const startNoteRenderer = this.renderer as TabBarRenderer;
             this._resolvePaintRange(cx, note);
@@ -285,8 +280,6 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
                 endNoteRenderer,
                 endNote
             );
-
-            canvas.color = color;
         }
     }
 

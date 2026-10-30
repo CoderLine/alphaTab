@@ -1007,7 +1007,8 @@ export class StaffSystem {
             using _ = ElementStyleHelper.track(
                 canvas,
                 TrackSubElement.SystemSeparator,
-                this.allStaves[0].modelStaff.track
+                this.allStaves[0].modelStaff.track,
+                true
             );
 
             // NOTE: the divider is currently not "nicely" centered between the systems as this would lead to cropping

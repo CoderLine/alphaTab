@@ -18,11 +18,10 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
 import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.truncate
 
 @ExperimentalUnsignedTypes
 internal inline fun UByteArray.decodeToFloatArray(): FloatArray {
@@ -228,99 +227,24 @@ internal inline fun Int?.toDouble(): Double? {
     return this?.toDouble()
 }
 
+/**
+ * Parses a decimal number with optional sign, fraction and exponent, locale-independent, with optional
+ * surrounding whitespace. Unlike ECMAScript, text with trailing characters is NaN.
+ */
 internal inline fun String.toDoubleOrNaN(): Double {
-    try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
-        if (number != null) {
-            return number.toDouble()
-        }
-    } catch (e: Throwable) {
-    }
-    return Double.NaN
-}
-
-internal fun String.toIntOrNaN(): Double {
-    try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
-        if (number != null) {
-            return number.toInt().toDouble()
-        }
-    } catch (e: Throwable) {
-    }
-    return Double.NaN
+    return this.toDoubleOrNull() ?: Double.NaN
 }
 
 /**
- * Parses like ECMAScript `parseInt`: leading whitespace and an optional sign are skipped,
- * the longest prefix of digits of the radix is parsed, and NaN is returned if there is none.
- * A radix of 0 means 10, or 16 for a `0x` prefix.
+ * Parses an integer in radix 10 (also for radix 0) or 16, locale-independent, with optional surrounding
+ * whitespace. In radix 10 the text is read like [toDoubleOrNaN] and truncated towards zero
+ * (`"3.5"` gives 3, `"-0.5"` gives -0). Unlike ECMAScript, text with trailing characters is NaN.
  */
 internal fun String.toIntOrNaN(radix: Double): Double {
-    var r = radix.toInt()
-    var i = 0
-    while (i < this.length && isEcmaScriptWhiteSpace(this[i])) {
-        i++
-    }
-
-    var sign = 1.0
-    if (i < this.length && (this[i] == '+' || this[i] == '-')) {
-        if (this[i] == '-') {
-            sign = -1.0
-        }
-        i++
-    }
-
-    var stripPrefix = true
-    if (r != 0) {
-        if (r < 2 || r > 36) {
-            return Double.NaN
-        }
-        stripPrefix = r == 16
-    } else {
-        r = 10
-    }
-
-    if (stripPrefix && i + 1 < this.length && this[i] == '0' && (this[i + 1] == 'x' || this[i + 1] == 'X')) {
-        i += 2
-        r = 16
-    }
-
-    val start = i
-    var value = 0.0
-    while (i < this.length) {
-        val digit = asciiDigitValue(this[i])
-        if (digit >= r) {
-            break
-        }
-        value = value * r + digit
-        i++
-    }
-
-    if (i == start) {
-        return Double.NaN
-    }
-
-    // beyond 2^53 only the decimal conversion rounds like ECMAScript
-    if (r == 10 && i - start > 15) {
-        value = this.substring(start, i).toDouble()
-    }
-
-    return sign * value
-}
-
-private fun asciiDigitValue(c: Char): Int {
-    return when (c) {
-        in '0'..'9' -> c - '0'
-        in 'a'..'z' -> c - 'a' + 10
-        in 'A'..'Z' -> c - 'A' + 10
-        else -> Int.MAX_VALUE
-    }
-}
-
-private fun isEcmaScriptWhiteSpace(c: Char): Boolean {
-    return when (c) {
-        '\t', '\n', '\u000B', '\u000C', '\r', '\u2028', '\u2029', '\uFEFF' -> true
-        else -> Character.getType(c) == Character.SPACE_SEPARATOR.toInt()
+    return when (radix) {
+        0.0, 10.0 -> truncate(this.toDoubleOrNaN())
+        16.0 -> this.trim().toULongOrNull(16)?.toDouble() ?: Double.NaN
+        else -> throw IllegalArgumentException("Radix $radix is not supported")
     }
 }
 

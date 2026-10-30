@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 
 namespace AlphaTab.Core.EcmaScript;
 
@@ -25,103 +26,33 @@ internal static class Number
     }
 
     /// <summary>
-    /// Parses like ECMAScript <c>parseInt</c>: leading whitespace and an optional sign are skipped,
-    /// the longest prefix of digits of the radix is parsed, and NaN is returned if there is none.
-    /// A radix of 0 means 10, or 16 for a <c>0x</c> prefix.
+    /// Parses an integer in radix 10 (also for radix 0) or 16, culture-invariant, with optional surrounding
+    /// whitespace. In radix 10 the text is read like <see cref="ParseFloat"/> and truncated towards zero
+    /// (<c>"3.5"</c> gives 3, <c>"-0.5"</c> gives -0). Unlike ECMAScript, text with trailing characters is NaN.
     /// </summary>
     public static double ParseInt(string s, int radix)
     {
-        var i = 0;
-        while (i < s.Length && IsWhiteSpace(s[i]))
+        switch (radix)
         {
-            i++;
+            case 0:
+            case 10:
+                return System.Math.Truncate(ParseFloat(s));
+            case 16:
+                return ulong.TryParse(s, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var hex)
+                    ? hex
+                    : double.NaN;
+            default:
+                throw new NotSupportedException($"Radix {radix} is not supported");
         }
-
-        var sign = 1.0;
-        if (i < s.Length && (s[i] == '+' || s[i] == '-'))
-        {
-            if (s[i] == '-')
-            {
-                sign = -1.0;
-            }
-
-            i++;
-        }
-
-        var stripPrefix = true;
-        if (radix != 0)
-        {
-            if (radix < 2 || radix > 36)
-            {
-                return double.NaN;
-            }
-
-            stripPrefix = radix == 16;
-        }
-        else
-        {
-            radix = 10;
-        }
-
-        if (stripPrefix && i + 1 < s.Length && s[i] == '0' && (s[i + 1] == 'x' || s[i + 1] == 'X'))
-        {
-            i += 2;
-            radix = 16;
-        }
-
-        var start = i;
-        var value = 0.0;
-        while (i < s.Length)
-        {
-            var digit = DigitValue(s[i]);
-            if (digit >= radix)
-            {
-                break;
-            }
-
-            value = value * radix + digit;
-            i++;
-        }
-
-        if (i == start)
-        {
-            return double.NaN;
-        }
-
-        // beyond 2^53 only the decimal conversion rounds like ECMAScript
-        if (radix == 10 && i - start > 15)
-        {
-            value = double.Parse(s.Substring(start, i - start), CultureInfo.InvariantCulture);
-        }
-
-        return sign * value;
     }
 
-    private static bool IsWhiteSpace(char c)
-    {
-        return c is '\t' or '\n' or '\v' or '\f' or '\r' or '\u2028' or '\u2029' or '\uFEFF' ||
-               char.GetUnicodeCategory(c) == UnicodeCategory.SpaceSeparator;
-    }
-
-    private static int DigitValue(char c)
-    {
-        return c switch
-        {
-            >= '0' and <= '9' => c - '0',
-            >= 'a' and <= 'z' => c - 'a' + 10,
-            >= 'A' and <= 'Z' => c - 'A' + 10,
-            _ => int.MaxValue
-        };
-    }
-
+    /// <summary>
+    /// Parses a decimal number with optional sign, fraction and exponent, culture-invariant, with optional
+    /// surrounding whitespace. Unlike ECMAScript, text with trailing characters is NaN.
+    /// </summary>
     public static double ParseFloat(string s)
     {
-        if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
-        {
-            return d;
-        }
-
-        return double.NaN;
+        return double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? d : double.NaN;
     }
 
     public static bool IsNaN(double d)

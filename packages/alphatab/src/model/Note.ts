@@ -993,7 +993,7 @@ export class Note {
                         }
                     }
                 } else {
-                    Logger.warning('Model', 'Unsupported bend type detected, fallback to custom', null);
+                    Logger.warning('Model', 'Unsupported bend type detected, fallback to custom');
                 }
             } else if (points!.length === 3) {
                 const origin: BendPoint = points[0];

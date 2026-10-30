@@ -166,7 +166,7 @@ export class ScoreRenderer implements IScoreRenderer {
 
     private _render(renderHints?: RenderHints): boolean {
         if (this.width === 0) {
-            Logger.warning('Rendering', 'AlphaTab skipped rendering because of width=0 (element invisible)', null);
+            Logger.warning('Rendering', 'AlphaTab skipped rendering because of width=0 (element invisible)');
             return false;
         }
         // For partial renders we preserve the existing bounds so bars outside the re-layouted

@@ -1107,7 +1107,12 @@ export class BarRendererBase {
         }
 
         for (const slur of multiSystemSlurs) {
-            slur.paint(cx, cy, canvas);
+            const previousColor = ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, slur.voice, true);
+            try {
+                slur.paint(cx, cy, canvas);
+            } finally {
+                ElementStyleHelper.restore(canvas, previousColor);
+            }
         }
     }
 

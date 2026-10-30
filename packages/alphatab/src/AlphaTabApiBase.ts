@@ -802,8 +802,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!this.container.isVisible) {
             Logger.warning(
                 'Rendering',
-                'AlphaTab container was invisible while autosizing, waiting for element to become visible',
-                null
+                'AlphaTab container was invisible while autosizing, waiting for element to become visible'
             );
             this.uiFacade.rootContainerBecameVisible.on(() => {
                 Logger.debug('Rendering', 'AlphaTab container became visible, doing autosizing');
