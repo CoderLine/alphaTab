@@ -280,16 +280,21 @@ export class TabBarRenderer extends LineBarRenderer {
         const drawnLineCount = this.drawnLineCount;
         const tuning = this.bar.staff.tuning;
         const tuningLen = tuning.length;
+        const voices = this.voiceContainer.beatGlyphs;
 
         // First pass: count gaps per string-line for exact typed-array sizing.
         const bucketCount = new Uint32Array(drawnLineCount);
         let total = 0;
-        for (const voice of this.voiceContainer.beatGlyphs) {
-            for (const bg of voice) {
+        for (let v = 0, nv = voices.length; v < nv; v++) {
+            const voice = voices[v];
+            for (let b = 0, nb = voice.length; b < nb; b++) {
+                const bg = voice[b];
                 const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
                 const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                 if (noteNumbers) {
-                    for (const g of noteNumbers.noteGlyphs) {
+                    const noteGlyphs = noteNumbers.noteGlyphs;
+                    for (let k = 0, nk = noteGlyphs.length; k < nk; k++) {
+                        const g = noteGlyphs[k];
                         const str = g.note.string;
                         if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;
@@ -325,14 +330,18 @@ export class TabBarRenderer extends LineBarRenderer {
         const beatRefs: TabBeatContainerGlyph[] = new Array(total);
         const padding: number = this.smuflMetrics.staffLineThickness;
 
-        for (const voice of this.voiceContainer.beatGlyphs) {
-            for (const bg of voice) {
+        for (let v = 0, nv = voices.length; v < nv; v++) {
+            const voice = voices[v];
+            for (let b = 0, nb = voice.length; b < nb; b++) {
+                const bg = voice[b];
                 const notes: TabBeatGlyph = (bg as TabBeatContainerGlyph).onNotes as TabBeatGlyph;
                 const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                 if (noteNumbers) {
                     const relativeXBase = noteNumbers.x - padding;
                     const fullWidth = noteNumbers.width + padding * 2;
-                    for (const g of noteNumbers.noteGlyphs) {
+                    const noteGlyphs = noteNumbers.noteGlyphs;
+                    for (let k = 0, nk = noteGlyphs.length; k < nk; k++) {
+                        const g = noteGlyphs[k];
                         const str = g.note.string;
                         if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;

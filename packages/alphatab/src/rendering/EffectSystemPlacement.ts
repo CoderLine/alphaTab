@@ -65,7 +65,9 @@ export class EffectSystemPlacement {
         // effects like TabWhammy) in one walk.
         for (let i = 0; i < staff.barRenderers.length; i++) {
             const r = staff.barRenderers[i];
-            for (const b of r.topEffects.bands) {
+            const topBands = r.topEffects.bands;
+            for (let j = 0, n = topBands.length; j < n; j++) {
+                const b = topBands[j];
                 if (!b.isEmpty) {
                     // Reset; `_placeSide` only writes it when computeLocalXRange succeeds,
                     // but the band-y loop reads it for every band.
@@ -74,7 +76,9 @@ export class EffectSystemPlacement {
                     top.push(b);
                 }
             }
-            for (const b of r.bottomEffects.bands) {
+            const bottomBands = r.bottomEffects.bands;
+            for (let j = 0, n = bottomBands.length; j < n; j++) {
+                const b = bottomBands[j];
                 if (!b.isEmpty) {
                     b.placedMagnitude = 0;
                     b.finalizeBand();
@@ -119,10 +123,12 @@ export class EffectSystemPlacement {
 
         const staffTopOverflow = staff.topOverflow;
         const staffBottomOverflow = staff.bottomOverflow;
-        for (const band of top) {
+        for (let i = 0, n = top.length; i < n; i++) {
+            const band = top[i];
             band.y = staffTopOverflow - (band.placedMagnitude + band.height);
         }
-        for (const band of bottom) {
+        for (let i = 0, n = bottom.length; i < n; i++) {
+            const band = bottom[i];
             band.y = band.placedMagnitude + band.renderer.bottomEffects.height - staffBottomOverflow;
         }
     }

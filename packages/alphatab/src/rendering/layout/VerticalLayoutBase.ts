@@ -712,7 +712,9 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
     private _needsLineBreak(barIndex: number) {
         let anyTrackNeedsLineBreak = false;
         let allTracksNeedLineBreak = true;
-        for (const track of this.renderer.tracks!) {
+        const tracks = this.renderer.tracks!;
+        for (let i = 0, n = tracks.length; i < n; i++) {
+            const track = tracks[i];
             if (track.lineBreaks && track.lineBreaks!.has(barIndex + 1)) {
                 anyTrackNeedsLineBreak = true;
             } else {

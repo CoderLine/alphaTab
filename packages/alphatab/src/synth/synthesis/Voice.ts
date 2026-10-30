@@ -112,6 +112,8 @@ export class Voice {
             return;
         }
 
+        // The SynthHelper formulas are written out in this method: V8 does not inline every call of a
+        // method this large and boxes each double passed to or returned from a call that stays.
         const region: Region = this.region;
         const input: Float32Array = region.samples;
         let outL: number = 0;
@@ -167,7 +169,7 @@ export class Voice {
             tmpVibLfoToPitch = region.vibLfoToPitch;
             tmpModEnvToPitch = region.modEnvToPitch;
         } else {
-            pitchRatio = SynthHelper.timecents2Secs(this.pitchInputTimecents) * this.pitchOutputFactor;
+            pitchRatio = Math.pow(2, this.pitchInputTimecents / 1200.0) * this.pitchOutputFactor;
             tmpModLfoToPitch = 0;
             tmpVibLfoToPitch = 0;
             tmpModEnvToPitch = 0;
@@ -176,7 +178,7 @@ export class Voice {
         if (dynamicGain) {
             tmpModLfoToVolume = region.modLfoToVolume * 0.1;
         } else {
-            noteGain = SynthHelper.decibelsToGain(this.noteGainDb);
+            noteGain = this.noteGainDb > -100 ? Math.pow(10.0, this.noteGainDb * 0.05) : 0;
             tmpModLfoToVolume = 0;
         }
 
@@ -195,22 +197,22 @@ export class Voice {
                     this.modEnv.level * tmpModEnvToFilterFc;
                 tmpLowpass.active = fres <= 13500.0;
                 if (tmpLowpass.active) {
-                    tmpLowpass.setup(SynthHelper.cents2Hertz(fres) / tmpSampleRate);
+                    tmpLowpass.setup((8.176 * Math.pow(2.0, fres / 1200.0)) / tmpSampleRate);
                 }
             }
 
             if (dynamicPitchRatio) {
-                pitchRatio =
-                    SynthHelper.timecents2Secs(
-                        this.pitchInputTimecents +
-                            (this.modLfo.level * tmpModLfoToPitch +
-                                this.vibLfo.level * tmpVibLfoToPitch +
-                                this.modEnv.level * tmpModEnvToPitch)
-                    ) * this.pitchOutputFactor;
+                const timecents: number =
+                    this.pitchInputTimecents +
+                    (this.modLfo.level * tmpModLfoToPitch +
+                        this.vibLfo.level * tmpVibLfoToPitch +
+                        this.modEnv.level * tmpModEnvToPitch);
+                pitchRatio = Math.pow(2, timecents / 1200.0) * this.pitchOutputFactor;
             }
 
             if (dynamicGain) {
-                noteGain = SynthHelper.decibelsToGain(this.noteGainDb + this.modLfo.level * tmpModLfoToVolume);
+                const db: number = this.noteGainDb + this.modLfo.level * tmpModLfoToVolume;
+                noteGain = db > -100 ? Math.pow(10.0, db * 0.05) : 0;
             }
 
             // Update EG.

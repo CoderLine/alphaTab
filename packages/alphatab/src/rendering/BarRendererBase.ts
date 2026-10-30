@@ -574,25 +574,23 @@ export class BarRendererBase {
                 continue;
             }
             const bandKey = `${rowKey}/${band.info.notationElement}`;
-            for (const voiceGlyphs of band.glyphsByVoice) {
-                for (const glyph of voiceGlyphs) {
-                    if (!glyph.beat || glyph.width <= 0) {
-                        continue;
-                    }
-                    const w = glyph.width;
-                    const t = glyph.beat.absoluteDisplayStart;
-                    switch (policy) {
-                        case OverlayRodPolicy.Left:
-                            info.addOverlayRod(bandKey, t, 0, w);
-                            break;
-                        case OverlayRodPolicy.Right:
-                            info.addOverlayRod(bandKey, t, w, 0);
-                            break;
-                        default: {
-                            const half = w * 0.5;
-                            info.addOverlayRod(bandKey, t, half, half);
-                            break;
-                        }
+            for (const glyph of band.glyphs) {
+                if (!glyph.beat || glyph.width <= 0) {
+                    continue;
+                }
+                const w = glyph.width;
+                const t = glyph.beat.absoluteDisplayStart;
+                switch (policy) {
+                    case OverlayRodPolicy.Left:
+                        info.addOverlayRod(bandKey, t, 0, w);
+                        break;
+                    case OverlayRodPolicy.Right:
+                        info.addOverlayRod(bandKey, t, w, 0);
+                        break;
+                    default: {
+                        const half = w * 0.5;
+                        info.addOverlayRod(bandKey, t, half, half);
+                        break;
                     }
                 }
             }

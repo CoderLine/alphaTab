@@ -50,7 +50,9 @@ export class EffectBandContainer {
     }
 
     public alignGlyphs() {
-        for (const effectBand of this._bands) {
+        const bands = this._bands;
+        for (let i = 0, n = bands.length; i < n; i++) {
+            const effectBand = bands[i];
             effectBand.resetHeight();
             effectBand.alignGlyphs();
         }
@@ -69,8 +71,9 @@ export class EffectBandContainer {
     }
 
     public populateSkyline(): void {
-        for (const band of this._bands) {
-            band.populateSkyline();
+        const bands = this._bands;
+        for (let i = 0, n = bands.length; i < n; i++) {
+            bands[i].populateSkyline();
         }
     }
 

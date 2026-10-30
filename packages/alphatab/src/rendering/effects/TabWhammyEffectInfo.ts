@@ -33,15 +33,14 @@ export const tabWhammyEffectInfo: EffectInfo = {
         // re-register the sizes so they are available during finalization later
         const info = band.renderer.staff!.getSharedLayoutData<[number, number]>(offsetSharedDataKey, [0, 0]);
         band.renderer.staff!.setSharedLayoutData(offsetSharedDataKey, info);
-        for (const voiceGlyphs of band.glyphsByVoice) {
-            for (let i = 0, n = voiceGlyphs.length; i < n; i++) {
-                const tb = voiceGlyphs[i] as TabWhammyBarGlyph;
-                if (tb.originalTopOffset > info[0]) {
-                    info[0] = tb.originalTopOffset;
-                }
-                if (tb.originalBottomOffset > info[1]) {
-                    info[1] = tb.originalBottomOffset;
-                }
+        const glyphs = band.glyphs;
+        for (let i = 0, n = glyphs.length; i < n; i++) {
+            const tb = glyphs[i] as TabWhammyBarGlyph;
+            if (tb.originalTopOffset > info[0]) {
+                info[0] = tb.originalTopOffset;
+            }
+            if (tb.originalBottomOffset > info[1]) {
+                info[1] = tb.originalBottomOffset;
             }
         }
     },
@@ -49,13 +48,12 @@ export const tabWhammyEffectInfo: EffectInfo = {
         const info = band.renderer.staff!.getSharedLayoutData<[number, number]>(offsetSharedDataKey, [0, 0]);
         const top = info[0];
         const bottom = info[1];
-        for (const voiceGlyphs of band.glyphsByVoice) {
-            for (let i = 0, n = voiceGlyphs.length; i < n; i++) {
-                const tb = voiceGlyphs[i] as TabWhammyBarGlyph;
-                tb.topOffset = top;
-                tb.bottomOffset = bottom;
-                tb.height = top + bottom;
-            }
+        const glyphs = band.glyphs;
+        for (let i = 0, n = glyphs.length; i < n; i++) {
+            const tb = glyphs[i] as TabWhammyBarGlyph;
+            tb.topOffset = top;
+            tb.bottomOffset = bottom;
+            tb.height = top + bottom;
         }
         band.height = top + bottom;
     },
