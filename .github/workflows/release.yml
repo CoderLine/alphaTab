@@ -17,6 +17,10 @@ on:
         type: boolean
         description: Release Android packages
         default: true
+      release_website:
+        type: boolean
+        description: Deploy the website (alphatab.net) after the web packages
+        default: true
       dry_run:
         type: boolean
         description: Build and verify all selected packages without publishing them
@@ -50,7 +54,21 @@ jobs:
     uses: ./.github/workflows/~publish_kotlin.yml
     secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_kotlin_android == 'true')
-    with: 
+    with:
       version: ${{github.run_number}}
       force: true
+      dry_run: ${{ inputs.dry_run == true }}
+
+  website:
+    needs: web
+    # inputs are null on tag pushes
+    if: ${{ !cancelled() && (github.event_name == 'push' || inputs.release_website) && (needs.web.result == 'success' || needs.web.result == 'skipped') }}
+    uses: ./.github/workflows/~publish_website.yml
+    permissions:
+      contents: read
+    with:
+      channel: stable
+      npm_tag: latest
+      deploy_branch: main
+      expected_alphatab_version: ${{ needs.web.outputs.alphatab_version }}
       dry_run: ${{ inputs.dry_run == true }}
