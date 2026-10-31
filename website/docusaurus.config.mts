@@ -12,7 +12,7 @@ import * as fs from "fs";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { AlphaTabWebPackPlugin } from "@coderline/alphatab-webpack";
-import webpack, { type Module, type RuleSetRule } from "webpack";
+import type { Compiler, Module, RuleSetRule } from "webpack";
 
 const siteDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -165,6 +165,38 @@ function getSortValue(
 // Docusaurus loads .mts configs via jiti, which does not support top-level
 // await. Wrap the config in an async default-export function so we can await
 // the shields.io fetch at build time.
+const lazyCompilationOptions = { imports: true, entries: false };
+
+// Docusaurus' dev server is webpack-dev-server, which does not wire up Rspack's lazy
+// compilation; the middleware must be created on the compiler before its first build.
+let rspackLazyCompilationMiddleware: ((req: unknown, res: unknown, next: () => void) => void) | undefined;
+type RspackCompiler = {
+  rspack: { lazyCompilationMiddleware(compiler: unknown): typeof rspackLazyCompilationMiddleware };
+};
+class RspackLazyCompilationMiddlewarePlugin {
+  apply(compiler: Compiler) {
+    const rspackCompiler = compiler as unknown as RspackCompiler;
+    rspackLazyCompilationMiddleware = rspackCompiler.rspack.lazyCompilationMiddleware(rspackCompiler);
+  }
+}
+
+function lazyCompilationConfig(isRspack: boolean) {
+  if (!isRspack) {
+    return { experiments: { lazyCompilation: lazyCompilationOptions } };
+  }
+  return {
+    lazyCompilation: lazyCompilationOptions,
+    devServer: {
+      setupMiddlewares(middlewares: unknown[]) {
+        if (rspackLazyCompilationMiddleware) {
+          middlewares.unshift({ name: "rspack-lazy-compilation", middleware: rspackLazyCompilationMiddleware });
+        }
+        return middlewares;
+      },
+    },
+  };
+}
+
 async function createConfig(): Promise<Config> {
   const githubStarsInitial = await fetchInitialGithubStars(githubRepo, "1.7k");
   return {
@@ -177,14 +209,12 @@ async function createConfig(): Promise<Config> {
   projectName: "alphaTab",
   onBrokenLinks: "throw",
   future: {
-    // Individual v4 flags only: the v4 umbrella also switches the bundler to
-    // Rspack, which AlphaTabWebPackPlugin does not support.
     v4: {
       removeLegacyPostBuildHeadAttribute: true,
     },
     faster: {
-      rspackBundler: false,
-      rspackPersistentCache: false,
+      rspackBundler: true,
+      rspackPersistentCache: true,
       mdxCrossCompilerCache: true,
       ssgWorkerThreads: true,
       swcJsLoader: true,
@@ -732,9 +762,12 @@ async function createConfig(): Promise<Config> {
               ),
             };
 
+        const bundler = options.currentBundler;
+        const isRspack = bundler.name === "rspack";
+
         // Webpack keeps each module in several serialized forms, which makes the
         // uncompressed packs several hundred MB per compilation.
-        const cache =
+        const webpackCache =
           typeof config.cache === "object" && config.cache.type === "filesystem"
             ? {
                 type: "filesystem" as const,
@@ -750,7 +783,7 @@ async function createConfig(): Promise<Config> {
         // time and roughly double the size of those chunks.
         const isDevClient = !isServer && config.mode === "development";
         const sourceMaps = isDevClient
-          ? new webpack.EvalSourceMapDevToolPlugin({
+          ? new bundler.instance.EvalSourceMapDevToolPlugin({
               module: true,
               columns: false,
               moduleFilenameTemplate: config.output?.devtoolModuleFilenameTemplate,
@@ -762,16 +795,10 @@ async function createConfig(): Promise<Config> {
           // Every page (including ~540 generated reference pages) and the alphaTex editor's
           // Monaco are `import()`ed, so in dev they compile when the browser first requests
           // them instead of all at startup.
-          ...(isDevClient
-            ? { experiments: { lazyCompilation: { imports: true, entries: false } } }
-            : {}),
+          ...(isDevClient ? lazyCompilationConfig(isRspack) : {}),
           ...(sourceMaps ? { devtool: false } : {}),
-          cache,
+          ...(webpackCache ? { cache: webpackCache } : {}),
           optimization: {
-            // Per-runtime export analysis gives the page, the alphaTab worker and the
-            // alphaTex language-server worker different code for alphaTab's core, so
-            // each runtime would get its own copy instead of sharing one chunk.
-            ...(isServer ? {} : { usedExports: "global" as const }),
             splitChunks: {
               cacheGroups: {
                 // Docusaurus turns splitChunks off for the server bundle; only the group below
@@ -820,6 +847,7 @@ async function createConfig(): Promise<Config> {
           },
           plugins: [
             ...(sourceMaps ? [sourceMaps] : []),
+            ...(isDevClient && isRspack ? [new RspackLazyCompilationMiddlewarePlugin()] : []),
             // Copy the Font and SoundFont Files to the output
             new AlphaTabWebPackPlugin({
               assetOutputDir: config.output!.path,

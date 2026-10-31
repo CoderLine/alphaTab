@@ -16,17 +16,17 @@ export interface AlphaTabWebPackPluginOptions {
     assetOutputDir?: string | false;
 
     /**
-     * Whether alphaTab should configure the audio worklet support in WebPack.
-     * This might break support for audio playback unless audio worklet support is added
-     * through other means to WebPack.
+     * Whether the plugin bundles alphaTab's audio worklet (the `alphaTabWorklet.addModule()` call)
+     * as a worklet entry sharing alphaTab's core chunk with the page.
+     * When disabled, audio playback through audio worklets needs to be configured by other means.
      * (default: true)
      */
     audioWorklets?: boolean;
 
     /**
-     * Whether alphaTab should configure the web worklet support in WebPack.
-     * This might break support for audio playback and background unless audio worklet support is added
-     * through other means to WebPack.
+     * Whether the plugin bundles alphaTab's web worker (the `new Worker(new URL(...))` call) as a worker
+     * entry, regardless of the worker parsing the application configured (e.g. Angular disables it).
+     * When disabled, alphaTab's worker follows the application's `module.parser.javascript.worker` setting.
      * (default: true)
      */
     webWorkers?: boolean;

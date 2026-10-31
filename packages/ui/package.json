@@ -11,7 +11,8 @@
     },
     "type": "module",
     "sideEffects": [
-        "**/*.scss"
+        "**/*.scss",
+        "**/*.worker.ts"
     ],
     "exports": {
         ".": "./src/index.ts",

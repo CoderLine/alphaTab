@@ -1,9 +1,8 @@
 import fs from 'node:fs';
 import * as path from 'node:path';
 import * as url from 'node:url';
-import type { Plugin } from 'vite';
+import type { Plugin, ResolvedConfig } from 'vite';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
-import type { ResolvedConfig } from './bridge';
 
 /**
  * @public
@@ -16,7 +15,7 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
         name: 'vite-plugin-alphatab-copy',
         enforce: 'pre',
         configResolved(config) {
-            resolvedConfig = config as ResolvedConfig;
+            resolvedConfig = config;
         },
         buildEnd() {
             // reset for watch mode
