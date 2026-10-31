@@ -38,10 +38,22 @@ while (!fs.existsSync(path.resolve(repositoryRoot, '.git'))) {
     repositoryRoot = parent;
 }
 
+// In a linked worktree `.git` is a file pointing at the worktree's git directory.
+function resolveGitDir(): string {
+    const dotGit = path.resolve(repositoryRoot, '.git');
+    if (fs.existsSync(dotGit) && fs.statSync(dotGit).isFile()) {
+        const match = /^gitdir:\s*(.+)$/m.exec(fs.readFileSync(dotGit, 'utf8'));
+        if (match) {
+            return path.resolve(repositoryRoot, match[1].trim());
+        }
+    }
+    return dotGit;
+}
+
 function getGitBranch(): string {
-    const filepath = path.resolve(repositoryRoot, '.git/HEAD');
+    const filepath = path.resolve(resolveGitDir(), 'HEAD');
     if (!fs.existsSync(filepath)) {
-        throw new Error('.git/HEAD does not exist');
+        throw new Error(`${filepath} does not exist`);
     }
     const buf = fs.readFileSync(filepath);
     const match = /ref: refs\/heads\/([^\n]+)/.exec(buf.toString());
