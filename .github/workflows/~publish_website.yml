@@ -141,7 +141,7 @@ jobs:
 
   deploy:
     needs: build
-    if: ${{ !cancelled() && needs.build.result == 'success' && !inputs.dry_run && vars.WEBSITE_DEPLOY_ENABLED == 'true' }}
+    if: ${{ !cancelled() && needs.build.result == 'success' && !inputs.dry_run }}
     runs-on: ubuntu-latest
     environment:
       name: website
