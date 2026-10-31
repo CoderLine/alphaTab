@@ -19,10 +19,10 @@ import {
   getTypeWithNullableInfo,
   repositoryRoot,
 } from "./typeschema.mjs";
-import { clearGeneratedPages, FileStream, openFileStream } from "./util.mjs";
+import { trackGeneratedPages, FileStream, openFileStream } from "./util.mjs";
 
 export async function generateTypeDocs(context: GenerateContext) {
-  await clearGeneratedPages(
+  trackGeneratedPages(
     path.join(repositoryRoot, "docs", "reference", "types")
   );
 

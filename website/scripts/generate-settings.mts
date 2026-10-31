@@ -17,12 +17,12 @@ import {
   writeReferenceTable,
 } from "./generate-common.mjs";
 import { GenerateContext } from "./typeschema.mjs";
-import { clearGeneratedPages, openFileStream } from "./util.mjs";
+import { trackGeneratedPages, openFileStream } from "./util.mjs";
 
 export async function generateSettings(context: GenerateContext) {
   enableWarningsOnMissingDocs();
   try {
-    await clearGeneratedPages(
+    trackGeneratedPages(
       path.join(repositoryRoot, "docs", "reference", "settings")
     );
 

@@ -159,10 +159,11 @@ await generateSettings(context);
 await generateTypeDocs(context);
 await generateApiDocs(context);
 await generateAlphaTexDocs();
+await removeStaleGeneratedPages();
 
 // styles for syntax highlighting
 import { PrismTheme, PrismThemeEntry, themes as prismThemes } from "prism-react-renderer";
-import { openFileStream } from "./util.mjs";
+import { openFileStream, removeStaleGeneratedPages } from "./util.mjs";
 
 await using styles = await openFileStream(path.join(
   repositoryRoot,

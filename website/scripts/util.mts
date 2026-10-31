@@ -1,11 +1,30 @@
 import fs from "fs";
 import path from "path";
 
+const writtenFiles = new Set<string>();
+const generatedPageDirs = new Set<string>();
+
 /**
- * Deletes the generated `.mdx` pages below `dir` and the folders left empty.
- * Hand-written `_*.mdx` partials stay.
+ * Marks `dir` as holding generated `.mdx` pages. {@link removeStaleGeneratedPages}
+ * later deletes the pages below it that the current run did not write.
+ * Hand-written `_*.mdx` partials are never touched.
  */
-export async function clearGeneratedPages(dir: string): Promise<void> {
+export function trackGeneratedPages(dir: string): void {
+  generatedPageDirs.add(path.resolve(dir));
+}
+
+/**
+ * Deletes generated pages below the tracked folders that the current run did not
+ * write, and the folders left empty. Runs after generation so a watching dev server
+ * never sees pages disappear and reappear.
+ */
+export async function removeStaleGeneratedPages(): Promise<void> {
+  for (const dir of generatedPageDirs) {
+    await removeStalePages(dir);
+  }
+}
+
+async function removeStalePages(dir: string): Promise<void> {
   let entries: fs.Dirent[];
   try {
     entries = await fs.promises.readdir(dir, { withFileTypes: true });
@@ -19,8 +38,12 @@ export async function clearGeneratedPages(dir: string): Promise<void> {
   for (const entry of entries) {
     const entryPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      await clearGeneratedPages(entryPath);
-    } else if (entry.name.endsWith(".mdx") && !entry.name.startsWith("_")) {
+      await removeStalePages(entryPath);
+    } else if (
+      entry.name.endsWith(".mdx") &&
+      !entry.name.startsWith("_") &&
+      !writtenFiles.has(entryPath)
+    ) {
       await fs.promises.rm(entryPath);
     }
   }
@@ -37,15 +60,20 @@ export interface FileStream extends AsyncDisposable {
   writeLine(s?: string): Promise<void>;
 }
 
-export async function openFileStream(path: string): Promise<FileStream> {
-  const fileStream = await fs.promises.open(path, "w");
+/**
+ * Collects the written text in memory. On dispose the file is replaced atomically,
+ * and only when its content changed, so watchers never read partial files.
+ */
+export async function openFileStream(filePath: string): Promise<FileStream> {
+  const resolvedPath = path.resolve(filePath);
+  const chunks: string[] = [];
   let _suspended = false;
 
   const write = async (s: string) => {
     if (_suspended) {
       return;
     }
-    await fileStream.write(s);
+    chunks.push(s);
   };
   const writeLine = (s?: string) => {
     if (s) {
@@ -55,11 +83,26 @@ export async function openFileStream(path: string): Promise<FileStream> {
     }
   };
   const asyncDispose = async () => {
-    await fileStream.close();
+    writtenFiles.add(resolvedPath);
+    const content = chunks.join("");
+    let existing: string | undefined;
+    try {
+      existing = await fs.promises.readFile(resolvedPath, "utf8");
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "ENOENT") {
+        throw e;
+      }
+    }
+    if (existing === content) {
+      return;
+    }
+    const tempPath = `${resolvedPath}.${process.pid}.tmp`;
+    await fs.promises.writeFile(tempPath, content);
+    await fs.promises.rename(tempPath, resolvedPath);
   };
 
   return {
-    path,
+    path: filePath,
     write,
     writeLine,
     [Symbol.asyncDispose]: asyncDispose,
