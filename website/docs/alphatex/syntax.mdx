@@ -12,6 +12,7 @@ keywords:
   - fret notation
 ---
 
+import Link from '@docusaurus/Link';
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 This page describes the alphaTex source syntax and defines the vocabulary the rest of the reference uses. Every other page links back to the anchors here on first use of a term. Save alphaTex source with the file extension `.atex`.
@@ -55,10 +56,10 @@ Examples:
 
 ## Argument lists {#argument-lists}
 
-<a id="argument-list"></a>
+<Link id="argument-list" />
 An **argument list** is the group of values you pass into a metadata tag or a property. Wrap multiple values in parentheses. Omit the parentheses when you pass a single value.
 
-<a id="argument"></a><a id="parameter"></a>
+<Link id="argument" /><Link id="parameter" />
 Each entry inside the list is called an **argument**. The reference tables describe the matching **parameters** — the positional slots that the language accepts for a given construct.
 
 An argument can be:
@@ -83,7 +84,7 @@ Argument entries are separated by whitespace. Commas are not used.
 
 ## Properties {#properties}
 
-<a id="property"></a>
+<Link id="property" />
 A **property** is a `name arguments` pair inside curly braces. Properties attach to beats, notes, and metadata tags to add effects, visibility flags, and other optional aspects.
 
 Property names are case-insensitive. The argument list of a property follows the rules in [Argument lists](#argument-lists).
@@ -96,7 +97,7 @@ C4 { b (0 4) v txt "Bend with Vibrato" }
 
 ## Metadata tags {#metadata-tags}
 
-<a id="metadata-tag"></a>
+<Link id="metadata-tag" />
 A **metadata tag** is a backslash-prefixed construct of the form `\name arguments {properties}`. The argument list and the property block are both optional; individual tags decide which arguments and properties they accept.
 
 Metadata tag names are case-insensitive.
@@ -145,7 +146,7 @@ A property attached to a single note, controlling effects specific to that note.
 
 Every reference entry lists one or more **signatures**. A signature is one accepted parameter list for the construct — the parameters it names, their types, and their order. When you write a metadata tag or a property, your argument list must match exactly one of its signatures.
 
-<a id="overload"></a>
+<Link id="overload" />
 A construct with more than one signature is **overloaded**. `\title`, for example, accepts a single string in one signature and a title-plus-template-plus-alignment triple in another. The reference page for each construct shows every signature it accepts.
 
 ## Case sensitivity {#case-sensitivity}
