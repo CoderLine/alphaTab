@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import { useAlphaTabApi } from '@coderline/alphatab-react';
 import { useAlphaTabModule } from '@site/src/alphatab-react/module';
 import { usePlayerSelector } from '../player/PlayerProvider';

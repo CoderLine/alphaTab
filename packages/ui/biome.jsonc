@@ -9,6 +9,14 @@
         "includes": ["*.ts", "src/**", "test/**", "!**/*.scss"]
     },
     "linter": {
-        "includes": ["*.ts", "src/**", "test/**", "!**/*.scss"]
+        "includes": ["*.ts", "src/**", "test/**", "!**/*.scss"],
+        "rules": {
+            "a11y": {
+                // Icons are decorative; the controls around them carry the label.
+                "noSvgWithoutTitle": "off",
+                // Groups and radios are styled ARIA roles on purpose; fieldset and input would need resets.
+                "useSemanticElements": "off"
+            }
+        }
     }
 }

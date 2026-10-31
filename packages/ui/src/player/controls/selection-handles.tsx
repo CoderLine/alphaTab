@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type * as alphaTab from '@coderline/alphatab';
 import styles from './selection-handles.module.scss';
 
@@ -117,11 +118,13 @@ export function SelectionHandles({ api, mountElement }: SelectionHandlesProps) {
 
     return (
         <div className={styles.handles} aria-hidden="true">
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer-only handles; the range is also selectable on the score */}
             <div
                 ref={startHandleRef}
                 className={`${styles.handle} ${dragging === 'start' ? styles.handleDragging : ''}`}
                 onMouseDown={beginDrag('start')}
             />
+            {/* biome-ignore lint/a11y/noStaticElementInteractions: pointer-only handles; the range is also selectable on the score */}
             <div
                 ref={endHandleRef}
                 className={`${styles.handle} ${styles.handleEnd} ${dragging === 'end' ? styles.handleDragging : ''}`}

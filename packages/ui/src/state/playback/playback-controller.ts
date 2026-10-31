@@ -224,8 +224,9 @@ export class PlaybackController {
     attachBackingTrack(audio: Uint8Array): void {
         const score = this.score;
         if (!score) { return; }
-        score.backingTrack = new this.module.model.BackingTrack();
-        score.backingTrack.rawAudioFile = audio;
+        const backingTrack = new this.module.model.BackingTrack();
+        backingTrack.rawAudioFile = audio;
+        score.backingTrack = backingTrack;
         this.backingTrackFailed = false;
         this.patch({ notice: null });
         if (this.api.actualPlayerMode === this.module.PlayerMode.EnabledBackingTrack) {
@@ -598,8 +599,9 @@ export class PlaybackController {
         } else if (!hasSyncPoints(score)) {
             throw new Error('the score has no sync points');
         }
-        score.backingTrack = new this.module.model.BackingTrack();
-        score.backingTrack.rawAudioFile = audio;
+        const attached = new this.module.model.BackingTrack();
+        attached.rawAudioFile = audio;
+        score.backingTrack = attached;
     }
 
     /** Switches alphaTab to the given source, keeping the position. Returns whether a new player was requested. */

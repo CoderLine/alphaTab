@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import clsx from 'clsx';
 import type { model } from '@coderline/alphatab';
 import type { TexDiagnostic } from '../state/store';

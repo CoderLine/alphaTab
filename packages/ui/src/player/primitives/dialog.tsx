@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { IconClose } from '../icons';
 import styles from './dialog.module.scss';
@@ -33,6 +34,7 @@ export const Dialog: React.FC<DialogProps> = ({ title, onClose, footer, wide, ch
     }, []);
 
     return (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: a click on the backdrop closes; the keyboard closes through the native cancel event
         <dialog
             ref={ref}
             className={clsx(styles.dialog, wide && styles.wide)}

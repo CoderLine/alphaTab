@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import styles from './color-field.module.scss';
 
@@ -234,6 +235,9 @@ const ColorPopover: React.FC<ColorPopoverProps> = ({ anchor, label, value, onCha
                 role="slider"
                 tabIndex={0}
                 aria-label="Saturation and brightness"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(hsv.v * 100)}
                 aria-valuetext={`saturation ${Math.round(hsv.s * 100)}%, brightness ${Math.round(hsv.v * 100)}%`}
                 onKeyDown={onAreaKey}
                 onPointerDown={(e) => {

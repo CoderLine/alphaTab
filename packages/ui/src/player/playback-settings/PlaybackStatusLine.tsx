@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import clsx from 'clsx';
 import type { PlaybackState } from '../../state/playback';
 import { preparationText } from './format';

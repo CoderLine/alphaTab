@@ -1,6 +1,6 @@
 export * from './player/icons';
 
-export { type AlphaTabPreset } from './state/settings';
+export type { AlphaTabPreset } from './state/settings';
 export {
     bindExternalMedia,
     type ExternalMediaTarget,

@@ -23,6 +23,7 @@ function AttributionInfo({ entry }: { entry: SoundFontEntry }): React.ReactEleme
     if (!attribution) { return null; }
 
     return (
+        // biome-ignore lint/a11y/noStaticElementInteractions: keeps Escape from the popover inside from closing the surrounding menu
         <div
             ref={rootRef}
             className={styles.info}

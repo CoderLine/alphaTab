@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { soundFontLibrary, useSoundFontLibrary } from '../../state/playback';
 import { PlaybackSourceToggle } from './PlaybackSourceToggle';
 import { SoundFontList } from './SoundFontList';

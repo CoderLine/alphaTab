@@ -287,7 +287,7 @@ const SettingRow: React.FC<{ entry: SchemaEntry; settings: PlaygroundSettings; q
     return (
         <div className={clsx(styles.row, quick && styles.rowQuick, control.type === 'font' && styles.rowStacked)}>
             <span className={styles.rowLabel} title={entry.description}>
-                {overridden && <span className={styles.changedDot} aria-label="changed" />}
+                {overridden && <span className={styles.changedDot} role="img" aria-label="changed" />}
                 {entry.label}
             </span>
             <div className={styles.rowControl}>

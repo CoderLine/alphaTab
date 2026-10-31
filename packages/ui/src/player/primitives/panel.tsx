@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import clsx from 'clsx';
 import { IconClose } from '../icons';
 import styles from './ui.module.scss';

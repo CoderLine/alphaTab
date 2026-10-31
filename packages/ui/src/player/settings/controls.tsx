@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import styles from './settings.module.scss';
 

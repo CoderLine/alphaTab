@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { playbackPreferences, usePlaybackPreferences, type PlaybackSourcePreference } from '../../state/playback';
 import { Segmented } from '../primitives/segmented';
 
