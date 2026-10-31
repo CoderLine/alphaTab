@@ -107,9 +107,19 @@ by calling `basicEditorLspIntegration`. It provides diagnostics, completions, ho
 ```ts
 import { basicEditorLspIntegration } from '@coderline/alphatab-monaco/lsp';
 
-const lspWorker = new Worker(new URL('./lsp.worker.ts', import.meta.url));
-await basicEditorLspIntegration(editor, lspWorker, { languageId: 'alphatex' });
+const lspWorker = new Worker(new URL('./lsp.worker.ts', import.meta.url), { type: 'module' });
+const lsp = await basicEditorLspIntegration(editor, lspWorker, {
+    languageId: 'alphatex',
+    // optional: wait for a pause in typing before requesting diagnostics
+    diagnosticsDelay: 150
+});
+
+// when the editor goes away
+lsp.dispose();
+lspWorker.terminate();
 ```
+
+The integration answers only for the editor's model, so every editor on a page can have its own language server. `completionRange` sets the range a completion replaces, for example the word being typed. Disposing the result removes the providers and markers and closes the connection; terminating the worker is up to you.
 
 The alphaTex editor on the [alphaTab landing page](/) is built on this stack.
 

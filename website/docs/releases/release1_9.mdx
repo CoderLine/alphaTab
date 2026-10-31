@@ -310,6 +310,7 @@ Full demo and all options: [Staff element display](/docs/features/render/staff-e
 * alphaTex: the note property [`string`](/docs/alphatex/note-properties#string) shows a string number on pitched notes, as in `a4{string 1}` ([#2913](https://github.com/CoderLine/alphaTab/pull/2913), thanks [@magmasystems](https://github.com/magmasystems))
 * alphaTex: harmonic values can be fractional, as in `3.3{ah 2.4}`, so exported files with such values load again ([#2941](https://github.com/CoderLine/alphaTab/pull/2941), thanks [@stewacide](https://github.com/stewacide))
 * alphaTex: the exporter writes [`acc`](/docs/alphatex/note-properties#acc) only where the accidental changes the spelling ([#2931](https://github.com/CoderLine/alphaTab/pull/2931), thanks [@gabbe](https://github.com/gabbe))
+* alphaTex: `basicEditorLspIntegration` of `@coderline/alphatab-monaco` answers only for its editor's model, so several editors can each use a language server, and returns a disposable; `diagnosticsDelay` and `completionRange` tune diagnostics and completions (see [Monaco](/docs/alphatex/monaco#setup-the-monaco-lsp-integration))
 * alphaTex: `@coderline/alphatab-language-server` and `@coderline/alphatab-monaco` bundle and run again; the language server has separate entry points for browsers and Node.js ([#2830](https://github.com/CoderLine/alphaTab/pull/2830); see [Language server](/docs/alphatex/lsp), [Monaco](/docs/alphatex/monaco) and the [package changes](#package-changes))
 
 ### MusicXML Extensions
