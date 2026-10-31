@@ -741,6 +741,50 @@ describe('useAlphaTabEvent', () => {
         expect(() => render(<Listener onScore={() => {}} />)).toThrow(/inside <AlphaTabProvider>/);
         vi.mocked(console.error).mockRestore();
     });
+
+    it('reports a throwing handler without stopping the other listeners', () => {
+        const reported = vi.fn();
+        vi.stubGlobal('reportError', reported);
+        const failure = new Error('handler failed');
+        const after = vi.fn();
+        render(
+            <Player>
+                <Listener
+                    onScore={() => {
+                        throw failure;
+                    }}
+                />
+                <Listener onScore={after} />
+            </Player>
+        );
+        const live = liveApis()[0];
+        live.scoreLoaded.trigger('score');
+        vi.unstubAllGlobals();
+
+        expect(reported).toHaveBeenCalledWith(failure);
+        expect(after).toHaveBeenCalledWith('score');
+    });
+
+    it('receives the replay of an already loaded score on every subscription', () => {
+        const onScore = vi.fn();
+        function Toggle({ show }: { show: boolean }) {
+            return show ? <Listener onScore={onScore} /> : null;
+        }
+        const { rerender } = render(
+            <Player>
+                <Toggle show={false} />
+            </Player>
+        );
+        const score = { tracks: [] };
+        liveApis()[0].score = score;
+        rerender(
+            <Player>
+                <Toggle show={true} />
+            </Player>
+        );
+        // StrictMode subscribes, unsubscribes and subscribes again on mount
+        expect(onScore.mock.calls).toEqual([[score], [score]]);
+    });
 });
 
 describe('useAlphaTabEventValue', () => {
@@ -782,5 +826,95 @@ describe('useAlphaTabEventValue', () => {
             return <span>{String(value)}</span>;
         }
         expect(renderToString(<State />)).toContain('undefined');
+    });
+
+    it('takes the API from the provider in the context form', () => {
+        let value: number | undefined;
+        function State() {
+            value = useAlphaTabEventValue('playerStateChanged', e => e.state * 10);
+            return null;
+        }
+        render(
+            <Player>
+                <State />
+            </Player>
+        );
+        const live = liveApis()[0];
+        // playerStateChanged replays the current state on subscription
+        expect(value).toBe(0);
+        act(() => live.playerStateChanged.trigger({ state: 2 }));
+        expect(value).toBe(20);
+    });
+
+    it('is undefined without read until the event fires', () => {
+        let value: number | undefined;
+        function Tracks() {
+            value = useAlphaTabEventValue('scoreLoaded', score => score.tracks.length);
+            return null;
+        }
+        render(
+            <Player>
+                <Tracks />
+            </Player>
+        );
+        const live = liveApis()[0];
+        expect(value).toBeUndefined();
+        act(() => live.scoreLoaded.trigger({ tracks: [1, 2] }));
+        expect(value).toBe(2);
+    });
+
+    it('uses the replayed value of an already loaded score', () => {
+        let value: number | undefined;
+        function Tracks({ show }: { show: boolean }) {
+            return show ? <Count /> : null;
+        }
+        function Count() {
+            value = useAlphaTabEventValue('scoreLoaded', score => score.tracks.length);
+            return null;
+        }
+        const { rerender } = render(
+            <Player>
+                <Tracks show={false} />
+            </Player>
+        );
+        liveApis()[0].score = { tracks: [1, 2, 3] };
+        rerender(
+            <Player>
+                <Tracks show={true} />
+            </Player>
+        );
+        expect(value).toBe(3);
+    });
+
+    it('derives again when select changes without an event', () => {
+        let value: number | undefined;
+        function State({ factor }: { factor: number }) {
+            value = useAlphaTabEventValue('playerStateChanged', e => e.state * factor);
+            return null;
+        }
+        const { rerender } = render(
+            <Player>
+                <State factor={1} />
+            </Player>
+        );
+        const live = liveApis()[0];
+        act(() => live.playerStateChanged.trigger({ state: 3 }));
+        expect(value).toBe(3);
+        rerender(
+            <Player>
+                <State factor={2} />
+            </Player>
+        );
+        expect(value).toBe(6);
+    });
+
+    it('requires a provider for the context form', () => {
+        function State() {
+            useAlphaTabEventValue('playerStateChanged', e => e.state);
+            return null;
+        }
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        expect(() => render(<State />)).toThrow(/inside <AlphaTabProvider>/);
+        vi.mocked(console.error).mockRestore();
     });
 });
