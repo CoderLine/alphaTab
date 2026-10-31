@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type * as alphaTab from '@coderline/alphatab';
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from '@coderline/alphatab';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -26,26 +25,23 @@ let entryId = 0;
 
 const MidiLog: React.FC<{ maxEntries: number }> = ({ maxEntries }) => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
   const [entries, setEntries] = useState<LogEntry[]>([]);
 
   useEffect(() => {
-    if (!api || !module) { return; }
+    if (!api) { return; }
     api.midiEventsPlayedFilter = [
-      module.midi.MidiEventType.NoteOn,
-      module.midi.MidiEventType.AlphaTabMetronome,
-      module.midi.MidiEventType.TempoChange,
+      alphaTab.midi.MidiEventType.NoteOn,
+      alphaTab.midi.MidiEventType.AlphaTabMetronome,
+      alphaTab.midi.MidiEventType.TempoChange,
     ];
-  }, [api, module]);
+  }, [api]);
 
   const typeName = (t: alphaTab.midi.MidiEventType): string => {
-    if (!module) { return String(t); }
-    const map = module.midi.MidiEventType as unknown as Record<number, string>;
+    const map = alphaTab.midi.MidiEventType as unknown as Record<number, string>;
     return map[t] ?? String(t);
   };
 
   const describe = (evt: alphaTab.midi.MidiEvent): string => {
-    if (!module) { return ''; }
     const anyEvt = evt as unknown as {
       channel?: number;
       noteKey?: number;
@@ -54,15 +50,15 @@ const MidiLog: React.FC<{ maxEntries: number }> = ({ maxEntries }) => {
       metronomeNumerator?: number;
     };
     if (
-      evt instanceof module.midi.NoteOnEvent ||
-      evt instanceof module.midi.NoteOffEvent
+      evt instanceof alphaTab.midi.NoteOnEvent ||
+      evt instanceof alphaTab.midi.NoteOffEvent
     ) {
       return `ch ${anyEvt.channel} key ${anyEvt.noteKey} vel ${anyEvt.noteVelocity}`;
     }
-    if (evt instanceof module.midi.TempoChangeEvent) {
+    if (evt instanceof alphaTab.midi.TempoChangeEvent) {
       return `${anyEvt.microSecondsPerQuarterNote ?? ''} µs/qn`;
     }
-    if (evt instanceof module.midi.AlphaTabMetronomeEvent) {
+    if (evt instanceof alphaTab.midi.AlphaTabMetronomeEvent) {
       return `metronome beat ${anyEvt.metronomeNumerator ?? ''}`;
     }
     return '';
@@ -109,12 +105,20 @@ export const MidiEventLog: React.FC<MidiEventLogProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showCode = true,
   maxEntries = 20,
-}) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <MidiLog maxEntries={maxEntries} />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+}) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <MidiLog maxEntries={maxEntries} />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

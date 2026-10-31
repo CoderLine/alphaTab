@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -12,22 +13,22 @@ export interface VolumeMixDemoProps {
 }
 
 const VolumeMixControls: React.FC = () => {
-  const controls = usePlayerControls();
+  const api = useAlphaTabApi();
   const [master, setMaster] = useState(1);
   const [metronome, setMetronome] = useState(0.3);
   const [countIn, setCountIn] = useState(0.7);
 
   useEffect(() => {
-    controls?.setMasterVolume(master);
-  }, [controls, master]);
+    if (api) { api.masterVolume = master; }
+  }, [api, master]);
 
   useEffect(() => {
-    controls?.setMetronomeVolume(metronome);
-  }, [controls, metronome]);
+    if (api) { api.metronomeVolume = metronome; }
+  }, [api, metronome]);
 
   useEffect(() => {
-    controls?.setCountInVolume(countIn);
-  }, [controls, countIn]);
+    if (api) { api.countInVolume = countIn; }
+  }, [api, countIn]);
 
   const slider = (label: string, val: number, set: (v: number) => void, id: string) => (
     <div className={styles.field}>
@@ -57,12 +58,20 @@ const VolumeMixControls: React.FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const VolumeMixDemo: React.FC<VolumeMixDemoProps> = ({ file, tex, showCode = true }) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <VolumeMixControls />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+export const VolumeMixDemo: React.FC<VolumeMixDemoProps> = ({ file, tex, showCode = true }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <VolumeMixControls />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

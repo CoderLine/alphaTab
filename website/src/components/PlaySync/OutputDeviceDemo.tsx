@@ -2,8 +2,8 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import type * as alphaTab from '@coderline/alphatab';
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -90,12 +90,20 @@ const OutputDeviceControls: React.FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const OutputDeviceDemo: React.FC<OutputDeviceDemoProps> = ({ file, tex, showCode = true }) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <OutputDeviceControls />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+export const OutputDeviceDemo: React.FC<OutputDeviceDemoProps> = ({ file, tex, showCode = true }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <OutputDeviceControls />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

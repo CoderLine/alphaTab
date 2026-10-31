@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import React, { useMemo, useState } from 'react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -36,14 +37,12 @@ export interface SoundFontSwitcherProps {
 
 const DEFAULT_OPTIONS: SoundFontOption[] = [{ label: 'Sonivox (bundled)' }];
 
-const BUNDLED_SOUNDFONT_URL = '/soundfont/sonivox.sf3';
-const PLAYER_SETTINGS = { player: { soundFont: BUNDLED_SOUNDFONT_URL } };
-
 const SoundFontControls: React.FC<{
   options: SoundFontOption[];
   allowCustomUrl: boolean;
   append: boolean;
-}> = ({ options, allowCustomUrl, append }) => {
+  bundledUrl: string;
+}> = ({ options, allowCustomUrl, append, bundledUrl }) => {
   const api = useAlphaTabApi();
   const [selected, setSelected] = useState(0);
   const [customUrl, setCustomUrl] = useState('');
@@ -77,7 +76,7 @@ const SoundFontControls: React.FC<{
     if (!opt.url) {
       setLoading(true);
       setStatus('loading bundled Sonivox…');
-      api.loadSoundFont(BUNDLED_SOUNDFONT_URL, false);
+      api.loadSoundFont(bundledUrl, false);
       return;
     }
     void loadFromUrl(opt.url, opt.label);
@@ -148,16 +147,27 @@ export const SoundFontSwitcher: React.FC<SoundFontSwitcherProps> = ({
   append = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showCode = true,
-}) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex} settings={PLAYER_SETTINGS}>
-      <TransportBar />
-      <SoundFontControls
-        options={options}
-        allowCustomUrl={allowCustomUrl}
-        append={append}
-      />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+}) => {
+  const bundledUrl = useBaseUrl('/soundfont/sonivox.sf3');
+  const settings = useMemo(() => ({ player: { soundFont: bundledUrl } }), [bundledUrl]);
+  const site = useSiteAlphaTabSettings({ player: true, settings });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <SoundFontControls
+          options={options}
+          allowCustomUrl={allowCustomUrl}
+          append={append}
+          bundledUrl={bundledUrl}
+        />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -58,22 +59,26 @@ const ToggleControls: React.FC<{
   file,
   tex,
 }) => {
-  const controls = usePlayerControls();
+  const api = useAlphaTabApi();
   const [on, setOn] = useState(defaultOn);
   const isInitialRender = React.useRef(true);
 
   useEffect(() => {
-    if (!controls) { return; }
-    const patch = patchFromPath(settingPath, on ? onValue : offValue);
-    controls.updateSettings(patch);
-    // On the first mount the score is loaded fresh with the seed settings, so
-    // we only need to reload for subsequent toggles.
-    if (reload && !isInitialRender.current) {
-      if (tex) { controls.loadScoreFromTex(tex); }
-      else if (file) { void controls.loadScoreFromUrl(file); }
+    if (!api) { return; }
+    // The API was created with the seed settings, so only later toggles apply.
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
     }
-    isInitialRender.current = false;
-  }, [controls, on, settingPath, onValue, offValue, reload, tex, file]);
+    api.settings.fillFromJson(patchFromPath(settingPath, on ? onValue : offValue));
+    api.updateSettings();
+    if (reload) {
+      if (tex) { api.tex(tex); }
+      else if (file) { api.load(file); }
+    } else if (api.score) {
+      api.render();
+    }
+  }, [api, on, settingPath, onValue, offValue, reload, tex, file]);
 
   return (
     <div className={styles.extras}>
@@ -106,10 +111,16 @@ export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
     () => patchFromPath(settingPath, defaultOn ? onValue : offValue),
     [settingPath, defaultOn, onValue, offValue],
   );
+  const site = useSiteAlphaTabSettings({ player: true, settings: initialSetting });
 
   return (
     <div className={styles.wrapper}>
-      <PlayerProvider file={file} tex={tex} settings={initialSetting}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <TransportBar />
         <ToggleControls
           settingPath={settingPath}
@@ -122,8 +133,8 @@ export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
           file={file}
           tex={tex}
         />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
     </div>
   );
 };

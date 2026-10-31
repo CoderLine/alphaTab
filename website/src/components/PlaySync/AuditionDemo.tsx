@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import styles from './styles.module.scss';
 
 export interface AuditionDemoProps {
@@ -45,11 +45,18 @@ const AuditionControls: React.FC = () => {
 export const AuditionDemo: React.FC<AuditionDemoProps> = ({
   file = '/files/features/Chords.gp5',
   showCode = true,
-}) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file}>
-      <AuditionControls />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+}) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <AuditionControls />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

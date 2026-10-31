@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from '@coderline/alphatab';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -16,27 +16,24 @@ export interface CountInMetronomeDemoProps {
 type PlaybackPhase = 'Stopped' | 'Count-in bar' | 'Playing' | 'Paused';
 
 const CountInControls: React.FC = () => {
-  const controls = usePlayerControls();
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
   const [countIn, setCountIn] = useState(true);
   const [metronome, setMetronome] = useState(false);
   const [phase, setPhase] = useState<PlaybackPhase>('Stopped');
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    controls?.setCountInVolume(countIn ? 0.7 : 0);
-  }, [controls, countIn]);
+    if (api) { api.countInVolume = countIn ? 0.7 : 0; }
+  }, [api, countIn]);
 
   useEffect(() => {
-    controls?.setMetronomeVolume(metronome ? 0.7 : 0);
-  }, [controls, metronome]);
+    if (api) { api.metronomeVolume = metronome ? 0.7 : 0; }
+  }, [api, metronome]);
 
   useAlphaTabEvent(
     'playerStateChanged',
     (e) => {
-      if (!module) { return; }
-      const isPlaying = e.state === module.synth.PlayerState.Playing;
+      const isPlaying = e.state === alphaTab.synth.PlayerState.Playing;
       setPlaying(isPlaying);
       if (e.stopped) {
         setPhase('Stopped');
@@ -57,10 +54,10 @@ const CountInControls: React.FC = () => {
   );
 
   const restart = () => {
-    if (!controls) { return; }
-    controls.stop();
+    if (!api) { return; }
+    api.stop();
     // Give the player a beat to reset before pressing play again.
-    window.setTimeout(() => controls.playPause(), 50);
+    window.setTimeout(() => api.playPause(), 50);
   };
 
   return (
@@ -94,12 +91,20 @@ export const CountInMetronomeDemo: React.FC<CountInMetronomeDemoProps> = ({
   file,
   tex,
   showCode = true,
-}) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <CountInControls />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+}) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <CountInControls />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

@@ -1,17 +1,16 @@
 'use client';
 
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import * as solid from '@fortawesome/free-solid-svg-icons';
-import CodeBlock from '@theme/CodeBlock';
+import * as alphaTab from '@coderline/alphatab';
 import {
-  PlayerProvider,
-  PlayerHost,
-  usePlayerControls,
-  usePlayerState,
-  formatTime,
-  type PlayerProviderProps,
-} from '@coderline/alphatab-ui';
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEventValue,
+} from '@coderline/alphatab-react';
+import { formatTime, IconPause, IconPlay, IconStop } from '@coderline/alphatab-ui';
+import CodeBlock from '@theme/CodeBlock';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import styles from './styles.module.scss';
 
 export interface TransportControlsProps {
@@ -19,29 +18,37 @@ export interface TransportControlsProps {
   file?: string;
   /** Inline alphaTex source to load. Mutually exclusive with `file`. */
   tex?: string;
-  settings?: PlayerProviderProps['settings'];
-  tracks?: PlayerProviderProps['tracks'];
+  settings?: alphaTab.json.SettingsJson;
+  tracks?: number[] | 'all';
   /** Render a copy-pasteable code block below the demo. Defaults to `true`. */
   showCode?: boolean;
   /** Optional custom TypeScript snippet shown when `showCode` is true. */
   codeSample?: string;
   /**
    * Additional consumer components rendered inside the alphaTab provider,
-   * between the transport bar and the score. Use hooks from
-   * `@coderline/alphatab-ui` to react to state.
+   * between the transport bar and the score. Use the hooks of
+   * `@coderline/alphatab-react` to reach the API.
    */
   children?: React.ReactNode;
 }
 
 /**
  * Standalone transport strip — Play/Pause, Stop, time readout, progress bar.
- * Must be rendered inside an `<PlayerProvider>`. Exposed so demos that layer
+ * Must be rendered inside an `<AlphaTabProvider>`. Exposed so demos that layer
  * their own chrome on top of the transport can compose it as a sibling.
  */
 export const TransportBar: React.FC = () => {
-  const controls = usePlayerControls();
-  const { isPlaying, currentTime, endTime } = usePlayerState();
-  const safeEnd = endTime > 0 ? endTime : 1;
+  const api = useAlphaTabApi();
+  const isReady =
+    useAlphaTabEventValue('playerReady', () => true, (a) => a.isReadyForPlayback) ?? false;
+  const isPlaying =
+    useAlphaTabEventValue(
+      'playerStateChanged',
+      (e) => e.state === alphaTab.synth.PlayerState.Playing,
+    ) ?? false;
+  const position = useAlphaTabEventValue('playerPositionChanged', (e) => e);
+  const currentTime = position?.currentTime ?? 0;
+  const safeEnd = position && position.endTime > 0 ? position.endTime : 1;
   const progress = (currentTime / safeEnd) * 100;
 
   return (
@@ -49,21 +56,21 @@ export const TransportBar: React.FC = () => {
       <div className={styles.transportButtons}>
         <button
           className={styles.iconButton}
-          onClick={() => controls?.playPause()}
-          disabled={!controls}
+          onClick={() => api?.playPause()}
+          disabled={!isReady}
           aria-label={isPlaying ? 'Pause' : 'Play'}
           title={isPlaying ? 'Pause' : 'Play'}
         >
-          <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+          {isPlaying ? <IconPause aria-hidden="true" /> : <IconPlay aria-hidden="true" />}
         </button>
         <button
           className={styles.iconButton}
-          onClick={() => controls?.stop()}
-          disabled={!controls}
+          onClick={() => api?.stop()}
+          disabled={!isReady}
           aria-label="Stop"
           title="Stop"
         >
-          <FontAwesomeIcon icon={solid.faStop} />
+          <IconStop aria-hidden="true" />
         </button>
       </div>
       <div className={styles.timeReadout}>
@@ -77,7 +84,7 @@ export const TransportBar: React.FC = () => {
 };
 
 /**
- * Thin `PlayerProvider` wrapper that lays down the standard demo chrome:
+ * Lays down the standard demo chrome around an `AlphaTabProvider`:
  * transport bar on top, the score below, an optional code block at the
  * bottom. Additional consumer components can be composed via `children` —
  * they render between the transport bar and the score.
@@ -94,14 +101,21 @@ export const TransportControls: React.FC<TransportControlsProps> = ({
   if (file && tex) {
     throw new Error('TransportControls: pass either `file` or `tex`, not both.');
   }
+  const site = useSiteAlphaTabSettings({ player: true, settings });
 
   return (
     <div className={styles.wrapper}>
-      <PlayerProvider file={file} tex={tex} tracks={tracks} settings={settings}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        tracks={tracks}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <TransportBar />
         {children}
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode && codeSample && (
         <CodeBlock language="typescript" title="TypeScript Code for this sample">
           {codeSample}

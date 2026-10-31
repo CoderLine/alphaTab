@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -13,7 +13,6 @@ export interface SeekDemoProps {
 }
 
 const SeekControls: React.FC = () => {
-  const controls = usePlayerControls();
   const api = useAlphaTabApi();
   const [tick, setTick] = React.useState(0);
   const [time, setTime] = React.useState(0);
@@ -28,14 +27,18 @@ const SeekControls: React.FC = () => {
       <div className={styles.fieldRow}>
         <button
           className={styles.mixerBtn}
-          onClick={() => controls?.seekToTick(3840)}
+          onClick={() => {
+            if (api) { api.tickPosition = 3840; }
+          }}
           disabled={!api}
         >
           Jump to tick 3840
         </button>
         <button
           className={styles.mixerBtn}
-          onClick={() => controls?.seekToTime(30000)}
+          onClick={() => {
+            if (api) { api.timePosition = 30000; }
+          }}
           disabled={!api}
         >
           Jump to 30 s
@@ -50,12 +53,20 @@ const SeekControls: React.FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const SeekDemo: React.FC<SeekDemoProps> = ({ file, tex, showCode = true }) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <SeekControls />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+export const SeekDemo: React.FC<SeekDemoProps> = ({ file, tex, showCode = true }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <SeekControls />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

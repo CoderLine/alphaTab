@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import React, { useState } from 'react';
+import { AlphaTabHost, AlphaTabProvider } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -17,14 +18,10 @@ const OPTIONS = [
   { value: 1500, label: '1500 ms (stable)' },
 ];
 
-const BufferSizeControls: React.FC = () => {
-  const controls = usePlayerControls();
-  const [buffer, setBuffer] = useState(500);
-
-  useEffect(() => {
-    controls?.updateSettings({ player: { bufferTimeInMilliseconds: buffer } });
-  }, [controls, buffer]);
-
+const BufferSizeControls: React.FC<{
+  buffer: number;
+  onChange: (buffer: number) => void;
+}> = ({ buffer, onChange: setBuffer }) => {
   return (
     <div className={styles.extras}>
       <div className={styles.fieldRow}>
@@ -47,12 +44,24 @@ const BufferSizeControls: React.FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const BufferSizeDemo: React.FC<BufferSizeDemoProps> = ({ file, tex, showCode = true }) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <BufferSizeControls />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+export const BufferSizeDemo: React.FC<BufferSizeDemoProps> = ({ file, tex, showCode = true }) => {
+  const [buffer, setBuffer] = useState(500);
+  const site = useSiteAlphaTabSettings({
+    player: true,
+    settings: { player: { bufferTimeInMilliseconds: buffer } },
+  });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <BufferSizeControls buffer={buffer} onChange={setBuffer} />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

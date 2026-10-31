@@ -1,8 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayerProvider, PlayerHost, usePlayerState } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
+import type * as alphaTab from '@coderline/alphatab';
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEventValue,
+} from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -18,9 +24,11 @@ export interface TrackMixerDemoProps {
   showCode?: boolean;
 }
 
+const NO_TRACKS: alphaTab.model.Track[] = [];
+
 const TrackMixer: React.FC = () => {
   const api = useAlphaTabApi();
-  const { tracks } = usePlayerState();
+  const tracks = useAlphaTabEventValue('scoreLoaded', (score) => score.tracks) ?? NO_TRACKS;
   const [state, setState] = useState<Map<number, TrackState>>(new Map());
 
   // Seed the mixer strip state whenever a new score is loaded.
@@ -122,12 +130,19 @@ export const TrackMixerDemo: React.FC<TrackMixerDemoProps> = ({
   file = '/files/Bach_Prelude_BWV999.gp',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showCode = true,
-}) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file}>
-      <TransportBar />
-      <TrackMixer />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+}) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <TrackMixer />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

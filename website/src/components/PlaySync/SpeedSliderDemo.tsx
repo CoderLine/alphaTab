@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -12,12 +13,12 @@ export interface SpeedSliderDemoProps {
 }
 
 const SpeedSlider: React.FC = () => {
-  const controls = usePlayerControls();
+  const api = useAlphaTabApi();
   const [speed, setSpeed] = useState(1);
 
   useEffect(() => {
-    controls?.setPlaybackSpeed(speed);
-  }, [controls, speed]);
+    if (api) { api.playbackSpeed = speed; }
+  }, [api, speed]);
 
   const preset = (v: number) => () => setSpeed(v);
 
@@ -50,12 +51,20 @@ const SpeedSlider: React.FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const SpeedSliderDemo: React.FC<SpeedSliderDemoProps> = ({ file, tex, showCode = true }) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <SpeedSlider />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+export const SpeedSliderDemo: React.FC<SpeedSliderDemoProps> = ({ file, tex, showCode = true }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <SpeedSlider />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};

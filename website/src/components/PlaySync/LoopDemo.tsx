@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import type * as alphaTab from '@coderline/alphatab';
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -46,7 +46,6 @@ const lastBeatOfBar = (
 };
 
 const LoopControls: React.FC = () => {
-  const controls = usePlayerControls();
   const api = useAlphaTabApi();
   const [barCount, setBarCount] = useState(0);
   const [startBar, setStartBar] = useState(2);
@@ -96,9 +95,9 @@ const LoopControls: React.FC = () => {
   }, [api, startBar, endBar, barCount, playerReady]);
 
   useEffect(() => {
-    if (!controls || !playerReady) { return; }
-    controls.setLoopPlayback(isLooping);
-  }, [controls, isLooping, playerReady]);
+    if (!api || !playerReady) { return; }
+    api.isLooping = isLooping;
+  }, [api, isLooping, playerReady]);
 
   // Reflect user-driven range drags in the info panel and the bar dropdowns.
   useAlphaTabEvent('playbackRangeHighlightChanged', (e) => {
@@ -170,12 +169,20 @@ const LoopControls: React.FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const LoopDemo: React.FC<LoopDemoProps> = ({ file, tex, showCode = true }) => (
-  <div className={styles.wrapper}>
-    <PlayerProvider file={file} tex={tex}>
-      <TransportBar />
-      <LoopControls />
-      <PlayerHost />
-    </PlayerProvider>
-  </div>
-);
+export const LoopDemo: React.FC<LoopDemoProps> = ({ file, tex, showCode = true }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
+  return (
+    <div className={styles.wrapper}>
+      <AlphaTabProvider
+        file={file}
+        tex={tex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <TransportBar />
+        <LoopControls />
+        <AlphaTabHost />
+      </AlphaTabProvider>
+    </div>
+  );
+};
