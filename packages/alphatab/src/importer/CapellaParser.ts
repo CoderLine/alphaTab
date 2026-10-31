@@ -704,11 +704,13 @@ export class CapellaParser {
                             chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
                         }
                         this._parseDuration(chordBeat, c.findChildElement('duration')!);
-                        chordBeat.updateDurations();
-                        this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
                         this._currentVoice.addBeat(chordBeat);
 
                         this._parseChord(chordBeat, c);
+
+                        // the duration depends on the voice and the notes (full-bar rest detection)
+                        chordBeat.updateDurations();
+                        this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
 
                         if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
                             this._currentVoiceState.currentBarComplete = true;
@@ -718,9 +720,9 @@ export class CapellaParser {
                         const restBeat = this._parseRestDurations(c.findChildElement('duration')!);
                         if (restBeat) {
                             this._initFromPreviousBeat(restBeat, this._currentVoice);
+                            this._currentVoice.addBeat(restBeat);
                             restBeat.updateDurations();
                             this._currentVoiceState.currentPosition += restBeat.playbackDuration;
-                            this._currentVoice.addBeat(restBeat);
 
                             if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
                                 this._currentVoiceState.currentBarComplete = true;
