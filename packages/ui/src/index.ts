@@ -17,7 +17,9 @@ export {
     type MediaElementLike,
     type MediaElementLikeEvent
 } from './state/external-media';
+export { attachFileDrop, type FileDropHandlers } from './state/file-drop';
 export { formatMegabytes, formatPercent, formatTime } from './state/format';
+export { type AudioPeaks, buildPeaks, decodeAudioPeaks, PEAK_BUCKET, peaksForWidth } from './state/peaks';
 export * from './state/playback';
 export { formatCapo, formatKey, formatTuning, TRACK_COLORS, trackColor } from './state/score-info';
 export {
@@ -56,6 +58,7 @@ export { SettingsFlyout, type SettingsFlyoutHandlers, type SettingsFlyoutState }
 export { SourceSwitch } from './player/controls/source-switch';
 export { TrackPanel } from './player/controls/track-panel';
 export { Transport } from './player/controls/transport';
+export { BackingTrackWaveform } from './player/controls/waveform';
 export * from './player/icons';
 export {
     PlaybackSettingsPanel,

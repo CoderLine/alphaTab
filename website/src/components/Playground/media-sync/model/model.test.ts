@@ -5,7 +5,7 @@ import { autoSync, canToggle, moveMarker, moveRange, toggleMarker, MIN_SYNC_POIN
 import { createHistory, historyReducer } from './history';
 import { toFlatSyncPoints } from './apply';
 import { generateSyncCode } from './codegen';
-import { buildPeaks, findSongRange } from './audio';
+import { findSongRange } from './song-range';
 
 const BAR = 3840; // 4/4 at 960 ticks per quarter
 
@@ -188,17 +188,5 @@ describe('audio analysis', () => {
         const [start, end] = findSongRange(samples, samples, rate);
         assert.ok(Math.abs(start - 2000) <= 20, `start ${start}`);
         assert.ok(Math.abs(end - 57000) <= 20, `end ${end}`);
-    });
-
-    it('builds normalized peak levels', () => {
-        const samples = new Float32Array(1024);
-        samples[300] = 0.25;
-        samples[900] = -0.5;
-        const levels = buildPeaks(samples, samples);
-        assert.equal(levels[0].length, 8);
-        near(levels[0][7], 1);
-        near(levels[0][2], 0.5);
-        assert.equal(levels[levels.length - 1].length, 1);
-        near(levels[levels.length - 1][0], 1);
     });
 });
