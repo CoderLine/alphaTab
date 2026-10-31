@@ -10,6 +10,7 @@ import {
     useState
 } from 'react';
 import { AlphaTabContext, type AlphaTabContextValue } from './context';
+import { diffSettings, settingsEqual, snapshotSettings } from './settings';
 
 /**
  * Props of {@link AlphaTabProvider}.
@@ -23,10 +24,16 @@ export interface AlphaTabProviderProps {
      */
     configureSettings?: (settings: Settings) => void;
     /**
-     * A settings patch merged into the API settings. It is applied at construction and again whenever
-     * its JSON serialization changes, through `settings.fillFromJson`, `updateSettings()` and `render()`,
+     * A settings patch merged into the API settings. It is applied whole at construction. Afterwards,
+     * the values that differ from the previous render's patch are applied through
+     * `settings.fillFromJson`, followed by `updateSettings()` and, when a score is loaded, `render()`,
      * batched to the next animation frame. A change never recreates the API.
-     * Keys removed from the patch keep their last applied value.
+     *
+     * Values are compared structurally: plain objects by key regardless of order, arrays by element and
+     * `Map`s by entry, while DOM nodes and other class instances are compared by identity. Settings the
+     * patch leaves unchanged are not touched, so values set at runtime through the API stay in place.
+     * Arrays and `Map`s replace the setting whole. Keys removed from the patch, or set to `undefined`,
+     * keep their last applied value; a key that comes back is applied again.
      */
     settings?: json.SettingsJson;
     /**
@@ -59,10 +66,6 @@ export interface AlphaTabProviderHandle {
     readonly api: AlphaTabApi | null;
 }
 
-function serializeSettings(settings: json.SettingsJson | undefined): string | undefined {
-    return settings === undefined ? undefined : JSON.stringify(settings);
-}
-
 /**
  * Owns one alphaTab API instance and provides it to its subtree.
  *
@@ -83,7 +86,7 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
             latestProps.current = props;
         });
 
-        const appliedSettings = useRef<string | undefined>(undefined);
+        const appliedSettings = useRef<json.SettingsJson | undefined>(undefined);
         const pendingFrame = useRef(0);
 
         useEffect(() => {
@@ -107,7 +110,7 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
             if (settings) {
                 initial.fillFromJson(settings);
             }
-            appliedSettings.current = serializeSettings(settings);
+            appliedSettings.current = snapshotSettings(settings);
 
             const created = new AlphaTabApi(mountElement, initial);
             const detach = onApi?.(created);
@@ -126,16 +129,17 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
             };
         }, [scrollElement, mountElement]);
 
-        const settingsKey = serializeSettings(props.settings);
+        const settings = props.settings;
         useEffect(() => {
-            if (!api || settingsKey === appliedSettings.current) {
+            if (!api || settingsEqual(appliedSettings.current, settings)) {
                 return;
             }
-            appliedSettings.current = settingsKey;
-            const patch = latestProps.current.settings;
-            if (patch) {
-                api.settings.fillFromJson(patch);
+            const patch = diffSettings(appliedSettings.current, settings);
+            appliedSettings.current = snapshotSettings(settings);
+            if (!patch) {
+                return;
             }
+            api.settings.fillFromJson(patch);
             if (!pendingFrame.current) {
                 pendingFrame.current = requestAnimationFrame(() => {
                     pendingFrame.current = 0;
@@ -145,7 +149,7 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
                     }
                 });
             }
-        }, [api, settingsKey]);
+        });
 
         useImperativeHandle(ref, () => ({ api }), [api]);
 

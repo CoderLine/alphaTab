@@ -285,6 +285,64 @@ describe('AlphaTabProvider', () => {
         expect(live.render).toHaveBeenCalledTimes(1);
     });
 
+    it('applies only the changed settings and keeps runtime changes to the others', async () => {
+        const element = document.createElement('div');
+        const elements = new Map([['a', true]]);
+        const props = (scale: number, map: Map<string, boolean>) => ({
+            settings: {
+                display: { scale },
+                player: { scrollMode: 1, scrollElement: element },
+                notation: { elements: map }
+            } as AlphaTabProviderProps['settings']
+        });
+        const { rerender } = render(<Player {...props(1, elements)} />);
+        const live = liveApis()[0];
+        live.score = { tracks: [] };
+        live.settings.player.scrollMode = 2;
+        const patches = live.settings.patches.length;
+
+        rerender(<Player {...props(1, new Map(elements))} />);
+        await nextFrame();
+        expect(live.settings.patches).toHaveLength(patches);
+        expect(live.updateSettings).not.toHaveBeenCalled();
+
+        rerender(<Player {...props(2, new Map([['a', false]]))} />);
+        await nextFrame();
+        expect(live.settings.patches.slice(patches)).toEqual([
+            { display: { scale: 2 }, notation: { elements: new Map([['a', false]]) } }
+        ]);
+        expect(live.settings.player.scrollMode).toBe(2);
+        expect(live.updateSettings).toHaveBeenCalledTimes(1);
+        expect(live.render).toHaveBeenCalledTimes(1);
+    });
+
+    it('applies settings changed before the API exists at construction', () => {
+        function Late({ scale, withHost }: { scale: number; withHost: boolean }) {
+            return (
+                <StrictMode>
+                    <AlphaTabProvider settings={{ display: { scale } }}>
+                        {withHost && <AlphaTabHost />}
+                    </AlphaTabProvider>
+                </StrictMode>
+            );
+        }
+        const { rerender } = render(<Late scale={1} withHost={false} />);
+        rerender(<Late scale={2} withHost={false} />);
+        rerender(<Late scale={2} withHost={true} />);
+        const live = liveApis()[0];
+        expect(live.initialSettings).toMatchObject({ display: { scale: 2 } });
+        expect(live.settings.patches).toEqual([{ display: { scale: 2 } }]);
+    });
+
+    it('updates settings without rendering while no score is loaded', async () => {
+        const { rerender } = render(<Player settings={{ display: { scale: 1 } }} />);
+        const live = liveApis()[0];
+        rerender(<Player settings={{ display: { scale: 2 } }} />);
+        await nextFrame();
+        expect(live.updateSettings).toHaveBeenCalledTimes(1);
+        expect(live.render).not.toHaveBeenCalled();
+    });
+
     it('recreates the API when the host element changes', () => {
         const { rerender } = render(<Player hostKey="a" />);
         const first = liveApis()[0];
