@@ -47,7 +47,7 @@
     "@docusaurus/module-type-aliases": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@types/react": "^19.0.10",
-    "copy-webpack-plugin": "^12.0.2",
+    "copy-webpack-plugin": "^14.0.0",
     "docusaurus-plugin-sass": "^0.2.6",
     "remark-github-admonitions-to-directives": "^2.1.0",
     "resolve-url-loader": "^5.0.0",

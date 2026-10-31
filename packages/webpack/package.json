@@ -59,7 +59,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.6.3",
-        "@rspack/core": "^1.7.12",
+        "@rspack/core": "^2.2.9",
         "@types/node": "^26.6.5",
         "html-webpack-plugin": "^5.6.6",
         "rimraf": "^6.1.3",
