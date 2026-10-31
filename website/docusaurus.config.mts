@@ -176,6 +176,19 @@ async function createConfig(): Promise<Config> {
   organizationName: "CoderLine",
   projectName: "alphaTab",
   onBrokenLinks: "throw",
+  future: {
+    // Individual v4 flags only: the v4 umbrella also switches the bundler to
+    // Rspack, which AlphaTabWebPackPlugin does not support.
+    v4: {
+      removeLegacyPostBuildHeadAttribute: true,
+    },
+    faster: {
+      rspackBundler: false,
+      rspackPersistentCache: false,
+      mdxCrossCompilerCache: true,
+      ssgWorkerThreads: true,
+    },
+  },
   customFields: {
     isPreRelease: isPreRelease,
     alphaTabVersion: alphaTabVersion,
