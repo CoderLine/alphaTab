@@ -180,25 +180,18 @@ jobs:
         with:
           node-version: 'lts/*'
           cache: 'npm'
-      - id: workspaces
-        if: steps.dist-cache.outputs.cache-hit != 'true'
-        run: |
-          args=""
-          for ws in packages/alphatab packages/alphatex packages/transpiler packages/tooling packages/lsp packages/monaco packages/webpack packages/vite packages/react; do
-            if [ -f "$ws/package.json" ]; then args="$args -w $ws"; fi
-          done
-          echo "args=$args" >> "$GITHUB_OUTPUT"
       - if: steps.dist-cache.outputs.cache-hit != 'true'
-        run: npm ci $WORKSPACES --include-workspace-root
-        env:
-          WORKSPACES: ${{ steps.workspaces.outputs.args }}
+        run: >
+          npm ci --include-workspace-root
+          -w packages/alphatab -w packages/alphatex -w packages/transpiler -w packages/tooling
+          -w packages/lsp -w packages/monaco -w packages/webpack -w packages/vite -w packages/react
       - if: steps.dist-cache.outputs.cache-hit != 'true'
         run: npm run build-web
       - if: steps.dist-cache.outputs.cache-hit != 'true'
         run: npm run build-language-server
       - if: steps.dist-cache.outputs.cache-hit != 'true'
         run: npm run build-monaco
-      - if: steps.dist-cache.outputs.cache-hit != 'true' && hashFiles('packages/react/package.json') != ''
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
         run: npm run build -w packages/react
       - if: steps.dist-cache.outputs.cache-hit != 'true'
         run: node scripts/check-published-types.mts
@@ -266,14 +259,7 @@ jobs:
           path: ~/.npm
           key: npm-website-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-website-${{ runner.os }}-
-      - id: workspaces
-        run: |
-          args="-w website"
-          if [ -f packages/ui/package.json ]; then args="$args -w packages/ui"; fi
-          echo "args=$args" >> "$GITHUB_OUTPUT"
-      - run: npm ci $WORKSPACES --include-workspace-root
-        env:
-          WORKSPACES: ${{ steps.workspaces.outputs.args }}
+      - run: npm ci --include-workspace-root -w website -w packages/ui
       - uses: actions/download-artifact@v8
         with:
           name: web-dist

@@ -85,7 +85,7 @@ function ApplyColors() {
 export const ColoringExample: React.FC<ColoringExampleProps> = ({
   showCode = true,
 }) => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const codeLines = `
   const api = new alphaTab.AlphaTabApi(...);

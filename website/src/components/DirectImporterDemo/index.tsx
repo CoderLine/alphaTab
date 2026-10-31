@@ -79,7 +79,7 @@ export const DirectImporterDemo: React.FC<DirectImporterDemoProps> = ({
   showCode = true,
 }) => {
   const [info, setInfo] = useState<InspectedScore | null>(null);
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `import * as alphaTab from '@coderline/alphatab';
 

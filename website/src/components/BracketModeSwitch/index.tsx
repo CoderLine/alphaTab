@@ -37,7 +37,7 @@ export const BracketModeSwitch: React.FC<BracketModeSwitchProps> = ({
   showCode = true,
 }) => {
   const [mode, setMode] = useState<ModeName>("GroupStaves");
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.bracketExtendMode =

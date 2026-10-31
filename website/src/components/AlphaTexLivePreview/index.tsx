@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
 import { AlphaTabHost, AlphaTabProvider } from "@coderline/alphatab-react";
 import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
+import { DemoPlayButton } from "@site/src/components/DemoPlayButton";
 import * as Riffs from "@site/src/tex-riffs";
 import styles from "./styles.module.scss";
 
@@ -61,6 +62,7 @@ document.getElementById('tex-input').addEventListener('input', (e) => {
           spellCheck={false}
           onChange={(e) => onChange(e.target.value)}
         />
+        <DemoPlayButton />
         <AlphaTabHost />
       </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}

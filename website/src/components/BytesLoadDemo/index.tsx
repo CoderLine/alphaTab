@@ -125,7 +125,7 @@ export const BytesLoadDemo: React.FC<BytesLoadDemoProps> = ({
 }) => {
   const [byteCount, setByteCount] = useState<number | null>(null);
   const [format, setFormat] = useState<string>("");
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `const bytes = new Uint8Array(
   await fetch('/scores/song.gp').then((r) => r.arrayBuffer())

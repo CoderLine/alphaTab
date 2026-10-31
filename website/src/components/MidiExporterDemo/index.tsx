@@ -133,7 +133,7 @@ const MidiExporterControls: React.FC = () => {
 export const MidiExporterDemo: React.FC<MidiExporterDemoProps> = ({
   showCode = true,
 }) => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
   return (
     <div>
       <AlphaTabProvider

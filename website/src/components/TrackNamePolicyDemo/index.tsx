@@ -65,7 +65,7 @@ export const TrackNamePolicyDemo: React.FC<TrackNamePolicyDemoProps> = ({
   const [mode, setMode] = useState<ModeName>("FullName");
   const [orientation, setOrientation] =
     useState<OrientationName>("Horizontal");
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `api.scoreLoaded.on((score) => {
   const s = score.stylesheet;

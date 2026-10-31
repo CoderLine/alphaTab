@@ -164,7 +164,7 @@ export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
 }) => {
   const [record, setRecord] = useState<ErrorRecord | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `api.error.on((error) => {
   if (error instanceof alphaTab.importer.UnsupportedFormatError) {

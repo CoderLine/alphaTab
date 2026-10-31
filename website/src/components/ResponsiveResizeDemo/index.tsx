@@ -47,7 +47,7 @@ export const ResponsiveResizeDemo: React.FC<ResponsiveResizeDemoProps> = ({
   const [width, setWidth] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const [displayWidth, setDisplayWidth] = useState(0);
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   useEffect(() => {
     if (!dragging) { return; }

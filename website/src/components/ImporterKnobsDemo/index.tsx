@@ -123,7 +123,7 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
 }) => {
   const [beatTextAsLyrics, setBeatTextAsLyrics] = useState(false);
   const [encoding, setEncoding] = useState<Encoding>("windows-1252");
-  const site = useSiteAlphaTabSettings({ player: true, settings: IMPORTER_SETTINGS });
+  const site = useSiteAlphaTabSettings({ settings: IMPORTER_SETTINGS });
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/oldfile.gp5' },

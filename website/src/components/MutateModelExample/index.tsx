@@ -152,7 +152,7 @@ const MutateModelInner: React.FC = () => {
 };
 
 export const MutateModelExample: React.FC = () => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
   return (
     <div>
       <AlphaTabProvider

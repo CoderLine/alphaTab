@@ -94,7 +94,7 @@ const Inner: React.FC = () => {
 export const ScoreLoadedInspector: React.FC<ScoreLoadedInspectorProps> = ({
   showCode = true,
 }) => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/song.gp5' },
 });

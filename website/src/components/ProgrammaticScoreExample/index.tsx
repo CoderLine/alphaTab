@@ -130,7 +130,7 @@ const RenderBuiltScore: React.FC = () => {
 export const ProgrammaticScoreExample: React.FC<ProgrammaticScoreExampleProps> = ({
   showCode = true,
 }) => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
   return (
     <div>
       <AlphaTabProvider

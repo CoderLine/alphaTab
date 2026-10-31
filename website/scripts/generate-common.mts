@@ -84,6 +84,11 @@ export type ReferencePage = {
   url: string
 };
 
+
+function categoryAnchor(category: string) {
+  return category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 export class ReferenceTableData {
   public readonly categories = new Map<string, ReferencePage[]>();
 
@@ -108,6 +113,7 @@ export async function writeReferenceTable(
 
   await table.writeLine(`import { CodeBadge } from "@site/src/components/CodeBadge";`);
   await table.writeLine(`import { Signature } from "@site/src/components/Signature";`);
+  await table.writeLine(`import Link from "@docusaurus/Link";`);
   await table.writeLine();
   await table.writeLine(`<table className="table table-striped table-condensed reference-table">`);
   await table.writeLine(`  <thead>`);
@@ -125,7 +131,7 @@ export async function writeReferenceTable(
 
 
   for (const [category, pages] of categoriesSorted) {
-    await table.writeLine(`    <tr><th colSpan="4">${category}</th></tr>`);
+    await table.writeLine(`    <tr><th colSpan="4"><Link id="${categoryAnchor(category)}" />${category}</th></tr>`);
 
     const sorted = pages
       .sort((a, b) => {

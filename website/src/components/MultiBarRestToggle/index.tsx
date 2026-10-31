@@ -56,7 +56,7 @@ export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
   showCode = true,
 }) => {
   const [enabled, setEnabled] = useState(true);
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.multiTrackMultiBarRest = ${enabled};

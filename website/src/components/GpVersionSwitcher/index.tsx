@@ -87,7 +87,7 @@ export const GpVersionSwitcher: React.FC<GpVersionSwitcherProps> = ({
   showCode = true,
 }) => {
   const [active, setActive] = useState<Variant>(INITIAL_VARIANT);
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/song.gp' }, // GP7/8 ZIP archive

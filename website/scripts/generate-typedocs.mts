@@ -301,7 +301,7 @@ async function writeEnumMembers(
     await fileStream.write(`    <tr>\n`);
 
     await fileStream.write(
-      `      <td id="${member.name.getText().toLowerCase()}">\`${member.name.getText()}\`</td>\n`
+      `      <td><Link id="${member.name.getText().toLowerCase()}" />\`${member.name.getText()}\`</td>\n`
     );
 
     const numericValue = context.checker.getConstantValue(member);

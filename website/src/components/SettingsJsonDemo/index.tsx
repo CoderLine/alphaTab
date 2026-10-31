@@ -245,7 +245,6 @@ export const SettingsJsonDemo: React.FC<SettingsJsonDemoProps> = ({
   showCode = true,
 }) => {
   const site = useSiteAlphaTabSettings({
-    player: true,
     settings: { display: { scale: 1.0 } },
   });
   return (

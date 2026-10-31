@@ -76,7 +76,7 @@ export const ToggleElementsDemo: React.FC<ToggleElementsDemoProps> = ({
     EffectPalmMute: true,
   });
 
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const flip = (key: ElementKey) => {
     setVisibility((v) => ({ ...v, [key]: !v[key] }));

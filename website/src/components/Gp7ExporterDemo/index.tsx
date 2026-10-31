@@ -105,7 +105,7 @@ const Gp7ExporterControls: React.FC = () => {
 export const Gp7ExporterDemo: React.FC<Gp7ExporterDemoProps> = ({
   showCode = true,
 }) => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
   return (
     <div>
       <AlphaTabProvider

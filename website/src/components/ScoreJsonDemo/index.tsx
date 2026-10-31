@@ -162,7 +162,7 @@ const ScoreJsonControls: React.FC = () => {
 export const ScoreJsonDemo: React.FC<ScoreJsonDemoProps> = ({
   showCode = true,
 }) => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
   return (
     <div>
       <AlphaTabProvider

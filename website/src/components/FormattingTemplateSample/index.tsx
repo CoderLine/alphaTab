@@ -58,7 +58,7 @@ const FormattingTemplateInner: React.FC = () => {
 };
 
 export const FormattingTemplateSample: React.FC = () => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const codeLines = `
   function adjustStyle(score: alphaTab.model.Score) {

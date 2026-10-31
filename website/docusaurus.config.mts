@@ -208,6 +208,7 @@ async function createConfig(): Promise<Config> {
   organizationName: "CoderLine",
   projectName: "alphaTab",
   onBrokenLinks: "throw",
+  onBrokenAnchors: "throw",
   future: {
     v4: {
       removeLegacyPostBuildHeadAttribute: true,
