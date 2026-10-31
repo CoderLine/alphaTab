@@ -40,7 +40,7 @@ export const BarRangeDemo: React.FC<BarRangeDemoProps> = ({
     () => ({ display: { startBar, barCount } }),
     [startBar, barCount],
   );
-  const site = useSiteAlphaTabSettings({ player: true, settings: rangeSettings });
+  const site = useSiteAlphaTabSettings({ settings: rangeSettings });
 
   const useTex = !file;
   const texContent = useTex ? tex ?? DEFAULT_TEX : undefined;

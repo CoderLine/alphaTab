@@ -197,7 +197,7 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
   };
 
   const tex = typeof children === "string" ? children : undefined;
-  const site = useSiteAlphaTabSettings({ player: true, settings: NOTE_BOUNDS_SETTINGS });
+  const site = useSiteAlphaTabSettings({ settings: NOTE_BOUNDS_SETTINGS });
 
   return (
     <>

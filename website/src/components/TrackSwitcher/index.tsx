@@ -129,7 +129,7 @@ const Inner: React.FC = () => {
 export const TrackSwitcher: React.FC<TrackSwitcherProps> = ({
   showCode = true,
 }) => {
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: {
     file: '/scores/song.gp5',

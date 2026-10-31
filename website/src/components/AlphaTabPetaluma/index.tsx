@@ -35,7 +35,6 @@ export const AlphaTabPetaluma: React.FC<AlphaTabPetalumaProps> = ({
 }) => {
   const tex = typeof children === "string" ? children : undefined;
   const site = useSiteAlphaTabSettings({
-    player: true,
     settings: {
       core: {
         // Plain object form is accepted by settings.fillFromJson at runtime;

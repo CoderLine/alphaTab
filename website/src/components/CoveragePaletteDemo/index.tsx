@@ -38,7 +38,7 @@ export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
     () => ({ display: { resources: palette } }),
     [palette],
   );
-  const site = useSiteAlphaTabSettings({ player: true, settings: paletteSettings });
+  const site = useSiteAlphaTabSettings({ settings: paletteSettings });
 
   const set = (key: Field, value: string) => {
     setPalette((p) => ({ ...p, [key]: value }));

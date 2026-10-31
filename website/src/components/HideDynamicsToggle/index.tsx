@@ -31,7 +31,7 @@ export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
   showCode = true,
 }) => {
   const [hidden, setHidden] = useState(false);
-  const site = useSiteAlphaTabSettings({ player: true, settings: BAR_COUNT_SETTINGS });
+  const site = useSiteAlphaTabSettings({ settings: BAR_COUNT_SETTINGS });
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.hideDynamics = ${hidden};

@@ -37,7 +37,7 @@ export const ChordDiagramLayoutSwitch: React.FC<
   ChordDiagramLayoutSwitchProps
 > = ({ showCode = true }) => {
   const [placement, setPlacement] = useState<Placement>("Top");
-  const site = useSiteAlphaTabSettings({ player: true, settings: BAR_COUNT_SETTINGS });
+  const site = useSiteAlphaTabSettings({ settings: BAR_COUNT_SETTINGS });
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.globalDisplayChordDiagramsOnTop = ${placement === "Top"};

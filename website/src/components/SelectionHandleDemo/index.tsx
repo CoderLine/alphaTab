@@ -11,6 +11,7 @@ import {
 } from "@coderline/alphatab-react";
 import { SelectionHandles } from "@coderline/alphatab-ui";
 import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
+import { DemoPlayButton } from "@site/src/components/DemoPlayButton";
 import styles from "./styles.module.scss";
 
 export interface SelectionHandleDemoProps {
@@ -88,6 +89,7 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({
                 settings={site.settings}
             >
                 {showEventLog && <HighlightPayloadTap onPayload={setPayload} />}
+                <DemoPlayButton className={styles.play} />
                 <AlphaTabHost overlay={<SelectionHandlesOverlay />} />
             </AlphaTabProvider>
             {showEventLog && (

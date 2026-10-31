@@ -23,7 +23,6 @@ export const ZoomSliderDemo: React.FC<ZoomSliderDemoProps> = ({
   const [scale, setScale] = useState(1.3);
   const [pendingScale, setPendingScale] = useState(1.3);
   const site = useSiteAlphaTabSettings({
-    player: true,
     settings: { display: { scale } },
   });
 

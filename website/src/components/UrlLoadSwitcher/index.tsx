@@ -65,7 +65,7 @@ export const UrlLoadSwitcher: React.FC<UrlLoadSwitcherProps> = ({
   showCode = true,
 }) => {
   const [currentUrl, setCurrentUrl] = useState(CHORDS_URL);
-  const site = useSiteAlphaTabSettings({ player: true });
+  const site = useSiteAlphaTabSettings();
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/chords.gp5' },

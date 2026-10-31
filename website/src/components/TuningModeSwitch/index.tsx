@@ -49,7 +49,6 @@ export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
   const [mode, setMode] = useState<ModeName>("Score");
   const [hidden, setHidden] = useState(false);
   const site = useSiteAlphaTabSettings({
-    player: true,
     settings: { display: { barCount: 12 } },
   });
 

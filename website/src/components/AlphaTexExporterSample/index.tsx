@@ -75,7 +75,7 @@ const AlphaTexExporterInner: FC = () => {
 };
 
 export const AlphaTexExporterSample: FC = () => {
-    const site = useSiteAlphaTabSettings({ player: true });
+    const site = useSiteAlphaTabSettings();
     return (
         <AlphaTabProvider
             file="/files/Bach_Prelude_BWV999.gp"

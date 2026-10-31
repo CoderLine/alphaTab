@@ -24,7 +24,6 @@ export const SpacingSlidersDemo: React.FC<SpacingSlidersDemoProps> = ({
   const [spacingRatio, setSpacingRatio] = useState(1.5);
   const [lastSystemFillThreshold, setLastSystemFillThreshold] = useState(0.5);
   const site = useSiteAlphaTabSettings({
-    player: true,
     settings: {
       display: {
         stretchForce,
