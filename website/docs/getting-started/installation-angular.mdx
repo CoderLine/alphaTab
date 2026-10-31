@@ -21,7 +21,7 @@ npm install @coderline/alphatab
 
 Angular's default builder (`@angular/build:application`, esbuild) has no plugin API, bundles `new Worker(new URL(...))` only in your own code, not inside dependencies, and has no Audio Worklet support. If alphaTab is imported and bundled normally, the production build still references `./alphaTab.worker.mjs` next to `main-[hash].js`, the file does not exist, and the score never renders, without an error. `ng serve` hides the problem, because its Vite pre-bundling resolves the worker URL.
 
-Keep alphaTab out of the bundle and let the browser load its ES modules instead. The page, the workers and the worklet then share one `alphaTab.core.mjs`. In `angular.json`, under `projects.<app>.architect.build.options`:
+Keep alphaTab out of the bundle and let the browser load its ES modules instead. The page, the workers and the worklet then share one `alphaTab.core.min.mjs`. In `angular.json`, under `projects.<app>.architect.build.options`:
 
 ```json
 {
@@ -35,7 +35,7 @@ Keep alphaTab out of the bundle and let the browser load its ES modules instead.
         { "glob": "**/*", "input": "node_modules/@coderline/alphatab/dist/font", "output": "font" },
         { "glob": "sonivox.sf3", "input": "node_modules/@coderline/alphatab/dist/soundfont", "output": "soundfont" },
         {
-            "glob": "alphaTab.{mjs,core.mjs,worker.mjs,worklet.mjs}",
+            "glob": "alphaTab.{min.mjs,core.min.mjs,worker.min.mjs,worklet.min.mjs}",
             "input": "node_modules/@coderline/alphatab/dist",
             "output": "alphatab"
         }
@@ -51,7 +51,7 @@ Map the package name to the copy with an import map in `src/index.html`:
 <head>
   <meta charset="utf-8">
   <base href="/">
-  <script type="importmap">{ "imports": { "@coderline/alphatab": "/alphatab/alphaTab.mjs" } }</script>
+  <script type="importmap">{ "imports": { "@coderline/alphatab": "/alphatab/alphaTab.min.mjs" } }</script>
 </head>
 <body>
   <app-root></app-root>
@@ -105,7 +105,7 @@ export class App {
 ```
 
 - **`externalDependencies`** keeps `import ... from '@coderline/alphatab'` as a bare import in the browser and the server bundle. TypeScript still checks against the installed package, and the initial bundle stays small enough for the default budgets.
-- **`assets`** copies alphaTab's ES modules to `/alphatab/`, the font to `/font/` and the SoundFont to `/soundfont/`. alphaTab finds its worker and worklet next to `alphaTab.mjs`.
+- **`assets`** copies alphaTab's minified ES modules to `/alphatab/`, the font to `/font/` and the SoundFont to `/soundfont/`. `alphaTab.min.mjs` imports `alphaTab.core.min.mjs` and starts `alphaTab.worker.min.mjs` and `alphaTab.worklet.min.mjs` from next to itself, which import the same core. For debugging, copy `alphaTab.{mjs,core.mjs,worker.mjs,worklet.mjs}` and map the package to `/alphatab/alphaTab.mjs` instead; each set references only its own files.
 - **`preloadInitial: false`.** Otherwise the production build adds `<link rel="modulepreload" href="@coderline/alphatab">`, which browsers do not resolve through the import map; it fails with a MIME type error.
 - **`afterNextRender`** runs only in the browser, after hydration, so the component also works with server-side rendering. The server renders the button and an empty container. With Zone.js (the Angular 20 default), create alphaTab inside `NgZone.runOutsideAngular` so its timers and frequent events do not trigger change detection.
 
