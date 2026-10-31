@@ -198,6 +198,13 @@ export class Environment {
     public static readonly isViteBundled: boolean = Environment._detectVite();
 
     /**
+     * Whether alphaTab runs inside a bundle created by Turbopack (e.g. Next.js).
+     * @target web
+     * @since 1.9.0
+     */
+    public static readonly isTurbopackBundled: boolean = Environment._detectTurbopack();
+
+    /**
      * @target web
      */
     public static readonly scriptFile: string | null = Environment._detectScriptFile();
@@ -733,6 +740,20 @@ export class Environment {
     /**
      * @target web
      */
+    private static _detectTurbopack(): boolean {
+        try {
+            // Turbopack compiles this free variable to its module context's require function.
+            // @ts-expect-error
+            return typeof __turbopack_require__ === 'function';
+        } catch {
+            // ignore any errors
+        }
+        return false;
+    }
+
+    /**
+     * @target web
+     */
     private static _detectWebPlatform(): WebPlatform {
         // There might be polyfills or platforms like Electron which have a global process object defined even in the browser.
         // We need to differenciate between those platforms and a real nodejs
@@ -798,6 +819,7 @@ export class Environment {
         print(`Platform: ${WebPlatform[Environment.webPlatform]}`);
         print(`WebPack: ${Environment.isWebPackBundled}`);
         print(`Vite: ${Environment.isViteBundled}`);
+        print(`Turbopack: ${Environment.isTurbopackBundled}`);
         if (Environment.webPlatform !== WebPlatform.NodeJs) {
             print(`Browser: ${navigator.userAgent}`);
             print(`Window Size: ${window.outerWidth}x${window.outerHeight}`);

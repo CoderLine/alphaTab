@@ -19,11 +19,12 @@ if (alphaTab.Environment.isRunningInWorker) {
             if (
                 alphaTab.Environment.webPlatform === alphaTab.WebPlatform.BrowserModule ||
                 alphaTab.Environment.isWebPackBundled ||
-                alphaTab.Environment.isViteBundled
+                alphaTab.Environment.isViteBundled ||
+                alphaTab.Environment.isTurbopackBundled
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating webworker');
                 try {
-                    // the standard form bundlers (webpack, Rspack, Vite, Parcel) turn into a worker entry
+                    // the standard form bundlers (webpack, Rspack, Vite, Parcel, Turbopack) turn into a worker entry
                     return new Worker(new URL('./alphaTab.worker.ts', import.meta.url), {
                         type: 'module'
                     });
@@ -106,6 +107,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 );
             }
 
+            // Turbopack bundles workers but not worklets: there the worklet loads from core.scriptFile.
             if (
                 alphaTab.Environment.webPlatform === alphaTab.WebPlatform.BrowserModule ||
                 alphaTab.Environment.isWebPackBundled ||
@@ -119,8 +121,15 @@ if (alphaTab.Environment.isRunningInWorker) {
                 return alphaTabWorklet.addModule(new URL('./alphaTab.worklet.ts', import.meta.url));
             }
 
+            if (!settings.core.scriptFile) {
+                throw new alphaTab.AlphaTabError(
+                    alphaTab.AlphaTabErrorType.General,
+                    'Could not detect alphaTab script file, cannot initialize audio worklet'
+                );
+            }
+
             alphaTab.Logger.debug('AlphaTab', 'Creating Script worklet');
-            return context.audioWorklet.addModule(settings.core.scriptFile!);
+            return context.audioWorklet.addModule(settings.core.scriptFile);
         }
     );
 }
