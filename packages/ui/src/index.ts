@@ -50,7 +50,7 @@ export {
 } from './state/store';
 
 export { ExportMenu, type ExportMenuProps } from './player/controls/export-menu';
-export { Scrubber } from './player/controls/scrubber';
+export { Scrubber, type ScrubberProps } from './player/controls/scrubber';
 export { SelectionHandles } from './player/controls/selection-handles';
 export { SettingsFlyout, type SettingsFlyoutHandlers, type SettingsFlyoutState } from './player/controls/settings-flyout';
 export { SourceSwitch } from './player/controls/source-switch';

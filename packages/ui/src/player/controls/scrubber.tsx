@@ -1,15 +1,27 @@
 import React from 'react';
 import type { TempoMarker, LoopRangeBars } from '../../state/store';
 
-interface ScrubberProps {
+export interface ScrubberProps {
     totalBars?: number;
+    /** Zero-based bar the playback is in. */
     currentBar?: number;
     compact?: boolean;
     tempoMarkers?: TempoMarker[];
     loopRange?: LoopRangeBars | null;
+    /** Seeks to a fraction of the song, 0..1, on pointer input. Without it the scrubber is display only. */
     onSeek?: (fraction: number) => void;
+    /** Seeks to the start of a zero-based bar on keyboard input; falls back to `onSeek`. */
+    onSeekBar?: (bar: number) => void;
 }
 
+/** Bars a Page Up or Page Down press moves. */
+const PAGE_BARS = 4;
+
+/**
+ * The song timeline with bar ticks, tempo markers and the loop range. With `onSeek` it is a slider:
+ * pointer drags seek continuously; the arrow keys move by a bar, Page Up and Page Down by four,
+ * Home and End to the first and last bar.
+ */
 export const Scrubber: React.FC<ScrubberProps> = ({
     totalBars = 64,
     currentBar = 0,
@@ -17,6 +29,7 @@ export const Scrubber: React.FC<ScrubberProps> = ({
     tempoMarkers,
     loopRange,
     onSeek,
+    onSeekBar,
 }) => {
     const W = compact ? 400 : 600;
     const tempoH = compact ? 0 : 12;
@@ -69,21 +82,48 @@ export const Scrubber: React.FC<ScrubberProps> = ({
         };
     }, [drag, seekAtClientX]);
 
+    const lastBar = safeTotal - 1;
+    const shownBar = Math.max(0, Math.min(currentBar, lastBar));
+    const seekBar = (bar: number) => {
+        const target = Math.max(0, Math.min(bar, lastBar));
+        if (onSeekBar) { onSeekBar(target); }
+        else { onSeek?.(target / safeTotal); }
+    };
+    const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        const target =
+            e.key === 'ArrowRight' || e.key === 'ArrowUp' ? shownBar + 1 :
+            e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? shownBar - 1 :
+            e.key === 'PageUp' ? shownBar + PAGE_BARS :
+            e.key === 'PageDown' ? shownBar - PAGE_BARS :
+            e.key === 'Home' ? 0 :
+            e.key === 'End' ? lastBar :
+            null;
+        if (target === null) { return; }
+        e.preventDefault();
+        seekBar(target);
+    };
+    const slider = onSeek
+        ? {
+              role: 'slider',
+              'aria-label': 'Playback position',
+              'aria-valuemin': 1,
+              'aria-valuemax': safeTotal,
+              'aria-valuenow': shownBar + 1,
+              'aria-valuetext': `Bar ${shownBar + 1} of ${safeTotal}`,
+              tabIndex: 0,
+              onKeyDown,
+              onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
+                  setDrag(true);
+                  seekAtClientX(e.clientX);
+              },
+          }
+        : {};
+
     return (
         <div
             ref={wrapperRef}
-            role={onSeek ? 'slider' : undefined}
-            aria-label={onSeek ? 'Playback position' : undefined}
-            aria-valuemin={onSeek ? 0 : undefined}
-            aria-valuemax={onSeek ? safeTotal : undefined}
-            aria-valuenow={onSeek ? Math.max(0, Math.min(currentBar, safeTotal)) : undefined}
-            tabIndex={onSeek ? 0 : undefined}
             style={{ width: '100%', cursor: onSeek ? 'pointer' : undefined, touchAction: 'none' }}
-            onPointerDown={(e) => {
-                if (!onSeek) { return; }
-                setDrag(true);
-                seekAtClientX(e.clientX);
-            }}
+            {...slider}
         >
             <svg
                 viewBox={`0 0 ${W} ${H}`}

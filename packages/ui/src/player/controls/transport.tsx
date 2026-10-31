@@ -53,6 +53,7 @@ export const Transport: React.FC = () => {
                         tempoMarkers={state.tempoMarkers}
                         loopRange={state.loopRangeBars}
                         onSeek={(f) => controls?.seekToFraction(f)}
+                        onSeekBar={(b) => controls?.seekToBar(b)}
                     />
                 </div>
                 <span className={styles.time}>{formatTime(state.endTime)}</span>

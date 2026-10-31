@@ -163,6 +163,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     };
 
     const onSeekFraction = (f: number) => controls?.seekToFraction(f);
+    const onSeekBar = (bar: number) => controls?.seekToBar(bar);
     const playDisabled = !playback.isReadyForPlayback;
     const playLabel = playDisabled ? 'Preparing playback' : state.isPlaying ? 'Pause' : 'Play';
     const totalBarsForScrubber = state.totalBars > 0 ? state.totalBars : 64;
@@ -255,6 +256,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
                                             tempoMarkers={state.tempoMarkers}
                                             loopRange={state.loopRangeBars}
                                             onSeek={onSeekFraction}
+                                            onSeekBar={onSeekBar}
                                             compact
                                         />
                                     </div>
@@ -285,6 +287,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
                                             tempoMarkers={state.tempoMarkers}
                                             loopRange={state.loopRangeBars}
                                             onSeek={onSeekFraction}
+                                            onSeekBar={onSeekBar}
                                         />
                                     </div>
                                     <span className={styles.timeLabel}>{formatTime(state.endTime)}</span>
