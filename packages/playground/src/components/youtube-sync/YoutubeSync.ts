@@ -1,18 +1,4 @@
 import type * as alphaTab from '@coderline/alphatab';
-import { type Mountable, css, html, injectStyles, parseHtml } from '../../util/Dom';
-
-injectStyles(
-    'YoutubeSync',
-    css`
-    .at-youtube-wrap {
-        display: flex;
-        justify-content: center;
-        height: 360px;
-        background: #000;
-    }
-    .at-youtube-wrap > .at-youtube { width: 640px; height: 360px; }
-`
-);
 
 // Minimal YouTube IFrame API surface used by this component.
 interface YTPlayer {
@@ -83,36 +69,39 @@ function loadYouTubeApi(): Promise<void> {
     return ytApiPromise;
 }
 
-export interface YoutubeSyncProps {
-    videoId: string;
-}
-
-export class YoutubeSync implements Mountable {
-    readonly root: HTMLElement;
-    private playerEl: HTMLElement;
+/**
+ * Plays a YouTube video as the external media of an API in `PlayerMode.EnabledExternalMedia`: the
+ * video's state drives alphaTab, and alphaTab's transport controls the video through the handler.
+ */
+export class YoutubeSync {
     private player: YTPlayer | null = null;
     private currentTimeInterval: number | undefined;
+    private disposed = false;
+    private readonly unsubscribePlayerReady: () => void;
 
+    /** Replaces the content of `host` with the video player. */
     constructor(
-        private api: alphaTab.AlphaTabApi,
-        private props: YoutubeSyncProps
+        private readonly api: alphaTab.AlphaTabApi,
+        private readonly host: HTMLElement,
+        private readonly videoId: string
     ) {
-        this.root = parseHtml(html`
-            <div class="at-youtube-wrap">
-                <div class="at-youtube"></div>
-            </div>
-        `);
-        this.playerEl = this.root.querySelector('.at-youtube')!;
-        this.bind();
+        // alphaTab creates a new output whenever it rebuilds its player.
+        this.unsubscribePlayerReady = api.playerReady.on(() => this.installHandler());
+        this.bind().catch(e => console.error('YouTube player failed to start', e));
     }
 
     private async bind(): Promise<void> {
         await loadYouTubeApi();
+        if (this.disposed) {
+            return;
+        }
         const ready = Promise.withResolvers<void>();
-        this.player = new window.YT!.Player(this.playerEl, {
+        const placeholder = document.createElement('div');
+        this.host.replaceChildren(placeholder);
+        this.player = new window.YT!.Player(placeholder, {
             height: '360',
             width: '640',
-            videoId: this.props.videoId,
+            videoId: this.videoId,
             playerVars: { autoplay: 0 },
             events: {
                 onReady: () => ready.resolve(),
@@ -124,12 +113,15 @@ export class YoutubeSync implements Mountable {
             }
         });
         await ready.promise;
+        this.installHandler();
+    }
 
+    private installHandler(): void {
+        const player = this.player;
         const output = this.api.player?.output as alphaTab.synth.IExternalMediaSynthOutput | undefined;
-        if (!output) {
+        if (!player || !output || this.disposed) {
             return;
         }
-        const player = this.player!;
         const handler: alphaTab.synth.IExternalMediaHandler = {
             get backingTrackDuration() {
                 return player.getDuration() * 1000;
@@ -157,6 +149,7 @@ export class YoutubeSync implements Mountable {
         // YT.PlayerState: -1=unstarted, 0=ended, 1=playing, 2=paused, 3=buffering, 5=cued
         switch (state) {
             case 1: // playing
+                this.clearInterval();
                 this.currentTimeInterval = window.setInterval(() => {
                     const output = this.api.player?.output as alphaTab.synth.IExternalMediaSynthOutput | undefined;
                     if (output && this.player) {
@@ -184,8 +177,11 @@ export class YoutubeSync implements Mountable {
     }
 
     dispose(): void {
+        this.disposed = true;
+        this.unsubscribePlayerReady();
         this.clearInterval();
         this.player?.destroy?.();
-        this.root.remove();
+        this.player = null;
+        this.host.replaceChildren();
     }
 }

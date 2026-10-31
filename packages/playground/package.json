@@ -6,12 +6,16 @@
     "type": "module",
     "dependencies": {
         "@coderline/alphatab": "*",
+        "@coderline/alphatab-react": "*",
+        "@coderline/alphatab-ui": "*",
         "@fontsource/noto-sans": "^5.3.0",
         "@fontsource/noto-serif": "^5.3.0",
         "@popperjs/core": "^2.11.8",
         "@types/serve-static": "^2.2.0",
+        "clsx": "^2.1.1",
         "lucide": "^1.61.0",
-        "monaco-editor": "^0.57.0",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
         "serve-static": "^2.2.1"
     },
     "scripts": {
@@ -22,7 +26,10 @@
         "dev": "vite"
     },
     "devDependencies": {
-        "split.js": "^1.6.5",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.3.0",
+        "@vitejs/plugin-react": "^6.1.2",
+        "sass": "^1.107.1",
         "tslib": "^2.8.1",
         "typescript": "^6.0.3",
         "vite": "^8.3.5",

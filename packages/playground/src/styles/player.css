@@ -1,0 +1,15 @@
+/* Pages of the player demos: the player view fills the window. */
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    display: block;
+}
+
+#app {
+    position: absolute;
+    inset: 0;
+}

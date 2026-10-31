@@ -1,0 +1,88 @@
+.grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.gridTick {
+  position: absolute;
+  background: rgba(0, 120, 220, 0.25);
+}
+
+.gridTickMain {
+  background: rgba(0, 120, 220, 0.55);
+}
+
+.padPanel {
+  position: fixed;
+  bottom: 96px;
+  right: 24px;
+  padding: 0 12px 12px 12px;
+  background: rgba(33, 37, 41, 0.92);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+}
+
+.padHandle {
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.stateDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6c757d;
+
+  .recording & {
+    background: #e53935;
+    box-shadow: 0 0 6px #e53935;
+  }
+}
+
+.padGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  opacity: 0.4;
+  pointer-events: none;
+
+  .recording & {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.pad {
+  padding: 8px 10px;
+  min-width: 68px;
+  background: #4a5056;
+  color: #fff;
+  border: 1px solid #6c757d;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: pre;
+  font-family: inherit;
+  transition: background 0.12s ease-out, border-color 0.12s ease-out;
+}
+
+.padFlash {
+  background: #ff7043;
+  border-color: #ffab91;
+}
