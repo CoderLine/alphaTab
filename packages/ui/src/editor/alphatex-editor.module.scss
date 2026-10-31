@@ -44,10 +44,10 @@
   }
 }
 
-// Above every page layer, including a maximized player (`--ifm-z-index-fixed` + 1).
+// Suggest, hover and signature widgets cover every page layer, including a maximized player.
 .overflowHost {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: calc(var(--ifm-z-index-fixed) + 10);
+  z-index: var(--at-z-overlay, 1000);
 }

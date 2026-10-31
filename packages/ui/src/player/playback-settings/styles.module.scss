@@ -109,7 +109,7 @@
 }
 
 .status_error {
-  color: var(--ifm-color-danger);
+  color: var(--at-danger);
 }
 
 .rowProgress {
@@ -209,7 +209,7 @@
 }
 
 .statusNotice {
-  color: var(--ifm-color-warning-darkest, var(--at-ink-soft));
+  color: var(--at-warning, var(--at-ink-soft));
 }
 
 .retry {

@@ -3,8 +3,8 @@
   flex-direction: column;
   width: 340px;
   // Opens upward from the transport bar; keep header and footer below the sticky navbar.
-  max-height: calc(100vh - var(--ifm-navbar-height, 60px) - 120px);
-  scroll-margin-top: calc(var(--ifm-navbar-height, 60px) + 12px);
+  max-height: calc(100vh - var(--at-host-offset, 0px) - 120px);
+  scroll-margin-top: calc(var(--at-host-offset, 0px) + 12px);
   background: var(--at-surface);
   border: 1px solid var(--at-line);
   border-radius: 12px;
