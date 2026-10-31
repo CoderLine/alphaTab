@@ -23,6 +23,8 @@ permissions:
 jobs:
   website:
     uses: ./.github/workflows/~publish_website.yml
+    secrets:
+      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
     with:
       channel: ${{ inputs.channel }}
       npm_tag: ${{ inputs.channel == 'stable' && 'latest' || 'alpha' }}

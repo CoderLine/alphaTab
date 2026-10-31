@@ -64,6 +64,8 @@ jobs:
     # inputs are null on tag pushes
     if: ${{ !cancelled() && (github.event_name == 'push' || inputs.release_website) && (needs.web.result == 'success' || needs.web.result == 'skipped') }}
     uses: ./.github/workflows/~publish_website.yml
+    secrets:
+      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
     permissions:
       contents: read
     with:

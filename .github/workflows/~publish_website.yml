@@ -22,6 +22,10 @@ on:
       dry_run:
         type: boolean
         default: false
+    secrets:
+      DEPLOY_TOKEN:
+        description: Bearer token of docs-deploy.alphaTab.net
+        required: true
 
 permissions:
   contents: read
@@ -177,6 +181,10 @@ jobs:
         working-directory: build
       - name: Push Zip To Server
         run: |
+          if [ -z "$DEPLOY_TOKEN" ]; then
+            echo "::error::The DEPLOY_TOKEN secret is empty"
+            exit 1
+          fi
           curl --request POST \
           --url https://docs-deploy.alphaTab.net/ \
           --header "authorization: Bearer $DEPLOY_TOKEN" \

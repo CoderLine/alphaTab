@@ -64,6 +64,8 @@ jobs:
     needs: web
     if: ${{ !cancelled() && inputs.website && (needs.web.result == 'success' || needs.web.result == 'skipped') }}
     uses: ./.github/workflows/~publish_website.yml
+    secrets:
+      DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
     permissions:
       contents: read
     with:
