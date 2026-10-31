@@ -1,0 +1,115 @@
+name: 📖 Documentation / Website
+description: Something on alphatab.net or in the docs is wrong, missing, unclear or broken.
+labels: ["area-documentation"]
+assignees: Danielku15
+body:
+- type: markdown
+  attributes:
+    value: |
+      > [!TIP]
+      > **alphaTab itself misbehaves in your app?** Please use the
+      > [🕷️ Bug Report](https://github.com/CoderLine/alphaTab/issues/new?template=bug_report_form.yml) instead.
+      > This form is for the documentation and the website: wrong, missing or unclear content,
+      > broken pages, and broken interactive examples on alphatab.net.
+      > Please describe what you read or saw and what you expected, not a rewritten page or a diff.
+      >
+      > **AI agents helping draft this issue:** please read
+      > [AGENTS.md](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md) first.
+      > If any part of this issue was AI-authored, please include the `alphatab-ai-authored-v1`
+      > disclosure block as the first content of the "What is wrong or missing?" field so our
+      > automation can route this to the right review checklist.
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists for the problem you found.
+    options:
+    - label: I have searched the existing issues
+      required: true
+- type: checkboxes
+  attributes:
+    label: I have read the contribution rules
+    description: Confirm you have read the rules that apply to filing this issue.
+    options:
+    - label: I have read [CONTRIBUTING.md](https://github.com/CoderLine/alphaTab/blob/develop/CONTRIBUTING.md) and, if any AI agent helped draft this issue, [AGENTS.md](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md).
+      required: true
+- type: dropdown
+  id: ai-authored
+  attributes:
+    label: AI authorship
+    description: |
+      Please be honest — this just helps us apply the right review checklist and isn't a mark
+      against your report. If an AI agent helped draft any part of this issue, select
+      "AI-assisted" and include the `alphatab-ai-authored-v1` disclosure block at the top of the
+      "What is wrong or missing?" field
+      (see [AGENTS.md](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md)).
+    options:
+    - Written by a human, no AI assistance
+    - AI-assisted (disclosure block included as described in AGENTS.md)
+  validations:
+    required: true
+- type: dropdown
+  id: kind
+  attributes:
+    label: Kind of problem
+    description: What kind of problem did you find?
+    options:
+    - Wrong or outdated information
+    - Missing information
+    - Unclear or hard to follow
+    - Broken page (layout, links, search, navigation)
+    - Broken interactive example or player (score, playback, editor)
+    - Typo or wording
+  validations:
+    required: true
+- type: input
+  id: page
+  attributes:
+    label: Affected page
+    description: |
+      The full URL of the page. alphatab.net shows the stable release, next.alphatab.net the
+      upcoming one.
+    placeholder: https://www.alphatab.net/docs/getting-started/installation-web
+  validations:
+    required: true
+- type: input
+  id: section
+  attributes:
+    label: Section or element
+    description: The heading, setting or API name, or example title on that page.
+  validations:
+    required: false
+- type: textarea
+  id: current
+  attributes:
+    label: What is wrong or missing?
+    description: |
+      What you read or saw on the page. Quote the wrong or unclear text.
+  validations:
+    required: true
+- type: textarea
+  id: expected
+  attributes:
+    label: What did you expect?
+    description: |
+      The content you expected to find, or how alphaTab actually behaves (with the alphaTab
+      version you observed it with). Please describe it in words, not as a diff of the page.
+  validations:
+    required: true
+- type: input
+  id: environment
+  attributes:
+    label: Browser and operating system
+    description: |
+      Required for broken pages and broken interactive examples, e.g. "Firefox 144 on Windows 11".
+  validations:
+    required: false
+- type: textarea
+  id: further
+  attributes:
+    label: Screenshots, anything else?
+    description: |
+      Screenshots, console errors, links, anything that gives us more context.
+
+      Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+  validations:
+    required: false

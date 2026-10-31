@@ -7,6 +7,9 @@ body:
   attributes:
     value: |
       > [!TIP]
+      > **Problem with the docs or alphatab.net?** Please use the
+      > [📖 Documentation / Website](https://github.com/CoderLine/alphaTab/issues/new?template=docs_report_form.yml) form instead.
+      >
       > **Please describe what you observe, not what you think the fix is.**
       > This form is for describing what you (as a user of alphaTab) see and expect.
       > Diffs, proposed patches, or "the bug is at file X line Y" claims from reading source
