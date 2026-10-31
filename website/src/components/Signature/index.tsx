@@ -2,15 +2,20 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import { FC } from "react";
 import Link from "@docusaurus/Link";
+import { type SignatureToken, type EncodedSignatureTokens, decodeSignatureTokens } from "./tokens";
 
-export type SignatureToken =
-    [string, string] | [string, string, string];
+export type { SignatureToken, EncodedSignatureTokens };
+
+type SignatureTokens = SignatureToken[] | EncodedSignatureTokens;
+
+const toTokens = (tokens: SignatureTokens | undefined) =>
+    typeof tokens === 'string' ? decodeSignatureTokens(tokens) : tokens;
 
 export type SignatureProps = {
     style: 'block' | 'inline',
-    js: SignatureToken[],
-    csharp?: SignatureToken[],
-    kotlin?: SignatureToken[],
+    js: SignatureTokens,
+    csharp?: SignatureTokens,
+    kotlin?: SignatureTokens,
 }
 
 
@@ -64,17 +69,17 @@ export const Signature: FC<SignatureProps> = ({ style, js, csharp, kotlin }) => 
         {
             label: 'JavaScript',
             value: 'js',
-            tokens: js
+            tokens: toTokens(js)
         },
         {
             label: 'C#',
             value: 'cs',
-            tokens: csharp
+            tokens: toTokens(csharp)
         },
         {
             label: 'Kotlin',
             value: 'kt',
-            tokens: kotlin
+            tokens: toTokens(kotlin)
         }
     ].filter(i => i.tokens !== undefined);
 

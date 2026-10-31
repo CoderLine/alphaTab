@@ -105,11 +105,24 @@ export const AlphaTexEditor = React.forwardRef<AlphaTexEditorHandle, AlphaTexEdi
                     const next = model.getValue();
                     if (next !== valueRef.current) { onChangeRef.current(next); }
                 });
+                // Fixed overflow widgets are placed from the editor's page position at its last
+                // render, and scrolling the page or an ancestor doesn't render the editor.
+                let renderFrame = 0;
+                const onScroll = () => {
+                    if (renderFrame) { return; }
+                    renderFrame = requestAnimationFrame(() => {
+                        renderFrame = 0;
+                        editor.render(true);
+                    });
+                };
+                document.addEventListener('scroll', onScroll, { capture: true, passive: true });
                 editorRef.current = editor;
                 setReady(true);
 
                 return () => {
                     editorRef.current = null;
+                    document.removeEventListener('scroll', onScroll, { capture: true });
+                    cancelAnimationFrame(renderFrame);
                     changes.dispose();
                     lsp.dispose();
                     editor.dispose();

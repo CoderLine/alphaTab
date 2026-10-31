@@ -1424,6 +1424,20 @@ export type TypeReferencedCodeToken = {
 
 type TypeReferencedCodeLanguage = "js" | "c#" | "kotlin";
 
+const signatureTokenKindCodes = {
+  identifier: "i",
+  token: "t",
+  keyword: "k",
+  whitespace: "w",
+} as const;
+
+// Newline separates tokens and tab separates a link target, so both are escaped in the text.
+function escapeSignatureTokenText(text: string): string {
+  return text.replace(/[\\\r\n\t]/g, (c) =>
+    c === "\\" ? "\\\\" : c === "\r" ? "\\r" : c === "\n" ? "\\n" : "\\t"
+  );
+}
+
 export class TypeReferencedCodeBuilder {
   private chunks: TypeReferencedCodeToken[] = [];
   public links = true;
@@ -1535,29 +1549,41 @@ export class TypeReferencedCodeBuilder {
     return plain;
   }
 
+  /**
+   * Returns the tokens as a JS string literal in the compact encoding that
+   * `decodeSignatureTokens` in src/components/Signature reads.
+   */
   public toJSON(language: TypeReferencedCodeLanguage) {
     const translated = this.translateChunks(this.chunks, language);
 
-    const json: any[] = [];
+    const encoded: string[] = [];
     for (const chunk of translated) {
       switch (chunk.kind) {
         case "identifier":
         case "token":
         case "keyword":
         case "whitespace":
-          json.push([chunk.kind, chunk.content.toString()]);
+          encoded.push(
+            signatureTokenKindCodes[chunk.kind] +
+              escapeSignatureTokenText(chunk.content.toString())
+          );
           break;
 
         // case "type": // rewritten during translateChunks
         //   break;
         case "link":
           const link = chunk.content as TypeReferencedCodeLink;
-          json.push(['identifier', link.linkText, link.link]);
+          encoded.push(
+            signatureTokenKindCodes.identifier +
+              escapeSignatureTokenText(link.linkText) +
+              "\t" +
+              escapeSignatureTokenText(link.link)
+          );
           break;
       }
     }
 
-    return JSON.stringify(json);
+    return JSON.stringify(encoded.join("\n"));
   }
 
 

@@ -12,7 +12,7 @@ import * as fs from "fs";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { AlphaTabWebPackPlugin } from "@coderline/alphatab-webpack";
-import type { Module, RuleSetRule } from "webpack";
+import webpack, { type Module, type RuleSetRule } from "webpack";
 
 const siteDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -732,8 +732,46 @@ async function createConfig(): Promise<Config> {
               ),
             };
 
+        // Webpack keeps each module in several serialized forms, which makes the
+        // uncompressed packs several hundred MB per compilation.
+        const cache =
+          typeof config.cache === "object" && config.cache.type === "filesystem"
+            ? {
+                type: "filesystem" as const,
+                compression: "gzip" as const,
+                ...(config.mode === "development"
+                  ? { maxMemoryGenerations: 1 }
+                  : {}),
+              }
+            : undefined;
+
+        // Same maps as Docusaurus' `eval-cheap-module-source-map`, but only for the site's own
+        // code: maps for prebuilt code (Monaco, alphaTab's dist) embed its source a second
+        // time and roughly double the size of those chunks.
+        const isDevClient = !isServer && config.mode === "development";
+        const sourceMaps = isDevClient
+          ? new webpack.EvalSourceMapDevToolPlugin({
+              module: true,
+              columns: false,
+              moduleFilenameTemplate: config.output?.devtoolModuleFilenameTemplate,
+              exclude: [/[\\/]node_modules[\\/]/, /[\\/]packages[\\/][^\\/]+[\\/]dist[\\/]/],
+            })
+          : undefined;
+
         return {
+          // Every page (including ~540 generated reference pages) and the alphaTex editor's
+          // Monaco are `import()`ed, so in dev they compile when the browser first requests
+          // them instead of all at startup.
+          ...(isDevClient
+            ? { experiments: { lazyCompilation: { imports: true, entries: false } } }
+            : {}),
+          ...(sourceMaps ? { devtool: false } : {}),
+          cache,
           optimization: {
+            // Per-runtime export analysis gives the page, the alphaTab worker and the
+            // alphaTex language-server worker different code for alphaTab's core, so
+            // each runtime would get its own copy instead of sharing one chunk.
+            ...(isServer ? {} : { usedExports: "global" as const }),
             splitChunks: {
               cacheGroups: {
                 // Docusaurus turns splitChunks off for the server bundle; only the group below
@@ -759,6 +797,17 @@ async function createConfig(): Promise<Config> {
           },
           module: {
             rules: [
+              ...(isDevClient
+                ? [
+                    {
+                      test: /[\\/]\.docusaurus[\\/]registry\.js$/,
+                      loader: path.resolve(
+                        context.siteDir,
+                        "scripts/registry-without-weak-ids-loader.cjs"
+                      ),
+                    },
+                  ]
+                : []),
               {
                 // Monaco's fallback for hosts without MonacoEnvironment.getWorker: webpack would copy
                 // the unbundled module, whose relative imports do not exist, into the build root.
@@ -770,6 +819,7 @@ async function createConfig(): Promise<Config> {
             ],
           },
           plugins: [
+            ...(sourceMaps ? [sourceMaps] : []),
             // Copy the Font and SoundFont Files to the output
             new AlphaTabWebPackPlugin({
               assetOutputDir: config.output!.path,

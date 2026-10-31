@@ -24,15 +24,17 @@ async function initialize(): Promise<MonacoApi> {
         getWorker: () => new Worker(new URL('./editor.worker.ts', import.meta.url), { type: 'module' }),
     };
 
-    const [monaco, { addTextMateGrammarSupport, registerAlphaTexGrammar }, onigurumaWasm] = await Promise.all([
+    const [monaco, { addTextMateGrammarSupport, registerAlphaTexGrammar }, onigurumaWasm, { applyMonacoPageScrollFix }] = await Promise.all([
         import('monaco-editor'),
         import('@coderline/alphatab-monaco'),
         fetch(new URL('vscode-oniguruma/release/onig.wasm', import.meta.url)).then((r) => {
             if (!r.ok) { throw new Error(`[AlphaTexEditor] Failed to fetch onig.wasm: ${r.status}`); }
             return r.arrayBuffer();
         }),
+        import('./monaco-page-scroll-fix'),
     ]);
 
+    applyMonacoPageScrollFix();
     await registerAlphaTexGrammar(addTextMateGrammarSupport(onigurumaWasm));
     defineTheme(monaco);
     return monaco;

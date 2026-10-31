@@ -2,7 +2,6 @@ import React, { ReactElement } from "react";
 import { TooltipSinceBadge } from "../SinceBadge";
 import Details from "@theme/Details";
 import { Tooltip } from "react-tooltip";
-import ReactDOMServer from "react-dom/server";
 import styles from "./styles.module.scss";
 
 export enum FeatureStatus {
@@ -48,35 +47,32 @@ export const FileFormatFeatureCell: React.FC<FileFormatFeatureCellProps> = ({
     return <></>;
   }
 
-  const tooltip =
-    status.since || status.tooltip
-      ? ReactDOMServer.renderToStaticMarkup(
-          <>
-            <TooltipSinceBadge since={status.since} inline={true} /> {status.tooltip}
-          </>
-        )
-      : "";
-
   const classNames = ["feature-status-has-tooltip", styles.noWrap];
-  if (tooltip) {
+  if (status.since || status.tooltip) {
     classNames.push(styles.hasTooltip);
   }
 
   return (
     <>
-      <span className={classNames.join(" ")} data-tooltip-html={tooltip}>
+      <span
+        className={classNames.join(" ")}
+        data-tooltip-content={status.tooltip}
+        data-tooltip-since={status.since}
+      >
         <FeatureStatusDisplay status={status.status} />
       </span>
     </>
   );
 };
 
-function computeFeatureStatistics(node: React.ReactNode): {
+type FeatureStatistics = {
   totalFeatures: number;
   supportedFeatures: number;
   totalRelevantFeatures: number;
   supportedRelevantFeatures: number;
-} {
+};
+
+function computeFeatureStatistics(node: React.ReactNode): FeatureStatistics {
   let featureRows: ReactElement<FileFormatFeatureRowProps>[] = [];
 
   collectFeatureRows(featureRows, node);
@@ -138,23 +134,23 @@ export const FileFormatFeatureGroup: React.FC<FileFormatFeatureGroupProps> = ({
   children,
   tooltip,
 }) => {
-  const renderedTooltip = ReactDOMServer.renderToStaticMarkup(
-    <>
-    {tooltip}
-    <FileFormatFeatureStatistics node={children} />
-    </>
-  );
-
-  const classNames = ["feature-status-has-tooltip", styles.noWrap];
-  if (renderedTooltip) {
-    classNames.push(styles.hasTooltip);
-  }
+  const classNames = [
+    "feature-status-has-tooltip",
+    styles.noWrap,
+    styles.hasTooltip,
+  ];
 
   return (
     <>
       <tr>
         <td>
-          <strong className={classNames.join(" ")} data-tooltip-html={renderedTooltip}>
+          <strong
+            className={classNames.join(" ")}
+            data-tooltip-content={tooltip}
+            data-tooltip-statistics={JSON.stringify(
+              computeFeatureStatistics(children)
+            )}
+          >
             {title}
           </strong>
         </td>
@@ -221,8 +217,13 @@ export type FileFormatFeatureStatisticsProps = {
 
 export const FileFormatFeatureStatistics: React.FC<
   FileFormatFeatureStatisticsProps
-> = ({ node }) => {
-  const statistics = computeFeatureStatistics(node);
+> = ({ node }) => (
+  <FeatureStatisticsDisplay statistics={computeFeatureStatistics(node)} />
+);
+
+const FeatureStatisticsDisplay: React.FC<{ statistics: FeatureStatistics }> = ({
+  statistics,
+}) => {
   return (
     <p>
       <strong>Number of total supported features:</strong>{" "}
@@ -308,6 +309,28 @@ function collectFeatureRows(
   }
 }
 
+// Tooltip data travels on the anchor's data attributes (see FileFormatFeatureCell
+// and FileFormatFeatureGroup) and is rendered only when a tooltip opens. Returning
+// null keeps react-tooltip from opening an empty tooltip.
+function renderFeatureTooltip(
+  content: string | null,
+  anchor: HTMLElement | null
+): React.ReactNode {
+  const since = anchor?.dataset.tooltipSince;
+  const statistics = anchor?.dataset.tooltipStatistics;
+  if (!content && !since && !statistics) {
+    return null;
+  }
+  return (
+    <>
+      <TooltipSinceBadge since={since} inline={true} /> {content}
+      {statistics && (
+        <FeatureStatisticsDisplay statistics={JSON.parse(statistics)} />
+      )}
+    </>
+  );
+}
+
 export type FileFormatFeatureTableProps = {
   children: React.ReactNode;
 };
@@ -378,7 +401,12 @@ export const FileFormatFeatureTable: React.FC<FileFormatFeatureTableProps> = ({
           </li>
         </ul>
       </Details>
-      <Tooltip anchorSelect=".feature-status-has-tooltip" />
+      <Tooltip
+        anchorSelect=".feature-status-has-tooltip"
+        render={({ content, activeAnchor }) =>
+          renderFeatureTooltip(content, activeAnchor)
+        }
+      />
       <table
         className={"table table-striped table-condensed " + styles.featureTable}
       >
