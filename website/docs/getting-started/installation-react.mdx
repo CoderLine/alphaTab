@@ -293,6 +293,23 @@ export function ScoreViewer() {
 }
 ```
 
+**`basePath`.** Next.js applies [`basePath`](https://nextjs.org/docs/app/api-reference/config/next-config-js/basePath) to the bundled workers, but not to URLs into `public/`. Prefix `core.file`, `core.fontDirectory`, `core.scriptFile` and `player.soundFont` with it. To read it in the component, expose it in `next.config.ts`:
+
+```ts
+import type { NextConfig } from 'next';
+
+const basePath = '/sub';
+
+const nextConfig: NextConfig = {
+    basePath,
+    env: { NEXT_PUBLIC_BASE_PATH: basePath }
+};
+
+export default nextConfig;
+```
+
+and build the URLs from it, for example ``scriptFile: `${process.env.NEXT_PUBLIC_BASE_PATH}/alphatab/alphaTab.mjs` ``.
+
 Limitations:
 
 - **Two copies of the core.** The page and the workers share one chunk; the worklet loads the copied, unminified `alphaTab.core.mjs` (about 2.5 MB).
