@@ -772,7 +772,8 @@ export class PlayerStore {
             for (let i = 0; i < score.masterBars.length; i++) {
                 const mb = score.masterBars[i];
                 barStartTicks.push(tick);
-                const bpm = mb.tempoAutomations?.[0]?.value ?? score.tempo;
+                // A bar without a tempo change keeps the tempo of the bars before it.
+                const bpm = mb.tempoAutomations?.[0]?.value ?? (lastBpm < 0 ? score.tempo : lastBpm);
                 if (bpm !== lastBpm) {
                     tempoMarkers.push({ atBar: i, bpm });
                     lastBpm = bpm;
