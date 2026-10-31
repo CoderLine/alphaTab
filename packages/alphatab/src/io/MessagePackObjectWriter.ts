@@ -242,7 +242,7 @@ export class MessagePackObjectWriter implements IObjectWriter {
                 this._view.setInt32(p + 1, v);
                 this._position = p + 5;
             }
-        } else if (Math.fround(v) === v || v !== v) {
+        } else if (Math.fround(v) === v || Number.isNaN(v)) {
             buffer[p] = 0xca;
             this._view.setFloat32(p + 1, v);
             this._position = p + 5;
@@ -280,8 +280,11 @@ export class MessagePackObjectWriter implements IObjectWriter {
         if (length <= 31) {
             // optimistic: short ASCII strings (all keys) are copied in one pass
             let i = 0;
-            let c = 0;
-            while (i < length && (c = s.charCodeAt(i)) < 0x80) {
+            while (i < length) {
+                const c = s.charCodeAt(i);
+                if (c >= 0x80) {
+                    break;
+                }
                 buffer[p + 1 + i] = c;
                 i++;
             }
