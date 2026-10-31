@@ -10,6 +10,7 @@ import {
     useState
 } from 'react';
 import { AlphaTabContext, type AlphaTabContextValue } from './context';
+import { warnInDevelopment } from './dev';
 import { ApiLifecycle } from './lifecycle';
 import { diffSettings, settingsEqual, snapshotSettings } from './settings';
 
@@ -19,8 +20,8 @@ import { diffSettings, settingsEqual, snapshotSettings } from './settings';
 export interface AlphaTabProviderProps {
     /**
      * Prepares the settings of a new API instance. Called right before construction, after
-     * `player.scrollElement` is set to the host's scroll element and the initial sources are applied,
-     * and before {@link AlphaTabProviderProps.settings} is merged on top.
+     * `player.scrollElement` is set to the host's scroll element and before
+     * {@link AlphaTabProviderProps.settings} is merged on top.
      * Only the function passed in the render that precedes the construction is used.
      */
     configureSettings?: (settings: Settings) => void;
@@ -38,16 +39,26 @@ export interface AlphaTabProviderProps {
      */
     settings?: json.SettingsJson;
     /**
-     * The URL of a file to load when the API is created (`core.file`). Takes precedence over
-     * {@link AlphaTabProviderProps.tex}. Later changes are ignored; load further scores through the API.
+     * The URL of the score to display, loaded through `api.load(file, tracks)`.
+     *
+     * The source props are reactive: the provider loads the score once a new API instance is provided,
+     * after the effects of its descendants have subscribed to the API, and again whenever `file` or
+     * `tex` changes. Removing the source keeps the displayed score. Only one of `file` and `tex` should
+     * be set; a non-empty `file` takes precedence, and setting both logs a warning in development.
+     * Consumers that load scores through the API themselves should omit `file` and `tex`, as a change
+     * of either would load the prop's score over theirs.
      */
     file?: string;
     /**
-     * alphaTex source to load when the API is created (`core.tex`). Later changes are ignored; load
-     * further scores through the API, e.g. `api.tex()`.
+     * alphaTex source of the score to display, loaded through `api.tex(tex, tracks)`. Reactive like
+     * {@link AlphaTabProviderProps.file}, which takes precedence.
      */
     tex?: string;
-    /** The initially displayed tracks (`core.tracks`). Later changes are ignored. */
+    /**
+     * The tracks to display: track indexes, or `'all'`. Applied with the next source load; a change
+     * while `file` and `tex` stay the same re-renders the displayed score with the new tracks, also
+     * one loaded through the API. Arrays are compared by content. Defaults to the first track.
+     */
     tracks?: number | number[] | 'all';
     /**
      * Called with every new API instance, right after construction. A returned function is called
@@ -67,6 +78,31 @@ export interface AlphaTabProviderProps {
 export interface AlphaTabProviderHandle {
     /** The live API instance, `null` while no {@link AlphaTabHost} is mounted. */
     readonly api: AlphaTabApi | null;
+}
+
+interface LoadedSource {
+    readonly api: AlphaTabApi;
+    readonly file: string | undefined;
+    readonly tex: string | undefined;
+    readonly tracksKey: string | undefined;
+}
+
+/** A value-comparable form of the `tracks` prop, as the indexes `api.renderScore` takes. */
+function trackIndexesKey(tracks: AlphaTabProviderProps['tracks']): string | undefined {
+    if (tracks === undefined) {
+        return undefined;
+    }
+    if (tracks === 'all') {
+        return '-1';
+    }
+    return (typeof tracks === 'number' ? [tracks] : tracks).join(',');
+}
+
+function parseTrackIndexesKey(key: string | undefined): number[] | undefined {
+    if (key === undefined) {
+        return undefined;
+    }
+    return key === '' ? [] : key.split(',').map(Number);
 }
 
 /**
@@ -107,19 +143,10 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
             // destroying clears the mount element, so it must not hit the successor's content
             lifecycle.destroyRetired((_, element) => element === mountElement);
 
-            const { configureSettings, settings, file, tex, tracks, onApi } = latestProps.current;
+            const { configureSettings, settings, onApi } = latestProps.current;
 
             const initial = new Settings();
             initial.player.scrollElement = scrollElement;
-            if (file) {
-                initial.core.file = file;
-            } else if (tex !== undefined) {
-                initial.core.tex = true;
-                mountElement.textContent = tex;
-            }
-            if (tracks !== undefined) {
-                initial.core.tracks = tracks;
-            }
             configureSettings?.(initial);
             if (settings) {
                 initial.fillFromJson(settings);
@@ -176,6 +203,38 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
                 }
             });
         });
+
+        const file = props.file || undefined;
+        const tex = file === undefined ? props.tex : undefined;
+        const tracksKey = trackIndexesKey(props.tracks);
+        const loadedSource = useRef<LoadedSource | null>(null);
+        // Runs after the descendants' effects, so their subscriptions see the events of the first load.
+        useEffect(() => {
+            if (!api || api !== lifecycle.live) {
+                return;
+            }
+            const previous = loadedSource.current?.api === api ? loadedSource.current : null;
+            loadedSource.current = { api, file, tex, tracksKey };
+            const trackIndexes = parseTrackIndexesKey(tracksKey);
+            if (previous && previous.file === file && previous.tex === tex) {
+                if (previous.tracksKey !== tracksKey && api.score) {
+                    api.renderScore(api.score, trackIndexes);
+                }
+                return;
+            }
+            if (file !== undefined) {
+                api.load(file, trackIndexes);
+            } else if (tex !== undefined) {
+                api.tex(tex, trackIndexes);
+            }
+        }, [lifecycle, api, file, tex, tracksKey]);
+
+        const bothSources = !!props.file && props.tex !== undefined;
+        useEffect(() => {
+            if (bothSources) {
+                warnInDevelopment('<AlphaTabProvider> received both file and tex; tex is ignored.');
+            }
+        }, [bothSources]);
 
         useImperativeHandle(ref, () => handle, [handle]);
 

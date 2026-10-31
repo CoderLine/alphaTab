@@ -38,6 +38,9 @@ interface FakeApi {
     readonly renderStarted: FakeEmitter;
     readonly updateSettings: ReturnType<typeof vi.fn>;
     readonly render: ReturnType<typeof vi.fn>;
+    readonly load: ReturnType<typeof vi.fn>;
+    readonly tex: ReturnType<typeof vi.fn>;
+    readonly renderScore: ReturnType<typeof vi.fn>;
 }
 
 interface FakeSettings {
@@ -128,6 +131,18 @@ vi.mock('@coderline/alphatab', () => {
         public readonly error = new EventEmitter();
         public readonly updateSettings = vi.fn(() => fake.log.push(`updateSettings ${this.id}`));
         public readonly render = vi.fn(() => fake.log.push(`render ${this.id}`));
+        public readonly load = vi.fn((data: unknown, tracks?: number[]) => {
+            fake.log.push(`load ${this.id} ${String(data)} ${JSON.stringify(tracks)}`);
+            this.renderStarted.trigger(false);
+            return true;
+        });
+        public readonly tex = vi.fn((tex: string, tracks?: number[]) => {
+            fake.log.push(`tex ${this.id} ${tex} ${JSON.stringify(tracks)}`);
+            this.renderStarted.trigger(false);
+        });
+        public readonly renderScore = vi.fn((score: unknown, tracks?: number[]) => {
+            fake.log.push(`renderScore ${this.id} ${score === this.score} ${JSON.stringify(tracks)}`);
+        });
 
         public constructor(
             public readonly element: HTMLElement,
@@ -390,37 +405,116 @@ describe('AlphaTabProvider', () => {
         expect(live.destroyed).toBe(true);
     });
 
-    it('applies creation-time sources, configureSettings and settings in order', () => {
+    it('applies configureSettings and then settings before construction', () => {
         let scrollElementSeen: unknown;
         const configureSettings = (settings: Settings) => {
             scrollElementSeen = settings.player.scrollElement;
             settings.display.scale = 2;
             settings.player.scrollMode = 1;
         };
-        render(
-            <Player
-                file="song.gp"
-                tracks={[0, 2]}
-                configureSettings={configureSettings}
-                settings={{ display: { scale: 3 } }}
-            />
-        );
+        render(<Player configureSettings={configureSettings} settings={{ display: { scale: 3 } }} />);
 
         const live = liveApis()[0];
         expect(scrollElementSeen).toBe(live.element.closest('.scroll'));
         expect(live.settings.player.scrollElement).toBe(scrollElementSeen);
-        expect(live.initialSettings).toMatchObject({
-            core: { file: 'song.gp', tex: false, tracks: [0, 2] },
-            player: { scrollMode: 1 },
-            display: { scale: 3 }
-        });
+        expect(live.initialSettings).toMatchObject({ player: { scrollMode: 1 }, display: { scale: 3 } });
     });
 
-    it('places tex into the mount element before construction', () => {
-        render(<Player tex="\title Test ." />);
-        const live = liveApis()[0];
-        expect(live.settings.core.tex).toBe(true);
-        expect(live.initialText).toBe('\\title Test .');
+    describe('sources', () => {
+        function loads() {
+            return fake.log.filter(entry => /^(load|tex|renderScore) /.test(entry));
+        }
+
+        it('loads the source through the API, not through core settings', () => {
+            render(<Player file="song.gp" tracks={[0, 2]} />);
+            const live = liveApis()[0];
+            expect(live.initialSettings).toMatchObject({ core: { file: null, tex: false, tracks: null } });
+            expect(loads()).toEqual([`load ${live.id} song.gp [0,2]`]);
+        });
+
+        it('loads alphaTex without touching the mount element', () => {
+            render(<Player tex="\title Test ." />);
+            const live = liveApis()[0];
+            expect(live.initialText).toBe('');
+            expect(loads()).toEqual([`tex ${live.id} \\title Test . undefined`]);
+        });
+
+        it('loads after the descendants have subscribed', () => {
+            const started = vi.fn();
+            function Listener() {
+                useAlphaTabEvent('renderStarted', started);
+                return null;
+            }
+            render(
+                <Player tex="\title Test .">
+                    <Listener />
+                </Player>
+            );
+            expect(started).toHaveBeenCalledTimes(1);
+        });
+
+        it('prefers file over tex and warns about both', () => {
+            const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            render(<Player file="song.gp" tex="\title Test ." />);
+            const live = liveApis()[0];
+            expect(loads()).toEqual([`load ${live.id} song.gp undefined`]);
+            expect(warn).toHaveBeenCalledWith(expect.stringContaining('both file and tex'));
+            warn.mockRestore();
+        });
+
+        it('falls back to tex when file is empty', () => {
+            const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            render(<Player file="" tex="\title Test ." />);
+            const live = liveApis()[0];
+            expect(loads()).toEqual([`tex ${live.id} \\title Test . undefined`]);
+            expect(warn).not.toHaveBeenCalled();
+            warn.mockRestore();
+        });
+
+        it('loads nothing without a source', () => {
+            render(<Player tracks="all" />);
+            expect(loads()).toEqual([]);
+        });
+
+        it('reloads when the source changes and skips unchanged values', () => {
+            const { rerender } = render(<Player file="a.gp" tracks={[1]} />);
+            const live = liveApis()[0];
+            rerender(<Player file="a.gp" tracks={[1]} />);
+            rerender(<Player file="b.gp" tracks={[1]} />);
+            rerender(<Player tex="\title T ." tracks={[1]} />);
+            rerender(<Player tex="\title T ." tracks={[1]} />);
+            rerender(<Player tracks={[1]} />);
+            expect(fake.apis).toEqual([live]);
+            expect(loads()).toEqual([
+                `load ${live.id} a.gp [1]`,
+                `load ${live.id} b.gp [1]`,
+                `tex ${live.id} \\title T . [1]`
+            ]);
+        });
+
+        it('re-renders the displayed score when only the tracks change', () => {
+            const { rerender } = render(<Player file="a.gp" tracks={[0]} />);
+            const live = liveApis()[0];
+            rerender(<Player file="a.gp" tracks={2} />);
+            live.score = { tracks: [] };
+            rerender(<Player file="a.gp" tracks={[2]} />);
+            rerender(<Player file="a.gp" tracks="all" />);
+            rerender(<Player file="a.gp" />);
+            expect(loads()).toEqual([
+                `load ${live.id} a.gp [0]`,
+                `renderScore ${live.id} true [-1]`,
+                `renderScore ${live.id} true undefined`
+            ]);
+        });
+
+        it('loads the source again for a new instance', () => {
+            const { rerender } = render(<Player file="a.gp" hostKey="a" />);
+            const first = liveApis()[0];
+            rerender(<Player file="a.gp" hostKey="b" />);
+            const second = liveApis()[0];
+            expect(second).not.toBe(first);
+            expect(loads()).toEqual([`load ${first.id} a.gp undefined`, `load ${second.id} a.gp undefined`]);
+        });
     });
 
     it('patches changed settings without recreating the API', async () => {
