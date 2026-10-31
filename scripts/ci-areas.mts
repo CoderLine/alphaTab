@@ -1,7 +1,8 @@
 /**
  * Maps the files changed by a CI event to the areas of the repository that need verification.
  *
- * Usage (in GitHub Actions, writes `<area>=true|false`, `lint` and `lint_workspaces` to `$GITHUB_OUTPUT`):
+ * Usage (in GitHub Actions, writes `<area>=true|false`, `lint`, `lint_workspaces`, `build_web`, `build_website`,
+ * `test_web` and the `web_tests` matrix to `$GITHUB_OUTPUT`):
  *
  *   node scripts/ci-areas.mts --event <github.event_name> --before <github.event.before> --head <sha>
  *
@@ -152,6 +153,87 @@ export function lintWorkspaces(areas: Areas, existing: readonly string[]): strin
     return existing.filter(ws => selected.has(ws));
 }
 
+/** One leg of the `test_web` matrix: `install` and `test` are `-w <workspace>` arguments. */
+export interface WebTestLeg {
+    id: string;
+    name: string;
+    install: string;
+    test: string;
+}
+
+interface WebTestLegDefinition {
+    id: string;
+    name: string;
+    /** The areas whose changes this leg verifies. */
+    areas: Area[];
+    install: string[];
+    /** The workspaces whose `test-web` script runs. */
+    test: string[];
+}
+
+const webTestLegs: WebTestLegDefinition[] = [
+    {
+        id: 'alphatab',
+        name: 'alphaTab',
+        areas: ['core', 'webpkgs'],
+        install: ['packages/alphatab', 'packages/alphatex', 'packages/transpiler', 'packages/tooling'],
+        test: ['packages/alphatab', 'packages/alphatex', 'packages/transpiler', 'packages/tooling']
+    },
+    {
+        id: 'bundlers',
+        name: 'Bundlers',
+        areas: ['core', 'webpkgs'],
+        install: ['packages/alphatab', 'packages/transpiler', 'packages/tooling', 'packages/vite', 'packages/webpack'],
+        test: ['packages/vite', 'packages/webpack']
+    },
+    {
+        id: 'editor',
+        name: 'Editor and Player',
+        areas: ['core', 'webpkgs', 'player'],
+        install: [
+            'packages/alphatab',
+            'packages/alphatex',
+            'packages/transpiler',
+            'packages/tooling',
+            'packages/lsp',
+            'packages/monaco',
+            'packages/playground',
+            'packages/react',
+            'packages/ui'
+        ],
+        test: ['packages/lsp', 'packages/monaco', 'packages/playground', 'packages/react', 'packages/ui']
+    }
+];
+
+export interface WebJobs {
+    /** Whether `build_web` produces the `web-dist` artifact. */
+    buildWeb: boolean;
+    buildWebsite: boolean;
+    /** The `test_web` matrix legs to run, empty to skip the job. */
+    tests: WebTestLeg[];
+}
+
+function workspaceArgs(workspaces: readonly string[], existing: readonly string[]): string {
+    return workspaces
+        .filter(ws => existing.includes(ws))
+        .map(ws => `-w ${ws}`)
+        .join(' ');
+}
+
+/** The web jobs the areas need, with workspace arguments restricted to `existing`. */
+export function webJobs(areas: Areas, existing: readonly string[]): WebJobs {
+    const tests = webTestLegs
+        .filter(leg => leg.areas.some(a => areas[a]))
+        .map(leg => ({
+            id: leg.id,
+            name: leg.name,
+            install: workspaceArgs(leg.install, existing),
+            test: workspaceArgs(leg.test, existing)
+        }));
+    const buildWebsite = areas.core || areas.webpkgs || areas.player || areas.website;
+    return { buildWeb: buildWebsite || tests.length > 0, buildWebsite, tests };
+}
+
 export interface Git {
     hasCommit(rev: string): boolean;
     fetchCommit(sha: string): boolean;
@@ -240,13 +322,19 @@ function main() {
     }).values;
 
     const areas = detectAreas(processGit, args.event!, args.before!, args.head!);
-    const workspaces = lintWorkspaces(areas, existingPackageWorkspaces());
+    const existing = existingPackageWorkspaces();
+    const workspaces = lintWorkspaces(areas, existing);
     const lint = workspaces.length > 0 || areas.github;
+    const web = webJobs(areas, existing);
 
     const lines = [
         ...areaNames.map(a => `${a}=${areas[a]}`),
         `lint=${lint}`,
-        `lint_workspaces=${workspaces.map(ws => `-w ${ws}`).join(' ')}`
+        `lint_workspaces=${workspaceArgs(workspaces, existing)}`,
+        `build_web=${web.buildWeb}`,
+        `build_website=${web.buildWebsite}`,
+        `test_web=${web.tests.length > 0}`,
+        `web_tests=${JSON.stringify({ include: web.tests })}`
     ];
     console.info(lines.join('\n'));
     if (process.env.GITHUB_OUTPUT) {

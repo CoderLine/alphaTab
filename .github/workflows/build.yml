@@ -39,6 +39,10 @@ jobs:
       github: ${{ steps.areas.outputs.github }}
       lint: ${{ steps.areas.outputs.lint }}
       lint_workspaces: ${{ steps.areas.outputs.lint_workspaces }}
+      build_web: ${{ steps.areas.outputs.build_web }}
+      build_website: ${{ steps.areas.outputs.build_website }}
+      test_web: ${{ steps.areas.outputs.test_web }}
+      web_tests: ${{ steps.areas.outputs.web_tests }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -149,10 +153,7 @@ jobs:
   build_web:
     name: Build Web
     needs: changes
-    if: >-
-      needs.changes.outputs.core == 'true' || needs.changes.outputs.webpkgs == 'true' ||
-      needs.changes.outputs.player == 'true' || needs.changes.outputs.website == 'true' ||
-      needs.changes.outputs.playground == 'true'
+    if: needs.changes.outputs.build_web == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -216,49 +217,21 @@ jobs:
   test_web:
     name: Test Web (${{ matrix.name }})
     needs: [changes, build_web]
-    if: >-
-      needs.changes.outputs.core == 'true' || needs.changes.outputs.webpkgs == 'true' ||
-      needs.changes.outputs.player == 'true' || needs.changes.outputs.playground == 'true'
+    if: needs.changes.outputs.test_web == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - id: alphatab
-            name: alphaTab
-            install: packages/alphatab packages/alphatex packages/transpiler packages/tooling
-            test: packages/alphatab packages/alphatex packages/transpiler packages/tooling
-          - id: bundlers
-            name: Bundlers
-            install: packages/alphatab packages/transpiler packages/tooling packages/vite packages/webpack
-            test: packages/vite packages/webpack
-          - id: editor
-            name: Editor and Player
-            install: >-
-              packages/alphatab packages/alphatex packages/transpiler packages/tooling
-              packages/lsp packages/monaco packages/playground packages/react packages/ui
-            test: packages/lsp packages/monaco packages/playground packages/react packages/ui
+      # the legs and the areas selecting them are webTestLegs in scripts/ci-areas.mts
+      matrix: ${{ fromJSON(needs.changes.outputs.web_tests) }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
           cache: 'npm'
-      - id: workspaces
-        run: |
-          to_args() {
-            for ws in $1; do
-              if [ -f "$ws/package.json" ]; then printf -- ' -w %s' "$ws"; fi
-            done
-          }
-          echo "install=$(to_args "$INSTALL")" >> "$GITHUB_OUTPUT"
-          echo "test=$(to_args "$TEST")" >> "$GITHUB_OUTPUT"
-        env:
-          INSTALL: ${{ matrix.install }}
-          TEST: ${{ matrix.test }}
       - run: npm ci $WORKSPACES --include-workspace-root
         env:
-          WORKSPACES: ${{ steps.workspaces.outputs.install }}
+          WORKSPACES: ${{ matrix.install }}
       - uses: actions/download-artifact@v8
         with:
           name: web-dist
@@ -267,7 +240,7 @@ jobs:
       - id: test
         run: npm run test-web $WORKSPACES
         env:
-          WORKSPACES: ${{ steps.workspaces.outputs.test }}
+          WORKSPACES: ${{ matrix.test }}
       - uses: actions/upload-artifact@v7
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with:
@@ -279,9 +252,7 @@ jobs:
   website:
     name: Build Website
     needs: [changes, build_web]
-    if: >-
-      needs.changes.outputs.core == 'true' || needs.changes.outputs.webpkgs == 'true' ||
-      needs.changes.outputs.player == 'true' || needs.changes.outputs.website == 'true'
+    if: needs.changes.outputs.build_website == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

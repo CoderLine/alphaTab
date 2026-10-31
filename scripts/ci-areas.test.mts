@@ -10,7 +10,8 @@ import {
     isWebsiteRelevant,
     lintWorkspaces,
     noAreas,
-    resolveBase
+    resolveBase,
+    webJobs
 } from './ci-areas.mts';
 
 function only(...areas: Area[]) {
@@ -166,11 +167,107 @@ describe('lintWorkspaces', () => {
         ]);
     });
 
+    it('playground lints the playground and the editor packages it builds on', () => {
+        assert.deepEqual(lintWorkspaces(areasOf(['packages/playground/src/a.ts']), existing), [
+            'packages/alphatab',
+            'packages/alphatex',
+            'packages/lsp',
+            'packages/monaco',
+            'packages/playground',
+            'packages/tooling',
+            'packages/transpiler'
+        ]);
+    });
+
     it('player skips packages that do not exist yet', () => {
         const ws = lintWorkspaces(only('player'), existing);
         assert.ok(!ws.includes('packages/react'));
         assert.ok(ws.includes('packages/playground'));
         assert.ok(lintWorkspaces(only('player'), [...existing, 'packages/ui']).includes('packages/ui'));
+    });
+});
+
+describe('webJobs', () => {
+    const withPlayer = [...existing, 'packages/react', 'packages/ui'].sort();
+
+    function jobsOf(files: string[]) {
+        const jobs = webJobs(areasOf(files), withPlayer);
+        return { buildWeb: jobs.buildWeb, buildWebsite: jobs.buildWebsite, tests: jobs.tests.map(t => t.id) };
+    }
+
+    it('core runs every leg and the website', () => {
+        assert.deepEqual(jobsOf(['packages/alphatab/src/model/Score.ts']), {
+            buildWeb: true,
+            buildWebsite: true,
+            tests: ['alphatab', 'bundlers', 'editor']
+        });
+    });
+
+    it('web packages run every leg and the website', () => {
+        assert.deepEqual(jobsOf(['packages/vite/src/a.ts']), {
+            buildWeb: true,
+            buildWebsite: true,
+            tests: ['alphatab', 'bundlers', 'editor']
+        });
+    });
+
+    it('ui-only change runs the editor leg and the website', () => {
+        assert.deepEqual(jobsOf(['packages/ui/src/a.tsx']), {
+            buildWeb: true,
+            buildWebsite: true,
+            tests: ['editor']
+        });
+    });
+
+    it('react-only change runs the editor leg and the website', () => {
+        assert.deepEqual(jobsOf(['packages/react/src/a.tsx']), {
+            buildWeb: true,
+            buildWebsite: true,
+            tests: ['editor']
+        });
+    });
+
+    it('playground-only change needs no web job', () => {
+        assert.deepEqual(jobsOf(['packages/playground/src/a.ts']), {
+            buildWeb: false,
+            buildWebsite: false,
+            tests: []
+        });
+    });
+
+    it('ui and core changes run every leg', () => {
+        assert.deepEqual(jobsOf(['packages/ui/src/a.tsx', 'packages/alphatab/src/a.ts']), {
+            buildWeb: true,
+            buildWebsite: true,
+            tests: ['alphatab', 'bundlers', 'editor']
+        });
+    });
+
+    it('playground and website changes build the website without tests', () => {
+        assert.deepEqual(jobsOf(['packages/playground/src/a.ts', 'website/docs/a.mdx']), {
+            buildWeb: true,
+            buildWebsite: true,
+            tests: []
+        });
+    });
+
+    it('csharp, kotlin and github changes need no web job', () => {
+        assert.deepEqual(jobsOf(['packages/csharp/a.cs', 'packages/kotlin/a.kt', '.github/scripts/a.mjs']), {
+            buildWeb: false,
+            buildWebsite: false,
+            tests: []
+        });
+    });
+
+    it('legs carry workspace arguments for existing packages only', () => {
+        const editor = webJobs(only('player'), existing).tests[0];
+        assert.equal(editor.name, 'Editor and Player');
+        assert.equal(
+            editor.install,
+            '-w packages/alphatab -w packages/alphatex -w packages/transpiler -w packages/tooling ' +
+                '-w packages/lsp -w packages/monaco -w packages/playground'
+        );
+        assert.equal(editor.test, '-w packages/lsp -w packages/monaco -w packages/playground');
     });
 });
 
