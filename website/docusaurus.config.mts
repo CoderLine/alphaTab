@@ -12,7 +12,7 @@ import * as fs from "fs";
 import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import { AlphaTabWebPackPlugin } from "@coderline/alphatab-webpack";
-import { RuleSetRule } from "webpack";
+import type { Module, RuleSetRule } from "webpack";
 
 const siteDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -735,6 +735,30 @@ async function createConfig(): Promise<Config> {
             };
 
         return {
+          optimization: {
+            splitChunks: {
+              cacheGroups: {
+                // Docusaurus turns splitChunks off for the server bundle; only the group below
+                // is wanted there, not webpack's defaults.
+                ...(isServer ? { default: false, defaultVendors: false } : {}),
+                // Linked workspace packages resolve outside node_modules, so webpack's vendor
+                // group misses them and every page chunk would embed its own copy of alphaTab.
+                linkedPackages: {
+                  test: (module: Module) => {
+                    const resource = module.nameForCondition();
+                    return (
+                      !!resource &&
+                      !resource.startsWith(siteDir + path.sep) &&
+                      !/[\\/]node_modules[\\/]/.test(resource)
+                    );
+                  },
+                  idHint: "vendors",
+                  priority: -10,
+                  reuseExistingChunk: true,
+                },
+              },
+            },
+          },
           module: {
             rules: [
               {
