@@ -70,5 +70,5 @@ jobs:
       channel: next
       npm_tag: alpha
       deploy_branch: develop
-      expected_alphatab_version: ${{ needs.web.outputs.alphatab_version }}
+      expected_versions: ${{ needs.web.outputs.published_versions }}
       dry_run: ${{ inputs.dry_run }}

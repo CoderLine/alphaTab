@@ -17,9 +17,9 @@ on:
         type: boolean
         default: false
     outputs:
-      alphatab_version:
-        description: The @coderline/alphatab version published by this run; empty if it was not published
-        value: ${{ jobs.build.outputs.alphatab_version }}
+      published_versions:
+        description: JSON object of the npm packages published by this run and their versions; {} on dry runs
+        value: ${{ jobs.build.outputs.published_versions }}
 
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
       contents: read
       id-token: write
     outputs:
-      alphatab_version: ${{ steps.publish.outputs.alphatab_version }}
+      published_versions: ${{ steps.publish.outputs.published_versions }}
     steps:
       - uses: actions/checkout@v7
         with:

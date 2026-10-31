@@ -134,9 +134,15 @@ function publish(platform: string, packages: Set<string>, dryRun: boolean) {
                     resolve(import.meta.dirname, '../packages', packageName)
                 );
             }
-            // the website build waits until the registry serves this version
-            const published = !dryRun && packages.has('alphatab');
-            writeOutput(`alphatab_version=${published ? readPackageVersion('alphatab') : ''}`);
+            // the website build waits until the registry serves each of these versions
+            const published: Record<string, string> = {};
+            if (!dryRun) {
+                for (const packageName of packages) {
+                    const { name, version } = readPackageJson(packageName);
+                    published[name] = version;
+                }
+            }
+            writeOutput(`published_versions=${JSON.stringify(published)}`);
             break;
         }
         case 'dotnet': {
@@ -210,9 +216,9 @@ function check(platform: string, packages: Set<string>) {
     writeOutput(`has_changes=${hasChanges ? 'true' : 'false'}`);
 }
 
-function readPackageVersion(packageName: string): string {
+function readPackageJson(packageName: string): { name: string; version: string } {
     const packageJson = resolve(import.meta.dirname, '../packages', packageName, 'package.json');
-    return JSON.parse(readFileSync(packageJson, 'utf-8')).version;
+    return JSON.parse(readFileSync(packageJson, 'utf-8'));
 }
 
 function writeOutput(line: string) {

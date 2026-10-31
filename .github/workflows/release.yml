@@ -70,5 +70,5 @@ jobs:
       channel: stable
       npm_tag: latest
       deploy_branch: main
-      expected_alphatab_version: ${{ needs.web.outputs.alphatab_version }}
+      expected_versions: ${{ needs.web.outputs.published_versions }}
       dry_run: ${{ inputs.dry_run == true }}

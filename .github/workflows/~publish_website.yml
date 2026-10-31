@@ -15,8 +15,8 @@ on:
         description: The deploy target on docs-deploy.alphaTab.net (develop or main)
         type: string
         required: true
-      expected_alphatab_version:
-        description: The @coderline/alphatab version the dist-tag has to serve before the build starts
+      expected_versions:
+        description: JSON object of npm packages and the versions their dist-tag has to serve before the build starts
         type: string
         default: ''
       dry_run:
@@ -49,30 +49,37 @@ jobs:
         name: Resolve published versions
         run: |
           set -euo pipefail
-          view() { npm view "$1@$NPM_TAG" version --prefer-online; }
-
-          if [ -n "$EXPECTED" ]; then
-            for attempt in $(seq 1 40); do
-              current=$(view @coderline/alphatab || true)
-              if [ "$current" = "$EXPECTED" ]; then break; fi
-              echo "@coderline/alphatab@$NPM_TAG is '$current', waiting for '$EXPECTED' ($attempt/40)"
-              sleep 15
-            done
-            if [ "$current" != "$EXPECTED" ]; then
-              echo "::error::@coderline/alphatab@$NPM_TAG is '$current', expected '$EXPECTED'"
+          view() { npm view "$1@$NPM_TAG" version --prefer-online 2>/dev/null || true; }
+          # npm accepts a publish minutes before the registry serves it, and per package at different times
+          resolve() {
+            local key="$1" name="$2" expected current
+            expected=$(jq -r --arg name "$name" '.[$name] // empty' <<< "$EXPECTED")
+            current=$(view "$name")
+            if [ -n "$expected" ]; then
+              for attempt in $(seq 1 40); do
+                if [ "$current" = "$expected" ]; then break; fi
+                echo "$name@$NPM_TAG is '$current', waiting for '$expected' ($attempt/40)"
+                sleep 15
+                current=$(view "$name")
+              done
+              if [ "$current" != "$expected" ]; then
+                echo "::error::$name@$NPM_TAG is '$current', expected '$expected'"
+                exit 1
+              fi
+            elif [ -z "$current" ]; then
+              echo "::error::$name@$NPM_TAG could not be resolved"
               exit 1
             fi
-          fi
+            echo "$key=$current" | tee -a "$GITHUB_OUTPUT"
+          }
 
-          alphatab=${EXPECTED:-$(view @coderline/alphatab)}
-          lsp=$(view @coderline/alphatab-language-server)
-          monaco=$(view @coderline/alphatab-monaco)
-          webpack=$(view @coderline/alphatab-webpack)
-          printf 'alphatab=%s\nlsp=%s\nmonaco=%s\nwebpack=%s\n' "$alphatab" "$lsp" "$monaco" "$webpack" \
-            | tee -a "$GITHUB_OUTPUT"
+          resolve alphatab @coderline/alphatab
+          resolve lsp @coderline/alphatab-language-server
+          resolve monaco @coderline/alphatab-monaco
+          resolve webpack @coderline/alphatab-webpack
         env:
           NPM_TAG: ${{ inputs.npm_tag }}
-          EXPECTED: ${{ inputs.expected_alphatab_version }}
+          EXPECTED: ${{ inputs.expected_versions || '{}' }}
 
       - uses: actions/cache@v6
         with:
