@@ -156,7 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      # keyed on the checked-out sources, before anything is generated or installed
+      # keyed on the checked-out sources, before anything is generated or installed; a cached dist
+      # passed the published types check of the script version in its key
       - id: dist-cache
         uses: actions/cache/restore@v6
         with:
@@ -166,7 +167,8 @@ jobs:
             web-dist-${{ runner.os }}-${{ hashFiles(
             'packages/alphatab/src/**', 'packages/lsp/src/**', 'packages/monaco/src/**',
             'packages/webpack/src/**', 'packages/vite/src/**', 'packages/react/src/**',
-            'packages/tooling/src/**', 'packages/transpiler/src/**',
+            'packages/alphatex/src/**', 'packages/tooling/src/**', 'packages/transpiler/src/**',
+            'scripts/check-published-types.mts',
             'packages/alphatab/font/**', 'packages/alphatab/bundler/**', 'packages/alphatab/scripts/**',
             'packages/*/vite.config.ts', 'packages/*/package.json', 'packages/*/tsconfig.json',
             'tsconfig.base.json', 'package.json', 'package-lock.json',
@@ -197,6 +199,8 @@ jobs:
         run: npm run build-monaco
       - if: steps.dist-cache.outputs.cache-hit != 'true' && hashFiles('packages/react/package.json') != ''
         run: npm run build -w packages/react
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: node scripts/check-published-types.mts
       - uses: actions/cache/save@v6
         if: steps.dist-cache.outputs.cache-hit != 'true' && github.event_name != 'pull_request'
         with:
