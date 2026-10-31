@@ -1,6 +1,7 @@
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import { Environment } from '@coderline/alphatab/Environment';
 import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileWire } from '@coderline/alphatab/midi/MidiFileWire';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { AlphaSynthWebWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorkerApi';
 import type { IAlphaSynthWorkerMessage } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
@@ -42,6 +43,24 @@ export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
         };
 
         this._promise = Promise.withResolvers();
+        /*@target web*/
+        if (
+            MidiFileWire.post(
+                this._worker.worker,
+                {
+                    cmd: 'alphaSynth.exporter.initialize',
+                    exporterId: this._exporterId,
+                    options: Environment.prepareForPostMessage(options),
+                    midi: null,
+                    syncPoints: Environment.prepareForPostMessage(syncPoints),
+                    transpositionPitches: Environment.prepareForPostMessage(transpositionPitches)
+                },
+                midi
+            )
+        ) {
+            await this._promise.promise;
+            return;
+        }
         this._worker.worker.postMessage({
             cmd: 'alphaSynth.exporter.initialize',
             exporterId: this._exporterId,

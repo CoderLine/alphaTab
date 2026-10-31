@@ -1,4 +1,3 @@
-import { DiagnosticSeverity } from '@coderline/alphatab-language-server/server/types';
 import * as monaco from 'monaco-editor';
 import {
     CompletionTriggerKind,
@@ -19,6 +18,7 @@ import type {
 import {
     CompletionItemKind,
     CompletionItemTag,
+    DiagnosticSeverity,
     InsertTextFormat,
     MarkedString,
     MarkupContent
@@ -49,7 +49,7 @@ export type MonacoLocation = Pick<
 export function lspToMonacoMarker(diagnostic: Diagnostic): monaco.editor.IMarkerData {
     return {
         severity: lspToMonacoSeverity(diagnostic.severity),
-        message: diagnostic.message,
+        message: typeof diagnostic.message === 'string' ? diagnostic.message : diagnostic.message.value,
         ...lspToMonacoRange(diagnostic.range),
         code: diagnostic.code?.toString(),
         tags: diagnostic.tags,

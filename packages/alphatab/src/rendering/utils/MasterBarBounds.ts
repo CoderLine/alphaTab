@@ -89,24 +89,40 @@ export class MasterBarBounds {
         this.visualBounds.scaleWith(scale);
         this.lineAlignedBounds.scaleWith(scale);
 
-        this.bars.sort((a, b) => {
-            if (a.realBounds.y < b.realBounds.y) {
-                return -1;
-            }
-            if (a.realBounds.y > b.realBounds.y) {
-                return 1;
-            }
-            if (a.realBounds.x < b.realBounds.x) {
-                return -1;
-            }
-            if (a.realBounds.x > b.realBounds.x) {
-                return 1;
-            }
-            return 0;
-        });
+        this.sortBars();
         for (const bar of this.bars) {
             bar.finish(scale);
         }
+    }
+
+    /**
+     * Orders the bars top-down and left-to-right, keeping the order of bars at the same position.
+     * @internal
+     */
+    public sortBars(): void {
+        const bars = this.bars;
+        for (let i = 1; i < bars.length; i++) {
+            if (MasterBarBounds._compareBars(bars[i - 1], bars[i]) > 0) {
+                bars.sort((a, b) => MasterBarBounds._compareBars(a, b));
+                return;
+            }
+        }
+    }
+
+    private static _compareBars(a: BarBounds, b: BarBounds): number {
+        if (a.realBounds.y < b.realBounds.y) {
+            return -1;
+        }
+        if (a.realBounds.y > b.realBounds.y) {
+            return 1;
+        }
+        if (a.realBounds.x < b.realBounds.x) {
+            return -1;
+        }
+        if (a.realBounds.x > b.realBounds.x) {
+            return 1;
+        }
+        return 0;
     }
 
     /**

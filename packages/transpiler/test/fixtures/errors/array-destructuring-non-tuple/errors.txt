@@ -1,0 +1,1 @@
+input.ts:6:15: Array destructuring of a non-tuple source ([a, b] = arr) is not supported. See SYNTAX.md for the workaround.

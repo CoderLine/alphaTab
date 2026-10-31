@@ -1,0 +1,25 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.cell {
+  background: var(--at-bg);
+  border: 1px solid var(--at-line-soft);
+  border-radius: 6px;
+  padding: 6px 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.label {
+  font-family: var(--at-font-mono);
+  font-size: 9px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}

@@ -48,6 +48,10 @@ export enum EffectBandMode {
 export interface EffectBandInfo {
     mode: EffectBandMode;
     effect: EffectInfo;
+    /**
+     * Visual-stack position within {@link EffectInfo.placementCategory}.
+     * Higher value = closer to staff. Defaults to the declaration index.
+     */
     order?: number;
     shouldCreate?: (staff: Staff) => boolean;
 }
@@ -63,6 +67,13 @@ export abstract class BarRendererFactory {
     public effectBands: EffectBandInfo[];
 
     public abstract get staffId(): string;
+
+    /**
+     * Priority in the staff-display cascade. Lower wins. The lowest-priority
+     * render-staff among siblings sharing the same model {@link Staff}
+     * is the {@link StaffPlacement.Primary} painter.
+     */
+    public abstract get cascadePriority(): number;
 
     public constructor(effectBands: EffectBandInfo[]) {
         this.effectBands = effectBands;

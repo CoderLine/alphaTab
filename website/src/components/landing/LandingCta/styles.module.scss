@@ -1,0 +1,149 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.section {
+  background: var(--at-bg);
+  border-bottom: 1px solid var(--at-line);
+  @include section-tokens;
+}
+
+.inner {
+  @include section-container;
+  padding-top: var(--section-pad-y);
+  padding-bottom: var(--section-pad-y);
+}
+
+.card {
+  background: var(--at-cta-bg);
+  color: var(--at-cta-ink);
+  border-radius: 18px;
+  padding: 56px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+    padding: 40px 36px;
+    gap: 32px;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    padding: 32px 24px;
+    gap: 28px;
+    border-radius: 14px;
+  }
+}
+
+.copy {
+  position: relative;
+}
+
+.versionPill {
+  color: var(--at-cta-accent);
+  background: color-mix(in srgb, var(--at-cta-accent) 16%, transparent);
+  border-color: color-mix(in srgb, var(--at-cta-accent) 30%, transparent);
+}
+
+.title {
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: -2px;
+  margin: 20px 0 0;
+  font-weight: 700;
+  color: var(--at-cta-ink);
+
+  @include tablet { font-size: 42px; }
+  @include mobile {
+    font-size: 32px;
+
+    .titleBreak { display: none; }
+  }
+}
+
+.titleBreak {}
+
+.lede {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--at-cta-ink-soft);
+  margin: 18px 0 0;
+  max-width: 480px;
+
+  @include mobile { font-size: 14.5px; }
+}
+
+.installs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  min-width: 0;
+}
+
+.installCard {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px 16px;
+
+  @include mobile { padding: 10px 14px; }
+}
+
+.installPlatform {
+  font-size: 12px;
+  color: var(--at-cta-ink-soft);
+  margin-bottom: 4px;
+}
+
+.installCmd {
+  font-family: var(--at-font-mono);
+  font-size: 13px;
+  color: var(--at-cta-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 11.5px;
+    word-break: break-all;
+    white-space: normal;
+    line-height: 1.4;
+  }
+}
+
+.quickstart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border-radius: 8px;
+  background: var(--at-cta-accent);
+  color: var(--at-cta-accent-ink);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  border: 1px solid var(--at-cta-accent);
+  width: auto;
+  margin-top: 4px;
+  text-decoration: none;
+  align-self: flex-start;
+
+  &:hover {
+    color: var(--at-cta-accent-ink);
+    background: color-mix(in srgb, var(--at-cta-accent) 88%, white);
+    text-decoration: none;
+  }
+
+  @include mobile {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    align-self: stretch;
+  }
+}

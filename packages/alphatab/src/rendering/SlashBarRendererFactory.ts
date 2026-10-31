@@ -11,8 +11,12 @@ import { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer
  * @internal
  */
 export class SlashBarRendererFactory extends BarRendererFactory {
-    public get staffId(): string {
+    public override get staffId(): string {
         return SlashBarRenderer.StaffId;
+    }
+
+    public override get cascadePriority(): number {
+        return 2;
     }
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {

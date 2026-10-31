@@ -55,13 +55,15 @@ export class GlyphGroup extends Glyph {
     }
 
     public addGlyph(g: Glyph): void {
-        if (!this.glyphs) {
-            this.glyphs = [];
-        }
         if (this.renderer) {
             g.renderer = this.renderer;
         }
-        this.glyphs.push(g);
+        const glyphs = this.glyphs;
+        if (!glyphs) {
+            this.glyphs = [g];
+        } else {
+            glyphs.push(g);
+        }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -69,8 +71,10 @@ export class GlyphGroup extends Glyph {
         if (!glyphs || glyphs.length === 0) {
             return;
         }
-        for (const g of glyphs) {
-            g.paint(cx + this.x, cy + this.y, canvas);
+        const x = cx + this.x;
+        const y = cy + this.y;
+        for (let i = 0, j = glyphs.length; i < j; i++) {
+            glyphs[i].paint(x, y, canvas);
         }
     }
 }

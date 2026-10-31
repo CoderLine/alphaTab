@@ -6,7 +6,12 @@ import type { IMidiFileHandler } from '@coderline/alphatab/midi/IMidiFileHandler
  */
 export class FlatMidiEventGenerator implements IMidiFileHandler {
     public midiEvents: FlatMidiEvent[] = [];
+    public metronomeEvents: FlatMetronomeEvent[] = [];
     public tickShift = 0;
+
+    public addMetronome(tick: number, counter: number, durationInTicks: number): void {
+        this.metronomeEvents.push(new FlatMetronomeEvent(tick, counter, durationInTicks));
+    }
 
     public addTickShift(tickShift: number): void {
         this.tickShift = tickShift;
@@ -116,6 +121,36 @@ export class FlatTempoEvent extends FlatMidiEvent {
 
         if (obj instanceof FlatTempoEvent) {
             return this.tempo === obj.tempo;
+        }
+
+        return false;
+    }
+}
+
+/**
+ * @internal
+ */
+export class FlatMetronomeEvent extends FlatMidiEvent {
+    public counter: number = 0;
+    public durationInTicks: number = 0;
+
+    public constructor(tick: number, counter: number, durationInTicks: number) {
+        super(tick);
+        this.counter = counter;
+        this.durationInTicks = durationInTicks;
+    }
+
+    public override toString(): string {
+        return `Metronome: ${super.toString()} Counter[${this.counter}] Duration[${this.durationInTicks}]`;
+    }
+
+    public override equals(obj: unknown): boolean {
+        if (!super.equals(obj)) {
+            return false;
+        }
+
+        if (obj instanceof FlatMetronomeEvent) {
+            return this.counter === obj.counter && this.durationInTicks === obj.durationInTicks;
         }
 
         return false;

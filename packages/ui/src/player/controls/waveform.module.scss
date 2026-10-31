@@ -1,0 +1,25 @@
+.waveform {
+  position: relative;
+  flex-shrink: 0;
+  height: 56px;
+  border-top: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  cursor: pointer;
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--at-accent);
+  opacity: 0.55;
+}
+
+.cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--at-cursor, var(--at-accent));
+  pointer-events: none;
+}

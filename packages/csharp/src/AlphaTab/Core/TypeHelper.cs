@@ -99,6 +99,19 @@ namespace AlphaTab.Core
             return list.Any(predicate);
         }
 
+        public static bool Every<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            return list.All(predicate);
+        }
+
+        public static IList<T> Splice<T>(this IList<T> data, double start)
+        {
+            var deleteCount = data.Count - (int)start;
+            var items = data.GetRange((int)start, deleteCount);
+            data.RemoveRange((int)start, deleteCount);
+            return new List<T>(items);
+        }
+
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
         {
             var items = data.GetRange((int)start, (int)deleteCount);
@@ -263,13 +276,22 @@ namespace AlphaTab.Core
 
         public static IList<T> Sort<T>(this IList<T> data, Func<T, T, double> func)
         {
+            // Sign-only conversion: a direct (int) cast truncates and can
+            // overflow when the JS-style comparator returns values outside
+            // int range (e.g. packed sort keys at 2^40).
+            int Compare(T a, T b)
+            {
+                var d = func(a, b);
+                return d < 0 ? -1 : d > 0 ? 1 : 0;
+            }
+
             switch (data)
             {
                 case List<T> l:
-                    l.Sort((a, b) => (int)func(a, b));
+                    l.Sort(Compare);
                     break;
                 case T[] array:
-                    System.Array.Sort(array, (a, b) => (int)func(a, b));
+                    System.Array.Sort(array, Compare);
                     break;
                 default:
                     throw new NotSupportedException("Cannot sort list of type " +
@@ -279,7 +301,7 @@ namespace AlphaTab.Core
             return data;
         }
 
-        public static void Sort<T>(this IList<T> data)
+        public static IList<T> Sort<T>(this IList<T> data)
         {
             switch (data)
             {
@@ -293,6 +315,7 @@ namespace AlphaTab.Core
                     throw new NotSupportedException("Cannot sort list of type " +
                                                     data.GetType().FullName);
             }
+            return data;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -347,7 +370,7 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int CharCodeAt(this string s, double index)
+        public static double CharCodeAt(this string s, double index)
         {
             return s[(int)index];
         }

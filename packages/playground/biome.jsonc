@@ -3,24 +3,12 @@
     "root": false,
     "extends": "//",
     "files": {
-        "includes": [
-            "*.ts",
-            "src/**",
-            "test/**"
-        ]
+        "includes": ["*.ts", "src/**", "test/**", "demos/**/*.ts", "demos/**/*.tsx", "!**/*.scss"]
     },
     "formatter": {
-        "includes": [
-            "*.ts",
-            "src/**",
-            "test/**"
-        ]
+        "includes": ["*.ts", "src/**", "test/**", "demos/**/*.ts", "demos/**/*.tsx", "!**/*.scss"]
     },
     "linter": {
-        "includes": [
-            "*.ts",
-            "src/**",
-            "test/**"
-        ]
+        "includes": ["*.ts", "src/**", "test/**", "demos/**/*.ts", "demos/**/*.tsx", "!**/*.scss"]
     }
 }

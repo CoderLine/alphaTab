@@ -1,5 +1,11 @@
 import { Clef } from '@coderline/alphatab/model/Clef';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import type {
+    NumberedBarOverride,
+    ScoreBarOverride,
+    SlashBarOverride,
+    TabBarOverride
+} from '@coderline/alphatab/model/BarOverrides';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import type { Staff } from '@coderline/alphatab/model/Staff';
@@ -399,10 +405,65 @@ export class Bar {
     public keySignatureType: KeySignatureType = KeySignatureType.Major;
 
     /**
-     * How bar numbers should be displayed.
-     * If specified, overrides the value from the stylesheet on score level.
+     * How bar numbers should be displayed on this specific bar.
+     * @deprecated Use {@link scoreDisplay}, {@link tabDisplay},
+     * {@link slashDisplay}, or {@link numberedDisplay} `.barNumber` for
+     * per-staff-type per-bar control. The setter broadcasts the value
+     * to all four override bags (lazy-creating each); on `undefined`
+     * it clears `.barNumber` on each existing bag without removing it.
      */
-    public barNumberDisplay?: BarNumberDisplay;
+    public get barNumberDisplay(): BarNumberDisplay | undefined {
+        return this.scoreDisplay?.barNumber;
+    }
+    public set barNumberDisplay(value: BarNumberDisplay | undefined) {
+        if (value !== undefined) {
+            this.scoreDisplay ??= {};
+            this.scoreDisplay.barNumber = value;
+            this.tabDisplay ??= {};
+            this.tabDisplay.barNumber = value;
+            this.slashDisplay ??= {};
+            this.slashDisplay.barNumber = value;
+            this.numberedDisplay ??= {};
+            this.numberedDisplay.barNumber = value;
+        } else {
+            if (this.scoreDisplay) {
+                this.scoreDisplay.barNumber = undefined;
+            }
+            if (this.tabDisplay) {
+                this.tabDisplay.barNumber = undefined;
+            }
+            if (this.slashDisplay) {
+                this.slashDisplay.barNumber = undefined;
+            }
+            if (this.numberedDisplay) {
+                this.numberedDisplay.barNumber = undefined;
+            }
+        }
+    }
+
+    /**
+     * Per-bar override for the standard-notation staff's display.
+     * @since 1.9.0
+     */
+    public scoreDisplay?: ScoreBarOverride;
+
+    /**
+     * Per-bar override for the tablature staff's display.
+     * @since 1.9.0
+     */
+    public tabDisplay?: TabBarOverride;
+
+    /**
+     * Per-bar override for the slash staff's display.
+     * @since 1.9.0
+     */
+    public slashDisplay?: SlashBarOverride;
+
+    /**
+     * Per-bar override for the numbered (jianpu) staff's display.
+     * @since 1.9.0
+     */
+    public numberedDisplay?: NumberedBarOverride;
 
     /**
      * The shortest duration contained across beats in this bar.
@@ -514,9 +575,10 @@ export class Bar {
                 }
             }
 
-            const isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
-
             for (const marker of sustainPedals) {
+                // a press while the pedal is already down continues the pedal
+                const isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
+
                 if (previousMarker && previousMarker.pedalType !== SustainPedalMarkerType.Up) {
                     //duplicate or out-of-order markers
                     if (previousMarker.bar === this && marker.ratioPosition <= previousMarker.ratioPosition) {

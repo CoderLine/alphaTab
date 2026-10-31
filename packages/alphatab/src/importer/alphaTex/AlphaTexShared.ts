@@ -198,6 +198,12 @@ export enum AlphaTexDiagnosticCode {
     AT220 = 220,
 
     /**
+     * A string number can only be specified on pitched notes, use the 'fret.string' syntax to specify the string of fretted notes.
+     * @since 1.9.0
+     */
+    AT221 = 221,
+
+    /**
      * Expected no arguments, but found some.
      */
     AT300 = 300,
@@ -231,6 +237,12 @@ export enum AlphaTexDiagnosticCode {
      * This staff metadata tag should be specified as staff property.
      */
     AT306 = 306,
+
+    /**
+     * The staff display property is not supported by the staff type, the value has no effect.
+     * @since 1.9.0
+     */
+    AT307 = 307,
 
     /**
      * The dots separating score metadata, score contents and the sync points can be removed.
@@ -279,6 +291,22 @@ export enum AlphaTexAccidentalMode {
 export enum AlphaTexVoiceMode {
     StaffWise = 0,
     BarWise = 1
+}
+
+/**
+ * The staff types selected by the alphaTex staff display tags (`\defaultStaffDisplay`, `\staffDisplay`, `\barDisplay`).
+ * @since 1.9.0
+ * @public
+ */
+export enum AlphaTexStaffType {
+    /** Standard notation */
+    Score = 0,
+    /** Guitar tablature */
+    Tabs = 1,
+    /** Slash notation */
+    Slash = 2,
+    /** Numbered notation (Jianpu) */
+    Numbered = 3
 }
 
 /**

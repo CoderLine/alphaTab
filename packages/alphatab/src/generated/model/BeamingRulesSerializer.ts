@@ -4,41 +4,45 @@
 // the code is regenerated.
 // </auto-generated>
 import { BeamingRules } from "@coderline/alphatab/model/MasterBar";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { Duration } from "@coderline/alphatab/model/Duration";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class BeamingRulesSerializer {
-    public static fromJson(obj: BeamingRules, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["groups"]);
+    public static read(obj: BeamingRules, reader: IObjectReader): void {
+        reader.readRecord(BeamingRulesSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    BeamingRulesSerializer._readGroups(obj, r);
+                    return true;
+            }
+            return false;
+        });
+    }
+    private static _readGroups(obj: BeamingRules, r: IObjectReader): void {
+        obj.groups = new Map<Duration, number[]>();
+        r.readObject((k, rr) => {
+            obj.groups.set(JsonHelper.parseEnum<Duration>(k, Duration)!, rr.readValue()! as number[]);
+            return true;
+        });
+    }
+    public static write(obj: BeamingRules | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BeamingRulesSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: BeamingRules | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
+        w.startObject(BeamingRulesSerializer._fields);
+        w.mapField(0);
+        for (const [k, v] of obj.groups!) {
+            w.prop(k.toString());
+            w.writeValue(v);
         }
-        const o = new Map<string, unknown>();
-        {
-            const m = new Map<string, unknown>();
-            o.set("groups", m);
-            for (const [k, v] of obj.groups!) {
-                m.set(k.toString(), v);
-            }
-        }
-        return o;
-    }
-    public static setProperty(obj: BeamingRules, property: string, v: unknown): boolean {
-        switch (property) {
-            case "groups":
-                obj.groups = new Map<Duration, number[]>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.groups.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number[]);
-                });
-                return true;
-        }
-        return false;
+        w.endMap();
+        w.endObject();
     }
 }

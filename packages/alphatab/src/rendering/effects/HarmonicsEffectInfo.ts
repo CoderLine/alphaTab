@@ -1,96 +1,71 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { Note } from '@coderline/alphatab/model/Note';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import { NoteEffectInfoBase } from '@coderline/alphatab/rendering/effects/NoteEffectInfoBase';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { createNoteShouldCreateGlyph } from '@coderline/alphatab/rendering/effects/NoteEffectInfoBase';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class HarmonicsEffectInfo extends NoteEffectInfoBase {
-    private _harmonicType: HarmonicType;
-    private _beat: Beat | null = null;
-    private _effectId: string;
-
-    public override get effectId(): string {
-        return this._effectId;
+export function harmonicToString(type: HarmonicType): string {
+    switch (type) {
+        case HarmonicType.Natural:
+            return 'N.H.';
+        case HarmonicType.Artificial:
+            return 'A.H.';
+        case HarmonicType.Pinch:
+            return 'P.H.';
+        case HarmonicType.Tap:
+            return 'T.H.';
+        case HarmonicType.Semi:
+            return 'S.H.';
+        case HarmonicType.Feedback:
+            return 'Fdbk.';
     }
+    return '';
+}
 
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectHarmonics;
+function harmonicEffectId(harmonicType: HarmonicType): string {
+    switch (harmonicType) {
+        case HarmonicType.None:
+            return 'harmonics-none';
+        case HarmonicType.Natural:
+            return 'harmonics-natural';
+        case HarmonicType.Artificial:
+            return 'harmonics-artificial';
+        case HarmonicType.Pinch:
+            return 'harmonics-pinch';
+        case HarmonicType.Tap:
+            return 'harmonics-tap';
+        case HarmonicType.Semi:
+            return 'harmonics-semi';
+        case HarmonicType.Feedback:
+            return 'harmonics-feedback';
+        default:
+            return '';
     }
+}
 
-    public constructor(harmonicType: HarmonicType) {
-        super();
-        this._harmonicType = harmonicType;
-        switch (harmonicType) {
-            case HarmonicType.None:
-                this._effectId = 'harmonics-none';
-                break;
-            case HarmonicType.Natural:
-                this._effectId = 'harmonics-natural';
-                break;
-            case HarmonicType.Artificial:
-                this._effectId = 'harmonics-artificial';
-                break;
-            case HarmonicType.Pinch:
-                this._effectId = 'harmonics-pinch';
-                break;
-            case HarmonicType.Tap:
-                this._effectId = 'harmonics-tap';
-                break;
-            case HarmonicType.Semi:
-                this._effectId = 'harmonics-semi';
-                break;
-            case HarmonicType.Feedback:
-                this._effectId = 'harmonics-feedback';
-                break;
-            default:
-                this._effectId = '';
-                break;
-        }
-    }
-
-    protected shouldCreateGlyphForNote(note: Note): boolean {
-        if (!note.isHarmonic || note.harmonicType !== this._harmonicType) {
-            return false;
-        }
-        if (note.beat !== this._beat) {
-            this._beat = note.beat;
-        }
-        return true;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.GroupedOnBeat;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new LineRangedGlyph(
-            HarmonicsEffectInfo.harmonicToString(this._harmonicType),
-            NotationElement.EffectHarmonics
-        );
-    }
-
-    public static harmonicToString(type: HarmonicType): string {
-        switch (type) {
-            case HarmonicType.Natural:
-                return 'N.H.';
-            case HarmonicType.Artificial:
-                return 'A.H.';
-            case HarmonicType.Pinch:
-                return 'P.H.';
-            case HarmonicType.Tap:
-                return 'T.H.';
-            case HarmonicType.Semi:
-                return 'S.H.';
-            case HarmonicType.Feedback:
-                return 'Fdbk.';
-        }
-        return '';
-    }
+/**
+ * @internal
+ */
+export function createHarmonicsEffectInfo(harmonicType: HarmonicType): EffectInfo {
+    return {
+        effectId: harmonicEffectId(harmonicType),
+        notationElement: NotationElement.EffectHarmonics,
+        hideOnMultiTrack: false,
+        sizingMode: EffectBarGlyphSizing.GroupedOnBeat,
+        shouldCreateGlyph: createNoteShouldCreateGlyph(
+            (note: Note): boolean => note.isHarmonic && note.harmonicType === harmonicType
+        ),
+        createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph =>
+            new LineRangedGlyph(harmonicToString(harmonicType), NotationElement.EffectHarmonics),
+        canExpand: (_from: Beat, _to: Beat): boolean => true,
+        placementCategory: EffectBandPlacementCategory.NoteAttached
+    };
 }

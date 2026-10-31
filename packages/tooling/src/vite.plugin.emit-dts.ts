@@ -1,12 +1,15 @@
 import path from 'node:path';
 import ts from 'typescript';
 import type { Plugin } from 'vite';
+import { packagesDir, workspacePackageOf } from './workspace';
 
 /**
  * `afterDeclarations` transformer that rewrites tsconfig-path-aliased imports
- * in emitted `.d.ts` files back to relative paths, so bundled declarations
- * carry no `@coderline/alphatab/X` references that won't resolve at
- * consumption time.
+ * in emitted `.d.ts` files to relative paths when they target the package
+ * itself or a private workspace package, whose declarations have to ship
+ * with it. Aliases of other published packages stay package imports.
+ * Relative paths are computed from the source file, so they hold only for
+ * an emit that mirrors the source tree.
  */
 export function dtsPathsTransformer(
     mapping?: Record<string, string>,
@@ -43,10 +46,18 @@ export function dtsPathsTransformer(
             return false;
         };
 
+        const isShippedWith = (filePath: string, target: string) => {
+            const targetPackage = workspacePackageOf(target);
+            return !targetPackage || targetPackage.isPrivate || targetPackage === workspacePackageOf(filePath);
+        };
+
         const mapPath = (filePath: string, input: string): string | undefined => {
             for (const [k, v] of Object.entries(mapping!)) {
                 if (input.startsWith(k) && !isExternal(input)) {
                     const absoluteFile = path.resolve(v, input.substring(k.length));
+                    if (!isShippedWith(filePath, absoluteFile)) {
+                        return undefined;
+                    }
                     return `./${path.relative(path.dirname(filePath), absoluteFile).replaceAll('\\', '/')}`;
                 }
             }
@@ -104,8 +115,10 @@ export interface EmitDtsOptions {
  * Vite plugin that drives `ts.createProgram(...).emit(emitOnlyDtsFiles)` once
  * per process per `(projectDir, declarationDir)` pair, applying
  * {@link dtsPathsTransformer} as `afterDeclarations`. Produces the per-file
- * `.d.ts` tree under `declarationDir` that the api-extractor bundling step in
- * `vite.ts` rolls up into a single bundled `.d.ts` per entry.
+ * `.d.ts` of the package's sources and of the private workspace packages they
+ * use under `declarationDir`, placed at `intermediateDeclarationPath()`.
+ * The api-extractor bundling step in `vite.ts` rolls these up into a single
+ * bundled `.d.ts` per entry.
  */
 const emitCache = new Map<string, boolean>();
 
@@ -137,9 +150,8 @@ export function emitDtsPlugin(options: EmitDtsOptions): Plugin {
                     declarationDir,
                     noEmit: false,
                     declarationMap: false,
-                    // root the emit at src/ so paths mirror the source tree
-                    // (src/Foo.ts -> dist/types/Foo.d.ts).
-                    rootDir: srcDir
+                    // see intermediateDeclarationPath()
+                    rootDir: packagesDir
                 },
                 tsconfigPath
             );
@@ -161,10 +173,17 @@ export function emitDtsPlugin(options: EmitDtsOptions): Plugin {
                 dtsPathsTransformer()
             ];
 
-            // confine emit to `declarationDir`; TS would otherwise also write
-            // `.d.ts` next to any source outside `rootDir` (cross-package
-            // imports in monorepos).
-            const declarationDirPrefix = declarationDir + path.sep;
+            // only the package's own sources and the private packages it uses
+            // ship declarations; other packages are referenced by name.
+            const srcDirPrefix = srcDir + path.sep;
+            const ownPackage = workspacePackageOf(srcDir);
+            const isEmitted = (sourceFile: string) => {
+                if (sourceFile.startsWith(srcDirPrefix)) {
+                    return true;
+                }
+                const sourcePackage = workspacePackageOf(sourceFile);
+                return sourcePackage !== undefined && sourcePackage !== ownPackage && sourcePackage.isPrivate;
+            };
             const filteredWriteFile: ts.WriteFileCallback = (
                 fileName,
                 content,
@@ -173,13 +192,11 @@ export function emitDtsPlugin(options: EmitDtsOptions): Plugin {
                 sourceFiles,
                 data
             ) => {
-                const normalized = path.resolve(fileName);
-                if (!normalized.startsWith(declarationDirPrefix)) {
+                if (!sourceFiles?.every(s => isEmitted(path.resolve(s.fileName)))) {
                     return;
                 }
-                ts.sys.writeFile(normalized, content, writeByteOrderMark);
+                ts.sys.writeFile(path.resolve(fileName), content, writeByteOrderMark);
                 void onError;
-                void sourceFiles;
                 void data;
             };
 
@@ -192,11 +209,9 @@ export function emitDtsPlugin(options: EmitDtsOptions): Plugin {
             );
 
             // Tolerated diagnostics that don't block emission:
-            // TS6059: file not under 'rootDir' (expected for cross-package
-            //   monorepo imports — TS still emits the per-file .d.ts).
             // TS18003: no inputs were found (false alarm when the program is
             //   constrained via fileNames).
-            const tolerated = new Set<number>([6059, 18003]);
+            const tolerated = new Set<number>([18003]);
 
             const diagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
             for (const diagnostic of diagnostics) {

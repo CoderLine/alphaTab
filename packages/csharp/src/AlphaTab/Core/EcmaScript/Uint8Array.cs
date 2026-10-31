@@ -41,6 +41,11 @@ public class Uint8Array : IEnumerable<byte>, IEnumerable<double>
     {
     }
 
+    public Uint8Array(IEnumerable<double> values)
+        : this(values.Select(d => (byte)d).ToArray())
+    {
+    }
+
     public double this[double index]
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -106,5 +111,23 @@ public class Uint8Array : IEnumerable<byte>, IEnumerable<double>
             (int)ByteOffset,
             (int)Length
         );
+    }
+
+    public void Fill(double value)
+    {
+        var start = (int)ByteOffset;
+        var length = (int)Length;
+        if (value == 0)
+        {
+            System.Array.Clear(Buffer.Raw, start, length);
+        }
+        else
+        {
+            var b = (byte)value;
+            for (var i = 0; i < length; i++)
+            {
+                Buffer.Raw[start + i] = b;
+            }
+        }
     }
 }

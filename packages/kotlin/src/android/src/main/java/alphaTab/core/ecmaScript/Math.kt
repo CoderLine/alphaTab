@@ -6,6 +6,7 @@ import kotlin.math.roundToInt
 internal class Math {
     companion object {
         public const val PI: Double = kotlin.math.PI
+        public const val SQRT2: Double = 1.4142135623730951;
         public fun log10(x: Double): Double {
             return kotlin.math.log10(x)
         }
@@ -76,6 +77,10 @@ internal class Math {
 
         public fun max(vararg v: Double): Double {
             return v.max()
+        }
+
+        public fun min(vararg v: Double): Double {
+            return v.min()
         }
 
         public fun random(): Double {

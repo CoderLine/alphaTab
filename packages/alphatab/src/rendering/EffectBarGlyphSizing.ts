@@ -34,5 +34,10 @@ export enum EffectBarGlyphSizing {
     /**
      * The effect glyph is placed on the whole bar covering the whole width
      */
-    FullBar = 5
+    FullBar = 5,
+
+    /**
+     * The effect glyph is placed on the left edge of the bar with its own dedicated width
+     */
+    SingleStartBar = 6
 }

@@ -1,14 +1,26 @@
-﻿using System.Text;
+﻿using System.Collections.Concurrent;
+using System.Text;
 
 namespace AlphaTab.Core.EcmaScript;
 
 internal class TextDecoder
 {
+    private static readonly ConcurrentDictionary<string, Encoding> EncodingCache = new();
     private readonly Encoding _encoding;
 
     public TextDecoder(string encoding)
     {
-        _encoding = Encoding.GetEncoding(encoding);
+        _encoding = EncodingCache.GetOrAdd(encoding, s =>
+        {
+            try
+            {
+                return Encoding.GetEncoding(encoding);
+            }
+            catch
+            {
+                return Encoding.Default;
+            }
+        });
     }
 
     public string Decode(ArrayBuffer data)

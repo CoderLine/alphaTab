@@ -10,7 +10,9 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
- * A helper to apply element styles in a specific rendering scope via the `using` keyword
+ * A helper to apply element styles in a specific rendering scope, either via the `using` keyword
+ * on the scopes returned by `score`, `bar`, `voice` etc. or via the `apply*` methods paired with
+ * {@link restore} in a `finally` block. The latter do not allocate and are meant for hot paint paths.
  * @internal
  */
 export class ElementStyleHelper {
@@ -20,13 +22,26 @@ export class ElementStyleHelper {
         score: Score,
         forceDefault: boolean = false
     ): Disposable | undefined {
+        return ElementStyleHelper._scope(canvas, ElementStyleHelper.applyScore(canvas, element, score, forceDefault));
+    }
+
+    /**
+     * Applies the style of the element to the canvas.
+     * @returns The color to pass to {@link restore} once the styled element is painted.
+     */
+    public static applyScore(
+        canvas: ICanvas,
+        element: ScoreSubElement,
+        score: Score,
+        forceDefault: boolean = false
+    ): Color | undefined {
         if (!score.style && !forceDefault) {
             return undefined;
         }
 
         const defaultColor: Color = ElementStyleHelper._scoreDefaultColor(canvas.settings.display.resources, element);
 
-        return new ElementStyleScope<ScoreSubElement>(canvas, element, score.style, defaultColor);
+        return ElementStyleHelper._apply<ScoreSubElement>(canvas, element, score.style, defaultColor, forceDefault);
     }
 
     public static scoreColor(res: RenderingResources, element: ScoreSubElement, score: Score): Color | undefined {
@@ -40,7 +55,7 @@ export class ElementStyleHelper {
     }
 
     private static _scoreDefaultColor(res: RenderingResources, _element: ScoreSubElement) {
-        const defaultColor: Color = res.mainGlyphColor;
+        const defaultColor: Color = res.scoreInfoColor;
 
         return defaultColor;
     }
@@ -51,6 +66,19 @@ export class ElementStyleHelper {
         bar: Bar,
         forceDefault: boolean = false
     ): Disposable | undefined {
+        return ElementStyleHelper._scope(canvas, ElementStyleHelper.applyBar(canvas, element, bar, forceDefault));
+    }
+
+    /**
+     * Applies the style of the element to the canvas.
+     * @returns The color to pass to {@link restore} once the styled element is painted.
+     */
+    public static applyBar(
+        canvas: ICanvas,
+        element: BarSubElement,
+        bar: Bar,
+        forceDefault: boolean = false
+    ): Color | undefined {
         if (!bar.style && !forceDefault) {
             return undefined;
         }
@@ -93,7 +121,19 @@ export class ElementStyleHelper {
                 break;
         }
 
-        return new ElementStyleScope<BarSubElement>(canvas, element, bar.style, defaultColor);
+        return ElementStyleHelper._apply<BarSubElement>(canvas, element, bar.style, defaultColor, forceDefault);
+    }
+
+    /**
+     * The colour of a staff-line sub-element of the bar. Staff lines inherit no colour from other elements:
+     * without an entry in the bar style the default staff-line colour applies.
+     */
+    public static staffLineColor(res: RenderingResources, element: BarSubElement, bar: Bar): Color {
+        const style = bar.style;
+        if (style && style.colors.has(element)) {
+            return style.colors.get(element) ?? res.staffLineColor;
+        }
+        return res.staffLineColor;
     }
 
     public static voice(
@@ -102,6 +142,19 @@ export class ElementStyleHelper {
         voice: Voice,
         forceDefault: boolean = false
     ): Disposable | undefined {
+        return ElementStyleHelper._scope(canvas, ElementStyleHelper.applyVoice(canvas, element, voice, forceDefault));
+    }
+
+    /**
+     * Applies the style of the element to the canvas.
+     * @returns The color to pass to {@link restore} once the styled element is painted.
+     */
+    public static applyVoice(
+        canvas: ICanvas,
+        element: VoiceSubElement,
+        voice: Voice,
+        forceDefault: boolean = false
+    ): Color | undefined {
         if (!voice.style && !forceDefault) {
             return undefined;
         }
@@ -111,12 +164,15 @@ export class ElementStyleHelper {
                 ? canvas.settings.display.resources.mainGlyphColor
                 : canvas.settings.display.resources.secondaryGlyphColor;
 
-        return new ElementStyleScope<VoiceSubElement>(canvas, element, voice.style, defaultColor);
+        return ElementStyleHelper._apply<VoiceSubElement>(canvas, element, voice.style, defaultColor, forceDefault);
     }
 
-    public static trackColor(res: RenderingResources, element: TrackSubElement, track: Track): Color | undefined {
-        const defaultColor = ElementStyleHelper._trackDefaultColor(res, element);
-
+    /**
+     * The colour of the track style entry for the element, `defaultColor` for a `null` entry and `undefined`
+     * without an entry.
+     * @param defaultColor The colour the element has without a style where it is painted.
+     */
+    public static trackColor(element: TrackSubElement, track: Track, defaultColor: Color): Color | undefined {
         if (track.style && track.style!.colors.has(element)) {
             return track.style!.colors.get(element) ?? defaultColor;
         }
@@ -127,10 +183,10 @@ export class ElementStyleHelper {
     private static _trackDefaultColor(res: RenderingResources, element: TrackSubElement) {
         let defaultColor: Color = res.mainGlyphColor;
         switch (element) {
-            case TrackSubElement.TrackName:
             case TrackSubElement.SystemSeparator:
             case TrackSubElement.StringTuning:
                 break;
+            case TrackSubElement.TrackName:
             case TrackSubElement.BracesAndBrackets:
                 defaultColor = res.barSeparatorColor;
                 break;
@@ -145,13 +201,26 @@ export class ElementStyleHelper {
         track: Track,
         forceDefault: boolean = false
     ): Disposable | undefined {
+        return ElementStyleHelper._scope(canvas, ElementStyleHelper.applyTrack(canvas, element, track, forceDefault));
+    }
+
+    /**
+     * Applies the style of the element to the canvas.
+     * @returns The color to pass to {@link restore} once the styled element is painted.
+     */
+    public static applyTrack(
+        canvas: ICanvas,
+        element: TrackSubElement,
+        track: Track,
+        forceDefault: boolean = false
+    ): Color | undefined {
         if (!track.style && !forceDefault) {
             return undefined;
         }
 
         const defaultColor = ElementStyleHelper._trackDefaultColor(canvas.settings.display.resources, element);
 
-        return new ElementStyleScope<TrackSubElement>(canvas, element, track.style, defaultColor);
+        return ElementStyleHelper._apply<TrackSubElement>(canvas, element, track.style, defaultColor, forceDefault);
     }
 
     public static beatColor(res: RenderingResources, element: BeatSubElement, beat: Beat): Color | undefined {
@@ -175,13 +244,26 @@ export class ElementStyleHelper {
         beat: Beat,
         forceDefault: boolean = false
     ): Disposable | undefined {
+        return ElementStyleHelper._scope(canvas, ElementStyleHelper.applyBeat(canvas, element, beat, forceDefault));
+    }
+
+    /**
+     * Applies the style of the element to the canvas.
+     * @returns The color to pass to {@link restore} once the styled element is painted.
+     */
+    public static applyBeat(
+        canvas: ICanvas,
+        element: BeatSubElement,
+        beat: Beat,
+        forceDefault: boolean = false
+    ): Color | undefined {
         if (!beat.style && !forceDefault) {
             return undefined;
         }
 
         const defaultColor = ElementStyleHelper._beatDefaultColor(canvas.settings.display.resources, element, beat);
 
-        return new ElementStyleScope<BeatSubElement>(canvas, element, beat.style, defaultColor);
+        return ElementStyleHelper._apply<BeatSubElement>(canvas, element, beat.style, defaultColor, forceDefault);
     }
 
     public static noteColor(res: RenderingResources, element: NoteSubElement, note: Note): Color | undefined {
@@ -206,6 +288,19 @@ export class ElementStyleHelper {
         note: Note,
         forceDefault: boolean = false
     ): Disposable | undefined {
+        return ElementStyleHelper._scope(canvas, ElementStyleHelper.applyNote(canvas, element, note, forceDefault));
+    }
+
+    /**
+     * Applies the style of the element to the canvas.
+     * @returns The color to pass to {@link restore} once the styled element is painted.
+     */
+    public static applyNote(
+        canvas: ICanvas,
+        element: NoteSubElement,
+        note: Note,
+        forceDefault: boolean = false
+    ): Color | undefined {
         if (!note.style && !forceDefault) {
             return undefined;
         }
@@ -215,38 +310,64 @@ export class ElementStyleHelper {
                 ? canvas.settings.display.resources.mainGlyphColor
                 : canvas.settings.display.resources.secondaryGlyphColor;
 
-        return new ElementStyleScope<NoteSubElement>(canvas, element, note.style, defaultColor);
+        return ElementStyleHelper._apply<NoteSubElement>(canvas, element, note.style, defaultColor, forceDefault);
+    }
+
+    /**
+     * Restores the canvas color changed by one of the `apply*` methods.
+     * @param previousColor The value returned by the `apply*` method.
+     */
+    public static restore(canvas: ICanvas, previousColor: Color | undefined) {
+        if (previousColor) {
+            canvas.color = previousColor!;
+        }
+    }
+
+    /**
+     * Without an entry for the element in the style, the element inherits the current canvas colour,
+     * unless `forceDefault` is set: then the default colour of the element applies.
+     */
+    private static _apply<TSubElement extends number>(
+        canvas: ICanvas,
+        element: TSubElement,
+        container: ElementStyle<TSubElement> | undefined,
+        defaultColor: Color,
+        forceDefault: boolean
+    ): Color | undefined {
+        if (container && container.colors.has(element)) {
+            const previousColor = canvas.color;
+            canvas.color = container.colors.get(element) ?? defaultColor;
+            return previousColor;
+        }
+
+        if (forceDefault) {
+            const previousColor = canvas.color;
+            canvas.color = defaultColor;
+            return previousColor;
+        }
+
+        return undefined;
+    }
+
+    private static _scope(canvas: ICanvas, previousColor: Color | undefined): Disposable | undefined {
+        return previousColor ? new ElementStyleScope(canvas, previousColor!) : undefined;
     }
 }
 
 /**
- * A helper class for applying elements styles to the canvas and restoring the previous state afterwards.
+ * Restores the canvas color on dispose.
  * @internal
  */
-class ElementStyleScope<TSubElement extends number> implements Disposable {
+class ElementStyleScope implements Disposable {
     private _canvas: ICanvas;
-    private _previousColor?: Color;
+    private _previousColor: Color;
 
-    public constructor(
-        canvas: ICanvas,
-        element: TSubElement,
-        container: ElementStyle<TSubElement> | undefined,
-        defaultColor: Color
-    ) {
+    public constructor(canvas: ICanvas, previousColor: Color) {
         this._canvas = canvas;
-
-        if (container && container.colors.has(element)) {
-            this._previousColor = canvas.color;
-            canvas.color = container.colors.get(element) ?? defaultColor;
-        } else if (!container) {
-            this._previousColor = canvas.color;
-            canvas.color = defaultColor;
-        }
+        this._previousColor = previousColor;
     }
 
     [Symbol.dispose]() {
-        if (this._previousColor) {
-            this._canvas.color = this._previousColor!;
-        }
+        this._canvas.color = this._previousColor;
     }
 }

@@ -1,0 +1,1 @@
+input.ts:17:13: Get accessor declarations in object literals not supported

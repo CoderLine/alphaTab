@@ -4,63 +4,63 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlaybackInformation } from "@coderline/alphatab/model/PlaybackInformation";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class PlaybackInformationSerializer {
-    public static fromJson(obj: PlaybackInformation, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["volume", "balance", "port", "program", "bank", "primarychannel", "secondarychannel", "ismute", "issolo"]);
+    public static read(obj: PlaybackInformation, reader: IObjectReader): void {
+        reader.readRecord(PlaybackInformationSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.volume = r.readNumber();
+                    return true;
+                case 1:
+                    obj.balance = r.readNumber();
+                    return true;
+                case 2:
+                    obj.port = r.readNumber();
+                    return true;
+                case 3:
+                    obj.program = r.readNumber();
+                    return true;
+                case 4:
+                    obj.bank = r.readNumber();
+                    return true;
+                case 5:
+                    obj.primaryChannel = r.readNumber();
+                    return true;
+                case 6:
+                    obj.secondaryChannel = r.readNumber();
+                    return true;
+                case 7:
+                    obj.isMute = r.readBoolean();
+                    return true;
+                case 8:
+                    obj.isSolo = r.readBoolean();
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: PlaybackInformation | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => PlaybackInformationSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: PlaybackInformation | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("volume", obj.volume);
-        o.set("balance", obj.balance);
-        o.set("port", obj.port);
-        o.set("program", obj.program);
-        o.set("bank", obj.bank);
-        o.set("primarychannel", obj.primaryChannel);
-        o.set("secondarychannel", obj.secondaryChannel);
-        o.set("ismute", obj.isMute);
-        o.set("issolo", obj.isSolo);
-        return o;
-    }
-    public static setProperty(obj: PlaybackInformation, property: string, v: unknown): boolean {
-        switch (property) {
-            case "volume":
-                obj.volume = v! as number;
-                return true;
-            case "balance":
-                obj.balance = v! as number;
-                return true;
-            case "port":
-                obj.port = v! as number;
-                return true;
-            case "program":
-                obj.program = v! as number;
-                return true;
-            case "bank":
-                obj.bank = v! as number;
-                return true;
-            case "primarychannel":
-                obj.primaryChannel = v! as number;
-                return true;
-            case "secondarychannel":
-                obj.secondaryChannel = v! as number;
-                return true;
-            case "ismute":
-                obj.isMute = v! as boolean;
-                return true;
-            case "issolo":
-                obj.isSolo = v! as boolean;
-                return true;
-        }
-        return false;
+        w.startObject(PlaybackInformationSerializer._fields);
+        w.numberField(0, obj.volume);
+        w.numberField(1, obj.balance);
+        w.numberField(2, obj.port);
+        w.numberField(3, obj.program);
+        w.numberField(4, obj.bank);
+        w.numberField(5, obj.primaryChannel);
+        w.numberField(6, obj.secondaryChannel);
+        w.booleanField(7, obj.isMute);
+        w.booleanField(8, obj.isSolo);
+        w.endObject();
     }
 }

@@ -1,7 +1,7 @@
+import type { Color } from '@coderline/alphatab/model/Color';
+import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import type { Color } from '@coderline/alphatab/model/Color';
 
 /**
  * @internal
@@ -18,6 +18,22 @@ export class MusicFontGlyph extends EffectGlyph {
         super(x, y);
         this.glyphScale = glyphScale;
         this.symbol = symbol;
+    }
+
+    public override getBoundingBoxLeft(): number {
+        let x = super.getBoundingBoxLeft() + this.offsetX;
+        if (this.center) {
+            x -= this.width / 2;
+        }
+        return x;
+    }
+
+    public override getBoundingBoxRight(): number {
+        let x = super.getBoundingBoxRight() + this.offsetX;
+        if (this.center) {
+            x -= this.width / 2;
+        }
+        return x;
     }
 
     public override getBoundingBoxTop(): number {

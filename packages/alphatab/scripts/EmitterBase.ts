@@ -61,8 +61,8 @@ export function generateFile(program: ts.Program, sourceFile: ts.SourceFile, fil
 
 export function generateClass(
     program: ts.Program,
-    classDeclaration: ts.ClassDeclaration,
-    generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile
+    classDeclaration: ts.ClassDeclaration | ts.InterfaceDeclaration,
+    generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration | ts.InterfaceDeclaration) => ts.SourceFile
 ) {
     const sourceFileName = path.relative(
         path.join(path.dirname(program.getCompilerOptions().configFilePath as string), 'src'),
@@ -83,11 +83,14 @@ export function generateClass(
 
 export default function createEmitter(
     jsDocMarker: string,
-    generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration) => ts.SourceFile
+    generate: (program: ts.Program, classDeclaration: ts.ClassDeclaration | ts.InterfaceDeclaration) => ts.SourceFile
 ) {
     function scanSourceFile(program: ts.Program, sourceFile: ts.SourceFile) {
         for (const stmt of sourceFile.statements) {
-            if (ts.isClassDeclaration(stmt) && ts.getJSDocTags(stmt).some(t => t.tagName.text === jsDocMarker)) {
+            if (
+                (ts.isClassDeclaration(stmt) || ts.isInterfaceDeclaration(stmt)) &&
+                ts.getJSDocTags(stmt).some(t => t.tagName.text === jsDocMarker)
+            ) {
                 generateClass(program, stmt, generate);
             }
         }

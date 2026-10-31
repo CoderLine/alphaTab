@@ -1,0 +1,75 @@
+---
+title: Features
+description: What alphaTab can do — grouped by capability, each entry with a demo and a link into the reference.
+sidebar_position: 0
+keywords:
+  - alphaTab
+  - features
+  - capabilities
+---
+
+import { FeatureGrid, FeatureCard } from '@site/src/components/FeatureCard';
+import { IconCode, IconDownload, IconFileMusic, IconPlay } from '@coderline/alphatab-ui';
+import { IconNotation, IconPointer } from '@site/src/components/FeatureCard/icons';
+
+alphaTab is a music-notation SDK that reads Guitar Pro, MusicXML, CapXML, and alphaTex files and produces engraved sheet music with playback. This section catalogs what alphaTab does, grouped by capability. Each entry links into the [API reference](/docs/reference/api/) or a deeper guide for the exact signatures.
+
+## Portable across Web, .NET, and Android {#portable}
+
+alphaTab compiles a single TypeScript core to JavaScript, C#, and Kotlin. API surface, class names, setting names, and event names are identical on every runtime. Code samples on these pages are written in JavaScript; every property and method has the same name on .NET and Android. Platform-specific setup — loading a file, obtaining a container, downloading a byte array — is shown as a placeholder helper like `getAlphaTabContainer()` or `readScoreFile()` that you replace with the natural equivalent for your platform.
+
+Where a capability genuinely differs across platforms, the card names the affected platforms with a small pill.
+
+## Capabilities {#capabilities}
+
+<FeatureGrid columns={2}>
+  <FeatureCard
+    title="Import & load"
+    icon={IconFileMusic}
+    accent="sky"
+    hook="Every Guitar Pro version, MusicXML, CapXML, and alphaTex — from a URL, a byte buffer, or an inline string."
+    link="/docs/features/import-load/"
+  />
+  <FeatureCard
+    title="Render"
+    icon={IconNotation}
+    accent="violet"
+    hook="Layout modes, backends, notation types, styling, and every music-engraving detail alphaTab draws."
+    link="/docs/features/render/"
+  />
+  <FeatureCard
+    title="Play & sync"
+    icon={IconPlay}
+    accent="emerald"
+    hook="Built-in synthesizer, playback controls, count-in, loop, per-track mixing, and external audio and video sync."
+    link="/docs/features/play-sync/"
+  />
+  <FeatureCard
+    title="Interact"
+    icon={IconPointer}
+    accent="amber"
+    hook="Playback cursor, beat highlighting, mouse events, range selection, and custom cursor and scroll handlers."
+    link="/docs/features/interact/"
+  />
+  <FeatureCard
+    title="Export"
+    icon={IconDownload}
+    accent="rose"
+    hook="Write Guitar Pro 7, alphaTex, SMF 1.0 MIDI, or rendered PCM audio from any loaded score."
+    link="/docs/features/export/"
+  />
+  <FeatureCard
+    title="Extend"
+    icon={IconCode}
+    accent="slate"
+    hook="Custom SMuFL fonts, programmatic score construction, worker and worklet initialization, and hosting alphaTab on your platform."
+    link="/docs/features/extend/"
+  />
+</FeatureGrid>
+
+## Where else to look {#where-else}
+
+- [Getting started](/docs/getting-started/installation-web) — install on your platform and render your first score.
+- [Guides](/docs/guides/audio-export) — task-oriented walkthroughs (audio export, video sync, coloring, MIDI events, custom fonts).
+- [Reference](/docs/reference/api/) — auto-generated per-method, per-setting docs with per-platform signatures.
+- [alphaTex](/docs/alphatex/introduction) — the text format for authoring music notation by hand.

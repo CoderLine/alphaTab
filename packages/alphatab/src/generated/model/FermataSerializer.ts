@@ -4,36 +4,37 @@
 // the code is regenerated.
 // </auto-generated>
 import { Fermata } from "@coderline/alphatab/model/Fermata";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { FermataType } from "@coderline/alphatab/model/Fermata";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class FermataSerializer {
-    public static fromJson(obj: Fermata, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["type", "length"]);
+    public static read(obj: Fermata, reader: IObjectReader): void {
+        reader.readRecord(FermataSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.type = JsonHelper.parseEnum<FermataType>(r.readValue(), FermataType)!;
+                    return true;
+                case 1:
+                    obj.length = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: Fermata | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => FermataSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: Fermata | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("type", obj.type as number);
-        o.set("length", obj.length);
-        return o;
-    }
-    public static setProperty(obj: Fermata, property: string, v: unknown): boolean {
-        switch (property) {
-            case "type":
-                obj.type = JsonHelper.parseEnum<FermataType>(v, FermataType)!;
-                return true;
-            case "length":
-                obj.length = v! as number;
-                return true;
-        }
-        return false;
+        w.startObject(FermataSerializer._fields);
+        w.numberField(0, obj.type as number);
+        w.numberField(1, obj.length);
+        w.endObject();
     }
 }

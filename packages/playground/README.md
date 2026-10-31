@@ -4,10 +4,13 @@ A development harness for alphaTab. Each demo under `demos/` exercises a specifi
 library against the live source under `packages/alphatab/src/`. Editing alphaTab source hot-reloads
 the playground via Vite's workspace alias.
 
-The playground is **not** a framework reference for end users. Framework-specific components are
-planned as separate packages. The patterns shown here are deliberately framework-agnostic: a
-React/Angular/Svelte/Vue user can read these classes, understand which alphaTab events to subscribe
-to and when to clean up, then apply the same logic in their framework's idiomatic shape.
+The player demos are built from the same packages as the website's player, also resolved to their
+live sources: [`@coderline/alphatab-ui`](../ui/) (player and alphaTex editor components, state and
+styles) on top of [`@coderline/alphatab-react`](../react/) (the API lifecycle and event hooks) on top
+of `@coderline/alphatab`. A change to any of these layers shows up in the playground right away. The
+playground is not a reference for end users; for the raw API without a framework, read the demo
+specific parts (`src/components/recorder/DrumRecorder.ts`, `src/components/youtube-sync/YoutubeSync.ts`)
+and the packages above.
 
 ## Running it
 
@@ -25,208 +28,63 @@ Other scripts (run from `packages/playground/`):
 - `npm run typecheck` — `tsc --noEmit` against the playground's tsconfig.
 - `npm run lint` — Biome lint.
 
+Every player demo takes `?engine=svg|html5` and `?loglevel=debug|info|warning|error` in its address;
+they apply on top of the UI's settings and survive a settings reset. In the browser console,
+`window.api` is the demo's `AlphaTabApi` and `window.alphaTab` the alphaTab module. On the Control
+demo, CapsLock shows a crosshair following the mouse.
+
 ## Architecture at a glance
 
 ```
-demos/<feature>/index.html         minimal "<div id='app'></div>" + module script
-demos/<feature>/index.ts           constructs an App and appends `app.root`
+demos/<feature>/index.html         page shell: "<div id='app'></div>" + module script
+demos/<feature>/index.tsx          mountDemo(<FeatureApp />)
 
-src/apps/<Feature>App.ts           top-level composer per demo, owns the AlphaTabApi
-src/components/<Composer>.ts       alphaTab-aware composer (TransportBar, Footer, Sidebar, …)
-src/components/primitives/         alphaTab-unaware UI bricks (IconButton, Dropdown, Slider, …)
-src/util/Dom.ts                    html/css tagged templates, parseHtml, injectStyles, mount
-src/util/Icons.ts                  lucide pass-through
+src/apps/<Feature>App.tsx          a <PlayerProvider> with the demo's settings and its view
+src/player/mount.tsx               mountDemo: React root, UiEnvironment, NavMenu; DevGlobals (window.api)
+src/player/environment.ts          the UiEnvironment of the demos, player settings, single-sample documents
+src/player/DemoPlayerView.tsx      the shared <PlayerView>: header, track and settings panels, waveform, drops
+src/components/recorder/           Drum Recorder: score extension logic, pads, rhythm grid
+src/components/youtube-sync/       YouTube Sync: the external-media handler and the video
+src/components/NavMenu.ts          demo navigation (vanilla, on every page)
+src/components/Crosshair.ts        CapsLock crosshair (vanilla)
+src/apps/LabsIndexApp.ts           labs index (vanilla)
+src/apps/TestResultsApp.ts         visual test results (vanilla)
+src/util/Dom.ts                    html/css tagged templates, parseHtml, injectStyles for the vanilla pages
 src/util/Paths.ts                  default file paths
-src/styles/common.css              palette, fonts, resets — global CSS
+src/styles/common.css              fonts, resets and score cursor colors for every page
+src/styles/player.css              full-window layout of the player pages
 ```
 
-The component tree for a typical demo is `App → composers → primitives`. The App constructs the
-AlphaTabApi after mounting its viewport, then mounts composers into placeholders in its template.
-Composers do the same for their primitives.
+### Player demos
 
-## The component contract
+A demo app wraps its view in `<PlayerProvider>` from `@coderline/alphatab-ui`. The provider creates
+the `AlphaTabApi` when its host mounts, attaches a `PlayerStore` to it and destroys both on unmount.
+Components below it read state through `usePlayerSelector`/`usePlayerState`, act through
+`usePlayerControls()`, and reach the API through `useAlphaTabApi()` and `useAlphaTabEvent()` from
+`@coderline/alphatab-react`.
 
-Every UI piece is a class with this consistent shape:
+- **Settings** come in three layers: the UI's base settings (`applyBaseSettings`), the environment's
+  `settingsLayer` (page parameters plus the demo's own layer passed to `mountDemo`, re-applied on
+  every settings reset), and the provider's `settings` prop. The prop sets `player.playerMode` and
+  `player.soundFont` (see `playerSettings()`), so the playback source is fixed and the SoundFont is
+  loaded straight from `/font/`, without the website's SoundFont library and its cache.
+- **Documents**: demos that open files use `useScoreDocument` with `singleSampleDocuments(...)`; it
+  loads the sample, opens dropped or picked files and re-imports on importer settings changes. The
+  alphaTex editor keeps its document in `sessionStorage`.
+- **Layout**: `DemoPlayerView` renders the `PlayerView` composite with a header (file, panel
+  toggles, open, export menu), the track panel, the settings panel (every alphaTab setting, persisted
+  per demo in `localStorage`), the rendering indicator and the backing-track waveform. Demos add an
+  editor panel, content above the workspace or an overlay in score coordinates.
+- **Styles** are SCSS modules next to their component; the UI's design tokens come from
+  `@coderline/alphatab-ui/styles/tokens.scss`.
 
-```ts
-class Transport implements Mountable {
-    readonly root: HTMLElement;            // detached at construction; mounted by caller
+### Vanilla pages
 
-    constructor(api: alphaTab.AlphaTabApi); // engine deps as args; never `parent`
-
-    setReady(ready: boolean): void;         // parent → child push API
-    onSomething: (() => void) | null = null; // child → parent event API
-
-    dispose(): void;
-}
-```
-
-Rules:
-
-- **Constructor takes engine dependencies and props, never `parent`.** Build DOM detached as `.root`.
-  Mounting is the caller's job.
-- **Public methods are the parent → child push API.** Parents call `transport.setReady(true)`
-  directly. No prop diffing, no virtual DOM.
-- **Assignable callback fields are the child → parent event API.** A child exposes
-  `onPlayClick: (() => void) | null = null`; the parent assigns a function. For multi-listener
-  fan-out, a typed `EventEmitter<T>` is fine.
-- **`dispose()` releases everything**: api event subscriptions (the `() => void` returned by
-  `api.event.on(...)`), DOM listeners, intervals, ResizeObservers, child components. Removing
-  `this.root` takes the entire DOM subtree with it.
-- **Composition over inheritance.** `Footer` composes `TransportBar`; `App` composes one of each
-  top-level piece.
-- **Engine events drive UI.** Each component subscribes directly to the alphaTab events it needs
-  (`TransportBar` → `playerStateChanged`; `TrackList` → `scoreLoaded`; `TimeSlider` →
-  `playerPositionChanged`; `Waveform` → `scoreLoaded` + DOM events on the audio element). The api
-  is the source of truth — no intermediate state container.
-
-### No IDs, kebab-prefixed classes, component-local nesting
-
-- **No `id` attributes inside component markup.** IDs collide across multiple instances. Use class
-  names or `data-*`.
-- **Prefix every class with the component's kebab name** — `at-icon-btn`, `at-transport-…`,
-  `at-drum-pad-…`. Names are global; prefixes prevent leaks.
-- **Nested selectors stay component-local** — `.at-track .at-track-controls`, never bare
-  `.at-track-controls`.
-
-### Styles co-located via `injectStyles`
-
-```ts
-import { html, css, parseHtml, injectStyles } from '../../util/Dom';
-
-injectStyles('IconButton', css`
-  .at-icon-btn { display: inline-flex; align-items: center; … }
-  .at-icon-btn[disabled] { opacity: 0.4; cursor: default; }
-`);
-```
-
-`injectStyles(key, sheet)` is keyed by component name and injects the `<style>` tag once per page,
-no matter how many instances are constructed. The `html` and `css` tagged templates are essentially
-identity functions — `html` auto-escapes interpolated runtime strings (XSS guard for track names,
-file names, etc.), and editors hook off the tag name for syntax highlighting (recommend the
-`bierner.lit-html` VS Code extension; see `.vscode/extensions.json`).
-
-## Two layers — primitives and composers
-
-[`src/components/primitives/`](./src/components/primitives/) holds **generic, alphaTab-unaware UI
-bricks**. They take props in their constructor, render a detached subtree, and expose typed methods
-plus assignable callbacks. They are reusable across demos and (in spirit) across other projects:
-
-- [IconButton](./src/components/primitives/IconButton.ts) — icon + tooltip + onClick.
-- [ToggleButton](./src/components/primitives/ToggleButton.ts) — IconButton with active state.
-- [Dropdown](./src/components/primitives/Dropdown.ts) — popper-positioned dropdown with click-outside
-  dismissal and keyboard handling.
-- [Tooltip](./src/components/primitives/Tooltip.ts) — popper-positioned hover tooltip.
-- [ProgressBar](./src/components/primitives/ProgressBar.ts) — clickable horizontal fill with
-  `onClickPercent`.
-- [Slider](./src/components/primitives/Slider.ts) — `<input type="range">` wrapper.
-- [LoadingProgress](./src/components/primitives/LoadingProgress.ts) — circular percentage indicator.
-- [Spinner](./src/components/primitives/Spinner.ts) — indeterminate rotating ring.
-
-[`src/components/`](./src/components/) holds the **alphaTab-aware composers**. They take the
-`AlphaTabApi` (and sometimes options) in their constructor, declare a layout template with
-`cmp-…` placeholders, and mount primitives into those placeholders. Composers translate engine
-events into primitive method calls; primitives stay alphaTab-unaware.
-
-A button-per-feature design (`MetronomeToggle`, `CountInToggle`, …) would be a class explosion.
-`TransportBar` instead instantiates a `ToggleButton` per toggle inline:
-
-```ts
-this.metronome = mount(this.root, '.cmp-metronome',
-    new ToggleButton({ icon: Icons.Metronome, tooltip: 'Metronome' }));
-this.metronome.onChange = on => { api.metronomeVolume = on ? 1 : 0; };
-```
-
-Components stay as their own class only when they have **non-trivial behaviour of their own**:
-[Waveform](./src/components/Waveform.ts) (canvas drawing), [TimeSlider](./src/components/TimeSlider.ts),
-[TrackItem](./src/components/TrackItem.ts) (compound),
-[SelectionHandles](./src/components/SelectionHandles.ts) (drag math),
-[Crosshair](./src/components/Crosshair.ts), [DragDrop](./src/components/DragDrop.ts),
-the recorder/alphatex/youtube subfolders.
-
-## Composition mechanics
-
-> **A component's constructor builds its DOM detached and exposes it as `.root`. It does not mount
-> itself.** Mounting happens at the call-site, in one of two explicit, swappable ways.
-
-### Static layout — placeholder + `mount()`
-
-The composer's `parseHtml` template declares the **complete** visual structure including
-`<div class="cmp-…"></div>` placeholders. `mount(parent, '.cmp-x', component)` swaps each
-placeholder for the component's root:
-
-```ts
-// src/components/Footer.ts
-this.root = parseHtml(html`
-    <div class="at-footer">
-        <div class="cmp-waveform"></div>
-        <div class="cmp-time-slider"></div>
-        <div class="cmp-transport"></div>
-    </div>
-`);
-this.waveform = mount(this.root, '.cmp-waveform', new Waveform(api));
-this.timeSlider = mount(this.root, '.cmp-time-slider', new TimeSlider(api));
-this.transport = mount(this.root, '.cmp-transport', new TransportBar(api));
-```
-
-Reading the `parseHtml` block tells you the exact layout. To move the waveform after the
-time-slider, you swap two `<div>` lines — wiring stays identical.
-
-`mount()` throws on a missing placeholder, so typos fail loudly at construction.
-
-### Dynamic layout — container + direct `appendChild`
-
-For lists whose children depend on runtime state (`TrackList` growing as scores load,
-`DrumPadPanel` building pads from a config), the composer's template declares a **container**
-rather than placeholders, and instances are appended directly:
-
-```ts
-// src/components/TrackList.ts
-this.root = parseHtml(html`<div class="at-track-list"></div>`);
-api.scoreLoaded.on(score => {
-    for (const item of this.items) item.dispose();
-    this.items = [];
-    for (const track of score.tracks) {
-        const item = new TrackItem(api, track);
-        this.root.appendChild(item.root);
-        this.items.push(item);
-    }
-});
-```
-
-### Mounting the App
-
-The top-level App is mounted by the demo's `index.ts`:
-
-```ts
-// demos/control/index.ts
-import { ControlApp } from '../../src/apps/ControlApp';
-const app = new ControlApp();
-document.getElementById('app')!.appendChild(app.root);
-```
-
-## Dom utilities
-
-All in [`src/util/Dom.ts`](./src/util/Dom.ts):
-
-- `html\`…\`` — tagged template that auto-escapes interpolated values. Use for runtime strings
-  (track names, song titles, MIDI program names). Static literals are inlined as-is.
-- `css\`…\`` — identity tag; gives editors a hook for CSS syntax highlighting.
-- `parseHtml(markup)` — parses a markup string into an `HTMLElement` (detached).
-- `escapeHtml(value)` — manual escape. `html\`…\`` calls this for you.
-- `injectStyles(key, sheet)` — injects the sheet once per `key` (component class name).
-- `mount(container, selector, component)` — replaces a `cmp-…` placeholder with `component.root`,
-  returns the component for chaining.
-- `Mountable` — `interface { readonly root: HTMLElement }`. Implemented by every component.
-
-## Conventions and naming
-
-- **`at-…`** — alphaTab-semantic class names (`at-track`, `at-player`, `at-canvas`, `at-viewport`).
-  Kept where alphaTab itself or existing CSS expects them.
-- **`at-<component-kebab>-…`** — component-local class names (`at-icon-btn`, `at-transport`,
-  `at-drum-pad-panel`). Prefix prevents global collisions.
-- **`cmp-<slot>`** — placeholder marker classes inside composer templates. Replaced by `mount()`,
-  not styled.
+The labs index, the visual test results and the shared `NavMenu`/`Crosshair` stay framework-free.
+They build their DOM detached with `parseHtml(html\`…\`)`, expose it as `root` and remove it in
+`dispose()`. `html` escapes interpolated values; `injectStyles(key, sheet)` adds a component's sheet
+once per page. Class names are prefixed with the component's kebab name (`at-nav-menu-…`) since the
+sheets are global.
 
 ## Adding a new demo
 
@@ -234,44 +92,33 @@ All in [`src/util/Dom.ts`](./src/util/Dom.ts):
 2. Add `index.html`:
    ```html
    <!doctype html>
-   <html>
+   <html lang="en">
      <head>
        <meta charset="utf-8" />
        <title>alphaTab — My Feature</title>
        <link rel="stylesheet" href="../../src/styles/common.css" />
+       <link rel="stylesheet" href="../../src/styles/player.css" />
      </head>
      <body>
        <div id="app"></div>
-       <script type="module" src="./index.ts"></script>
+       <script type="module" src="./index.tsx"></script>
      </body>
    </html>
    ```
-3. Add `index.ts` constructing your App and appending `app.root` to `#app`.
-4. Build the App in `src/apps/MyFeatureApp.ts` — composing existing components from
-   `src/components/` and primitives from `src/components/primitives/`.
-5. Add the demo to the `DEMOS` array in
-   [`src/apps/LabsIndexApp.ts`](./src/apps/LabsIndexApp.ts) so it shows up on the homepage.
-
-## Adding a new component
-
-Decide primitive vs composer:
-
-- **Primitive** if it's alphaTab-unaware — a piece of UI plumbing reusable across demos. Goes in
-  `src/components/primitives/`. Constructor takes props only.
-- **Composer** if it consumes the `AlphaTabApi` directly. Goes in `src/components/` (or a demo-specific
-  subfolder for components used by exactly one demo).
-
-Either way: one file with `injectStyles(name, css\`…\`)` at the top, a class implementing
-`Mountable` with a constructor that builds DOM detached, and a `dispose()` that walks tracked
-subscriptions and removes `this.root`.
+3. Add `index.tsx` calling `mountDemo(<MyFeatureApp />)` from `src/player/mount`.
+4. Build the app in `src/apps/MyFeatureApp.tsx`: a `<PlayerProvider settings={playerSettings()}>`
+   with `<DevGlobals />` and a view rendering `<DemoPlayerView demo="my-feature" … />`, or the
+   `@coderline/alphatab-ui` components directly.
+5. Add the demo to the `DEMOS` array in [`src/util/Demos.ts`](./src/util/Demos.ts) so it shows up on
+   the labs index and in the navigation.
 
 ## Demos
 
 | Demo | Path | What it exercises |
 | --- | --- | --- |
-| Control | [`demos/control/`](./demos/control/) | Full player: track sidebar, transport bar with all toggles/dropdowns, downloads, drag-drop, layout/scroll/zoom pickers. |
+| Control | [`demos/control/`](./demos/control/) | Full player: track panel with mute/solo/volume and visibility, transport with loop/count-in/metronome, all settings (layout, scroll mode, zoom, tempo, output device), exports (Guitar Pro, alphaTex, MIDI, WAV, print), drag-drop, backing-track waveform. |
 | Drum Recorder | [`demos/recorder/`](./demos/recorder/) | Programmatic score construction, dynamic system extension, tick-cache updates, MIDI extension/regeneration, `playedBeatChanged`. |
-| AlphaTex Editor | [`demos/alphatex-editor/`](./demos/alphatex-editor/) | Round-trip between AlphaTex source and the Score model via `AlphaTexImporter` / `AlphaTexExporter`, with Monaco LSP. |
+| AlphaTex Editor | [`demos/alphatex-editor/`](./demos/alphatex-editor/) | Monaco with the alphaTex language server next to the live rendering; edits re-render with `reuseViewport`, dropped files are converted with `AlphaTexExporter`. |
 | YouTube Sync | [`demos/youtube-sync/`](./demos/youtube-sync/) | `EnabledExternalMedia` player mode driving alphaTab from a YouTube IFrame player. |
 | Visual Test Results | [`demos/test-results/`](./demos/test-results/) | Diff viewer for visual regression failures with accept-to-reference flow. |
 
@@ -289,26 +136,20 @@ The custom Vite plugin in [`vite.plugin.server.ts`](./vite.plugin.server.ts) add
 
 ## Editing alphaTab source
 
-`@coderline/alphatab` resolves via [`tsconfig.base.json`](../../tsconfig.base.json) paths to
-`packages/alphatab/src/alphaTab.main.ts`. Editing any source file under `packages/alphatab/src/`
-triggers a Vite full-page reload — no manual rebuild needed.
+`@coderline/alphatab`, `@coderline/alphatab-react`, `@coderline/alphatab-ui`, the language server and
+the Monaco integration resolve via [`tsconfig.base.json`](../../tsconfig.base.json) paths to their
+`src/` folders. Editing any of them triggers a Vite hot update or a full-page reload — no manual
+rebuild needed. The workers (alphaTab's, Monaco's and the alphaTex language server) are module
+workers loaded from source as well.
 
 If you need to test against a built artifact instead, replace the workspace alias path or import
 from the published package name in a single demo.
 
 ## Troubleshooting
 
-- **`mount()` throws `Placeholder '.cmp-x' not found`** — the placeholder's class name in your
-  composer template doesn't match the selector you pass to `mount()`. Both use kebab case, prefixed
-  `cmp-`.
-- **Style leaks across components** — you forgot to prefix a class, or used a bare nested
-  selector (`.label` instead of `.at-icon-btn .label`). Component CSS is global; the prefix is the
-  only scoping mechanism.
-- **`<style>` tags duplicating in `<head>`** — you called `injectStyles` with a different key for
-  the same component. Keep the key constant per component class.
-- **Dispose leaks (events still firing after a demo navigation)** — your composer didn't push the
-  unsubscribe function returned by `api.event.on(...)` into its tracked-subscriptions array, or
-  forgot to walk the array in `dispose()`.
-- **Monaco worker fails to load** — see the comment in
-  [`alphatexLanguageServerWrap.ts`](./alphatexLanguageServerWrap.ts) explaining the indirection
-  required by Vite's `?worker` import.
+- **The page reloads once on the first visit of a demo** — Vite found dependencies to pre-bundle
+  (e.g. the language server's) and reloads after optimizing them.
+- **Settings look stuck after experimenting** — the settings panel persists its overrides per demo
+  in `localStorage`; use "Reset all" in the panel.
+- **Two React copies / invalid hook call** — `resolve.dedupe` in [`vite.config.ts`](./vite.config.ts)
+  keeps the ui and react sources on the playground's React; keep it when changing the config.

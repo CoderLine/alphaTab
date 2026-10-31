@@ -1,452 +1,412 @@
-// This XML parser is based on the XML Parser of the Haxe Standard Library (MIT)
-/*
- * Copyright (C)2005-2019 Haxe Foundation
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- */
-
 import { XmlError } from '@coderline/alphatab/xml/XmlError';
 import { XmlNode, XmlNodeType } from '@coderline/alphatab/xml/XmlNode';
 
 /**
- * @internal
- */
-enum XmlState {
-    IgnoreSpaces = 0,
-    Begin = 1,
-    BeginNode = 2,
-    TagName = 3,
-    Body = 4,
-    AttribName = 5,
-    Equals = 6,
-    AttvalBegin = 7,
-    AttribVal = 8,
-    Childs = 9,
-    Close = 10,
-    WaitEnd = 11,
-    WaitEndRet = 12,
-    Pcdata = 13,
-    Header = 14,
-    Comment = 15,
-    Doctype = 16,
-    Cdata = 17,
-    Escape = 18
-}
-
-/**
+ * A non-validating XML parser building a {@link XmlNode} tree in a single forward pass.
+ *
+ * It covers what the XML based file formats need: elements, attributes, character data with
+ * the predefined entities and character references, CDATA sections and the document type declaration.
+ * Comments and processing instructions are skipped, other entities are kept as written.
+ * See {@link XmlNode} on how character data is represented.
  * @internal
  */
 export class XmlParser {
-    public static readonly CharCodeLF: number = 10;
-    public static readonly CharCodeTab: number = 9;
-    public static readonly CharCodeCR: number = 13;
-    public static readonly CharCodeSpace: number = 32;
-    public static readonly CharCodeLowerThan: number = 60;
-    public static readonly CharCodeAmp: number = 38;
-    public static readonly CharCodeBrackedClose: number = 93;
-    public static readonly CharCodeBrackedOpen: number = 91;
-    public static readonly CharCodeGreaterThan: number = 62;
-    public static readonly CharCodeExclamation: number = 33;
-    public static readonly CharCodeUpperD: number = 68;
-    public static readonly CharCodeLowerD: number = 100;
-    public static readonly CharCodeMinus: number = 45;
-    public static readonly CharCodeQuestion: number = 63;
-    public static readonly CharCodeSlash: number = 47;
-    public static readonly CharCodeEquals: number = 61;
-    public static readonly CharCodeDoubleQuote: number = 34;
-    public static readonly CharCodeSingleQuote: number = 39;
-    public static readonly CharCodeSharp: number = 35;
-    public static readonly CharCodeLowerX: number = 120;
-    public static readonly CharCodeLowerA: number = 97;
-    public static readonly CharCodeLowerZ: number = 122;
-    public static readonly CharCodeUpperA: number = 65;
-    public static readonly CharCodeUpperZ: number = 90;
-    public static readonly CharCode0: number = 48;
-    public static readonly CharCode9: number = 57;
-    public static readonly CharCodeColon: number = 58;
-    public static readonly CharCodeDot: number = 46;
-    public static readonly CharCodeUnderscore: number = 95;
-    public static readonly CharCodeSemi: number = 59;
+    private static readonly _charTab = 0x09;
+    private static readonly _charLineFeed = 0x0a;
+    private static readonly _charCarriageReturn = 0x0d;
+    private static readonly _charSpace = 0x20;
+    private static readonly _charExclamation = 0x21;
+    private static readonly _charDoubleQuote = 0x22;
+    private static readonly _charHash = 0x23;
+    private static readonly _charAmpersand = 0x26;
+    private static readonly _charSingleQuote = 0x27;
+    private static readonly _charSlash = 0x2f;
+    private static readonly _charSemicolon = 0x3b;
+    private static readonly _charLessThan = 0x3c;
+    private static readonly _charEquals = 0x3d;
+    private static readonly _charGreaterThan = 0x3e;
+    private static readonly _charQuestion = 0x3f;
+    private static readonly _charBracketOpen = 0x5b;
+    private static readonly _charBracketClose = 0x5d;
+    private static readonly _charLowerX = 0x78;
+    private static readonly _charByteOrderMark = 0xfeff;
 
-    private static _escapes: Map<string, string> = new Map<string, string>([
-        ['lt', '<'],
-        ['gt', '>'],
-        ['amp', '&'],
-        ['quot', '"'],
-        ['apos', "'"]
-    ]);
+    // longest entity reference we resolve (e.g. &#x10FFFF;) to avoid scanning far on stray ampersands
+    private static readonly _maxEntityLength = 10;
 
-    public static parse(str: string, p: number, parent: XmlNode): number {
-        let c: number = str.charCodeAt(p);
-        let state: XmlState = XmlState.Begin;
-        let next: XmlState = XmlState.Begin;
-        let start: number = 0;
-        let buf: string = '';
-        let escapeNext: XmlState = XmlState.Begin;
-        let xml: XmlNode | null = null;
-        let aname: string | null = null;
+    private readonly _xml: string;
+    private readonly _length: number;
+    private _pos: number = 0;
+    // the ancestors of the element currently being filled
+    private readonly _openElements: XmlNode[] = [];
 
-        let nbrackets: number = 0;
+    private constructor(xml: string) {
+        this._xml = xml;
+        this._length = xml.length;
+    }
 
-        let attrValQuote: number = 0;
+    /**
+     * Parses the given XML and adds the read nodes to the given document.
+     * @throws {XmlError} if the XML is malformed.
+     */
+    public static parse(xml: string, document: XmlNode): void {
+        new XmlParser(xml)._parseDocument(document);
+    }
 
-        while (p < str.length) {
-            c = str.charCodeAt(p);
-            switch (state) {
-                case XmlState.IgnoreSpaces:
-                    switch (c) {
-                        case XmlParser.CharCodeLF:
-                        case XmlParser.CharCodeCR:
-                        case XmlParser.CharCodeTab:
-                        case XmlParser.CharCodeSpace:
-                            break;
-                        default:
-                            state = next;
-                            continue;
-                    }
-                    break;
+    private _parseDocument(document: XmlNode) {
+        const xml = this._xml;
+        if (this._length > 0 && xml.charCodeAt(0) === XmlParser._charByteOrderMark) {
+            this._pos = 1;
+        }
 
-                case XmlState.Begin:
-                    switch (c) {
-                        case XmlParser.CharCodeLowerThan:
-                            state = XmlState.IgnoreSpaces;
-                            next = XmlState.BeginNode;
-                            break;
-                        default:
-                            start = p;
-                            state = XmlState.Pcdata;
-                            continue;
-                    }
-                    break;
-
-                case XmlState.Pcdata:
-                    if (c === XmlParser.CharCodeLowerThan) {
-                        buf += str.substr(start, p - start);
-                        const child: XmlNode = new XmlNode();
-                        child.nodeType = XmlNodeType.Text;
-                        child.value = buf;
-                        buf = '';
-                        parent.addChild(child);
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.BeginNode;
-                    } else if (c === XmlParser.CharCodeAmp) {
-                        buf += str.substr(start, p - start);
-                        state = XmlState.Escape;
-                        escapeNext = XmlState.Pcdata;
-                        start = p + 1;
-                    }
-                    break;
-
-                case XmlState.Cdata:
-                    if (
-                        c === XmlParser.CharCodeBrackedClose &&
-                        str.charCodeAt(p + 1) === XmlParser.CharCodeBrackedClose &&
-                        str.charCodeAt(p + 2) === XmlParser.CharCodeGreaterThan
-                    ) {
-                        // ]]>
-                        const child: XmlNode = new XmlNode();
-                        child.nodeType = XmlNodeType.CDATA;
-                        child.value = str.substr(start, p - start);
-                        parent.addChild(child);
-                        p += 2;
-                        state = XmlState.Begin;
-                    }
-                    break;
-
-                case XmlState.BeginNode:
-                    switch (c) {
-                        case XmlParser.CharCodeExclamation:
-                            if (str.charCodeAt(p + 1) === XmlParser.CharCodeBrackedOpen) {
-                                p += 2;
-                                if (str.substr(p, 6).toUpperCase() !== 'CDATA[') {
-                                    throw new XmlError('Expected <![CDATA[', str, p);
-                                }
-                                p += 5;
-                                state = XmlState.Cdata;
-                                start = p + 1;
-                            } else if (
-                                str.charCodeAt(p + 1) === XmlParser.CharCodeUpperD ||
-                                str.charCodeAt(p + 1) === XmlParser.CharCodeLowerD
-                            ) {
-                                if (str.substr(p + 2, 6).toUpperCase() !== 'OCTYPE') {
-                                    throw new XmlError('Expected <!DOCTYPE', str, p);
-                                }
-                                p += 8;
-                                state = XmlState.Doctype;
-                                start = p + 1;
-                            } else if (
-                                str.charCodeAt(p + 1) !== XmlParser.CharCodeMinus ||
-                                str.charCodeAt(p + 2) !== XmlParser.CharCodeMinus
-                            ) {
-                                throw new XmlError('Expected <!--', str, p);
-                            } else {
-                                p += 2;
-                                state = XmlState.Comment;
-                                start = p + 1;
-                            }
-                            break;
-                        case XmlParser.CharCodeQuestion:
-                            state = XmlState.Header;
-                            start = p;
-                            break;
-                        case XmlParser.CharCodeSlash:
-                            if (!parent) {
-                                throw new XmlError('Expected node name', str, p);
-                            }
-                            start = p + 1;
-                            state = XmlState.IgnoreSpaces;
-                            next = XmlState.Close;
-                            break;
-                        default:
-                            state = XmlState.TagName;
-                            start = p;
-                            continue;
-                    }
-                    break;
-
-                case XmlState.TagName:
-                    if (!XmlParser._isValidChar(c)) {
-                        if (p === start) {
-                            throw new XmlError('Expected node name', str, p);
-                        }
-                        xml = new XmlNode();
-                        xml.nodeType = XmlNodeType.Element;
-                        xml.localName = str.substr(start, p - start);
-                        parent.addChild(xml);
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.Body;
-                        continue;
-                    }
-                    break;
-
-                case XmlState.Body:
-                    switch (c) {
-                        case XmlParser.CharCodeSlash:
-                            state = XmlState.WaitEnd;
-                            break;
-                        case XmlParser.CharCodeGreaterThan:
-                            state = XmlState.Childs;
-                            break;
-                        default:
-                            state = XmlState.AttribName;
-                            start = p;
-                            continue;
-                    }
-                    break;
-
-                case XmlState.AttribName:
-                    if (!XmlParser._isValidChar(c)) {
-                        if (start === p) {
-                            throw new XmlError('Expected attribute name', str, p);
-                        }
-                        const tmp: string = str.substr(start, p - start);
-                        aname = tmp;
-                        if (xml!.attributes.has(aname)) {
-                            throw new XmlError(`Duplicate attribute [${aname}]`, str, p);
-                        }
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.Equals;
-                        continue;
-                    }
-                    break;
-
-                case XmlState.Equals:
-                    switch (c) {
-                        case XmlParser.CharCodeEquals:
-                            state = XmlState.IgnoreSpaces;
-                            next = XmlState.AttvalBegin;
-                            break;
-                        default:
-                            throw new XmlError('Expected =', str, p);
-                    }
-                    break;
-
-                case XmlState.AttvalBegin:
-                    switch (c) {
-                        case XmlParser.CharCodeDoubleQuote:
-                        case XmlParser.CharCodeSingleQuote:
-                            buf = '';
-                            state = XmlState.AttribVal;
-                            start = p + 1;
-                            attrValQuote = c;
-                            break;
-                    }
-                    break;
-
-                case XmlState.AttribVal:
-                    switch (c) {
-                        case XmlParser.CharCodeAmp:
-                            buf += str.substr(start, p - start);
-                            state = XmlState.Escape;
-                            escapeNext = XmlState.AttribVal;
-                            start = p + 1;
-                            break;
-                        default:
-                            if (c === attrValQuote) {
-                                buf += str.substr(start, p - start);
-                                const value: string = buf;
-                                buf = '';
-                                xml!.attributes.set(aname!, value);
-                                state = XmlState.IgnoreSpaces;
-                                next = XmlState.Body;
-                            }
-                            break;
-                    }
-                    break;
-
-                case XmlState.Childs:
-                    p = XmlParser.parse(str, p, xml!);
-                    start = p;
-                    state = XmlState.Begin;
-                    break;
-
-                case XmlState.WaitEnd:
-                    switch (c) {
-                        case XmlParser.CharCodeGreaterThan:
-                            state = XmlState.Begin;
-                            break;
-                        default:
-                            throw new XmlError('Expected >', str, p);
-                    }
-                    break;
-
-                case XmlState.WaitEndRet:
-                    switch (c) {
-                        case XmlParser.CharCodeGreaterThan:
-                            return p;
-                        default:
-                            throw new XmlError('Expected >', str, p);
-                    }
-
-                case XmlState.Close:
-                    if (!XmlParser._isValidChar(c)) {
-                        if (start === p) {
-                            throw new XmlError('Expected node name', str, p);
-                        }
-                        const v: string = str.substr(start, p - start);
-                        if (v !== parent.localName) {
-                            throw new XmlError(`Expected </${parent.localName}>`, str, p);
-                        }
-                        state = XmlState.IgnoreSpaces;
-                        next = XmlState.WaitEndRet;
-                        continue;
-                    }
-                    break;
-
-                case XmlState.Comment:
-                    if (
-                        c === XmlParser.CharCodeMinus &&
-                        str.charCodeAt(p + 1) === XmlParser.CharCodeMinus &&
-                        str.charCodeAt(p + 2) === XmlParser.CharCodeGreaterThan
-                    ) {
-                        p += 2;
-                        state = XmlState.Begin;
-                    }
-                    break;
-
-                case XmlState.Doctype:
-                    if (c === XmlParser.CharCodeBrackedOpen) {
-                        nbrackets++;
-                    } else if (c === XmlParser.CharCodeBrackedClose) {
-                        nbrackets--;
-                    } else if (c === XmlParser.CharCodeGreaterThan && nbrackets === 0) {
-                        // >
-                        const node: XmlNode = new XmlNode();
-                        node.nodeType = XmlNodeType.DocumentType;
-                        node.value = str.substr(start, p - start);
-                        parent.addChild(node);
-                        state = XmlState.Begin;
-                    }
-                    break;
-
-                case XmlState.Header:
-                    if (c === XmlParser.CharCodeQuestion && str.charCodeAt(p + 1) === XmlParser.CharCodeGreaterThan) {
-                        p++;
-                        state = XmlState.Begin;
-                    }
-                    break;
-
-                case XmlState.Escape:
-                    if (c === XmlParser.CharCodeSemi) {
-                        const s: string = str.substr(start, p - start);
-                        if (s.charCodeAt(0) === XmlParser.CharCodeSharp) {
-                            const code: number =
-                                s.charCodeAt(1) === XmlParser.CharCodeLowerX
-                                    ? Number.parseInt(`0${s.substr(1, s.length - 1)}`, 10)
-                                    : Number.parseInt(s.substr(1, s.length - 1), 10);
-                            buf += String.fromCharCode(code);
-                        } else if (XmlParser._escapes.has(s)) {
-                            buf += XmlParser._escapes.get(s);
-                        } else {
-                            buf += `&${s};`?.toString();
-                        }
-                        start = p + 1;
-                        state = escapeNext;
-                    } else if (!XmlParser._isValidChar(c) && c !== XmlParser.CharCodeSharp) {
-                        buf += '&';
-                        buf += str.substr(start, p - start);
-                        p--;
-                        start = p + 1;
-                        state = escapeNext;
-                    }
-                    break;
+        let current = document;
+        while (this._pos < this._length) {
+            if (xml.charCodeAt(this._pos) !== XmlParser._charLessThan) {
+                this._readCharacterData(current);
+                continue;
             }
 
+            switch (xml.charCodeAt(this._pos + 1)) {
+                case XmlParser._charSlash:
+                    current = this._readEndTag(current);
+                    break;
+                case XmlParser._charQuestion:
+                    this._pos = this._indexAfter('?>', this._pos + 2, 'processing instruction');
+                    break;
+                case XmlParser._charExclamation:
+                    this._readDeclaration(current);
+                    break;
+                default:
+                    current = this._readStartTag(current);
+                    break;
+            }
+        }
+
+        if (current !== document) {
+            throw new XmlError(`Unexpected end of document, missing </${current.localName}>`, xml, this._pos);
+        }
+    }
+
+    /**
+     * Reads a run of character data up to the next markup.
+     */
+    private _readCharacterData(current: XmlNode) {
+        const xml = this._xml;
+        let firstContent = -1;
+        let lastContent = -1;
+        let hasReference = false;
+
+        let p = this._pos;
+        while (p < this._length) {
+            const c = xml.charCodeAt(p);
+            if (c === XmlParser._charLessThan) {
+                break;
+            }
+            if (!XmlParser._isWhitespace(c)) {
+                if (firstContent === -1) {
+                    firstContent = p;
+                }
+                lastContent = p;
+                if (c === XmlParser._charAmpersand) {
+                    hasReference = true;
+                }
+            }
+            p++;
+        }
+        this._pos = p;
+
+        // formatting whitespace and character data outside the root element is not relevant
+        if (firstContent === -1 || current.nodeType !== XmlNodeType.Element) {
+            return;
+        }
+
+        const text = hasReference
+            ? this._decode(firstContent, lastContent + 1)
+            : xml.substring(firstContent, lastContent + 1);
+        current.appendText(text, false);
+    }
+
+    /**
+     * Reads a start tag (or empty element tag) including its attributes.
+     * @returns The element which receives the following content.
+     */
+    private _readStartTag(parent: XmlNode): XmlNode {
+        const xml = this._xml;
+        this._pos++; // <
+        const element = new XmlNode(XmlNodeType.Element, this._readName('element name'));
+        parent.addChild(element);
+
+        while (true) {
+            this._skipWhitespace();
+            if (this._pos >= this._length) {
+                break;
+            }
+
+            const c = xml.charCodeAt(this._pos);
+            if (c === XmlParser._charGreaterThan) {
+                this._pos++;
+                this._openElements.push(parent);
+                return element;
+            }
+
+            if (c === XmlParser._charSlash) {
+                this._expect(this._pos + 1, XmlParser._charGreaterThan, "'>' after '/'");
+                this._pos += 2;
+                return parent;
+            }
+
+            const name = this._readName('attribute name');
+            this._skipWhitespace();
+            this._expect(this._pos, XmlParser._charEquals, `'=' after attribute ${name}`);
+            this._pos++;
+            this._skipWhitespace();
+            element.attributes.set(name, this._readAttributeValue(name));
+        }
+
+        throw new XmlError(`Unexpected end of document in tag <${element.localName}>`, xml, this._pos);
+    }
+
+    private _readAttributeValue(name: string): string {
+        const xml = this._xml;
+        const quote = this._pos < this._length ? xml.charCodeAt(this._pos) : 0;
+        if (quote !== XmlParser._charDoubleQuote && quote !== XmlParser._charSingleQuote) {
+            throw new XmlError(`Expected quoted value for attribute ${name}`, xml, this._pos);
+        }
+
+        const start = this._pos + 1;
+        let hasReference = false;
+        let p = start;
+        while (p < this._length) {
+            const c = xml.charCodeAt(p);
+            if (c === quote) {
+                this._pos = p + 1;
+                return hasReference ? this._decode(start, p) : xml.substring(start, p);
+            }
+            if (c === XmlParser._charAmpersand) {
+                hasReference = true;
+            }
             p++;
         }
 
-        if (state === XmlState.Begin) {
-            start = p;
-            state = XmlState.Pcdata;
-        }
-
-        if (state === XmlState.Pcdata) {
-            if (p !== start) {
-                buf += str.substr(start, p - start);
-                const node: XmlNode = new XmlNode();
-                node.nodeType = XmlNodeType.Text;
-                node.value = buf;
-                parent.addChild(node);
-            }
-            return p;
-        }
-        if (state === XmlState.Escape && escapeNext === XmlState.Pcdata) {
-            buf += '&';
-            buf += str.substr(start, p - start);
-            const node: XmlNode = new XmlNode();
-            node.nodeType = XmlNodeType.Text;
-            node.value = buf;
-            parent.addChild(node);
-            return p;
-        }
-        throw new XmlError('Unexpected end', str, p);
+        throw new XmlError(`Unterminated value for attribute ${name}`, xml, start);
     }
 
-    private static _isValidChar(c: number): boolean {
+    /**
+     * Reads an end tag and checks that it closes the current element.
+     * @returns The parent of the closed element.
+     */
+    private _readEndTag(current: XmlNode): XmlNode {
+        const xml = this._xml;
+        const nameStart = this._pos + 2; // </
+        let p = nameStart;
+        while (p < this._length && !XmlParser._isNameEnd(xml.charCodeAt(p))) {
+            p++;
+        }
+
+        // compare in place to avoid allocating the name of every end tag
+        const name = current.localName;
+        let matches = current.nodeType === XmlNodeType.Element && p - nameStart === name.length;
+        for (let i = 0; matches && i < name.length; i++) {
+            matches = xml.charCodeAt(nameStart + i) === name.charCodeAt(i);
+        }
+        if (!matches) {
+            const expected = current.nodeType === XmlNodeType.Element ? `</${name}>` : 'no end tag';
+            throw new XmlError(`Unexpected </${xml.substring(nameStart, p)}>, expected ${expected}`, xml, this._pos);
+        }
+
+        this._pos = p;
+        this._skipWhitespace();
+        this._expect(this._pos, XmlParser._charGreaterThan, `'>' to end </${name}>`);
+        this._pos++;
+        return this._openElements.pop()!;
+    }
+
+    /**
+     * Reads the markup starting with '<!': comments, CDATA sections and the document type declaration.
+     */
+    private _readDeclaration(current: XmlNode) {
+        const xml = this._xml;
+        if (this._isAt('<!--', false)) {
+            this._pos = this._indexAfter('-->', this._pos + 4, 'comment');
+        } else if (this._isAt('<![CDATA[', false)) {
+            const start = this._pos + 9;
+            this._pos = this._indexAfter(']]>', start, 'CDATA section');
+            if (current.nodeType === XmlNodeType.Element) {
+                current.appendText(xml.substring(start, this._pos - 3), true);
+            }
+        } else if (this._isAt('<!DOCTYPE', true)) {
+            this._pos += 9;
+            this._skipWhitespace();
+            const start = this._pos;
+            // the internal subset in brackets can contain '>'
+            let depth = 0;
+            while (this._pos < this._length) {
+                const c = xml.charCodeAt(this._pos);
+                if (c === XmlParser._charBracketOpen) {
+                    depth++;
+                } else if (c === XmlParser._charBracketClose) {
+                    depth--;
+                } else if (c === XmlParser._charGreaterThan && depth <= 0) {
+                    break;
+                }
+                this._pos++;
+            }
+            if (this._pos >= this._length) {
+                throw new XmlError('Unterminated document type declaration', xml, start);
+            }
+
+            if (current.nodeType === XmlNodeType.Document) {
+                const docType = new XmlNode(XmlNodeType.DocumentType);
+                docType.innerText = xml.substring(start, this._pos).trim();
+                current.addChild(docType);
+            }
+            this._pos++;
+        } else {
+            throw new XmlError('Unsupported markup declaration', xml, this._pos);
+        }
+    }
+
+    /**
+     * Decodes the character data in the given range resolving entity and character references.
+     */
+    private _decode(start: number, end: number): string {
+        const xml = this._xml;
+        let result = '';
+        let segmentStart = start;
+        let p = start;
+        while (p < end) {
+            if (xml.charCodeAt(p) !== XmlParser._charAmpersand) {
+                p++;
+                continue;
+            }
+
+            const nameStart = p + 1;
+            let semicolon = nameStart;
+            const maxEnd = Math.min(end, nameStart + XmlParser._maxEntityLength);
+            while (semicolon < maxEnd && xml.charCodeAt(semicolon) !== XmlParser._charSemicolon) {
+                semicolon++;
+            }
+
+            const resolved =
+                semicolon < maxEnd ? XmlParser._resolveReference(xml.substring(nameStart, semicolon)) : null;
+            if (resolved === null) {
+                // keep unknown references as written
+                p++;
+                continue;
+            }
+
+            result += xml.substring(segmentStart, p);
+            result += resolved;
+            p = semicolon + 1;
+            segmentStart = p;
+        }
+
+        return result + xml.substring(segmentStart, end);
+    }
+
+    private static _resolveReference(name: string): string | null {
+        switch (name) {
+            case 'lt':
+                return '<';
+            case 'gt':
+                return '>';
+            case 'amp':
+                return '&';
+            case 'quot':
+                return '"';
+            case 'apos':
+                return "'";
+        }
+
+        if (name.length < 2 || name.charCodeAt(0) !== XmlParser._charHash) {
+            return null;
+        }
+
+        const isHex = name.charCodeAt(1) === XmlParser._charLowerX;
+        const digits = name.substring(isHex ? 2 : 1);
+        const codePoint = Number.parseInt(digits, isHex ? 16 : 10);
+        if (Number.isNaN(codePoint) || codePoint < 0 || codePoint > 0x10ffff) {
+            return null;
+        }
+        return String.fromCodePoint(codePoint);
+    }
+
+    private _readName(kind: string): string {
+        const xml = this._xml;
+        const start = this._pos;
+        while (this._pos < this._length && !XmlParser._isNameEnd(xml.charCodeAt(this._pos))) {
+            this._pos++;
+        }
+        if (this._pos === start) {
+            throw new XmlError(`Expected ${kind}`, xml, start);
+        }
+        return xml.substring(start, this._pos);
+    }
+
+    /**
+     * Finds the given terminator starting at the given position.
+     * @returns The position after the terminator.
+     */
+    private _indexAfter(terminator: string, from: number, construct: string): number {
+        const index = this._xml.indexOf(terminator, from);
+        if (index === -1) {
+            throw new XmlError(`Unterminated ${construct}`, this._xml, this._pos);
+        }
+        return index + terminator.length;
+    }
+
+    private _isAt(text: string, ignoreCase: boolean): boolean {
+        const xml = this._xml;
+        if (this._pos + text.length > this._length) {
+            return false;
+        }
+        for (let i = 0; i < text.length; i++) {
+            let actual = xml.charCodeAt(this._pos + i);
+            let expected = text.charCodeAt(i);
+            if (ignoreCase) {
+                actual = XmlParser._toUpperAscii(actual);
+                expected = XmlParser._toUpperAscii(expected);
+            }
+            if (actual !== expected) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private _expect(position: number, expected: number, description: string) {
+        if (position >= this._length || this._xml.charCodeAt(position) !== expected) {
+            throw new XmlError(`Expected ${description}`, this._xml, position);
+        }
+    }
+
+    private _skipWhitespace() {
+        const xml = this._xml;
+        while (this._pos < this._length && XmlParser._isWhitespace(xml.charCodeAt(this._pos))) {
+            this._pos++;
+        }
+    }
+
+    private static _toUpperAscii(c: number): number {
+        return c >= 0x61 && c <= 0x7a ? c - 0x20 : c;
+    }
+
+    private static _isWhitespace(c: number): boolean {
         return (
-            (c >= XmlParser.CharCodeLowerA && c <= XmlParser.CharCodeLowerZ) ||
-            (c >= XmlParser.CharCodeUpperA && c <= XmlParser.CharCodeUpperZ) ||
-            (c >= XmlParser.CharCode0 && c <= XmlParser.CharCode9) ||
-            c === XmlParser.CharCodeColon ||
-            c === XmlParser.CharCodeDot ||
-            c === XmlParser.CharCodeUnderscore ||
-            c === XmlParser.CharCodeMinus
+            c === XmlParser._charSpace ||
+            c === XmlParser._charLineFeed ||
+            c === XmlParser._charCarriageReturn ||
+            c === XmlParser._charTab
+        );
+    }
+
+    private static _isNameEnd(c: number): boolean {
+        return (
+            XmlParser._isWhitespace(c) ||
+            c === XmlParser._charGreaterThan ||
+            c === XmlParser._charSlash ||
+            c === XmlParser._charEquals ||
+            c === XmlParser._charLessThan
         );
     }
 }

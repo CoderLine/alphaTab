@@ -1,7 +1,6 @@
 import { FermataType } from '@coderline/alphatab/model/Fermata';
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 
 /**
  * @internal
@@ -24,7 +23,9 @@ export class FermataGlyph extends MusicFontGlyph {
         }
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx - this.width / 2, cy + this.height, canvas);
+    public override doLayout(): void {
+        super.doLayout();
+        this.center = true;
+        this.offsetY = this.height;
     }
 }

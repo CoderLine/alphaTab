@@ -9,7 +9,7 @@ export const DEMOS: DemoEntry[] = [
         href: '/demos/control/',
         title: 'Control',
         description:
-            'The full-featured player: track sidebar, transport bar, layout/scroll/zoom pickers, downloads, drag-drop loading.'
+            'The full-featured player: track panel, transport, every setting, downloads, drag-drop loading and the backing-track waveform.'
     },
     {
         href: '/demos/recorder/',

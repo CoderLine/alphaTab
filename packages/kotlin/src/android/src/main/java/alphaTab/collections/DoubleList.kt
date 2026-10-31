@@ -125,8 +125,26 @@ public class DoubleList : IDoubleIterable {
         return DoubleList(copy, copy.size)
     }
 
-    public fun sort() {
+    public fun sort(): DoubleList {
         _items.sort(0, _size)
+        return this
+    }
+
+    public fun sort(comparison: (a: Double, b: Double) -> Double): DoubleList {
+        val sorted = _items.copyOfRange(0, _size).sortedWith { a, b -> comparison(a, b).compareTo(0.0) }
+        for (i in sorted.indices) {
+            _items[i] = sorted[i]
+        }
+        return this
+    }
+
+    public fun indexOf(value: Double): Double {
+        for (i in 0 until _size) {
+            if (_items[i] == value) {
+                return i.toDouble()
+            }
+        }
+        return -1.0
     }
 
     internal fun sortDescending() {
@@ -142,6 +160,11 @@ public class DoubleList : IDoubleIterable {
         }
         _size--
         return d
+    }
+
+    public fun pop(): Double {
+        _size--
+        return _items[_size]
     }
 
     public fun spread(): DoubleArray {
@@ -186,5 +209,23 @@ public class DoubleList : IDoubleIterable {
         var accumulator = initial
         for (element in _items) accumulator = operation(accumulator, element)
         return accumulator
+    }
+
+    public fun some(predicate: (Double) -> Boolean): Boolean {
+        for (el in this) {
+            if(predicate(el)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    public fun every(predicate: (Double) -> Boolean): Boolean {
+        for (el in this) {
+            if(!predicate(el)) {
+                return false
+            }
+        }
+        return true
     }
 }

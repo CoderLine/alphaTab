@@ -4,51 +4,55 @@
 // the code is regenerated.
 // </auto-generated>
 import { NoteStyle } from "@coderline/alphatab/model/Note";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { NoteSubElement } from "@coderline/alphatab/model/Note";
 import { Color } from "@coderline/alphatab/model/Color";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class NoteStyleSerializer {
-    public static fromJson(obj: NoteStyle, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["notehead", "noteheadcenteronstem", "colors"]);
+    public static read(obj: NoteStyle, reader: IObjectReader): void {
+        reader.readRecord(NoteStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.noteHead = JsonHelper.parseEnum<MusicFontSymbol>(r.readValue(), MusicFontSymbol);
+                    return true;
+                case 1:
+                    obj.noteHeadCenterOnStem = r.readValue() as boolean | undefined;
+                    return true;
+                case 2:
+                    NoteStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
+    }
+    private static _readColors(obj: NoteStyle, r: IObjectReader): void {
+        obj.colors = new Map<NoteSubElement, Color | null>();
+        r.readObject((k, rr) => {
+            obj.colors.set(JsonHelper.parseEnum<NoteSubElement>(k, NoteSubElement)!, Color.fromJson(rr.readValue()));
+            return true;
+        });
+    }
+    public static write(obj: NoteStyle | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => NoteStyleSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: NoteStyle | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
+        w.startObject(NoteStyleSerializer._fields);
+        w.valueField(0, obj.noteHead as number | undefined);
+        w.valueField(1, obj.noteHeadCenterOnStem);
+        w.mapField(2);
+        for (const [k, v] of obj.colors!) {
+            w.prop(k.toString());
+            w.writeValue(Color.toJson(v));
         }
-        const o = new Map<string, unknown>();
-        o.set("notehead", obj.noteHead as number | undefined);
-        o.set("noteheadcenteronstem", obj.noteHeadCenterOnStem);
-        {
-            const m = new Map<string, unknown>();
-            o.set("colors", m);
-            for (const [k, v] of obj.colors!) {
-                m.set(k.toString(), Color.toJson(v));
-            }
-        }
-        return o;
-    }
-    public static setProperty(obj: NoteStyle, property: string, v: unknown): boolean {
-        switch (property) {
-            case "notehead":
-                obj.noteHead = JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol);
-                return true;
-            case "noteheadcenteronstem":
-                obj.noteHeadCenterOnStem = v as boolean | undefined;
-                return true;
-            case "colors":
-                obj.colors = new Map<NoteSubElement, Color | null>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.colors.set(JsonHelper.parseEnum<NoteSubElement>(k, NoteSubElement)!, Color.fromJson(v));
-                });
-                return true;
-        }
-        return false;
+        w.endMap();
+        w.endObject();
     }
 }

@@ -7,7 +7,6 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NoteHeadGlyphBase } from '@coderline/alphatab/rendering/glyphs/NoteHeadGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -26,17 +25,25 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ =
+        const previousColor =
             this.beat!.notes.length === 0
                 ? undefined
-                : ElementStyleHelper.note(canvas, this.noteHeadElement, this.beat!.notes[0]);
-        super.paint(cx, cy, canvas);
-        this._paintEffects(cx, cy, canvas);
+                : ElementStyleHelper.applyNote(canvas, this.noteHeadElement, this.beat!.notes[0]);
+        try {
+            super.paint(cx, cy, canvas);
+            this._paintEffects(cx, cy, canvas);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
     private _paintEffects(cx: number, cy: number, canvas: ICanvas) {
-        using _ = ElementStyleHelper.beat(canvas, this.effectElement, this.beat!);
-        for (const g of this.beatEffects.values()) {
-            g.paint(cx + this.x, cy + this.y, canvas);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, this.effectElement, this.beat!);
+        try {
+            for (const g of this.beatEffects.values()) {
+                g.paint(cx + this.x, cy + this.y, canvas);
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 
@@ -66,18 +73,10 @@ export class SlashNoteHeadGlyph extends NoteHeadGlyphBase {
         }
 
         if (!Number.isNaN(minEffectY)) {
-            lr.registerBeatEffectOverflows(minEffectY, maxEffectY);
+            lr.registerBeatEffectOverflowsForBeat(this.beat!, minEffectY, maxEffectY);
         }
 
-        const direction = lr.getBeatDirection(this.beat!);
-        const symbol = this.symbol;
-        if (direction === BeamDirection.Up) {
-            const stemInfoUp = lr.smuflMetrics.stemUp.has(symbol) ? lr.smuflMetrics.stemUp.get(symbol)!.x : 0;
-            this.stemX = stemInfoUp;
-        } else {
-            const stemInfoDown = lr.smuflMetrics.stemDown.has(symbol) ? lr.smuflMetrics.stemDown.get(symbol)!.x : 0;
-            this.stemX = stemInfoDown;
-        }
+        this.stemX = this.getStemX(lr.smuflMetrics, lr.getBeatDirection(this.beat!));
     }
 
     public static getSymbol(duration: Duration): MusicFontSymbol {

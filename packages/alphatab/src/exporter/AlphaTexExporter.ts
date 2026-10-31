@@ -17,7 +17,9 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexArgumentList,
-    type IAlphaTexAstNode
+    type IAlphaTexAstNode,
+    type AlphaTexDotTokenNode,
+    type AlphaTexAtTokenNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 import type { IAlphaTexLanguageImportHandler } from '@coderline/alphatab/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
@@ -181,7 +183,7 @@ class AlphaTexPrinter {
         this._writeComments(n.leadingComments);
 
         this._writeValue(n.noteValue);
-        this._writeToken(n.noteStringDot, false);
+        this._writeToken(n.noteStringSeparator, false);
         this._writeValue(n.noteString);
 
         if (n.noteEffects) {
@@ -377,6 +379,9 @@ class AlphaTexPrinter {
             switch (tokenNode.nodeType) {
                 case AlphaTexNodeType.Dot:
                     this._writer.write('.');
+                    break;
+                case AlphaTexNodeType.At:
+                    this._writer.write('@');
                     break;
                 case AlphaTexNodeType.Backslash:
                     this._writer.write('\\');
@@ -658,6 +663,17 @@ export class AlphaTexExporter extends ScoreExporter {
                 nodeType: AlphaTexNodeType.String,
                 text: PercussionMapper.getArticulationName(data)
             } as AlphaTexStringLiteral;
+
+            if (!Number.isNaN(data.string)) {
+                note.noteStringSeparator = {
+                    nodeType: AlphaTexNodeType.At
+                } as AlphaTexAtTokenNode;
+                const stringNumber = data.beat.voice.bar.staff.tuning.length - data.string + 1;
+                note.noteString = {
+                    nodeType: AlphaTexNodeType.Number,
+                    value: stringNumber
+                };
+            }
         } else if (data.isPiano) {
             note.noteValue = {
                 nodeType: AlphaTexNodeType.Ident,
@@ -668,9 +684,9 @@ export class AlphaTexExporter extends ScoreExporter {
                 nodeType: AlphaTexNodeType.Number,
                 value: data.fret
             } as AlphaTexNumberLiteral;
-            note.noteStringDot = {
+            note.noteStringSeparator = {
                 nodeType: AlphaTexNodeType.Dot
-            };
+            } as AlphaTexDotTokenNode;
             const stringNumber = data.beat.voice.bar.staff.tuning.length - data.string + 1;
             note.noteString = {
                 nodeType: AlphaTexNodeType.Number,

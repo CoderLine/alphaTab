@@ -102,12 +102,31 @@ export class MidiFile {
         if (this.tracks.length === 1) {
             return this.tracks[0].events;
         }
+        // merge the (already sorted) tracks. this keeps the order of events on the same tick
+        // (sorting would not guarantee this on all platforms)
         const events: MidiEvent[] = [];
-        for (const t of this.tracks) {
-            this.events.push(...t.events);
-        }
+        const positions: number[] = this.tracks.map(_ => 0);
+        while (true) {
+            let nextTrack = -1;
+            let nextTick = 0;
+            for (let i = 0; i < this.tracks.length; i++) {
+                const trackEvents = this.tracks[i].events;
+                if (positions[i] < trackEvents.length) {
+                    const tick = trackEvents[positions[i]].tick;
+                    if (nextTrack === -1 || tick < nextTick) {
+                        nextTrack = i;
+                        nextTick = tick;
+                    }
+                }
+            }
 
-        events.sort((a, b) => a.tick - b.tick);
+            if (nextTrack === -1) {
+                break;
+            }
+
+            events.push(this.tracks[nextTrack].events[positions[nextTrack]]);
+            positions[nextTrack]++;
+        }
         return events;
     }
 

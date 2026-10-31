@@ -1,0 +1,332 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+@use '@coderline/alphatab-ui/styles/tokens';
+@use './highlight.scss';
+@use './docs.scss';
+
+// Latin subsets only: each weight file otherwise also pulls in the Cyrillic, Greek,
+// Vietnamese and Devanagari faces, ~200 extra font assets the English site never uses.
+@import "@fontsource/noto-sans/latin-300.css";
+@import "@fontsource/noto-sans/latin-400.css";
+@import "@fontsource/noto-sans/latin-500.css";
+@import "@fontsource/noto-sans/latin-700.css";
+@import "@fontsource/noto-sans/latin-ext-300.css";
+@import "@fontsource/noto-sans/latin-ext-400.css";
+@import "@fontsource/noto-sans/latin-ext-500.css";
+@import "@fontsource/noto-sans/latin-ext-700.css";
+
+@import "@fontsource/noto-sans/latin-300-italic.css";
+@import "@fontsource/noto-sans/latin-400-italic.css";
+@import "@fontsource/noto-sans/latin-500-italic.css";
+@import "@fontsource/noto-sans/latin-700-italic.css";
+@import "@fontsource/noto-sans/latin-ext-300-italic.css";
+@import "@fontsource/noto-sans/latin-ext-400-italic.css";
+@import "@fontsource/noto-sans/latin-ext-500-italic.css";
+@import "@fontsource/noto-sans/latin-ext-700-italic.css";
+
+@import "@fontsource/noto-serif/latin-300.css";
+@import "@fontsource/noto-serif/latin-400.css";
+@import "@fontsource/noto-serif/latin-500.css";
+@import "@fontsource/noto-serif/latin-700.css";
+@import "@fontsource/noto-serif/latin-ext-300.css";
+@import "@fontsource/noto-serif/latin-ext-400.css";
+@import "@fontsource/noto-serif/latin-ext-500.css";
+@import "@fontsource/noto-serif/latin-ext-700.css";
+
+@import "@fontsource/noto-serif/latin-300-italic.css";
+@import "@fontsource/noto-serif/latin-400-italic.css";
+@import "@fontsource/noto-serif/latin-500-italic.css";
+@import "@fontsource/noto-serif/latin-700-italic.css";
+@import "@fontsource/noto-serif/latin-ext-300-italic.css";
+@import "@fontsource/noto-serif/latin-ext-400-italic.css";
+@import "@fontsource/noto-serif/latin-ext-500-italic.css";
+@import "@fontsource/noto-serif/latin-ext-700-italic.css";
+
+@import 'react-tooltip/dist/react-tooltip.css';
+
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #426d9d;
+  --ifm-color-primary-dark: #3b628d;
+  --ifm-color-primary-darker: #385d85;
+  --ifm-color-primary-darkest: #2e4c6e;
+  --ifm-color-primary-light: #4978ad;
+  --ifm-color-primary-lighter: #4c7db4;
+  --ifm-color-primary-lightest: #648ebe;
+  --ifm-code-font-size: 95%;
+  --ifm-z-index-fixed: 2000;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.2);
+
+  --ifm-font-family-base: "Noto Sans", sans-serif;
+
+  /* The alphaTab UI tokens (packages/ui/src/styles/tokens.scss) that follow Infima. */
+  --at-host-offset: var(--ifm-navbar-height);
+  --at-z-overlay: calc(var(--ifm-z-index-fixed) + 10);
+  --at-warning: var(--ifm-color-warning-darkest);
+}
+
+button, input {
+    font: var(--ifm-font-size-base) / var(--ifm-line-height-base) var(--ifm-font-family-base);
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme="dark"] {
+  --ifm-color-primary: #426d9d;
+  --ifm-color-primary-dark: #3b628d;
+  --ifm-color-primary-darker: #385d85;
+  --ifm-color-primary-darkest: #2e4c6e;
+  --ifm-color-primary-light: #4978ad;
+  --ifm-color-primary-lighter: #4c7db4;
+  --ifm-color-primary-lightest: #648ebe;
+}
+
+body {
+  background: var(--at-bg);
+  height: auto !important;
+  min-height: 100%;
+}
+
+.theme-layout-navbar {
+  .navbar__inner {
+    max-width: var(--ifm-container-width-xl);
+    margin: 0 auto;
+  }
+}
+
+
+.DocSearch {
+  --docsearch-searchbox-background: var(--at-surface-alt);
+  --docsearch-subtle-color: var(--at-line);
+  --docsearch-key-background: var(--at-surface);
+}
+
+.DocSearch-Button {
+  border-radius: 8px;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  color: var(--at-muted);
+  font-family: var(--at-font-mono);
+  min-width: 200px;
+  padding: 5px 12px 5px 10px;
+  height: auto;
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover {
+    border-color: var(--at-accent);
+    background: var(--at-surface);
+    box-shadow: none;
+  }
+
+  .DocSearch-Button-Key {
+    border: 1px solid var(--at-line);
+    background: var(--at-surface);
+    color: var(--at-muted);
+    box-shadow: none;
+    padding-bottom: 0;
+  }
+
+  .DocSearch-Button-Container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .DocSearch-Button-Placeholder {
+    font-size: 12px;
+    color: var(--at-muted);
+  }
+
+  .DocSearch-Search-Icon {
+    width: 13px;
+    height: 13px;
+    stroke: var(--at-muted);
+  }
+}
+
+
+
+.docusaurus-highlight-code-line {
+  background-color: rgba(0, 0, 0, 0.1);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
+}
+
+[data-theme="dark"] .docusaurus-highlight-code-line {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+a {
+  text-decoration: none;
+}
+
+img.thumbnail {
+  max-width: 400px;
+  transition: transform 0.2s;
+
+  &:hover {
+    transform: scale(1.5);
+  }
+}
+
+.badge--header {
+  font-size: 0.75rem;
+}
+
+.theme-doc-markdown {
+  position: relative;
+}
+
+li.types-item .menu__list-item-collapsible {
+  flex-wrap: no-wrap;
+}
+
+li.types-item .menu__list {
+  font-size: 0.8rem;
+}
+
+li.types-item .menu__link {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Icon is now rendered inline by the custom GitHubStarsLink React component
+// (src/theme/NavbarItem/GitHubStarsLink.tsx). No ::before pseudo needed.
+
+/* Styles for player */
+[data-theme="dark"] {
+  .at-cursor-bar {
+    /* Defines the color of the bar background when a bar is played */
+    background: rgba(66, 109, 157, 0.2);
+  }
+
+  .at-selection div {
+    /* Defines the color of the selection background */
+    background: rgba(64, 64, 255, 0.1);
+  }
+
+  .at-cursor-beat {
+    /* Defines the beat cursor */
+    background: rgba(61, 142, 234, 0.75);
+    width: 3px;
+  }
+
+  .at-highlight * {
+    /* Defines the color of the music symbols when they are being played (svg) */
+    fill: #0078ff;
+    stroke: #0078ff;
+  }
+}
+
+[data-theme="light"] {
+  .at-cursor-bar {
+    /* Defines the color of the bar background when a bar is played */
+    background: rgba(255, 242, 0, 0.25);
+  }
+
+  .at-selection div {
+    /* Defines the color of the selection background */
+    background: rgba(64, 64, 255, 0.1);
+  }
+
+  .at-cursor-beat {
+    /* Defines the beat cursor */
+    background: rgba(64, 64, 255, 0.75);
+    width: 3px;
+  }
+
+  .at-highlight * {
+    /* Defines the color of the music symbols when they are being played (svg) */
+    fill: #0078ff;
+    stroke: #0078ff;
+  }
+}
+
+@import "react-tooltip/dist/react-tooltip.css";
+
+.codeBlockContainer {
+  border-radius: var(--ifm-code-border-radius);
+  box-shadow: var(--ifm-global-shadow-lw);
+  margin-bottom: var(--ifm-leading);
+  background: var(--prism-background-color);
+  color: var(--prism-color);
+
+  & .codeBlockContent {
+    border-radius: inherit;
+    direction: ltr;
+    position: relative;
+  }
+
+  & .codeBlock {
+    --ifm-pre-background: var(--prism-background-color);
+    margin: 0;
+    padding: 0;
+    scrollbar-width: thin;
+  }
+
+  & .codeBlockLines {
+    float: left;
+    font: inherit;
+    min-width: 100%;
+    padding: var(--ifm-pre-padding);
+
+    & a {
+      text-decoration: underline dotted;
+    }
+
+
+    & a:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+
+.signature-tabs {
+  margin-top: calc(var(--ifm-leading) * -1);
+
+  &>.tabs-container {
+    margin-bottom: 0;
+
+    &>.margin-top--md {
+      margin-top: 0 !important;
+    }
+  }
+
+  .tabs {
+    justify-content: flex-end;
+  }
+
+  .tabs__item {
+    padding: 0.1rem 0.2rem;
+    border-radius: 0;
+    font-weight: normal;
+    font-size: 80%;
+  }
+
+  .codeBlockContainer .codeBlockLines {
+    padding: 0.25rem;
+  }
+}
+
+// Sidebar items marked with `sidebar-hidden` are removed from the sidebar UI
+// but stay in the sidebar tree so tools like FeatureChapterGrid can still read
+// their frontmatter. Applied by the custom sidebarItemsGenerator in
+// docusaurus.config.mts to feature-catalog external-link stubs.
+.theme-doc-sidebar-menu .menu__list-item:has(.sidebar-hidden),
+.theme-doc-sidebar-menu .menu__list-item > .sidebar-hidden {
+  display: none;
+}
+
+// Infima's prose rule `.markdown li + li { margin-top: var(--ifm-list-item-margin); }`
+// applies to every non-first list item inside `.markdown`, including flex-row
+// pill selectors used across the demo components. In a flex row that shows up
+// as the first pill floating higher than the rest. Reset it here.
+.pills .pills__item {
+  margin-top: 0;
+}

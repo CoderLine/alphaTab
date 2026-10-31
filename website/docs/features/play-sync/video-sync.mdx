@@ -1,0 +1,89 @@
+---
+title: "Video sync"
+description: "Drive the alphaTab cursor from a YouTube iframe or an HTML5 video element via IExternalMediaHandler."
+sidebar_custom_props:
+  feature_chapter: sync
+  feature_order: 20
+keywords:
+  - alphaTab
+  - video
+  - sync
+  - YouTube
+  - HTML5 video
+  - external media
+---
+
+import { ExternalMediaSample } from '@site/src/components/ExternalMediaSample';
+
+A YouTube guitar lesson synced to a printable score — the video plays and the notation scrolls alongside — has become a standard learning format. Video sync uses the same infrastructure as backing-track audio, with one twist: alphaTab does not own the media element. You implement `IExternalMediaHandler`, alphaTab calls it for play, pause, seek, volume, and playback rate, and you feed the current time back through `player.output.updatePosition`. The same handler shape drives an HTML5 `<video>` tag and the YouTube IFrame Player API alike.
+
+The demo below pairs the Bach BWV 999 score with a matching MP4 whose visualization is generated from the same audio stream — the on-screen waveform *is* the sound you hear, so nothing drifts between what you see and what plays. Press play on the video; the alphaTab cursor tracks the video's clock via the external-media handler shown further down.
+
+<ExternalMediaSample mediaType="video" showCode={false} />
+
+## The two-way contract
+
+External-media mode plugs two pieces together:
+
+- **`IExternalMediaHandler`** — the object you implement. It exposes `backingTrackDuration`, `playbackRate`, `masterVolume`, `seekTo`, `play`, and `pause`. alphaTab calls into it whenever the score's transport changes.
+- **`api.player.output.updatePosition(ms)`** — the call you make on every media time update, roughly every 50 ms during playback and after every seek. This is how alphaTab moves the cursor.
+
+Set `player.playerMode` to `PlayerMode.EnabledExternalMedia` and assign your handler to `api.player.output.handler`.
+
+## YouTube quirk
+
+The YouTube IFrame API resumes playback whenever `seekTo` is called on a non-playing player. alphaTab issues an initial seek to position zero during load, so a naive handler starts the video the moment the page mounts. The workaround is to defer the initial seek until the user actually presses play — check `player.getPlayerState()` inside your `seekTo` and queue the position if the state is `UNSTARTED` or `CUED`.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const video = document.getElementById('video');
+
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledExternalMedia,
+    soundFont: '/soundfont/sonivox.sf2',
+  },
+});
+
+const handler = {
+  get backingTrackDuration() {
+    const d = video.duration;
+    return Number.isFinite(d) ? d * 1000 : 0;
+  },
+  get playbackRate() { return video.playbackRate; },
+  set playbackRate(value) { video.playbackRate = value; },
+  get masterVolume() { return video.volume; },
+  set masterVolume(value) { video.volume = value; },
+  seekTo(timeMs) { video.currentTime = timeMs / 1000; },
+  play() { video.play(); },
+  pause() { video.pause(); },
+};
+
+api.playerReady.on(() => {
+  api.player.output.handler = handler;
+});
+
+let updateTimer = 0;
+const pushPosition = () => api.player.output.updatePosition(video.currentTime * 1000);
+
+video.addEventListener('play', () => {
+  api.play();
+  updateTimer = window.setInterval(pushPosition, 50);
+});
+video.addEventListener('pause', () => { api.pause(); clearInterval(updateTimer); });
+video.addEventListener('seeked', pushPosition);
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Where to look next
+
+- [Backing-track audio](backing-track-audio) — when the audio lives inside the score file or you can control the audio element directly.
+- [Sync points at runtime](sync-points-at-runtime) — aligning the video's time axis with the score's bars.
+- [Seeking by tick and time](seeking-by-tick-and-time) — the same `timePosition` axis your handler feeds back through `updatePosition`.
+- [`PlayerMode.EnabledExternalMedia`](/docs/reference/settings/player/playermode), [`IExternalMediaHandler`](/docs/reference/types/synth/iexternalmediahandler), and [`IExternalMediaSynthOutput`](/docs/reference/types/synth/iexternalmediasynthoutput) in the reference.

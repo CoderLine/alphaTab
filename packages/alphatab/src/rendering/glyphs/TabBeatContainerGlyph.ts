@@ -10,6 +10,7 @@ import { TabSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/TabSlide
 import { TabSlurGlyph } from '@coderline/alphatab/rendering/glyphs/TabSlurGlyph';
 import { TabTieGlyph } from '@coderline/alphatab/rendering/glyphs/TabTieGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
+import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 
 /**
@@ -17,7 +18,8 @@ import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingH
  */
 export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;
-    private _effectSlurs: TabSlurGlyph[] = [];
+    private _effectSlurStarts: Set<BeamDirection> | null = null;
+    private _effectSlurEnds: Set<BeamDirection> | null = null;
 
     public constructor(beat: Beat) {
         super(beat);
@@ -30,7 +32,8 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public override doLayout(): void {
-        this._effectSlurs = [];
+        this._effectSlurStarts?.clear();
+        this._effectSlurEnds?.clear();
         super.doLayout();
         if (this._bend) {
             this._bend.renderer = this.renderer;
@@ -56,46 +59,43 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
             const tapSlur: TabTieGlyph = new TabTieGlyph(`tab.tie.leftHandTap.${n.id}`, n, n, false);
             this.addTie(tapSlur);
         }
+        // effect slurs: one arc per side of the beat (see TabSlurGlyph)
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
-            let expanded: boolean = false;
-            for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n, n.effectSlurDestination, false, false)) {
-                    expanded = true;
-                    break;
+            const direction = TabTieGlyph.getBeamDirectionForNote(n);
+            let slurStarts = this._effectSlurStarts;
+            const group =
+                slurStarts !== null && slurStarts.has(direction)
+                    ? null
+                    : TabSlurGlyph.getEffectSlurGroup(this.beat, direction);
+            if (group) {
+                if (!slurStarts) {
+                    slurStarts = new Set<BeamDirection>();
+                    this._effectSlurStarts = slurStarts;
                 }
-            }
-            if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(
-                    `tab.slur.effect.${n.id}`,
-                    n,
-                    n.effectSlurDestination,
-                    false,
-                    false
+                slurStarts.add(direction);
+                this.addTie(
+                    new TabSlurGlyph(`tab.slur.effect.${group.startNote.id}`, group.startNote, group.endNote, false)
                 );
-                this._effectSlurs.push(effectSlur);
-                this.addTie(effectSlur);
             }
         }
         // end effect slur on last beat
         if (n.isEffectSlurDestination && n.effectSlurOrigin) {
-            let expanded: boolean = false;
-            for (const slur of this._effectSlurs) {
-                if (slur.tryExpand(n.effectSlurOrigin, n, false, true)) {
-                    expanded = true;
-                    break;
+            const direction = TabTieGlyph.getBeamDirectionForNote(n.effectSlurOrigin);
+            let slurEnds = this._effectSlurEnds;
+            const group =
+                slurEnds !== null && slurEnds.has(direction)
+                    ? null
+                    : TabSlurGlyph.getEffectSlurGroup(n.effectSlurOrigin.beat, direction);
+            if (group && group.endNote === n) {
+                if (!slurEnds) {
+                    slurEnds = new Set<BeamDirection>();
+                    this._effectSlurEnds = slurEnds;
                 }
-            }
-            if (!expanded) {
-                const effectSlur: TabSlurGlyph = new TabSlurGlyph(
-                    `tab.slur.effect.${n.effectSlurOrigin.id}`,
-                    n.effectSlurOrigin,
-                    n,
-                    false,
-                    true
+                slurEnds.add(direction);
+                this.addTie(
+                    new TabSlurGlyph(`tab.slur.effect.${group.startNote.id}`, group.startNote, group.endNote, true)
                 );
-                this._effectSlurs.push(effectSlur);
-                this.addTie(effectSlur);
             }
         }
         if (n.slideInType !== SlideInType.None || n.slideOutType !== SlideOutType.None) {

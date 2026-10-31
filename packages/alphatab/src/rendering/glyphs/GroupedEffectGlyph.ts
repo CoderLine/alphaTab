@@ -17,6 +17,35 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
         this.endPosition = endPosition;
     }
 
+    public override getBoundingBoxRight(): number {
+        if (!this.beat) {
+            return super.getBoundingBoxRight();
+        }
+        return this.renderer.getBeatX(this.beat, this.endPosition);
+    }
+
+    /**
+     * Publishes the chain's true cross-renderer painted xEnd to the owning
+     * {@link EffectBand} so its xRange covers intermediate columns. Called by
+     * {@link EffectBand.finalizeChainSpans} on chain heads only.
+     */
+    public publishChainSpan(): void {
+        if (!this.isLinkedWithNext) {
+            return;
+        }
+        let last: GroupedEffectGlyph = this.nextGlyph as GroupedEffectGlyph;
+        while (last.isLinkedWithNext) {
+            last = last.nextGlyph as GroupedEffectGlyph;
+        }
+        const trueEndXStaff = last.renderer.x + last.renderer.getBeatX(last.beat!, this.endPosition);
+        const trueEndXLocal = trueEndXStaff - this.renderer.x;
+        const xStart = this.getBoundingBoxLeft();
+        if (trueEndXLocal <= xStart) {
+            return;
+        }
+        this.band?.publishSpanRange(xStart, trueEndXLocal);
+    }
+
     public get isLinkedWithPrevious(): boolean {
         return !!this.previousGlyph && this.previousGlyph.renderer.staff?.system === this.renderer.staff!.system;
     }

@@ -60,7 +60,11 @@ export interface ICursorHandler {
 /**
  * A cursor handler which animates the beat cursor to the next beat or end of the beat bounds
  * depending on the cursor mode.
- * @internal
+ * @remarks
+ * This is the default handler when {@link PlayerSettings.enableAnimatedBeatCursor} is enabled.
+ * Custom {@link ICursorHandler} implementations can delegate to it to keep the default cursor placement.
+ * @since 1.9.0
+ * @public
  */
 export class ToNextBeatAnimatingCursorHandler implements ICursorHandler {
     public onAttach(_cursors: Cursors): void {
@@ -107,7 +111,11 @@ export class ToNextBeatAnimatingCursorHandler implements ICursorHandler {
 
 /**
  * A cursor handler which just places the bar and beat cursor without any animations applied.
- * @internal
+ * @remarks
+ * This is the default handler when {@link PlayerSettings.enableAnimatedBeatCursor} is disabled.
+ * Custom {@link ICursorHandler} implementations can delegate to it to keep the default cursor placement.
+ * @since 1.9.0
+ * @public
  */
 export class NonAnimatingCursorHandler implements ICursorHandler {
     public onAttach(_cursors: Cursors): void {

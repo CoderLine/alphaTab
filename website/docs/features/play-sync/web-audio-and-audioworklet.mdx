@@ -1,0 +1,68 @@
+---
+title: "Web Audio and AudioWorklet"
+description: "How alphaTab drives Web Audio in the browser, with AudioWorklet as the primary output and ScriptProcessor as the fallback."
+sidebar_custom_props:
+  feature_chapter: backends
+  feature_order: 10
+  feature_platforms: [web]
+keywords:
+  - alphaTab
+  - Web Audio
+  - AudioWorklet
+  - ScriptProcessor
+  - browser
+---
+
+import { TransportControls } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+When you build for the web, this is the backend that plays audio. In the browser, alphaTab renders synthesized samples through an `AudioContext` — the default output feeds an `AudioWorkletNode` that runs the sample buffer on the dedicated audio thread; older browsers fall back to a `ScriptProcessorNode` on the main thread. This page covers what runs when, and the one setting that lets you steer that choice.
+
+<TransportControls
+  tex={Riffs.FOLK_ARPEGGIO}
+  showCode={false}
+/>
+
+## The two output modes
+
+`PlayerOutputMode` selects which Web Audio node consumes samples:
+
+- **`WebAudioAudioWorklets`** (default) — samples travel to an `AudioWorkletProcessor` registered under the name `alphatab`. The processor runs off the main thread, so garbage collection and UI work do not underrun the audio buffer. This is the mode you want on every modern browser.
+- **`WebAudioScriptProcessor`** — samples are pulled from a `ScriptProcessorNode` on the main thread. Use this when a hosting environment blocks Audio Worklets (some sandboxed extensions, some legacy WebViews).
+
+alphaTab picks the worklet mode automatically. Set the fallback only when a specific host forces your hand.
+
+## Autoplay and the resume handshake
+
+Browsers suspend a fresh `AudioContext` until the user interacts with the page. alphaTab installs `touchend` and `click` listeners on `document.body` on first construction; the first gesture calls `context.resume()` and playback proceeds. If your UI intercepts those events before they reach `body`, resume the context yourself inside your handler, then call `api.playPause()`.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
+    soundFont: '/soundfont/sonivox.sf2',
+    // Force the ScriptProcessor path only when the host blocks AudioWorklet.
+    outputMode: alphaTab.PlayerOutputMode.WebAudioAudioWorklets,
+  },
+});
+
+api.playerReady.on(() => {
+  api.playPause();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. On this page the code targets the web runtime; the AudioWorklet backend does not exist on .NET or Android, which have their own backends.
+
+## Where to look next
+
+- [Audio buffer size](audio-buffer-size) — the latency vs stability knob for the circular sample buffer both modes share.
+- [Selecting an output device (Web)](selecting-an-output-device) — routing the resulting Web Audio stream to a specific sink.
+- [NAudio (.NET)](naudio-net) and [AudioTrack (Android)](audiotrack-android) — the sibling backends on the other runtimes.
+- [`PlayerOutputMode`](/docs/reference/types/playeroutputmode) and [`player.outputMode`](/docs/reference/settings/player/outputmode) in the reference.

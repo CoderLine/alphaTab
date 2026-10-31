@@ -21,6 +21,9 @@ export interface CoreSettingsJson {
      * be defined before initializing. Please be aware that bundling alphaTab together with other scripts might cause errors
      * in case those scripts are not suitable for web workers. e.g. if there is a script bundled together with alphaTab that accesses the DOM,
      * this will cause an error when alphaTab starts this script as worker.
+     *
+     * With Turbopack, which bundles no Audio Worklets, alphaTab loads its Audio Worklet from this file: point it to a
+     * copy of `alphaTab.mjs` served next to `alphaTab.core.mjs`.
      * @defaultValue Absolute url to JavaScript file containing alphaTab. (auto detected)
      * @category Core - JavaScript Specific
      * @target web
@@ -135,6 +138,7 @@ export interface CoreSettingsJson {
      * The log level to use within alphaTab
      * @remarks
      * AlphaTab internally does quite a bit of logging for debugging and informational purposes. The log level of alphaTab can be controlled via this setting.
+     * The published JavaScript files do not contain the messages of the `trace` level; they are only written when running alphaTab from its TypeScript sources and on .NET and Android.
      * @defaultValue `LogLevel.Info`
      * @category Core
      * @since 0.9.6

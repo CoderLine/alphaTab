@@ -1,5 +1,7 @@
 import { Environment } from '@coderline/alphatab/Environment';
 import { Logger } from '@coderline/alphatab/Logger';
+import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileWire } from '@coderline/alphatab/midi/MidiFileWire';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { AlphaSynthWorkerSynthOutput } from '@coderline/alphatab/platform/worker/AlphaSynthWorkerSynthOutput';
 import type {
@@ -34,7 +36,11 @@ export class AlphaSynthWebWorker {
 
     public handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>): void {
         const data = e.data;
-        switch (data.cmd) {
+        const cmd = data.cmd;
+        if(!cmd) {
+            return;
+        }
+        switch (cmd) {
             case 'alphaSynth.initialize':
                 AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                 Logger.logLevel = data.logLevel;
@@ -100,7 +106,7 @@ export class AlphaSynthWebWorker {
                 this._player.stop();
                 break;
             case 'alphaSynth.playOneTimeMidiFile':
-                this._player.playOneTimeMidiFile(JsonConverter.jsObjectToMidiFile(data.midi));
+                this._player.playOneTimeMidiFile(AlphaSynthWebWorker._readMidi(data.midi));
                 break;
             case 'alphaSynth.loadSoundFontBytes':
                 this._player.loadSoundFont(data.data, data.append);
@@ -109,7 +115,7 @@ export class AlphaSynthWebWorker {
                 this._player.resetSoundFonts();
                 break;
             case 'alphaSynth.loadMidi':
-                this._player.loadMidiFile(JsonConverter.jsObjectToMidiFile(data.midi));
+                this._player.loadMidiFile(AlphaSynthWebWorker._readMidi(data.midi));
                 break;
             case 'alphaSynth.setChannelMute':
                 this._player.setChannelMute(data.channel, data.mute);
@@ -137,10 +143,19 @@ export class AlphaSynthWebWorker {
                 break;
         }
 
-        if (data.cmd.startsWith('alphaSynth.exporter')) {
+        if (cmd.startsWith('alphaSynth.exporter')) {
             this._handleExporterMessage(e);
         }
     }
+
+    private static _readMidi(midi: unknown): MidiFile {
+        /*@target web*/
+        if (midi instanceof Float64Array) {
+            return MidiFileWire.decode(midi);
+        }
+        return JsonConverter.jsObjectToMidiFile(midi);
+    }
+
     private _handleExporterMessage(ev: MessageEvent<IAlphaSynthWorkerMessage>) {
         const data = ev.data;
         const cmd = data.cmd;
@@ -152,7 +167,7 @@ export class AlphaSynthWebWorker {
                     exporterId = data.exporterId;
                     exporter = this._player.exportAudio(
                         data.options,
-                        JsonConverter.jsObjectToMidiFile(data.midi),
+                        AlphaSynthWebWorker._readMidi(data.midi),
                         data.syncPoints,
                         data.transpositionPitches
                     );

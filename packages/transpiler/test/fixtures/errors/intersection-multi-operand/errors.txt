@@ -1,0 +1,1 @@
+input.ts:19:27: Intersection type with multiple distinct operands (A & B) is not supported. See SYNTAX.md for the workaround.

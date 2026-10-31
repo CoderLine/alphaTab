@@ -1,11 +1,12 @@
 {
     "name": "@coderline/alphatab-monorepo",
-    "version": "1.8.4",
+    "version": "1.9.0",
     "description": "Monorepo for alphaTab and its related packages",
     "private": true,
     "type": "module",
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "website"
     ],
     "scripts": {
         "clean": "npm run clean --workspaces --if-present",
@@ -42,11 +43,21 @@
 
         "build-monaco": "npm run build --workspace=packages/monaco",
 
+        "build-react": "npm run build --workspace=packages/react",
+
+        "build-website": "npm run build --workspace=website",
+        "dev-website": "npm run start --workspace=website",
+
         "nightly-check": "node ./scripts/nightly.mts --mode check",
         "nightly-pack": "node ./scripts/nightly.mts --mode pack",
-        "nightly-publish": "node ./scripts/nightly.mts --mode publish"
+        "nightly-publish": "node ./scripts/nightly.mts --mode publish",
+
+        "readme-hero": "node ./scripts/readme-hero/generate.mts"
+    },
+    "overrides": {
+        "dompurify": "^3.4.12"
     },
     "devDependencies": {
-        "concurrently": "^9.2.1"
+        "opentype.js": "^2.0.0"
     }
 }

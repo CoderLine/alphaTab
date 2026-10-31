@@ -4,134 +4,178 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlayerSettings } from "@coderline/alphatab/PlayerSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { VibratoPlaybackSettingsSerializer } from "@coderline/alphatab/generated/VibratoPlaybackSettingsSerializer";
-import { SlidePlaybackSettingsSerializer } from "@coderline/alphatab/generated/SlidePlaybackSettingsSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { PlayerOutputMode } from "@coderline/alphatab/PlayerSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { PlayerMode } from "@coderline/alphatab/PlayerSettings";
 import { ScrollMode } from "@coderline/alphatab/PlayerSettings";
+import { VibratoPlaybackSettingsSerializer } from "@coderline/alphatab/generated/VibratoPlaybackSettingsSerializer";
+import { SlidePlaybackSettingsSerializer } from "@coderline/alphatab/generated/SlidePlaybackSettingsSerializer";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class PlayerSettingsSerializer {
-    public static fromJson(obj: PlayerSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => PlayerSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["soundfont", "scrollelement", "outputmode", "enableplayer", "playermode", "enablecursor", "enableanimatedbeatcursor", "enableelementhighlighting", "enableuserinteraction", "enableseektoclick", "enableplaybackrangeselection", "resetplaybackrangeonclick", "scrolloffsetx", "scrolloffsety", "scrollmode", "scrollspeed", "nativebrowsersmoothscroll", "songbookbendduration", "songbookdipduration", "vibrato", "slide", "playtripletfeel", "buffertimeinmilliseconds", "positionupdateintervalinmilliseconds"]);
+    public static read(obj: PlayerSettings, reader: IObjectReader): void {
+        reader.readRecord(PlayerSettingsSerializer._fields, (id, k, rr) => PlayerSettingsSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: PlayerSettings | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        /*@target web*/
-        o.set("soundfont", obj.soundFont);
-        /*@target web*/
-        o.set("outputmode", obj.outputMode as number);
-        o.set("enableplayer", obj.enablePlayer);
-        o.set("playermode", obj.playerMode as number);
-        o.set("enablecursor", obj.enableCursor);
-        o.set("enableanimatedbeatcursor", obj.enableAnimatedBeatCursor);
-        o.set("enableelementhighlighting", obj.enableElementHighlighting);
-        o.set("enableuserinteraction", obj.enableUserInteraction);
-        o.set("scrolloffsetx", obj.scrollOffsetX);
-        o.set("scrolloffsety", obj.scrollOffsetY);
-        o.set("scrollmode", obj.scrollMode as number);
-        o.set("scrollspeed", obj.scrollSpeed);
-        /*@target web*/
-        o.set("nativebrowsersmoothscroll", obj.nativeBrowserSmoothScroll);
-        o.set("songbookbendduration", obj.songBookBendDuration);
-        o.set("songbookdipduration", obj.songBookDipDuration);
-        o.set("vibrato", VibratoPlaybackSettingsSerializer.toJson(obj.vibrato));
-        o.set("slide", SlidePlaybackSettingsSerializer.toJson(obj.slide));
-        o.set("playtripletfeel", obj.playTripletFeel);
-        o.set("buffertimeinmilliseconds", obj.bufferTimeInMilliseconds);
-        return o;
+    public static readProperty(obj: PlayerSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = PlayerSettingsSerializer._fields.idOf(property);
+        return id >= 0 ? PlayerSettingsSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
-        switch (property) {
+    private static _readField(obj: PlayerSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
             /*@target web*/
-            case "soundfont":
-                obj.soundFont = v as string | null;
-                return true;
-            /*@target web*/
-            case "scrollelement":
-                obj.scrollElement = v! as string | HTMLElement;
+            case 0:
+                obj.soundFont = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "outputmode":
-                obj.outputMode = JsonHelper.parseEnum<PlayerOutputMode>(v, PlayerOutputMode)!;
-                return true;
-            case "enableplayer":
-                obj.enablePlayer = v! as boolean;
-                return true;
-            case "playermode":
-                obj.playerMode = JsonHelper.parseEnum<PlayerMode>(v, PlayerMode)!;
-                return true;
-            case "enablecursor":
-                obj.enableCursor = v! as boolean;
-                return true;
-            case "enableanimatedbeatcursor":
-                obj.enableAnimatedBeatCursor = v! as boolean;
-                return true;
-            case "enableelementhighlighting":
-                obj.enableElementHighlighting = v! as boolean;
-                return true;
-            case "enableuserinteraction":
-                obj.enableUserInteraction = v! as boolean;
-                return true;
-            case "scrolloffsetx":
-                obj.scrollOffsetX = v! as number;
-                return true;
-            case "scrolloffsety":
-                obj.scrollOffsetY = v! as number;
-                return true;
-            case "scrollmode":
-                obj.scrollMode = JsonHelper.parseEnum<ScrollMode>(v, ScrollMode)!;
-                return true;
-            case "scrollspeed":
-                obj.scrollSpeed = v! as number;
+            case 1:
+                obj.scrollElement = r.readValue()! as string | HTMLElement;
                 return true;
             /*@target web*/
-            case "nativebrowsersmoothscroll":
-                obj.nativeBrowserSmoothScroll = v! as boolean;
+            case 2:
+                obj.outputMode = JsonHelper.parseEnum<PlayerOutputMode>(r.readValue(), PlayerOutputMode)!;
                 return true;
-            case "songbookbendduration":
-                obj.songBookBendDuration = v! as number;
+            case 3:
+                obj.enablePlayer = r.readBoolean();
                 return true;
-            case "songbookdipduration":
-                obj.songBookDipDuration = v! as number;
+            case 4:
+                obj.playerMode = JsonHelper.parseEnum<PlayerMode>(r.readValue(), PlayerMode)!;
                 return true;
-            case "playtripletfeel":
-                obj.playTripletFeel = v! as boolean;
+            case 5:
+                obj.enableCursor = r.readBoolean();
                 return true;
-            case "buffertimeinmilliseconds":
-                obj.bufferTimeInMilliseconds = v! as number;
+            case 6:
+                obj.enableAnimatedBeatCursor = r.readBoolean();
                 return true;
+            case 7:
+                obj.enableElementHighlighting = r.readBoolean();
+                return true;
+            case 8:
+                obj.enableUserInteraction = r.readBoolean();
+                return true;
+            case 9:
+                obj.enableSeekToClick = r.readBoolean();
+                return true;
+            case 10:
+                obj.enablePlaybackRangeSelection = r.readBoolean();
+                return true;
+            case 11:
+                obj.resetPlaybackRangeOnClick = r.readBoolean();
+                return true;
+            case 12:
+                obj.scrollOffsetX = r.readNumber();
+                return true;
+            case 13:
+                obj.scrollOffsetY = r.readNumber();
+                return true;
+            case 14:
+                obj.scrollMode = JsonHelper.parseEnum<ScrollMode>(r.readValue(), ScrollMode)!;
+                return true;
+            case 15:
+                obj.scrollSpeed = r.readNumber();
+                return true;
+            /*@target web*/
+            case 16:
+                obj.nativeBrowserSmoothScroll = r.readBoolean();
+                return true;
+            case 17:
+                obj.songBookBendDuration = r.readNumber();
+                return true;
+            case 18:
+                obj.songBookDipDuration = r.readNumber();
+                return true;
+            case 19:
+                VibratoPlaybackSettingsSerializer.read(obj.vibrato, r);
+                return true;
+            case 20:
+                SlidePlaybackSettingsSerializer.read(obj.slide, r);
+                return true;
+            case 21:
+                obj.playTripletFeel = r.readBoolean();
+                return true;
+            case 22:
+                obj.bufferTimeInMilliseconds = r.readNumber();
+                return true;
+            case 23:
+                obj.positionUpdateIntervalInMilliseconds = r.readNumber();
+                return true;
+        }
+        return false;
+    }
+    public static readFlexible(obj: PlayerSettings, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? PlayerSettingsSerializer._readField(obj, id, rr, false) : PlayerSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: PlayerSettings, property: string, r: IObjectReader): boolean {
+        if (["vibrato", "slide"].indexOf(property) < 0 && PlayerSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
         }
         if (["vibrato"].indexOf(property) >= 0) {
-            VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, v as Map<string, unknown>);
+            VibratoPlaybackSettingsSerializer.readFlexible(obj.vibrato, r);
             return true;
         }
         for (const c of ["vibrato"]) {
             if (property.indexOf(c) === 0) {
-                if (VibratoPlaybackSettingsSerializer.setProperty(obj.vibrato, property.substring(c.length), v)) {
+                if (VibratoPlaybackSettingsSerializer.readFlexibleProperty(obj.vibrato, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         if (["slide"].indexOf(property) >= 0) {
-            SlidePlaybackSettingsSerializer.fromJson(obj.slide, v as Map<string, unknown>);
+            SlidePlaybackSettingsSerializer.readFlexible(obj.slide, r);
             return true;
         }
         for (const c of ["slide"]) {
             if (property.indexOf(c) === 0) {
-                if (SlidePlaybackSettingsSerializer.setProperty(obj.slide, property.substring(c.length), v)) {
+                if (SlidePlaybackSettingsSerializer.readFlexibleProperty(obj.slide, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+    public static write(obj: PlayerSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(PlayerSettingsSerializer._fields);
+        /*@target web*/
+        {
+            w.valueField(0, obj.soundFont);
+        }
+        /*@target web*/
+        {
+            w.numberField(2, obj.outputMode as number);
+        }
+        w.booleanField(3, obj.enablePlayer);
+        w.numberField(4, obj.playerMode as number);
+        w.booleanField(5, obj.enableCursor);
+        w.booleanField(6, obj.enableAnimatedBeatCursor);
+        w.booleanField(7, obj.enableElementHighlighting);
+        w.booleanField(9, obj.enableSeekToClick);
+        w.booleanField(10, obj.enablePlaybackRangeSelection);
+        w.booleanField(11, obj.resetPlaybackRangeOnClick);
+        w.numberField(12, obj.scrollOffsetX);
+        w.numberField(13, obj.scrollOffsetY);
+        w.numberField(14, obj.scrollMode as number);
+        w.numberField(15, obj.scrollSpeed);
+        /*@target web*/
+        {
+            w.booleanField(16, obj.nativeBrowserSmoothScroll);
+        }
+        w.numberField(17, obj.songBookBendDuration);
+        w.numberField(18, obj.songBookDipDuration);
+        w.field(19);
+        VibratoPlaybackSettingsSerializer.write(obj.vibrato, w);
+        w.field(20);
+        SlidePlaybackSettingsSerializer.write(obj.slide, w);
+        w.booleanField(21, obj.playTripletFeel);
+        w.numberField(22, obj.bufferTimeInMilliseconds);
+        w.numberField(23, obj.positionUpdateIntervalInMilliseconds);
+        w.endObject();
     }
 }

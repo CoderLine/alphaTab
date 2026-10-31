@@ -95,6 +95,10 @@ public class List<T> : Iterable<T> {
         return _data.any(predicate)
     }
 
+    public fun every(predicate: (T) -> Boolean): Boolean {
+        return _data.all(predicate)
+    }
+
     public fun includes(value: T): Boolean {
         return _data.contains(value)
     }
@@ -112,7 +116,13 @@ public class List<T> : Iterable<T> {
     }
 
     public fun sort(comparison: (a: T, b: T) -> Double): List<T> {
-        _data.sortWith { a, b -> comparison(a, b).toInt() }
+        // Sign-only conversion: `.toInt()` truncates and can overflow when
+        // the JS-style comparator returns values outside Int range
+        // (e.g. packed sort keys at 2^40).
+        _data.sortWith { a, b ->
+            val d = comparison(a, b)
+            if (d < 0) -1 else if (d > 0) 1 else 0
+        }
         return this
     }
 
@@ -145,6 +155,15 @@ public class List<T> : Iterable<T> {
         return mapped
     }
 
+    @kotlin.jvm.JvmName("mapToBoolean")
+    internal fun map(transform: (v: T) -> Boolean): BooleanList {
+        val mapped = BooleanList(_data.size)
+        _data.forEachIndexed { index, item ->
+            mapped[index] = transform(item)
+        }
+        return mapped
+    }
+
 
     internal fun reduce(operation: (acc: Double, v: T) -> Double, initial: Double): Double {
         var accumulator = initial
@@ -169,22 +188,33 @@ public class List<T> : Iterable<T> {
         return _data.removeAt(0)
     }
 
+    public fun splice(start: Double): List<T> {
+        var actualStart = start.toInt()
+        if (actualStart < 0) {
+            actualStart += _data.size
+        }
+        if (actualStart < 0) {
+            actualStart = 0
+        }
+        if (actualStart >= _data.size) {
+            return List()
+        }
+
+        val remove = List(ArrayListWithRemoveRange(_data.subList(actualStart, _data.size)))
+        _data.removeRange(actualStart, _data.size)
+        return remove
+    }
+
     public fun splice(start: Double, deleteCount: Double, vararg newElements: T): List<T> {
         var actualStart = start.toInt()
         if (actualStart < 0) {
             actualStart += _data.size
         }
+        val deleteEnd = actualStart + maxOf(deleteCount.toInt(), 0)
 
-        val remove = if (deleteCount > 0) List(
-            ArrayListWithRemoveRange(
-                _data.subList(
-                    start.toInt(),
-                    _data.size
-                )
-            )
-        ) else List()
-        _data.removeRange(start.toInt(), (start + deleteCount).toInt())
-        _data.addAll(start.toInt(), newElements.toList())
+        val remove = List(ArrayListWithRemoveRange(_data.subList(actualStart, deleteEnd)))
+        _data.removeRange(actualStart, deleteEnd)
+        _data.addAll(actualStart, newElements.toList())
         return remove
     }
 
@@ -193,17 +223,11 @@ public class List<T> : Iterable<T> {
         if (actualStart < 0) {
             actualStart += _data.size
         }
+        val deleteEnd = actualStart + maxOf(deleteCount.toInt(), 0)
 
-        val remove = if (deleteCount > 0) List(
-            ArrayListWithRemoveRange(
-                _data.subList(
-                    start.toInt(),
-                    _data.size
-                )
-            )
-        ) else List()
-        _data.removeRange(start.toInt(), (start + deleteCount).toInt())
-        _data.addAll(start.toInt(), newElements.toList())
+        val remove = List(ArrayListWithRemoveRange(_data.subList(actualStart, deleteEnd)))
+        _data.removeRange(actualStart, deleteEnd)
+        _data.addAll(actualStart, newElements.toList())
         return remove
     }
 

@@ -1,0 +1,175 @@
+@use '../breakpoints' as *;
+
+.card {
+  position: relative;
+  overflow: hidden;
+  background: var(--at-surface);
+  border: 1px solid var(--at-line);
+  border-radius: 16px;
+  min-height: 420px;
+  padding: 44px 64px;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+
+  @include tablet { padding: 36px 40px; min-height: 360px; }
+  @include mobile { padding: 28px 24px; min-height: 380px; }
+}
+
+.topRule {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--at-ink);
+  opacity: 0.95;
+}
+
+.topRuleThin {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--at-ink);
+  opacity: 0.8;
+}
+
+.dateStrip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  font-family: var(--at-font-mono);
+  font-size: 10.5px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+
+  @include mobile { margin-bottom: 16px; }
+}
+
+.dateLabel {
+  color: var(--story-accent);
+  font-weight: 600;
+}
+
+.dateLine {
+  flex: 1;
+  height: 1px;
+  background: var(--at-line-soft);
+  opacity: 0.8;
+}
+
+.nameplate {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 68px;
+  line-height: 0.95;
+  font-weight: 700;
+  color: var(--at-ink);
+  letter-spacing: -1.6px;
+  text-wrap: balance;
+  margin-bottom: 24px;
+
+  @include tablet { font-size: 52px; }
+  @include mobile { font-size: 36px; margin-bottom: 18px; }
+}
+
+.body {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+  flex: 1;
+  align-items: flex-start;
+  padding-top: 18px;
+  border-top: 1px solid var(--at-line);
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-top: 14px;
+  }
+}
+
+.dropCap {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 96px;
+  line-height: 0.9;
+  font-weight: 700;
+  color: var(--story-accent);
+  letter-spacing: -2px;
+  align-self: flex-start;
+
+  @include mobile { font-size: 64px; }
+}
+
+.bodyContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+
+  @include mobile { min-height: auto; }
+}
+
+.quote {
+  margin: 0;
+  color: var(--at-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+  text-wrap: pretty;
+  max-width: 680px;
+
+  @include tablet { font-size: 22px; }
+  @include mobile { font-size: 18px; }
+}
+
+.sourceRow {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--at-line-soft);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  @include mobile { margin-top: 18px; }
+}
+
+.sourceLabel {
+  font-family: var(--at-font-mono);
+  font-size: 11.5px;
+  color: var(--at-ink);
+  font-weight: 500;
+}
+
+.sourceSpacer { flex: 1; }
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--story-accent);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--story-accent);
+  }
+}
+
+.cornerMark {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 80px;
+  height: 4px;
+  background: var(--story-accent);
+  opacity: 0.6;
+}

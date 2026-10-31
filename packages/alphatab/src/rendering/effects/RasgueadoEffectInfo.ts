@@ -1,41 +1,25 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class RasgueadoEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectRasgueado;
-    }
-
-    public get canShareBand(): boolean {
-        return false;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+export const rasgueadoEffectInfo: EffectInfo = {
+    effectId: 'EffectRasgueado',
+    notationElement: NotationElement.EffectRasgueado,
+    hideOnMultiTrack: false,
+    sizingMode: EffectBarGlyphSizing.GroupedOnBeat,
+    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.hasRasgueado;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.GroupedOnBeat;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
+    },
+    createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph => {
         return new LineRangedGlyph('rasg.', NotationElement.EffectRasgueado);
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
-        return true;
-    }
-}
+    },
+    canExpand: (_from: Beat, _to: Beat): boolean => true,
+    placementCategory: EffectBandPlacementCategory.Span
+};

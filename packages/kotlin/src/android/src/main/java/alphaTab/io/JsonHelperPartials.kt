@@ -40,7 +40,7 @@ internal open class JsonHelperPartials {
 
 
         public fun <T : Enum<T>> parseEnum(value: String, values: Array<T>): T? {
-            val valueInt = value.toIntOrNaN()
+            val valueInt = value.toIntOrNaN(10.0)
             val isNaN = valueInt.isNaN()
             val valueLower = value.lowercase()
             for (e in values) {

@@ -1,0 +1,89 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.banner {
+  background: var(--at-accent-soft);
+  border-bottom: 1px solid var(--at-line);
+  @include section-tokens;
+}
+
+.inner {
+  @include section-container;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--at-ink);
+
+  @include mobile {
+    height: 36px;
+    gap: 8px;
+    font-size: 11.5px;
+  }
+}
+
+.tag {
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--at-accent);
+  color: var(--at-accent-ink);
+  font-family: var(--at-font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.detailFull {
+  @include mobile { display: none; }
+}
+
+.detailShort {
+  display: none;
+  @include mobile { display: inline; }
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--at-accent);
+  font-weight: 600;
+  font-size: 12.5px;
+  white-space: nowrap;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--at-accent);
+    text-decoration: underline;
+  }
+
+  @include mobile {
+    font-size: 11.5px;
+  }
+}
+
+.ctaFull {
+  @include mobile {
+    display: none;
+  }
+}
+
+.ctaShort {
+  display: none;
+  @include mobile {
+    display: inline;
+  }
+}

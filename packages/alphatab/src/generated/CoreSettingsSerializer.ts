@@ -4,94 +4,129 @@
 // the code is regenerated.
 // </auto-generated>
 import { CoreSettings } from "@coderline/alphatab/CoreSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { FontFileFormat } from "@coderline/alphatab/CoreSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { LogLevel } from "@coderline/alphatab/LogLevel";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class CoreSettingsSerializer {
-    public static fromJson(obj: CoreSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => CoreSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["scriptfile", "fontdirectory", "smuflfontsources", "file", "tex", "tracks", "enablelazyloading", "engine", "loglevel", "useworkers", "includenotebounds"]);
+    public static read(obj: CoreSettings, reader: IObjectReader): void {
+        reader.readRecord(CoreSettingsSerializer._fields, (id, k, rr) => CoreSettingsSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: CoreSettings | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        /*@target web*/
-        o.set("scriptfile", obj.scriptFile);
-        /*@target web*/
-        o.set("fontdirectory", obj.fontDirectory);
-        /*@target web*/
-        if (obj.smuflFontSources !== null) {
-            const m = new Map<string, unknown>();
-            o.set("smuflfontsources", m);
-            for (const [k, v] of obj.smuflFontSources!) {
-                m.set(k.toString(), v);
-            }
-        }
-        /*@target web*/
-        o.set("file", obj.file);
-        /*@target web*/
-        o.set("tex", obj.tex);
-        /*@target web*/
-        o.set("tracks", obj.tracks);
-        o.set("enablelazyloading", obj.enableLazyLoading);
-        o.set("engine", obj.engine);
-        o.set("loglevel", obj.logLevel as number);
-        o.set("useworkers", obj.useWorkers);
-        o.set("includenotebounds", obj.includeNoteBounds);
-        return o;
+    public static readProperty(obj: CoreSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = CoreSettingsSerializer._fields.idOf(property);
+        return id >= 0 ? CoreSettingsSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: CoreSettings, property: string, v: unknown): boolean {
-        switch (property) {
+    private static _readField(obj: CoreSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
             /*@target web*/
-            case "scriptfile":
-                obj.scriptFile = v as string | null;
-                return true;
-            /*@target web*/
-            case "fontdirectory":
-                obj.fontDirectory = v as string | null;
+            case 0:
+                obj.scriptFile = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "smuflfontsources":
-                obj.smuflFontSources = new Map<FontFileFormat, string>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.smuflFontSources!.set(JsonHelper.parseEnum<FontFileFormat>(k, FontFileFormat)!, v as string);
-                });
+            case 1:
+                obj.fontDirectory = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "file":
-                obj.file = v as string | null;
+            case 2:
+                CoreSettingsSerializer._readSmuflFontSources(obj, r, flexible);
                 return true;
             /*@target web*/
-            case "tex":
-                obj.tex = v! as boolean;
+            case 3:
+                obj.file = r.readValue() as string | null;
                 return true;
             /*@target web*/
-            case "tracks":
-                obj.tracks = v as number | number[] | "all" | null;
+            case 4:
+                obj.tex = r.readBoolean();
                 return true;
-            case "enablelazyloading":
-                obj.enableLazyLoading = v! as boolean;
+            /*@target web*/
+            case 5:
+                obj.tracks = r.readValue() as number | number[] | "all" | null;
                 return true;
-            case "engine":
-                obj.engine = v! as string;
+            case 6:
+                obj.enableLazyLoading = r.readBoolean();
                 return true;
-            case "loglevel":
-                obj.logLevel = JsonHelper.parseEnum<LogLevel>(v, LogLevel)!;
+            case 7:
+                obj.engine = r.readString();
                 return true;
-            case "useworkers":
-                obj.useWorkers = v! as boolean;
+            case 8:
+                obj.logLevel = JsonHelper.parseEnum<LogLevel>(r.readValue(), LogLevel)!;
                 return true;
-            case "includenotebounds":
-                obj.includeNoteBounds = v! as boolean;
+            case 9:
+                obj.useWorkers = r.readBoolean();
+                return true;
+            case 10:
+                obj.includeNoteBounds = r.readBoolean();
                 return true;
         }
         return false;
+    }
+    /**
+ * @target web
+ */
+    private static _readSmuflFontSources(obj: CoreSettings, r: IObjectReader, flexible: boolean): void {
+        obj.smuflFontSources = new Map<FontFileFormat, string>();
+        r.readObject((k, rr) => {
+            obj.smuflFontSources!.set(JsonHelper.parseEnum<FontFileFormat>(k, FontFileFormat)!, rr.readString());
+            return true;
+        });
+    }
+    public static readFlexible(obj: CoreSettings, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? CoreSettingsSerializer._readField(obj, id, rr, false) : CoreSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: CoreSettings, property: string, r: IObjectReader): boolean {
+        if (CoreSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static write(obj: CoreSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(CoreSettingsSerializer._fields);
+        /*@target web*/
+        {
+            w.valueField(0, obj.scriptFile);
+        }
+        /*@target web*/
+        {
+            w.valueField(1, obj.fontDirectory);
+        }
+        /*@target web*/
+        {
+            if (obj.smuflFontSources !== null) {
+                w.mapField(2);
+                for (const [k, v] of obj.smuflFontSources!) {
+                    w.prop(k.toString());
+                    w.writeString(v);
+                }
+                w.endMap();
+            }
+        }
+        /*@target web*/
+        {
+            w.valueField(3, obj.file);
+        }
+        /*@target web*/
+        {
+            w.booleanField(4, obj.tex);
+        }
+        /*@target web*/
+        {
+            w.valueField(5, obj.tracks);
+        }
+        w.booleanField(6, obj.enableLazyLoading);
+        w.stringField(7, obj.engine);
+        w.numberField(8, obj.logLevel as number);
+        w.booleanField(9, obj.useWorkers);
+        w.booleanField(10, obj.includeNoteBounds);
+        w.endObject();
     }
 }

@@ -115,6 +115,9 @@ internal class AndroidCanvas : ICanvas {
     }
 
     override fun fillRect(x: Double, y: Double, w: Double, h: Double) {
+        if (w <= 0.0) {
+            return
+        }
         createPaint().let {
             it.style = Paint.Style.FILL
             _canvas!!.drawRect(

@@ -4,162 +4,200 @@
 // the code is regenerated.
 // </auto-generated>
 import { MasterBar } from "@coderline/alphatab/model/MasterBar";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import { KeySignature } from "@coderline/alphatab/model/KeySignature";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { BeamingRulesSerializer } from "@coderline/alphatab/generated/model/BeamingRulesSerializer";
-import { SectionSerializer } from "@coderline/alphatab/generated/model/SectionSerializer";
-import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
-import { FermataSerializer } from "@coderline/alphatab/generated/model/FermataSerializer";
+import { KeySignatureType } from "@coderline/alphatab/model/KeySignatureType";
 import { BeamingRules } from "@coderline/alphatab/model/MasterBar";
+import { BeamingRulesSerializer } from "@coderline/alphatab/generated/model/BeamingRulesSerializer";
 import { TripletFeel } from "@coderline/alphatab/model/TripletFeel";
 import { Section } from "@coderline/alphatab/model/Section";
+import { SectionSerializer } from "@coderline/alphatab/generated/model/SectionSerializer";
 import { Automation } from "@coderline/alphatab/model/Automation";
+import { AutomationSerializer } from "@coderline/alphatab/generated/model/AutomationSerializer";
 import { Fermata } from "@coderline/alphatab/model/Fermata";
+import { FermataSerializer } from "@coderline/alphatab/generated/model/FermataSerializer";
 import { Direction } from "@coderline/alphatab/model/Direction";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class MasterBarSerializer {
-    public static fromJson(obj: MasterBar, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["alternateendings", "custombarnumbertext", "custombarnumber", "keysignature", "keysignaturetype", "isdoublebar", "isrepeatstart", "repeatcount", "timesignaturenumerator", "timesignaturedenominator", "timesignaturecommon", "beamingrules", "isfreetime", "tripletfeel", "section", "tempoautomations", "syncpoints", "fermata", "start", "isanacrusis", "displayscale", "displaywidth", "directions"]);
+    public static read(obj: MasterBar, reader: IObjectReader): void {
+        reader.readRecord(MasterBarSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.alternateEndings = r.readNumber();
+                    return true;
+                case 1:
+                    obj.customBarNumberText = r.readValue() as string | undefined;
+                    return true;
+                case 2:
+                    obj.customBarNumber = r.readValue() as number | undefined;
+                    return true;
+                case 3:
+                    obj.keySignature = JsonHelper.parseEnum<KeySignature>(r.readValue(), KeySignature)!;
+                    return true;
+                case 4:
+                    obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(r.readValue(), KeySignatureType)!;
+                    return true;
+                case 5:
+                    obj.isDoubleBar = r.readBoolean();
+                    return true;
+                case 6:
+                    obj.isRepeatStart = r.readBoolean();
+                    return true;
+                case 7:
+                    obj.repeatCount = r.readNumber();
+                    return true;
+                case 8:
+                    obj.timeSignatureNumerator = r.readNumber();
+                    return true;
+                case 9:
+                    obj.timeSignatureDenominator = r.readNumber();
+                    return true;
+                case 10:
+                    obj.timeSignatureCommon = r.readBoolean();
+                    return true;
+                case 11:
+                    if (r.isNullish()) {
+                        obj.beamingRules = undefined;
+                    }
+                    else {
+                        obj.beamingRules = new BeamingRules();
+                        BeamingRulesSerializer.read(obj.beamingRules, r);
+                    }
+                    return true;
+                case 12:
+                    obj.isFreeTime = r.readBoolean();
+                    return true;
+                case 13:
+                    obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(r.readValue(), TripletFeel)!;
+                    return true;
+                case 14:
+                    if (r.isNullish()) {
+                        obj.section = null;
+                    }
+                    else {
+                        obj.section = new Section();
+                        SectionSerializer.read(obj.section, r);
+                    }
+                    return true;
+                case 15:
+                    MasterBarSerializer._readTempoAutomations(obj, r);
+                    return true;
+                case 16:
+                    MasterBarSerializer._readSyncPoints(obj, r);
+                    return true;
+                case 17:
+                    MasterBarSerializer._readFermata(obj, r);
+                    return true;
+                case 18:
+                    obj.start = r.readNumber();
+                    return true;
+                case 19:
+                    obj.isAnacrusis = r.readBoolean();
+                    return true;
+                case 20:
+                    obj.displayScale = r.readNumber();
+                    return true;
+                case 21:
+                    obj.displayWidth = r.readNumber();
+                    return true;
+                case 22:
+                    for (const i of (r.readValue() as number[])) {
+                        obj.addDirection(JsonHelper.parseEnum<Direction>(i, Direction)!);
+                    }
+                    return true;
+            }
+            return false;
+        });
+    }
+    private static _readTempoAutomations(obj: MasterBar, r: IObjectReader): void {
+        obj.tempoAutomations = [];
+        r.readArray(rr => {
+            const i = new Automation();
+            AutomationSerializer.read(i, rr);
+            obj.tempoAutomations.push(i);
+        });
+    }
+    private static _readSyncPoints(obj: MasterBar, r: IObjectReader): void {
+        if (!r.isNullish()) {
+            obj.syncPoints = [];
+            r.readArray(rr => {
+                const i = new Automation();
+                AutomationSerializer.read(i, rr);
+                obj.addSyncPoint(i);
+            });
+        }
+    }
+    private static _readFermata(obj: MasterBar, r: IObjectReader): void {
+        obj.fermata = new Map<number, Fermata>();
+        r.readObject((k, rr) => {
+            const i = new Fermata();
+            FermataSerializer.read(i, rr);
+            obj.addFermata(Number.parseInt(k), i);
+            return true;
+        });
+    }
+    public static write(obj: MasterBar | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => MasterBarSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: MasterBar | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("alternateendings", obj.alternateEndings);
-        o.set("isdoublebar", obj.isDoubleBar);
-        o.set("isrepeatstart", obj.isRepeatStart);
-        o.set("repeatcount", obj.repeatCount);
-        o.set("timesignaturenumerator", obj.timeSignatureNumerator);
-        o.set("timesignaturedenominator", obj.timeSignatureDenominator);
-        o.set("timesignaturecommon", obj.timeSignatureCommon);
+        w.startObject(MasterBarSerializer._fields);
+        w.numberField(0, obj.alternateEndings);
+        w.valueField(1, obj.customBarNumberText);
+        w.valueField(2, obj.customBarNumber);
+        w.booleanField(5, obj.isDoubleBar);
+        w.booleanField(6, obj.isRepeatStart);
+        w.numberField(7, obj.repeatCount);
+        w.numberField(8, obj.timeSignatureNumerator);
+        w.numberField(9, obj.timeSignatureDenominator);
+        w.booleanField(10, obj.timeSignatureCommon);
         if (obj.beamingRules) {
-            o.set("beamingrules", BeamingRulesSerializer.toJson(obj.beamingRules));
+            w.field(11);
+            BeamingRulesSerializer.write(obj.beamingRules, w);
         }
-        o.set("isfreetime", obj.isFreeTime);
-        o.set("tripletfeel", obj.tripletFeel as number);
+        w.booleanField(12, obj.isFreeTime);
+        w.numberField(13, obj.tripletFeel as number);
         if (obj.section) {
-            o.set("section", SectionSerializer.toJson(obj.section));
+            w.field(14);
+            SectionSerializer.write(obj.section, w);
         }
-        o.set("tempoautomations", obj.tempoAutomations.map(i => AutomationSerializer.toJson(i)));
+        w.arrayField(15, obj.tempoAutomations!.length);
+        for (const i of obj.tempoAutomations!) {
+            AutomationSerializer.write(i, w);
+        }
+        w.endArray();
         if (obj.syncPoints !== undefined) {
-            o.set("syncpoints", obj.syncPoints?.map(i => AutomationSerializer.toJson(i)));
+            w.arrayField(16, obj.syncPoints!.length);
+            for (const i of obj.syncPoints!) {
+                AutomationSerializer.write(i, w);
+            }
+            w.endArray();
         }
         if (obj.fermata !== null) {
-            const m = new Map<string, unknown>();
-            o.set("fermata", m);
+            w.mapField(17);
             for (const [k, v] of obj.fermata!) {
-                m.set(k.toString(), FermataSerializer.toJson(v));
+                w.prop(k.toString());
+                FermataSerializer.write(v, w);
             }
+            w.endMap();
         }
-        o.set("start", obj.start);
-        o.set("isanacrusis", obj.isAnacrusis);
-        o.set("displayscale", obj.displayScale);
-        o.set("displaywidth", obj.displayWidth);
+        w.numberField(18, obj.start);
+        w.booleanField(19, obj.isAnacrusis);
+        w.numberField(20, obj.displayScale);
+        w.numberField(21, obj.displayWidth);
         if (obj.directions !== null) {
             const a: number[] = [];
-            o.set("directions", a);
             for (const v of obj.directions!) {
                 a.push(v as number);
             }
+            w.valueField(22, a);
         }
-        return o;
-    }
-    public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
-        switch (property) {
-            case "alternateendings":
-                obj.alternateEndings = v! as number;
-                return true;
-            case "isdoublebar":
-                obj.isDoubleBar = v! as boolean;
-                return true;
-            case "isrepeatstart":
-                obj.isRepeatStart = v! as boolean;
-                return true;
-            case "repeatcount":
-                obj.repeatCount = v! as number;
-                return true;
-            case "timesignaturenumerator":
-                obj.timeSignatureNumerator = v! as number;
-                return true;
-            case "timesignaturedenominator":
-                obj.timeSignatureDenominator = v! as number;
-                return true;
-            case "timesignaturecommon":
-                obj.timeSignatureCommon = v! as boolean;
-                return true;
-            case "beamingrules":
-                if (v) {
-                    obj.beamingRules = new BeamingRules();
-                    BeamingRulesSerializer.fromJson(obj.beamingRules, v);
-                }
-                else {
-                    obj.beamingRules = undefined;
-                }
-                return true;
-            case "isfreetime":
-                obj.isFreeTime = v! as boolean;
-                return true;
-            case "tripletfeel":
-                obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!;
-                return true;
-            case "section":
-                if (v) {
-                    obj.section = new Section();
-                    SectionSerializer.fromJson(obj.section, v);
-                }
-                else {
-                    obj.section = null;
-                }
-                return true;
-            case "tempoautomations":
-                obj.tempoAutomations = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new Automation();
-                    AutomationSerializer.fromJson(i, o);
-                    obj.tempoAutomations.push(i);
-                }
-                return true;
-            case "syncpoints":
-                if (v) {
-                    obj.syncPoints = [];
-                    for (const o of (v as (Map<string, unknown> | null)[])) {
-                        const i = new Automation();
-                        AutomationSerializer.fromJson(i, o);
-                        obj.addSyncPoint(i);
-                    }
-                }
-                return true;
-            case "fermata":
-                obj.fermata = new Map<number, Fermata>();
-                JsonHelper.forEach(v, (v, k) => {
-                    const i = new Fermata();
-                    FermataSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.addFermata(Number.parseInt(k), i);
-                });
-                return true;
-            case "start":
-                obj.start = v! as number;
-                return true;
-            case "isanacrusis":
-                obj.isAnacrusis = v! as boolean;
-                return true;
-            case "displayscale":
-                obj.displayScale = v! as number;
-                return true;
-            case "displaywidth":
-                obj.displayWidth = v! as number;
-                return true;
-            case "directions":
-                for (const i of (v as number[])) {
-                    obj.addDirection(JsonHelper.parseEnum<Direction>(i, Direction)!);
-                }
-                return true;
-        }
-        return false;
+        w.endObject();
     }
 }

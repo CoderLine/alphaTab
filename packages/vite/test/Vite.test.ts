@@ -5,6 +5,11 @@ import { alphaTab } from '../src/alphaTab.vite';
 
 type ViteLike = typeof import('vite');
 
+function expectMinified(fileName: string, text: string) {
+    // the unminified bundle has tens of thousands of lines, the minified one only the license banners
+    expect(text.split('\n').length, `${fileName} is not minified`).toBeLessThan(1000);
+}
+
 async function runBundleSmokeTest(vite: ViteLike) {
     const bundlerProject = './test-data/project';
 
@@ -40,46 +45,53 @@ async function runBundleSmokeTest(vite: ViteLike) {
         expect(fs.existsSync(file), `File '${file}' Missing`).toBe(true);
     }
 
-    const dir = await fs.promises.readdir(path.join(bundlerProject, 'dist', 'assets'), { withFileTypes: true });
-
-    let appValidated = false;
-    let workletValidated = false;
-    let workerValidated = false;
-
-    for (const file of dir) {
-        if (file.isFile()) {
-            const text = await fs.promises.readFile(path.join(file.parentPath, file.name), 'utf8');
-
-            if (file.name.startsWith('index-')) {
-                // ensure new worker has worker import
-                expect(text.match(/new [^ ]+\.alphaTabWorker\(new [^ ]+\.alphaTabUrl/)).toBeTruthy();
-                // ensure worker bootstrapping script is references
-                expect(text).toContain('assets/alphaTab.worker-');
-                // ensure worklet bootstrapper script is references
-                expect(text).toContain('assets/alphaTab.worklet-');
-                // without custom chunking the app will bundle alphatab directly
-                expect(text).toContain('.at-surface');
-                // ensure __ALPHATAB_VITE__ got replaced
-                expect(text).not.toContain('__ALPHATAB_VITE__');
-                appValidated = true;
-            } else if (file.name.startsWith('alphaTab.worker-')) {
-                expect(text).toContain('initializeWorker()');
-                // without custom chunking the app will bundle alphatab directly
-                expect(text).toContain('.at-surface');
-
-                workerValidated = true;
-            } else if (file.name.startsWith('alphaTab.worklet-')) {
-                expect(text).toContain('initializeAudioWorklet()');
-                // without custom chunking the app will bundle alphatab directly
-                expect(text).toContain('.at-surface');
-                workletValidated = true;
-            }
-        }
+    const assetsDir = path.join(bundlerProject, 'dist', 'assets');
+    const jsFiles = new Map<string, string>();
+    for (const file of await fs.promises.readdir(assetsDir)) {
+        expect(file, `unexpected output file '${file}'`).toMatch(/\.js$/);
+        jsFiles.set(file, await fs.promises.readFile(path.join(assetsDir, file), 'utf8'));
     }
 
-    expect(appValidated, 'Missing app validation').toBe(true);
-    expect(workerValidated, 'Missing worker validation').toBe(true);
-    expect(workletValidated, 'Missing worklet validation').toBe(true);
+    const findChunk = (prefix: string): [string, string] => {
+        const matches = [...jsFiles].filter(([name]) => name.startsWith(prefix));
+        expect(
+            matches.map(([name]) => name),
+            `expected exactly one '${prefix}*' chunk`
+        ).toHaveLength(1);
+        return matches[0];
+    };
+    const importsOf = (code: string) => [...code.matchAll(/\bfrom\s*["']\.\/([^"']+)["']/g)].map(m => m[1]);
+
+    const [coreName, coreCode] = findChunk('alphaTab.core-');
+    const [, indexCode] = findChunk('index-');
+    const [workerName, workerCode] = findChunk('alphaTab.worker-');
+    const [workletName, workletCode] = findChunk('alphaTab.worklet-');
+
+    // core once: only the shared core chunk carries alphaTab's code
+    const filesWithCore = [...jsFiles].filter(([, code]) => code.includes('.at-surface')).map(([name]) => name);
+    expect(filesWithCore).toEqual([coreName]);
+    expectMinified(coreName, coreCode);
+
+    expect(importsOf(indexCode)).toContain(coreName);
+    expect(importsOf(workerCode)).toEqual([coreName]);
+    expect(importsOf(workletCode)).toEqual([coreName]);
+    expect(workerCode).toContain('initializeWorker()');
+    expect(workletCode).toContain('initializeAudioWorklet()');
+
+    // the page starts worker and worklet through the emitted chunk URLs
+    expect(indexCode).toMatch(new RegExp(`new Worker\\(new URL\\([^)]*${escapeRegExp(workerName)}`));
+    expect(indexCode).toMatch(new RegExp(`addModule\\(new URL\\([^)]*${escapeRegExp(workletName)}`));
+
+    // the alphaTabUrl fallback markers are not bundler syntax and stay as written
+    expect(indexCode).toMatch(/\.alphaTabUrl\(\s*["'`]\.\/alphaTab\.worker\.mjs["'`]/);
+
+    for (const [name, code] of jsFiles) {
+        expect(code, `${name} contains the detection marker`).not.toContain('__ALPHATAB_VITE__');
+    }
+}
+
+function escapeRegExp(text: string) {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 async function loadVite(major: 7 | 8): Promise<ViteLike> {
@@ -93,11 +105,29 @@ async function loadVite(major: 7 | 8): Promise<ViteLike> {
 // Both cases share global state (process.cwd, the dist/ folder), so they
 // must run sequentially — that is what vitest does inside a single describe.
 describe('Vite', () => {
+    it('peer range accepts every tested vite major', () => {
+        const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+        const ranges = (pkg.peerDependencies.vite as string).split('||').map(r => r.trim());
+        expect(ranges).toContain('^7');
+        expect(ranges).toContain('^8');
+    });
+
     it('bundle-correctly (vite 8, rolldown)', { timeout: 30000 }, async () => {
         await runBundleSmokeTest(await loadVite(8));
     });
 
     it('bundle-correctly (vite 7, rollup)', { timeout: 30000 }, async () => {
         await runBundleSmokeTest(await loadVite(7));
+    });
+
+    it('serves alphaTab unbundled in dev', async () => {
+        for (const major of [7, 8] as const) {
+            const vite = await loadVite(major);
+            const config = await vite.resolveConfig(
+                { configFile: false, root: './test-data/project', plugins: [alphaTab()] },
+                'serve'
+            );
+            expect(config.optimizeDeps.exclude, `vite ${major}`).toContain('@coderline/alphatab');
+        }
     });
 });

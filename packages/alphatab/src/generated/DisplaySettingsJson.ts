@@ -9,6 +9,10 @@ import { RenderingResourcesJson } from "@coderline/alphatab/generated/RenderingR
 import { SystemsLayoutMode } from "@coderline/alphatab/DisplaySettings";
 /**
  * The display settings control how the general layout and display of alphaTab is done.
+ * @remarks
+ * The "♪ alphaTab.net" attribution in the rendered score is not configurable here. It must stay visible in the
+ * rendered output; removing, hiding, covering or cropping it requires permission from the alphaTab maintainers, see
+ * [Attribution](https://alphatab.net/docs/attribution).
  * @json
  * @json_declaration
  * @public
@@ -39,6 +43,34 @@ export interface DisplaySettingsJson {
      * | ![Default](https://alphatab.net/img/reference/property/stretchforce-default.png) | ![0.5](https://alphatab.net/img/reference/property/stretchforce-half.png) |
      */
     stretchForce?: number;
+    /**
+     * The proportional spacing ratio between successive note durations.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `Math.SQRT2` (≈ 1.414, matches Dorico's default)
+     * @remarks
+     * Controls the *shape* of the horizontal spacing curve - how much wider a note of duration `2d` is rendered relative to a note of duration `d`.
+     * AlphaTab uses a power-law spacing model (the same approach used by Dorico, MuseScore and Finale): doubling the note duration multiplies its
+     * allocated horizontal space by `spacingRatio`.
+     *
+     * Reference values for cross-application comparison:
+     *
+     * | Application / Style        | Ratio                | Character                          |
+     * |----------------------------|----------------------|------------------------------------|
+     * | Dorico default             | √2 ≈ 1.414           | Tight, efficient, orchestral       |
+     * | MuseScore default          | 1.5                  | Balanced, general-purpose          |
+     * | Finale default (Fibonacci) | φ ≈ 1.618            | Loose, traditional engraving       |
+     *
+     * AlphaTab defaults to `√2` (Dorico's value). This produces tighter spacing at long
+     * durations than the alternatives, which matters for guitar tablature where rest bars and
+     * whole notes are common - looser ratios make those bars dominate system width.
+     *
+     * This setting is orthogonal to {@link stretchForce}: `spacingRatio` controls the *shape* of the spacing (proportions between durations),
+     * `stretchForce` controls the overall *density* (how tightly or loosely the music is packed). Both can be adjusted independently.
+     *
+     * Values are clamped to the range `[1.2, 2.0]`. A value of `1.0` would produce equal spacing for all durations and is rejected.
+     */
+    spacingRatio?: number;
     /**
      * The layouting mode used to arrange the the notation.
      * @remarks
@@ -105,16 +137,56 @@ export interface DisplaySettingsJson {
      */
     barCountPerPartial?: number;
     /**
-     * Whether to justify also the last system in page layouts.
+     * The minimum fullness ratio at which the last system in a flow is justified to fill the
+     * available staff width.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `1`
      * @remarks
-     * Setting this option to `true` tells alphaTab to also justify the last system (row) like it
-     * already does for the systems which are full.
+     * The "fullness" of a system is its natural unjustified width divided by the available
+     * staff width. The last system is stretched to full width only when its fullness is
+     * **greater than or equal to** this threshold; otherwise it renders at its natural width.
+     *
+     * Following industry convention (Dorico, MuseScore), a sparsely populated final system
+     * looks better compact than spread across the full page. The threshold lets users tune
+     * where that boundary sits.
+     *
+     * Common values:
+     *
+     * - `1` (default) — never justify the last system. Equivalent to the legacy
+     *   `justifyLastSystem = false` behaviour.
+     * - `0` — always justify the last system, even when sparse. Equivalent to the legacy
+     *   `justifyLastSystem = true` behaviour.
+     * - `0.4`–`0.7` — Dorico/MuseScore-style: justify when the last system is reasonably full,
+     *   leave compact when only a few bars trail.
+     *
+     * The threshold is bypassed when the last system is naturally wider than the available
+     * staff width - in that case the system still compresses to fit, since otherwise content
+     * would overflow horizontally.
+     *
+     * Values outside `[0, 1]` are clamped.
+     */
+    lastSystemFillThreshold?: number;
+    /**
+     * Whether to justify also the last system in page layouts.
+     *
+     * @remarks
+     * @deprecated Use {@link lastSystemFillThreshold} for fine-grained control over when the
+     * last system is justified. This property is now a thin wrapper:
+     *
+     * - **Get** returns `true` when {@link lastSystemFillThreshold} is less than `1` (i.e. some
+     *   degree of last-system justification is enabled), `false` otherwise.
+     * - **Set** to `true` writes `lastSystemFillThreshold = 0` (always justify regardless of
+     *   fullness). Set to `false` writes `lastSystemFillThreshold = 1` (never justify).
+     *
      * | Justification Disabled                                       | Justification Enabled                                |
      * |--------------------------------------------------------------|-------------------------------------------------------|
      * | ![Disabled](https://alphatab.net/img/reference/property/justify-last-system-false.png) | ![Enabled](https://alphatab.net/img/reference/property/justify-last-system-true.png) |
+     *
      * @since 1.3.0
      * @category Display
      * @defaultValue `false`
+     * @json_read_only
      */
     justifyLastSystem?: boolean;
     /**
@@ -219,6 +291,13 @@ export interface DisplaySettingsJson {
      */
     accoladeBarPaddingRight?: number;
     /**
+     * The padding between inline tuning labels and the start of the tab staff.
+     * @since 1.9.0
+     * @category Display
+     * @defaultValue `5`
+     */
+    inlineTuningPaddingRight?: number;
+    /**
      * The top padding applied to the first main notation staff (standard, tabs, numbered, slash).
      * @since 1.8.0
      * @category Display
@@ -275,14 +354,18 @@ export interface DisplaySettingsJson {
      * The left padding applied between the left line and the first glyph in the following staff in a system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `2`
+     * @defaultValue `6`
      */
     staffPaddingLeft?: number;
     /**
-     * The padding between individual effect bands.
+     * Clearance applied around each effect band on its staff-facing side:
+     * "bottom padding" for top bands (between the band and the staff or
+     * the band stacked below it) and "top padding" for bottom bands
+     * (mirrored). Also used as the inter-band gap when bands stack on
+     * the same side.
      * @since 1.7.0
      * @category Display
-     * @defaultValue `2`
+     * @defaultValue `5`
      */
     effectBandPaddingBottom?: number;
     /**
@@ -303,7 +386,7 @@ export interface DisplaySettingsJson {
      * The mode used to arrange staves and systems.
      * @since 1.3.0
      * @category Display
-     * @defaultValue `1`
+     * @defaultValue `SystemsLayoutMode.Automatic`
      * @remarks
      * By default alphaTab uses an own (automatic) mode to arrange and scale the bars when
      * putting them into staves. This property allows changing this mode to change the music sheet arrangement.

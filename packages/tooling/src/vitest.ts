@@ -1,7 +1,8 @@
 import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { defineConfig } from 'vitest/config';
-import { buildTsconfigAliases } from './vite';
+import { buildTsconfigAliases } from './tsconfig-aliases';
+import { stripProfilingPlugin } from './vite.plugin.strip-profiling';
 
 class SummaryLabelReporter {
     constructor(private readonly label: string) {}
@@ -14,6 +15,8 @@ class SummaryLabelReporter {
 
 export interface VitestPackageOptions {
     setupFiles?: string[];
+    /** The test environment, e.g. `jsdom` for packages that render DOM. Defaults to `node`. */
+    environment?: 'node' | 'jsdom';
     truncateThreshold?: number;
     testTimeout?: number;
 }
@@ -25,12 +28,15 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
             ? ['default', 'github-actions', new SummaryLabelReporter(pkg.name)]
             : ['default'];
     return defineConfig({
+        plugins: [stripProfilingPlugin({ enabled: false })],
         resolve: {
             tsconfigPaths: true,
             alias: buildTsconfigAliases(process.cwd())
         },
         test: {
-            include: ['test/**/*.test.ts'],
+            include: ['test/**/*.test.{ts,tsx}'],
+            environment: options.environment ?? 'node',
+            isolate: false,
             testTimeout: options.testTimeout ?? 30000,
             setupFiles: options.setupFiles,
             passWithNoTests: true,

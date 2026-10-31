@@ -1,0 +1,14 @@
+.wrap {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 360px;
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.video {
+  width: 640px;
+  height: 360px;
+}

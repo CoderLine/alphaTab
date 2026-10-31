@@ -142,7 +142,8 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         settings.player.enableCursor = false;
         settings.player.playerMode = PlayerMode.Disabled;
         settings.player.enableElementHighlighting = false;
-        settings.player.enableUserInteraction = false;
+        settings.player.enableSeekToClick = false;
+        settings.player.enablePlaybackRangeSelection = false;
         settings.player.soundFont = null;
         settings.display.scale = 0.8;
         settings.display.stretchForce = 0.8;
@@ -289,7 +290,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
             );
         };
         request.onprogress = e => {
-            Logger.debug('AlphaSynth', `Soundfont downloading: ${e.loaded}/${e.total} bytes`);
+            Logger.trace('AlphaSynth', `Soundfont downloading: ${e.loaded}/${e.total} bytes`);
             const args = new ProgressEventArgs(e.loaded, e.total);
             (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(args);
             this.uiFacade.triggerEvent(this.container, 'soundFontLoad', args);

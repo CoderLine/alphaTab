@@ -1,5 +1,11 @@
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Chord } from '@coderline/alphatab/model/Chord';
+import type {
+    NumberedStaffConfig,
+    ScoreStaffConfig,
+    SlashStaffConfig,
+    TabStaffConfig
+} from '@coderline/alphatab/model/StaffConfigs';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -101,6 +107,30 @@ export class Staff {
     public showStandardNotation: boolean = true;
 
     /**
+     * Per-{@link Staff} override for the standard-notation staff's display.
+     * @since 1.9.0
+     */
+    public scoreConfig?: ScoreStaffConfig;
+
+    /**
+     * Per-{@link Staff} override for the tablature staff's display.
+     * @since 1.9.0
+     */
+    public tabConfig?: TabStaffConfig;
+
+    /**
+     * Per-{@link Staff} override for the slash staff's display.
+     * @since 1.9.0
+     */
+    public slashConfig?: SlashStaffConfig;
+
+    /**
+     * Per-{@link Staff} override for the numbered (jianpu) staff's display.
+     * @since 1.9.0
+     */
+    public numberedConfig?: NumberedStaffConfig;
+
+    /**
      * Gets or sets whether the staff contains percussion notation
      */
     public isPercussion: boolean = false; // alphaTab2.0: should be on track level
@@ -111,30 +141,29 @@ export class Staff {
      */
     public standardNotationLineCount: number = Staff.DefaultStandardNotationLineCount;
 
-    private _filledVoices:Set<number> = new Set<number>([0]);
+    private _filledVoices: Set<number> = new Set<number>([0]);
 
     /**
      * The indexes of the non-empty voices in this staff..
      * @json_ignore
      */
-    public get filledVoices():Set<number> {
+    public get filledVoices(): Set<number> {
         return this._filledVoices;
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
-        if (this.isPercussion) {
-            this.stringTuning.tunings = [];
-            this.showTablature = false;
-            this.displayTranspositionPitch = 0;
-        }
         this.stringTuning.finish();
-        if(this.stringTuning.tunings.length === 0){
+        if (this.isPercussion) {
+            this.displayTranspositionPitch = 0;
+            this.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
+        }
+        if (this.stringTuning.tunings.length === 0) {
             this.showTablature = false;
         }
 
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings, sharedDataBag);
-            for(const v of this.bars[i].filledVoices) {
+            for (const v of this.bars[i].filledVoices) {
                 this._filledVoices.add(v);
             }
         }

@@ -1,0 +1,73 @@
+---
+title: "Dynamics, hairpins, and accents"
+description: "ppp-fff, crescendo / decrescendo, sudden accents."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 30
+keywords:
+  - alphaTab
+  - dynamics
+  - hairpins
+  - accents
+  - crescendo
+  - decrescendo
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Dynamics tell the reader how loud each passage is and how the volume changes over time. alphaTab renders the standard set — from `ppp` to `fff`, plus hairpins and per-note accents — below the notation staff.
+
+## Static dynamics {#static}
+
+Dynamic markings — `ppp`, `pp`, `p`, `mp`, `mf`, `f`, `ff`, `fff` — are the italic Italian labels a composer uses to fix a passage's loudness. alphaTab renders them in the dynamics font below the staff at the beat where the volume changes.
+
+<AlphaTab file="/files/features/Dynamics.gp5" />
+
+## Crescendo and decrescendo hairpins {#hairpins}
+
+Crescendo (`<`) and decrescendo (`>`) hairpins draw the "grow louder" and "grow softer" contour between two dynamic marks — the standard way to score a swell or a fade. alphaTab renders each hairpin below the staff, spanning every beat between its start and end.
+
+<AlphaTab tex={true}>{`
+\\track "Guitar"
+:4 3.3 { dy pp } 5.3 7.3 8.3 { cre } |
+:4 7.3 8.3 10.3 12.3 { dy ff } |
+:4 12.3 { dec } 10.3 8.3 7.3 |
+:4 5.3 3.3 { dy pp } :2 5.3
+`}</AlphaTab>
+
+## Accents {#accents}
+
+Single-note accents mark one note as louder or longer than its neighbours — the sudden punch on a syncopated beat, the tenuto sustain on a legato line. alphaTab renders them as marks above or below the notehead and supports three levels: normal accent (`>`), heavy accent (`^`), and tenuto (`—`).
+
+<AlphaTab tex={true}>{`
+\\track "Guitar"
+:4 3.3{ac} :8 5.3 7.3 :4 8.3{hac} :8 7.3 5.3 |
+:4 5.3{ten} 3.3{ac} :2 3.3
+`}</AlphaTab>
+
+## Show it in code
+
+Dynamics are score-wide visible by default. To hide them — a common request for print layouts — set the stylesheet policy on the score model in a `scoreLoaded` handler:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  score.stylesheet.hideDynamics = true;
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Where to look next
+
+- [Hiding dynamics](./hide-dynamics) — the score-wide toggle in detail, with a live checkbox.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide accents or hairpins independently via `notation.elements`.
+- [`hideDynamics`](/docs/reference/types/model/renderstylesheet/#hidedynamics) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`notation.elements`](/docs/reference/settings/notation/elements) and [`NotationElement`](/docs/reference/types/notationelement) — the map and enum, including `EffectDynamics` and `EffectCrescendo`.

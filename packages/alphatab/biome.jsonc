@@ -9,7 +9,8 @@
             "!.rollup.cache",
             "!node_modules",
             "!test-data",
-            "!src/generated"
+            "!src/generated",
+            "!test/generated"
         ]
     },
     "formatter": {

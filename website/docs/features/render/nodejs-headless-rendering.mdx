@@ -1,0 +1,69 @@
+---
+title: "Node.js headless rendering"
+description: "Server-side image rendering."
+sidebar_custom_props:
+  feature_chapter: backends
+  feature_order: 40
+keywords:
+  - alphaTab
+  - Node.js
+  - headless
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Run alphaTab in Node.js to produce SVG or PNG images from a score — for server-side PNG thumbnails, CI-generated screenshots that guard against layout regressions, print-on-demand PDF pipelines, or preview generation. No browser, no DOM, no user interface.
+
+The preview below is a browser-side SVG rendering; the Node.js pipeline described afterwards produces the same output — as an SVG string, or as a PNG buffer with alphaSkia wired in — on the server.
+
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{Riffs.STEADY_PULSE}</AlphaTab>
+
+## The Node.js pipeline
+
+alphaTab's core is platform-independent. In Node.js you skip `AlphaTabApi` (which expects a DOM host) and drive the low-level `ScoreRenderer` directly:
+
+1. Load the score bytes with `fs` and hand them to `ScoreLoader.loadScoreFromBytes`.
+2. Set `settings.core.engine` to `'svg'` for text output or `'skia'` for PNG.
+3. Instantiate `ScoreRenderer`, subscribe to `partialLayoutFinished` and `partialRenderFinished`, and call `renderScore`.
+4. Collect the partial results — SVG strings or Skia image handles — and stitch them into your final artifact.
+
+For PNG output, install `@coderline/alphaskia` plus the platform native package (`@coderline/alphaskia-windows`, `-linux`, or `-macos`), enable it via `alphaTab.Environment.enableAlphaSkia`, then render onto an `AlphaSkiaCanvas` and call `endRender().toPng()`.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+import * as fs from 'fs';
+
+const fileData = await fs.promises.readFile(process.argv[2]);
+const settings = new alphaTab.Settings();
+settings.core.engine = 'svg';
+
+const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+  new Uint8Array(fileData),
+  settings,
+);
+
+const renderer = new alphaTab.rendering.ScoreRenderer(settings);
+renderer.width = 1200;
+
+const svgChunks = [];
+renderer.preRender.on(() => { svgChunks.length = 0; });
+renderer.partialLayoutFinished.on((r) => renderer.renderResult(r.id));
+renderer.partialRenderFinished.on((r) => svgChunks.push(r.renderResult));
+
+renderer.renderScore(score, [0]);
+await fs.promises.writeFile('out.svg', svgChunks.join('\n'));
+```
+
+Swap `engine` to `'skia'` and wire `Environment.enableAlphaSkia` plus an `AlphaSkiaCanvas` to emit PNG instead. The complete PNG walkthrough — Bravura loading, custom text fonts, and the final `toPng()` — lives in the Node.js guide linked below.
+
+## Where to look next
+
+- [Node.js guide](/docs/guides/nodejs) — the full walkthrough including PNG export and custom fonts.
+- [Skia rendering (.NET / Android)](skia-backend) — the same backend used for PNG output.
+- [alphaSkia on GitHub](https://github.com/CoderLine/alphaSkia) — the raster rendering library.
+- [`ScoreRenderer`](/docs/reference/types/rendering/scorerenderer) in the API reference.
+- [`core.engine`](/docs/reference/settings/core/engine) in the settings reference.

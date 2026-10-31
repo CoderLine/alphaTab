@@ -1,0 +1,428 @@
+---
+title: Main Viewport
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Basic setup
+
+As our application will grow in this tutorial with new UI elements, we already prepare
+the rough structure according to the final solution. 
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="View Port"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:padding="6dp"
+        android:background="#436d9d"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/controls"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/trackName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Track Name"
+                android:textColor="@color/white" />
+            <TextView
+                android:id="@+id/songName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Song Name - Artist Name"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/playPause"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:textColor="@color/white"
+                android:paddingHorizontal="7dp"
+                android:contentDescription="Play/Pause"
+                android:src="@drawable/baseline_play_arrow_24" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+You can already see a bit the structure of the control. 
+This step is not really specific to alphaTab but important to understand from a structural perspective. 
+We are building a layout with main viewport and a bottom toolbar. The bottom bar will hold information and main media controls.
+
+Further controls and the track selection we will open in an overlay/popup when a user taps on the song information.
+
+For your project your development and design skills will be be needed to structure the elements right. 
+
+:::tip
+
+Icons can be added to your project via right-click on the `res` folder > New > Vector Asset
+
+:::
+
+The result will looks like this: 
+
+<img src="/img/tutorial-android/viewport1.png" height="400" />
+
+
+:::note
+
+From now on the tutorial might only list small code snippets depending on the changes added to the component. 
+The final file with all changes applied, will be added at the bottom of each tutorial section.
+
+:::
+
+
+## Initialize alphaTab
+
+Now let's finally bring alphaTab into the game. We add an alphaTab control to the 
+viewport. For now we will open a file picker when the user taps the song info.
+
+<Tabs
+  defaultValue="xml"
+  values={[
+    { label: 'New XML', value: 'xml', },
+    { label: 'New Kotlin', value: 'kotlin', },
+  ]
+}>
+<TabItem value="xml">
+
+We replace the `TextView` with a `alphaTab.AlphaTabView`. 
+
+```xml
+<alphaTab.AlphaTabView
+    android:id="@+id/alphatab"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+```
+
+</TabItem>
+<TabItem value="kotlin">
+
+* First we load references to our views with `findViewById`. 
+* Then we hook up a click listener to the info control to spawn a file selector via `ActivityResultContracts.OpenDocument()`.
+* When a file is opened we first read it into memory.
+* With the raw file data available we use the [`ScoreLoader`](/docs/guides/lowlevel-apis#loading-files-via-scoreloader) to load a score from the file.
+* With the `Score` loaded we pass it into the UI to be displayed. 
+
+```kotlin
+package net.alphatab.tutorial.android
+
+import alphaTab.AlphaTabView
+import alphaTab.core.ecmaScript.Uint8Array
+import alphaTab.importer.ScoreLoader
+import alphaTab.model.Score
+import android.annotation.SuppressLint
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import java.io.ByteArrayOutputStream
+import kotlin.contracts.ExperimentalContracts
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+@SuppressLint("SetTextI18n")
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var mAlphaTabView: AlphaTabView
+    private lateinit var mTrackName: TextView
+    private lateinit var mSongName: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        mAlphaTabView = findViewById(R.id.alphatab)
+        mTrackName = findViewById(R.id.trackName)
+        mSongName = findViewById(R.id.songName)
+        findViewById<View>(R.id.info).setOnClickListener {
+            mOpenFile.launch(arrayOf("*/*"))
+        }
+    }
+
+    private val mOpenFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+        val uri = it ?: return@registerForActivityResult
+        val score: Score
+        try {
+            val fileData = readFileData(uri)
+            score = ScoreLoader.loadScoreFromBytes(fileData, mAlphaTabView.settings)
+            Log.i("AlphaTab", "File loaded: ${score.title}")
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to load file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, "Failed to load file: ${e.message}", Toast.LENGTH_LONG).show()
+            return@registerForActivityResult
+        }
+
+        try {
+            mTrackName.text = score.tracks[0].name
+            mSongName.text = "${score.title} - ${score.artist}"
+            mAlphaTabView.tracks = arrayListOf(score.tracks[0])
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to render file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, "Failed to render file: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun readFileData(uri: Uri): Uint8Array {
+        val inputStream = contentResolver.openInputStream(uri)
+        inputStream.use {
+            ByteArrayOutputStream().use {
+                inputStream!!.copyTo(it)
+                return Uint8Array(it.toByteArray().asUByteArray())
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Result
+
+With this code we can launch the app and open a test file. Test files can be added to the simulator via drag&drop onto the simulator screen. 
+When running debug versions of your app the opening can be quite slow, to experience the real performace deploy a release version and test it. 
+
+<img src="/img/tutorial-android/viewport2-launched.png" width="300" />
+<img src="/img/tutorial-android/select-file.png" width="300" />
+<img src="/img/tutorial-android/file-opened.png" width="300" />
+
+
+## Final Files
+
+<Tabs
+  defaultValue="xml"
+  values={[
+    { label: 'activity_main.xml', value: 'xml', },
+    { label: 'MainActivtiy.kt', value: 'kotlin', },
+  ]
+}>
+<TabItem value="xml">
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText"
+    tools:context=".MainActivity">
+
+    <alphaTab.AlphaTabView
+        android:id="@+id/alphatab"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:padding="6dp"
+        android:background="#436d9d"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/controls"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/trackName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Track Name"
+                android:textColor="@color/white" />
+            <TextView
+                android:id="@+id/songName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Song Name - Artist Name"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/playPause"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:textColor="@color/white"
+                android:paddingHorizontal="7dp"
+                android:contentDescription="Play/Pause"
+                android:src="@drawable/baseline_play_arrow_24" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+</TabItem>
+<TabItem value="kotlin">
+
+```kotlin
+package net.alphatab.tutorial.android
+
+import alphaTab.AlphaTabView
+import alphaTab.core.ecmaScript.Uint8Array
+import alphaTab.importer.ScoreLoader
+import alphaTab.model.Score
+import android.annotation.SuppressLint
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import java.io.ByteArrayOutputStream
+import kotlin.contracts.ExperimentalContracts
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+@SuppressLint("SetTextI18n")
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var mAlphaTabView: AlphaTabView
+    private lateinit var mTrackName: TextView
+    private lateinit var mSongName: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        mAlphaTabView = findViewById(R.id.alphatab)
+        mTrackName = findViewById(R.id.trackName)
+        mSongName = findViewById(R.id.songName)
+        findViewById<View>(R.id.info).setOnClickListener {
+            mOpenFile.launch(arrayOf("*/*"))
+        }
+    }
+
+    private val mOpenFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+        val uri = it ?: return@registerForActivityResult
+        val score: Score
+        try {
+            val fileData = readFileData(uri)
+            score = ScoreLoader.loadScoreFromBytes(fileData, mAlphaTabView.settings)
+            Log.i("AlphaTab", "File loaded: ${score.title}")
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to load file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, "Failed to load file: ${e.message}", Toast.LENGTH_LONG).show()
+            return@registerForActivityResult
+        }
+
+        try {
+            mTrackName.text = score.tracks[0].name
+            mSongName.text = "${score.title} - ${score.artist}"
+            mAlphaTabView.tracks = arrayListOf(score.tracks[0])
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to render file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, "Failed to render file: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun readFileData(uri: Uri): Uint8Array {
+        val inputStream = contentResolver.openInputStream(uri)
+        inputStream.use {
+            ByteArrayOutputStream().use {
+                inputStream!!.copyTo(it)
+                return Uint8Array(it.toByteArray().asUByteArray())
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>

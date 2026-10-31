@@ -14,24 +14,28 @@ export enum AlphaTexNodeType {
     RParen = 7,
     Colon = 8,
     Asterisk = 9,
+    /**
+     * @since 1.9.0
+     */
+    At = 10,
 
     // General Nodes
-    Ident = 10,
-    Tag = 11,
-    Meta = 12,
-    Arguments = 13,
-    Props = 14,
-    Prop = 15,
-    Number = 16,
-    String = 17,
+    Ident = 100,
+    Tag = 101,
+    Meta = 102,
+    Arguments = 103,
+    Props = 104,
+    Prop = 105,
+    Number = 106,
+    String = 107,
 
     // Semantic Nodes
-    Score = 18,
-    Bar = 19,
-    Beat = 20,
-    Duration = 21,
-    NoteList = 22,
-    Note = 23
+    Score = 200,
+    Bar = 201,
+    Beat = 202,
+    Duration = 203,
+    NoteList = 204,
+    Note = 205
 }
 
 //
@@ -126,10 +130,16 @@ export interface AlphaTexComment {
 export interface AlphaTexTokenNode extends AlphaTexAstNode {}
 
 /**
+ * @since 1.9.0
+ * @public
+ */
+export interface IAlphaTexStringSeparatorNode extends IAlphaTexAstNode {}
+
+/**
  * @record
  * @public
  */
-export interface AlphaTexDotTokenNode extends AlphaTexTokenNode {
+export interface AlphaTexDotTokenNode extends AlphaTexTokenNode, IAlphaTexStringSeparatorNode {
     nodeType: AlphaTexNodeType.Dot;
 }
 
@@ -203,6 +213,15 @@ export interface AlphaTexColonTokenNode extends AlphaTexTokenNode {
  */
 export interface AlphaTexAsteriskTokenNode extends AlphaTexTokenNode {
     nodeType: AlphaTexNodeType.Asterisk;
+}
+
+/**
+ * @since 1.9.0
+ * @record
+ * @public
+ */
+export interface AlphaTexAtTokenNode extends AlphaTexTokenNode, IAlphaTexStringSeparatorNode {
+    nodeType: AlphaTexNodeType.At;
 }
 
 /**
@@ -528,9 +547,10 @@ export interface AlphaTexNoteNode extends AlphaTexAstNode {
     noteValue: IAlphaTexNoteValueNode;
 
     /**
-     * The dot separating the note value and the string for fretted/stringed instruments like guitars.
+     * The dot or @ separating the note value and the string for fretted/stringed instruments like guitars.
+     * @since 1.9.0
      */
-    noteStringDot?: AlphaTexDotTokenNode;
+    noteStringSeparator?: IAlphaTexStringSeparatorNode;
 
     /**
      * The string value for fretted/stringed notes like guitars.

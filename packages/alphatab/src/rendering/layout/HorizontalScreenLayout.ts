@@ -24,9 +24,24 @@ export class HorizontalScreenLayoutPartialInfo {
  */
 export class HorizontalScreenLayout extends ScoreLayout {
     private _system: StaffSystem | null = null;
+    private _systems: StaffSystem[] = [];
+
+    public override get systems(): StaffSystem[] {
+        return this._systems;
+    }
+
+    private _firstPartialBarCount: number = 0;
+
+    protected override getAttributionRendererIndex(_system: StaffSystem): number {
+        return this._firstPartialBarCount - 1;
+    }
 
     public get name(): string {
         return 'HorizontalScreen';
+    }
+
+    public override get sharesMinDurationAcrossBars(): boolean {
+        return false;
     }
 
     public get supportsResize(): boolean {
@@ -44,14 +59,13 @@ export class HorizontalScreenLayout extends ScoreLayout {
     public doResize(): void {
         // not supported
     }
-    
+
     public override doUpdateForBars(_renderHints: RenderHints): boolean {
         // not supported yet, modifications likely cause anyhow full updates
-        // as we do not optimize effect bands yet. with effect bands being more 
+        // as we do not optimize effect bands yet. with effect bands being more
         // isolated in bars we could try updating dynamically
         return false;
     }
-
 
     protected doLayoutAndRender(renderHints: RenderHints | undefined): void {
         const score: Score = this.renderer.score!;
@@ -69,11 +83,12 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
         endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
         this._system = this.createEmptyStaffSystem(0);
+        this._systems.splice(0, this._systems.length);
+        this._systems.push(this._system);
         // Each bar in horizontal layout is sized independently (by bar.displayWidth or the bar's
         // intrinsic width), so there is no shared staff width to distribute across bars. Keep each
         // bar's spring constants referenced against its own local minimum-duration so rendering
         // matches the historical per-bar behaviour.
-        this._system.shareMinDurationAcrossBars = false;
         this._system.isLast = true;
         this._system.x = this.pagePadding![0];
         this._system.y = this.pagePadding![1];
@@ -110,11 +125,19 @@ export class HorizontalScreenLayout extends ScoreLayout {
         if (currentPartial.masterBars.length > 0) {
             this._completePartial(partials, currentPartial);
         }
+        this._firstPartialBarCount = partials.length > 0 ? partials[0].masterBars.length : 0;
         this._finalizeStaffSystem();
 
         this.height = Math.floor(this._system.y + this._system.height);
-        this.width = this._system.x + this._system.width + this.pagePadding![2];
+        this.width =
+            (this._system.x + this._system.width + this.pagePadding![2]) * this.renderer.settings.display.scale;
         currentBarIndex = 0;
+
+        // before any partial is registered: without lazy loading, registering a partial paints it, and painting
+        // changes glyph sizes that the bounds read
+        if (partials.length > 0) {
+            this._system.buildBoundingsLookup(0, 0);
+        }
 
         let x = 0;
         for (let i: number = 0; i < partials.length; i++) {
@@ -124,7 +147,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             e.reuseViewport = renderHints?.reuseViewport ?? false;
             e.x = x;
             e.y = 0;
-            e.totalWidth = this.width;
+            e.totalWidth = this.scaledWidth;
             e.totalHeight = this.height;
             e.width = partial.width;
             e.height = this.height;
@@ -136,7 +159,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
             // pull to local scope for lambda
             const partialBarIndex = currentBarIndex;
             const partialIndex = i;
-            this._system.buildBoundingsLookup(0, 0);
             this.registerPartial(e, canvas => {
                 let renderX: number = this._system!.getBarX(partial.masterBars[0].index) + this._system!.accoladeWidth;
                 if (partialIndex === 0) {
@@ -145,10 +167,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
                 canvas.color = this.renderer.settings.display.resources.mainGlyphColor;
                 canvas.textAlign = TextAlign.Left;
-                Logger.debug(
+                Logger.trace(
                     this.name,
-                    `Rendering partial from bar ${partial.masterBars[0].index} to ${partial.masterBars[partial.masterBars.length - 1].index}`,
-                    null
+                    `Rendering partial from bar ${partial.masterBars[0].index} to ${partial.masterBars[partial.masterBars.length - 1].index}`
                 );
                 this._system!.paintPartial(
                     -renderX,
@@ -163,7 +184,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
 
         this.height = this.layoutAndRenderBottomScoreInfo(this.height);
-        this.height = this._layoutAndRenderAnnotation(this.height);
 
         this.height += this.pagePadding![3];
 
@@ -176,9 +196,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         for (const r of result.renderers) {
             const barDisplayWidth =
                 r.staff!.system.staves.length > 1 ? r.bar.masterBar.displayWidth : r.bar.displayWidth;
-            if (barDisplayWidth > 0) {
-                r.scaleToWidth(barDisplayWidth);
-            }
+            // Fall back to natural width so `scaleToWidth` still runs.
+            r.scaleToWidth(barDisplayWidth > 0 ? barDisplayWidth : r.width);
             const w = r.x + r.width;
             if (w > result.width) {
                 result.width = w;
@@ -197,10 +216,9 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
 
         partials.push(currentPartial);
-        Logger.debug(
+        Logger.trace(
             this.name,
-            `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
-            null
+            `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`
         );
 
         // start new partial
@@ -217,16 +235,12 @@ export class HorizontalScreenLayout extends ScoreLayout {
     private _alignRenderers(): void {
         this.width = 0;
         const system = this._system!;
+        // `_scaleBars` already ran. supportsResize=false ⇒ fresh
+        // StaffSystem per render, so no shared-layout-data reset is needed.
         for (const s of system.allStaves) {
-            s.resetSharedLayoutData();
-
             let w = 0;
             for (const renderer of s.barRenderers) {
                 renderer.x = w;
-                renderer.y = s.topPadding + s.topOverflow;
-                // note: this will ensure aspects like beaming helpers
-                // and overflows are prepared for finalization
-                renderer.scaleToWidth(renderer.width);
                 w += renderer.width;
             }
 

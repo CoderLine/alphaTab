@@ -18,11 +18,10 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
 import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.truncate
 
 @ExperimentalUnsignedTypes
 internal inline fun UByteArray.decodeToFloatArray(): FloatArray {
@@ -56,6 +55,10 @@ internal inline fun String.substr(startIndex: Double): String {
 
 internal inline fun String.splitBy(separator: String): List<String> {
     return List(this.split(separator))
+}
+
+internal fun String.splitBy(pattern: RegExp): List<String> {
+    return pattern.split(this)
 }
 
 internal inline fun String.replace(pattern: RegExp, replacement: String): String {
@@ -116,6 +119,10 @@ internal inline fun Double.toFixed(decimals: Double): String {
 
 internal inline fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
+}
+
+internal inline fun String.localeCompare(other: String): Double {
+    return this.compareTo(other).toDouble()
 }
 
 internal inline operator fun Double.plus(str: String): String {
@@ -220,34 +227,25 @@ internal inline fun Int?.toDouble(): Double? {
     return this?.toDouble()
 }
 
+/**
+ * Parses a decimal number with optional sign, fraction and exponent, locale-independent, with optional
+ * surrounding whitespace. Unlike ECMAScript, text with trailing characters is NaN.
+ */
 internal inline fun String.toDoubleOrNaN(): Double {
-    try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
-        if (number != null) {
-            return number.toDouble()
-        }
-    } catch (e: Throwable) {
-    }
-    return Double.NaN
+    return this.toDoubleOrNull() ?: Double.NaN
 }
 
-internal fun String.toIntOrNaN(): Double {
-    try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
-        if (number != null) {
-            return number.toInt().toDouble()
-        }
-    } catch (e: Throwable) {
-    }
-    return Double.NaN
-}
-
+/**
+ * Parses an integer in radix 10 (also for radix 0) or 16, locale-independent, with optional surrounding
+ * whitespace. In radix 10 the text is read like [toDoubleOrNaN] and truncated towards zero
+ * (`"3.5"` gives 3, `"-0.5"` gives -0). Unlike ECMAScript, text with trailing characters is NaN.
+ */
 internal fun String.toIntOrNaN(radix: Double): Double {
-    try {
-        return Integer.parseInt(this.trim(), radix.toInt()).toDouble();
-    } catch (e: Throwable) {
+    return when (radix) {
+        0.0, 10.0 -> truncate(this.toDoubleOrNaN())
+        16.0 -> this.trim().toULongOrNull(16)?.toDouble() ?: Double.NaN
+        else -> throw IllegalArgumentException("Radix $radix is not supported")
     }
-    return Double.NaN
 }
 
 
@@ -373,4 +371,12 @@ internal inline fun <reified T> List<T>.concat(other: Iterable<T>): List<T> {
     val copy = this.slice()
     copy.push(other)
     return copy
+}
+
+internal inline fun Throwable.cause(): Throwable? {
+    return this.cause
+}
+
+internal inline fun Throwable.stack(): String {
+    return this.stackTraceToString()
 }

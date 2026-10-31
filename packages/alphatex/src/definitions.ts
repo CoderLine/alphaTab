@@ -43,6 +43,7 @@ import { subtitle } from '@coderline/alphatab-alphatex//metadata/score/subtitle'
 import { systemsLayout } from '@coderline/alphatab-alphatex//metadata/score/systemslayout';
 import { tab } from '@coderline/alphatab-alphatex//metadata/score/tab';
 import { title } from '@coderline/alphatab-alphatex//metadata/score/title';
+import { tuningDisplayMode } from '@coderline/alphatab-alphatex//metadata/score/tuningdisplaymode';
 import { useSystemSignSeparator } from '@coderline/alphatab-alphatex//metadata/score/usesystemsignseparator';
 import { words } from '@coderline/alphatab-alphatex//metadata/score/words';
 import { wordsAndMusic } from '@coderline/alphatab-alphatex//metadata/score/wordsandmusic';
@@ -158,6 +159,11 @@ import { instrumentMeta } from '@coderline/alphatab-alphatex/metadata/staff/inst
 import type { AlphaTexExample, WithDescription, WithSignatures } from '@coderline/alphatab-alphatex/types';
 import { barNumberDisplay } from '@coderline/alphatab-alphatex/metadata/bar/barnumberdisplay';
 import { beaming } from '@coderline/alphatab-alphatex/metadata/bar/beamingRule';
+import { restDisplayPitch } from '@coderline/alphatab-alphatex/properties/beat/restDisplayPitch';
+import { barNumber } from '@coderline/alphatab-alphatex/metadata/bar/barNumber';
+import { defaultStaffDisplay } from '@coderline/alphatab-alphatex/metadata/score/defaultStaffDisplay';
+import { staffDisplay } from '@coderline/alphatab-alphatex/metadata/staff/staffDisplay';
+import { barDisplay } from '@coderline/alphatab-alphatex/metadata/bar/barDisplay';
 
 export const structuralMetaData = metadata(track, staff, voice);
 export const scoreMetaData = metadata(
@@ -178,6 +184,7 @@ export const scoreMetaData = metadata(
     showDynamics,
     hideDynamics,
     useSystemSignSeparator,
+    tuningDisplayMode,
     multiBarRest,
     bracketExtendMode,
     singleTrackTrackNamePolicy,
@@ -191,7 +198,8 @@ export const scoreMetaData = metadata(
     hideEmptyStaves,
     hideEmptyStavesInFirstSystem,
     showSingleStaffBrackets,
-    defaultBarNumberDisplay
+    defaultBarNumberDisplay,
+    defaultStaffDisplay
 );
 
 export const staffMetaData = metadata(
@@ -202,7 +210,8 @@ export const staffMetaData = metadata(
     articulation,
     displayTranspose,
     transpose,
-    instrumentMeta
+    instrumentMeta,
+    staffDisplay
 );
 
 export const barMetaData = metadata(
@@ -232,7 +241,9 @@ export const barMetaData = metadata(
     db,
     voiceMode,
     barNumberDisplay,
-    beaming
+    beaming,
+    barNumber,
+    barDisplay
 );
 
 export const allMetadata = new Map([
@@ -293,7 +304,8 @@ export const beatProperties = properties(
     instrument,
     bank,
     fermata,
-    beam
+    beam,
+    restDisplayPitch
 );
 
 export const noteProperties = properties(

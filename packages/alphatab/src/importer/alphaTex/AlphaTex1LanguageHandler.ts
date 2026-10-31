@@ -20,6 +20,7 @@ import {
     type AlphaTexMetaDataNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
+    type AlphaTexPropertiesNode,
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
@@ -31,6 +32,7 @@ import {
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexStaffNoteKind,
+    AlphaTexStaffType,
     ArgumentListParseTypesMode,
     type IAlphaTexImporter
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexShared';
@@ -44,6 +46,12 @@ import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType, type FlatSyncPoint } from '@coderline/alphatab/model/Automation';
 import { type Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@coderline/alphatab/model/Bar';
+import type {
+    NumberedBarOverride,
+    ScoreBarOverride,
+    SlashBarOverride,
+    TabBarOverride
+} from '@coderline/alphatab/model/BarOverrides';
 import { BarreShape } from '@coderline/alphatab/model/BarreShape';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
@@ -54,36 +62,43 @@ import { Clef } from '@coderline/alphatab/model/Clef';
 import { Color } from '@coderline/alphatab/model/Color';
 import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { type ElementDisplay, StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { Fermata } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
-import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { Lyrics } from '@coderline/alphatab/model/Lyrics';
 import { BeamingRules, type MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import type { Note } from '@coderline/alphatab/model/Note';
+import { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import { BarNumberDisplay, type RenderStylesheet } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, type RenderStylesheet, TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
 import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Staff } from '@coderline/alphatab/model/Staff';
+import type {
+    NumberedStaffConfig,
+    ScoreStaffConfig,
+    SlashStaffConfig,
+    TabStaffConfig
+} from '@coderline/alphatab/model/StaffConfigs';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { WahPedal } from '@coderline/alphatab/model/WahPedal';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 
@@ -188,6 +203,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'usesystemsignseparator':
                 score.stylesheet.useSystemSignSeparator = true;
                 return ApplyNodeResult.Applied;
+            case 'tuningdisplaymode':
+                const tuningDisplayMode = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'tuning display mode',
+                    AlphaTex1EnumMappings.tuningDisplayMode
+                );
+                if (tuningDisplayMode === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                score.stylesheet.tuningDisplayMode = tuningDisplayMode!;
+                return ApplyNodeResult.Applied;
             case 'multibarrest':
                 score.stylesheet.multiTrackMultiBarRest = true;
                 return ApplyNodeResult.Applied;
@@ -288,6 +315,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     return ApplyNodeResult.NotAppliedSemanticError;
                 }
                 score.stylesheet.barNumberDisplay = barNumberDisplay!;
+                return ApplyNodeResult.Applied;
+            case 'defaultstaffdisplay':
+                this._staffDisplayProperties(importer, metaData, score.stylesheet, undefined, undefined);
                 return ApplyNodeResult.Applied;
 
             default:
@@ -420,6 +450,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 importer.state.staffTuningApplied.delete(staff);
                 this._readTrackInstrument(importer, staff.track, metaData.arguments!);
 
+                return ApplyNodeResult.Applied;
+            case 'staffdisplay':
+                this._staffDisplayProperties(importer, metaData, undefined, staff, undefined);
                 return ApplyNodeResult.Applied;
             case 'bank':
                 staff.track.playbackInfo.bank = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
@@ -911,6 +944,30 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 bar.barNumberDisplay = barNumberDisplay!;
                 return ApplyNodeResult.Applied;
+            case 'bardisplay':
+                this._staffDisplayProperties(importer, metaData, undefined, undefined, bar);
+                return ApplyNodeResult.Applied;
+            case 'barnumber':
+                switch (metaData.arguments!.arguments[0].nodeType) {
+                    case AlphaTexNodeType.Number:
+                        bar.masterBar.customBarNumber = (
+                            metaData.arguments!.arguments[0] as AlphaTexNumberLiteral
+                        ).value;
+                        break;
+                    case AlphaTexNodeType.String:
+                        bar.masterBar.customBarNumberText = (metaData.arguments!.arguments[0] as AlphaTexTextNode).text;
+                        break;
+                }
+
+                bar.scoreDisplay ??= {};
+                bar.scoreDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.tabDisplay ??= {};
+                bar.tabDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.slashDisplay ??= {};
+                bar.slashDisplay!.barNumber = BarNumberDisplay.AllBars;
+                bar.numberedDisplay ??= {};
+                bar.numberedDisplay!.barNumber = BarNumberDisplay.AllBars;
+                return ApplyNodeResult.Applied;
             default:
                 return ApplyNodeResult.NotAppliedUnrecognizedMarker;
         }
@@ -1169,6 +1226,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 const instrumentName = (args!.arguments[0] as AlphaTexTextNode).text.toLowerCase();
                 if (instrumentName === 'percussion') {
                     for (const staff of track.staves) {
+                        // hide tablature by default unless explicitly requested in staff
+                        staff.showTablature = false;
                         importer.applyStaffNoteKind(staff, AlphaTexStaffNoteKind.Articulation);
                     }
                     track.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
@@ -1254,6 +1313,154 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             default:
                 return false;
         }
+    }
+
+    private _staffDisplayProperties(
+        importer: IAlphaTexImporter,
+        metaData: AlphaTexMetaDataNode,
+        stylesheet: RenderStylesheet | undefined,
+        staff: Staff | undefined,
+        bar: Bar | undefined
+    ) {
+        if (!metaData.properties) {
+            return;
+        }
+
+        // without arguments the properties apply to all staff types supporting them
+        const staffTypes: AlphaTexStaffType[] = [];
+        if (metaData.arguments) {
+            for (const a of metaData.arguments!.arguments) {
+                staffTypes.push(
+                    AlphaTex1EnumMappings.alphaTexStaffType.get((a as AlphaTexTextNode).text.toLowerCase())!
+                );
+            }
+        }
+        const isExplicit = staffTypes.length > 0;
+        if (!isExplicit) {
+            for (const t of AlphaTex1EnumMappings.alphaTexStaffType.values()) {
+                staffTypes.push(t);
+            }
+        }
+
+        const lookup = [AlphaTex1LanguageDefinitions.metaDataProperties.get(metaData.tag.tag.text.toLowerCase())!];
+        for (const p of metaData.properties.properties) {
+            if (!this._checkProperty(importer, lookup, p)) {
+                continue;
+            }
+
+            for (const t of staffTypes) {
+                if (!AlphaTex1LanguageHandler._applyStaffDisplayProperty(p, t, stylesheet, staff, bar) && isExplicit) {
+                    importer.addSemanticDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT307,
+                        message: `The property '${p.property.text}' has no effect on the staff type '${AlphaTex1EnumMappings.alphaTexStaffTypeReversed.get(t)}'`,
+                        severity: AlphaTexDiagnosticsSeverity.Warning,
+                        start: p.start,
+                        end: p.end
+                    });
+                }
+            }
+        }
+    }
+
+    /**
+     * Applies the property to the display settings of the staff type on the stylesheet, staff or bar
+     * (created on demand). Returns false if the staff type has no such setting.
+     */
+    private static _applyStaffDisplayProperty(
+        p: AlphaTexPropertyNode,
+        t: AlphaTexStaffType,
+        stylesheet: RenderStylesheet | undefined,
+        staff: Staff | undefined,
+        bar: Bar | undefined
+    ): boolean {
+        const name = p.property.text.toLowerCase();
+        const value = () => (p.arguments!.arguments[0] as AlphaTexTextNode).text.toLowerCase();
+        // all staff types have a bar number display
+        let applied = name === 'barnumber';
+        const barNumber = (v: BarNumberDisplay | undefined): BarNumberDisplay | undefined =>
+            name === 'barnumber' ? AlphaTex1EnumMappings.barNumberDisplay.get(value())! : v;
+        // <element>Visibility, <element>Placement and <element>Systems
+        const element = (prefix: string, display: ElementDisplay | undefined): ElementDisplay | undefined => {
+            if (!name.startsWith(prefix)) {
+                return display;
+            }
+            applied = true;
+            const d: ElementDisplay = display ?? {};
+            if (name.endsWith('visibility')) {
+                d.isVisible = p.arguments
+                    ? AlphaTex1LanguageHandler._booleanLikeValue(p.arguments!.arguments, 0)
+                    : true;
+            } else if (name.endsWith('placement')) {
+                d.staffPlacement = AlphaTex1EnumMappings.staffPlacement.get(value())!;
+            } else {
+                d.systemDisplay = AlphaTex1EnumMappings.systemDisplay.get(value())!;
+            }
+            return d;
+        };
+
+        if (bar && t === AlphaTexStaffType.Score) {
+            const c: ScoreBarOverride = bar.scoreDisplay ?? {};
+            c.clef = element('clef', c.clef);
+            c.keySignature = element('ks', c.keySignature);
+            c.timeSignature = element('ts', c.timeSignature);
+            c.barNumber = barNumber(c.barNumber);
+            bar.scoreDisplay = applied ? c : bar.scoreDisplay;
+        } else if (bar && t === AlphaTexStaffType.Tabs) {
+            const c: TabBarOverride = bar.tabDisplay ?? {};
+            c.clef = element('clef', c.clef);
+            c.timeSignature = element('ts', c.timeSignature);
+            c.barNumber = barNumber(c.barNumber);
+            bar.tabDisplay = applied ? c : bar.tabDisplay;
+        } else if (bar && t === AlphaTexStaffType.Slash) {
+            const c: SlashBarOverride = bar.slashDisplay ?? {};
+            c.keySignature = element('ks', c.keySignature);
+            c.timeSignature = element('ts', c.timeSignature);
+            c.barNumber = barNumber(c.barNumber);
+            bar.slashDisplay = applied ? c : bar.slashDisplay;
+        } else if (bar) {
+            const c: NumberedBarOverride = bar.numberedDisplay ?? {};
+            c.timeSignature = element('ts', c.timeSignature);
+            c.barNumber = barNumber(c.barNumber);
+            bar.numberedDisplay = applied ? c : bar.numberedDisplay;
+        } else if (t === AlphaTexStaffType.Score) {
+            const c: ScoreStaffConfig = staff?.scoreConfig ?? stylesheet?.scoreConfig ?? {};
+            c.clef = element('clef', c.clef);
+            c.keySignature = element('ks', c.keySignature);
+            c.timeSignature = element('ts', c.timeSignature);
+            c.barNumber = barNumber(c.barNumber);
+            if (staff && applied) {
+                staff.scoreConfig = c;
+            }
+        } else if (t === AlphaTexStaffType.Tabs) {
+            const c: TabStaffConfig = staff?.tabConfig ?? stylesheet?.tabConfig ?? {};
+            c.clef = element('clef', c.clef);
+            c.timeSignature = element('ts', c.timeSignature);
+            c.rests = element('rests', c.rests);
+            c.barNumber = barNumber(c.barNumber);
+            if (name === 'rhythm') {
+                c.rhythm = AlphaTex1EnumMappings.tabRhythmMode.get(value())!;
+                applied = true;
+            }
+            if (staff && applied) {
+                staff.tabConfig = c;
+            }
+        } else if (t === AlphaTexStaffType.Slash) {
+            const c: SlashStaffConfig = staff?.slashConfig ?? stylesheet?.slashConfig ?? {};
+            c.keySignature = element('ks', c.keySignature);
+            c.timeSignature = element('ts', c.timeSignature);
+            c.barNumber = barNumber(c.barNumber);
+            if (staff && applied) {
+                staff.slashConfig = c;
+            }
+        } else {
+            const c: NumberedStaffConfig = staff?.numberedConfig ?? stylesheet?.numberedConfig ?? {};
+            c.timeSignature = element('ts', c.timeSignature);
+            c.barNumber = barNumber(c.barNumber);
+            if (staff && applied) {
+                staff.numberedConfig = c;
+            }
+        }
+        return applied;
     }
 
     public applyStructuralMetaData(
@@ -1616,6 +1823,23 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'txt':
                 beat.text = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 return ApplyNodeResult.Applied;
+            case 'restdisplaypitch': {
+                const tuning = ModelUtils.parseTuning((p.arguments!.arguments[0] as AlphaTexTextNode).text);
+                if (tuning !== null) {
+                    beat.restDisplayTone = tuning.tone.noteValue;
+                    beat.restDisplayOctave = tuning.octave - 1;
+                } else {
+                    importer.addSemanticDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT212,
+                        message: `Invalid pitch value '${(p.arguments!.arguments[0] as AlphaTexTextNode).text}', expected format like 'C5' or 'G4'`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: p.arguments!.arguments[0].start,
+                        end: p.arguments!.arguments[0].end
+                    });
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                return ApplyNodeResult.Applied;
+            }
             case 'lyrics':
                 let lyricsLine = 0;
                 let lyricsText = '';
@@ -2316,6 +2540,33 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 note.ornament = NoteOrnament.LowerMordent;
                 return ApplyNodeResult.Applied;
             case 'string':
+                if (p.arguments && p.arguments.arguments.length > 0) {
+                    const stringArg = p.arguments.arguments[0] as AlphaTexNumberLiteral;
+                    if (!note.isPiano) {
+                        importer.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT221,
+                            message: `A string number can only be specified on pitched notes, use the 'fret.string' syntax to specify the string of fretted notes.`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: stringArg.start,
+                            end: stringArg.end
+                        });
+                        return ApplyNodeResult.NotAppliedSemanticError;
+                    }
+
+                    const stringCount = Note.getStringCount(note.beat.voice.bar.staff);
+                    const stringNumber = stringArg.value;
+                    if (stringNumber < 1 || stringNumber > stringCount) {
+                        importer.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT211,
+                            message: `Value is out of valid range. Allowed range: 1-${stringCount}, Actual Value: ${stringNumber}`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: stringArg.start,
+                            end: stringArg.end
+                        });
+                        return ApplyNodeResult.NotAppliedSemanticError;
+                    }
+                    note.string = stringCount - stringNumber + 1;
+                }
                 note.showStringNumber = true;
                 return ApplyNodeResult.Applied;
             case 'hide':
@@ -2562,6 +2813,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (stylesheet.useSystemSignSeparator) {
             nodes.push(Atnf.meta('useSystemSignSeparator'));
         }
+        if (stylesheet.tuningDisplayMode !== TuningDisplayMode.Score) {
+            nodes.push(
+                Atnf.identMeta(
+                    'tuningDisplayMode',
+                    AlphaTex1EnumMappings.tuningDisplayModeReversed.get(stylesheet.tuningDisplayMode)!
+                )
+            );
+        }
         if (stylesheet.multiTrackMultiBarRest) {
             nodes.push(Atnf.meta('multiBarRest'));
         }
@@ -2652,9 +2911,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             nodes.push(Atnf.meta('showSingleStaffBrackets'));
         }
 
-        if (stylesheet.barNumberDisplay !== BarNumberDisplay.AllBars) {
-            nodes.push(Atnf.identMeta('defaultBarNumberDisplay', BarNumberDisplay[stylesheet.barNumberDisplay]));
-        }
+        AlphaTex1LanguageHandler._buildStaffDisplayNodes(nodes, stylesheet, undefined, undefined, false);
 
         // Unsupported:
         // 'globaldisplaychorddiagramsontop',
@@ -2835,12 +3092,117 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             ];
         }
 
-        if (bar.barNumberDisplay !== undefined) {
-            nodes.push(Atnf.identMeta('barNumberDisplay', BarNumberDisplay[bar.barNumberDisplay]));
-        }
+        AlphaTex1LanguageHandler._buildStaffDisplayNodes(
+            nodes,
+            undefined,
+            undefined,
+            bar,
+            AlphaTex1LanguageHandler._isImpliedBarNumberDisplay(staff, bar, voice)
+        );
 
         return nodes;
     }
+    /**
+     * Builds the staff display tags (one per staff type) of the stylesheet, a staff or a bar. Values equal to the
+     * defaults (stylesheet) or implied by a custom bar number (bar) are skipped, a bar number display shared by all
+     * staff types is written via the shorthand tag.
+     */
+    private static _buildStaffDisplayNodes(
+        nodes: AlphaTexMetaDataNode[],
+        stylesheet: RenderStylesheet | undefined,
+        staff: Staff | undefined,
+        bar: Bar | undefined,
+        isImpliedBarNumber: boolean
+    ) {
+        const element = (
+            props: AlphaTexPropertiesNode,
+            prefix: string,
+            v: ElementDisplay | undefined,
+            d: ElementDisplay | undefined
+        ) => {
+            if (v?.isVisible !== undefined && v!.isVisible !== d?.isVisible) {
+                Atnf.prop(props.properties, `${prefix}Visibility`, Atnf.identValue(v!.isVisible! ? 'true' : 'false'));
+            }
+            if (v?.staffPlacement !== undefined && v!.staffPlacement !== d?.staffPlacement) {
+                Atnf.prop(props.properties, `${prefix}Placement`, Atnf.identValue(StaffPlacement[v!.staffPlacement!]));
+            }
+            if (v?.systemDisplay !== undefined && v!.systemDisplay !== d?.systemDisplay) {
+                Atnf.prop(props.properties, `${prefix}Systems`, Atnf.identValue(SystemDisplay[v!.systemDisplay!]));
+            }
+        };
+
+        const score = Atnf.props([]);
+        const tabs = Atnf.props([]);
+        const slash = Atnf.props([]);
+        const numbered = Atnf.props([]);
+        const barNumbers: (BarNumberDisplay | undefined)[] = [];
+        if (bar) {
+            element(score, 'clef', bar.scoreDisplay?.clef, undefined);
+            element(score, 'ks', bar.scoreDisplay?.keySignature, undefined);
+            element(score, 'ts', bar.scoreDisplay?.timeSignature, undefined);
+            element(tabs, 'clef', bar.tabDisplay?.clef, undefined);
+            element(tabs, 'ts', bar.tabDisplay?.timeSignature, undefined);
+            element(slash, 'ks', bar.slashDisplay?.keySignature, undefined);
+            element(slash, 'ts', bar.slashDisplay?.timeSignature, undefined);
+            element(numbered, 'ts', bar.numberedDisplay?.timeSignature, undefined);
+            barNumbers.push(bar.scoreDisplay?.barNumber);
+            barNumbers.push(bar.tabDisplay?.barNumber);
+            barNumbers.push(bar.slashDisplay?.barNumber);
+            barNumbers.push(bar.numberedDisplay?.barNumber);
+        } else {
+            // staves have no defaults, every defined value overrides the stylesheet
+            const defaults = staff ? undefined : AlphaTex1LanguageHandler._defaultScore.stylesheet;
+            const sc = staff ? staff.scoreConfig : stylesheet!.scoreConfig;
+            const tc = staff ? staff.tabConfig : stylesheet!.tabConfig;
+            const slc = staff ? staff.slashConfig : stylesheet!.slashConfig;
+            const nc = staff ? staff.numberedConfig : stylesheet!.numberedConfig;
+            element(score, 'clef', sc?.clef, defaults?.scoreConfig?.clef);
+            element(score, 'ks', sc?.keySignature, defaults?.scoreConfig?.keySignature);
+            element(score, 'ts', sc?.timeSignature, defaults?.scoreConfig?.timeSignature);
+            element(tabs, 'clef', tc?.clef, defaults?.tabConfig?.clef);
+            element(tabs, 'ts', tc?.timeSignature, defaults?.tabConfig?.timeSignature);
+            element(tabs, 'rests', tc?.rests, defaults?.tabConfig?.rests);
+            if (tc?.rhythm !== undefined && tc!.rhythm !== defaults?.tabConfig?.rhythm) {
+                Atnf.prop(tabs.properties, 'rhythm', Atnf.identValue(TabRhythmMode[tc!.rhythm!]));
+            }
+            element(slash, 'ks', slc?.keySignature, defaults?.slashConfig?.keySignature);
+            element(slash, 'ts', slc?.timeSignature, defaults?.slashConfig?.timeSignature);
+            element(numbered, 'ts', nc?.timeSignature, defaults?.numberedConfig?.timeSignature);
+            barNumbers.push(sc?.barNumber);
+            barNumbers.push(tc?.barNumber);
+            barNumbers.push(slc?.barNumber);
+            barNumbers.push(nc?.barNumber);
+        }
+
+        // bar numbers equal to the default (stylesheet) or implied by a custom bar number (bar) are not written,
+        // one shared by all staff types is written via the shorthand tag (there is none for staves)
+        let defaultBarNumber: BarNumberDisplay | undefined = undefined;
+        if (stylesheet) {
+            defaultBarNumber = BarNumberDisplay.FirstOfSystem;
+        } else if (isImpliedBarNumber) {
+            defaultBarNumber = BarNumberDisplay.AllBars;
+        }
+        const isShared = !staff && barNumbers.filter(b => b === barNumbers[0]).length === barNumbers.length;
+        if (isShared && barNumbers[0] !== undefined && barNumbers[0] !== defaultBarNumber) {
+            nodes.push(
+                Atnf.identMeta(bar ? 'barNumberDisplay' : 'defaultBarNumberDisplay', BarNumberDisplay[barNumbers[0]!])
+            );
+        }
+
+        const tag = bar ? 'barDisplay' : staff ? 'staffDisplay' : 'defaultStaffDisplay';
+        const staffTypes = ['score', 'tabs', 'slash', 'numbered'];
+        const all = [score, tabs, slash, numbered];
+        for (let i = 0; i < all.length; i++) {
+            const barNumber = barNumbers[i];
+            if (!isShared && barNumber !== undefined && barNumber !== defaultBarNumber) {
+                Atnf.prop(all[i].properties, 'barNumber', Atnf.identValue(BarNumberDisplay[barNumber!]));
+            }
+            if (all[i].properties.length > 0) {
+                nodes.push(Atnf.meta(tag, Atnf.identValue(staffTypes[i]), all[i]));
+            }
+        }
+    }
+
     private static _buildStaffMetaDataNodes(nodes: AlphaTexMetaDataNode[], staff: Staff) {
         const firstStaffMetaIndex = nodes.length;
 
@@ -2890,6 +3252,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             }
         }
 
+        AlphaTex1LanguageHandler._buildStaffDisplayNodes(nodes, undefined, staff, undefined, false);
         if (firstStaffMetaIndex < nodes.length) {
             nodes[firstStaffMetaIndex].leadingComments = [
                 {
@@ -2924,6 +3287,20 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         return chordNode;
+    }
+
+    /**
+     * A custom bar number (`\barNumber`) implies a forced bar number display (`allBars` on all staff types)
+     * on the bar it is written on (the first staff of the first track). In this case these values do not need to be exported.
+     */
+    private static _isImpliedBarNumberDisplay(staff: Staff, bar: Bar, voice: number): boolean {
+        const masterBar = bar.masterBar;
+        return (
+            voice === 0 &&
+            staff.index === 0 &&
+            staff.track.index === 0 &&
+            (masterBar.customBarNumber !== undefined || masterBar.customBarNumberText !== undefined)
+        );
     }
 
     private static _buildMasterBarMetaDataNodes(nodes: AlphaTexMetaDataNode[], masterBar: MasterBar) {
@@ -3035,6 +3412,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 tempo.arguments!.closeParenthesis = undefined;
             }
             nodes.push(tempo);
+        }
+
+        if (masterBar.customBarNumber !== undefined) {
+            nodes.push(Atnf.numberMeta('barNumber', masterBar.customBarNumber!));
+        }
+
+        if (masterBar.customBarNumberText !== undefined) {
+            nodes.push(Atnf.meta('barNumber', Atnf.args([Atnf.string(masterBar.barNumberText)])));
         }
 
         if (firstMetaIndex < nodes.length) {
@@ -3205,7 +3590,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (note.showStringNumber) {
-            Atnf.prop(properties, 'string');
+            if (note.isPiano && !Number.isNaN(note.string)) {
+                const stringNumber = Note.getStringCount(note.beat.voice.bar.staff) - note.string + 1;
+                Atnf.prop(properties, 'string', Atnf.numberValue(stringNumber));
+            } else {
+                Atnf.prop(properties, 'string');
+            }
         }
 
         if (note.isTrill) {
@@ -3319,18 +3709,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             Atnf.prop(properties, 'slur', Atnf.identValue(slurId));
         }
 
-        // NOTE: it would be better to check via accidentalhelper what accidentals we really need to force
-        const skipAccidental =
-            note.accidentalMode === NoteAccidentalMode.Default ||
-            (note.beat.voice.bar.keySignature === KeySignature.C &&
-                note.accidentalMode === NoteAccidentalMode.ForceNatural);
-
-        if (!skipAccidental) {
-            Atnf.prop(
-                properties,
-                'acc',
-                Atnf.identValue(ModelUtils.reverseAccidentalModeMapping.get(note.accidentalMode)!)
-            );
+        // only the spelling hints which change the rendering are needed
+        const accidentalMode = ModelUtils.simplifyAccidentalMode(
+            note.beat.voice.bar.keySignature,
+            note.displayValue,
+            note.accidentalMode
+        );
+        if (accidentalMode !== NoteAccidentalMode.Default) {
+            Atnf.prop(properties, 'acc', Atnf.identValue(ModelUtils.reverseAccidentalModeMapping.get(accidentalMode)!));
         }
 
         switch (note.ornament) {
@@ -3349,6 +3735,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         return properties;
+    }
+
+    /**
+     * The beat which precedes the given beat in the written alphaTex of its voice. Empty voices are written
+     * without beats, an importer continues with the state of the beat written before them.
+     */
+    private static _previousWrittenBeat(beat: Beat): Beat | null {
+        let previous = beat.previousBeat;
+        while (previous !== null && previous.voice.isEmpty) {
+            previous = previous.previousBeat;
+        }
+        return previous;
     }
 
     public buildBeatEffects(beat: Beat): AlphaTexPropertyNode[] {
@@ -3498,7 +3896,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 break;
         }
 
-        if ((beat.voice.bar.index === 0 && beat.index === 0) || beat.dynamics !== beat.previousBeat?.dynamics) {
+        const previousWrittenBeat = AlphaTex1LanguageHandler._previousWrittenBeat(beat);
+        if (previousWrittenBeat === null || beat.dynamics !== previousWrittenBeat.dynamics) {
             Atnf.prop(
                 properties,
                 'dy',

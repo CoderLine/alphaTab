@@ -37,7 +37,7 @@ Score (1,1) -> (1,19) {
             notes: [
               Note (1,12) -> (1,15) {
                 noteValue: Number "3" (1,12) -> (1,13),
-                noteStringDot: Dot (1,13) -> (1,14),
+                noteStringSeparator: Dot (1,13) -> (1,14),
                 noteString: Number "3" (1,14) -> (1,15),
               },
             ],
@@ -48,7 +48,7 @@ Score (1,1) -> (1,19) {
             notes: [
               Note (1,16) -> (1,19) {
                 noteValue: Number "3" (1,16) -> (1,17),
-                noteStringDot: Dot (1,17) -> (1,18),
+                noteStringSeparator: Dot (1,17) -> (1,18),
                 noteString: Number "4" (1,18) -> (1,19),
               },
             ],
@@ -662,7 +662,7 @@ Score (1,1) -> (1,8) {
             notes: [
               Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
-                noteStringDot: Dot (1,3) -> (1,4),
+                noteStringSeparator: Dot (1,3) -> (1,4),
                 noteString: Number "3" (1,4) -> (1,5),
               },
             ],
@@ -704,7 +704,7 @@ Score (1,1) -> (1,10) {
             notes: [
               Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
-                noteStringDot: Dot (1,3) -> (1,4),
+                noteStringSeparator: Dot (1,3) -> (1,4),
                 noteString: Number "3" (1,4) -> (1,5),
               },
             ],
@@ -3623,7 +3623,7 @@ Score (1,1) -> (1,8) {
             notes: [
               Note (1,1) -> (1,4) {
                 noteValue: Number "3" (1,1) -> (1,2),
-                noteStringDot: Dot (1,2) -> (1,3),
+                noteStringSeparator: Dot (1,2) -> (1,3),
                 noteString: Number "3" (1,3) -> (1,4),
               },
             ],
@@ -3634,7 +3634,7 @@ Score (1,1) -> (1,8) {
             notes: [
               Note (1,5) -> (1,8) {
                 noteValue: Number "4" (1,5) -> (1,6),
-                noteStringDot: Dot (1,6) -> (1,7),
+                noteStringSeparator: Dot (1,6) -> (1,7),
                 noteString: Number "2" (1,7) -> (1,8),
               },
             ],
@@ -3664,7 +3664,7 @@ Score (1,1) -> (1,26) {
             notes: [
               Note (1,4) -> (1,7) {
                 noteValue: Number "3" (1,4) -> (1,5),
-                noteStringDot: Dot (1,5) -> (1,6),
+                noteStringSeparator: Dot (1,5) -> (1,6),
                 noteString: Number "3" (1,6) -> (1,7),
               },
             ],
@@ -3725,7 +3725,7 @@ Score (1,1) -> (1,12) {
             notes: [
               Note (1,1) -> (1,4) {
                 noteValue: Number "3" (1,1) -> (1,2),
-                noteStringDot: Dot (1,2) -> (1,3),
+                noteStringSeparator: Dot (1,2) -> (1,3),
                 noteString: Number "3" (1,3) -> (1,4),
               },
             ],
@@ -3738,7 +3738,7 @@ Score (1,1) -> (1,12) {
             notes: [
               Note (1,7) -> (1,10) {
                 noteValue: Number "4" (1,7) -> (1,8),
-                noteStringDot: Dot (1,8) -> (1,9),
+                noteStringSeparator: Dot (1,8) -> (1,9),
                 noteString: Number "2" (1,9) -> (1,10),
               },
             ],
@@ -3770,7 +3770,7 @@ Score (1,1) -> (1,14) {
             notes: [
               Note (1,4) -> (1,7) {
                 noteValue: Number "3" (1,4) -> (1,5),
-                noteStringDot: Dot (1,5) -> (1,6),
+                noteStringSeparator: Dot (1,5) -> (1,6),
                 noteString: Number "3" (1,6) -> (1,7),
               },
             ],
@@ -3785,7 +3785,7 @@ Score (1,1) -> (1,14) {
             notes: [
               Note (1,11) -> (1,14) {
                 noteValue: Number "4" (1,11) -> (1,12),
-                noteStringDot: Dot (1,12) -> (1,13),
+                noteStringSeparator: Dot (1,12) -> (1,13),
                 noteString: Number "2" (1,13) -> (1,14),
               },
             ],
@@ -3811,7 +3811,7 @@ Score (1,1) -> (1,18) {
             notes: [
               Note (1,1) -> (1,4) {
                 noteValue: Number "3" (1,1) -> (1,2),
-                noteStringDot: Dot (1,2) -> (1,3),
+                noteStringSeparator: Dot (1,2) -> (1,3),
                 noteString: Number "3" (1,3) -> (1,4),
               },
             ],
@@ -3829,7 +3829,7 @@ Score (1,1) -> (1,18) {
             notes: [
               Note (1,10) -> (1,13) {
                 noteValue: Number "4" (1,10) -> (1,11),
-                noteStringDot: Dot (1,11) -> (1,12),
+                noteStringSeparator: Dot (1,11) -> (1,12),
                 noteString: Number "2" (1,12) -> (1,13),
               },
             ],
@@ -3862,7 +3862,7 @@ Score (1,1) -> (1,31) {
             notes: [
               Note (1,1) -> (1,4) {
                 noteValue: Number "3" (1,1) -> (1,2),
-                noteStringDot: Dot (1,2) -> (1,3),
+                noteStringSeparator: Dot (1,2) -> (1,3),
                 noteString: Number "3" (1,3) -> (1,4),
               },
             ],
@@ -3887,7 +3887,7 @@ Score (1,1) -> (1,31) {
             notes: [
               Note (1,13) -> (1,16) {
                 noteValue: Number "4" (1,13) -> (1,14),
-                noteStringDot: Dot (1,14) -> (1,15),
+                noteStringSeparator: Dot (1,14) -> (1,15),
                 noteString: Number "2" (1,15) -> (1,16),
               },
             ],
@@ -3946,7 +3946,7 @@ Score (1,1) -> (1,12) {
             notes: [
               Note (1,1) -> (1,4) {
                 noteValue: Number "3" (1,1) -> (1,2),
-                noteStringDot: Dot (1,2) -> (1,3),
+                noteStringSeparator: Dot (1,2) -> (1,3),
                 noteString: Number "3" (1,3) -> (1,4),
               },
             ],
@@ -3959,7 +3959,7 @@ Score (1,1) -> (1,12) {
             notes: [
               Note (1,7) -> (1,10) {
                 noteValue: Number "4" (1,7) -> (1,8),
-                noteStringDot: Dot (1,8) -> (1,9),
+                noteStringSeparator: Dot (1,8) -> (1,9),
                 noteString: Number "2" (1,9) -> (1,10),
               },
             ],
@@ -3987,7 +3987,7 @@ Score (1,1) -> (1,37) {
             notes: [
               Note (1,1) -> (1,4) {
                 noteValue: Number "3" (1,1) -> (1,2),
-                noteStringDot: Dot (1,2) -> (1,3),
+                noteStringSeparator: Dot (1,2) -> (1,3),
                 noteString: Number "3" (1,3) -> (1,4),
               },
             ],
@@ -4005,7 +4005,7 @@ Score (1,1) -> (1,37) {
             notes: [
               Note (1,9) -> (1,14) {
                 noteValue: Number "3" (1,9) -> (1,10),
-                noteStringDot: Dot (1,11) -> (1,12),
+                noteStringSeparator: Dot (1,11) -> (1,12),
                 noteString: Number "3" (1,13) -> (1,14),
               },
             ],
@@ -4023,7 +4023,7 @@ Score (1,1) -> (1,37) {
             notes: [
               Note (1,21) -> (1,24) {
                 noteValue: Number "3" (1,21) -> (1,22),
-                noteStringDot: Dot (1,22) -> (1,23),
+                noteStringSeparator: Dot (1,22) -> (1,23),
                 noteString: Number "3" (1,23) -> (1,24),
               },
             ],
@@ -4041,7 +4041,7 @@ Score (1,1) -> (1,37) {
             notes: [
               Note (1,30) -> (1,35) {
                 noteValue: Number "3" (1,30) -> (1,31),
-                noteStringDot: Dot (1,32) -> (1,33),
+                noteStringSeparator: Dot (1,32) -> (1,33),
                 noteString: Number "3" (1,34) -> (1,35),
               },
             ],
@@ -4408,12 +4408,12 @@ Score (1,1) -> (1,20) {
             notes: [
               Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
-                noteStringDot: Dot (1,3) -> (1,4),
+                noteStringSeparator: Dot (1,3) -> (1,4),
                 noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
                 noteValue: Number "4" (1,6) -> (1,7),
-                noteStringDot: Dot (1,7) -> (1,8),
+                noteStringSeparator: Dot (1,7) -> (1,8),
                 noteString: Number "2" (1,8) -> (1,9),
               },
             ],
@@ -4426,12 +4426,12 @@ Score (1,1) -> (1,20) {
             notes: [
               Note (1,12) -> (1,15) {
                 noteValue: Number "1" (1,12) -> (1,13),
-                noteStringDot: Dot (1,13) -> (1,14),
+                noteStringSeparator: Dot (1,13) -> (1,14),
                 noteString: Number "2" (1,14) -> (1,15),
               },
               Note (1,16) -> (1,19) {
                 noteValue: Number "6" (1,16) -> (1,17),
-                noteStringDot: Dot (1,17) -> (1,18),
+                noteStringSeparator: Dot (1,17) -> (1,18),
                 noteString: Number "1" (1,18) -> (1,19),
               },
             ],
@@ -4463,12 +4463,12 @@ Score (1,1) -> (1,32) {
             notes: [
               Note (1,5) -> (1,8) {
                 noteValue: Number "3" (1,5) -> (1,6),
-                noteStringDot: Dot (1,6) -> (1,7),
+                noteStringSeparator: Dot (1,6) -> (1,7),
                 noteString: Number "3" (1,7) -> (1,8),
               },
               Note (1,9) -> (1,12) {
                 noteValue: Number "4" (1,9) -> (1,10),
-                noteStringDot: Dot (1,10) -> (1,11),
+                noteStringSeparator: Dot (1,10) -> (1,11),
                 noteString: Number "2" (1,11) -> (1,12),
               },
             ],
@@ -4531,12 +4531,12 @@ Score (1,1) -> (1,24) {
             notes: [
               Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
-                noteStringDot: Dot (1,3) -> (1,4),
+                noteStringSeparator: Dot (1,3) -> (1,4),
                 noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
                 noteValue: Number "4" (1,6) -> (1,7),
-                noteStringDot: Dot (1,7) -> (1,8),
+                noteStringSeparator: Dot (1,7) -> (1,8),
                 noteString: Number "2" (1,8) -> (1,9),
               },
             ],
@@ -4551,12 +4551,12 @@ Score (1,1) -> (1,24) {
             notes: [
               Note (1,14) -> (1,17) {
                 noteValue: Number "1" (1,14) -> (1,15),
-                noteStringDot: Dot (1,15) -> (1,16),
+                noteStringSeparator: Dot (1,15) -> (1,16),
                 noteString: Number "2" (1,16) -> (1,17),
               },
               Note (1,18) -> (1,21) {
                 noteValue: Number "6" (1,18) -> (1,19),
-                noteStringDot: Dot (1,19) -> (1,20),
+                noteStringSeparator: Dot (1,19) -> (1,20),
                 noteString: Number "1" (1,20) -> (1,21),
               },
             ],
@@ -4590,12 +4590,12 @@ Score (1,1) -> (1,26) {
             notes: [
               Note (1,5) -> (1,8) {
                 noteValue: Number "3" (1,5) -> (1,6),
-                noteStringDot: Dot (1,6) -> (1,7),
+                noteStringSeparator: Dot (1,6) -> (1,7),
                 noteString: Number "3" (1,7) -> (1,8),
               },
               Note (1,9) -> (1,12) {
                 noteValue: Number "4" (1,9) -> (1,10),
-                noteStringDot: Dot (1,10) -> (1,11),
+                noteStringSeparator: Dot (1,10) -> (1,11),
                 noteString: Number "2" (1,11) -> (1,12),
               },
             ],
@@ -4612,12 +4612,12 @@ Score (1,1) -> (1,26) {
             notes: [
               Note (1,18) -> (1,21) {
                 noteValue: Number "1" (1,18) -> (1,19),
-                noteStringDot: Dot (1,19) -> (1,20),
+                noteStringSeparator: Dot (1,19) -> (1,20),
                 noteString: Number "2" (1,20) -> (1,21),
               },
               Note (1,22) -> (1,25) {
                 noteValue: Number "6" (1,22) -> (1,23),
-                noteStringDot: Dot (1,23) -> (1,24),
+                noteStringSeparator: Dot (1,23) -> (1,24),
                 noteString: Number "1" (1,24) -> (1,25),
               },
             ],
@@ -4645,12 +4645,12 @@ Score (1,1) -> (1,30) {
             notes: [
               Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
-                noteStringDot: Dot (1,3) -> (1,4),
+                noteStringSeparator: Dot (1,3) -> (1,4),
                 noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
                 noteValue: Number "4" (1,6) -> (1,7),
-                noteStringDot: Dot (1,7) -> (1,8),
+                noteStringSeparator: Dot (1,7) -> (1,8),
                 noteString: Number "2" (1,8) -> (1,9),
               },
             ],
@@ -4670,12 +4670,12 @@ Score (1,1) -> (1,30) {
             notes: [
               Note (1,17) -> (1,20) {
                 noteValue: Number "1" (1,17) -> (1,18),
-                noteStringDot: Dot (1,18) -> (1,19),
+                noteStringSeparator: Dot (1,18) -> (1,19),
                 noteString: Number "2" (1,19) -> (1,20),
               },
               Note (1,21) -> (1,24) {
                 noteValue: Number "6" (1,21) -> (1,22),
-                noteStringDot: Dot (1,22) -> (1,23),
+                noteStringSeparator: Dot (1,22) -> (1,23),
                 noteString: Number "1" (1,23) -> (1,24),
               },
             ],
@@ -4710,12 +4710,12 @@ Score (1,1) -> (1,43) {
             notes: [
               Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
-                noteStringDot: Dot (1,3) -> (1,4),
+                noteStringSeparator: Dot (1,3) -> (1,4),
                 noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
                 noteValue: Number "4" (1,6) -> (1,7),
-                noteStringDot: Dot (1,7) -> (1,8),
+                noteStringSeparator: Dot (1,7) -> (1,8),
                 noteString: Number "2" (1,8) -> (1,9),
               },
             ],
@@ -4742,12 +4742,12 @@ Score (1,1) -> (1,43) {
             notes: [
               Note (1,20) -> (1,23) {
                 noteValue: Number "1" (1,20) -> (1,21),
-                noteStringDot: Dot (1,21) -> (1,22),
+                noteStringSeparator: Dot (1,21) -> (1,22),
                 noteString: Number "2" (1,22) -> (1,23),
               },
               Note (1,24) -> (1,27) {
                 noteValue: Number "6" (1,24) -> (1,25),
-                noteStringDot: Dot (1,25) -> (1,26),
+                noteStringSeparator: Dot (1,25) -> (1,26),
                 noteString: Number "1" (1,26) -> (1,27),
               },
             ],
@@ -4808,12 +4808,12 @@ Score (1,1) -> (1,24) {
             notes: [
               Note (1,2) -> (1,5) {
                 noteValue: Number "3" (1,2) -> (1,3),
-                noteStringDot: Dot (1,3) -> (1,4),
+                noteStringSeparator: Dot (1,3) -> (1,4),
                 noteString: Number "3" (1,4) -> (1,5),
               },
               Note (1,6) -> (1,9) {
                 noteValue: Number "4" (1,6) -> (1,7),
-                noteStringDot: Dot (1,7) -> (1,8),
+                noteStringSeparator: Dot (1,7) -> (1,8),
                 noteString: Number "2" (1,8) -> (1,9),
               },
             ],
@@ -4828,12 +4828,12 @@ Score (1,1) -> (1,24) {
             notes: [
               Note (1,14) -> (1,17) {
                 noteValue: Number "1" (1,14) -> (1,15),
-                noteStringDot: Dot (1,15) -> (1,16),
+                noteStringSeparator: Dot (1,15) -> (1,16),
                 noteString: Number "2" (1,16) -> (1,17),
               },
               Note (1,18) -> (1,21) {
                 noteValue: Number "6" (1,18) -> (1,19),
-                noteStringDot: Dot (1,19) -> (1,20),
+                noteStringSeparator: Dot (1,19) -> (1,20),
                 noteString: Number "1" (1,20) -> (1,21),
               },
             ],
@@ -4863,12 +4863,12 @@ Score (1,1) -> (5,18) {
             notes: [
               Note (3,17) -> (3,20) {
                 noteValue: Number "3" (3,17) -> (3,18),
-                noteStringDot: Dot (3,18) -> (3,19),
+                noteStringSeparator: Dot (3,18) -> (3,19),
                 noteString: Number "3" (3,19) -> (3,20),
               },
               Note (4,17) -> (4,22) {
                 noteValue: Number "3" (4,17) -> (4,18),
-                noteStringDot: Dot (4,19) -> (4,20),
+                noteStringSeparator: Dot (4,19) -> (4,20),
                 noteString: Number "3" (4,21) -> (4,22),
               },
             ],
@@ -6331,12 +6331,12 @@ Score (1,1) -> (1,28) {
             notes: [
               Note (1,18) -> (1,21) {
                 noteValue: Number "3" (1,18) -> (1,19),
-                noteStringDot: Dot (1,19) -> (1,20),
+                noteStringSeparator: Dot (1,19) -> (1,20),
                 noteString: Number "3" (1,20) -> (1,21),
               },
               Note (1,22) -> (1,25) {
                 noteValue: Number "3" (1,22) -> (1,23),
-                noteStringDot: Dot (1,23) -> (1,24),
+                noteStringSeparator: Dot (1,23) -> (1,24),
                 noteString: Number "3" (1,24) -> (1,25),
               },
             ],
@@ -6513,7 +6513,7 @@ Score (1,1) -> (1,21) {
             notes: [
               Note (1,4) -> (1,7) {
                 noteValue: Number "3" (1,4) -> (1,5),
-                noteStringDot: Dot (1,5) -> (1,6),
+                noteStringSeparator: Dot (1,5) -> (1,6),
                 noteString: Number "3" (1,6) -> (1,7),
               },
             ],

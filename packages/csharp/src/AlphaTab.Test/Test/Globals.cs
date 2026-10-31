@@ -36,7 +36,7 @@ internal static class TestGlobals
 
     public static void Fail(object? message)
     {
-        Assert.Fail(Convert.ToString(message));
+        Assert.Fail(Convert.ToString(message) ?? string.Empty);
     }
 
     private static readonly Dictionary<string, int> SnapshotAssertionCounters = new();
@@ -136,6 +136,10 @@ internal class NotExpector<T>
         {
             CollectionAssert.DoesNotContain(collection, element, _message);
         }
+        else if (_actual is string str)
+        {
+            Assert.DoesNotContain((string)element, str);
+        }
         else
         {
             Assert.Fail("Contain can only be used with collection operands");
@@ -167,6 +171,22 @@ internal class NotExpector<T>
         if (_actual is IComparable d)
         {
             Assert.IsFalse(d.CompareTo(expected) < 0, _message);
+        }
+    }
+
+    public void ToBeGreaterThanOrEqual(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) >= 0, _message);
+        }
+    }
+
+    public void ToBeLessThanOrEqual(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsFalse(d.CompareTo(expected) <= 0, _message);
         }
     }
 
@@ -325,6 +345,24 @@ internal class Expector<T>
         LessThan(expected);
     }
 
+    public void ToBeGreaterThanOrEqual(double expected, string? message = null)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) >= 0,
+                _message ?? message ?? $"Expected {_actual} to be greater than or equal to {expected}");
+        }
+    }
+
+    public void ToBeLessThanOrEqual(double expected, string? message = null)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) <= 0,
+                _message ?? message ?? $"Expected {_actual} to be less than or equal to {expected}");
+        }
+    }
+
     public void ToBeInstanceOf(Type expected)
     {
         Assert.IsInstanceOfType(_actual, expected, _message);
@@ -340,9 +378,93 @@ internal class Expector<T>
         Assert.IsNull(_actual, _message);
     }
 
+    public void ToBeDefined()
+    {
+        Assert.IsNotNull(_actual, _message);
+    }
+
+    public void ToEqual(object? expected, string? message = null)
+    {
+        if (expected is null && _actual is null)
+        {
+            return;
+        }
+        if (expected is null || _actual is null)
+        {
+            Assert.Fail(message ?? _message ?? $"Expected {(expected is null ? "null" : expected.ToString())}, got {((object?)_actual is null ? "null" : _actual!.ToString())}");
+            return;
+        }
+
+        var expectedType = expected.GetType();
+        var actualType = _actual.GetType();
+
+        // Sequences compare element-wise, ignoring capacity and other implementation details.
+        if (expected is System.Collections.IEnumerable expectedSeq && _actual is System.Collections.IEnumerable actualSeq)
+        {
+            var e = expectedSeq.GetEnumerator();
+            var a = actualSeq.GetEnumerator();
+            var i = 0;
+            while (true)
+            {
+                var eNext = e.MoveNext();
+                var aNext = a.MoveNext();
+                if (!eNext && !aNext)
+                {
+                    return;
+                }
+                if (eNext != aNext)
+                {
+                    Assert.Fail(message ?? _message ?? $"Sequence length mismatch at index {i}");
+                    return;
+                }
+                var elementMessage = message ?? _message ?? $"Element {i}";
+                if (e.Current is System.Collections.IEnumerable and not string)
+                {
+                    new Expector<object>(a.Current, elementMessage).ToEqual(e.Current);
+                }
+                else
+                {
+                    Assert.AreEqual(e.Current, a.Current, elementMessage);
+                }
+                i++;
+            }
+        }
+
+        if (expectedType == actualType)
+        {
+            Assert.AreEqual(expected, _actual, message ?? _message);
+            return;
+        }
+
+        // Structural comparison: walk expected's properties (e.g. an anonymous object from a
+        // TS object-literal `expect(x).toEqual({...})`) and match against the actual instance's
+        // properties case-insensitively (TS source uses camelCase, C# properties are PascalCase).
+        var expectedProps = expectedType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        foreach (var prop in expectedProps)
+        {
+            var actualProp = actualType.GetProperty(
+                prop.Name,
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase
+            );
+            if (actualProp is null)
+            {
+                Assert.Fail(message ?? _message ?? $"Property '{prop.Name}' not found on {actualType.Name}");
+                return;
+            }
+            var expectedValue = prop.GetValue(expected);
+            var actualValue = actualProp.GetValue(_actual);
+            Assert.AreEqual(expectedValue, actualValue, $"Property '{prop.Name}'");
+        }
+    }
+
     public void ToThrow(Type expected)
     {
         Throw(expected);
+    }
+
+    public void ToThrow()
+    {
+        Throw(typeof(Exception));
     }
 
     public void Ok()

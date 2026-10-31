@@ -3,8 +3,10 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
+import type { Track } from '@coderline/alphatab/model/Track';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import type { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { Spring } from '@coderline/alphatab/rendering/staves/Spring';
 
 /**
@@ -17,52 +19,269 @@ interface BarLayoutingInfoBeatSizes {
 }
 
 /**
+ * Minimum-distance constraint contributed by overlay content (lyrics, beat text)
+ * attached to a beat. Records how far the overlay extends left/right of the beat's
+ * onTime anchor.
+ * @internal
+ * @record
+ */
+interface OverlayRod {
+    timePosition: number;
+    leftExtent: number;
+    rightExtent: number;
+}
+
+/**
+ * One column of the bar header (start barline, staff inset, clef, key signature,
+ * time signature ...) shared by all staves of a master bar. Header glyphs register
+ * their extents around their anchor; the column takes the maximum of all staves.
+ * @internal
+ */
+class HeaderRod {
+    public rank: number = 0;
+    public pre: number = 0;
+    public post: number = 0;
+    /**
+     * The extent right of the anchor without the trailing spacing.
+     */
+    public inkPost: number = 0;
+    public offset: number = 0;
+}
+
+/**
  * This public class stores size information about a stave.
  * It is used by the layout engine to collect the sizes of score parts
  * to align the parts across multiple staves.
  * @internal
  */
-export class BarLayoutingInfo {
-    private static readonly _defaultMinDuration: number = 30;
-    private static readonly _defaultMinDurationWidth: number = 7;
+export class BarLayoutingInfo implements IHeaderRodSink {
+    /**
+     * The longest duration (in ticks) the spacing reference can have; shorter durations in the score
+     * lower the reference.
+     */
+    public static readonly defaultMinDuration: number = 30;
+    private static readonly _defaultMinDurationWidth: number = 6.5;
+
+    // Valid range for `DisplaySettings.spacingRatio`. Outside this band the layout
+    // degenerates (collapse below 1.2, runaway above 2.0).
+    private static readonly _spacingRatioMin: number = 1.2;
+    private static readonly _spacingRatioMax: number = 2.0;
+
+    /**
+     * Power-law exponent for the spring formula, from `DisplaySettings.spacingRatio`.
+     * Clamps to `[_spacingRatioMin, _spacingRatioMax]`. By construction
+     * `phi(2*dmin, dmin) === spacingRatio`.
+     */
+    public static spacingExponentFromRatio(spacingRatio: number): number {
+        let r = spacingRatio;
+        if (r < BarLayoutingInfo._spacingRatioMin) {
+            r = BarLayoutingInfo._spacingRatioMin;
+        } else if (r > BarLayoutingInfo._spacingRatioMax) {
+            r = BarLayoutingInfo._spacingRatioMax;
+        }
+        return Math.log2(r);
+    }
 
     private _timeSortedSprings: Spring[] = [];
+    /** The springs ordered by the force at which they start to stretch beyond their {@link Spring.minWidth}. */
+    private readonly _springsByStretchForce: Spring[] = [];
+    private _totalMinWidth: number = 0;
     private _minTime: number = -1;
-    private _onTimePositionsForce: number = 0;
-    private _onTimePositions: Map<number, number> = new Map();
+    private static readonly _noOnTimePositions: number[] = [];
+    // the on-time positions of the last computed force and of the force before, see buildOnTimePositions
+    private _onTimeForce: number = Number.NaN;
+    private _onTimePositions: number[] = BarLayoutingInfo._noOnTimePositions;
+    private _previousOnTimeForce: number = Number.NaN;
+    private _previousOnTimePositions: number[] = BarLayoutingInfo._noOnTimePositions;
     private _incompleteGraceRodsWidth: number = 0;
     private _beatSizes: Map<number, BarLayoutingInfoBeatSizes> = new Map();
 
-    // the smallest duration we have between two springs to ensure we have positive spring constants
-    private _minDuration: number = BarLayoutingInfo._defaultMinDuration;
+    /**
+     * Overlay rods bucketed per visual band. Outer key is a `bandKey` identifying one
+     * band row (staff, side and `NotationElement`). Inner map keyed by `Spring.timePosition`.
+     * Rods in different bands occupy different vertical tracks and never collide;
+     * pair-overlap evaluates each band independently. Same-band, same-timePosition
+     * registrations max-merge.
+     */
+    private _overlayRodsByBand: Map<number, Map<number, OverlayRod>> = new Map();
+
+    /**
+     * Per-band time-sorted view of {@link _overlayRodsByBand}. Maintained on insert
+     * via the same insertion-sort {@link addSpring} uses on {@link _timeSortedSprings}.
+     */
+    private _timeSortedOverlayRodsByBand: Map<number, OverlayRod[]> = new Map();
+
+    // the duration reference of the spacing formula, shared by all bars of a layout,
+    // or lowered by the bar's own springs when no reference was given
+    private _minDuration: number;
+    private readonly _usesLocalMinDuration: boolean;
+
+    /** Precomputed `log2(spacingRatio)`. Default matches `DisplaySettings.spacingRatio = √2`. */
+    private readonly _spacingExponent: number;
+
+    // Safety floor preventing overlay items from touching at the minimum-force boundary
+    // (rare; in normal layouts justification slack dominates).
+    private static readonly _overlayMinPadding: number = 3;
+
+    /**
+     * The minimum padding between the content of two adjacent beats ({@link EngravingSettings.beatContentPadding}).
+     */
+    public readonly beatContentPadding: number;
+
+    /**
+     * The minimum padding between the content of the last beat and the bar line
+     * ({@link EngravingSettings.barlineContentPadding}).
+     */
+    public readonly barlineContentPadding: number;
+
+    public constructor(
+        spacingRatio: number = Math.SQRT2,
+        beatContentPadding: number = 0,
+        barlineContentPadding: number = 0,
+        minDuration: number = BarLayoutingInfo.defaultMinDuration,
+        usesLocalMinDuration: boolean = false
+    ) {
+        this._minDuration = minDuration;
+        this._usesLocalMinDuration = usesLocalMinDuration;
+        this._spacingExponent = BarLayoutingInfo.spacingExponentFromRatio(spacingRatio);
+        this.beatContentPadding = beatContentPadding;
+        this.barlineContentPadding = barlineContentPadding;
+    }
 
     /**
      * an internal version number that increments whenever a change was made.
      */
     public version: number = 0;
 
-    public preBeatSize: number = 0;
-    public postBeatSize: number = 0;
-    public minStretchForce: number = 0;
-    public totalSpringConstant: number = 0;
+    /**
+     * Header columns sorted by rank. Instances are pooled across resize cycles:
+     * only the first {@link _headerRodCount} entries are valid.
+     */
+    private _headerRods: HeaderRod[] = [];
+    private _headerRodCount: number = 0;
+    private _headerRodsDirty: boolean = false;
+    private _preBeatSize: number = 0;
+    private _preBeatTrailingSpace: number = 0;
 
     /**
-     * The smallest note duration encountered within this bar's springs, used as the reference in
-     * the Gourlay stretch formula. Read by the owning {@link StaffSystem} so that the system can
-     * aggregate a shared minimum across all bars and trigger a reconcile if an added bar introduces
-     * a shorter duration than previously seen.
+     * The total width of the bar header (all header columns), shared across all staves.
      */
-    public get localMinDuration(): number {
-        return this._minDuration;
+    public get preBeatSize(): number {
+        if (this._headerRodsDirty) {
+            this._updateHeaderRods();
+        }
+        return this._preBeatSize;
     }
 
     /**
-     * The minimum-duration reference against which the spring constants currently held by this info
-     * were computed. Set by {@link finish} and {@link recomputeSpringConstants}. The owning
-     * StaffSystem compares this against its system-wide minimum to decide whether spring constants
-     * need re-derivation.
+     * The empty space at the end of the bar header (the trailing spacing of its last column),
+     * between the header content (or the start barline) and the first beat.
      */
-    public computedWithMinDuration: number = 0;
+    public get preBeatTrailingSpace(): number {
+        if (this._headerRodsDirty) {
+            this._updateHeaderRods();
+        }
+        return this._preBeatTrailingSpace;
+    }
+
+    /**
+     * Clears all header columns. Called at the start of each layout cycle of a system,
+     * the bar renderers re-register their header glyphs afterwards.
+     */
+    public resetHeaderRods(): void {
+        this._headerRodCount = 0;
+        this._preBeatSize = 0;
+        this._preBeatTrailingSpace = 0;
+        this._headerRodsDirty = false;
+    }
+
+    /**
+     * Registers the extents of a header glyph around its anchor for the column identified by `rank`.
+     * Columns are ordered by their rank, the same rank across staves forms one aligned column.
+     * @param rank The rank identifying (and ordering) the column.
+     * @param pre The extent left of the anchor.
+     * @param post The extent right of the anchor (including the glyph's trailing spacing).
+     * @param trailingSpace The part of `post` which is empty space after the glyph.
+     */
+    public addHeaderRod(rank: number, pre: number, post: number, trailingSpace: number = 0): void {
+        const inkPost = post - trailingSpace;
+        const rods = this._headerRods;
+        const count = this._headerRodCount;
+        let insertPos = 0;
+        while (insertPos < count && rods[insertPos].rank < rank) {
+            insertPos++;
+        }
+
+        this._headerRodsDirty = true;
+        if (insertPos < count && rods[insertPos].rank === rank) {
+            const existing = rods[insertPos];
+            if (existing.pre < pre) {
+                existing.pre = pre;
+            }
+            if (existing.post < post) {
+                existing.post = post;
+            }
+            if (existing.inkPost < inkPost) {
+                existing.inkPost = inkPost;
+            }
+            return;
+        }
+
+        // reuse a pooled instance (from a previous cycle) if available
+        let rod: HeaderRod;
+        if (count < rods.length) {
+            rod = rods[count];
+            rods.splice(count, 1);
+        } else {
+            rod = new HeaderRod();
+        }
+        rod.rank = rank;
+        rod.pre = pre;
+        rod.post = post;
+        rod.inkPost = inkPost;
+        rod.offset = 0;
+        rods.splice(insertPos, 0, rod);
+        this._headerRodCount = count + 1;
+    }
+
+    /**
+     * Gets the x-position (relative to the header start) for a header glyph registered with
+     * {@link addHeaderRod}, aligning its anchor with the anchors of the other staves.
+     * @param rank The rank of the column.
+     * @param ownPre The extent left of the anchor the glyph registered.
+     */
+    public getHeaderRodX(rank: number, ownPre: number): number {
+        if (this._headerRodsDirty) {
+            this._updateHeaderRods();
+        }
+        const rods = this._headerRods;
+        for (let i = 0; i < this._headerRodCount; i++) {
+            const rod = rods[i];
+            if (rod.rank === rank) {
+                return rod.offset + rod.pre - ownPre;
+            }
+        }
+        return 0;
+    }
+
+    private _updateHeaderRods(): void {
+        const rods = this._headerRods;
+        let x = 0;
+        for (let i = 0; i < this._headerRodCount; i++) {
+            const rod = rods[i];
+            rod.offset = x;
+            x += rod.pre + rod.post;
+        }
+        this._preBeatSize = x;
+        this._preBeatTrailingSpace =
+            this._headerRodCount > 0 ? rods[this._headerRodCount - 1].post - rods[this._headerRodCount - 1].inkPost : 0;
+        this._headerRodsDirty = false;
+    }
+
+    public postBeatSize: number = 0;
+    public minStretchForce: number = 0;
+    /** Whether the last spring constant calculation found any springs. */
+    public hasSprings: boolean = true;
 
     private _updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
@@ -77,20 +296,20 @@ export class BarLayoutingInfo {
         }
         return undefined;
     }
-    
-    public setBeatSizes(beat: BeatContainerGlyphBase, sizes: BarLayoutingInfoBeatSizes) {
+
+    public setBeatSizes(beat: BeatContainerGlyphBase, preBeatSize: number, onBeatSize: number) {
         const key = beat.absoluteDisplayStart;
         if (this._beatSizes.has(key)) {
             const current = this._beatSizes.get(key)!;
-            if (current.onBeatSize < sizes.onBeatSize) {
-                current.onBeatSize = sizes.onBeatSize;
+            if (current.onBeatSize < onBeatSize) {
+                current.onBeatSize = onBeatSize;
             }
 
-            if (current.preBeatSize < sizes.preBeatSize) {
-                current.preBeatSize = sizes.preBeatSize;
+            if (current.preBeatSize < preBeatSize) {
+                current.preBeatSize = preBeatSize;
             }
         } else {
-            this._beatSizes.set(key, sizes);
+            this._beatSizes.set(key, { preBeatSize, onBeatSize });
         }
     }
 
@@ -126,34 +345,28 @@ export class BarLayoutingInfo {
     public allGraceRods: Map<string, Spring[]> = new Map();
     public springs: Map<number, Spring> = new Map();
 
+    /**
+     * @param isEmptyBeat Whether the spring is added for a placeholder beat of an empty voice. Its duration
+     * keeps the spacing but is not one of the {@link Spring.allDurations} played at this position.
+     */
     public addSpring(
         start: number,
         duration: number,
         graceBeatWidth: number,
         preBeatWidth: number,
-        postSpringSize: number
+        postSpringSize: number,
+        isEmptyBeat: boolean = false
     ): Spring {
         this.version++;
         let spring: Spring;
         if (!this.springs.has(start)) {
             spring = new Spring();
             spring.timePosition = start;
-            spring.allDurations.add(duration);
-            // check in the previous spring for the shortest duration that overlaps with this spring
-            // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring.
-            if (this._timeSortedSprings.length > 0) {
-                let smallestDuration: number = duration;
-                const previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
-                for (const prevDuration of previousSpring.allDurations) {
-                    const end: number = previousSpring.timePosition + prevDuration;
-                    if (end >= start && prevDuration < smallestDuration) {
-                        smallestDuration = prevDuration;
-                    }
-                }
-                //spring.smallestDuration = duration;
-                if (duration < this._minDuration) {
-                    this._minDuration = duration;
-                }
+            if (!isEmptyBeat) {
+                spring.allDurations.add(duration);
+            }
+            if (this._usesLocalMinDuration && this._timeSortedSprings.length > 0 && duration < this._minDuration) {
+                this._minDuration = duration;
             }
             spring.longestDuration = duration;
             spring.postSpringWidth = postSpringSize;
@@ -165,7 +378,10 @@ export class BarLayoutingInfo {
             while (insertPos > 0 && timeSorted[insertPos].timePosition > start) {
                 insertPos--;
             }
-            this._timeSortedSprings.splice(insertPos + 1, 0, spring);
+            timeSorted.splice(insertPos + 1, 0, spring);
+            for (let i = insertPos + 1; i < timeSorted.length; i++) {
+                timeSorted[i].index = i;
+            }
         } else {
             spring = this.springs.get(start)!;
             if (spring.postSpringWidth < postSpringSize) {
@@ -183,7 +399,9 @@ export class BarLayoutingInfo {
             if (duration > spring.longestDuration) {
                 spring.longestDuration = duration;
             }
-            spring.allDurations.add(duration);
+            if (!isEmptyBeat) {
+                spring.allDurations.add(duration);
+            }
         }
         if (this._minTime === -1 || this._minTime > start) {
             this._minTime = start;
@@ -233,7 +451,49 @@ export class BarLayoutingInfo {
                 }
             }
 
-            this.addSpring(start, beat.displayDuration, graceBeatSize, preBeatSize, postBeatSize);
+            beat.spring = this.addSpring(
+                start,
+                beat.displayDuration,
+                graceBeatSize,
+                preBeatSize,
+                postBeatSize,
+                beat.isEmptyBeat
+            );
+        }
+    }
+
+    /**
+     * Registers an overlay rod for a beat into the bucket identified by `bandKey`
+     * (one band row: staff, side and notation element). Same-band, same-timePosition
+     * duplicates max-merge.
+     */
+    public addOverlayRod(bandKey: number, timePosition: number, leftExtent: number, rightExtent: number): void {
+        this.version++;
+        let bandMap = this._overlayRodsByBand.get(bandKey);
+        let bandSorted = this._timeSortedOverlayRodsByBand.get(bandKey);
+        if (!bandMap) {
+            bandMap = new Map<number, OverlayRod>();
+            this._overlayRodsByBand.set(bandKey, bandMap);
+            bandSorted = [];
+            this._timeSortedOverlayRodsByBand.set(bandKey, bandSorted);
+        }
+        const rod = bandMap.get(timePosition);
+        if (!rod) {
+            const newRod: OverlayRod = { timePosition, leftExtent, rightExtent };
+            bandMap.set(timePosition, newRod);
+            const timeSorted: OverlayRod[] = bandSorted!;
+            let insertPos: number = timeSorted.length - 1;
+            while (insertPos > 0 && timeSorted[insertPos].timePosition > timePosition) {
+                insertPos--;
+            }
+            timeSorted.splice(insertPos + 1, 0, newRod);
+        } else {
+            if (rod.leftExtent < leftExtent) {
+                rod.leftExtent = leftExtent;
+            }
+            if (rod.rightExtent < rightExtent) {
+                rod.rightExtent = rightExtent;
+            }
         }
     }
 
@@ -251,37 +511,49 @@ export class BarLayoutingInfo {
         }
         this._incompleteGraceRodsWidth = 0;
         for (const s of this.incompleteGraceRods.values()) {
+            // padding to the beat before the grace group (see MultiVoiceContainerGlyph)
+            this._incompleteGraceRodsWidth += this.beatContentPadding;
             for (const sp of s) {
                 this._incompleteGraceRodsWidth += sp.preBeatWidth + sp.postSpringWidth;
             }
         }
 
         this._calculateSpringConstants(this._minDuration);
-        this.computedWithMinDuration = this._minDuration;
         this.version++;
     }
 
     /**
-     * Re-derives the spring constants (and {@link minStretchForce} / {@link totalSpringConstant})
-     * using a caller-supplied minimum-duration reference rather than this bar's local minimum.
-     *
-     * Called by {@link StaffSystem.reconcileMinDurationIfDirty} when a bar added later to the
-     * system introduced a shorter note than previously seen, invalidating this bar's spring
-     * constants. Grace-rod data is not recomputed — it is independent of the minimum-duration
-     * reference. The internal {@link version} is bumped so downstream consumers (e.g.
-     * {@link BarRendererBase.applyLayoutingInfo}) pick up the refreshed positions.
+     * The spacing duration reference for a layout: the shortest displayed beat duration of the
+     * rendered bars, at most {@link defaultMinDuration}.
      */
-    public recomputeSpringConstants(minDuration: number): void {
-        this._calculateSpringConstants(minDuration);
-        this.computedWithMinDuration = minDuration;
-        this.version++;
+    public static referenceMinDuration(tracks: Track[], firstBarIndex: number, lastBarIndex: number): number {
+        let minDuration = BarLayoutingInfo.defaultMinDuration;
+        for (const track of tracks) {
+            for (const staff of track.staves) {
+                const last = Math.min(lastBarIndex, staff.bars.length - 1);
+                for (let i = firstBarIndex; i <= last; i++) {
+                    for (const voice of staff.bars[i].voices) {
+                        for (const beat of voice.beats) {
+                            if (beat.graceType === GraceType.None) {
+                                const duration = beat.displayDuration;
+                                if (duration > 0 && duration < minDuration) {
+                                    minDuration = duration;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return minDuration;
     }
 
     private _calculateSpringConstants(minDuration: number): void {
-        let totalSpringConstant: number = 0;
         const sortedSprings: Spring[] = this._timeSortedSprings;
+        this._onTimeForce = Number.NaN;
+        this._previousOnTimeForce = Number.NaN;
         if (sortedSprings.length === 0) {
-            this.totalSpringConstant = -1;
+            this.hasSprings = false;
             this.minStretchForce = -1;
             return;
         }
@@ -295,35 +567,113 @@ export class BarLayoutingInfo {
                 duration = Math.abs(nextSpring.timePosition - currentSpring.timePosition);
             }
             currentSpring.springConstant = this._calculateSpringConstant(currentSpring, duration, minDuration);
-            totalSpringConstant += 1 / currentSpring.springConstant;
         }
-        this.totalSpringConstant = 1 / totalSpringConstant;
+        this.hasSprings = true;
 
         // calculate the force required to have at least the minimum size.
         this.minStretchForce = 0;
-        // We take the space required between current and next spring
-        // and calculate the force needed so that the current spring
-        // reserves enough space
-
         for (let i: number = 0; i < sortedSprings.length; i++) {
             const currentSpring = sortedSprings[i];
             let requiredSpace = 0;
 
             if (i === sortedSprings.length - 1) {
-                requiredSpace = currentSpring.postSpringWidth;
+                requiredSpace = currentSpring.postSpringWidth + this.barlineContentPadding;
             } else {
                 const nextSpring = sortedSprings[i + 1];
-                requiredSpace = currentSpring.postSpringWidth + nextSpring.preSpringWidth;
+                requiredSpace = currentSpring.postSpringWidth + this.beatContentPadding + nextSpring.preSpringWidth;
             }
 
-            // for the first spring we need to ensure we take the initial
-            // pre-spring width into account
-            if (i === 0) {
-                requiredSpace += currentSpring.preSpringWidth;
-            }
+            // the first spring's pre-spring width is not part of the requirement:
+            // it is a fixed offset in front of the first spring (see calculateVoiceWidth,
+            // spaceToForce and buildOnTimePositions) and does not need to be stretched in.
 
+            currentSpring.minWidth = requiredSpace;
             const requiredSpaceForce = requiredSpace * currentSpring.springConstant;
             this._updateMinStretchForce(requiredSpaceForce);
+        }
+
+        // Overlay rods: pair-overlap + last-rod phantom-next-beat per band. Bands
+        // occupy different vertical tracks (lyric below, beat-text above, ...) so
+        // each bucket is evaluated independently and their forces max-merge into
+        // `minStretchForce`.
+        // TODO(overlay-rods, cross-bar): bar-local only. A system-level accumulator
+        // could pair bar N's last rod with bar N+1's first rod across the boundary.
+        const overlayPadding = BarLayoutingInfo._overlayMinPadding;
+        for (const rods of this._timeSortedOverlayRodsByBand.values()) {
+            this._applyOverlayRodConstraints(rods, sortedSprings, overlayPadding);
+        }
+
+        this._updateSpringsByStretchForce();
+    }
+
+    private _updateSpringsByStretchForce(): void {
+        const byForce: Spring[] = this._springsByStretchForce;
+        while (byForce.length > 0) {
+            byForce.pop();
+        }
+        let totalMinWidth = 0;
+        for (const spring of this._timeSortedSprings) {
+            totalMinWidth += spring.minWidth;
+            const stretchForce = spring.minWidth * spring.springConstant;
+            byForce.push(spring);
+            let i = byForce.length - 1;
+            while (i > 0 && byForce[i - 1].minWidth * byForce[i - 1].springConstant > stretchForce) {
+                byForce[i] = byForce[i - 1];
+                i--;
+            }
+            byForce[i] = spring;
+        }
+        this._totalMinWidth = totalMinWidth;
+    }
+
+    /**
+     * Pair-overlap + last-rod phantom-next-beat for a single band's rod list.
+     * Called once per band by {@link _calculateSpringConstants}.
+     */
+    private _applyOverlayRodConstraints(rods: OverlayRod[], sortedSprings: Spring[], overlayPadding: number): void {
+        if (rods.length === 0) {
+            return;
+        }
+
+        // Pair-overlap pass: for each adjacent (A, B), sum 1/k over the springs
+        // anchored in [A.timePosition, B.timePosition) and convert the required gap
+        // `A.rightExtent + B.leftExtent + padding` to a force `requiredGap / invSum`.
+        let springIdx = 0;
+        while (springIdx < sortedSprings.length && sortedSprings[springIdx].timePosition !== rods[0].timePosition) {
+            springIdx++;
+        }
+
+        for (let r = 1; r < rods.length; r++) {
+            const a = rods[r - 1];
+            const b = rods[r];
+
+            let invSum = 0;
+            while (springIdx < sortedSprings.length && sortedSprings[springIdx].timePosition !== b.timePosition) {
+                invSum += 1 / sortedSprings[springIdx].springConstant;
+                springIdx++;
+            }
+
+            const requiredGap = a.rightExtent + b.leftExtent + overlayPadding;
+            if (requiredGap > 0 && invSum > 0) {
+                const overlayForce = requiredGap / invSum;
+                this._updateMinStretchForce(overlayForce);
+            }
+        }
+
+        // Last-rod phantom-next-beat: treat the bar's right edge as a phantom beat
+        // with leftExtent=0. Natural gap = force/k_last + postBeatSize, floored by
+        // lastSpring.postSpringWidth + postBeatSize. Fires only on overflow.
+        // TODO: symmetric handling for the first beat's
+        // LEFT edge is an accepted MVP gap (no force-scaled gap before first onTime).
+        const lastRod = rods[rods.length - 1];
+        const lastSpring = sortedSprings[sortedSprings.length - 1];
+        if (lastRod.timePosition === lastSpring.timePosition) {
+            const overlayRightRequirement = lastRod.rightExtent + overlayPadding;
+            const naturalRightBudget = lastSpring.postSpringWidth + this.postBeatSize;
+            if (overlayRightRequirement > naturalRightBudget) {
+                const requiredForce = (overlayRightRequirement - this.postBeatSize) * lastSpring.springConstant;
+                this._updateMinStretchForce(requiredForce);
+            }
         }
     }
 
@@ -380,25 +730,69 @@ export class BarLayoutingInfo {
 
         const minDurationWidth = BarLayoutingInfo._defaultMinDurationWidth;
 
-        const phi: number = 1 + 0.85 * Math.log2(duration / minDuration);
+        // Power-law (Dorico/MuseScore/Finale) model: phi grows as a configurable power of the
+        // duration ratio so that doubling the duration multiplies horizontal allocation by
+        // exactly `spacingRatio` (= 2 ^ _spacingExponent). Replaces the previous additive
+        // `1 + 0.85 * log2(d/dmin)` formula which produced a compressing ratio at long
+        // durations and caused rest-only bars to balloon under high stretch force.
+        const phi: number = Math.pow(duration / minDuration, this._spacingExponent);
         return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
     }
 
+    /**
+     * Gets the force at which the voices take the given width (the inverse of {@link calculateVoiceWidth}).
+     * A spring keeps its {@link Spring.minWidth} until the force stretches it further, so a bar narrower
+     * than its natural width takes the space from the springs stretched beyond their minimum first.
+     * Below the bar's minimum width the force is negative (down to -1), and all springs are squeezed
+     * proportionally to their minimum widths.
+     */
     public spaceToForce(space: number): number {
-        if (this.totalSpringConstant !== -1) {
-            if (this._timeSortedSprings.length > 0) {
-                space -= this._timeSortedSprings[0].preSpringWidth;
-            }
-            space -= this._incompleteGraceRodsWidth;
-            return Math.max(space, 0) * this.totalSpringConstant;
+        if (!this.hasSprings) {
+            return -1;
         }
-        return -1;
+        space -= this._timeSortedSprings[0].preSpringWidth;
+        space -= this._incompleteGraceRodsWidth;
+        if (space < 0) {
+            space = 0;
+        }
+
+        let fixedWidth = this._totalMinWidth;
+        if (space < fixedWidth) {
+            return space / fixedWidth - 1;
+        }
+
+        let inverseSpringConstant = 0;
+        for (const spring of this._springsByStretchForce) {
+            const stretchForce = spring.minWidth * spring.springConstant;
+            if (fixedWidth + stretchForce * inverseSpringConstant >= space) {
+                break;
+            }
+            fixedWidth -= spring.minWidth;
+            inverseSpringConstant += 1 / spring.springConstant;
+        }
+        return inverseSpringConstant > 0 ? (space - fixedWidth) * (1 / inverseSpringConstant) : 0;
+    }
+
+    /**
+     * The narrowest width the voices can take without overlapping content.
+     */
+    public get minVoiceWidth(): number {
+        return this.calculateVoiceWidth(0);
+    }
+
+    /**
+     * The width of the bars of this master bar before justification, as
+     * {@link BarRendererBase.applyLayoutingInfo} computes it.
+     */
+    public naturalBarWidth(stretchForce: number): number {
+        const voiceWidth = this.calculateVoiceWidth(Math.max(stretchForce, this.minStretchForce));
+        return Math.ceil(Math.floor(this.preBeatSize + voiceWidth) + this.postBeatSize);
     }
 
     public calculateVoiceWidth(force: number): number {
         let width = 0;
-        if (this.totalSpringConstant !== -1) {
-            width = this._calculateWidth(force, this.totalSpringConstant);
+        for (const spring of this._timeSortedSprings) {
+            width += this._calculateSpringWidth(spring, force);
         }
 
         if (this._timeSortedSprings.length > 0) {
@@ -408,28 +802,51 @@ export class BarLayoutingInfo {
         return width;
     }
 
-    private _calculateWidth(force: number, springConstant: number): number {
-        return force / springConstant;
+    private _calculateSpringWidth(spring: Spring, force: number): number {
+        if (force < 0) {
+            return spring.minWidth * (1 + force);
+        }
+        const width = force / spring.springConstant;
+        return width < spring.minWidth ? spring.minWidth : width;
     }
 
-    public buildOnTimePositions(force: number): Map<number, number> {
-        if (this.totalSpringConstant === -1) {
-            return new Map<number, number>();
+    /**
+     * The x positions of the time-sorted springs at the given force, indexed by {@link Spring.index}.
+     * The result is shared: it stays valid until positions for two other forces were requested and
+     * must not be modified.
+     */
+    public buildOnTimePositions(force: number): number[] {
+        if (!this.hasSprings) {
+            return BarLayoutingInfo._noOnTimePositions;
         }
-        if (ModelUtils.isAlmostEqualTo(this._onTimePositionsForce, force) && this._onTimePositions) {
+        if (ModelUtils.isAlmostEqualTo(this._onTimeForce, force)) {
             return this._onTimePositions;
         }
-        this._onTimePositionsForce = force;
-        const positions: Map<number, number> = new Map<number, number>();
-        this._onTimePositions = positions;
+
+        // the layout alternates between the natural and the fitted force of a bar
+        const previousForce = this._previousOnTimeForce;
+        let positions = this._previousOnTimePositions;
+        this._previousOnTimeForce = this._onTimeForce;
+        this._previousOnTimePositions = this._onTimePositions;
+        this._onTimeForce = force;
+        if (previousForce === force) {
+            this._onTimePositions = positions;
+            return positions;
+        }
+
         const sortedSprings: Spring[] = this._timeSortedSprings;
+        if (positions.length !== sortedSprings.length) {
+            positions = new Array<number>(sortedSprings.length);
+        }
+        this._onTimePositions = positions;
         if (sortedSprings.length === 0) {
             return positions;
         }
+
         let springX: number = sortedSprings[0].preSpringWidth;
         for (let i: number = 0; i < sortedSprings.length; i++) {
-            positions.set(sortedSprings[i].timePosition, springX);
-            springX += this._calculateWidth(force, sortedSprings[i].springConstant);
+            positions[i] = springX;
+            springX += this._calculateSpringWidth(sortedSprings[i], force);
         }
         return positions;
     }

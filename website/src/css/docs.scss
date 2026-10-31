@@ -1,0 +1,580 @@
+// Docs page styling — applies the design's docs chrome to Docusaurus's
+// existing markup. Hybrid approach: pure CSS overrides, no swizzles unless
+// CSS can't reach the bit we need.
+
+// Square icon-only search trigger, sized to match the neighbouring icon buttons.
+@mixin search-icon-only {
+  .DocSearch-Button {
+    min-width: 0;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    justify-content: center;
+
+    .DocSearch-Button-Container { height: auto; }
+
+    .DocSearch-Button-Placeholder,
+    .DocSearch-Button-Keys {
+      display: none;
+    }
+  }
+}
+
+// ─── Navbar ──────────────────────────────────────────────────────────
+.navbar {
+  --ifm-navbar-background-color: var(--at-surface);
+  --ifm-navbar-link-color: var(--at-ink-soft);
+  --ifm-navbar-link-hover-color: var(--at-ink);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 56px;
+  --ifm-navbar-padding-vertical: 0;
+  --ifm-navbar-item-padding-horizontal: 10px;
+
+  border-bottom: 1px solid var(--at-line);
+  padding: 0 24px;
+
+  @media (max-width: 996px) {
+    padding: 0 16px;
+  }
+
+  .navbar__inner {
+    height: 100%;
+  }
+
+  // Left side — primary nav links
+  .navbar__items:not(.navbar__items--right) {
+    gap: 4px;
+
+    .navbar__brand {
+      margin-right: 16px;
+    }
+
+    .navbar__item {
+      padding: 0;
+    }
+
+    .navbar__link {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      position: relative;
+      transition: background-color 120ms ease, color 120ms ease;
+
+      &:hover {
+        background: var(--at-surface-alt);
+      }
+
+      &--active {
+        color: var(--at-ink);
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 12px;
+          right: 12px;
+          bottom: -1px;
+          height: 2px;
+          background: var(--at-accent);
+        }
+
+        &:hover { background: var(--at-surface-alt); }
+      }
+    }
+  }
+
+  // Right side — search, version dropdown, github
+  .navbar__items--right {
+    gap: 10px;
+
+    .navbar__item {
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    // Version dropdown — pill-like
+    .navbar__link {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: var(--at-font-mono);
+      color: var(--at-muted);
+      border: 1px solid var(--at-line);
+      background: var(--at-surface-alt);
+
+      &:hover {
+        color: var(--at-ink);
+        background: var(--at-surface);
+      }
+    }
+  }
+
+  // .header-github-link styling is owned by the custom NavbarItem component
+  // (src/theme/NavbarItem/GitHubStarsLink.module.scss); we don't redeclare it here.
+
+  // Color-mode toggle
+  .clean-btn {
+    padding: 6px;
+    border-radius: 6px;
+
+    &:hover {
+      background: var(--at-surface-alt);
+    }
+  }
+
+  // The Docusaurus navbar collapses to a hamburger drawer at < 996 px. In the
+  // narrow band between 996 (full nav appears) and ~1100 the full nav is
+  // visible but cramped — condense it to match the design's tablet treatment.
+  @media (min-width: 997px) and (max-width: 1100px) {
+    padding: 0 16px;
+
+    // Hide secondary links (alphaTex / Showcase) — tagged in docusaurus.config.
+    .navbar-link-secondary { display: none; }
+
+    .navbar__items:not(.navbar__items--right) {
+      gap: 0;
+
+      .navbar__brand { margin-right: 12px; }
+      .navbar__link { padding: 8px 10px; font-size: 12.5px; }
+    }
+
+    .navbar__items--right {
+      gap: 6px;
+      @include search-icon-only;
+    }
+  }
+
+  @media (max-width: 996px) {
+    .navbar__items--right {
+      gap: 4px;
+      @include search-icon-only;
+
+      // Infima moves .navbar__item entries into the drawer at this width; the
+      // right-group `display: flex` above would otherwise keep them in the bar.
+      .navbar__item { display: none; }
+
+      // Docusaurus pins the search container absolutely here, which overlaps
+      // the custom items that stay in the bar.
+      > :has(> .DocSearch-Button) { position: static; }
+    }
+  }
+}
+
+// The GitHub link is rendered by the custom NavbarItem component
+// (src/theme/NavbarItem/GitHubStarsLink.tsx) which owns its own icon + count.
+// The `.header-github-link` class is kept on the anchor purely for the navbar
+// padding/hover rules above (.navbar { ... .header-github-link {...} }).
+
+// ─── Docs: sidebar ──────────────────────────────────────────────────
+$sidebar-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E");
+$sidebar-panel-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='M9 3v18'/%3E%3C/svg%3E");
+
+.theme-doc-sidebar-container {
+  --doc-sidebar-hidden-width: 44px;
+  border-right-color: var(--at-line);
+
+  nav.menu {
+    padding: 16px 4px 16px 10px;
+  }
+}
+
+.theme-doc-sidebar-menu {
+  // Each guided level costs indent + padding; sized so the longest setting
+  // names (e.g. lastNotationStaffPaddingBottom) fit on one line at 300px.
+  --sidebar-guide-indent: 11px;
+  --sidebar-guide-padding: 6px;
+
+  .menu__list-item:not(:first-child) {
+    margin-top: 1px;
+  }
+
+  .menu__list-item-collapsible {
+    border-radius: 6px;
+    transition: background-color 120ms ease;
+
+    &:hover {
+      background: var(--at-surface-alt);
+    }
+  }
+
+  .menu__link {
+    position: relative;
+    font-size: 13.5px;
+    font-weight: 450;
+    line-height: 1.35;
+    color: var(--at-ink-soft);
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: background-color 120ms ease, color 120ms ease;
+
+    &:hover {
+      background: var(--at-surface-alt);
+      color: var(--at-ink);
+    }
+
+    &--sublist {
+      font-weight: 500;
+    }
+
+    // Ancestors of the current page
+    &--sublist.menu__link--active {
+      color: var(--at-ink);
+      font-weight: 600;
+    }
+
+    &--active:not(.menu__link--sublist) {
+      background: var(--at-accent-soft);
+      color: var(--at-accent);
+      font-weight: 600;
+    }
+  }
+
+  // A category whose own index page is open. Infima forces the link inside a
+  // collapsible row transparent, so the fill goes on the row.
+  .menu__list-item-collapsible--active {
+    &,
+    &:hover {
+      background: var(--at-accent-soft);
+    }
+
+    > .menu__link {
+      color: var(--at-accent);
+      font-weight: 600;
+    }
+  }
+
+  .theme-doc-sidebar-item-category-level-1 {
+    > .menu__list-item-collapsible > .menu__link {
+      font-weight: 600;
+    }
+
+    > .menu__list-item-collapsible:not(.menu__list-item-collapsible--active) > .menu__link {
+      color: var(--at-ink);
+    }
+
+    &:not(.menu__list-item--collapsed) {
+      margin-bottom: 10px;
+    }
+  }
+
+  .menu__list .menu__list {
+    margin: 1px 0 0 var(--sidebar-guide-indent);
+    padding-left: var(--sidebar-guide-padding);
+    border-left: 1px solid var(--at-line);
+
+    .menu__link {
+      padding-left: 8px;
+      padding-right: 6px;
+    }
+
+    .menu__link--active:not(.menu__link--sublist)::before {
+      content: '';
+      position: absolute;
+      left: calc(-1 * var(--sidebar-guide-padding) - 1.5px);
+      top: 5px;
+      bottom: 5px;
+      width: 2px;
+      border-radius: 2px;
+      background: var(--at-accent);
+    }
+  }
+
+  .menu__link--sublist-caret::after,
+  .menu__caret::before {
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
+    background: currentColor;
+    mask: $sidebar-chevron center / 14px 14px no-repeat;
+    filter: none;
+    transform: rotate(90deg);
+    transition: transform 160ms ease;
+  }
+
+  .menu__list-item--collapsed > .menu__list-item-collapsible > .menu__link--sublist-caret::after,
+  .menu__list-item--collapsed > .menu__list-item-collapsible > .menu__caret::before {
+    transform: rotate(0deg);
+  }
+
+  .menu__link--sublist-caret::after {
+    color: var(--at-muted);
+  }
+
+  .menu__list-item-collapsible:hover .menu__link--sublist-caret::after {
+    color: var(--at-ink-soft);
+  }
+
+  .menu__caret {
+    margin: 2px;
+    padding: 0 6px;
+    border-radius: 6px;
+    color: var(--at-muted);
+
+    &:hover {
+      background: var(--at-line-soft);
+      color: var(--at-ink);
+    }
+  }
+}
+
+// Collapse / expand controls. Both only carry hashed CSS-module classes;
+// category links also have role="button", hence the `div` qualifier.
+@media (min-width: 997px) {
+  .theme-doc-sidebar-container {
+    .button.button--secondary {
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      height: auto;
+      margin: 0;
+      padding: 10px 20px;
+      border: 0;
+      border-top: 1px solid var(--at-line-soft);
+      border-radius: 0;
+      background: var(--at-surface);
+      color: var(--at-muted);
+      font: 500 12.5px/1 var(--ifm-font-family-base);
+      transition: color 120ms ease;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--at-surface);
+        color: var(--at-ink);
+      }
+
+      svg {
+        display: none;
+      }
+
+      &::before {
+        content: '';
+        width: 16px;
+        height: 16px;
+        background: currentColor;
+        mask: $sidebar-panel-icon center / 16px 16px no-repeat;
+      }
+
+      &::after {
+        content: 'Collapse sidebar';
+      }
+    }
+
+    div[role='button'] {
+      align-items: flex-end;
+      padding-bottom: 10px;
+      background: var(--at-surface);
+      color: var(--at-muted);
+
+      &:hover,
+      &:focus {
+        background: var(--at-surface);
+        color: var(--at-ink);
+      }
+
+      svg {
+        display: none;
+      }
+
+      &::after {
+        content: '';
+        width: 32px;
+        height: 32px;
+        background: currentColor;
+        mask: $sidebar-panel-icon center / 16px 16px no-repeat;
+      }
+    }
+  }
+}
+
+// ─── Docs: table of contents (right rail) ───────────────────────────
+.theme-doc-toc-desktop {
+  border-left-color: var(--at-line);
+  padding-left: 24px;
+
+  &::before {
+    content: 'On this page';
+    display: block;
+    font-family: var(--at-font-mono);
+    font-size: 11px;
+    color: var(--at-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 14px;
+  }
+}
+
+.table-of-contents {
+  border-left: none;
+  font-size: 13px;
+  padding-left: 0;
+
+  .table-of-contents__link {
+    color: var(--at-ink-soft);
+    padding-left: 10px;
+    border-left: 2px solid var(--at-line-soft);
+    transition: color 120ms ease, border-color 120ms ease;
+
+    &:hover {
+      color: var(--at-ink);
+    }
+
+    &--active {
+      color: var(--at-accent);
+      border-left-color: var(--at-accent);
+      font-weight: 500;
+    }
+  }
+}
+
+// ─── Docs: breadcrumbs ──────────────────────────────────────────────
+.theme-doc-breadcrumbs {
+  margin-bottom: 18px;
+
+  .breadcrumbs {
+    font-family: var(--at-font-mono);
+    font-size: 12px;
+    color: var(--at-muted);
+
+    &__item {
+      &::after {
+        background-image: none;
+        content: '/';
+        color: var(--at-line);
+        height: auto;
+        opacity: 1;
+        margin: 0 6px;
+      }
+
+      &:last-child::after { display: none; }
+
+      &--active .breadcrumbs__link {
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--at-accent-soft);
+        color: var(--at-accent);
+        font-weight: 500;
+      }
+    }
+
+    &__link {
+      color: var(--at-muted);
+      background: transparent;
+      padding: 0;
+      transition: color 120ms ease;
+
+      &:hover {
+        color: var(--at-ink);
+        background: transparent;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+// ─── Docs: body typography ──────────────────────────────────────────
+.theme-doc-markdown {
+  color: var(--at-ink-soft);
+
+  h1 {
+    font-size: 44px;
+    letter-spacing: -1.6px;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--at-ink);
+    margin-bottom: 28px;
+
+    @media (max-width: 996px) {
+      font-size: 36px;
+      letter-spacing: -1.2px;
+    }
+
+    @media (max-width: 640px) {
+      font-size: 30px;
+    }
+  }
+
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.8px;
+    color: var(--at-ink);
+    margin-top: 36px;
+    margin-bottom: 14px;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--at-ink);
+    margin-top: 24px;
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  li {
+    line-height: 1.75;
+  }
+
+  strong {
+    color: var(--at-ink);
+  }
+}
+
+// ─── Docs: admonitions / callouts ───────────────────────────────────
+.admonition,
+.theme-admonition {
+  border-radius: 10px;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  padding: 14px 18px;
+  margin: 20px 0;
+
+  &.admonition-note,
+  &.alert--info {
+    background: var(--at-accent-soft);
+    border-color: var(--at-accent-soft-strong);
+    color: var(--at-ink-soft);
+  }
+}
+
+// ─── Docs: prev / next cards ────────────────────────────────────────
+.pagination-nav__link {
+  border: 1px solid var(--at-line);
+  border-radius: 10px;
+  background: var(--at-surface);
+  padding: 16px;
+  transition: border-color 120ms ease, background-color 120ms ease;
+
+  &:hover {
+    border-color: var(--at-accent);
+    background: var(--at-surface);
+  }
+}
+
+.pagination-nav__sublabel {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+}
+
+.pagination-nav__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--at-ink);
+}
+
+// ─── Docs: code block chrome ────────────────────────────────────────
+.theme-code-block {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--at-line);
+}

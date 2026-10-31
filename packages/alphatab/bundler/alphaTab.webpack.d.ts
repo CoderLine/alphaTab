@@ -1,2 +1,2 @@
-export { AlphaTabWebPackPlugin } from './webpack/alphaTab.webpack';
-export type { AlphaTabWebPackPluginOptions } from './webpack/AlphaTabWebPackPluginOptions';
+export { AlphaTabWebPackPlugin } from '@coderline/alphatab-webpack';
+export type { AlphaTabWebPackPluginOptions } from '@coderline/alphatab-webpack/AlphaTabWebPackPluginOptions';

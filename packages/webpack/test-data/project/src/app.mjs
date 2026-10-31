@@ -28,3 +28,7 @@ const playPause = document.querySelector('#playPause');
 playPause.onclick = ()=>{
   api.playPause();
 };
+// the application disables worker parsing for its own code (module.parser.javascript.worker: false)
+export function createAppWorker() {
+  return new Worker(new URL('./app.worker.mjs', import.meta.url));
+}

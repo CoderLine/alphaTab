@@ -3,14 +3,13 @@ import type { Font } from '@coderline/alphatab/model/Font';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -29,6 +28,10 @@ export class NoteNumberGlyph extends Glyph {
         this._note = note;
     }
 
+    public get note(): Note {
+        return this._note;
+    }
+
     private get _padding() {
         return (this.renderer as TabBarRenderer).lineSpacing * 0.25;
     }
@@ -43,10 +46,21 @@ export class NoteNumberGlyph extends Glyph {
 
     public override doLayout(): void {
         const n: Note = this._note;
-        let fret: number = n.fret - n.beat.voice.bar.staff.transpositionPitch;
-        if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
-            fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
+        let fret: number;
+        if (n.isStringed) {
+            fret = n.fret - n.beat.voice.bar.staff.transpositionPitch;
+            if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
+                fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
+            }
+        } else {
+            const articulation = PercussionMapper.getArticulation(n);
+            if (articulation) {
+                fret = articulation.id;
+            } else {
+                fret = n.percussionArticulation;
+            }
         }
+
         if (!n.isTieDestination) {
             this._noteString = n.isDead ? 'x' : fret.toString();
             if (n.isGhost) {
@@ -94,54 +108,72 @@ export class NoteNumberGlyph extends Glyph {
         }
         this.isEmpty = !this._noteString;
         if (!this.isEmpty) {
-            this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.tablatureFont;
+            const scoreRenderer = this.renderer.scoreRenderer;
+            const canvas = scoreRenderer.canvas!;
+            const textMeasures = scoreRenderer.layout!.textMeasures;
+            canvas.font = this.renderer.resources.tablatureFont;
             const hasTrill: boolean = !!this._trillNoteString;
-            this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(
-                this._noteString + (hasTrill ? ' ' : '')
-            ).width;
+            this.noteStringWidth = textMeasures.measureText(canvas, this._noteString + (hasTrill ? ' ' : '')).width;
             this.width = this.noteStringWidth;
-            this.height = this.renderer.scoreRenderer.canvas!.font.size;
+            this.height = canvas.font.size;
             if (hasTrill) {
-                this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-                this._trillNoteStringWidth =
-                    3 + this.renderer.scoreRenderer.canvas!.measureText(this._trillNoteString).width;
+                canvas.font = this.renderer.resources.graceFont;
+                this._trillNoteStringWidth = 3 + textMeasures.measureText(canvas, this._trillNoteString).width;
                 this.width += this._trillNoteStringWidth;
             }
         }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this.paintCentered(cx, cy, canvas, this.width);
+    }
+
+    /**
+     * Paints the note text horizontally centered within the given column width.
+     */
+    public paintCentered(cx: number, cy: number, canvas: ICanvas, columnWidth: number): void {
         if (this.isEmpty) {
             return;
         }
         const textWidth: number = this.noteStringWidth + this._trillNoteStringWidth;
-        const x: number = cx + this.x + (this.width - textWidth) / 2;
+        const x: number = cx + this.x + (columnWidth - textWidth) / 2;
         const y = cy + this.y;
 
         this.paintTrill(x, y, canvas);
 
-        using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
-        canvas.fillText(this._noteString!, x, y);
+        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        try {
+            canvas.fillText(this._noteString!, x, y);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
 
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y - this.height / 2, this.width, this.height);
     }
     paintTrill(x: number, cy: number, canvas: ICanvas) {
-        using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
-        const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
-        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth, cy);
-        this.renderer.scoreRenderer.canvas!.font = prevFont;
+        if (!this._trillNoteString) {
+            return;
+        }
+        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        try {
+            const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
+            this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
+            canvas.fillText(this._trillNoteString!, x + this.noteStringWidth, cy);
+            this.renderer.scoreRenderer.canvas!.font = prevFont;
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 
-    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
-        const noteBounds: NoteBounds = new NoteBounds();
-        noteBounds.note = this._note;
-        noteBounds.noteHeadBounds = new Bounds();
-        noteBounds.noteHeadBounds.x = cx + this.x;
-        noteBounds.noteHeadBounds.y = cy + this.y - this.height / 2;
-        noteBounds.noteHeadBounds.w = this.width;
-        noteBounds.noteHeadBounds.h = this.height;
-        beatBounds.addNote(noteBounds);
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
+        const scale = this.renderer.settings.display.scale;
+        writer.addNote(
+            this._note,
+            (cx + this.x) * scale,
+            (cy + this.y - this.height / 2) * scale,
+            this.width * scale,
+            this.height * scale
+        );
     }
 }

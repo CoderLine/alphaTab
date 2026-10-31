@@ -9,7 +9,7 @@ import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BeatContainerGlyphBase } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { MultiBarRestGlyph } from '@coderline/alphatab/rendering/glyphs/MultiBarRestGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
-import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -129,7 +129,20 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyphBase {
 
     public override applyLayoutingInfo(_info: BarLayoutingInfo): void {}
 
-    public override buildBoundingsLookup(_barBounds: BarBounds, _cx: number, _cy: number): void {}
+    public override scaleToWidth(beatWidth: number): void {
+        super.scaleToWidth(beatWidth);
+        // Behind Bars: the multiple-rest bar is centred within the bar
+        const g = this._glyph;
+        if (g) {
+            g.x = Math.max(0, (beatWidth - g.width) / 2);
+        }
+    }
+
+    public override emitSkyline(base: number): void {
+        this._glyph?.emitSkyline(base);
+    }
+
+    public override buildBoundingsLookup(_writer: IBoundsLookupWriter, _cx: number, _cy: number): void {}
 
     public override doLayout(): void {
         if (this.renderer.showMultiBarRest) {

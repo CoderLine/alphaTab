@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { Gp7Exporter } from '@coderline/alphatab/exporter/Gp7Exporter';
 import {
     GpifInstrumentArticulation,
@@ -16,9 +15,12 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
+import type { XmlNode } from '@coderline/alphatab/xml/XmlNode';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import { GpImporterTestHelper } from 'test/importer/GpImporterTestHelper';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
+import { describe, expect, it } from 'vitest';
 
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -50,21 +52,23 @@ describe('Gp7ExporterTest', () => {
         const exported = exportGp7(expected);
         const actual = prepareImporterWithBytes(exported).readScore();
 
+        ComparisonHelpers.simplifyAccidentalModes(expected);
+        ComparisonHelpers.simplifyAccidentalModes(actual);
+        ComparisonHelpers.removeRedundantPitches(expected);
+        ComparisonHelpers.removeRedundantPitches(actual);
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
-    async function testRoundTripFolderEqual(
-        name: string,
-        ignoredFiles?: string[],
-        ignoreKeys: string[] | null = null
-    ): Promise<void> {
+    // other formats (e.g. MusicXML) have too many differences to the Guitar Pro data model for a full roundtrip
+    const roundTripExtensions = ['.gp3', '.gp4', '.gp5', '.gpx', '.gp'];
+
+    async function testRoundTripFolderEqual(name: string, ignoreKeys: string[] | null = null): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
-        const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files) {
-            if (!ignoredFilesLookup.has(file) && !file.endsWith('.png')) {
+            if (roundTripExtensions.some(e => file.endsWith(e))) {
                 await testRoundTripEqual(`${name}/${file}`, ignoreKeys);
             }
         }
@@ -77,7 +81,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-effects-and-annotations', async () => {
-        await testRoundTripFolderEqual('visual-tests/effects-and-annotations', ['hidden-dots.mxml']);
+        await testRoundTripFolderEqual('visual-tests/effects-and-annotations');
     });
 
     it('visual-general', async () => {
@@ -89,11 +93,11 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-layout', async () => {
-        await testRoundTripFolderEqual('visual-tests/layout', ['extended-barlines.xml']);
+        await testRoundTripFolderEqual('visual-tests/layout');
     });
 
     it('visual-music-notation', async () => {
-        await testRoundTripFolderEqual('visual-tests/music-notation', ['barlines.xml']);
+        await testRoundTripFolderEqual('visual-tests/music-notation');
     });
 
     it('visual-notation-legend', async () => {
@@ -110,7 +114,6 @@ describe('Gp7ExporterTest', () => {
 
     it('gp5-to-gp7', async () => {
         await testRoundTripEqual('conversion/full-song.gp5', [
-            'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'automations' // volume automations are not yet supported in gpif
         ]);
@@ -118,7 +121,6 @@ describe('Gp7ExporterTest', () => {
 
     it('gp6-to-gp7', async () => {
         await testRoundTripEqual('conversion/full-song.gpx', [
-            'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'percussionarticulation' // gets added
         ]);
@@ -144,15 +146,53 @@ describe('Gp7ExporterTest', () => {
 
         const actual = prepareImporterWithBytes(exported).readScore();
 
+        ComparisonHelpers.simplifyAccidentalModes(expected);
+        ComparisonHelpers.simplifyAccidentalModes(actual);
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
-        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', null);
+    });
+
+    it('score-systems-layout-as-text', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            \\defaultSystemsLayout 2
+            \\systemsLayout 1 3 2
+            \\track "Bass" 3.4.2 5.4.2 | 0.3.1 | 2.3.1 | 3.3.1 | 5.3.1 | 0.2.1
+        `);
+
+        const gpif = new XmlDocument();
+        gpif.parse(GpImporterTestHelper.extractGpif(exportGp7(score)));
+        const scoreNode = gpif.firstElement!.findChildElement('Score')!;
+
+        // Guitar Pro reads the layout only from plain text content
+        const defaultLayout = scoreNode.findChildElement('ScoreSystemsDefaultLayout')!;
+        expect(defaultLayout.isCData).toBe(false);
+        expect(defaultLayout.innerText).toBe('2');
+
+        const layout = scoreNode.findChildElement('ScoreSystemsLayout')!;
+        expect(layout.isCData).toBe(false);
+        expect(layout.innerText).toBe('1 3 2');
+
+        expect(scoreNode.findChildElement('MultiVoice')!.innerText).toBe('1>');
+    });
+
+    it('beat-timer-as-integer', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            C4.4 { timer } C4.4 { timer }
+        `);
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        beats[0].timer = 1621.4;
+        beats[1].timer = 3243.6;
+
+        const gpif = GpImporterTestHelper.extractGpif(exportGp7(score));
+
+        expect(gpif).toContain('<Timer>1621</Timer>');
+        expect(gpif).toContain('<Timer>3244</Timer>');
     });
 
     it('alphatex-drums-to-gp7', () => {
-        const tex = `\\track "Drums"
-        \\instrument percussion
+        const tex = `\\track "Drums" { instrument percussion }
         \\clef neutral
         \\articulation defaults
         \\articulation Kick 36
@@ -165,10 +205,12 @@ describe('Gp7ExporterTest', () => {
 
         const actual = prepareImporterWithBytes(exported).readScore();
 
+        ComparisonHelpers.simplifyAccidentalModes(expected);
+        ComparisonHelpers.simplifyAccidentalModes(actual);
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
-        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', null);
 
         expect(actual.tracks[0].percussionArticulations.length).toBe(2);
         expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).toBe(0);
@@ -182,7 +224,291 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp8', async () => {
-        await testRoundTripFolderEqual('guitarpro8', undefined, ['bendpoints', 'bendtype']);
+        await testRoundTripFolderEqual('guitarpro8', ['bendpoints', 'bendtype']);
+    });
+
+    // Regression: MusicXML using MuseScore's `staff*4+localVoice` convention
+    // produces bars whose bar.voices contains sparse voice slots (indices 0..8+).
+    // Prior to the fix, GpifWriter emitted one <Voices> token per slot, producing
+    // <Voices>-1 -1 -1 -1 5 -1 -1 -1 -1</Voices> — invalid GPIF (GP requires
+    // exactly 4 slots) that crashed Guitar Pro 8 and MuseScore. The writer must
+    // now always emit exactly 4 slots, place the non-empty voice inside 0..3,
+    // and skip empty voices so their beats don't leak as orphan <Beat> nodes.
+    it('musicxml-sparse-voice-indices-produce-valid-gpif', () => {
+        const musicXml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <part-list>
+    <score-part id="P1"><part-name>Piano</part-name></score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <staves>2</staves>
+        <clef number="1"><sign>G</sign><line>2</line></clef>
+        <clef number="2"><sign>F</sign><line>4</line></clef>
+      </attributes>
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <staff>1</staff>
+      </note>
+      <backup><duration>4</duration></backup>
+      <note>
+        <pitch><step>C</step><octave>3</octave></pitch>
+        <duration>4</duration>
+        <voice>5</voice>
+        <type>whole</type>
+        <staff>2</staff>
+      </note>
+    </measure>
+  </part>
+</score-partwise>`;
+
+        const expected = ScoreLoader.loadScoreFromBytes(IOHelper.stringToBytes(musicXml));
+        const exported = exportGp7(expected);
+
+        const settings = new Settings();
+        const zip = new ZipReader(ByteBuffer.fromBuffer(exported), settings.importer.maxDecodingBufferSize).read();
+        const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
+        const gpif = IOHelper.toString(gpifData, settings.importer.encoding);
+        const xml = new XmlDocument();
+        xml.parse(gpif);
+
+        // Every <Bar>/<Voices> must have exactly 4 space-separated tokens.
+        let barCount = 0;
+        for (const bar of xml.findChildElement('GPIF')!.findChildElement('Bars')!.childElements()) {
+            barCount++;
+            const voices = bar.findChildElement('Voices')!.innerText.trim().split(/\s+/);
+            expect(voices.length).toBe(4);
+        }
+        expect(barCount).toBeGreaterThan(0);
+
+        // No orphan <Beat> — every declared beat id must be referenced from
+        // some <Voice>/<Beats>.
+        const referencedBeatIds = new Set<string>();
+        for (const voice of xml.findChildElement('GPIF')!.findChildElement('Voices')!.childElements()) {
+            const beatsList = voice.findChildElement('Beats')!.innerText.trim();
+            if (beatsList.length > 0) {
+                for (const id of beatsList.split(/\s+/)) {
+                    referencedBeatIds.add(id);
+                }
+            }
+        }
+        for (const beat of xml.findChildElement('GPIF')!.findChildElement('Beats')!.childElements()) {
+            const id = beat.getAttribute('id');
+            expect(referencedBeatIds.has(id)).toBe(true);
+        }
+    });
+
+    // GP7/8 defaults an unset <Fret> to Int32.MinValue and playback breaks —
+    // piano notes must carry valid String+Fret consistent with the emitted Tuning.
+    it('musicxml-piano-notes-get-string-and-fret', () => {
+        const musicXml = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <part-list>
+    <score-part id="P1"><part-name>Piano</part-name></score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key><fifths>0</fifths></key>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <note>
+        <pitch><step>D</step><octave>5</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <note>
+        <pitch><step>E</step><octave>5</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <note>
+        <pitch><step>F</step><octave>5</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+  </part>
+</score-partwise>`;
+
+        const expected = ScoreLoader.loadScoreFromBytes(IOHelper.stringToBytes(musicXml));
+        const exported = exportGp7(expected);
+
+        const settings = new Settings();
+        const zip = new ZipReader(ByteBuffer.fromBuffer(exported), settings.importer.maxDecodingBufferSize).read();
+        const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
+        const gpif = IOHelper.toString(gpifData, settings.importer.encoding);
+        const xml = new XmlDocument();
+        xml.parse(gpif);
+
+        // Read the exported tuning + capo from the first staff.
+        const track = xml.findChildElement('GPIF')!.findChildElement('Tracks')!.findChildElement('Track')!;
+        const staffProps = track.findChildElement('Staves')!.findChildElement('Staff')!.findChildElement('Properties')!;
+        let tuning: number[] = [];
+        let capo = 0;
+        for (const prop of staffProps.childElements()) {
+            const name = prop.getAttribute('name');
+            if (name === 'Tuning') {
+                tuning = prop
+                    .findChildElement('Pitches')!
+                    .innerText.trim()
+                    .split(/\s+/)
+                    .map(s => Number.parseInt(s, 10));
+                // <Pitches> is written high-to-low reversed (low-to-high). Un-reverse
+                // to get Staff.tuning's high-to-low convention.
+                tuning.reverse();
+            } else if (name === 'CapoFret') {
+                capo = Number.parseInt(prop.findChildElement('Fret')!.innerText, 10);
+            }
+        }
+        expect(tuning.length).toBeGreaterThan(0);
+
+        // Every note under the piano track must have String + Fret + Midi
+        // and satisfy the pitch identity.
+        let noteCount = 0;
+        for (const note of xml.findChildElement('GPIF')!.findChildElement('Notes')!.childElements()) {
+            noteCount++;
+            const props = note.findChildElement('Properties')!;
+            let str = Number.NaN;
+            let fret = Number.NaN;
+            let midi = Number.NaN;
+            for (const prop of props.childElements()) {
+                const name = prop.getAttribute('name');
+                if (name === 'String') {
+                    str = Number.parseInt(prop.findChildElement('String')!.innerText, 10) + 1;
+                } else if (name === 'Fret') {
+                    fret = Number.parseInt(prop.findChildElement('Fret')!.innerText, 10);
+                } else if (name === 'Midi') {
+                    midi = Number.parseInt(prop.findChildElement('Number')!.innerText, 10);
+                }
+            }
+            expect(Number.isNaN(str)).toBe(false);
+            expect(Number.isNaN(fret)).toBe(false);
+            expect(Number.isNaN(midi)).toBe(false);
+            // Guard against the "Int32.MinValue sentinel" scenario the fix
+            // exists to prevent.
+            expect(fret).toBeGreaterThan(-1000);
+            expect(fret).toBeLessThan(1000);
+            // Pitch identity: capo + tuning[N-string] + fret === midi
+            expect(capo + tuning[tuning.length - str] + fret).toBe(midi);
+        }
+        expect(noteCount).toBe(4);
+    });
+
+    it('export-keeps-score-untouched', () => {
+        const score = ScoreLoader.loadAlphaTex('\\instrument piano \\tuning piano . c4 d4 e4 f4');
+        const before = JsonConverter.scoreToJsObject(score);
+
+        // pitched staves need string and fret assigned during export, the input score must not change
+        const first = GpImporterTestHelper.extractGpif(exportGp7(score));
+        ComparisonHelpers.expectJsonEqual(before, JsonConverter.scoreToJsObject(score), '<score>', null);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].realValue).toBe(60);
+
+        // a repeated export must produce the same file
+        const second = GpImporterTestHelper.extractGpif(exportGp7(score));
+        expect(second).toBe(first);
+    });
+
+    /**
+     * Reads the concert and transposed pitch of all notes in score order as `step accidental octave`.
+     */
+    function readNotePitches(gpif: string): string[][] {
+        const xml = new XmlDocument();
+        xml.parse(gpif);
+        const root = xml.findChildElement('GPIF')!;
+
+        const lookup = (section: string) => {
+            const elements = new Map<string, XmlNode>();
+            for (const e of root.findChildElement(section)!.childElements()) {
+                elements.set(e.getAttribute('id'), e);
+            }
+            return elements;
+        };
+        const ids = (e: XmlNode, name: string) => {
+            const result: string[] = [];
+            for (const id of e.findChildElement(name)!.innerText.trim().split(/\s+/)) {
+                if (id.length > 0 && id !== '-1') {
+                    result.push(id);
+                }
+            }
+            return result;
+        };
+        const pitch = (note: XmlNode, name: string) => {
+            for (const property of note.findChildElement('Properties')!.childElements()) {
+                if (property.getAttribute('name') === name) {
+                    const p = property.findChildElement('Pitch')!;
+                    return `${p.findChildElement('Step')!.innerText} ${p.findChildElement('Accidental')!.innerText} ${p.findChildElement('Octave')!.innerText}`;
+                }
+            }
+            return '';
+        };
+
+        const bars = lookup('Bars');
+        const voices = lookup('Voices');
+        const beats = lookup('Beats');
+        const notes = lookup('Notes');
+        const result: string[][] = [];
+        for (const masterBar of root.findChildElement('MasterBars')!.childElements()) {
+            for (const bar of ids(masterBar, 'Bars')) {
+                for (const voice of ids(bars.get(bar)!, 'Voices')) {
+                    for (const beat of ids(voices.get(voice)!, 'Beats')) {
+                        if (!beats.get(beat)!.findChildElement('Notes')) {
+                            continue;
+                        }
+                        for (const note of ids(beats.get(beat)!, 'Notes')) {
+                            const n = notes.get(note)!;
+                            result.push([pitch(n, 'ConcertPitch'), pitch(n, 'TransposedPitch')]);
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    async function testPitchSpelling(name: string) {
+        const data = await TestPlatform.loadFile(`test-data/${name}`);
+        const expected = readNotePitches(GpImporterTestHelper.extractGpif(data));
+        const actual = readNotePitches(
+            GpImporterTestHelper.extractGpif(exportGp7(ScoreLoader.loadScoreFromBytes(data)))
+        );
+
+        expect(actual.length).toBe(expected.length);
+        for (let i = 0; i < expected.length; i++) {
+            expect(actual[i][1], `TransposedPitch of note ${i}`).toBe(expected[i][1]);
+            // without transposition the concert pitch has the same spelling
+            if (expected[i][0] === expected[i][1]) {
+                expect(actual[i][0], `ConcertPitch of note ${i}`).toBe(expected[i][0]);
+            }
+        }
+    }
+
+    it('pitch-spelling-key-signatures', async () => {
+        await testPitchSpelling('visual-tests/music-notation/key-signatures.gp');
+    });
+
+    it('pitch-spelling-accidentals', async () => {
+        await testPitchSpelling('visual-tests/music-notation/accidentals-advanced.gp');
     });
 
     /**
@@ -372,7 +698,7 @@ describe('Gp7ExporterTest', () => {
     it('sound-mapper', async () => {
         const settings = new Settings();
         const zip = new ZipReader(
-            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp')), 
+            ByteBuffer.fromBuffer(await TestPlatform.loadFile('test-data/exporter/articulations.gp')),
             settings.importer.maxDecodingBufferSize
         ).read();
         const gpifData = zip.find(e => e.fileName === 'score.gpif')!.data;
@@ -444,9 +770,10 @@ describe('Gp7ExporterTest', () => {
 
         for (let i = 0; i < expectedElements.length; i++) {
             const expectedElement = expectedElements[i];
-            expect(actualElements.length, `Element ${i} (${expectedElement.name}) missing in actual file`).toBeGreaterThan(
-                i
-            );
+            expect(
+                actualElements.length,
+                `Element ${i} (${expectedElement.name}) missing in actual file`
+            ).toBeGreaterThan(i);
             const actualElement = actualElements[i];
 
             expect(actualElement.name).toBe(expectedElement.name);
@@ -462,32 +789,40 @@ describe('Gp7ExporterTest', () => {
                 const actualArticulation = actualElement.articulations[j];
 
                 expect(actualArticulation.name).toBe(expectedArticulation.name);
-                expect(actualArticulation.staffLine, `Wrong staffline for articulation ${actualArticulation.name}`).toBe(
-                    expectedArticulation.staffLine
-                );
-                expect(actualArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' '), `Wrong noteHeads for articulation ${actualArticulation.name}`).toBe(
-                    expectedArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' ')
-                );
-                expect(MusicFontSymbol[actualArticulation.techniqueSymbol], `Wrong techniqueSymbol for articulation ${actualArticulation.name}`).toBe(
-                    MusicFontSymbol[expectedArticulation.techniqueSymbol]
-                );
-                expect(TechniqueSymbolPlacement[actualArticulation.techniqueSymbolPlacement], `Wrong techniqueSymbolPlacement for articulation ${actualArticulation.name}`).toBe(
-                    TechniqueSymbolPlacement[expectedArticulation.techniqueSymbolPlacement]
-                );
-                expect(actualArticulation.inputMidiNumbers.map(i => i.toString()).join(','), `Wrong inputMidiNumbers for articulation ${actualArticulation.name}`).toBe(
-                    expectedArticulation.inputMidiNumbers.map(i => i.toString()).join(',')
-                );
-                expect(actualArticulation.outputMidiNumber, `Wrong outputMidiNumber for articulation ${actualArticulation.name}`).toBe(
-                    expectedArticulation.outputMidiNumber
-                );
-                expect(actualArticulation.outputRSESound, `Wrong outputRSESound for articulation ${actualArticulation.name}`).toBe(
-                    expectedArticulation.outputRSESound
-                );
+                expect(
+                    actualArticulation.staffLine,
+                    `Wrong staffline for articulation ${actualArticulation.name}`
+                ).toBe(expectedArticulation.staffLine);
+                expect(
+                    actualArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' '),
+                    `Wrong noteHeads for articulation ${actualArticulation.name}`
+                ).toBe(expectedArticulation.noteHeads.map(s => MusicFontSymbol[s]).join(' '));
+                expect(
+                    MusicFontSymbol[actualArticulation.techniqueSymbol],
+                    `Wrong techniqueSymbol for articulation ${actualArticulation.name}`
+                ).toBe(MusicFontSymbol[expectedArticulation.techniqueSymbol]);
+                expect(
+                    TechniqueSymbolPlacement[actualArticulation.techniqueSymbolPlacement],
+                    `Wrong techniqueSymbolPlacement for articulation ${actualArticulation.name}`
+                ).toBe(TechniqueSymbolPlacement[expectedArticulation.techniqueSymbolPlacement]);
+                expect(
+                    actualArticulation.inputMidiNumbers.map(i => i.toString()).join(','),
+                    `Wrong inputMidiNumbers for articulation ${actualArticulation.name}`
+                ).toBe(expectedArticulation.inputMidiNumbers.map(i => i.toString()).join(','));
+                expect(
+                    actualArticulation.outputMidiNumber,
+                    `Wrong outputMidiNumber for articulation ${actualArticulation.name}`
+                ).toBe(expectedArticulation.outputMidiNumber);
+                expect(
+                    actualArticulation.outputRSESound,
+                    `Wrong outputRSESound for articulation ${actualArticulation.name}`
+                ).toBe(expectedArticulation.outputRSESound);
             }
 
-            expect(actualElement.articulations.length, `articulation length mismatch on element ${expectedElement.name}`).toBe(
-                expectedElement.articulations.length
-            );
+            expect(
+                actualElement.articulations.length,
+                `articulation length mismatch on element ${expectedElement.name}`
+            ).toBe(expectedElement.articulations.length);
         }
 
         expect(actualInstrumentSet.elements.length).toBe(expectedInstrumentSet.elements.length);

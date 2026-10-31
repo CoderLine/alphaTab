@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 410" role="img" aria-labelledby="alphatab-bundle-structure-title">
+  <title id="alphatab-bundle-structure-title">app.mjs imports alphaTab.mjs. alphaTab.mjs imports alphaTab.core.mjs, starts alphaTab.worker.mjs with new Worker and loads alphaTab.worklet.mjs with audioWorklet.addModule. The worker and the worklet both import alphaTab.core.mjs.</title>
+  <style>
+    .atbs-node rect { fill: var(--ifm-color-primary, #426d9d); fill-opacity: 0.12; stroke: var(--ifm-color-primary, #426d9d); stroke-width: 1.5; }
+    .atbs-node text { fill: currentColor; font-family: var(--ifm-font-family-monospace, monospace); font-size: 15px; text-anchor: middle; dominant-baseline: central; }
+    .atbs-edge { fill: none; stroke: currentColor; stroke-opacity: 0.7; stroke-width: 1.5; marker-end: url(#alphatab-bundle-structure-arrow); }
+    .atbs-label rect { fill: var(--at-bg, var(--ifm-background-surface-color, #fff)); }
+    .atbs-label text { fill: currentColor; font-family: var(--ifm-font-family-base, sans-serif); font-size: 13px; text-anchor: middle; dominant-baseline: central; }
+  </style>
+  <defs>
+    <marker id="alphatab-bundle-structure-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor" fill-opacity="0.7" />
+    </marker>
+  </defs>
+
+  <path class="atbs-edge" d="M340,54 L340,110" />
+  <path class="atbs-edge" d="M300,154 C300,195 130,190 130,230" />
+  <path class="atbs-edge" d="M380,154 C380,195 550,190 550,230" />
+  <path class="atbs-edge" d="M340,154 L340,350" />
+  <path class="atbs-edge" d="M130,274 C130,315 300,310 300,350" />
+  <path class="atbs-edge" d="M550,274 C550,315 380,310 380,350" />
+
+  <g class="atbs-node"><rect x="250" y="10" width="180" height="44" rx="8" /><text x="340" y="32">app.mjs</text></g>
+  <g class="atbs-node"><rect x="250" y="110" width="180" height="44" rx="8" /><text x="340" y="132">alphaTab.mjs</text></g>
+  <g class="atbs-node"><rect x="20" y="230" width="220" height="44" rx="8" /><text x="130" y="252">alphaTab.worker.mjs</text></g>
+  <g class="atbs-node"><rect x="440" y="230" width="220" height="44" rx="8" /><text x="550" y="252">alphaTab.worklet.mjs</text></g>
+  <g class="atbs-node"><rect x="240" y="350" width="200" height="44" rx="8" /><text x="340" y="372">alphaTab.core.mjs</text></g>
+
+  <g class="atbs-label"><rect x="316" y="72" width="48" height="20" rx="4" /><text x="340" y="82">import</text></g>
+  <g class="atbs-label"><rect x="174" y="182" width="82" height="20" rx="4" /><text x="215" y="192">new Worker</text></g>
+  <g class="atbs-label"><rect x="390" y="182" width="150" height="20" rx="4" /><text x="465" y="192">audioWorklet.addModule</text></g>
+  <g class="atbs-label"><rect x="316" y="242" width="48" height="20" rx="4" /><text x="340" y="252">import</text></g>
+  <g class="atbs-label"><rect x="191" y="302" width="48" height="20" rx="4" /><text x="215" y="312">import</text></g>
+  <g class="atbs-label"><rect x="441" y="302" width="48" height="20" rx="4" /><text x="465" y="312">import</text></g>
+</svg>

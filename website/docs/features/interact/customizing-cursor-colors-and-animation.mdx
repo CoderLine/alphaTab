@@ -1,0 +1,82 @@
+---
+title: "Customizing cursor colors and animation"
+description: "Restyle the bar cursor, beat cursor, beat highlight, and selection via CSS classes, and toggle the beat-cursor animation."
+sidebar_custom_props:
+  feature_chapter: cursor
+  feature_order: 20
+keywords:
+  - alphaTab
+  - cursor
+  - animation
+  - CSS
+  - at-cursor-bar
+  - at-cursor-beat
+  - at-highlight
+---
+
+import { CursorToggleDemo } from '@site/src/components/CursorToggleDemo';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Matching the cursor to a brand color, softening the animation for readers with `prefers-reduced-motion`, tuning the highlight to sit well against a dark theme — all of it happens in your own CSS. On the Web platform the cursor and highlight overlays are regular DOM elements tagged with stable class names. Pick a theme in the demo below to see the classes swap under three different stylesheets, and toggle the beat-cursor animation to compare a smooth slide against a hard per-beat tick.
+
+<CursorToggleDemo showThemeToggle showAnimationToggle showCode={false} tex={Riffs.AMAZING_GRACE} />
+
+## The four classes
+
+alphaTab tags four overlay elements with stable classes. Target them from your stylesheet:
+
+- `.at-cursor-bar` — the rectangle behind the currently played bar.
+- `.at-cursor-beat` — the vertical line at the currently played beat. Give it an explicit `width` — without one it collapses to zero.
+- `.at-highlight` — applied to the SVG groups of the currently played beat when the render engine is SVG. Style both `fill` and `stroke` to catch every shape.
+- `.at-selection` — wrapper the range-selection overlay uses; a child `div` per bar area sits inside.
+
+## Animating or ticking the beat cursor
+
+The beat cursor either slides across the beat's width or ticks from beat to beat. `player.enableAnimatedBeatCursor` picks between the two, and defaults to `true`. Turn it off for editor UIs where a hard step reads more clearly, or for accessibility surfaces that honor reduced-motion preferences. The difference shows up during playback — press play in the demo above and toggle the checkbox to watch the beat cursor switch between a smooth slide and a hard step per beat.
+
+## Show it in code
+
+```css
+/* Highlight overlays */
+.at-cursor-bar {
+  background: rgba(255, 242, 0, 0.25);
+}
+
+.at-cursor-beat {
+  background: rgba(64, 64, 255, 0.75);
+  width: 3px;
+}
+
+.at-highlight * {
+  fill: #0078ff;
+  stroke: #0078ff;
+}
+
+.at-selection div {
+  background: rgba(64, 64, 255, 0.1);
+}
+```
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableAnimatedBeatCursor: true,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Cursor and element highlighting](./cursor-and-element-highlighting) — the two flags and the two events driving the overlays.
+- [A custom cursor handler](./custom-cursor-handler) — replace placement and animation entirely.
+- [`enableAnimatedBeatCursor`](/docs/reference/settings/player/enableanimatedbeatcursor) in the settings reference.

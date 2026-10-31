@@ -1,0 +1,52 @@
+---
+title: "Horizontal layout"
+description: "LayoutMode.Horizontal; single-line scrolling view for timeline UIs."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 20
+keywords:
+  - alphaTab
+  - layout
+  - horizontal
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
+
+Horizontal layout renders every bar on a single row and lets the container scroll sideways. Reach for it when you build a DAW timeline aligned to bar positions, a scrolling teleprompter view for live performance, or any view where a moving playback cursor should sweep the score left-to-right against an audio waveform pinned above it.
+
+<BoundedScoreFrame maxHeight={420} overflow="x">
+  <AlphaTab tex={true} settings={{ display: { layoutMode: 'horizontal', stretchForce: 1.5 } }}>{Riffs.AM_VERSE_CHORUS}</AlphaTab>
+</BoundedScoreFrame>
+
+## What changes compared to page layout
+
+- **No row wrapping.** Bars stay on one system regardless of container width. The container becomes horizontally scrollable and the vertical extent stays as short as one system.
+- **`stretchForce` sizes the row instead of packing it.** Since there is no wrap, `display.stretchForce` acts as the density knob for the whole line — larger values produce a longer, more airy row.
+- **Bar widths respect `bar.displayWidth`.** When the source file carries per-bar widths (Guitar Pro), horizontal layout uses them directly. Set the values on the score model before or during `scoreLoaded` to align two scores column-for-column, or to lock a bar to a fixed waveform region.
+
+Horizontal layout pairs well with the [smooth scroll mode](/docs/reference/settings/player/scrollmode) so the cursor drives the viewport during playback.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  display: {
+    layoutMode: alphaTab.LayoutMode.Horizontal,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Page layout](./page-layout) — the wrapping default.
+- [Parchment layout](./parchment-layout) — page layout that honors the source's systems layout.
+- [`display.layoutMode`](/docs/reference/settings/display/layoutmode) and [`display.stretchForce`](/docs/reference/settings/display/stretchforce) reference entries.

@@ -6,11 +6,17 @@ import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 
 /**
  * @internal
  */
 export class ClefGlyph extends MusicFontGlyph {
+    /**
+     * The bar header column of clefs (shared with {@link TabClefGlyph}).
+     */
+    public static readonly HeaderRank: number = 200;
+
     private _clef: Clef;
     private _clefOttava: Ottavia;
     private _ottavaGlyph?: MusicFontGlyph;
@@ -41,7 +47,6 @@ export class ClefGlyph extends MusicFontGlyph {
             const ottavaBottom = this.y + ottava.getBoundingBoxBottom();
             bottom = ModelUtils.maxBoundingBox(bottom, ottavaBottom);
         }
-
 
         return bottom;
     }
@@ -97,6 +102,16 @@ export class ClefGlyph extends MusicFontGlyph {
         this._ottavaGlyph!.doLayout();
     }
 
+    public override registerHeaderRod(info: IHeaderRodSink): void {
+        // left aligned
+        const spacing = this.renderer.smuflMetrics.preBeatGlyphSpacing;
+        info.addHeaderRod(ClefGlyph.HeaderRank, 0, this.width + spacing, spacing);
+    }
+
+    public override applyHeaderRod(info: IHeaderRodSink): void {
+        this.x = info.getHeaderRodX(ClefGlyph.HeaderRank, 0);
+    }
+
     private static _getSymbol(clef: Clef, clefOttava: Ottavia): MusicFontSymbol {
         switch (clef) {
             case Clef.Neutral:
@@ -141,13 +156,20 @@ export class ClefGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationClef, this.renderer.bar);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            BarSubElement.StandardNotationClef,
+            this.renderer.bar
+        );
+        try {
+            super.paint(cx, cy, canvas);
 
-        super.paint(cx, cy, canvas);
-
-        const ottava = this._ottavaGlyph;
-        if (ottava) {
-            ottava.paint(cx + this.x, cy + this.y, canvas);
+            const ottava = this._ottavaGlyph;
+            if (ottava) {
+                ottava.paint(cx + this.x, cy + this.y, canvas);
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

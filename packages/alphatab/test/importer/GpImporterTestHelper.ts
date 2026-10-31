@@ -1,6 +1,7 @@
 import { expect } from 'vitest';
 import { Gp3To5Importer } from '@coderline/alphatab/importer/Gp3To5Importer';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
@@ -19,6 +20,7 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Settings } from '@coderline/alphatab/Settings';
+import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
 import { TestPlatform } from 'test/TestPlatform';
 /**
  * @internal
@@ -37,6 +39,15 @@ export class GpImporterTestHelper {
         const readerBase: Gp3To5Importer = new Gp3To5Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), settings ?? new Settings());
         return readerBase;
+    }
+
+    /**
+     * Gets the score.gpif contained in a Guitar Pro 7+ file.
+     */
+    public static extractGpif(data: Uint8Array): string {
+        const settings = new Settings();
+        const entries = new ZipReader(ByteBuffer.fromBuffer(data), settings.importer.maxDecodingBufferSize).read();
+        return IOHelper.toString(entries.find(e => e.fileName === 'score.gpif')!.data, settings.importer.encoding);
     }
 
     public static checkNotes(score: Score): void {
@@ -339,6 +350,13 @@ export class GpImporterTestHelper {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].rightHandFinger).toBe(
             Fingers.LittleFinger
         );
+        // each note has a finger on one hand only
+        for (let i = 0; i < 5; i++) {
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[i].notes[0].rightHandFinger).toBe(Fingers.Unknown);
+            expect(score.tracks[0].staves[0].bars[0].voices[0].beats[i + 5].notes[0].leftHandFinger).toBe(
+                Fingers.Unknown
+            );
+        }
     }
 
     public static checkStroke(score: Score): void {

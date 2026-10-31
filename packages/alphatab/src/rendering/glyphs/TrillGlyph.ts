@@ -1,5 +1,5 @@
-import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
 
@@ -16,6 +16,11 @@ export class TrillGlyph extends GroupedEffectGlyph {
     public override doLayout(): void {
         super.doLayout();
         this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.OrnamentTrill)!;
+    }
+
+    public override getBoundingBoxLeft(): number {
+        const trillSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OrnamentTrill)!;
+        return this.x - trillSize / 2;
     }
 
     protected override paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {

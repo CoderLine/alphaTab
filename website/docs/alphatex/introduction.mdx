@@ -1,0 +1,44 @@
+---
+title: Introduction
+description: alphaTex is alphaTab's plain-text music notation format — write scores as source, load them through the tex option or the tex() API.
+keywords:
+  - alphaTab
+  - alphaTex
+  - text notation
+  - music notation
+  - tex
+  - source format
+---
+
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+alphaTex is a plain-text notation format for alphaTab. You write a score as source code and alphaTab parses it into the same data model any other format produces.
+
+Enable alphaTex loading by setting the [`tex`](/docs/reference/settings/core/tex) option, or feed a string directly through the [`tex()`](/docs/reference/api/tex) method on the API. alphaTab reads the source from the element contents and parses it. You can also load it from a file the same way you load any other format.
+
+alphaTex covers most of the notation features alphaTab supports. If a feature you need is missing, [open a discussion on GitHub](https://github.com/CoderLine/alphaTab/discussions/new).
+
+Start with the [language syntax](./syntax) — it defines every term the rest of this section uses.
+
+## Showcase
+
+The example below renders entirely from alphaTex source: the "Intro Build" lead guitar part of Iron Waltz, the alphaTab demo song.
+
+<AlphaTexSample>{`
+\\title "Iron Waltz"
+\\subtitle "Intro Build"
+\\artist "alphaTab"
+\\tempo 196
+\\track ("Lead Guitar" "Lead Gtr.") { instrument distortionguitar }
+\\tuning (Eb4 Bb3 Gb3 Db3 Ab2 Eb2)
+\\ts (3 4)
+\\section "Intro Build"
+7.1.4{dy f} 14.1.8 12.2 14.2 12.2 |
+:16 11.1{b (0 2)} -.1{b (2 0)} :8 11.1 12.2.4 :8 11.1 12.1 |
+:16 11.1{h} 12.1{h} :8 11.1 12.2 14.2 16.2 14.2 |
+2.1.4 4.1 6.1{v} |
+7.1.4 7.2.8 7.1 9.1 7.1 |
+:16 11.1{b (0 2)} -.1{b (2 0)} :8 11.1 12.2.4 :8 11.1 12.1 |
+11.1.8 12.1 11.1 9.1 7.1 6.1 |
+2.1.4 4.1 6.1{v}
+`}</AlphaTexSample>

@@ -1,19 +1,19 @@
-import * as cs from './csharp/CSharpAst';
-import ts from 'typescript';
-import path from 'node:path';
 import fs from 'node:fs';
-import type CSharpEmitterContext from './csharp/CSharpEmitterContext';
+import path from 'node:path';
+import ts from 'typescript';
+import type EmitterContextBase from './EmitterContextBase';
+import * as cs from './ir/Ir';
 
 export default abstract class AstPrinterBase {
     protected _sourceFile: cs.SourceFile;
     private _source = '';
-    protected _context: CSharpEmitterContext;
+    protected _context: EmitterContextBase;
     protected _isStartOfLine: boolean = true;
     protected _indent: number = 0;
 
     public diagnostics: ts.Diagnostic[] = [];
 
-    public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
+    public constructor(sourceFile: cs.SourceFile, context: EmitterContextBase) {
         this._sourceFile = sourceFile;
         this._context = context;
     }
@@ -226,6 +226,10 @@ export default abstract class AstPrinterBase {
     protected abstract writeDeconstructDeclaration(expr: cs.DeconstructDeclaration): void;
 
     protected writeToDoExpression(_expr: cs.ToDoExpression) {
+        // Load-bearing debug fallthrough: the transformer emits a ToDoExpression
+        // whenever it hits an unsupported TS expression kind (the diagnostic
+        // categorises the failure, this writer keeps the .cs/.kt source
+        // syntactically locatable). Snapshot tests today contain no such marker.
         this.write('/* TODO */');
     }
 

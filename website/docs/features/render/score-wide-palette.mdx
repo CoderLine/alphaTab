@@ -1,0 +1,66 @@
+---
+title: "Score-wide palette"
+description: "display.resources default colors for staff lines, glyphs, and text."
+sidebar_custom_props:
+  feature_chapter: coloring
+  feature_order: 20
+keywords:
+  - alphaTab
+  - palette
+  - resources
+  - color
+  - theme
+---
+
+import { CoveragePaletteDemo } from '@site/src/components/CoveragePaletteDemo';
+
+Set the default color of every staff line, glyph, and text block from one place. The [`display.resources`](/docs/reference/settings/display/resources) container holds a color field per element category, so a single settings object retints the whole document without touching individual notes. Use it to match your corporate palette, to build a dark-mode themed player with tinted glyphs, or to reserve red for a highlight layer applied on top through [per-element colors](./per-element-colors).
+
+<CoveragePaletteDemo showCode={false} />
+
+## What each field paints
+
+Each color on [`RenderingResources`](/docs/reference/types/renderingresources/) covers one visual category:
+
+- `staffLineColor` — the five horizontal lines of the notation staff and the tab staff lines.
+- `barSeparatorColor` — barlines, the accolade brace, and repeat signs.
+- `barNumberColor` — bar numbers rendered above each system.
+- `mainGlyphColor` — noteheads, stems, beams, and effect glyphs of the primary voice.
+- `secondaryGlyphColor` — the same glyphs when they belong to a secondary voice; defaults to a semi-transparent black so lower voices sit visually behind the main line.
+- `scoreInfoColor` — the title, subtitle, artist, album, and copyright text.
+
+The [`RenderingResources`](/docs/reference/types/renderingresources/) reference lists every field, including the font counterparts (`barNumberFont`, `copyrightFont`, and so on) that pair with each color.
+
+## Show it in code
+
+Configure the palette at construction time — it takes effect on the first render:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  display: {
+    resources: {
+      mainGlyphColor: '#e91e63',
+      staffLineColor: '#3f51b5',
+      barSeparatorColor: '#3f51b5',
+      barNumberColor: '#3f51b5',
+      scoreInfoColor: '#3f51b5',
+    },
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. The `display.resources` block is identical on every runtime.
+
+To change the palette after load, mutate `api.settings.display.resources` and call [`api.updateSettings()`](/docs/reference/api/updatesettings) followed by [`api.render()`](/docs/reference/api/render).
+
+## Where to look next
+
+- [Per-element colors](./per-element-colors) — override the color of one notehead, stem, or effect glyph instead of the score-wide default.
+- [Styling the playback cursor](./player-cursor-styling) — CSS for the bar cursor, beat cursor, and beat highlight overlays.
+- [`display.resources`](/docs/reference/settings/display/resources) — the settings-side entry point for the palette.
+- [`RenderingResources`](/docs/reference/types/renderingresources/) — the full field list with default values.
+- [`updateSettings`](/docs/reference/api/updatesettings) and [`render`](/docs/reference/api/render) — apply palette changes made after load.

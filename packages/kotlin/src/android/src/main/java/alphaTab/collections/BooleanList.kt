@@ -5,22 +5,27 @@ public interface IBooleanIterable : Iterable<Boolean> {
 }
 
 internal class BooleanList : IBooleanIterable {
-    private val _data: BooleanArray
+    companion object {
+        private const val DefaultCapacity: Int = 4
+    }
+
+    private var _data: BooleanArray
+    private var _size: Int
 
     constructor(vararg elements: Boolean) {
         this._data = elements
+        this._size = elements.size
     }
 
     constructor(size: Int) {
         this._data = BooleanArray(size)
+        this._size = size
     }
 
-    constructor(size: Double) {
-        this._data = BooleanArray(size.toInt())
-    }
+    constructor(size: Double) : this(size.toInt())
 
     public val length: Double
-        get() = _data.size.toDouble()
+        get() = _size.toDouble()
 
     public operator fun get(index: Int): Boolean {
         return _data[index]
@@ -30,22 +35,34 @@ internal class BooleanList : IBooleanIterable {
         _data[index] = value
     }
 
+    public fun push(item: Boolean) {
+        if (_size == _data.size) {
+            val newCapacity = if (_data.isEmpty()) DefaultCapacity else 2 * _data.size
+            _data = _data.copyOf(newCapacity)
+        }
+        _data[_size] = item
+        _size++
+    }
+
     public override fun iterator(): BooleanIterator {
-        return _data.iterator()
+        return Iterator(this)
     }
 
     public fun fill(b: Boolean) {
-        _data.fill(b)
+        _data.fill(b, 0, _size)
     }
 
-    @Suppress("NOTHING_TO_INLINE")
-    public inline fun spread(): BooleanArray {
-        return _data;
+    public fun spread(): BooleanArray {
+        return if (_size == _data.size) _data else _data.copyOf(_size)
     }
 
-    @Suppress("NOTHING_TO_INLINE")
-    public inline fun indexOf(v: Boolean): Double {
-        return _data.indexOf(v).toDouble()
+    public fun indexOf(v: Boolean): Double {
+        for (i in 0 until _size) {
+            if (_data[i] == v) {
+                return i.toDouble()
+            }
+        }
+        return -1.0
     }
 
     public fun <TOut> map(transform: (v: Boolean) -> TOut): List<TOut> {
@@ -54,5 +71,21 @@ internal class BooleanList : IBooleanIterable {
             mapped.push(transform(el))
         }
         return mapped
+    }
+
+    private class Iterator(private val list: BooleanList) : BooleanIterator() {
+        private var _index = 0
+        override fun hasNext(): Boolean {
+            return _index < list._size
+        }
+
+        override fun nextBoolean(): Boolean {
+            if (_index >= list._size) {
+                throw NoSuchElementException("List has no more elements")
+            }
+            val value = list._data[_index]
+            _index++
+            return value
+        }
     }
 }

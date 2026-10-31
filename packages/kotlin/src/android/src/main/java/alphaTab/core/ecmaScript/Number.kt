@@ -22,7 +22,7 @@ internal class Number {
         }
 
         inline fun parseInt(s: String): Double {
-            return s.toIntOrNaN()
+            return s.toIntOrNaN(0.0)
         }
 
         inline fun parseInt(s: String, radix: Double): Double {

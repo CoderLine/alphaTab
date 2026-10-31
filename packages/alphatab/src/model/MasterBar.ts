@@ -151,6 +151,13 @@ export class BeamingRules {
  */
 export class MasterBar {
     public static readonly MaxAlternateEndings: number = 8;
+
+    /**
+     * @internal
+     * @json_ignore
+     */
+    public _realBarNumber = Number.NaN;
+
     /**
      * Gets or sets the bitflag for the alternate endings. Each bit defines for which repeat counts
      * the bar is played.
@@ -174,6 +181,57 @@ export class MasterBar {
      * @json_ignore
      */
     public index: number = 0;
+
+    /**
+     * A custom string to display for the bar number as override. 
+     * Even with a custom string, this masterbar contributes to the incremental bar numbers 
+     * across the score. Set the {@link customBarNumber} for the next master bar if you want 
+     * alternative counting.
+     * @since 1.9.0
+     */
+    public customBarNumberText?: string;
+
+    /**
+     * A custom bar number affecting this and subsequent bar numbers.
+     * e.g. allows setting the initial bar number to 10 and the second will be 11.
+     * Any change to {@link customBarNumber} requires an additional call to {@link Score.finish} 
+     * to consolidate the counting.
+     * @since 1.9.0
+     */
+    public customBarNumber?: number;
+
+    /**
+     * The actual bar number of this masterbar respecting any Pick-Up bars and manually overriden bar numbers.
+     * Returns NaN for pick-up bars (see {@link isAnacrusis}) Only available after data model finish.
+     * The final bar number is not guaranteed to be unique. using {@see customBarNumber} 
+     * users might reset or change counting in any custom fashion. Do not rely on the bar number
+     * for lookup or indexing.
+     * @since 1.9.0
+     */
+    public get barNumber(): number {
+        return this._realBarNumber;
+    }
+
+    /**
+     * Returns the actual text displayed for this master bar respecting any custom overrides and
+     * out-of-order numbers. Only available after data model finish.
+     * @since 1.9.0
+     */
+    public get barNumberText(): string {
+        let text = this.customBarNumberText;
+        if (text !== undefined) {
+            return text;
+        }
+
+        const barNumber = this._realBarNumber;
+        if (!Number.isNaN(barNumber)) {
+            text = barNumber.toString();
+        } else {
+            text = '';
+        }
+
+        return text;
+    }
 
     /**
      * Whether the masterbar is has any changes applied to it (e.g. tempo changes, time signature changes etc)
@@ -211,6 +269,7 @@ export class MasterBar {
     /**
      * The key signature used on all bars.
      * @deprecated Use key signatures on bar level
+     * @json_read_only
      */
     public get keySignature(): KeySignature {
         return this.score.tracks[0].staves[0].bars[this.index].keySignature;
@@ -227,6 +286,7 @@ export class MasterBar {
     /**
      * The type of key signature (major/minor)
      * @deprecated Use key signatures on bar level
+     * @json_read_only
      */
     public get keySignatureType(): KeySignatureType {
         return this.score.tracks[0].staves[0].bars[this.index].keySignatureType;
@@ -355,6 +415,18 @@ export class MasterBar {
     public isAnacrusis: boolean = false;
 
     /**
+     * The position in the nominal meter (unit: midi ticks) at which the first tick of this bar sits.
+     * @remarks
+     * The beats of a pick-up bar are stored starting at tick 0 and the bar only plays for the duration of its content.
+     * Musically the content forms the end of a full bar: for a 3/8 pick-up in a 2/4 time signature, tick 0 is the
+     * offbeat of beat 1. Any metric interpretation of bar relative ticks (beaming, triplet feel, metronome) has to add
+     * this offset. For all other bars it is 0. Only available after data model finish.
+     * @json_ignore
+     * @internal
+     */
+    public anacrusisOffset: number = 0;
+
+    /**
      * Gets a percentual scale for the size of the bars when displayed in a multi-track layout.
      */
     public displayScale: number = 1;
@@ -473,5 +545,10 @@ export class MasterBar {
         if (this.beamingRules) {
             sharedDataBag.set('beamingRules', beamingRules);
         }
+
+        // nominal duration is a plain calculation, the actual pick-up duration needs one pass over all staves.
+        this.anacrusisOffset = this.isAnacrusis
+            ? Math.max(0, this.calculateDuration(false) - this.calculateDuration())
+            : 0;
     }
 }

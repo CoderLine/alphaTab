@@ -1,0 +1,56 @@
+---
+title: "Playback speed"
+description: "Slower-for-practice, live slider demo."
+sidebar_custom_props:
+  feature_chapter: transport
+  feature_order: 20
+keywords:
+  - alphaTab
+  - playback
+  - speed
+  - tempo
+---
+
+import { SpeedSliderDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Learners work up to tempo. A slow-down button that pulls a tricky solo down to `0.5×` while the fingering settles in — then back up to `1.25×` for a stretch, then `1.0×` for the take — is table stakes for a practice tool. `playbackSpeed` is the single property behind that button. It scales the tempo without repitching the audio, so the note pitches stay put while the timing stretches.
+
+<SpeedSliderDemo
+  tex={Riffs.AM_VERSE_CHORUS}
+  showCode={false}
+/>
+
+## The property
+
+`playbackSpeed` is a multiplier applied to the score's tempo. `1.0` plays at the notated tempo. `0.5` runs at half speed, `2.0` at double. The playground exposes the full supported range of `0.1` through `3.0`.
+
+The setter takes effect immediately — even mid-playback — so binding it to a slider produces a smooth speed change without interrupting the audio. The pitch stays fixed; only the timing scales. Both the transport clock and the on-screen cursor follow the modified tempo.
+
+Setting `playbackSpeed` while the player is paused stores the value; it applies as soon as `play()` runs.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
+});
+
+const slider = document.getElementById('speed');
+slider.addEventListener('input', () => {
+  api.playbackSpeed = Number(slider.value);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Play, pause, stop](./play-pause-stop) — the transport methods this property modulates.
+- [Looping a section](./looping-a-section) — pair a slow speed with a tight loop for focused practice.
+- [`playbackSpeed`](/docs/reference/api/playbackspeed) reference entry.

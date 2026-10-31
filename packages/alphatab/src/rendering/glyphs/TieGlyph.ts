@@ -1,9 +1,10 @@
 import type { Note } from '@coderline/alphatab/model/Note';
-import { TextAlign, TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { Voice } from '@coderline/alphatab/model/Voice';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
-import type { ResolvedTieGlyphLabel, TieGlyphLabel } from '@coderline/alphatab/rendering/glyphs/TieGlyphLabel';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
+import type { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
@@ -16,12 +17,27 @@ export interface ITieGlyph {
      * If set, the tie bounds will be requested and the overflow is applied.
      */
     readonly checkForOverflow: boolean;
+    /**
+     * Whether {@link collectSkylineShape} describes the drawn extent, used for the skyline instead of
+     * the bounding box (which then only sizes the overflow).
+     */
+    readonly hasSkylineShape: boolean;
+    /**
+     * Adds the drawn extent to the shape, staff-local x and renderer-local y like the bounding box.
+     * Only valid once the beats are positioned.
+     */
+    collectSkylineShape(shape: SkylineShape): void;
+    getBoundingBoxTop(): number;
+    getBoundingBoxBottom(): number;
+    getBoundingBoxLeft(): number;
+    getBoundingBoxRight(): number;
 }
 
 /**
  * @internal
  */
 export abstract class TieGlyph extends Glyph implements ITieGlyph {
+    public readonly hasSkylineShape: boolean = false;
     public tieDirection: BeamDirection = BeamDirection.Up;
     public readonly slurEffectId: string;
     protected isForEnd: boolean;
@@ -37,31 +53,49 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     private _endX: number = 0;
     private _endY: number = 0;
     private _tieHeight: number = 0;
-    private _boundingBox?: Bounds;
+    private _hasBoundingBox: boolean = false;
+    private _boundingBoxX: number = 0;
+    private _boundingBoxY: number = 0;
+    private _boundingBoxW: number = 0;
+    private _boundingBoxH: number = 0;
     private _shouldPaint: boolean = false;
-    // Resolved per-label paint state. Lazily grown; re-layouts mutate
-    // existing entries in place and update `_resolvedLabelCount` to
-    // signal how many of them are valid this pass.
-    private _resolvedLabels: ResolvedTieGlyphLabel[] = [];
-    private _resolvedLabelCount: number = 0;
-    private _labelBaselineOffset: number = 0;
 
-    public get checkForOverflow() {
-        return this._shouldPaint && this._boundingBox !== undefined;
+    public collectSkylineShape(_shape: SkylineShape): void {
+        // the bounding box describes a tie closely enough
     }
 
+    public get checkForOverflow() {
+        return this._shouldPaint && this._hasBoundingBox;
+    }
+
+    /** Renderer-local Y. Staff finalize may shift `renderer.y` after tie layout, so geometry stays renderer-relative. */
     public override getBoundingBoxTop(): number {
-        if (this._boundingBox) {
-            return this._boundingBox!.y;
+        if (this._hasBoundingBox) {
+            return this._boundingBoxY;
         }
         return this._startY;
     }
 
     public override getBoundingBoxBottom(): number {
-        if (this._boundingBox) {
-            return this._boundingBox.y + this._boundingBox.h;
+        if (this._hasBoundingBox) {
+            return this._boundingBoxY + this._boundingBoxH;
         }
         return this._startY;
+    }
+
+    /** Staff-absolute X — `_startX`/`_endX` bake in their renderers' `.x` for cross-bar ties. */
+    public override getBoundingBoxLeft(): number {
+        if (this._hasBoundingBox) {
+            return this._boundingBoxX;
+        }
+        return this._startX;
+    }
+
+    public override getBoundingBoxRight(): number {
+        if (this._hasBoundingBox) {
+            return this._boundingBoxX + this._boundingBoxW;
+        }
+        return this._endX;
     }
 
     public override doLayout(): void {
@@ -97,6 +131,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 } else {
                     this._endX = this.calculateEndX();
                     this._endY = this.caclculateEndY();
+                    this._ensureMinimumSpan();
                 }
             } else {
                 this._shouldPaint = true;
@@ -104,13 +139,21 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 this._endX = this.calculateEndX();
                 this._startY = this.calculateStartY();
                 this._endY = this.caclculateEndY();
+                this._ensureMinimumSpan();
             }
             this._shouldPaint = true;
         } else if (startNoteRenderer.staff !== endNoteRenderer!.staff) {
-            const firstRendererInStaff = startNoteRenderer.staff!.barRenderers[0];
-            this._startX = firstRendererInStaff!.x;
-
+            // continued tie/slur on a new system: start after the clef and
+            // key/time signatures instead of the very left edge of the staff.
+            // ties ending on the first beat can have their end sitting directly
+            // at the start of the beat area, keep a minimum length so the
+            // continuation curve stays visible in this case.
+            const firstRendererInStaff = endNoteRenderer!.staff!.barRenderers[0];
+            // padding to shift ties clearly before the first note (slight visual tuning)
+            const padding = 2 * firstRendererInStaff!.smuflMetrics.oneStaffSpace;
             this._endX = this.calculateEndX();
+            this._startX =
+                Math.min(firstRendererInStaff!.x + firstRendererInStaff!.beatGlyphsStart, this._endX) - padding;
 
             const startGlyph = startNoteRenderer.scoreRenderer.layout!.slurRegistry.completeMultiSystemSlur(this);
             if (startGlyph) {
@@ -124,19 +167,12 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             this._shouldPaint = startNoteRenderer.staff !== endNoteRenderer!.staff;
         }
 
-        this._boundingBox = undefined;
+        this._hasBoundingBox = false;
         this.y = Math.min(this._startY, this._endY);
         const down = this.tieDirection === BeamDirection.Down;
-        let tieBoundingBox: Bounds;
-        // Bezier control points for the tie. Computed once and reused
-        // for both the bounding box (via _calculateActualTieHeightFromCps)
-        // and label-apex sampling further below — avoids a redundant
-        // call to _computeBezierControlPoints (and its 14-element array
-        // allocation) per labeled slur per layout.
-        let cps: number[] = [];
         if (this.shouldDrawBendSlur()) {
             this._tieHeight = 0;
-            tieBoundingBox = TieGlyph.calculateBendSlurHeight(
+            const bendBoundingBox = TieGlyph.calculateBendSlurHeight(
                 this._startX,
                 this._startY,
                 this._endX,
@@ -144,108 +180,61 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 down,
                 this.renderer.smuflMetrics.tieHeight
             );
+            this._boundingBoxX = bendBoundingBox.x;
+            this._boundingBoxY = bendBoundingBox.y;
+            this._boundingBoxW = bendBoundingBox.w;
+            this._boundingBoxH = bendBoundingBox.h;
         } else {
             this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
             const tieThickness = this.renderer.smuflMetrics.tieMidpointThickness;
-            cps = TieGlyph._computeBezierControlPoints(
-                1,
-                this._startX,
-                this._startY,
-                this._endX,
-                this._endY,
-                down,
-                this._tieHeight,
-                tieThickness
-            );
-            tieBoundingBox = TieGlyph._calculateActualTieHeightFromCps(
-                cps,
-                this._startX,
-                this._startY,
-                this._endX,
-                this._endY,
-                down,
-                tieThickness
-            );
-        }
-
-        this._boundingBox = tieBoundingBox;
-        this._resolvedLabelCount = 0;
-        const labels = this.getSlurLabels();
-        if (labels !== null && labels.length > 0 && this.shouldPaintLabels()) {
-            const res = this.renderer.settings.display.resources;
-            const padding = this.renderer.smuflMetrics.oneStaffSpace * 0.25;
-            let maxTextHeight = 0;
-
-            // Single Y line for all labels — the outer arc apex.
-            // Painted offset adds `padding` on the outward side, so
-            // every label sits the same fixed distance from its arc.
-            const labelLineY = cps.length > 0
-                ? 0.125 * cps[7] + 0.375 * cps[9] + 0.375 * cps[11] + 0.125 * cps[13]
-                : (this._startY + this._endY) / 2;
-
-            for (const label of labels) {
-                const fromX = this.resolveLabelAnchorX(label.fromNote);
-                const toX = this.resolveLabelAnchorX(label.toNote);
-                if (fromX === null || toX === null) {
-                    continue;
-                }
-                const midX = (fromX + toX) / 2;
-                if (midX < this._startX || midX > this._endX) {
-                    continue;
-                }
-
-                // Per-element font.size as an upper bound on glyph
-                // height — avoids per-label measureText calls. All H/P
-                // and sl. labels use the same _effectFont, so this is
-                // typically computed once.
-                const font = res.getFontForNotationElement(label.element);
-                if (font.size > maxTextHeight) {
-                    maxTextHeight = font.size;
-                }
-
-                // grow cache lazily; mutate existing slot in place otherwise
-                let slot: ResolvedTieGlyphLabel;
-                if (this._resolvedLabelCount < this._resolvedLabels.length) {
-                    slot = this._resolvedLabels[this._resolvedLabelCount];
-                    slot.x = midX;
-                    slot.y = labelLineY;
-                    slot.text = label.text;
-                    slot.element = label.element;
-                } else {
-                    slot = {
-                        x: midX,
-                        y: labelLineY,
-                        text: label.text,
-                        element: label.element
-                    };
-                    this._resolvedLabels.push(slot);
-                }
-                this._resolvedLabelCount++;
-            }
-
-            if (this._resolvedLabelCount > 0) {
-                // canvas.textBaseline is 'hanging' (TextBaseline.Top), so
-                // fillText positions `y` at the glyph's top edge.
-                if (this.tieDirection === BeamDirection.Up) {
-                    tieBoundingBox.y -= maxTextHeight + padding;
-                    this._labelBaselineOffset = -(maxTextHeight + padding);
-                } else {
-                    this._labelBaselineOffset = padding;
-                }
-                tieBoundingBox.h += maxTextHeight + padding;
+            const cps = this.renderer.scoreRenderer.layout!.tieControlPoints;
+            if (
+                TieGlyph._computeBezierControlPoints(
+                    cps,
+                    1,
+                    this._startX,
+                    this._startY,
+                    this._endX,
+                    this._endY,
+                    down,
+                    this._tieHeight,
+                    tieThickness
+                )
+            ) {
+                this._setBoundingBoxFromCps(cps, down, tieThickness);
+            } else {
+                this._boundingBoxX = this._startX;
+                this._boundingBoxY = this._startY;
+                this._boundingBoxW = this._endX - this._startX;
+                this._boundingBoxH = this._endY - this._startY;
             }
         }
 
-        this.height = tieBoundingBox.h;
+        this._hasBoundingBox = true;
+        this.height = this._boundingBoxH;
 
         if (this.tieDirection === BeamDirection.Up) {
             // the tie might go above `this.y` due to its shape
             // here we calculate how much this is so we can consider the
             // respective overflow
-            const overlap = this.y - tieBoundingBox.y;
+            const overlap = this.y - this._boundingBoxY;
             if (overlap > 0) {
                 this.y -= overlap;
             }
+        }
+    }
+
+    /**
+     * Keeps ties and slurs at least as long as the padding the spacing keeps between beats. Only bars
+     * squeezed below their minimum width (overlapping content) can bring the anchors closer than this or
+     * even reverse their order, which would otherwise produce degenerated or inverted curves.
+     */
+    private _ensureMinimumSpan(): void {
+        const minSpan = this.renderer.smuflMetrics.beatContentPadding;
+        if (this._endX - this._startX < minSpan) {
+            const center = (this._startX + this._endX) / 2;
+            this._startX = center - minSpan / 2;
+            this._endX = center + minSpan / 2;
         }
     }
 
@@ -254,102 +243,44 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             return;
         }
 
+        // Tie Y is renderer-local; resolve `renderer.y` at paint time.
+        const rendererY = this.renderer.y;
+
         const isDown = this.tieDirection === BeamDirection.Down;
 
         if (this.shouldDrawBendSlur()) {
             TieGlyph.drawBendSlur(
                 canvas,
                 cx + this._startX,
-                cy + this._startY,
+                cy + rendererY + this._startY,
                 cx + this._endX,
-                cy + this._endY,
+                cy + rendererY + this._endY,
                 isDown,
                 this.renderer.smuflMetrics.tieHeight
             );
         } else {
             TieGlyph.paintTie(
                 canvas,
+                this.renderer.scoreRenderer.layout!.tiePaintControlPoints,
                 1,
                 cx + this._startX,
-                cy + this._startY,
+                cy + rendererY + this._startY,
                 cx + this._endX,
-                cy + this._endY,
+                cy + rendererY + this._endY,
                 isDown,
                 this._tieHeight,
                 this.renderer.smuflMetrics.tieMidpointThickness
             );
         }
-
-        if (this._resolvedLabelCount > 0) {
-            const ta = canvas.textAlign;
-            const tb = canvas.textBaseline;
-            canvas.textAlign = TextAlign.Center;
-            canvas.textBaseline = TextBaseline.Top;
-            const res = this.renderer.resources;
-            let lastElement = -1;
-            for (let i = 0; i < this._resolvedLabelCount; i++) {
-                const label = this._resolvedLabels[i];
-                if (label.element !== lastElement) {
-                    canvas.font = res.getFontForNotationElement(label.element);
-                    lastElement = label.element;
-                }
-                canvas.fillText(label.text, cx + label.x, cy + label.y + this._labelBaselineOffset);
-            }
-            canvas.textAlign = ta;
-            canvas.textBaseline = tb;
-        }
-    }
-
-    /**
-     * Returns the labels to paint along this slur, or `null` when there
-     * are none. Override in subclasses.
-     */
-    protected getSlurLabels(): TieGlyphLabel[] | null {
-        return null;
-    }
-
-    /**
-     * Whether label painting is enabled. Defaults to `true`. Subclasses
-     * may override to disable labels on the bend-slur path or other
-     * special cases.
-     */
-    protected shouldPaintLabels(): boolean {
-        return !this.shouldDrawBendSlur();
-    }
-
-    /**
-     * Looks up the absolute X coordinate of an anchor note. Reuses
-     * the start/end bar renderers already resolved by the subclass
-     * (NoteTieGlyph) when the note's bar matches — most labels live
-     * in the slur's start or end bar, so this avoids the double Map
-     * lookup in `getRendererForBar` per label per layout. Returns
-     * `null` when the note's bar is not rendered on this glyph's
-     * staff (cross-system case).
-     */
-    protected resolveLabelAnchorX(note: Note): number | null {
-        const bar = note.beat.voice.bar;
-        let renderer: LineBarRenderer | null = null;
-        const start = this.lookupStartBeatRenderer();
-        if (start !== null && start.bar === bar) {
-            renderer = start;
-        } else {
-            const end = this.lookupEndBeatRenderer();
-            if (end !== null && end.bar === bar) {
-                renderer = end;
-            } else {
-                renderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                    this.renderer.staff!.staffId,
-                    bar
-                ) as LineBarRenderer | null;
-            }
-        }
-        if (renderer === null) {
-            return null;
-        }
-        return renderer.x + renderer.getNoteX(note, NoteXPosition.Center);
     }
 
     protected abstract shouldDrawBendSlur(): boolean;
+
+    /**
+     * The voice the tie or slur starts in. Its voice colour applies to every piece of the tie, including the
+     * continuations on later systems.
+     */
+    public abstract get voice(): Voice;
 
     public getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
         return this.renderer.smuflMetrics.tieHeight;
@@ -368,11 +299,8 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
 
     protected abstract calculateEndX(): number;
 
-    public calculateMultiSystemSlurY(renderer: BarRendererBase) {
-        const startRenderer = this.lookupStartBeatRenderer();
-        const startY = this.calculateStartY();
-        const relY = startY - startRenderer.y;
-        return renderer.y + relY;
+    public calculateMultiSystemSlurY(_renderer: BarRendererBase) {
+        return this.calculateStartY();
     }
 
     public shouldCreateMultiSystemSlur(renderer: BarRendererBase) {
@@ -394,28 +322,43 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         offset: number,
         size: number
     ): Bounds {
-        const cp = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
-        return TieGlyph._calculateActualTieHeightFromCps(cp, x1, y1, x2, y2, down, size);
+        const cp = TieGlyph.newControlPoints();
+        if (!TieGlyph._computeBezierControlPoints(cp, scale, x1, y1, x2, y2, down, offset, size)) {
+            return new Bounds(x1, y1, x2 - x1, y2 - y1);
+        }
+        TieGlyph._calculateBoundingBoxFromCps(cp, down, size);
+        return new Bounds(cp[14], cp[15], cp[16], cp[17]);
     }
 
     /**
-     * Derives the bounding box for a tie from already-computed control
-     * points. Splits the bbox math from cps generation so callers that
-     * need BOTH cps and bbox (e.g. multi-label slur layout) avoid a
-     * second call to `_computeBezierControlPoints`.
+     * Creates the scratch array the tie geometry is computed in: 14 control point coordinates followed
+     * by the bounding box (x, y, w, h).
      */
-    private static _calculateActualTieHeightFromCps(
-        cp: number[],
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        down: boolean,
-        size: number
-    ): Bounds {
-        if (cp.length === 0) {
-            return new Bounds(x1, y1, x2 - x1, y2 - y1);
+    public static newControlPoints(): number[] {
+        // the fractional literal makes JS engines store the list as doubles from the start, so the
+        // fractional coordinates written into it do not reallocate it (`fill` would make it an integer list again)
+        const cps: number[] = [
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
+        ];
+        for (let i = 0; i < cps.length; i++) {
+            cps[i] = 0;
         }
+        return cps;
+    }
+
+    private _setBoundingBoxFromCps(cp: number[], down: boolean, size: number): void {
+        TieGlyph._calculateBoundingBoxFromCps(cp, down, size);
+        this._boundingBoxX = cp[14];
+        this._boundingBoxY = cp[15];
+        this._boundingBoxW = cp[16];
+        this._boundingBoxH = cp[17];
+    }
+
+    /**
+     * Derives the bounding box of a tie from the control points in `cp[0..13]` and stores it in
+     * `cp[14..17]` as x, y, w, h.
+     */
+    private static _calculateBoundingBoxFromCps(cp: number[], down: boolean, size: number): void {
         const p0x = cp[0];
         const p0y = cp[1];
         const c1x = cp[2];
@@ -439,15 +382,18 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             yMin -= size;
         }
 
-        const b = new Bounds();
-        b.x = xMin;
-        b.y = yMin;
-        b.w = xMax - xMin;
-        b.h = yMax - yMin;
-        return b;
+        cp[14] = xMin;
+        cp[15] = yMin;
+        cp[16] = xMax - xMin;
+        cp[17] = yMax - yMin;
     }
 
+    /**
+     * Writes the control points of the tie outline into `cps[0..13]`.
+     * @returns false (and leaves `cps` untouched) when start and end coincide.
+     */
     private static _computeBezierControlPoints(
+        cps: number[],
         scale: number,
         x1: number,
         y1: number,
@@ -456,9 +402,9 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         down: boolean,
         offset: number,
         size: number
-    ): number[] {
+    ): boolean {
         if (x1 === x2 && y1 === y2) {
-            return [];
+            return false;
         }
 
         // ensure endX > startX
@@ -514,26 +460,52 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         let cp4y = y1 - offset - size;
 
         const angle = Math.atan2(dY, dX);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
 
-        [cp1x, cp1y] = TieGlyph._rotate(cp1x, cp1y, x1, y1, angle);
-        [cp2x, cp2y] = TieGlyph._rotate(cp2x, cp2y, x1, y1, angle);
-        [cp3x, cp3y] = TieGlyph._rotate(cp3x, cp3y, x1, y1, angle);
-        [cp4x, cp4y] = TieGlyph._rotate(cp4x, cp4y, x1, y1, angle);
+        let dx = cp1x - x1;
+        let dy = cp1y - y1;
+        cp1x = x1 + (dx * cos - dy * sin);
+        cp1y = y1 + (dx * sin + dy * cos);
 
-        return [x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, cp3x, cp3y, cp4x, cp4y, x1, y1];
+        dx = cp2x - x1;
+        dy = cp2y - y1;
+        cp2x = x1 + (dx * cos - dy * sin);
+        cp2y = y1 + (dx * sin + dy * cos);
+
+        dx = cp3x - x1;
+        dy = cp3y - y1;
+        cp3x = x1 + (dx * cos - dy * sin);
+        cp3y = y1 + (dx * sin + dy * cos);
+
+        dx = cp4x - x1;
+        dy = cp4y - y1;
+        cp4x = x1 + (dx * cos - dy * sin);
+        cp4y = y1 + (dx * sin + dy * cos);
+
+        cps[0] = x1;
+        cps[1] = y1;
+        cps[2] = cp1x;
+        cps[3] = cp1y;
+        cps[4] = cp2x;
+        cps[5] = cp2y;
+        cps[6] = x2;
+        cps[7] = y2;
+        cps[8] = cp3x;
+        cps[9] = cp3y;
+        cps[10] = cp4x;
+        cps[11] = cp4y;
+        cps[12] = x1;
+        cps[13] = y1;
+        return true;
     }
 
-    private static _rotate(x: number, y: number, rotateX: number, rotateY: number, angle: number): [number, number] {
-        const dx = x - rotateX;
-        const dy = y - rotateY;
-        const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
-        const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
-        return [rotateX + rx, rotateY + ry];
-    }
-
-
+    /**
+     * @param cps scratch for the tie geometry, see {@link newControlPoints}.
+     */
     public static paintTie(
         canvas: ICanvas,
+        cps: number[],
         scale: number,
         x1: number,
         y1: number,
@@ -543,7 +515,9 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         offset: number /*= 22*/,
         size: number /*= 4*/
     ): void {
-        const cps = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
+        if (!TieGlyph._computeBezierControlPoints(cps, scale, x1, y1, x2, y2, down, offset, size)) {
+            cps = [];
+        }
 
         canvas.beginPath();
         canvas.moveTo(cps[0], cps[1]);
@@ -568,80 +542,15 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         // canvas.color = c;
     }
 
-    public static calculateBendSlurTopY(
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        down: boolean,
-        scale: number,
-        bendSlurHeight: number
-    ) {
-        let normalVectorX: number = y2 - y1;
-        let normalVectorY: number = x2 - x1;
-        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
-        if (down) {
-            normalVectorX *= -1;
-        } else {
-            normalVectorY *= -1;
-        }
-        // make to unit vector
-        normalVectorX /= length;
-        normalVectorY /= length;
-
-        let offset: number = bendSlurHeight * scale;
-        if (x2 - x1 < 20) {
-            offset /= 2;
-        }
-        const centerY: number = (y2 + y1) / 2;
-        const cp1Y: number = centerY + offset * normalVectorY;
-
-        return cp1Y;
-    }
-
-    public static calculateBendSlurHeight(
+    /** The peak `[x, y]` through which {@link drawBendSlur} draws the slur. */
+    public static calculateBendSlurPeak(
         x1: number,
         y1: number,
         x2: number,
         y2: number,
         down: boolean,
         bendSlurHeight: number
-    ): Bounds {
-        let normalVectorX: number = y2 - y1;
-        let normalVectorY: number = x2 - x1;
-        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
-        if (down) {
-            normalVectorX *= -1;
-        } else {
-            normalVectorY *= -1;
-        }
-        // make to unit vector
-        normalVectorX /= length;
-        normalVectorY /= length;
-        // center of connection
-        const centerY: number = (y2 + y1) / 2;
-        let offset: number = bendSlurHeight;
-        if (x2 - x1 < 20) {
-            offset /= 2;
-        }
-        const cp1Y: number = centerY + offset * normalVectorY;
-
-        const minY = Math.min(y1, y2, cp1Y);
-        const maxY = Math.max(y1, y2, cp1Y);
-
-        return new Bounds(x1, Math.min(y1, y2, cp1Y), x2 - x1, maxY - minY);
-    }
-
-    public static drawBendSlur(
-        canvas: ICanvas,
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        down: boolean,
-        bendSlurHeight: number,
-        slurText?: string
-    ): void {
+    ): [number, number] {
         let normalVectorX: number = y2 - y1;
         let normalVectorY: number = x2 - x1;
         const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
@@ -660,8 +569,48 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         if (x2 - x1 < 20) {
             offset /= 2;
         }
-        const cp1X: number = centerX + offset * normalVectorX;
-        const cp1Y: number = centerY + offset * normalVectorY;
+        return [centerX + offset * normalVectorX, centerY + offset * normalVectorY];
+    }
+
+    public static calculateBendSlurTopY(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        scale: number,
+        bendSlurHeight: number
+    ) {
+        return TieGlyph.calculateBendSlurPeak(x1, y1, x2, y2, down, bendSlurHeight * scale)[1];
+    }
+
+    public static calculateBendSlurHeight(
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        bendSlurHeight: number
+    ): Bounds {
+        const cp1Y = TieGlyph.calculateBendSlurPeak(x1, y1, x2, y2, down, bendSlurHeight)[1];
+        const minY = Math.min(y1, y2, cp1Y);
+        const maxY = Math.max(y1, y2, cp1Y);
+        return new Bounds(x1, minY, x2 - x1, maxY - minY);
+    }
+
+    public static drawBendSlur(
+        canvas: ICanvas,
+        x1: number,
+        y1: number,
+        x2: number,
+        y2: number,
+        down: boolean,
+        bendSlurHeight: number,
+        slurText?: string
+    ): void {
+        const peak = TieGlyph.calculateBendSlurPeak(x1, y1, x2, y2, down, bendSlurHeight);
+        const cp1X = peak[0];
+        const cp1Y = peak[1];
         canvas.beginPath();
         canvas.moveTo(x1, y1);
         canvas.lineTo(cp1X, cp1Y);
@@ -689,6 +638,10 @@ export abstract class NoteTieGlyph extends TieGlyph {
         super(slurEffectId, forEnd);
         this.startNote = startNote;
         this.endNote = endNote;
+    }
+
+    public override get voice(): Voice {
+        return this.startNote.beat.voice;
     }
 
     protected get isLeftHandTap() {
@@ -727,14 +680,14 @@ export abstract class NoteTieGlyph extends TieGlyph {
     protected override calculateStartY(): number {
         const startNoteRenderer = this.lookupStartBeatRenderer();
         if (this.isLeftHandTap) {
-            return startNoteRenderer.y + startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Center);
+            return startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Center);
         }
 
         switch (this.tieDirection) {
             case BeamDirection.Up:
-                return startNoteRenderer.y + startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
+                return startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
             default:
-                return startNoteRenderer.y + startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Bottom);
+                return startNoteRenderer.getNoteY(this.startNote, NoteYPosition.Bottom);
         }
     }
 
@@ -760,14 +713,14 @@ export abstract class NoteTieGlyph extends TieGlyph {
         }
 
         if (this.isLeftHandTap) {
-            return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
+            return endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Center);
         }
 
         switch (this.tieDirection) {
             case BeamDirection.Up:
-                return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Top);
+                return endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Top);
             default:
-                return endNoteRenderer.y + endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Bottom);
+                return endNoteRenderer!.getNoteY(this.endNote, NoteYPosition.Bottom);
         }
     }
 
@@ -808,6 +761,10 @@ export class ContinuationTieGlyph extends TieGlyph {
         this._startTie = startTie;
     }
 
+    public override get voice(): Voice {
+        return this._startTie.voice;
+    }
+
     protected override lookupStartBeatRenderer() {
         return this.renderer as LineBarRenderer;
     }
@@ -832,7 +789,8 @@ export class ContinuationTieGlyph extends TieGlyph {
     }
 
     protected override calculateStartX(): number {
-        return this.renderer.staff!.barRenderers[0].x;
+        const first = this.renderer.staff!.barRenderers[0];
+        return first.x + first.beatGlyphsStart - 2 * first.smuflMetrics.oneStaffSpace;
     }
 
     protected override calculateEndX(): number {

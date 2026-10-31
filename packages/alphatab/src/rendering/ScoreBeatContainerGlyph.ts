@@ -6,18 +6,20 @@ import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
-import { BeatContainerGlyph } from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
+import {
+    BeatContainerGlyph,
+    type BeatContainerGlyphBase
+} from '@coderline/alphatab/rendering/glyphs/BeatContainerGlyph';
 import { FlagGlyph } from '@coderline/alphatab/rendering/glyphs/FlagGlyph';
 import { ScoreBeatGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatGlyph';
 import { ScoreBeatPreNotesGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBeatPreNotesGlyph';
 import { ScoreBendGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreBendGlyph';
+import { ScoreEffectSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreEffectSlurGlyph';
 import { ScoreLegatoGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlideLineGlyph';
 import { ScoreSlurGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTieGlyph';
-import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
@@ -34,11 +36,12 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public get prebendNoteHeadOffset() {
-        return (this.preNotes as ScoreBeatPreNotesGlyph).prebendNoteHeadOffset;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
+        return preNotes ? preNotes.prebendNoteHeadOffset : 0;
     }
 
     public get accidentalsWidth() {
-        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
         if (preNotes && preNotes.accidentals) {
             return preNotes.accidentals.width;
         }
@@ -46,10 +49,16 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public override doMultiVoiceLayout(): void {
-        this.preNotes.x = 0;
-        (this.preNotes as ScoreBeatPreNotesGlyph).doMultiVoiceLayout();
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
+        if (preNotes) {
+            preNotes.x = 0;
+            preNotes.doMultiVoiceLayout();
+            this.onNotes.x = preNotes.x + preNotes.width;
+        } else {
+            this.onNotes.x = 0;
+        }
         (this.onNotes as ScoreBeatGlyph).doMultiVoiceLayout();
+        this.invalidateNoteExtent();
 
         this._bend?.doMultiVoiceLayout();
     }
@@ -85,7 +94,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override getBoundingBoxTop(): number {
         if (this._bend !== null) {
-            return ModelUtils.minBoundingBox(this._bend.getBoundingBoxTop(), super.getBoundingBoxTop());
+            return ModelUtils.minBoundingBox(this._bend.getEstimatedBoundingBoxTop(), super.getBoundingBoxTop());
         } else {
             return super.getBoundingBoxTop();
         }
@@ -93,7 +102,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override getBoundingBoxBottom(): number {
         if (this._bend !== null) {
-            return ModelUtils.maxBoundingBox(this._bend.getBoundingBoxBottom(), super.getBoundingBoxTop());
+            return ModelUtils.maxBoundingBox(this._bend.getEstimatedBoundingBoxBottom(), super.getBoundingBoxBottom());
         } else {
             return super.getBoundingBoxBottom();
         }
@@ -133,26 +142,25 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             const tie: ScoreSlurGlyph = new ScoreSlurGlyph(`score.slur.${n.slurOrigin!.id}`, n.slurOrigin!, n, true);
             this.addTie(tie);
         }
+        // effect slurs (hammer-on, pull-off, legato slide) are a single slur per chord
         // start effect slur on first beat
-        if (!this._effectSlur && n.isEffectSlurOrigin && n.effectSlurDestination) {
-            const effectSlur = new ScoreSlurGlyph(`score.slur.effect.${n.beat.id}`, n, n.effectSlurDestination, false);
-            this._effectSlur = effectSlur;
-            this.addTie(effectSlur);
+        const beat = n.beat;
+        if (!this._effectSlur && n.isEffectSlurOrigin) {
+            const destination = ScoreEffectSlurGlyph.getDestinationBeat(beat);
+            if (destination) {
+                const effectSlur = new ScoreEffectSlurGlyph(`score.slur.effect.${beat.id}`, beat, destination, false);
+                this._effectSlur = effectSlur;
+                this.addTie(effectSlur);
+            }
         }
         // end effect slur on last beat
-        if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
-            const direction = (this.renderer as LineBarRenderer).getBeatDirection(n.beat);
-            const startNote =
-                direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
-            const endNote = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
-            const effectEndSlur = new ScoreSlurGlyph(
-                `score.slur.effect.${startNote.beat.id}`,
-                startNote,
-                endNote,
-                true
-            );
-            this._effectEndSlur = effectEndSlur;
-            this.addTie(effectEndSlur);
+        if (!this._effectEndSlur && n.effectSlurOrigin) {
+            const origin = n.effectSlurOrigin.beat;
+            if (ScoreEffectSlurGlyph.getDestinationBeat(origin) === beat) {
+                const effectEndSlur = new ScoreEffectSlurGlyph(`score.slur.effect.${origin.id}`, origin, beat, true);
+                this._effectEndSlur = effectEndSlur;
+                this.addTie(effectEndSlur);
+            }
         }
         if (n.hasBend) {
             if (!this._bend) {
@@ -186,6 +194,45 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             }
         }
     }
+
+    public override fitToNextBeat(next: BeatContainerGlyphBase): void {
+        const own = (this.onNotes as ScoreBeatGlyph).noteHeads;
+        const other = next instanceof ScoreBeatContainerGlyph ? (next.onNotes as ScoreBeatGlyph).noteHeads : null;
+        const both = own !== null && other !== null;
+        const sharesTop = both && own!.hasTopLedgerLines && other!.hasTopLedgerLines;
+        const sharesBottom = both && own!.hasBottomLedgerLines && other!.hasBottomLedgerLines;
+
+        let ownTrim = 0;
+        let otherTrim = 0;
+        if (sharesTop || sharesBottom) {
+            const ownExtension = own!.ledgerLineExtension;
+            const otherExtension = other!.ledgerLineExtension;
+            const ownEnd = this.x + this.onNotes.x + own!.x + own!.width + ownExtension;
+            const otherStart =
+                next.x + (next as ScoreBeatContainerGlyph).onNotes.x + other!.x + other!.noteStartX - otherExtension;
+            const missing =
+                ScoreBeatContainerGlyph.ledgerLineGap * this.renderer.smuflMetrics.oneStaffSpace -
+                (otherStart - ownEnd);
+            if (missing > 0) {
+                // shorten both facing ledger lines equally, but never shorter than the note heads
+                ownTrim = Math.min(ownExtension, missing / 2);
+                otherTrim = Math.min(otherExtension, missing - ownTrim);
+                ownTrim = Math.min(ownExtension, missing - otherTrim);
+            }
+        }
+
+        if (own) {
+            own.setLedgerLineTrimsRight(sharesTop ? ownTrim : 0, sharesBottom ? ownTrim : 0);
+        }
+        if (other) {
+            other.setLedgerLineTrimsLeft(sharesTop ? otherTrim : 0, sharesBottom ? otherTrim : 0);
+        }
+    }
+
+    /**
+     * The minimum gap between the ledger lines of neighbouring notes in stave-spaces (MuseScore's ledger line padding).
+     */
+    public static readonly ledgerLineGap: number = 0.25;
 
     private _flagStretch = 0;
 

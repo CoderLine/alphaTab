@@ -1,17 +1,26 @@
+import { MusicXmlNoteLinks, MusicXmlNoteLinkType } from '@coderline/alphatab/importer/MusicXmlNoteLinks';
+import { MusicXmlSpanApplier } from '@coderline/alphatab/importer/MusicXmlSpanApplier';
+import {
+    type MusicXmlSpanEvent,
+    MusicXmlSpanKind,
+    type MusicXmlSpanPlacement,
+    MusicXmlSpanReader,
+    MusicXmlSpanTracker
+} from '@coderline/alphatab/importer/MusicXmlSpans';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { Logger } from '@coderline/alphatab/Logger';
+import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
-import { Bar, BarLineStyle, SustainPedalMarkerType, SustainPedalMarker } from '@coderline/alphatab/model/Bar';
+import { Bar, BarLineStyle } from '@coderline/alphatab/model/Bar';
 import { Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { Chord } from '@coderline/alphatab/model/Chord';
 import { Clef } from '@coderline/alphatab/model/Clef';
-import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
@@ -19,6 +28,7 @@ import { FermataType, Fermata } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { InstrumentArticulation } from '@coderline/alphatab/model/InstrumentArticulation';
 import { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
@@ -34,8 +44,6 @@ import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
-import { SimileMark } from '@coderline/alphatab/model/SimileMark';
-import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
@@ -50,23 +58,53 @@ import type { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
 
 /**
+ * The pitch a note of a MusicXML harmonic describes.
+ * @internal
+ */
+enum MusicXmlHarmonicPitch {
+    None = 0,
+    Base = 1,
+    Touching = 2,
+    Sounding = 3
+}
+
+/**
+ * @internal
+ * @record
+ */
+interface MusicXmlHarmonic {
+    type: HarmonicType;
+    pitch: MusicXmlHarmonicPitch;
+    /**
+     * Groups the notes of one harmonic when a chord holds several of them (number-level, MusicXML 4.1).
+     */
+    group: string;
+}
+
+/**
+ * The note which represents a MusicXML harmonic in the current beat.
+ * @internal
+ * @record
+ */
+interface MusicXmlHarmonicGroup {
+    note: Note;
+    type: HarmonicType;
+    isBasePitch: boolean;
+    hasTouchingPitch: boolean;
+}
+
+/**
  * @internal
  */
 class StaffContext {
-    public slurStarts!: Map<string, Note>;
-    public currentDynamics = DynamicValue.F;
-    public tieStarts!: Set<Note>;
-    public tieStartIds!: Map<string, Note>;
-    public slideOrigins: Map<string, Note> = new Map<string, Note>();
+    /**
+     * The dynamics of a direction, shown on the next note of the staff (and of the voice, if given).
+     */
+    public pendingDynamics: DynamicValue | null = null;
+    public pendingDynamicsVoice: string = '';
+    public lastDynamics: DynamicValue | null = null;
     public transpose: number = 0;
     public isExplicitlyBeamed = false;
-
-    constructor() {
-        this.tieStarts = new Set<Note>();
-        this.tieStartIds = new Map<string, Note>();
-        this.slideOrigins = new Map<string, Note>();
-        this.slurStarts = new Map<string, Note>();
-    }
 }
 
 /**
@@ -97,6 +135,11 @@ class InstrumentArticulationWithPlaybackInfo extends InstrumentArticulation {
      * The balance to use when playing the note (-1 if using the default track balance).
      */
     public outputBalance: number = -1;
+
+    /**
+     * Whether this instrument was declared as an unpitched/percussion sound via `<midi-unpitched>`.
+     */
+    public isUnpitched: boolean = false;
 }
 
 /**
@@ -111,6 +154,16 @@ class TrackInfo {
     >();
 
     private _instrumentIdToArticulationIndex: Map<string, number> = new Map<string, number>();
+
+    /**
+     * The spans of directions and measure styles (e.g. let ring), span numbers are unique within a part.
+     */
+    public spans: MusicXmlSpanTracker = new MusicXmlSpanTracker();
+    public noteLinks: MusicXmlNoteLinks = new MusicXmlNoteLinks();
+    /**
+     * The alternate endings started but not stopped yet.
+     */
+    public openEndings: number = 0;
 
     private _lyricsLine = 0;
     private _lyricsLines: Map<string, number> = new Map<string, number>();
@@ -189,6 +242,23 @@ class TrackInfo {
         this.track.percussionArticulations.push(newArticulation);
         return index;
     }
+
+    public isUnpitchedInstrument(instrumentId: string): boolean {
+        return this.instruments.has(instrumentId) && this.instruments.get(instrumentId)!.isUnpitched;
+    }
+}
+
+/**
+ * Tracks how raw MusicXML voice numbers on a staff map into alphaTab's local
+ * (dense, 0-based) voice slots. Collapses MuseScore's sparse `staff*4+local`
+ * convention (staff 2 → voices 5..8) into dense per-staff indices.
+ * @internal
+ */
+class StaffVoicePacking {
+    // raw MusicXML voice string -> assigned local voice index on this staff
+    public readonly mapping: Map<string, number> = new Map<string, number>();
+    // raw voice strings kept in ascending numeric order (localIndex == index in this array)
+    public readonly sortedRawVoices: string[] = [];
 }
 
 /**
@@ -199,12 +269,25 @@ export class MusicXmlImporter extends ScoreImporter {
     private _idToTrackInfo: Map<string, TrackInfo> = new Map<string, TrackInfo>();
     private _indexToTrackInfo: Map<number, TrackInfo> = new Map<number, TrackInfo>();
     private _staffToContext: Map<Staff, StaffContext> = new Map<Staff, StaffContext>();
+    private _staffVoicePacking: Map<Staff, StaffVoicePacking> = new Map<Staff, StaffVoicePacking>();
 
-    private _currentBarNumberDisplayPart?: BarNumberDisplay;
-    private _currentBarNumberDisplayBar?: BarNumberDisplay;
+    /**
+     * The `measure-numbering` holds until it is changed, for all parts (`print` outside of a part)
+     * or for a single part.
+     */
+    private _barNumberDisplayAllParts?: BarNumberDisplay;
+    private _barNumberDisplayByTrack: Map<Track, BarNumberDisplay> = new Map<Track, BarNumberDisplay>();
+    /**
+     * The bar number the next (non-implicit) master bar gets by sequential counting.
+     * Used to only store custom bar numbers where the measure number differs from it.
+     */
+    private _nextBarNumber: number = 1;
 
     private _divisionsPerQuarterNote: number = 1;
-    private _currentDynamics = DynamicValue.F;
+    /**
+     * Whether the exporter writes the stop of octave shifts before the last shifted note instead of after it.
+     */
+    private _octaveShiftEndsBeforeLastNote: boolean = false;
 
     public get name(): string {
         return 'MusicXML';
@@ -219,14 +302,44 @@ export class MusicXmlImporter extends ScoreImporter {
             throw new UnsupportedFormatError('Unsupported format', e as Error);
         }
         this._score = new Score();
+        this._nextBarNumber = 1;
         this._score.stylesheet.hideDynamics = true;
 
         this._parseDom(dom);
+        this._applySpans();
+        this._applyDynamics();
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
 
         return this._score;
+    }
+
+    /**
+     * Applies the spans of all parts once all beats are known: a span can cover beats which appear before
+     * its start or after its stop in the document (other voices or staves). Must run before the model is finished
+     * as the note effects are linked there.
+     */
+    private _applySpans() {
+        const voiceIndexOf = (staff: Staff, voice: string) => {
+            if (this._staffVoicePacking.has(staff)) {
+                const mapping = this._staffVoicePacking.get(staff)!.mapping;
+                if (mapping.has(voice)) {
+                    return mapping.get(voice)!;
+                }
+            }
+            return -1;
+        };
+        for (const info of this._indexToTrackInfo.values()) {
+            new MusicXmlSpanApplier(
+                info.track,
+                this._score.masterBars,
+                this._beats,
+                voiceIndexOf,
+                this._octaveShiftEndsBeforeLastNote
+            ).apply(info.spans.finish());
+            info.noteLinks.apply();
+        }
     }
 
     private _extractMusicXml(): string {
@@ -568,7 +681,18 @@ export class MusicXmlImporter extends ScoreImporter {
                         this._score.tab += ` (${c.attributes.get('type')})`;
                     }
                     break;
-                // case 'software': Ignored
+                case 'software':
+                    // Finale and Sibelius write the end of octave shifts before the last shifted note
+                    // (see MusicXML test suite 33da, MuseScore import)
+                    const software = c.innerText.toLowerCase();
+                    if (
+                        software.indexOf('finale') >= 0 ||
+                        software.indexOf('sibelius') >= 0 ||
+                        software.indexOf('dolet') >= 0
+                    ) {
+                        this._octaveShiftEndsBeforeLastNote = true;
+                    }
+                    break;
                 case 'encoding-description':
                     this._score.notices += MusicXmlImporter._sanitizeDisplay(c.innerText);
                     break;
@@ -692,6 +816,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 case 'midi-unpitched':
                     articulation.outputMidiNumber = Number.parseInt(c.innerText, 10) - 1;
+                    articulation.isUnpitched = true;
                     break;
                 case 'volume':
                     articulation.outputVolume = MusicXmlImporter._interpolatePercent(Number.parseFloat(c.innerText));
@@ -873,43 +998,51 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
             }
         }
-
-        this._currentBarNumberDisplayPart = undefined;
     }
 
     private _parsePartwiseMeasure(element: XmlNode, track: Track, index: number) {
-        const masterBar = this._getOrCreateMasterBar(element, index);
+        const masterBar = this._getOrCreateMasterBar(element, index, element.getAttribute('number'));
         const implicit = element.attributes.get('implicit') === 'yes';
-        this._parsePartMeasure(element, masterBar, track, implicit, true);
-        this._currentBarNumberDisplayBar = undefined;
+        this._parsePartMeasure(element, masterBar, track, implicit);
     }
 
     private _parseTimewiseMeasure(element: XmlNode, index: number) {
-        const masterBar = this._getOrCreateMasterBar(element, index);
+        const masterBar = this._getOrCreateMasterBar(element, index, element.getAttribute('number'));
         const implicit = element.attributes.get('implicit') === 'yes';
 
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'part':
                     this._parseTimewisePart(c, masterBar, implicit);
-                    this._currentBarNumberDisplayPart = undefined;
                     break;
                 case 'print':
-                    this._parsePrint(c, masterBar, undefined, true);
+                    this._parsePrint(c, masterBar, undefined);
                     break;
             }
         }
-
-        this._currentBarNumberDisplayBar = undefined;
     }
 
-    private _getOrCreateMasterBar(element: XmlNode, index: number) {
+    private _getOrCreateMasterBar(element: XmlNode, index: number, measureNumber: string) {
         const implicit = element.attributes.get('implicit') === 'yes';
         while (this._score.masterBars.length <= index) {
             const newMasterBar = new MasterBar();
             if (implicit) {
                 newMasterBar.isAnacrusis = true;
+            } else {
+                // only store custom numbers which differ from the sequential counting
+                // (same counting as Score.finish: implicit bars do not count, custom texts do)
+                const number = Number.parseInt(measureNumber, 10);
+                if (!Number.isNaN(number)) {
+                    if (number !== this._nextBarNumber) {
+                        newMasterBar.customBarNumber = number;
+                    }
+                    this._nextBarNumber = number + 1;
+                } else {
+                    newMasterBar.customBarNumberText = measureNumber;
+                    this._nextBarNumber++;
+                }
             }
+
             this._score.addMasterBar(newMasterBar);
             if (newMasterBar.index > 0) {
                 newMasterBar.timeSignatureDenominator = newMasterBar.previousMasterBar!.timeSignatureDenominator;
@@ -929,7 +1062,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         const track = this._idToTrackInfo.get(id)!.track;
-        this._parsePartMeasure(element, masterBar, track, implicit, false);
+        this._parsePartMeasure(element, masterBar, track, implicit);
     }
 
     // current measure state
@@ -945,17 +1078,18 @@ export class MusicXmlImporter extends ScoreImporter {
      */
     private _lastBeat: Beat | null = null;
 
-    private _parsePartMeasure(
-        element: XmlNode,
-        masterBar: MasterBar,
-        track: Track,
-        implicit: boolean,
-        isPartwise: boolean
-    ) {
+    /**
+     * The harmonic groups of the last created beat, by their group number.
+     */
+    private _harmonicGroups = new Map<string, MusicXmlHarmonicGroup>();
+
+    private _parsePartMeasure(element: XmlNode, masterBar: MasterBar, track: Track, implicit: boolean) {
         this._musicalPosition = 0;
         this._lastBeat = null;
 
-        masterBar.alternateEndings = this._nextMasterBarRepeatEnding;
+        // bars within an alternate ending
+        const info = this._indexToTrackInfo.get(track.index)!;
+        masterBar.alternateEndings = masterBar.alternateEndings | info.openEndings;
 
         const barLines: XmlNode[] = [];
 
@@ -981,7 +1115,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'figured-bass': Not supported
                 case 'print':
-                    this._parsePrint(c, masterBar, track, true);
+                    this._parsePrint(c, masterBar, track);
                     break;
                 case 'sound':
                     this._parseSound(c, masterBar, track);
@@ -1001,25 +1135,23 @@ export class MusicXmlImporter extends ScoreImporter {
             this._parseBarLine(barLine, masterBar, track);
         }
 
-        this._applySimileMarks(masterBar, track);
-
         // initial empty staff and voice (if no other elements created something already)
         const staff = this._getOrCreateStaff(track, 0);
         const bar = this._getOrCreateBar(staff, masterBar);
 
         if (implicit) {
             bar.barNumberDisplay = BarNumberDisplay.Hide;
-        } else if (isPartwise) {
-            bar.barNumberDisplay = this._currentBarNumberDisplayBar ?? this._currentBarNumberDisplayPart;
+        } else if (this._barNumberDisplayByTrack.has(track)) {
+            bar.barNumberDisplay = this._barNumberDisplayByTrack.get(track)!;
         } else {
-            bar.barNumberDisplay = this._currentBarNumberDisplayPart ?? this._currentBarNumberDisplayBar;
+            bar.barNumberDisplay = this._barNumberDisplayAllParts;
         }
 
         // clear measure attribute
         this._keyAllStaves = null;
     }
 
-    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track | undefined, isMeasurePrint: boolean) {
+    private _parsePrint(element: XmlNode, masterBar: MasterBar, track: Track | undefined) {
         if (track !== undefined) {
             if (element.getAttribute('new-system', 'no') === 'yes') {
                 track.addLineBreaks(masterBar.index);
@@ -1047,58 +1179,14 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        if (isMeasurePrint) {
-            this._currentBarNumberDisplayBar = newDisplay;
+        if (newDisplay === undefined) {
+            return;
+        }
+        if (track === undefined) {
+            this._barNumberDisplayAllParts = newDisplay;
+            this._barNumberDisplayByTrack.clear();
         } else {
-            this._currentBarNumberDisplayPart = newDisplay;
-        }
-    }
-
-    private _applySimileMarks(masterBar: MasterBar, track: Track) {
-        if (this._simileMarkAllStaves !== null) {
-            for (const s of track.staves) {
-                const bar = this._getOrCreateBar(s, masterBar);
-                bar.simileMark = this._simileMarkAllStaves!;
-                if (bar.simileMark !== SimileMark.None) {
-                    this._clearBar(bar);
-                }
-            }
-
-            if (this._simileMarkAllStaves === SimileMark.FirstOfDouble) {
-                this._simileMarkAllStaves = SimileMark.SecondOfDouble;
-            } else {
-                this._simileMarkAllStaves = null;
-            }
-        }
-
-        if (this._simileMarkPerStaff !== null) {
-            const keys = Array.from(this._simileMarkPerStaff!.keys());
-            for (const i of keys) {
-                const s = this._getOrCreateStaff(track, i);
-                const bar = this._getOrCreateBar(s, masterBar);
-                bar.simileMark = this._simileMarkPerStaff!.get(i)!;
-
-                if (bar.simileMark !== SimileMark.None) {
-                    this._clearBar(bar);
-                }
-
-                if (bar.simileMark === SimileMark.FirstOfDouble) {
-                    this._simileMarkPerStaff!.set(i, SimileMark.SecondOfDouble);
-                } else {
-                    this._simileMarkPerStaff!.delete(i);
-                }
-            }
-            if (this._simileMarkPerStaff.size === 0) {
-                this._simileMarkPerStaff = null;
-            }
-        }
-    }
-
-    private _clearBar(bar: Bar) {
-        for (const v of bar.voices) {
-            const emptyBeat: Beat = new Beat();
-            emptyBeat.isEmpty = true;
-            v.addBeat(emptyBeat);
+            this._barNumberDisplayByTrack.set(track, newDisplay);
         }
     }
 
@@ -1115,7 +1203,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'coda': Ignored (use directions)
                 // case 'fermata': Ignored (on barline, they exist on beat notations)
                 case 'ending':
-                    this._parseEnding(c, masterBar);
+                    this._parseEnding(c, masterBar, track);
                     break;
                 case 'repeat':
                     this._parseRepeat(c, masterBar);
@@ -1137,8 +1225,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private _nextMasterBarRepeatEnding: number = 0;
-    private _parseEnding(element: XmlNode, masterBar: MasterBar): void {
+    private _parseEnding(element: XmlNode, masterBar: MasterBar, track: Track): void {
         const numbers = element
             .getAttribute('number')
             .split(',')
@@ -1149,19 +1236,18 @@ export class MusicXmlImporter extends ScoreImporter {
             flags = flags | ((0x01 << (num - 1)) & 0xff);
         }
 
-        masterBar.alternateEndings = flags;
-
+        // the endings of the master bar are the union of all parts
+        masterBar.alternateEndings = masterBar.alternateEndings | flags;
+        const info = this._indexToTrackInfo.get(track.index)!;
         switch (element.getAttribute('type', '')) {
             case 'start':
-                this._nextMasterBarRepeatEnding = this._nextMasterBarRepeatEnding | flags;
+                info.openEndings = info.openEndings | flags;
                 break;
             case 'stop':
             case 'discontinue':
-                this._nextMasterBarRepeatEnding = this._nextMasterBarRepeatEnding & ~flags;
+                info.openEndings = info.openEndings & ~flags;
                 break;
-            case 'continue':
-                // keep
-                break;
+            // case 'continue': keep
         }
     }
 
@@ -1234,29 +1320,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        if (element.attributes.has('coda')) {
-            masterBar.addDirection(Direction.TargetCoda);
-        }
-
-        if (element.attributes.has('tocoda')) {
-            masterBar.addDirection(Direction.JumpDaCoda);
-        }
-
-        if (element.attributes.has('dacapo')) {
-            masterBar.addDirection(Direction.JumpDaCapo);
-        }
-
-        if (element.attributes.has('dalsegno')) {
-            masterBar.addDirection(Direction.JumpDalSegno);
-        }
-
-        if (element.attributes.has('fine')) {
-            masterBar.addDirection(Direction.TargetFine);
-        }
-
-        if (element.attributes.has('segno')) {
-            masterBar.addDirection(Direction.TargetSegno);
-        }
+        this._parseSoundDirections(element, masterBar);
 
         // damper-pedal="" Ignored -> Handled via pedal direction
         // dynamics="" Ignored -> Handled via dynamics direction
@@ -1292,6 +1356,101 @@ export class MusicXmlImporter extends ScoreImporter {
             this._nextBeatAutomations.push(automation);
         }
     }
+
+    /**
+     * Applies the jump and marker attributes of a `<sound>` (measure or direction level) as directions.
+     * @returns true if any direction was applied.
+     */
+    private _parseSoundDirections(element: XmlNode, masterBar: MasterBar): boolean {
+        let hasDirections = false;
+        if (element.attributes.has('coda')) {
+            masterBar.addDirection(Direction.TargetCoda);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('tocoda')) {
+            masterBar.addDirection(Direction.JumpDaCoda);
+            hasDirections = true;
+        }
+
+        // yes-no typed, "no" means no jump
+        if (element.getAttribute('dacapo', 'no') !== 'no') {
+            masterBar.addDirection(Direction.JumpDaCapo);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('dalsegno')) {
+            masterBar.addDirection(Direction.JumpDalSegno);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('fine')) {
+            masterBar.addDirection(Direction.TargetFine);
+            hasDirections = true;
+        }
+
+        if (element.attributes.has('segno')) {
+            masterBar.addDirection(Direction.TargetSegno);
+            hasDirections = true;
+        }
+
+        return hasDirections;
+    }
+
+    /**
+     * The texts (normalized via {@link _normalizeDirectionLabel}) with which `<words>` print the directions
+     * of the `<sound>` attributes. Such words are only the visual counterpart of the direction which renders its
+     * own label, they are not added as additional beat text. Any other words next to a jump are kept as text.
+     * Covers the default labels of the MuseScore export and the spelled-out forms, but no double segno/coda
+     * or numbered forms as the directions are not mapped to their double variants.
+     */
+    private static readonly _soundDirectionLabels: Map<string, string[]> = new Map<string, string[]>([
+        ['dacapo', ['dc', 'dacapo', 'dcalfine', 'dacapoalfine', 'dcalcoda', 'dacapoalcoda']],
+        [
+            'dalsegno',
+            [
+                'ds',
+                'dalsegno',
+                'delsegno',
+                'dsalfine',
+                'dalsegnoalfine',
+                'delsegnoalfine',
+                'dsalcoda',
+                'dalsegnoalcoda',
+                'delsegnoalcoda'
+            ]
+        ],
+        ['tocoda', ['tocoda', 'dacoda']],
+        ['fine', ['fine']],
+        ['coda', ['coda']],
+        ['segno', ['segno']]
+    ]);
+
+    /**
+     * Lower-cases the text and removes dots and whitespace ("D. C. al Coda" -> "dcalcoda").
+     */
+    private static _normalizeDirectionLabel(text: string): string {
+        const lower = text.toLowerCase();
+        let normalized = '';
+        for (let i = 0; i < lower.length; i++) {
+            const c = lower.charAt(i);
+            if (c !== '.' && c !== ' ' && c !== '\t' && c !== '\r' && c !== '\n' && c !== '\u00a0') {
+                normalized += c;
+            }
+        }
+        return normalized;
+    }
+
+    private static _isSoundDirectionLabel(words: string, sound: XmlNode): boolean {
+        const normalized = MusicXmlImporter._normalizeDirectionLabel(words);
+        for (const [attribute, labels] of MusicXmlImporter._soundDirectionLabels) {
+            if (sound.attributes.has(attribute) && labels.indexOf(normalized) >= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private _parseSwing(element: XmlNode, masterBar: MasterBar) {
         let first = 0;
         let second = 0;
@@ -1340,11 +1499,33 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private _nextBeatAutomations: Automation[] | null = null;
     private _nextBeatChord: Chord | null = null;
-    private _nextBeatCrescendo: CrescendoType | null = null;
-    private _nextBeatLetRing: boolean = false;
-    private _nextBeatPalmMute: boolean = false;
-    private _nextBeatOttavia: Ottavia | null = null;
     private _nextBeatText: string | null = null;
+    /**
+     * Where the pending beat text is written, it can be the label of a following line (e.g. music21).
+     */
+    private _nextBeatTextTrackIndex: number = -1;
+    private _nextBeatTextBarIndex: number = -1;
+    private _nextBeatTextTicks: number = -1;
+    /**
+     * All beats in document order (see {@link MusicXmlSpanPosition.sequence}).
+     */
+    private _beats: Beat[] = [];
+
+    /**
+     * The placement of a span element at the current cursor.
+     */
+    private _placement(masterBar: MasterBar, staffIndex: number, voice: string, offset: number): MusicXmlSpanPlacement {
+        return {
+            staffIndex: staffIndex,
+            voice: voice,
+            position: {
+                barIndex: masterBar.index,
+                ticks: this._musicalPosition,
+                offset: offset,
+                sequence: this._beats.length
+            }
+        };
+    }
 
     private _parseSoundMidiInstrument(element: XmlNode, _masterBar: MasterBar) {
         let automation: Automation;
@@ -1694,7 +1875,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     // case 'for-part': not supported
                     // case 'directive': Ignored
                     case 'measure-style':
-                        this._parseMeasureStyle(c, track, false);
+                        this._parseMeasureStyle(c, masterBar, track, false);
                         break;
                 }
             }
@@ -1718,69 +1899,24 @@ export class MusicXmlImporter extends ScoreImporter {
                     // case 'for-part': not supported
                     // case 'directive': Ignored
                     case 'measure-style':
-                        this._parseMeasureStyle(c, track, true);
+                        this._parseMeasureStyle(c, masterBar, track, true);
                         break;
                 }
             }
         }
     }
 
-    private _simileMarkAllStaves: SimileMark | null = null;
-    private _simileMarkPerStaff: Map<number, SimileMark> | null = null;
-    private _isBeatSlash: boolean = false;
-    private _parseMeasureStyle(element: XmlNode, _track: Track, midBar: boolean) {
-        for (const c of element.childElements()) {
-            switch (c.localName) {
-                // case 'multiple-rest': Ignored, when multibar rests are enabled for rendering this info shouldn't matter.
-                case 'measure-repeat':
-                    if (!midBar) {
-                        let simileMark: SimileMark | null = null;
-                        switch (c.getAttribute('type')) {
-                            case 'start':
-                                switch (Number.parseInt(c.getAttribute('slashes', '1'), 10)) {
-                                    case 1:
-                                        simileMark = SimileMark.Simple;
-                                        break;
-                                    case 2:
-                                        simileMark = SimileMark.FirstOfDouble;
-                                        break;
-                                    default:
-                                        // not supported
-                                        break;
-                                }
-                                break;
-                            case 'stop':
-                                simileMark = null;
-                                break;
-                        }
-
-                        if (element.attributes.has('number')) {
-                            this._simileMarkPerStaff = this._simileMarkPerStaff ?? new Map<number, SimileMark>();
-                            const staff = Number.parseInt(element.attributes.get('number')!, 10) - 1;
-                            if (simileMark == null) {
-                                this._simileMarkPerStaff!.delete(staff);
-                            } else {
-                                this._simileMarkPerStaff!.set(staff, simileMark!);
-                            }
-                        } else {
-                            this._simileMarkAllStaves = simileMark;
-                        }
-                    }
-
-                    break;
-                // case 'beat-repeat': Not supported
-                case 'slash':
-                    // use-stems: not supported
-                    switch (c.getAttribute('type')) {
-                        case 'start':
-                            this._isBeatSlash = true;
-                            break;
-                        case 'stop':
-                            this._isBeatSlash = false;
-                            break;
-                    }
-                    break;
-            }
+    private _parseMeasureStyle(element: XmlNode, masterBar: MasterBar, track: Track, midBar: boolean) {
+        const events: MusicXmlSpanEvent[] = [];
+        MusicXmlSpanReader.readMeasureStyle(element, midBar, events);
+        if (events.length > 0) {
+            // the number of the measure style is the staff it applies to
+            const staffIndex = element.attributes.has('number')
+                ? Number.parseInt(element.attributes.get('number')!, 10) - 1
+                : -1;
+            this._indexToTrackInfo
+                .get(track.index)!
+                .spans.process(events, this._placement(masterBar, staffIndex, '', 0));
         }
     }
 
@@ -1903,8 +2039,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 break;
             case 'percussion':
                 bar.clef = Clef.Neutral;
-                if(bar.index === 0){
+                if (bar.index === 0) {
                     bar.staff.isPercussion = true;
+                    bar.staff.showTablature = false;
                 }
                 break;
             case 'tab':
@@ -2023,26 +2160,39 @@ export class MusicXmlImporter extends ScoreImporter {
     private _parseDirection(element: XmlNode, masterBar: MasterBar, track: Track) {
         const directionTypes: XmlNode[] = [];
         let offset: number | null = null;
-        // let voiceIndex = -1;
+        let offsetAffectsSound = false;
+        let voice = '';
         let staffIndex = -1;
         let tempo = -1;
+        let sound: XmlNode | null = null;
+        let hasSoundDirections = false;
+        // all words of the direction, also split ones like "D.S. al " + "Coda"
+        let allWords = '';
 
         for (const c of element.childElements()) {
             switch (c.localName) {
-                case 'direction-type':
+                case 'direction-type': {
                     // See https://github.com/CoderLine/alphaTab/issues/2102
-                    const type = c.firstElement;
-                    if (type) {
-                        directionTypes.push(type);
+                    // only one type per direction-type is handled, the last one wins
+                    const types = c.childElements();
+                    if (types.length > 0) {
+                        directionTypes.push(types[types.length - 1]);
+                    }
+                    for (const t of types) {
+                        if (t.localName === 'words') {
+                            allWords += t.innerText;
+                        }
                     }
                     break;
+                }
                 case 'offset':
                     offset = Number.parseFloat(c.innerText);
+                    offsetAffectsSound = c.getAttribute('sound', 'no') === 'yes';
                     break;
                 // case 'footnote': Ignored
                 // case 'level': Ignored
                 case 'voice':
-                    // voiceIndex = parseInt(c.innerText) - 1;
+                    voice = c.innerText.trim();
                     break;
                 case 'staff':
                     staffIndex = Number.parseInt(c.innerText, 10) - 1;
@@ -2051,12 +2201,15 @@ export class MusicXmlImporter extends ScoreImporter {
                     if (c.attributes.has('tempo')) {
                         tempo = Number.parseFloat(c.attributes.get('tempo')!);
                     }
+                    sound = c;
+                    hasSoundDirections = this._parseSoundDirections(c, masterBar);
                     break;
                 // case 'listening': Ignored
             }
         }
 
-        let staff: Staff | null = null;
+        // the staff of directions without staff, e.g. for pedal markers
+        let staff: Staff;
         if (staffIndex >= 0) {
             staff = this._getOrCreateStaff(track, staffIndex);
         } else if (this._lastBeat !== null) {
@@ -2064,24 +2217,19 @@ export class MusicXmlImporter extends ScoreImporter {
         } else {
             staff = this._getOrCreateStaff(track, 0);
         }
+        this._getOrCreateBar(staff, masterBar);
 
-        const bar = staff ? this._getOrCreateBar(staff, masterBar) : null;
-
-        const getRatioPosition = () => {
-            let timelyPosition = this._musicalPosition;
-            if (offset !== null) {
-                timelyPosition += offset!;
-            }
-
-            const totalDuration = masterBar.calculateDuration(false);
-            return timelyPosition / totalDuration;
-        };
+        const offsetTicks = offset !== null ? this._musicXmlDivisionsToAlphaTabTicks(offset!) : 0;
+        const totalDuration = masterBar.calculateDuration(false);
+        // the offset always affects the display, the sound only if specified
+        const displayRatioPosition = (this._musicalPosition + offsetTicks) / totalDuration;
+        const soundRatioPosition = offsetAffectsSound ? displayRatioPosition : this._musicalPosition / totalDuration;
 
         if (tempo > 0) {
             const tempoAutomation = new Automation();
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = tempo;
-            tempoAutomation.ratioPosition = getRatioPosition();
+            tempoAutomation.ratioPosition = soundRatioPosition;
 
             if (!this._hasSameTempo(masterBar, tempoAutomation)) {
                 masterBar.tempoAutomations.push(tempoAutomation);
@@ -2089,6 +2237,8 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         let previousWords: string = '';
+        const spanEvents: MusicXmlSpanEvent[] = [];
+        const pedalEvents: MusicXmlSpanEvent[] = [];
 
         for (const direction of directionTypes) {
             switch (direction.localName) {
@@ -2096,70 +2246,52 @@ export class MusicXmlImporter extends ScoreImporter {
                     masterBar.section = new Section();
                     masterBar.section.marker = direction.innerText;
                     break;
+                // <sound> jump attributes are the authoritative directions, the symbols are only their visual counterpart
+                // (e.g. a coda symbol printed next to "To Coda")
                 case 'segno':
-                    masterBar.addDirection(Direction.TargetSegno);
+                    if (!hasSoundDirections) {
+                        masterBar.addDirection(Direction.TargetSegno);
+                    }
                     break;
                 case 'coda':
-                    masterBar.addDirection(Direction.TargetCoda);
+                    if (!hasSoundDirections) {
+                        masterBar.addDirection(Direction.TargetCoda);
+                    }
                     break;
                 case 'words':
                     previousWords = direction.innerText;
                     break;
                 // case 'symbol': Not supported
                 case 'wedge':
-                    switch (direction.getAttribute('type')) {
-                        case 'crescendo':
-                            this._nextBeatCrescendo = CrescendoType.Crescendo;
-                            break;
-                        case 'diminuendo':
-                            this._nextBeatCrescendo = CrescendoType.Decrescendo;
-                            break;
-                        // case 'continue': Ignore
-                        case 'stop':
-                            this._nextBeatCrescendo = null;
-                            break;
-                    }
+                    MusicXmlSpanReader.readWedge(direction, spanEvents);
                     break;
                 case 'dynamics':
                     const newDynamics = this._parseDynamics(direction);
                     if (newDynamics !== null) {
-                        this._currentDynamics = newDynamics;
+                        const context = this._getStaffContext(staff);
+                        context.pendingDynamics = newDynamics;
+                        context.pendingDynamicsVoice = voice;
                         this._score.stylesheet.hideDynamics = false;
                     }
                     break;
                 case 'dashes':
-                    const type = direction.getAttribute('type', 'start');
-                    switch (previousWords) {
-                        case 'LetRing':
-                            this._nextBeatLetRing = type === 'start' || type === 'continue';
-                            break;
-                        case 'P.M.':
-                            this._nextBeatPalmMute = type === 'start' || type === 'continue';
-                            break;
+                case 'bracket':
+                    if (this._parseLine(direction, previousWords, track, masterBar.index, spanEvents)) {
+                        // the words are the label of the line, unknown lines keep their words as text
+                        previousWords = '';
                     }
-                    previousWords = '';
                     break;
-                // case 'bracket': Ignored
                 case 'pedal':
-                    const pedal = this._parsePedal(direction);
-                    if (pedal && bar) {
-                        pedal.ratioPosition = getRatioPosition();
-
-                        // up or holds without a previous down/hold?
-                        const canHaveUp =
-                            bar.sustainPedals.length > 0 &&
-                            bar.sustainPedals[bar.sustainPedals.length - 1].pedalType !== SustainPedalMarkerType.Up;
-
-                        if (pedal.pedalType !== SustainPedalMarkerType.Up || canHaveUp) {
-                            bar.sustainPedals.push(pedal);
-                        }
-                    }
+                    MusicXmlSpanReader.readPedal(direction, pedalEvents);
                     break;
                 case 'metronome':
-                    this._parseMetronome(direction, masterBar, getRatioPosition());
+                    // <sound tempo> is the authoritative playback tempo, the metronome is only its visual counterpart
+                    if (tempo <= 0) {
+                        this._parseMetronome(direction, masterBar, displayRatioPosition);
+                    }
                     break;
                 case 'octave-shift':
-                    this._nextBeatOttavia = this._parseOctaveShift(direction);
+                    MusicXmlSpanReader.readOctaveShift(direction, spanEvents);
                     break;
                 // case 'harp-pedals': Not supported
                 // case 'damp': Not supported
@@ -2176,52 +2308,67 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        if (previousWords) {
+        // directions without staff apply to all staves of the part, pedal markers are placed on a single staff
+        const spans = this._indexToTrackInfo.get(track.index)!.spans;
+        if (spanEvents.length > 0) {
+            spans.process(spanEvents, this._placement(masterBar, staffIndex, voice, offsetTicks));
+        }
+        if (pedalEvents.length > 0) {
+            spans.process(pedalEvents, this._placement(masterBar, staff.index, voice, offsetTicks));
+        }
+
+        // words printing the label of a <sound> direction are not repeated as text, the direction renders it
+        if (previousWords && !(hasSoundDirections && MusicXmlImporter._isSoundDirectionLabel(allWords, sound!))) {
             this._nextBeatText = previousWords;
+            this._nextBeatTextTrackIndex = track.index;
+            this._nextBeatTextBarIndex = masterBar.index;
+            this._nextBeatTextTicks = this._musicalPosition;
         }
     }
-    private _parseOctaveShift(element: XmlNode): Ottavia | null {
-        const type = element.getAttribute('type');
-        const size = Number.parseInt(element.getAttribute('size', '8'), 10);
 
-        switch (size) {
-            case 15:
-                switch (type) {
-                    case 'up':
-                        return Ottavia._15mb;
-                    case 'down':
-                        return Ottavia._15ma;
-                    case 'stop':
-                        return Ottavia.Regular;
-                    case 'continue':
-                        return this._nextBeatOttavia;
-                }
-                break;
-            case 8:
-                switch (type) {
-                    case 'up':
-                        return Ottavia._8vb;
-                    case 'down':
-                        return Ottavia._8va;
-                    case 'stop':
-                        return Ottavia.Regular;
-                    case 'continue':
-                        return this._nextBeatOttavia;
-                }
-                break;
+    /**
+     * Reads a `<dashes>` or `<bracket>` line.
+     * @returns Whether the words were used as the label of the line.
+     */
+    private _parseLine(
+        element: XmlNode,
+        words: string,
+        track: Track,
+        barIndex: number,
+        spanEvents: MusicXmlSpanEvent[]
+    ): boolean {
+        // the label can be a separate direction at the same position (e.g. music21)
+        const usesPendingText =
+            words.length === 0 &&
+            this._nextBeatText !== null &&
+            this._nextBeatTextTrackIndex === track.index &&
+            this._nextBeatTextBarIndex === barIndex &&
+            this._nextBeatTextTicks === this._musicalPosition &&
+            element.getAttribute('type', 'start') === 'start';
+        const label = usesPendingText ? this._nextBeatText! : words;
+        if (MusicXmlSpanReader.lineKind(label) === MusicXmlSpanKind.None) {
+            MusicXmlSpanReader.readLine(element, '', spanEvents);
+            return false;
         }
-
-        return null;
+        MusicXmlSpanReader.readLine(element, label, spanEvents);
+        if (usesPendingText) {
+            this._nextBeatText = null;
+        }
+        return true;
     }
+
     private _parseMetronome(element: XmlNode, masterBar: MasterBar, ratioPosition: number) {
         let unit: Duration | null = null;
+        let dots = 0;
         let perMinute: number = -1;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'beat-unit':
                     unit = this._parseBeatDuration(c);
                     break;
-                //  case 'beat-unit-dot' not supported
+                case 'beat-unit-dot':
+                    dots++;
+                    break;
                 //  case 'beat-unit-tied' not supported
                 case 'per-minute':
                     perMinute = Number.parseFloat(c.innerText);
@@ -2235,7 +2382,9 @@ export class MusicXmlImporter extends ScoreImporter {
         if (unit !== null && perMinute > 0) {
             const tempoAutomation: Automation = new Automation();
             tempoAutomation.type = AutomationType.Tempo;
-            tempoAutomation.value = perMinute * (unit / 4);
+            // alphaTab tempos are quarter notes per minute
+            const quartersPerUnit = (MidiUtils.toTicks(unit) / MidiUtils.QuarterTime) * (2 - Math.pow(0.5, dots));
+            tempoAutomation.value = perMinute * quartersPerUnit;
             tempoAutomation.ratioPosition = ratioPosition;
 
             if (!this._hasSameTempo(masterBar, tempoAutomation)) {
@@ -2251,28 +2400,6 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
         return false;
-    }
-
-    private _parsePedal(element: XmlNode): SustainPedalMarker | null {
-        const marker = new SustainPedalMarker();
-        switch (element.getAttribute('type')) {
-            case 'start':
-                marker.pedalType = SustainPedalMarkerType.Down;
-                break;
-            case 'stop':
-                marker.pedalType = SustainPedalMarkerType.Up;
-                break;
-            // case 'sostenuto': Not supported
-            // case 'change': Not supported
-            case 'continue':
-                marker.pedalType = SustainPedalMarkerType.Hold;
-                break;
-            // case 'discontinue': Not supported
-            // case 'resume': Not supported
-            default:
-                return null;
-        }
-        return marker;
     }
 
     private _parseDynamics(element: XmlNode) {
@@ -2391,38 +2518,178 @@ export class MusicXmlImporter extends ScoreImporter {
         return staff.bars[masterBar.index];
     }
 
-    private _getOrCreateVoice(bar: Bar, voiceIndex: number): Voice {
-        let voicesCreated = false;
-        while (bar.voices.length <= voiceIndex) {
-            bar.addVoice(new Voice());
-            voicesCreated = true;
+    private _resolveAndPlaceVoice(staff: Staff, rawVoice: string, bar: Bar): Voice {
+        let packing: StaffVoicePacking;
+        if (this._staffVoicePacking.has(staff)) {
+            packing = this._staffVoicePacking.get(staff)!;
+        } else {
+            packing = new StaffVoicePacking();
+            this._staffVoicePacking.set(staff, packing);
         }
 
-        // ensure voices on all bars
-        if (voicesCreated) {
-            for (const b of bar.staff.bars) {
-                while (b.voices.length <= voiceIndex) {
-                    b.addVoice(new Voice());
-                }
+        if (packing.mapping.has(rawVoice)) {
+            return bar.voices[packing.mapping.get(rawVoice)!];
+        }
+
+        let newVoiceNumber = Number.parseInt(rawVoice, 10);
+        if (Number.isNaN(newVoiceNumber)) {
+            Logger.warning('MusicXML', 'Voices need to be specified as numbers');
+            newVoiceNumber = 0;
+        }
+
+        // the first voice on the staff takes the initial voice which every bar is created with
+        if (packing.sortedRawVoices.length === 0) {
+            packing.sortedRawVoices.push(rawVoice);
+            packing.mapping.set(rawVoice, 0);
+            return bar.voices[0];
+        }
+
+        // find sorted-insertion position
+        let insertPos = packing.sortedRawVoices.length;
+        for (let i = 0; i < packing.sortedRawVoices.length; i++) {
+            const existing = Number.parseInt(packing.sortedRawVoices[i], 10);
+            const existingNumber = Number.isNaN(existing) ? 0 : existing;
+            if (existingNumber > newVoiceNumber) {
+                insertPos = i;
+                break;
             }
         }
 
-        return bar.voices[voiceIndex];
+        packing.sortedRawVoices.splice(insertPos, 0, rawVoice);
+
+        // insert a new Voice at insertPos in every bar of the staff, and re-index
+        for (const b of staff.bars) {
+            b.voices.splice(insertPos, 0, new Voice());
+            for (let i = insertPos; i < b.voices.length; i++) {
+                b.voices[i].index = i;
+                b.voices[i].bar = b;
+            }
+        }
+
+        // refresh mapping
+        packing.mapping.clear();
+        for (let i = 0; i < packing.sortedRawVoices.length; i++) {
+            packing.mapping.set(packing.sortedRawVoices[i], i);
+        }
+
+        return bar.voices[insertPos];
     }
 
     private _parseNote(element: XmlNode, masterBar: MasterBar, track: Track) {
-        // Beat level information
-        let beat: Beat | null = null;
+        // The <note> content model lists the identity and placement of the note (chord, pitch/unpitched/rest,
+        // instrument, voice, staff) before most other children, but <staff> comes late (after e.g. <notehead>).
+        // To interpret all children with the note attached to its beat/voice/bar/staff, we first read
+        // identity and placement, attach the note, and then interpret the remaining children in a second pass.
+
+        // Pass 1: identity and placement
+        let isChord = false;
+        let note: Note | null = null;
+        let isPitched = false;
+        let instrumentId: string | null = null;
+        let staffIndex = 0;
+        let voiceRaw: string = '1';
+        let isPlacementComplete = false;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'cue':
+                    // not supported
+                    // as they are meant to not be played, we skip them completely
+                    // instead of handling them wrong.
+                    // <cue> is part of the leading group of the note, nothing was created yet.
+                    return;
+                case 'chord':
+                    isChord = true;
+                    break;
+                case 'pitch':
+                    note = this._parsePitch(c);
+                    isPitched = true;
+                    break;
+                case 'unpitched':
+                    note = this._parseUnpitched(c, track);
+                    break;
+                case 'instrument':
+                    instrumentId = c.getAttribute('id', '');
+                    break;
+                case 'voice': {
+                    const trimmed = c.innerText.trim();
+                    voiceRaw = trimmed.length > 0 ? trimmed : '1';
+                    break;
+                }
+                case 'staff':
+                    staffIndex = Number.parseInt(c.innerText, 10) - 1;
+                    // last placement information
+                    isPlacementComplete = true;
+                    break;
+                // elements following <staff> carry no placement information
+                case 'beam':
+                case 'notations':
+                case 'lyric':
+                case 'play':
+                case 'listen':
+                    isPlacementComplete = true;
+                    break;
+            }
+
+            if (isPlacementComplete) {
+                break;
+            }
+        }
+
+        if (isChord && !this._lastBeat) {
+            Logger.warning('MusicXML', 'Malformed MusicXML, <chord /> cannot be set on the first note of a measure');
+            isChord = false;
+        }
+
+        if (isChord && !note) {
+            Logger.warning('MusicXML', 'Cannot mix <chord /> and <rest />');
+            isChord = false;
+        }
+
+        const harmonic = note !== null ? MusicXmlImporter._readHarmonic(element) : null;
+        if (isChord && harmonic !== null && this._foldHarmonicNote(note!, harmonic, track, staffIndex)) {
+            return;
+        }
+
+        // the stem direction relates to the written pitch, hence remember it before the staff transposition is applied
+        const writtenNoteValue = note !== null ? this._calculatePitchedNoteValue(note) : 0;
+
+        const staff = this._getOrCreateStaff(track, staffIndex);
+        let beat: Beat;
+        if (isChord) {
+            beat = this._lastBeat!;
+            beat.addNote(note!);
+        } else {
+            beat = this._createBeat(staff, masterBar, voiceRaw, note);
+            const context = this._getStaffContext(staff);
+            if (
+                note !== null &&
+                context.pendingDynamics !== null &&
+                (context.pendingDynamicsVoice.length === 0 || context.pendingDynamicsVoice === voiceRaw)
+            ) {
+                this._markDynamics(context, beat, context.pendingDynamics!, false);
+                context.pendingDynamics = null;
+            }
+        }
+
+        if (note !== null) {
+            note.isVisible = element.getAttribute('print-object', 'yes') !== 'no';
+            this._resolveAttachedNote(note, instrumentId, isPitched);
+            if (harmonic !== null && harmonic.pitch !== MusicXmlHarmonicPitch.None) {
+                this._harmonicGroups.set(harmonic.group, {
+                    note,
+                    type: harmonic.type,
+                    isBasePitch: harmonic.pitch === MusicXmlHarmonicPitch.Base,
+                    hasTouchingPitch: false
+                });
+            }
+        }
+
+        // Pass 2: interpret all other children with the note attached
         let graceType = GraceType.None;
         let graceDurationInDivisions = 0;
         let beamMode: BeatBeamingMode | null = null;
         // let graceTimeStealPrevious = 0;
         // let graceTimeStealFollowing = 0;
-
-        let isChord = false;
-
-        let staffIndex = 0;
-        let voiceIndex = 0;
 
         let durationInTicks = -1;
         let beatDuration: Duration | null = null;
@@ -2432,173 +2699,6 @@ export class MusicXmlImporter extends ScoreImporter {
         let tupletDenominator = -1;
 
         let preferredBeamDirection: BeamDirection | null = null;
-
-        // Note level
-        let note: Note | null = null;
-        let isPitched = false;
-        let instrumentId: string | null = null;
-        const noteIsVisible = element.getAttribute('print-object', 'yes') !== 'no';
-
-        // will create new beat with all information in the correct tree
-        // or add the note to an existing beat if specified accordingly.
-        const ensureBeat = () => {
-            if (beat !== null) {
-                return;
-            }
-
-            if (isChord && !this._lastBeat) {
-                Logger.warning(
-                    'MusicXML',
-                    'Malformed MusicXML, <chord /> cannot be set on the first note of a measure'
-                );
-                isChord = false;
-            }
-
-            if (isChord && !note) {
-                Logger.warning('MusicXML', 'Cannot mix <chord /> and <rest />');
-                isChord = false;
-            }
-
-            const staff = this._getOrCreateStaff(track, staffIndex);
-            if (isChord) {
-                beat = this._lastBeat!;
-                beat!.addNote(note!);
-                return;
-            }
-
-            const bar = this._getOrCreateBar(staff, masterBar);
-            const voice = this._getOrCreateVoice(bar, voiceIndex);
-
-            const actualMusicalPosition = voice.beats.length === 0 ? 0 : voice.beats[voice.beats.length - 1].displayEnd;
-
-            let gap = this._musicalPosition - actualMusicalPosition;
-            if (gap > 0) {
-                // we do not support cross staff beams yet and its a bigger thing to implement
-                // until then we try to detect whether we have a beam-group
-                // which starts at this staff, swaps to another, and comes back.
-                // then we create matching rests here
-
-                if (
-                    // Previously created beat has forced beams and is on another stuff
-                    this._lastBeat &&
-                    this._lastBeat.beamingMode === BeatBeamingMode.ForceMergeWithNext &&
-                    this._lastBeat.voice.bar.staff.index !== staffIndex &&
-                    // previous beat on this staff is also forced
-                    voice.beats.length > 0 &&
-                    voice.beats[voice.beats.length - 1].beamingMode === BeatBeamingMode.ForceMergeWithNext
-                ) {
-                    // chances are high that we have notes like this
-                    // staff1Note -> staff2Note -> staff2Note -> staff1Note
-                    // in this case we create rests for the gap caused by the staff2Notes
-                    const preferredDuration = voice.beats[voice.beats.length - 1].duration;
-                    while (gap > 0) {
-                        const restGap = this._createRestForGap(gap, preferredDuration);
-                        if (restGap !== null) {
-                            this._insertBeatToVoice(restGap, voice);
-                            gap -= restGap.playbackDuration;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-
-                // need an empty placeholder beat for the gap
-                if (gap > 0) {
-                    const placeholder = new Beat();
-                    placeholder.dynamics = this._currentDynamics;
-                    placeholder.isEmpty = true;
-                    placeholder.duration = Duration.TwoHundredFiftySixth; // smallest we have
-                    placeholder.overrideDisplayDuration = gap;
-                    placeholder.updateDurations();
-                    this._insertBeatToVoice(placeholder, voice);
-                }
-            } else if (gap < 0) {
-                Logger.error(
-                    'MusicXML',
-                    'Unsupported forward/backup detected. Cannot fill new beats into already filled area of voice'
-                );
-            }
-
-            if (durationInTicks < 0 && beatDuration !== null) {
-                durationInTicks = MidiUtils.toTicks(beatDuration!);
-                if (dots > 0) {
-                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots === 2);
-                }
-            }
-
-            const newBeat = new Beat();
-            beat = newBeat;
-            if (beamMode === null) {
-                newBeat.beamingMode = this._getStaffContext(staff).isExplicitlyBeamed
-                    ? BeatBeamingMode.ForceSplitToNext
-                    : BeatBeamingMode.Auto;
-            } else {
-                newBeat.beamingMode = beamMode;
-                this._getStaffContext(staff).isExplicitlyBeamed = true;
-            }
-            newBeat.isEmpty = false;
-            newBeat.dynamics = this._currentDynamics;
-            if (this._isBeatSlash) {
-                newBeat.slashed = true;
-            }
-
-            const automations = this._nextBeatAutomations;
-            this._nextBeatAutomations = null;
-            if (automations !== null) {
-                for (const automation of automations) {
-                    newBeat.automations.push(automation);
-                }
-            }
-
-            const chord = this._nextBeatChord;
-            this._nextBeatChord = null;
-            if (chord !== null) {
-                newBeat.chordId = chord.uniqueId;
-                if (!voice.bar.staff.hasChord(chord.uniqueId)) {
-                    voice.bar.staff.addChord(newBeat.chordId!, chord);
-                }
-            }
-
-            const crescendo = this._nextBeatCrescendo;
-            // Don't reset until 'stop' this._nextBeatCrescendo = null;
-            if (crescendo !== null) {
-                newBeat.crescendo = crescendo;
-            }
-
-            const ottavia = this._nextBeatOttavia;
-            // Don't set until 'stop'
-            if (ottavia !== null) {
-                newBeat.ottava = ottavia;
-            }
-
-            newBeat.isLetRing = this._nextBeatLetRing;
-            newBeat.isPalmMute = this._nextBeatPalmMute;
-            if (this._nextBeatText) {
-                newBeat.text = this._nextBeatText;
-                this._nextBeatText = null;
-            }
-
-            if (note !== null) {
-                newBeat.addNote(note!);
-            }
-
-            this._insertBeatToVoice(newBeat, voice);
-
-            // duration only after we added it into the tree
-            if (graceType !== GraceType.None) {
-                newBeat.graceType = graceType;
-                this._applyBeatDurationFromTicks(newBeat, graceDurationInDivisions, null, false);
-            } else {
-                newBeat.tupletNumerator = tupletNumerator;
-                newBeat.tupletDenominator = tupletDenominator;
-                newBeat.dots = dots;
-                newBeat.preferredBeamDirection = preferredBeamDirection;
-                this._applyBeatDurationFromTicks(newBeat, durationInTicks, beatDuration, true);
-            }
-
-            this._musicalPosition = newBeat.displayEnd;
-            this._lastBeat = newBeat;
-        };
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -2619,25 +2719,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     // graceTimeStealFollowing = parseInt(c.getAttribute('steal-time-previous', '0')) / 100.0;
                     break;
 
-                case 'chord':
-                    isChord = true;
-                    break;
-
-                case 'cue':
-                    // not supported
-                    // as they are meant to not be played, we skip them completely
-                    // instead of handling them wrong.
-                    return;
-
-                case 'pitch':
-                    note = this._parsePitch(c);
-                    isPitched = true;
-                    break;
-                case 'unpitched':
-                    note = this._parseUnpitched(c, track);
-                    break;
+                // case 'cue': handled in pass 1
+                // case 'chord': handled in pass 1
+                // case 'pitch': handled in pass 1
+                // case 'unpitched': handled in pass 1
                 case 'rest':
-                    note = null; // rest beat
                     if (beatDuration === null) {
                         beatDuration = Duration.Whole;
                     }
@@ -2647,21 +2733,17 @@ export class MusicXmlImporter extends ScoreImporter {
                     durationInTicks = this._parseDuration(c);
                     break;
                 // case 'tie': Ignored -> "tie" is sound, "tied" is notation
-                case 'instrument':
-                    instrumentId = c.getAttribute('id', '');
+                case 'tied':
+                    // not valid at this place but written for let ring by TuxGuitar
+                    if (note) {
+                        this._parseTied(c, note, voiceRaw);
+                    }
                     break;
+                // case 'instrument': handled in pass 1
 
                 // case 'footnote': Ignored
                 // case 'level': Ignored
-                case 'voice':
-                    voiceIndex = Number.parseInt(c.innerText, 10);
-                    if (Number.isNaN(voiceIndex)) {
-                        Logger.warning('MusicXML', 'Voices need to be specified as numbers');
-                        voiceIndex = 0;
-                    } else {
-                        voiceIndex = voiceIndex - 1;
-                    }
-                    break;
+                // case 'voice': handled in pass 1
                 case 'type':
                     beatDuration = this._parseBeatDuration(c);
                     break;
@@ -2700,14 +2782,12 @@ export class MusicXmlImporter extends ScoreImporter {
                             c,
                             note,
                             beatDuration ?? Duration.Quarter,
-                            preferredBeamDirection ?? this._estimateBeamDirection(note)
+                            preferredBeamDirection ?? this._estimateBeamDirection(writtenNoteValue)
                         );
                     }
                     break;
                 // case 'notehead-text': Not supported
-                case 'staff':
-                    staffIndex = Number.parseInt(c.innerText, 10) - 1;
-                    break;
+                // case 'staff': handled in pass 1
                 case 'beam':
                     // use the first beam as indicator whether to beam or split
                     if (c.getAttribute('number', '1') === '1') {
@@ -2725,12 +2805,10 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'notations':
-                    ensureBeat();
-                    this._parseNotations(c, note, beat!);
+                    this._parseNotations(c, note, beat, voiceRaw);
                     break;
                 case 'lyric':
-                    ensureBeat();
-                    this._parseLyric(c, beat!, track);
+                    this._parseLyric(c, beat, track);
                     break;
                 case 'play':
                     this._parsePlay(c, note);
@@ -2739,63 +2817,354 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        if (isPitched) {
-            const staff = this._getOrCreateStaff(track, staffIndex);
-            const transpose = this._getStaffContext(staff).transpose;
-            if (transpose !== 0) {
-                const value = note!.octave * 12 + note!.tone + transpose;
-                note!.octave = (value / 12) | 0;
-                note!.tone = value - note!.octave * 12;
+        // a chord note joins the already completed beat of the previous note
+        if (!isChord) {
+            if (beamMode === null) {
+                beat.beamingMode = this._getStaffContext(staff).isExplicitlyBeamed
+                    ? BeatBeamingMode.ForceSplitToNext
+                    : BeatBeamingMode.Auto;
+            } else {
+                beat.beamingMode = beamMode;
+                this._getStaffContext(staff).isExplicitlyBeamed = true;
             }
+
+            if (durationInTicks < 0 && beatDuration !== null) {
+                durationInTicks = MidiUtils.toTicks(beatDuration!);
+                if (dots > 0) {
+                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots === 2);
+                }
+            }
+
+            // duration only after we added it into the tree
+            if (graceType !== GraceType.None) {
+                beat.graceType = graceType;
+                this._applyBeatDurationFromTicks(beat, graceDurationInDivisions, null, false);
+            } else {
+                beat.tupletNumerator = tupletNumerator;
+                beat.tupletDenominator = tupletDenominator;
+                beat.dots = dots;
+                beat.preferredBeamDirection = preferredBeamDirection;
+                this._applyBeatDurationFromTicks(beat, durationInTicks, beatDuration, true);
+            }
+
+            this._musicalPosition = beat.displayEnd;
+            this._lastBeat = beat;
         }
 
-        // if not yet created do it befor we exit to ensure we created the beat/note
-        ensureBeat();
-
         if (note !== null) {
-            // Final note post-processing depends on the note already being attached to the
-            // beat/voice/bar/staff tree (e.g. percussion clef context on the resolved staff).
-            // Therefore this must run after ensureBeat() and after transposition has been applied.
-            this._finalizeImportedNote(note, track, instrumentId, isPitched, noteIsVisible);
+            // <technical><string> is only known after pass 2
+            this._finalizeStringNumber(note);
+            // natural harmonics are touched at the fret, artificial harmonics need the touching or sounding pitch of a following chord note
+            if (
+                harmonic !== null &&
+                harmonic.type === HarmonicType.Natural &&
+                (!note.isStringed || ModelUtils.harmonicValueToPitch(note.fret) > 0)
+            ) {
+                note.harmonicType = HarmonicType.Natural;
+                note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
+            }
         }
     }
 
     /**
-     * Applies note-level post-processing that requires the fully resolved parse context.
-     *
-     * Purpose:
-     * - Set final visibility.
-     * - Resolve percussion articulation consistently in one place.
-     *
-     * Why this is called at the end of _parseNote:
-     * - The logic relies on final note context (attached beat/voice/bar/staff), especially
-     *   staff percussion state, and on the final display value after transposition.
-     * - Running this earlier could use incomplete or wrong context and produce wrong
-     *   articulation mapping.
+     * Reads the `<technical><harmonic>` of the note.
+     * A harmonic without `<natural/>` or `<artificial/>` only shows the harmonic circle, like Guitar Pro 8 we ignore it
+     * (it exports pinch, tap and semi harmonics like this).
      */
-    private _finalizeImportedNote(
-        note: Note,
-        track: Track,
-        instrumentId: string | null,
-        isPitched: boolean,
-        noteIsVisible: boolean
-    ) {
-        note.isVisible = noteIsVisible;
+    private static _readHarmonic(element: XmlNode): MusicXmlHarmonic | null {
+        for (const notations of element.childElements()) {
+            if (notations.localName !== 'notations') {
+                continue;
+            }
+            for (const technical of notations.childElements()) {
+                if (technical.localName !== 'technical') {
+                    continue;
+                }
+                for (const c of technical.childElements()) {
+                    if (c.localName !== 'harmonic') {
+                        continue;
+                    }
+                    const harmonic: MusicXmlHarmonic = {
+                        type: HarmonicType.None,
+                        pitch: MusicXmlHarmonicPitch.None,
+                        group: c.getAttribute('number', '1')
+                    };
+                    for (const h of c.childElements()) {
+                        switch (h.localName) {
+                            case 'natural':
+                                harmonic.type = HarmonicType.Natural;
+                                break;
+                            case 'artificial':
+                                harmonic.type = HarmonicType.Artificial;
+                                break;
+                            case 'base-pitch':
+                                harmonic.pitch = MusicXmlHarmonicPitch.Base;
+                                break;
+                            case 'touching-pitch':
+                                harmonic.pitch = MusicXmlHarmonicPitch.Touching;
+                                break;
+                            case 'sounding-pitch':
+                                harmonic.pitch = MusicXmlHarmonicPitch.Sounding;
+                                break;
+                        }
+                    }
+                    return harmonic.type !== HarmonicType.None ? harmonic : null;
+                }
+            }
+        }
+        return null;
+    }
 
-        if (note.percussionArticulation >= 0) {
+    /**
+     * MusicXML writes a harmonic as separate chord notes for the base pitch (the played note),
+     * the touching pitch (where the string is touched) and the sounding pitch (what is heard).
+     * In alphaTab a harmonic is one note: the touching and sounding notes are folded into the note
+     * of their harmonic (which they follow in all known files: the MusicXML examples, the LilyPond test suite, Guitar Pro 8)
+     * and only define its harmonic value. A base pitch note starts a new harmonic.
+     * The touching pitch defines the harmonic more precisely than the sounding pitch (e.g. fret 7 and 19 sound the same),
+     * Guitar Pro 8 writes both consistently.
+     * The pitch is relative to the staff the note specifies, Guitar Pro 8 omits the `<staff>` on these chord notes
+     * of a tablature staff and writes them in the pitch of the first staff.
+     * @returns true if the note was folded and must not be added to the beat.
+     */
+    private _foldHarmonicNote(note: Note, harmonic: MusicXmlHarmonic, track: Track, staffIndex: number): boolean {
+        const group = this._harmonicGroups.get(harmonic.group);
+        if (
+            group === undefined ||
+            harmonic.pitch === MusicXmlHarmonicPitch.Base ||
+            harmonic.pitch === MusicXmlHarmonicPitch.None
+        ) {
+            return false;
+        }
+
+        // only the base pitch is a reference for the harmonic value
+        const played = group.note;
+        if (group.isBasePitch && !group.hasTouchingPitch) {
+            const transpose = this._getStaffContext(this._getOrCreateStaff(track, staffIndex)).transpose;
+            let interval = this._calculatePitchedNoteValue(note) + transpose - this._calculatePitchedNoteValue(played);
+            // natural harmonics are touched relative to the open string
+            if (played.isStringed && group.type === HarmonicType.Natural) {
+                interval += played.fret;
+            }
+
+            if (harmonic.pitch === MusicXmlHarmonicPitch.Touching) {
+                played.harmonicType = group.type;
+                played.harmonicValue = ModelUtils.deltaFretToHarmonicValue(interval);
+                group.hasTouchingPitch = true;
+            } else {
+                // the lowest fret sounding the interval
+                for (let fret = 1; fret <= 24; fret++) {
+                    const value = ModelUtils.deltaFretToHarmonicValue(fret);
+                    if (ModelUtils.harmonicValueToPitch(value) === interval) {
+                        played.harmonicType = group.type;
+                        played.harmonicValue = value;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates a new beat for the note on the given staff and inserts it into the voice at the current musical position.
+     * The beat level information of the note (beaming, duration, tuplets etc.) is applied after the note was fully parsed.
+     */
+    private _createBeat(staff: Staff, masterBar: MasterBar, voiceRaw: string, note: Note | null): Beat {
+        const bar = this._getOrCreateBar(staff, masterBar);
+        const voice = this._resolveAndPlaceVoice(staff, voiceRaw, bar);
+
+        const actualMusicalPosition = voice.beats.length === 0 ? 0 : voice.beats[voice.beats.length - 1].displayEnd;
+
+        let gap = this._musicalPosition - actualMusicalPosition;
+        if (gap > 0) {
+            // we do not support cross staff beams yet and its a bigger thing to implement
+            // until then we try to detect whether we have a beam-group
+            // which starts at this staff, swaps to another, and comes back.
+            // then we create matching rests here
+
+            if (
+                // Previously created beat has forced beams and is on another stuff
+                this._lastBeat &&
+                this._lastBeat.beamingMode === BeatBeamingMode.ForceMergeWithNext &&
+                this._lastBeat.voice.bar.staff.index !== staff.index &&
+                // previous beat on this staff is also forced
+                voice.beats.length > 0 &&
+                voice.beats[voice.beats.length - 1].beamingMode === BeatBeamingMode.ForceMergeWithNext
+            ) {
+                // chances are high that we have notes like this
+                // staff1Note -> staff2Note -> staff2Note -> staff1Note
+                // in this case we create rests for the gap caused by the staff2Notes
+                const preferredDuration = voice.beats[voice.beats.length - 1].duration;
+                while (gap > 0) {
+                    const restGap = this._createRestForGap(gap, preferredDuration);
+                    if (restGap !== null) {
+                        this._insertBeatToVoice(restGap, voice);
+                        gap -= restGap.playbackDuration;
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            // need an empty placeholder beat for the gap
+            if (gap > 0) {
+                const placeholder = new Beat();
+                placeholder.isEmpty = true;
+                placeholder.duration = Duration.TwoHundredFiftySixth; // smallest we have
+                placeholder.overrideDisplayDuration = gap;
+                placeholder.updateDurations();
+                this._insertBeatToVoice(placeholder, voice);
+            }
+        } else if (gap < 0) {
+            Logger.error(
+                'MusicXML',
+                'Unsupported forward/backup detected. Cannot fill new beats into already filled area of voice'
+            );
+        }
+
+        const newBeat = new Beat();
+        this._beats.push(newBeat);
+        this._harmonicGroups.clear();
+        newBeat.isEmpty = false;
+
+        const automations = this._nextBeatAutomations;
+        this._nextBeatAutomations = null;
+        if (automations !== null) {
+            for (const automation of automations) {
+                newBeat.automations.push(automation);
+            }
+        }
+
+        const chord = this._nextBeatChord;
+        this._nextBeatChord = null;
+        if (chord !== null) {
+            newBeat.chordId = chord.uniqueId;
+            if (!voice.bar.staff.hasChord(chord.uniqueId)) {
+                voice.bar.staff.addChord(newBeat.chordId!, chord);
+            }
+        }
+
+        if (this._nextBeatText) {
+            newBeat.text = this._nextBeatText;
+            this._nextBeatText = null;
+        }
+
+        // the note needs to be added before inserting (voice checks for rests)
+        if (note !== null) {
+            newBeat.addNote(note!);
+        }
+
+        this._insertBeatToVoice(newBeat, voice);
+
+        return newBeat;
+    }
+
+    /**
+     * Validates the string parsed from `<technical><string>` and decides whether it is a
+     * tab position (string + fret) or a string number annotation on a pitched note.
+     */
+    private _finalizeStringNumber(note: Note) {
+        if (Number.isNaN(note.string)) {
             return;
         }
 
+        const stringCount = Note.getStringCount(note.beat.voice.bar.staff);
+        if (note.string < 1 || note.string > stringCount) {
+            Logger.warning('MusicXML', `Ignoring <string> outside of the available ${stringCount} strings`);
+            note.string = Number.NaN;
+            note.fret = Number.NaN;
+            return;
+        }
+
+        // the note was attached to its beat before the string was known, register it now for the lookups by string
+        // (e.g. hammer-on destinations, let ring ending on the same string)
+        note.beat.noteStringLookup.set(note.string, note);
+
+        // on a staff with tuning, string and pitch define the tab position of a note written without fret
+        // (e.g. dead notes written by Guitar Pro 5)
+        if (
+            !note.isStringed &&
+            (note.isDead || !note.isPercussion) &&
+            note.beat.voice.bar.staff.tuning.length > 0
+        ) {
+            const fret = this._calculatePitchedNoteValue(note) - note.stringTuning;
+            if (fret >= 0) {
+                note.fret = fret;
+            } else if (note.isDead) {
+                note.fret = 0;
+            }
+        }
+
+        if (!note.isStringed && !note.isPercussion) {
+            note.showStringNumber = true;
+        }
+    }
+
+    /**
+     * Whether the note is played on a fretted instrument, which decides whether an x notehead or a mute is a dead note.
+     * MusicXML has no dedicated element for dead notes. Applications encode them as x notehead (MuseScore, TuxGuitar, Guitar Pro)
+     * or mute (TuxGuitar, Guitar Pro) which have other meanings on other instruments (e.g. hi-hats on percussion, spoken notes).
+     * The whole part is checked as the tuning is often only specified on the tablature staff while the x notehead
+     * is on the standard notation staff.
+     */
+    private _isFrettedInstrumentNote(note: Note): boolean {
+        if (note.isPercussion) {
+            return false;
+        }
+        for (const staff of note.beat.voice.bar.staff.track.staves) {
+            if (staff.isStringed) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Resolves the note values which depend on the staff the note is attached to.
+     *
+     * Purpose:
+     * - Apply the staff transposition to pitched notes.
+     * - Resolve percussion articulation consistently in one place.
+     *
+     * Why this is called right after attaching the note:
+     * - The logic relies on the note context (attached beat/voice/bar/staff), especially
+     *   staff percussion state, and on the final display value after transposition.
+     * - The remaining children of the note are interpreted afterwards and rely on the resolved
+     *   note (e.g. ties are matched on the transposed pitch).
+     */
+    private _resolveAttachedNote(note: Note, instrumentId: string | null, isPitched: boolean) {
+        const staff = note.beat.voice.bar.staff;
+        if (isPitched) {
+            const transpose = this._getStaffContext(staff).transpose;
+            if (transpose !== 0) {
+                const value = note.octave * 12 + note.tone + transpose;
+                note.octave = (value / 12) | 0;
+                note.tone = value - note.octave * 12;
+            }
+        }
+
+        const track = staff.track;
         const trackInfo = this._indexToTrackInfo.get(track.index)!;
-        if (instrumentId !== null) {
+
+        if (!isPitched) {
+            // <unpitched> note -> always a percussion/unpitched sound
+            note.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId ?? '', note);
+            return;
+        }
+
+        // isPitched === true from here on: only treat as percussion if we have
+        // explicit evidence this is really an unpitched/percussion sound. A plain
+        // <instrument> reference on a pitched note can just be disambiguating between
+        // multiple pitched score-instruments in the same part and must not imply percussion.
+        if (instrumentId !== null && trackInfo.isUnpitchedInstrument(instrumentId)) {
             note.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId, note);
-        } else if (note.beat.voice.bar.staff.isPercussion && isPitched) {
+        } else if (staff.isPercussion) {
             const knownArticulation = PercussionMapper.getArticulationById(note.displayValue);
             if (knownArticulation) {
-                note.percussionArticulation = knownArticulation.id;
+                note.percussionArticulation = track.getOrRegisterPercussionArticulation(knownArticulation);
             }
-        } else if (!isPitched) {
-            note.percussionArticulation = trackInfo.getOrCreateArticulation('', note);
         }
     }
 
@@ -2804,8 +3173,19 @@ export class MusicXmlImporter extends ScoreImporter {
             switch (c.localName) {
                 // case 'ipa': Ignored
                 case 'mute':
-                    if (note && c.innerText === 'palm') {
-                        note.isPalmMute = true;
+                    if (note) {
+                        switch (c.innerText) {
+                            case 'palm':
+                                note.isPalmMute = true;
+                                break;
+                            // an undifferentiated or straight mute (e.g. TuxGuitar, Guitar Pro) on a fretted instrument is a dead note
+                            case 'on':
+                            case 'straight':
+                                if (this._isFrettedInstrumentNote(note)) {
+                                    note.isDead = true;
+                                }
+                                break;
+                        }
                     }
                     break;
                 case 'semi-pitched':
@@ -2816,10 +3196,8 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private static readonly _b4Value = 71;
-    private _estimateBeamDirection(note: Note): BeamDirection {
-        return note.calculateRealValue(false, false) < MusicXmlImporter._b4Value
-            ? BeamDirection.Down
-            : BeamDirection.Up;
+    private _estimateBeamDirection(writtenNoteValue: number): BeamDirection {
+        return writtenNoteValue < MusicXmlImporter._b4Value ? BeamDirection.Down : BeamDirection.Up;
     }
 
     private _parseNoteHead(element: XmlNode, note: Note, beatDuration: Duration, beamDirection: BeamDirection) {
@@ -3131,6 +3509,9 @@ export class MusicXmlImporter extends ScoreImporter {
                     MusicFontSymbol.NoteheadXHalf,
                     MusicFontSymbol.NoteheadXBlack
                 );
+                if (this._isFrettedInstrumentNote(note)) {
+                    note.isDead = true;
+                }
                 break;
         }
     }
@@ -3149,7 +3530,6 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         const placeholder = new Beat();
-        placeholder.dynamics = this._currentDynamics;
         placeholder.isEmpty = false;
         placeholder.duration = preferredDuration;
         placeholder.overrideDisplayDuration = preferredDurationTicks;
@@ -3301,35 +3681,35 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private _parseNotations(element: XmlNode, note: Note | null, beat: Beat) {
+    private _parseNotations(element: XmlNode, note: Note | null, beat: Beat, voice: string) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'footnote': Ignored
                 // case 'level': Ignored
                 case 'tied':
                     if (note) {
-                        this._parseTied(c, note, beat.voice.bar.staff);
+                        this._parseTied(c, note, voice);
                     }
                     break;
                 case 'slur':
                     if (note) {
-                        this._parseSlur(c, note);
+                        this._parseNoteLink(c, MusicXmlNoteLinkType.Slur, note, voice);
                     }
                     break;
                 // case 'tuplet': Handled via time-modification
                 case 'glissando':
                     if (note) {
-                        this._parseGlissando(c, note);
+                        this._parseNoteLink(c, MusicXmlNoteLinkType.Glissando, note, voice);
                     }
                     break;
                 case 'slide':
                     if (note) {
-                        this._parseSlide(c, note);
+                        this._parseNoteLink(c, MusicXmlNoteLinkType.Slide, note, voice);
                     }
                     break;
                 case 'ornaments':
                     if (note) {
-                        this._parseOrnaments(c, note);
+                        this._parseOrnaments(c, note, voice);
                     }
                     break;
                 case 'technical':
@@ -3343,8 +3723,8 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'dynamics':
                     const dynamics = this._parseDynamics(c);
                     if (dynamics !== null) {
-                        beat.dynamics = dynamics;
-                        this._currentDynamics = dynamics;
+                        this._markDynamics(this._getStaffContext(beat.voice.bar.staff), beat, dynamics, true);
+                        this._score.stylesheet.hideDynamics = false;
                     }
                     break;
                 case 'fermata':
@@ -3360,6 +3740,103 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
+    private _noteLinks(note: Note): MusicXmlNoteLinks {
+        return this._indexToTrackInfo.get(note.beat.voice.bar.staff.track.index)!.noteLinks;
+    }
+
+    /**
+     * Reads an element linking notes (e.g. `<slur>`, `<slide>`) identified by its number.
+     */
+    private _parseNoteLink(element: XmlNode, type: MusicXmlNoteLinkType, note: Note, voice: string) {
+        const number = element.getAttribute('number', '1');
+        switch (element.getAttribute('type')) {
+            case 'start':
+                this._noteLinks(note).start(type, number, note, voice, 0);
+                break;
+            case 'stop':
+                this._noteLinks(note).stop(type, number, note, voice);
+                break;
+            // case 'continue': no meaning for the link
+        }
+    }
+
+    /**
+     * A note-attached marking repeating the previous one of the staff is not shown, as some exporters (e.g. Guitar Pro)
+     * write the dynamics on every note.
+     */
+    private _markDynamics(context: StaffContext, beat: Beat, value: DynamicValue, isNoteAttached: boolean) {
+        beat.dynamics = value;
+        beat.showDynamics = !isNoteAttached || context.lastDynamics !== value;
+        context.lastDynamics = value;
+    }
+
+    /**
+     * Carries the dynamics markings forward in time to all beats of their part, e.g. a single marking for both hands
+     * of a piano. Of markings at the same position, the one on the own staff wins.
+     */
+    private _applyDynamics() {
+        if (this._score.stylesheet.hideDynamics) {
+            return;
+        }
+        for (const track of this._score.tracks) {
+            const markings: Beat[] = [];
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            if (beat.showDynamics !== undefined) {
+                                markings.push(beat);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (const staff of track.staves) {
+                const ordered = markings.slice();
+                ordered.sort((a, b) => {
+                    const position = MusicXmlImporter._comparePosition(a, b);
+                    if (position !== 0) {
+                        return position;
+                    }
+                    return (a.voice.bar.staff === staff ? 1 : 0) - (b.voice.bar.staff === staff ? 1 : 0);
+                });
+
+                // per voice: index of the next marking and the dynamics in effect
+                const nextMarking: number[] = [];
+                const current: DynamicValue[] = [];
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        while (nextMarking.length <= voice.index) {
+                            nextMarking.push(0);
+                            current.push(DynamicValue.F);
+                        }
+                        for (const beat of voice.beats) {
+                            let next = nextMarking[voice.index];
+                            while (
+                                next < ordered.length &&
+                                MusicXmlImporter._comparePosition(ordered[next], beat) <= 0
+                            ) {
+                                current[voice.index] = ordered[next].dynamics;
+                                next++;
+                            }
+                            nextMarking[voice.index] = next;
+                            if (beat.showDynamics === undefined) {
+                                beat.dynamics = current[voice.index];
+                                beat.showDynamics = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static _comparePosition(a: Beat, b: Beat): number {
+        const bar = a.voice.bar.index - b.voice.bar.index;
+        return bar !== 0 ? bar : a.displayStart - b.displayStart;
+    }
+
     private _getStaffContext(staff: Staff) {
         if (!this._staffToContext.has(staff)) {
             const context = new StaffContext();
@@ -3367,49 +3844,6 @@ export class MusicXmlImporter extends ScoreImporter {
             return context;
         }
         return this._staffToContext.get(staff)!;
-    }
-
-    private _parseGlissando(element: XmlNode, note: Note) {
-        const type = element.getAttribute('type');
-        const number = element.getAttribute('number', '1');
-
-        const context = this._getStaffContext(note.beat.voice.bar.staff);
-
-        switch (type) {
-            case 'start':
-                context.slideOrigins.set(number, note);
-                break;
-            case 'stop':
-                if (context.slideOrigins.has(number)) {
-                    const origin = context.slideOrigins.get(number)!;
-                    origin.slideTarget = note;
-                    note.slideOrigin = origin;
-                    origin.slideOutType = SlideOutType.Shift; // TODO: wavy lines
-                }
-                break;
-        }
-    }
-
-    private _parseSlur(element: XmlNode, note: Note) {
-        const slurNumber: string = element.getAttribute('number', '1');
-
-        const context = this._getStaffContext(note.beat.voice.bar.staff);
-
-        switch (element.getAttribute('type')) {
-            case 'start':
-                context.slurStarts.set(slurNumber, note);
-                break;
-            case 'stop':
-                if (context.slurStarts.has(slurNumber)) {
-                    note.isSlurDestination = true;
-                    const slurStart = context.slurStarts.get(slurNumber)!;
-                    slurStart.slurDestination = note;
-                    note.slurOrigin = slurStart;
-
-                    context.slurStarts.delete(slurNumber);
-                }
-                break;
-        }
     }
 
     private _parseArpeggiate(element: XmlNode, beat: Beat) {
@@ -3492,18 +3926,20 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'down-bow':
                     beat.pickStroke = PickStroke.Down;
                     break;
-                case 'harmonic':
-                    break;
+                // case 'harmonic': handled in _parseNote
                 // case 'open-string': Not supported
                 // case 'thumb-position': Not supported
                 case 'fingering':
                     if (note) {
-                        note.leftHandFinger = this._parseFingering(c);
+                        note.leftHandFinger = this._parseFingering(
+                            c,
+                            !GeneralMidi.isPiano(beat.voice.bar.staff.track.playbackInfo.program)
+                        );
                     }
                     break;
                 case 'pluck':
                     if (note) {
-                        note.rightHandFinger = this._parseFingering(c);
+                        note.rightHandFinger = this._parseFingering(c, false);
                     }
                     break;
                 // case 'double-tongue': Not supported
@@ -3512,17 +3948,24 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'snap-pizzicato':  Not supported
                 case 'fret':
                     if (note) {
-                        note.fret = Number.parseInt(c.innerText, 10);
+                        if (beat.voice.bar.staff.tuning.length > 0) {
+                            note.fret = Number.parseInt(c.innerText, 10);
+                        } else {
+                            // without tuning the fret has no meaning, the pitch defines the note
+                            Logger.warning('MusicXML', 'Ignoring <fret> on staff without tuning');
+                        }
                     }
                     break;
                 case 'string':
                     if (note) {
-                        note.string = beat.voice.bar.staff.tuning.length - Number.parseInt(c.innerText, 10) + 1;
+                        // on staves without tuning the string is only an annotation (e.g. classical guitar string indications)
+                        note.string = Note.getStringCount(beat.voice.bar.staff) - Number.parseInt(c.innerText, 10) + 1;
                     }
                     break;
                 case 'hammer-on':
                 case 'pull-off':
-                    if (note) {
+                    // only the start is the origin, the destination (stop) is resolved by the model
+                    if (note && c.getAttribute('type', 'start') === 'start') {
                         note.isHammerPullOrigin = true;
                     }
                     break;
@@ -3608,45 +4051,83 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private _parseFingering(c: XmlNode): Fingers {
-        switch (c.innerText) {
+    /**
+     * Parses the text of a `<fingering>` or `<pluck>` element into a finger.
+     * @param c The element to parse.
+     * @param fretNumbering Whether digits follow the fretting hand numbering instead of the keyboard numbering.
+     * @remarks
+     * MusicXML defines the fingering as free text, "typically indicated 1,2,3,4,5", and leaves open which
+     * number means which finger (see also https://github.com/w3c-cg/musicxml/issues/438).
+     * The digits are therefore read in the convention of the instrument and hand:
+     * - Keyboards and the plucking hand (`<pluck>`): 1 = thumb … 5 = little finger.
+     * - Fretting hand on fretted and bowed instruments: 0 = open, 1 = index … 4 = little finger. 5 is mapped to the
+     *   thumb as it is the only finger not covered by 1-4.
+     *
+     * The piano check used by the caller must match the one in `FingeringGroupGlyph.fingerToMusicFontSymbol`,
+     * so that the fingering is displayed as written in the file.
+     * Letters follow the SMuFL fingering vocabulary (T, t, p: thumb; i: index; m: middle; a: ring;
+     * c, e, o, q, s, x: little finger) and are matched case-insensitive. Text which cannot be mapped to a finger is
+     * ignored.
+     */
+    private _parseFingering(c: XmlNode, fretNumbering: boolean): Fingers {
+        switch (c.innerText.toLowerCase()) {
             case '0':
                 return Fingers.NoOrDead;
             case '1':
+                return fretNumbering ? Fingers.IndexFinger : Fingers.Thumb;
+            case '2':
+                return fretNumbering ? Fingers.MiddleFinger : Fingers.IndexFinger;
+            case '3':
+                return fretNumbering ? Fingers.AnnularFinger : Fingers.MiddleFinger;
+            case '4':
+                return fretNumbering ? Fingers.LittleFinger : Fingers.AnnularFinger;
+            case '5':
+                return fretNumbering ? Fingers.Thumb : Fingers.LittleFinger;
             case 'p':
             case 't':
                 return Fingers.Thumb;
-            case '2':
             case 'i':
                 return Fingers.IndexFinger;
-            case '3':
             case 'm':
                 return Fingers.MiddleFinger;
-            case '4':
             case 'a':
                 return Fingers.AnnularFinger;
-            case '5':
             case 'c':
+            case 'e':
+            case 'o':
+            case 'q':
+            case 's':
+            case 'x':
                 return Fingers.LittleFinger;
         }
 
         return Fingers.Unknown;
     }
 
-    private _currentTrillStep: number = -1;
+    private _parseOrnaments(element: XmlNode, note: Note, voice: string): void {
+        // a trill mark defines the meaning of the wavy line, without it the line is a vibrato
+        let trillStep = -1;
+        for (const c of element.childElements()) {
+            if (c.localName === 'trill-mark') {
+                switch (c.getAttribute('trill-step', 'whole')) {
+                    case 'half':
+                        trillStep = 1;
+                        break;
+                    case 'unison':
+                        trillStep = 0;
+                        break;
+                    default:
+                        trillStep = 2;
+                        break;
+                }
+            }
+        }
 
-    private _parseOrnaments(element: XmlNode, note: Note): void {
-        let currentTrillStep = -1;
+        const links = this._noteLinks(note);
+        let hasLine = false;
         for (const c of element.childElements()) {
             switch (c.localName) {
-                case 'trill-mark':
-                    currentTrillStep = Number.parseInt(c.getAttribute('trill-step', '2'), 10);
-                    if (note.isStringed) {
-                        note.trillValue = note.stringTuning + currentTrillStep;
-                    } else if (!note.isPercussion) {
-                        note.trillValue = note.calculateRealValue(false, false) + currentTrillStep;
-                    }
-                    break;
+                // case 'trill-mark': handled above
                 case 'turn':
                     note.ornament = NoteOrnament.Turn;
                     break;
@@ -3659,20 +4140,19 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'inverted-vertical-turn': Not supported
                 // case 'shake': Not supported
                 case 'wavy-line':
-                    if (currentTrillStep > 0) {
-                        if (c.getAttribute('type') === 'start') {
-                            this._currentTrillStep = currentTrillStep;
-                        }
-                    } else if (this._currentTrillStep > 0) {
-                        if (c.getAttribute('type') === 'stop') {
-                            this._currentTrillStep = -1;
-                        } else if (note.isStringed) {
-                            note.trillValue = note.stringTuning + this._currentTrillStep;
-                        } else if (!note.isPercussion) {
-                            note.trillValue = note.calculateRealValue(false, false) + this._currentTrillStep;
-                        }
-                    } else {
-                        note.vibrato = VibratoType.Slight;
+                    const number = c.getAttribute('number', '1');
+                    switch (c.getAttribute('type')) {
+                        case 'start':
+                            links.start(MusicXmlNoteLinkType.WavyLine, number, note, voice, trillStep);
+                            hasLine = true;
+                            break;
+                        case 'continue':
+                            links.continue(MusicXmlNoteLinkType.WavyLine, number, note, voice, trillStep);
+                            hasLine = true;
+                            break;
+                        case 'stop':
+                            links.stop(MusicXmlNoteLinkType.WavyLine, number, note, voice);
+                            break;
                     }
                     break;
                 case 'mordent':
@@ -3699,74 +4179,28 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'other-element': Not supported
             }
         }
-    }
 
-    private _parseSlide(element: XmlNode, note: Note) {
-        const type = element.getAttribute('type');
-        const number = element.getAttribute('number', '1');
-
-        const context = this._getStaffContext(note.beat.voice.bar.staff);
-
-        switch (type) {
-            case 'start':
-                context.slideOrigins.set(number, note);
-                break;
-            case 'stop':
-                if (context.slideOrigins.has(number)) {
-                    const origin = context.slideOrigins.get(number)!;
-                    origin.slideTarget = note;
-                    note.slideOrigin = origin;
-                    origin.slideOutType = SlideOutType.Shift;
-                }
-                break;
+        // a trill on this note only
+        if (trillStep >= 0 && !hasLine) {
+            links.single(MusicXmlNoteLinkType.WavyLine, note, trillStep);
         }
     }
 
-    private _parseTied(element: XmlNode, note: Note, staff: Staff): void {
-        const type = element.getAttribute('type');
-        const number = element.getAttribute('number', '');
-
-        const context = this._getStaffContext(staff);
-
-        if (type === 'start') {
-            if (number) {
-                // start without end
-                if (context.tieStartIds.has(number)) {
-                    const unclosed = context.tieStartIds.get(number)!;
-                    context.tieStarts.delete(unclosed);
-                }
-
-                context.tieStartIds.set(number, note);
-            }
-
-            context.tieStarts.add(note);
-        } else if (type === 'stop' && !note.isTieDestination) {
-            let tieOrigin: Note | null = null;
-            if (number) {
-                if (!context.tieStartIds.has(number)) {
-                    return;
-                }
-
-                tieOrigin = context.tieStartIds.get(number)!;
-                context.tieStartIds.delete(number);
-                context.tieStarts.delete(note);
-            } else {
-                const realValue = this._calculatePitchedNoteValue(note);
-                for (const t of context.tieStarts) {
-                    if (this._calculatePitchedNoteValue(t) === realValue) {
-                        tieOrigin = t;
-                        context.tieStarts.delete(tieOrigin);
-                        break;
-                    }
-                }
-            }
-
-            if (!tieOrigin) {
-                return;
-            }
-
-            note.isTieDestination = true;
-            note.tieOrigin = tieOrigin;
+    private _parseTied(element: XmlNode, note: Note, voice: string): void {
+        // ties are identified by the pitch, the number is rarely given (see MusicXML spec)
+        const pitch = `${this._calculatePitchedNoteValue(note)}`;
+        switch (element.getAttribute('type')) {
+            case 'start':
+                this._noteLinks(note).start(MusicXmlNoteLinkType.Tie, pitch, note, voice, 0);
+                break;
+            case 'stop':
+                this._noteLinks(note).stop(MusicXmlNoteLinkType.Tie, pitch, note, voice);
+                break;
+            // an undamped note (e.g. MuseScore l.v., TuxGuitar let ring)
+            case 'let-ring':
+                note.isLetRing = true;
+                break;
+            // case 'continue': no meaning for the playback
         }
     }
 
@@ -3782,25 +4216,28 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
+    /**
+     * The spelling of the note is defined by its `<pitch>`, the `<accidental>` only describes the printed sign
+     * which is computed during rendering. We only report signs which contradict the pitch.
+     * https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/accidental/
+     */
     private _parseAccidental(element: XmlNode, note: Note) {
-        // NOTE: this can currently lead to wrong notes shown,
-        // TODO: check partwise-complex-measures.xml where accidentals and notes get wrong
-        // in combination with key signatures
+        let accidentalMode = NoteAccidentalMode.Default;
         switch (element.innerText) {
             case 'sharp':
-                note.accidentalMode = NoteAccidentalMode.ForceSharp;
+                accidentalMode = NoteAccidentalMode.ForceSharp;
                 break;
             case 'natural':
-                note.accidentalMode = NoteAccidentalMode.ForceNatural;
+                accidentalMode = NoteAccidentalMode.ForceNatural;
                 break;
             case 'flat':
-                note.accidentalMode = NoteAccidentalMode.ForceFlat;
+                accidentalMode = NoteAccidentalMode.ForceFlat;
                 break;
             case 'double-sharp':
-                note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
+                accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
                 break;
             case 'flat-flat':
-                note.accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
+                accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
                 break;
             // case 'sharp-sharp': Not supported
             // case 'natural-sharp': Not supported
@@ -3843,6 +4280,17 @@ export class MusicXmlImporter extends ScoreImporter {
             // default:
             //     Logger.warning('MusicXML', `Unsupported accidental ${element.innerText}`);
             //     break;
+        }
+
+        if (
+            accidentalMode !== NoteAccidentalMode.Default &&
+            note.accidentalMode !== NoteAccidentalMode.Default &&
+            accidentalMode !== note.accidentalMode
+        ) {
+            Logger.warning(
+                'MusicXML',
+                `Accidental '${element.innerText}' does not match the pitch of the note, the pitch is used`
+            );
         }
     }
 
@@ -3911,8 +4359,32 @@ export class MusicXmlImporter extends ScoreImporter {
 
         note.octave = (value / 12) | 0;
         note.tone = value - note.octave * 12;
+        note.accidentalMode = MusicXmlImporter._accidentalModeForAlter(semitones);
 
         return note;
+    }
+
+    /**
+     * The `<step>` and `<alter>` define the spelling of the note (e.g. F# vs Gb), also if no `<accidental>` is printed.
+     * https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/pitch/
+     */
+    private static _accidentalModeForAlter(alter: number): NoteAccidentalMode {
+        if (alter === 0) {
+            return NoteAccidentalMode.ForceNatural;
+        }
+        if (alter === 1) {
+            return NoteAccidentalMode.ForceSharp;
+        }
+        if (alter === 2) {
+            return NoteAccidentalMode.ForceDoubleSharp;
+        }
+        if (alter === -1) {
+            return NoteAccidentalMode.ForceFlat;
+        }
+        if (alter === -2) {
+            return NoteAccidentalMode.ForceDoubleFlat;
+        }
+        return NoteAccidentalMode.Default;
     }
 
     private _applyNoteHead(

@@ -6,9 +6,8 @@
 import path from 'node:path';
 import ts from 'typescript';
 import createEmitter from './EmitterBase';
-import { createFromJsonMethod } from './Serializer.fromJson';
-import { createSetPropertyMethod } from './Serializer.setProperty';
-import { createToJsonMethod } from './Serializer.toJson';
+import { createReadMethods } from './Serializer.read';
+import { createWriteMethods } from './Serializer.write';
 import { buildTypeSchema, toImportPath } from './TypeSchema';
 
 export default createEmitter('json', (program, input) => {
@@ -18,71 +17,37 @@ export default createEmitter('json', (program, input) => {
         path.resolve(input.getSourceFile().fileName)
     );
 
+    const className = input.name!.text;
     const serializable = buildTypeSchema(program, input);
 
-    const statements: ts.Statement[] = [];
-
-    const importedNames = new Set();
-    function importer(name: string, module: string) {
-        if (importedNames.has(name)) {
+    const imports = new Map<string, { module: string; typeOnly: boolean }>();
+    imports.set(className, { module: toImportPath(sourceFileName), typeOnly: false });
+    function importer(name: string, module: string, typeOnly: boolean = false) {
+        const existing = imports.get(name);
+        if (existing) {
+            existing.typeOnly &&= typeOnly;
             return;
         }
-        importedNames.add(name);
-        statements.push(
-            ts.factory.createImportDeclaration(
-                undefined,
-                ts.factory.createImportClause(
-                    false,
-                    undefined,
-                    ts.factory.createNamedImports([
-                        ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(name))
-                    ])
-                ),
-                ts.factory.createStringLiteral(module)
-            )
-        );
+        imports.set(name, { module, typeOnly });
     }
 
-    const clz = ts.addSyntheticLeadingComment(ts.factory.createClassDeclaration(
-            [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-            `${input.name!.text}Serializer`,
-            undefined,
-            undefined,
-            [
-                createFromJsonMethod(input, serializable, importer),
-                createToJsonMethod(input, serializable, importer),
-                createSetPropertyMethod(input, serializable, importer)
-            ]
-        ),
-        ts.SyntaxKind.MultiLineCommentTrivia,
-        '*\n * @internal\n ',
-        true
+    const methods = [
+        createReadMethods(className, serializable, importer),
+        createWriteMethods(className, serializable, importer)
+    ];
+
+    const importLines = Array.from(imports.entries()).map(
+        ([name, i]) => `import ${i.typeOnly ? 'type ' : ''}{ ${name} } from ${JSON.stringify(i.module)};`
     );
 
-    statements.push(clz);
+    const source = `${importLines.join('\n')}
+/**
+ * @internal
+ */
+export class ${className}Serializer {
+${methods.join('\n')}
+}
+`;
 
-    const sourceFile = ts.factory.createSourceFile(
-        [
-            ts.factory.createImportDeclaration(
-                undefined,
-                ts.factory.createImportClause(
-                    false,
-                    undefined,
-                    ts.factory.createNamedImports([
-                        ts.factory.createImportSpecifier(
-                            false,
-                            undefined,
-                            ts.factory.createIdentifier(input.name!.text)
-                        )
-                    ])
-                ),
-                ts.factory.createStringLiteral(toImportPath(sourceFileName))
-            ),
-            ...statements
-        ],
-        ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
-        ts.NodeFlags.None
-    );
-
-    return sourceFile;
+    return ts.createSourceFile(`${className}Serializer.ts`, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
 });

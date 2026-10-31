@@ -1,0 +1,94 @@
+// Design tokens of the alphaTab UI. Light values on :root, dark values under [data-theme="dark"];
+// hosts set that attribute on <html> or override the tokens after this sheet.
+
+:root {
+  --at-bg: #f4f7fb;
+  --at-surface: #ffffff;
+  --at-surface-alt: #eef2f8;
+  --at-ink: #0d1626;
+  --at-ink-soft: #3a4761;
+  --at-ink-muted: #697587;
+  --at-muted: #697587;
+  --at-line: #dfe5ee;
+  --at-line-soft: #eaeef5;
+  --at-accent: #3b6db8;
+  --at-accent-ink: #ffffff;
+  --at-accent-soft: rgba(59, 109, 184, .10);
+  --at-accent-soft-strong: rgba(59, 109, 184, .18);
+  --at-success: #2f8f6c;
+  --at-danger: #c0392b;
+  --at-code: #0d1626;
+  --at-code-bg: #eef2f8;
+  --at-code-surface: #0d1626;
+  --at-highlight: rgba(255, 214, 102, .35);
+  --at-cursor: rgba(59, 109, 184, .7);
+
+  --at-track-purple: #7a5cc0;
+  --at-track-green: #208a73;
+  --at-track-orange: #c07a3e;
+  --at-track-violet: #a64570;
+  --at-track-blue: #3e8eb3;
+  --at-track-indigo: #5b76d8;
+
+  --at-radius-sm: 6px;
+  --at-radius: 10px;
+  --at-radius-lg: 14px;
+  --at-radius-xl: 18px;
+
+  --at-shadow-lg: 0 30px 80px -40px rgba(13, 22, 38, .25);
+  --at-shadow-md: 0 20px 40px -25px rgba(13, 22, 38, .25);
+  --at-shadow-sm: 0 4px 12px -6px rgba(13, 22, 38, .12);
+
+  --at-cta-bg: #0a1020;
+  --at-cta-ink: #eef2f8;
+  --at-cta-ink-soft: #bcc6d6;
+  --at-cta-accent: #6a98e3;
+  --at-cta-accent-ink: #0a1020;
+
+  --at-font-mono: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Syntax palette for code on --at-code-surface, which is dark in both color modes. */
+  --at-syntax-plain: #e3eaf3;
+  --at-syntax-comment: #7a869a;
+  --at-syntax-string: #a4cba0;
+  --at-syntax-keyword: #9bb7e6;
+  --at-syntax-number: #dba78a;
+  --at-syntax-type: #e3c995;
+  --at-syntax-function: #9bcfd2;
+  --at-syntax-punctuation: #7e8aa0;
+  --at-syntax-invalid: #f28b82;
+
+  /* Space a host's fixed header takes at the top of the viewport. */
+  --at-host-offset: 0px;
+  /* Stacking level of popups that must cover every page layer, e.g. editor suggestions. */
+  --at-z-overlay: 1000;
+  --at-warning: #8a6100;
+}
+
+[data-theme="dark"] {
+  --at-bg: #0a1020;
+  --at-surface: #0f1729;
+  --at-surface-alt: #162033;
+  --at-ink: #eef2f8;
+  --at-ink-soft: #bcc6d6;
+  --at-ink-muted: #7e8aa0;
+  --at-muted: #7e8aa0;
+  --at-line: #1d2940;
+  --at-line-soft: #15203a;
+  --at-accent: #6a98e3;
+  --at-accent-ink: #0a1020;
+  --at-accent-soft: rgba(106, 152, 227, .16);
+  --at-accent-soft-strong: rgba(106, 152, 227, .28);
+  --at-success: #5cc398;
+  --at-danger: #f28b82;
+  --at-code: #eef2f8;
+  --at-code-bg: #0c1424;
+  --at-code-surface: #0a1226;
+  --at-highlight: rgba(255, 214, 102, .22);
+  --at-cursor: rgba(106, 152, 227, .85);
+
+  --at-shadow-lg: 0 30px 80px -30px rgba(0, 0, 0, .7);
+  --at-shadow-md: 0 20px 40px -20px rgba(0, 0, 0, .6);
+  --at-shadow-sm: 0 4px 12px -6px rgba(0, 0, 0, .5);
+  --at-warning: #e3b341;
+}

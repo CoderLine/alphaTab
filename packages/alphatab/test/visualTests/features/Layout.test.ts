@@ -1,5 +1,8 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
+import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
 
@@ -52,12 +55,62 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTest('layout/horizontal-layout.gp', settings);
     });
 
+    it('horizontal-layout-tie-across-partial', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Horizontal;
+        settings.display.barCountPerPartial = 2;
+        await VisualTestHelper.runVisualTestTex(
+            '\\track \\staff {score tabs} :2 5.3 7.3 | 7.3{t} 5.3 | 5.3{t} 3.3 | 3.3{t} 5.3 | 5.3{t} 7.3',
+            'test-data/visual-tests/layout/horizontal-layout-tie-across-partial.png',
+            settings
+        );
+    });
+
     it('horizontal-layout-bar5to8', async () => {
         const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.startBar = 5;
         settings.display.barCount = 4;
         await VisualTestHelper.runVisualTest('layout/horizontal-layout-5to8.gp', settings);
+    });
+
+    it('horizontal-layout-bar-numbers-partials', async () => {
+        // the first bar of a partial has its number centred on the barline, reaching into the previous partial
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Horizontal;
+        let tex = '';
+        for (let i = 0; i < 12; i++) {
+            tex += 'C4.4 D4 E4 F4 |';
+        }
+        await VisualTestHelper.runVisualTestTex(
+            tex,
+            'test-data/visual-tests/layout/horizontal-layout-bar-numbers-partials.png',
+            settings,
+            o => {
+                o.score.stylesheet.barNumberDisplay = BarNumberDisplay.AllBars;
+            }
+        );
+    });
+
+    it('horizontal-layout-scale', () => {
+        const totalWidths: number[] = [];
+        for (const scale of [1, 2]) {
+            const settings = new Settings();
+            settings.display.layoutMode = LayoutMode.Horizontal;
+            settings.display.scale = scale;
+            // padding is not scaled
+            settings.display.padding = [0];
+
+            const renderer = new ScoreRenderer(settings);
+            renderer.width = 1300;
+            renderer.renderFinished.on(e => {
+                totalWidths.push(e.totalWidth);
+            });
+            renderer.renderScore(ScoreLoader.loadAlphaTex('C4 D4 E4 F4 | C4 D4 E4 F4', settings), [0]);
+        }
+
+        expect(totalWidths.length).toBe(2);
+        expect(totalWidths[1]).toBeCloseTo(totalWidths[0] * 2, 0);
     });
 
     it('brackets-braces-none', async () => {
@@ -124,6 +177,83 @@ describe('LayoutTests', () => {
         });
     });
 
+    it('inline-tuning-first-system', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\track { defaultSystemsLayout 2 }
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            2.5.4 3.5.4 0.4.4 2.4.4 |
+            3.4.4 0.3.4 2.3.4 3.3.4 |
+            0.2.4 1.2.4 3.2.4 0.1.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-first-system.png',
+            settings
+        );
+    });
+
+    it('inline-tuning-with-bracket', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\bracketExtendMode groupsimilarinstruments
+            \\track "Guitar 1"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            \\track "Guitar 2"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-with-bracket.png',
+            settings,
+            o => {
+                o.tracks = [0, 1];
+            }
+        );
+    });
+
+    it('inline-tuning-seven-string', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\tuning E4 B3 G3 D3 A2 E2 B1
+            \\staff { tabs }
+            0.7.4 2.7.4 3.7.4 0.6.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-seven-string.png',
+            settings
+        );
+    });
+
+    it('inline-tuning-per-track-hidden', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\track "Guitar"
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+            \\track "Bass"
+            \\staff { tabs }
+            \\tuning E2 A1 D2 G2 hide
+            0.4.4 2.4.4 3.4.4 0.3.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-per-track-hidden.png',
+            settings,
+            o => {
+                o.tracks = [0, 1];
+            }
+        );
+    });
+
     it('system-layout-tex', async () => {
         const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
@@ -182,7 +312,7 @@ describe('LayoutTests', () => {
                     new VisualTestRun(1300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-0-1300.png'),
                     new VisualTestRun(600, 'test-data/visual-tests/layout/multi-system-slur-scale-down-1-600.png'),
                     new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-2-300.png'),
-                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-3-700.png')
+                    new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-down-3-300.png')
                 ];
             }
         );
@@ -206,6 +336,20 @@ describe('LayoutTests', () => {
                     new VisualTestRun(300, 'test-data/visual-tests/layout/multi-system-slur-scale-up-3-300.png')
                 ];
             }
+        );
+    });
+
+    it('multi-system-tie-first-beat', async () => {
+        // tie ending on the first beat of a new system: the continuation
+        // stub must start after the clef and keep a minimum visible length
+        const settings: Settings = new Settings();
+        settings.display.barsPerRow = 1;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            :1 C4 | -
+            `,
+            'test-data/visual-tests/layout/multi-system-tie-first-beat.png',
+            settings
         );
     });
 
@@ -330,6 +474,66 @@ describe('LayoutTests', () => {
         );
     });
 
+    // §G.5 — Mid-system visibility flip: hideEmptyStaves + multi-staff where a
+    // staff is invisible at the start of a system but a later bar in the same
+    // system has content and flips it visible. The v5 §G.5 invariant requires
+    // `_calculateAccoladeSpacing` to recompute when this flip happens so the
+    // brace and per-staff Y positions reflect the post-flip visibility. Closes
+    // B.5 (firstVisibleStaff first-call-only) and B.23 (staff.height locked too
+    // early). System 2 (bars 5-8) flips staff 2 visible at bar 8.
+    it('ghost-staff-visibility', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\defaultSystemsLayout 4
+            \\track "T1"
+            \\staff {score}
+            C4.4 *4 | r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | r.1 |
+                C4.1 |
+            \\staff {score}
+                \\clef C3
+                r.1 | r.1 | r.1 | r.1 |
+                r.1 | r.1 | r.1 | c4.1 |
+                r.1 |
+            `,
+            'test-data/visual-tests/layout/ghost-staff-visibility.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
+    // §G.7 — Accolade reflects post-add visibility: multi-track score where one
+    // track has content only on specific bars. The brace must scale to cover
+    // visible staves on each system; on systems where a track's bars are all
+    // rests, `hideEmptyStaves` makes its staff invisible and the brace shrinks.
+    // The visibility-fingerprint gate triggers the recompute that produces the
+    // correct accolade width per system.
+    it('accolade-on-revert', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\hideEmptyStaves
+            \\showSingleStaffBrackets
+            \\defaultSystemsLayout 3
+            \\track "T1"
+                C4.4 *4 | C4.4 *4 | C4.4 *4 |
+                C4.4 *4 | C4.4 *4 | C4.4 *4
+            \\track "T2"
+                C4.4 *4 | C4.4 *4 | C4.4 *4 |
+                r.1 | r.1 | r.1
+            `,
+            'test-data/visual-tests/layout/accolade-on-revert.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+                o.settings.display.layoutMode = LayoutMode.Parchment;
+            }
+        );
+    });
+
     describe('barnumberdisplay', () => {
         describe('stylesheet', () => {
             it('all', async () =>
@@ -414,5 +618,31 @@ describe('LayoutTests', () => {
                     }
                 ));
         });
+    });
+
+    it('barnumbers', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\defaultBarNumberDisplay allBars
+            // anacrusis (no number)
+            \\ac 
+                C4.1 
+            | 
+            // standard bar number 1
+                C4 
+            | 
+            // custom text instead of bar number 2
+            \\barNumber "Hello" 
+                C4
+            |
+            // a jump to 10 
+            \\barNumber 10
+                C4
+            |
+            // now becomes 11 after the customization before
+                C4
+            `,
+            'test-data/visual-tests/layout/barnumbers.png'
+        );
     });
 });

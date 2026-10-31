@@ -260,7 +260,7 @@ function generateClonePropertyStatements(
 
 function generateCloneBody(
     program: ts.Program,
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     importer: (name: string, module: string) => void
 ): ts.Block {
     const propertiesToSerialize = input.members
@@ -299,7 +299,7 @@ function generateCloneBody(
 
 function createCloneMethod(
     program: ts.Program,
-    input: ts.ClassDeclaration,
+    input: ts.ClassDeclaration | ts.InterfaceDeclaration,
     importer: (name: string, module: string) => void
 ) {
     return ts.factory.createMethodDeclaration(

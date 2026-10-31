@@ -1,0 +1,53 @@
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 0.375rem;
+}
+
+.control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9em;
+  margin: 0;
+
+  select {
+    padding: 0.15rem 0.4rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--ifm-color-emphasis-300);
+    background: var(--ifm-background-color);
+    color: var(--ifm-font-color-base);
+    font-family: inherit;
+    font-size: inherit;
+  }
+}
+
+.readonly {
+  display: inline-flex;
+  flex-direction: column;
+  font-size: 0.8em;
+  line-height: 1.2;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.readonlyLabel {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.7em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.readonlyValue {
+  color: var(--ifm-color-emphasis-800);
+}

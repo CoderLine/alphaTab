@@ -1,0 +1,46 @@
+---
+title: "Capella (CapXML)"
+description: "`.capx` support and its scope."
+sidebar_custom_props:
+  feature_chapter: formats
+  feature_order: 30
+keywords:
+  - alphaTab
+  - Capella
+  - CapXML
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Scores authored in Capella arrive as `.capx` archives — Capella's XML container format. alphaTab imports them so a Capella export opens in the same viewer as your Guitar Pro and MusicXML files, without a separate conversion step.
+
+The preview below loads a `.capx` file with the theme of Mozart's variations K. 265 on a piano grand staff, with lyrics under the right hand:
+
+<AlphaTab tex={false} file="/files/twinkle-mozart.capx" />
+
+## Scope of the Capella importer
+
+A `.capx` file is a ZIP archive holding a single `score.xml` that follows the [CapXML schema](https://www.capella.de/CapXML/). alphaTab reads that XML into the standard score model. The older binary Capella formats are not supported — export from Capella as CapXML first.
+
+Capella describes many notation elements visually through "graphical objects" rather than semantically, so the importer makes best-guess associations between those objects and the underlying beats and notes. Coverage is **basic and lightly tested** compared to the Guitar Pro or MusicXML importers. Rely on it for bread-and-butter notation — notes, rests, voices, ties, standard articulations, lyrics — and cross-check anything more exotic against the compatibility page below.
+
+The load path is identical to every other format alphaTab supports: point `core.file` at a `.capx`, and the importer is dispatched on content sniffing.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.capx' },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Capella compatibility](/docs/formats/capella) — element-by-element support table with the known limitations.
+- [Handling load errors](./handling-load-errors) — how to react when a `.capx` file fails to parse.
+- [`core.file`](/docs/reference/settings/core/file) and [`api.load`](/docs/reference/api/load) in the reference.

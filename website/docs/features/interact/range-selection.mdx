@@ -1,0 +1,91 @@
+---
+title: "Range selection"
+description: "Drive the playback-range highlight programmatically with `highlightPlaybackRange`, commit it to a loop with `applyPlaybackRangeFromHighlight`, and reset with `clearPlaybackRangeHighlight`."
+sidebar_custom_props:
+  feature_chapter: selection
+  feature_order: 10
+keywords:
+  - alphaTab
+  - selection
+  - range
+  - highlightPlaybackRange
+  - loop
+---
+
+import { SelectionHandleDemo } from '@site/src/components/SelectionHandleDemo';
+
+Drag-select a phrase to loop it. Extend the range with keyboard arrows. Wire a "loop this section" button in a lesson toolbar. Three methods drive the highlight overlay — the translucent bar you see behind the selected range — from your own gesture code, and one convenience method turns whatever is highlighted into a real playback loop. Grab the handles in the demo below to reshape the range; release, and playback loops the newly selected span.
+
+<SelectionHandleDemo>{`
+\\title "Canon"
+\\tempo 90
+.
+:8 15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+`}</SelectionHandleDemo>
+
+## The three methods
+
+- **`api.highlightPlaybackRange(startBeat, endBeat)`** — paints the highlight overlay between two beats. Pure visual: it does not change what plays.
+- **`api.applyPlaybackRangeFromHighlight()`** — reads the currently highlighted range, sets `api.playbackRange` to loop that span, and moves the tick position to the start.
+- **`api.clearPlaybackRangeHighlight()`** — clears the overlay. Also pure visual; it does not touch `playbackRange`.
+
+Split like this so a selection UI stays responsive during the drag (`highlightPlaybackRange` on every move), commits the loop only when the user releases (`applyPlaybackRangeFromHighlight` on drag-end), and clears cleanly (`clearPlaybackRangeHighlight` on escape or click-outside).
+
+## The built-in drag-select
+
+With `player.enablePlaybackRangeSelection` on, alphaTab drives the same overlay from mouse drags. A drag becomes a range once it reaches a second beat; a press and release on one beat stays a click. By default that click clears the range. Set `player.resetPlaybackRangeOnClick` to `false` to keep the range and seek inside it instead. The two-beat threshold and `resetPlaybackRangeOnClick` are available since 1.9.0. [Enabling and disabling interaction](./enabling-and-disabling-interaction#keep-the-range-on-click) covers the details.
+
+## The editor pattern
+
+Wire your drag gesture to the three methods. During the drag, keep painting the range. On release, commit it to a playback loop.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableSeekToClick: false,
+    enablePlaybackRangeSelection: false,
+  },
+});
+
+let dragStart = null;
+
+api.beatMouseDown.on((beat) => {
+  dragStart = beat;
+  api.highlightPlaybackRange(beat, beat);
+});
+
+api.beatMouseMove.on((beat) => {
+  if (!dragStart) {
+    return;
+  }
+  api.highlightPlaybackRange(dragStart, beat);
+});
+
+api.beatMouseUp.on((beat) => {
+  if (!dragStart || !beat || beat === dragStart) {
+    api.clearPlaybackRangeHighlight();
+    dragStart = null;
+    return;
+  }
+  api.applyPlaybackRangeFromHighlight();
+  api.isLooping = true;
+  dragStart = null;
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Selection change events](./selection-change-events) — the `playbackRangeHighlightChanged` event that streams selection updates while the user drags.
+- [Enabling and disabling interaction](./enabling-and-disabling-interaction) — turn the built-in drag-select off when your own gesture code owns the range.
+- [Looping a section](/docs/features/play-sync/looping-a-section) — the underlying `playbackRange` and `isLooping` transport `applyPlaybackRangeFromHighlight` writes into.
+- [`highlightPlaybackRange`](/docs/reference/api/highlightplaybackrange), [`applyPlaybackRangeFromHighlight`](/docs/reference/api/applyplaybackrangefromhighlight), and [`clearPlaybackRangeHighlight`](/docs/reference/api/clearplaybackrangehighlight) in the API reference.

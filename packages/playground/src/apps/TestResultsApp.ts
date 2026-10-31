@@ -1,7 +1,8 @@
+import { Settings } from '@coderline/alphatab';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
 import { NavMenu } from '../components/NavMenu';
-import { type Mountable, css, html, injectStyles, parseHtml } from '../util/Dom';
+import { css, html, injectStyles, type Mountable, parseHtml } from '../util/Dom';
 
 injectStyles(
     'TestResultsApp',
@@ -32,10 +33,37 @@ injectStyles(
         font-size: 1rem;
         margin: 0 0 8px 0;
     }
-    .at-test-comparer { position: relative; }
+    .at-test-comparer {
+        position: relative;
+        display: inline-grid;
+        grid-template-columns: max-content;
+        vertical-align: top;
+    }
+    .at-test-comparer .expected,
+    .at-test-comparer .actual {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: start;
+        justify-self: start;
+        display: block;
+        border: 1px solid red;
+        max-width: none;
+    }
+    .at-test-comparer .expected {
+        clip-path: inset(0 50% 0 0);
+    }
+    .at-test-comparer .actual {
+        clip-path: inset(0 0 0 50%);
+    }
+    .at-test-card.accepted .expected,
+    .at-test-card.accepted .actual { border-color: green; }
+    body.hide-accepted .at-test-card.accepted { display: none; }
+
     .at-test-comparer .slider-handle {
         position: absolute;
+        top: 0;
         bottom: 0;
+        left: 50%;
         width: 40px;
         transform: translateX(-50%);
         cursor: ew-resize;
@@ -59,10 +87,10 @@ injectStyles(
         content: '';
         position: sticky;
         top: calc(50vh - 20px);
+        bottom: calc(50vh - 20px);
         display: block;
         width: 40px;
         height: 40px;
-        margin-top: var(--knob-margin-top, 0);
         background-color: #fff;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 18L3 12l6-6M15 6l6 6-6 6' fill='none' stroke='%23555' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
         background-repeat: no-repeat;
@@ -76,34 +104,6 @@ injectStyles(
     .at-test-comparer .slider-handle:hover::after {
         box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35), 0 0 0 1.5px rgba(0, 0, 0, 0.12);
     }
-    .at-test-comparer .expected,
-    .at-test-comparer .actual,
-    .at-test-comparer .diff {
-        background: #fff;
-        border: 1px solid red;
-        position: absolute;
-    }
-    .at-test-comparer .expected { left: 0; }
-    .at-test-comparer .actual {
-        right: -2px;
-        box-shadow: -7px 0 10px -5px rgba(0, 0, 0, 0.5);
-        overflow: hidden;
-        border-left: 0;
-    }
-    .at-test-comparer .actual img {
-        position: absolute;
-        right: 0;
-        top: 0;
-        border-left: 1px solid red;
-    }
-    .at-test-comparer .diff {
-        display: none;
-        left: 0;
-    }
-    .at-test-card.accepted .diff,
-    .at-test-card.accepted .expected,
-    .at-test-card.accepted .actual { border-color: green; }
-    body.hide-accepted .at-test-card.accepted { display: none; }
 
     .at-test-controls {
         position: sticky;
@@ -163,7 +163,6 @@ injectStyles(
 interface TestResult {
     originalFile: string;
     newFile: string | Uint8Array;
-    diffFile: string | Uint8Array;
     accepted?: true;
 }
 
@@ -172,7 +171,9 @@ export class TestResultsApp implements Mountable {
     private listEl: HTMLElement;
     private remainingEl: HTMLElement;
     private currentResults: TestResult[] = [];
+    private blobUrls: string[] = [];
     private nav: NavMenu;
+    private abort = new AbortController();
 
     private onDragOver = (e: DragEvent) => {
         e.stopPropagation();
@@ -223,14 +224,20 @@ export class TestResultsApp implements Mountable {
 
     private async loadFromServer(): Promise<void> {
         try {
-            const res = await fetch('/test-results/list');
+            const res = await fetch('/test-results/list', { signal: this.abort.signal });
             const list = (await res.json()) as TestResult[];
+            if (this.abort.signal.aborted) {
+                return;
+            } 
             this.displayResults(list);
-        } catch {
+        } catch (e) {            
+            if ((e as Error).name === 'AbortError') {
+                return;
+            }  
             alert('error loading test results');
-        }
-    }
-
+        } 
+    }            
+            
     private updateRemaining(): void {
         if (this.currentResults.length === 0) {
             this.remainingEl.textContent = '';
@@ -240,8 +247,15 @@ export class TestResultsApp implements Mountable {
         this.remainingEl.textContent = `(${remaining}/${this.currentResults.length})`;
     }
 
-    private async displayResults(results: TestResult[]): Promise<void> {
+    private displayResults(results: TestResult[]): void {
+        if (this.abort.signal.aborted) {
+            return;
+        }
         this.listEl.replaceChildren();
+        for (const url of this.blobUrls) {
+            URL.revokeObjectURL(url);
+        }
+        this.blobUrls = [];
         this.currentResults = results;
         if (results.length === 0) {
             const banner = parseHtml(html`<div class="at-test-no-failures">No reported errors on visual tests.</div>`);
@@ -250,70 +264,63 @@ export class TestResultsApp implements Mountable {
             return;
         }
         for (const result of results) {
-            this.listEl.appendChild(await this.createResultCard(result));
+            this.listEl.appendChild(this.createResultCard(result));
         }
         this.updateRemaining();
     }
 
-    private async createResultCard(result: TestResult): Promise<HTMLElement> {
+    private createResultCard(result: TestResult): HTMLElement {
+        const expectedSrc = this.toSrc(result.originalFile);
+        const actualSrc = this.toSrc(result.newFile);
+
         const card = parseHtml(html`
             <div class="at-test-card">
                 <h5 class="at-test-card-title">${result.originalFile}</h5>
                 <div class="at-test-controls">
-                    <label><input type="checkbox" class="diff-toggle" /> Show Diff</label>
                     <button type="button" class="btn accept">Accept</button>
                 </div>
                 <div class="at-test-comparer">
-                    <div class="expected"><img alt="expected" /></div>
-                    <div class="actual"><img alt="actual" /></div>
-                    <div class="diff"><img alt="diff" /></div>
+                    <img class="expected" alt="expected" src="${expectedSrc}" loading="lazy" decoding="async" />
+                    <img class="actual" alt="actual" src="${actualSrc}" loading="lazy" decoding="async" />
                     <div class="slider-handle"></div>
                 </div>
             </div>
         `);
         const comparer = card.querySelector<HTMLElement>('.at-test-comparer')!;
-        const ex = comparer.querySelector<HTMLElement>('.expected')!;
-        const ac = comparer.querySelector<HTMLElement>('.actual')!;
-        const df = comparer.querySelector<HTMLElement>('.diff')!;
+        const actual = comparer.querySelector<HTMLImageElement>('.actual')!;
+        const expected = comparer.querySelector<HTMLImageElement>('.expected')!;
         const handle = comparer.querySelector<HTMLElement>('.slider-handle')!;
-        const exImg = ex.querySelector<HTMLImageElement>('img')!;
-        const acImg = ac.querySelector<HTMLImageElement>('img')!;
-        const dfImg = df.querySelector<HTMLImageElement>('img')!;
 
-        await Promise.allSettled([
-            loadImage(exImg, result.originalFile),
-            loadImage(acImg, result.newFile),
-            loadImage(dfImg, result.diffFile)
-        ]);
-
-        const width = Math.max(exImg.width, acImg.width);
-        const height = Math.max(exImg.height, acImg.height);
-        comparer.style.width = `${width}px`;
-        comparer.style.height = `${height}px`;
-        ex.style.width = `${width}px`;
-        ex.style.height = `${height}px`;
-        ac.style.width = `${width / 2}px`;
-        ac.style.height = `${height}px`;
-        df.style.width = `${width}px`;
-        df.style.height = `${height}px`;
-
-        handle.style.left = `${width / 2}px`;
-        handle.style.setProperty('--knob-margin-top', `${height / 2 - 20}px`);
+        let fraction = 0.5;
+        const applyClip = (): void => {
+            const width = comparer.getBoundingClientRect().width;
+            if (width === 0) {
+                return;
+            }
+            const x = fraction * width;
+            const expectedRight = Math.max(0, expected.clientWidth - x);
+            expected.style.clipPath = `inset(0 ${expectedRight}px 0 0)`;
+            actual.style.clipPath = `inset(0 0 0 ${x}px)`;
+            handle.style.left = `${x}px`;
+        };
+        new ResizeObserver(applyClip).observe(comparer);
 
         handle.addEventListener('pointerdown', e => {
             handle.setPointerCapture(e.pointerId);
             e.preventDefault();
         });
         handle.addEventListener('pointermove', e => {
-            if (!e.buttons) { return; }
+            if (!e.buttons) {
+                return;
+            }
             const rect = comparer.getBoundingClientRect();
-            const x = Math.max(0, Math.min(e.clientX - rect.left, width));
-            handle.style.left = `${x}px`;
-            ac.style.width = `${width - x}px`;
+            if (rect.width === 0) {
+                return;
+            }
+            const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+            fraction = x / rect.width;
+            applyClip();
         });
-        card.querySelector<HTMLInputElement>('.diff-toggle')!.onchange = e => {
-            df.style.display = (e.target as HTMLInputElement).checked ? 'block' : 'none';
-        };
         const acceptBtn = card.querySelector<HTMLButtonElement>('.accept')!;
         acceptBtn.onclick = async () => {
             acceptBtn.disabled = true;
@@ -338,6 +345,18 @@ export class TestResultsApp implements Mountable {
         return card;
     }
 
+    private toSrc(source: string | Uint8Array): string {
+        if (source instanceof Uint8Array) {
+            const url = URL.createObjectURL(new Blob([source.buffer as ArrayBuffer], { type: 'image/png' }));
+            this.blobUrls.push(url);
+            return url;
+        }
+        if (typeof source === 'string' && source.length > 0) {
+            return `/${source}`;
+        }
+        return '';
+    }
+
     private handleDrop(e: DragEvent): void {
         e.stopPropagation();
         e.preventDefault();
@@ -352,7 +371,7 @@ export class TestResultsApp implements Mountable {
             if (!(buffer instanceof ArrayBuffer)) {
                 return;
             }
-            const zip = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(buffer)), 128000000);
+            const zip = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(buffer)), new Settings().importer.maxDecodingBufferSize);
             const entries = zip.read();
             const grouped = new Map<string, TestResult>();
             for (const entry of entries) {
@@ -360,15 +379,13 @@ export class TestResultsApp implements Mountable {
                     continue;
                 }
                 const path = entry.fullName.startsWith('test-data/') ? entry.fullName : `test-data/${entry.fullName}`;
-                const key = `${path.replace('.diff.png', '').replace('.new.png', '')}.png`;
+                const key = `${path.replace('.new.png', '')}.png`;
                 let result = grouped.get(key);
                 if (!result) {
-                    result = { originalFile: key, newFile: '', diffFile: '' };
+                    result = { originalFile: key, newFile: '' };
                     grouped.set(key, result);
                 }
-                if (entry.fullName.endsWith('.diff.png')) {
-                    result.diffFile = entry.data;
-                } else if (entry.fullName.endsWith('.new.png')) {
+                if (entry.fullName.endsWith('.new.png')) {
                     result.newFile = entry.data;
                 }
             }
@@ -378,25 +395,16 @@ export class TestResultsApp implements Mountable {
     }
 
     dispose(): void {
+        this.abort.abort();
         document.body.removeEventListener('dragover', this.onDragOver, false);
         document.body.removeEventListener('dragenter', this.onDragEnter, true);
         document.body.removeEventListener('dragleave', this.onDragLeave);
         document.body.removeEventListener('drop', this.onDrop, true);
+        for (const url of this.blobUrls) {
+            URL.revokeObjectURL(url);
+        }
+        this.blobUrls = [];
         this.nav.dispose();
         this.root.remove();
     }
-}
-
-function loadImage(img: HTMLImageElement, source: string | Uint8Array): Promise<void> {
-    return new Promise((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject();
-        if (source instanceof Uint8Array) {
-            img.src = URL.createObjectURL(new Blob([source.buffer as ArrayBuffer], { type: 'image/png' }));
-        } else if (typeof source === 'string' && source.length > 0) {
-            img.src = `/${source}`;
-        } else {
-            reject();
-        }
-    });
 }

@@ -4,35 +4,35 @@
 // the code is regenerated.
 // </auto-generated>
 import { SyncPointData } from "@coderline/alphatab/model/Automation";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class SyncPointDataSerializer {
-    public static fromJson(obj: SyncPointData, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["baroccurence", "millisecondoffset"]);
+    public static read(obj: SyncPointData, reader: IObjectReader): void {
+        reader.readRecord(SyncPointDataSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.barOccurence = r.readNumber();
+                    return true;
+                case 1:
+                    obj.millisecondOffset = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: SyncPointData | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SyncPointDataSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: SyncPointData | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("baroccurence", obj.barOccurence);
-        o.set("millisecondoffset", obj.millisecondOffset);
-        return o;
-    }
-    public static setProperty(obj: SyncPointData, property: string, v: unknown): boolean {
-        switch (property) {
-            case "baroccurence":
-                obj.barOccurence = v! as number;
-                return true;
-            case "millisecondoffset":
-                obj.millisecondOffset = v! as number;
-                return true;
-        }
-        return false;
+        w.startObject(SyncPointDataSerializer._fields);
+        w.numberField(0, obj.barOccurence);
+        w.numberField(1, obj.millisecondOffset);
+        w.endObject();
     }
 }

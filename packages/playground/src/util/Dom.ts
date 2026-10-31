@@ -52,15 +52,11 @@ export function injectStyles(key: string, sheet: string): void {
         el = document.createElement('style');
         el.dataset.cmp = key;
         document.head.appendChild(el);
+    } else if (el.textContent === sheet) {
+        // Re-running the module on HMR but the stylesheet text is identical — skip the write
+        // to avoid invalidating computed styles for every element matching any selector in
+        // this sheet (which on a long list of cards causes a full-document layout thrash).
+        return;
     }
     el.textContent = sheet;
-}
-
-export function mount<T extends Mountable>(container: HTMLElement, selector: string, component: T): T {
-    const placeholder = container.querySelector(selector);
-    if (!placeholder) {
-        throw new Error(`mount: placeholder '${selector}' not found in container`);
-    }
-    placeholder.replaceWith(component.root);
-    return component;
 }

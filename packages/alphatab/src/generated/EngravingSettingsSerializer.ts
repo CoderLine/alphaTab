@@ -4,452 +4,516 @@
 // the code is regenerated.
 // </auto-generated>
 import { EngravingSettings } from "@coderline/alphatab/EngravingSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { EngravingStemInfoSerializer } from "@coderline/alphatab/generated/EngravingStemInfoSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { MusicFontSymbol } from "@coderline/alphatab/model/MusicFontSymbol";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { EngravingStemInfo } from "@coderline/alphatab/EngravingSettings";
+import { EngravingStemInfoSerializer } from "@coderline/alphatab/generated/EngravingStemInfoSerializer";
 import { Duration } from "@coderline/alphatab/model/Duration";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class EngravingSettingsSerializer {
-    public static fromJson(obj: EngravingSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => EngravingSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["musicfontsize", "onestaffspace", "tablinespacing", "arrowshaftthickness", "barlineseparation", "beamspacing", "beamthickness", "bracketthickness", "dashedbarlinedashlength", "dashedbarlinegaplength", "dashedbarlinethickness", "hairpinthickness", "legerlinethickness", "legerlineextension", "octavelinethickness", "pedallinethickness", "repeatbarlinedotseparation", "repeatendinglinethickness", "slurmidpointthickness", "stafflinethickness", "stemthickness", "thickbarlinethickness", "thinbarlinethickness", "thinthickbarlineseparation", "tiemidpointthickness", "tupletbracketthickness", "stemup", "stemdown", "repeatoffsetx", "standardstemlength", "stemflagoffsets", "glyphtop", "glyphbottom", "glyphwidths", "glyphheights", "numberedbarrendererbarsize", "numberedbarrendererbarspacing", "numbereddashglyphpadding", "numbereddashglyphwidth", "linerangedglyphdashgap", "linerangedglyphdashsize", "prenoteeffectpadding", "postnoteeffectpadding", "onnoteeffectpadding", "stringnumbercirclepadding", "rowcontainerpadding", "rowcontainergap", "alternateendingspadding", "sustainpedallinepadding", "tieheight", "beattimerpadding", "bendnoteheadelementpadding", "ghostparenthesiswidth", "ghostparenthesispadding", "brokenbeamwidth", "tabwhammytextpadding", "tabwhammyperhalfheight", "tabwhammydashsize", "songbookwhammydipheight", "deadslappedlinewidth", "lefthandtabtiewidth", "tabbenddashsize", "tabbendstaffpadding", "tabbendpervalueheight", "tabbendlabelpadding", "simpleslidewidth", "simpleslideheight", "chorddiagrampaddingx", "chorddiagrampaddingy", "chorddiagramstringspacing", "chorddiagramfretspacing", "chorddiagramnutheight", "chorddiagramfretheight", "chorddiagramlinewidth", "tripletfeelbracketpadding", "accidentalpadding", "prebeatglyphspacing", "temponotescale", "tuningglyphcirclenumberscale", "tuningglyphstringcolumnscale", "tuningglyphstringrowpadding", "directionsscale", "multivoicedisplacednoteheadspacing", "staffcontentpadding", "beatcontentpadding", "barlinecontentpadding", "stemflagheight"]);
+    public static read(obj: EngravingSettings, reader: IObjectReader): void {
+        reader.readRecord(EngravingSettingsSerializer._fields, (id, k, rr) => EngravingSettingsSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: EngravingSettings | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("musicfontsize", obj.musicFontSize);
-        o.set("onestaffspace", obj.oneStaffSpace);
-        o.set("tablinespacing", obj.tabLineSpacing);
-        o.set("arrowshaftthickness", obj.arrowShaftThickness);
-        o.set("barlineseparation", obj.barlineSeparation);
-        o.set("beamspacing", obj.beamSpacing);
-        o.set("beamthickness", obj.beamThickness);
-        o.set("bracketthickness", obj.bracketThickness);
-        o.set("dashedbarlinedashlength", obj.dashedBarlineDashLength);
-        o.set("dashedbarlinegaplength", obj.dashedBarlineGapLength);
-        o.set("dashedbarlinethickness", obj.dashedBarlineThickness);
-        o.set("hairpinthickness", obj.hairpinThickness);
-        o.set("legerlinethickness", obj.legerLineThickness);
-        o.set("legerlineextension", obj.legerLineExtension);
-        o.set("octavelinethickness", obj.octaveLineThickness);
-        o.set("pedallinethickness", obj.pedalLineThickness);
-        o.set("repeatbarlinedotseparation", obj.repeatBarlineDotSeparation);
-        o.set("repeatendinglinethickness", obj.repeatEndingLineThickness);
-        o.set("slurmidpointthickness", obj.slurMidpointThickness);
-        o.set("stafflinethickness", obj.staffLineThickness);
-        o.set("stemthickness", obj.stemThickness);
-        o.set("thickbarlinethickness", obj.thickBarlineThickness);
-        o.set("thinbarlinethickness", obj.thinBarlineThickness);
-        o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
-        o.set("tiemidpointthickness", obj.tieMidpointThickness);
-        o.set("tupletbracketthickness", obj.tupletBracketThickness);
-        {
-            const m = new Map<string, unknown>();
-            o.set("stemup", m);
-            for (const [k, v] of obj.stemUp!) {
-                m.set(k.toString(), EngravingStemInfoSerializer.toJson(v));
-            }
-        }
-        {
-            const m = new Map<string, unknown>();
-            o.set("stemdown", m);
-            for (const [k, v] of obj.stemDown!) {
-                m.set(k.toString(), EngravingStemInfoSerializer.toJson(v));
-            }
-        }
-        {
-            const m = new Map<string, unknown>();
-            o.set("repeatoffsetx", m);
-            for (const [k, v] of obj.repeatOffsetX!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("standardstemlength", obj.standardStemLength);
-        {
-            const m = new Map<string, unknown>();
-            o.set("stemflagoffsets", m);
-            for (const [k, v] of obj.stemFlagOffsets!) {
-                m.set(k.toString(), v);
-            }
-        }
-        {
-            const m = new Map<string, unknown>();
-            o.set("glyphtop", m);
-            for (const [k, v] of obj.glyphTop!) {
-                m.set(k.toString(), v);
-            }
-        }
-        {
-            const m = new Map<string, unknown>();
-            o.set("glyphbottom", m);
-            for (const [k, v] of obj.glyphBottom!) {
-                m.set(k.toString(), v);
-            }
-        }
-        {
-            const m = new Map<string, unknown>();
-            o.set("glyphwidths", m);
-            for (const [k, v] of obj.glyphWidths!) {
-                m.set(k.toString(), v);
-            }
-        }
-        {
-            const m = new Map<string, unknown>();
-            o.set("glyphheights", m);
-            for (const [k, v] of obj.glyphHeights!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
-        o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
-        o.set("numbereddashglyphpadding", obj.numberedDashGlyphPadding);
-        o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
-        o.set("linerangedglyphdashgap", obj.lineRangedGlyphDashGap);
-        o.set("linerangedglyphdashsize", obj.lineRangedGlyphDashSize);
-        o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
-        o.set("postnoteeffectpadding", obj.postNoteEffectPadding);
-        o.set("onnoteeffectpadding", obj.onNoteEffectPadding);
-        o.set("stringnumbercirclepadding", obj.stringNumberCirclePadding);
-        o.set("rowcontainerpadding", obj.rowContainerPadding);
-        o.set("rowcontainergap", obj.rowContainerGap);
-        o.set("alternateendingspadding", obj.alternateEndingsPadding);
-        o.set("sustainpedallinepadding", obj.sustainPedalLinePadding);
-        o.set("tieheight", obj.tieHeight);
-        o.set("beattimerpadding", obj.beatTimerPadding);
-        o.set("bendnoteheadelementpadding", obj.bendNoteHeadElementPadding);
-        o.set("ghostparenthesiswidth", obj.ghostParenthesisWidth);
-        o.set("ghostparenthesispadding", obj.ghostParenthesisPadding);
-        o.set("brokenbeamwidth", obj.brokenBeamWidth);
-        o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
-        o.set("tabwhammyperhalfheight", obj.tabWhammyPerHalfHeight);
-        o.set("tabwhammydashsize", obj.tabWhammyDashSize);
-        o.set("songbookwhammydipheight", obj.songBookWhammyDipHeight);
-        o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
-        o.set("lefthandtabtiewidth", obj.leftHandTabTieWidth);
-        o.set("tabbenddashsize", obj.tabBendDashSize);
-        o.set("tabbendstaffpadding", obj.tabBendStaffPadding);
-        o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
-        o.set("tabbendlabelpadding", obj.tabBendLabelPadding);
-        o.set("simpleslidewidth", obj.simpleSlideWidth);
-        o.set("simpleslideheight", obj.simpleSlideHeight);
-        o.set("chorddiagrampaddingx", obj.chordDiagramPaddingX);
-        o.set("chorddiagrampaddingy", obj.chordDiagramPaddingY);
-        o.set("chorddiagramstringspacing", obj.chordDiagramStringSpacing);
-        o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
-        o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
-        o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
-        o.set("chorddiagramlinewidth", obj.chordDiagramLineWidth);
-        o.set("tripletfeelbracketpadding", obj.tripletFeelBracketPadding);
-        o.set("accidentalpadding", obj.accidentalPadding);
-        o.set("prebeatglyphspacing", obj.preBeatGlyphSpacing);
-        o.set("temponotescale", obj.tempoNoteScale);
-        o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
-        o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
-        o.set("tuningglyphstringrowpadding", obj.tuningGlyphStringRowPadding);
-        o.set("directionsscale", obj.directionsScale);
-        o.set("multivoicedisplacednoteheadspacing", obj.multiVoiceDisplacedNoteHeadSpacing);
-        {
-            const m = new Map<string, unknown>();
-            o.set("stemflagheight", m);
-            for (const [k, v] of obj.stemFlagHeight!) {
-                m.set(k.toString(), v);
-            }
-        }
-        return o;
+    public static readProperty(obj: EngravingSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = EngravingSettingsSerializer._fields.idOf(property);
+        return id >= 0 ? EngravingSettingsSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: EngravingSettings, property: string, v: unknown): boolean {
-        switch (property) {
-            case "musicfontsize":
-                obj.musicFontSize = v! as number;
+    private static _readField(obj: EngravingSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                obj.musicFontSize = r.readNumber();
                 return true;
-            case "onestaffspace":
-                obj.oneStaffSpace = v! as number;
+            case 1:
+                obj.oneStaffSpace = r.readNumber();
                 return true;
-            case "tablinespacing":
-                obj.tabLineSpacing = v! as number;
+            case 2:
+                obj.tabLineSpacing = r.readNumber();
                 return true;
-            case "arrowshaftthickness":
-                obj.arrowShaftThickness = v! as number;
+            case 3:
+                obj.arrowShaftThickness = r.readNumber();
                 return true;
-            case "barlineseparation":
-                obj.barlineSeparation = v! as number;
+            case 4:
+                obj.barlineSeparation = r.readNumber();
                 return true;
-            case "beamspacing":
-                obj.beamSpacing = v! as number;
+            case 5:
+                obj.beamSpacing = r.readNumber();
                 return true;
-            case "beamthickness":
-                obj.beamThickness = v! as number;
+            case 6:
+                obj.beamThickness = r.readNumber();
                 return true;
-            case "bracketthickness":
-                obj.bracketThickness = v! as number;
+            case 7:
+                obj.bracketThickness = r.readNumber();
                 return true;
-            case "dashedbarlinedashlength":
-                obj.dashedBarlineDashLength = v! as number;
+            case 8:
+                obj.dashedBarlineDashLength = r.readNumber();
                 return true;
-            case "dashedbarlinegaplength":
-                obj.dashedBarlineGapLength = v! as number;
+            case 9:
+                obj.dashedBarlineGapLength = r.readNumber();
                 return true;
-            case "dashedbarlinethickness":
-                obj.dashedBarlineThickness = v! as number;
+            case 10:
+                obj.dashedBarlineThickness = r.readNumber();
                 return true;
-            case "hairpinthickness":
-                obj.hairpinThickness = v! as number;
+            case 11:
+                obj.hairpinThickness = r.readNumber();
                 return true;
-            case "legerlinethickness":
-                obj.legerLineThickness = v! as number;
+            case 12:
+                obj.legerLineThickness = r.readNumber();
                 return true;
-            case "legerlineextension":
-                obj.legerLineExtension = v! as number;
+            case 13:
+                obj.legerLineExtension = r.readNumber();
                 return true;
-            case "octavelinethickness":
-                obj.octaveLineThickness = v! as number;
+            case 14:
+                obj.octaveLineThickness = r.readNumber();
                 return true;
-            case "pedallinethickness":
-                obj.pedalLineThickness = v! as number;
+            case 15:
+                obj.pedalLineThickness = r.readNumber();
                 return true;
-            case "repeatbarlinedotseparation":
-                obj.repeatBarlineDotSeparation = v! as number;
+            case 16:
+                obj.repeatBarlineDotSeparation = r.readNumber();
                 return true;
-            case "repeatendinglinethickness":
-                obj.repeatEndingLineThickness = v! as number;
+            case 17:
+                obj.repeatEndingLineThickness = r.readNumber();
                 return true;
-            case "slurmidpointthickness":
-                obj.slurMidpointThickness = v! as number;
+            case 18:
+                obj.slurMidpointThickness = r.readNumber();
                 return true;
-            case "stafflinethickness":
-                obj.staffLineThickness = v! as number;
+            case 19:
+                obj.staffLineThickness = r.readNumber();
                 return true;
-            case "stemthickness":
-                obj.stemThickness = v! as number;
+            case 20:
+                obj.stemThickness = r.readNumber();
                 return true;
-            case "thickbarlinethickness":
-                obj.thickBarlineThickness = v! as number;
+            case 21:
+                obj.thickBarlineThickness = r.readNumber();
                 return true;
-            case "thinbarlinethickness":
-                obj.thinBarlineThickness = v! as number;
+            case 22:
+                obj.thinBarlineThickness = r.readNumber();
                 return true;
-            case "thinthickbarlineseparation":
-                obj.thinThickBarlineSeparation = v! as number;
+            case 23:
+                obj.thinThickBarlineSeparation = r.readNumber();
                 return true;
-            case "tiemidpointthickness":
-                obj.tieMidpointThickness = v! as number;
+            case 24:
+                obj.tieMidpointThickness = r.readNumber();
                 return true;
-            case "tupletbracketthickness":
-                obj.tupletBracketThickness = v! as number;
+            case 25:
+                obj.tupletBracketThickness = r.readNumber();
                 return true;
-            case "stemup":
-                obj.stemUp = new Map<MusicFontSymbol, EngravingStemInfo>();
-                JsonHelper.forEach(v, (v, k) => {
-                    const i = new EngravingStemInfo();
-                    EngravingStemInfoSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.stemUp.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
-                });
+            case 26:
+                EngravingSettingsSerializer._readStemUp(obj, r, flexible);
                 return true;
-            case "stemdown":
-                obj.stemDown = new Map<MusicFontSymbol, EngravingStemInfo>();
-                JsonHelper.forEach(v, (v, k) => {
-                    const i = new EngravingStemInfo();
-                    EngravingStemInfoSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.stemDown.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
-                });
+            case 27:
+                EngravingSettingsSerializer._readStemDown(obj, r, flexible);
                 return true;
-            case "repeatoffsetx":
-                obj.repeatOffsetX = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.repeatOffsetX.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
+            case 28:
+                EngravingSettingsSerializer._readRepeatOffsetX(obj, r, flexible);
                 return true;
-            case "standardstemlength":
-                obj.standardStemLength = v! as number;
+            case 29:
+                obj.standardStemLength = r.readNumber();
                 return true;
-            case "stemflagoffsets":
-                obj.stemFlagOffsets = new Map<Duration, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.stemFlagOffsets.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
-                });
+            case 30:
+                EngravingSettingsSerializer._readStemFlagOffsets(obj, r, flexible);
                 return true;
-            case "glyphtop":
-                obj.glyphTop = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphTop.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
+            case 31:
+                EngravingSettingsSerializer._readGlyphTop(obj, r, flexible);
                 return true;
-            case "glyphbottom":
-                obj.glyphBottom = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphBottom.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
+            case 32:
+                EngravingSettingsSerializer._readGlyphBottom(obj, r, flexible);
                 return true;
-            case "glyphwidths":
-                obj.glyphWidths = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphWidths.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
+            case 33:
+                EngravingSettingsSerializer._readGlyphWidths(obj, r, flexible);
                 return true;
-            case "glyphheights":
-                obj.glyphHeights = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphHeights.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
+            case 34:
+                EngravingSettingsSerializer._readGlyphHeights(obj, r, flexible);
                 return true;
-            case "numberedbarrendererbarsize":
-                obj.numberedBarRendererBarSize = v! as number;
+            case 35:
+                obj.numberedBarRendererBarSize = r.readNumber();
                 return true;
-            case "numberedbarrendererbarspacing":
-                obj.numberedBarRendererBarSpacing = v! as number;
+            case 36:
+                obj.numberedBarRendererBarSpacing = r.readNumber();
                 return true;
-            case "numbereddashglyphpadding":
-                obj.numberedDashGlyphPadding = v! as number;
+            case 37:
+                obj.numberedDashGlyphPadding = r.readNumber();
                 return true;
-            case "numbereddashglyphwidth":
-                obj.numberedDashGlyphWidth = v! as number;
+            case 38:
+                obj.numberedDashGlyphWidth = r.readNumber();
                 return true;
-            case "linerangedglyphdashgap":
-                obj.lineRangedGlyphDashGap = v! as number;
+            case 39:
+                obj.lineRangedGlyphDashGap = r.readNumber();
                 return true;
-            case "linerangedglyphdashsize":
-                obj.lineRangedGlyphDashSize = v! as number;
+            case 40:
+                obj.lineRangedGlyphDashSize = r.readNumber();
                 return true;
-            case "prenoteeffectpadding":
-                obj.preNoteEffectPadding = v! as number;
+            case 41:
+                obj.preNoteEffectPadding = r.readNumber();
                 return true;
-            case "postnoteeffectpadding":
-                obj.postNoteEffectPadding = v! as number;
+            case 42:
+                obj.postNoteEffectPadding = r.readNumber();
                 return true;
-            case "onnoteeffectpadding":
-                obj.onNoteEffectPadding = v! as number;
+            case 43:
+                obj.onNoteEffectPadding = r.readNumber();
                 return true;
-            case "stringnumbercirclepadding":
-                obj.stringNumberCirclePadding = v! as number;
+            case 44:
+                obj.stringNumberCirclePadding = r.readNumber();
                 return true;
-            case "rowcontainerpadding":
-                obj.rowContainerPadding = v! as number;
+            case 45:
+                obj.rowContainerPadding = r.readNumber();
                 return true;
-            case "rowcontainergap":
-                obj.rowContainerGap = v! as number;
+            case 46:
+                obj.rowContainerGap = r.readNumber();
                 return true;
-            case "alternateendingspadding":
-                obj.alternateEndingsPadding = v! as number;
+            case 47:
+                obj.alternateEndingsPadding = r.readNumber();
                 return true;
-            case "sustainpedallinepadding":
-                obj.sustainPedalLinePadding = v! as number;
+            case 48:
+                obj.sustainPedalLinePadding = r.readNumber();
                 return true;
-            case "tieheight":
-                obj.tieHeight = v! as number;
+            case 49:
+                obj.tieHeight = r.readNumber();
                 return true;
-            case "beattimerpadding":
-                obj.beatTimerPadding = v! as number;
+            case 50:
+                obj.beatTimerPadding = r.readNumber();
                 return true;
-            case "bendnoteheadelementpadding":
-                obj.bendNoteHeadElementPadding = v! as number;
+            case 51:
+                obj.bendNoteHeadElementPadding = r.readNumber();
                 return true;
-            case "ghostparenthesiswidth":
-                obj.ghostParenthesisWidth = v! as number;
+            case 52:
+                obj.ghostParenthesisWidth = r.readNumber();
                 return true;
-            case "ghostparenthesispadding":
-                obj.ghostParenthesisPadding = v! as number;
+            case 53:
+                obj.ghostParenthesisPadding = r.readNumber();
                 return true;
-            case "brokenbeamwidth":
-                obj.brokenBeamWidth = v! as number;
+            case 54:
+                obj.brokenBeamWidth = r.readNumber();
                 return true;
-            case "tabwhammytextpadding":
-                obj.tabWhammyTextPadding = v! as number;
+            case 55:
+                obj.tabWhammyTextPadding = r.readNumber();
                 return true;
-            case "tabwhammyperhalfheight":
-                obj.tabWhammyPerHalfHeight = v! as number;
+            case 56:
+                obj.tabWhammyPerHalfHeight = r.readNumber();
                 return true;
-            case "tabwhammydashsize":
-                obj.tabWhammyDashSize = v! as number;
+            case 57:
+                obj.tabWhammyDashSize = r.readNumber();
                 return true;
-            case "songbookwhammydipheight":
-                obj.songBookWhammyDipHeight = v! as number;
+            case 58:
+                obj.songBookWhammyDipHeight = r.readNumber();
                 return true;
-            case "deadslappedlinewidth":
-                obj.deadSlappedLineWidth = v! as number;
+            case 59:
+                obj.deadSlappedLineWidth = r.readNumber();
                 return true;
-            case "lefthandtabtiewidth":
-                obj.leftHandTabTieWidth = v! as number;
+            case 60:
+                obj.leftHandTabTieWidth = r.readNumber();
                 return true;
-            case "tabbenddashsize":
-                obj.tabBendDashSize = v! as number;
+            case 61:
+                obj.tabBendDashSize = r.readNumber();
                 return true;
-            case "tabbendstaffpadding":
-                obj.tabBendStaffPadding = v! as number;
+            case 62:
+                obj.tabBendStaffPadding = r.readNumber();
                 return true;
-            case "tabbendpervalueheight":
-                obj.tabBendPerValueHeight = v! as number;
+            case 63:
+                obj.tabBendPerValueHeight = r.readNumber();
                 return true;
-            case "tabbendlabelpadding":
-                obj.tabBendLabelPadding = v! as number;
+            case 64:
+                obj.tabBendLabelPadding = r.readNumber();
                 return true;
-            case "simpleslidewidth":
-                obj.simpleSlideWidth = v! as number;
+            case 65:
+                obj.simpleSlideWidth = r.readNumber();
                 return true;
-            case "simpleslideheight":
-                obj.simpleSlideHeight = v! as number;
+            case 66:
+                obj.simpleSlideHeight = r.readNumber();
                 return true;
-            case "chorddiagrampaddingx":
-                obj.chordDiagramPaddingX = v! as number;
+            case 67:
+                obj.chordDiagramPaddingX = r.readNumber();
                 return true;
-            case "chorddiagrampaddingy":
-                obj.chordDiagramPaddingY = v! as number;
+            case 68:
+                obj.chordDiagramPaddingY = r.readNumber();
                 return true;
-            case "chorddiagramstringspacing":
-                obj.chordDiagramStringSpacing = v! as number;
+            case 69:
+                obj.chordDiagramStringSpacing = r.readNumber();
                 return true;
-            case "chorddiagramfretspacing":
-                obj.chordDiagramFretSpacing = v! as number;
+            case 70:
+                obj.chordDiagramFretSpacing = r.readNumber();
                 return true;
-            case "chorddiagramnutheight":
-                obj.chordDiagramNutHeight = v! as number;
+            case 71:
+                obj.chordDiagramNutHeight = r.readNumber();
                 return true;
-            case "chorddiagramfretheight":
-                obj.chordDiagramFretHeight = v! as number;
+            case 72:
+                obj.chordDiagramFretHeight = r.readNumber();
                 return true;
-            case "chorddiagramlinewidth":
-                obj.chordDiagramLineWidth = v! as number;
+            case 73:
+                obj.chordDiagramLineWidth = r.readNumber();
                 return true;
-            case "tripletfeelbracketpadding":
-                obj.tripletFeelBracketPadding = v! as number;
+            case 74:
+                obj.tripletFeelBracketPadding = r.readNumber();
                 return true;
-            case "accidentalpadding":
-                obj.accidentalPadding = v! as number;
+            case 75:
+                obj.accidentalPadding = r.readNumber();
                 return true;
-            case "prebeatglyphspacing":
-                obj.preBeatGlyphSpacing = v! as number;
+            case 76:
+                obj.preBeatGlyphSpacing = r.readNumber();
                 return true;
-            case "temponotescale":
-                obj.tempoNoteScale = v! as number;
+            case 77:
+                obj.tempoNoteScale = r.readNumber();
                 return true;
-            case "tuningglyphcirclenumberscale":
-                obj.tuningGlyphCircleNumberScale = v! as number;
+            case 78:
+                obj.tuningGlyphCircleNumberScale = r.readNumber();
                 return true;
-            case "tuningglyphstringcolumnscale":
-                obj.tuningGlyphStringColumnScale = v! as number;
+            case 79:
+                obj.tuningGlyphStringColumnScale = r.readNumber();
                 return true;
-            case "tuningglyphstringrowpadding":
-                obj.tuningGlyphStringRowPadding = v! as number;
+            case 80:
+                obj.tuningGlyphStringRowPadding = r.readNumber();
                 return true;
-            case "directionsscale":
-                obj.directionsScale = v! as number;
+            case 81:
+                obj.directionsScale = r.readNumber();
                 return true;
-            case "multivoicedisplacednoteheadspacing":
-                obj.multiVoiceDisplacedNoteHeadSpacing = v! as number;
+            case 82:
+                obj.multiVoiceDisplacedNoteHeadSpacing = r.readNumber();
                 return true;
-            case "stemflagheight":
-                obj.stemFlagHeight = new Map<Duration, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.stemFlagHeight.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
-                });
+            case 83:
+                obj.staffContentPadding = r.readNumber();
+                return true;
+            case 84:
+                obj.beatContentPadding = r.readNumber();
+                return true;
+            case 85:
+                obj.barlineContentPadding = r.readNumber();
+                return true;
+            case 86:
+                EngravingSettingsSerializer._readStemFlagHeight(obj, r, flexible);
                 return true;
         }
         return false;
+    }
+    private static _readStemUp(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.stemUp = new Map<MusicFontSymbol, EngravingStemInfo>();
+        r.readObject((k, rr) => {
+            const i = new EngravingStemInfo();
+            if (flexible) {
+                EngravingStemInfoSerializer.readFlexible(i, rr);
+            }
+            else {
+                EngravingStemInfoSerializer.read(i, rr);
+            }
+            obj.stemUp.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
+            return true;
+        });
+    }
+    private static _readStemDown(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.stemDown = new Map<MusicFontSymbol, EngravingStemInfo>();
+        r.readObject((k, rr) => {
+            const i = new EngravingStemInfo();
+            if (flexible) {
+                EngravingStemInfoSerializer.readFlexible(i, rr);
+            }
+            else {
+                EngravingStemInfoSerializer.read(i, rr);
+            }
+            obj.stemDown.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
+            return true;
+        });
+    }
+    private static _readRepeatOffsetX(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.repeatOffsetX = new Map<MusicFontSymbol, number>();
+        r.readObject((k, rr) => {
+            obj.repeatOffsetX.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, rr.readNumber());
+            return true;
+        });
+    }
+    private static _readStemFlagOffsets(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.stemFlagOffsets = new Map<Duration, number>();
+        r.readObject((k, rr) => {
+            obj.stemFlagOffsets.set(JsonHelper.parseEnum<Duration>(k, Duration)!, rr.readNumber());
+            return true;
+        });
+    }
+    private static _readGlyphTop(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.glyphTop = new Map<MusicFontSymbol, number>();
+        r.readObject((k, rr) => {
+            obj.glyphTop.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, rr.readNumber());
+            return true;
+        });
+    }
+    private static _readGlyphBottom(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.glyphBottom = new Map<MusicFontSymbol, number>();
+        r.readObject((k, rr) => {
+            obj.glyphBottom.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, rr.readNumber());
+            return true;
+        });
+    }
+    private static _readGlyphWidths(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.glyphWidths = new Map<MusicFontSymbol, number>();
+        r.readObject((k, rr) => {
+            obj.glyphWidths.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, rr.readNumber());
+            return true;
+        });
+    }
+    private static _readGlyphHeights(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.glyphHeights = new Map<MusicFontSymbol, number>();
+        r.readObject((k, rr) => {
+            obj.glyphHeights.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, rr.readNumber());
+            return true;
+        });
+    }
+    private static _readStemFlagHeight(obj: EngravingSettings, r: IObjectReader, flexible: boolean): void {
+        obj.stemFlagHeight = new Map<Duration, number>();
+        r.readObject((k, rr) => {
+            obj.stemFlagHeight.set(JsonHelper.parseEnum<Duration>(k, Duration)!, rr.readNumber());
+            return true;
+        });
+    }
+    public static readFlexible(obj: EngravingSettings, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? EngravingSettingsSerializer._readField(obj, id, rr, false) : EngravingSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: EngravingSettings, property: string, r: IObjectReader): boolean {
+        if (EngravingSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static write(obj: EngravingSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(EngravingSettingsSerializer._fields);
+        w.numberField(0, obj.musicFontSize);
+        w.numberField(1, obj.oneStaffSpace);
+        w.numberField(2, obj.tabLineSpacing);
+        w.numberField(3, obj.arrowShaftThickness);
+        w.numberField(4, obj.barlineSeparation);
+        w.numberField(5, obj.beamSpacing);
+        w.numberField(6, obj.beamThickness);
+        w.numberField(7, obj.bracketThickness);
+        w.numberField(8, obj.dashedBarlineDashLength);
+        w.numberField(9, obj.dashedBarlineGapLength);
+        w.numberField(10, obj.dashedBarlineThickness);
+        w.numberField(11, obj.hairpinThickness);
+        w.numberField(12, obj.legerLineThickness);
+        w.numberField(13, obj.legerLineExtension);
+        w.numberField(14, obj.octaveLineThickness);
+        w.numberField(15, obj.pedalLineThickness);
+        w.numberField(16, obj.repeatBarlineDotSeparation);
+        w.numberField(17, obj.repeatEndingLineThickness);
+        w.numberField(18, obj.slurMidpointThickness);
+        w.numberField(19, obj.staffLineThickness);
+        w.numberField(20, obj.stemThickness);
+        w.numberField(21, obj.thickBarlineThickness);
+        w.numberField(22, obj.thinBarlineThickness);
+        w.numberField(23, obj.thinThickBarlineSeparation);
+        w.numberField(24, obj.tieMidpointThickness);
+        w.numberField(25, obj.tupletBracketThickness);
+        w.mapField(26);
+        for (const [k, v] of obj.stemUp!) {
+            w.prop(k.toString());
+            EngravingStemInfoSerializer.write(v, w);
+        }
+        w.endMap();
+        w.mapField(27);
+        for (const [k, v] of obj.stemDown!) {
+            w.prop(k.toString());
+            EngravingStemInfoSerializer.write(v, w);
+        }
+        w.endMap();
+        w.mapField(28);
+        for (const [k, v] of obj.repeatOffsetX!) {
+            w.prop(k.toString());
+            w.writeNumber(v);
+        }
+        w.endMap();
+        w.numberField(29, obj.standardStemLength);
+        w.mapField(30);
+        for (const [k, v] of obj.stemFlagOffsets!) {
+            w.prop(k.toString());
+            w.writeNumber(v);
+        }
+        w.endMap();
+        w.mapField(31);
+        for (const [k, v] of obj.glyphTop!) {
+            w.prop(k.toString());
+            w.writeNumber(v);
+        }
+        w.endMap();
+        w.mapField(32);
+        for (const [k, v] of obj.glyphBottom!) {
+            w.prop(k.toString());
+            w.writeNumber(v);
+        }
+        w.endMap();
+        w.mapField(33);
+        for (const [k, v] of obj.glyphWidths!) {
+            w.prop(k.toString());
+            w.writeNumber(v);
+        }
+        w.endMap();
+        w.mapField(34);
+        for (const [k, v] of obj.glyphHeights!) {
+            w.prop(k.toString());
+            w.writeNumber(v);
+        }
+        w.endMap();
+        w.numberField(35, obj.numberedBarRendererBarSize);
+        w.numberField(36, obj.numberedBarRendererBarSpacing);
+        w.numberField(37, obj.numberedDashGlyphPadding);
+        w.numberField(38, obj.numberedDashGlyphWidth);
+        w.numberField(39, obj.lineRangedGlyphDashGap);
+        w.numberField(40, obj.lineRangedGlyphDashSize);
+        w.numberField(41, obj.preNoteEffectPadding);
+        w.numberField(42, obj.postNoteEffectPadding);
+        w.numberField(43, obj.onNoteEffectPadding);
+        w.numberField(44, obj.stringNumberCirclePadding);
+        w.numberField(45, obj.rowContainerPadding);
+        w.numberField(46, obj.rowContainerGap);
+        w.numberField(47, obj.alternateEndingsPadding);
+        w.numberField(48, obj.sustainPedalLinePadding);
+        w.numberField(49, obj.tieHeight);
+        w.numberField(50, obj.beatTimerPadding);
+        w.numberField(51, obj.bendNoteHeadElementPadding);
+        w.numberField(52, obj.ghostParenthesisWidth);
+        w.numberField(53, obj.ghostParenthesisPadding);
+        w.numberField(54, obj.brokenBeamWidth);
+        w.numberField(55, obj.tabWhammyTextPadding);
+        w.numberField(56, obj.tabWhammyPerHalfHeight);
+        w.numberField(57, obj.tabWhammyDashSize);
+        w.numberField(58, obj.songBookWhammyDipHeight);
+        w.numberField(59, obj.deadSlappedLineWidth);
+        w.numberField(60, obj.leftHandTabTieWidth);
+        w.numberField(61, obj.tabBendDashSize);
+        w.numberField(62, obj.tabBendStaffPadding);
+        w.numberField(63, obj.tabBendPerValueHeight);
+        w.numberField(64, obj.tabBendLabelPadding);
+        w.numberField(65, obj.simpleSlideWidth);
+        w.numberField(66, obj.simpleSlideHeight);
+        w.numberField(67, obj.chordDiagramPaddingX);
+        w.numberField(68, obj.chordDiagramPaddingY);
+        w.numberField(69, obj.chordDiagramStringSpacing);
+        w.numberField(70, obj.chordDiagramFretSpacing);
+        w.numberField(71, obj.chordDiagramNutHeight);
+        w.numberField(72, obj.chordDiagramFretHeight);
+        w.numberField(73, obj.chordDiagramLineWidth);
+        w.numberField(74, obj.tripletFeelBracketPadding);
+        w.numberField(75, obj.accidentalPadding);
+        w.numberField(76, obj.preBeatGlyphSpacing);
+        w.numberField(77, obj.tempoNoteScale);
+        w.numberField(78, obj.tuningGlyphCircleNumberScale);
+        w.numberField(79, obj.tuningGlyphStringColumnScale);
+        w.numberField(80, obj.tuningGlyphStringRowPadding);
+        w.numberField(81, obj.directionsScale);
+        w.numberField(82, obj.multiVoiceDisplacedNoteHeadSpacing);
+        w.numberField(83, obj.staffContentPadding);
+        w.numberField(84, obj.beatContentPadding);
+        w.numberField(85, obj.barlineContentPadding);
+        w.mapField(86);
+        for (const [k, v] of obj.stemFlagHeight!) {
+            w.prop(k.toString());
+            w.writeNumber(v);
+        }
+        w.endMap();
+        w.endObject();
     }
 }

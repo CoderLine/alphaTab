@@ -5,6 +5,7 @@ import type { Clef } from '@coderline/alphatab/model/Clef';
 import { ModelUtils, type ResolvedSpelling } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
@@ -47,11 +48,11 @@ export class AccidentalHelper {
      */
     private static readonly _diatonicSteps: number[] = [0, 1, 2, 3, 4, 5, 6];
 
-    private _registeredAccidentals: Map<number, number> = new Map();
-    private _appliedScoreSteps: Map<number, number> = new Map();
-    private _appliedScoreStepsByValue: Map<number, number> = new Map();
-    private _notesByValue: Map<number, Note> = new Map();
-    private _beatSteps: Map<number, BeatSteps> = new Map();
+    private _registeredAccidentals: Map<number, number> | null = null;
+    private _appliedScoreSteps: Map<number, number> | null = null;
+    private _appliedScoreStepsByValue: Map<number, number> | null = null;
+    private _notesByValue: Map<number, Note> | null = null;
+    private _beatSteps: Map<number, BeatSteps> | null = null;
 
     /**
      * The beat on which the highest note of this helper was added.
@@ -147,9 +148,11 @@ export class AccidentalHelper {
             const spelling = ModelUtils.resolveSpelling(this._bar.keySignature, noteValue, accidentalMode);
             steps = AccidentalHelper.calculateNoteSteps(this._bar.clef, spelling);
 
-            const currentAccidentalOffset = this._registeredAccidentals.has(steps)
-                ? this._registeredAccidentals.get(steps)!
-                : null;
+            const registeredAccidentals = this._registeredAccidentals;
+            const currentAccidentalOffset =
+                registeredAccidentals !== null && registeredAccidentals.has(steps)
+                    ? registeredAccidentals.get(steps)!
+                    : null;
 
             accidentalToSet = ModelUtils.computeAccidentalForSpelling(
                 this._bar.keySignature,
@@ -193,15 +196,31 @@ export class AccidentalHelper {
             const shouldRegister = !quarterBend && accidentalToSet !== AccidentalType.None;
 
             if (shouldRegister) {
-                this._registeredAccidentals.set(steps, spelling.accidentalOffset);
+                let registered = this._registeredAccidentals;
+                if (!registered) {
+                    registered = new Map<number, number>();
+                    this._registeredAccidentals = registered;
+                }
+                registered.set(steps, spelling.accidentalOffset);
             }
         }
 
         if (note) {
-            this._appliedScoreSteps.set(note.id, steps);
-            this._notesByValue.set(noteValue, note);
+            this._getAppliedScoreSteps().set(note.id, steps);
+
+            let notesByValue = this._notesByValue;
+            if (!notesByValue) {
+                notesByValue = new Map<number, Note>();
+                this._notesByValue = notesByValue;
+            }
+            notesByValue.set(noteValue, note);
         } else {
-            this._appliedScoreStepsByValue.set(noteValue, steps);
+            let appliedScoreStepsByValue = this._appliedScoreStepsByValue;
+            if (!appliedScoreStepsByValue) {
+                appliedScoreStepsByValue = new Map<number, number>();
+                this._appliedScoreStepsByValue = appliedScoreStepsByValue;
+            }
+            appliedScoreStepsByValue.set(noteValue, steps);
         }
 
         if (this.minSteps === -1000 || this.minSteps < steps) {
@@ -221,12 +240,17 @@ export class AccidentalHelper {
     }
 
     private _registerSteps(relatedBeat: Beat, steps: number, note: Note | null) {
+        let allBeatSteps = this._beatSteps;
+        if (!allBeatSteps) {
+            allBeatSteps = new Map<number, BeatSteps>();
+            this._beatSteps = allBeatSteps;
+        }
         let beatSteps: BeatSteps;
-        if (this._beatSteps.has(relatedBeat.id)) {
-            beatSteps = this._beatSteps.get(relatedBeat.id)!;
+        if (allBeatSteps.has(relatedBeat.id)) {
+            beatSteps = allBeatSteps.get(relatedBeat.id)!;
         } else {
             beatSteps = new BeatSteps();
-            this._beatSteps.set(relatedBeat.id, beatSteps);
+            allBeatSteps.set(relatedBeat.id, beatSteps);
         }
         if (beatSteps.minSteps === -1000 || steps < beatSteps.minSteps) {
             beatSteps.minSteps = steps;
@@ -238,20 +262,29 @@ export class AccidentalHelper {
         }
     }
 
+    private _getBeatSteps(b: Beat): BeatSteps | null {
+        const allBeatSteps = this._beatSteps;
+        return allBeatSteps !== null && allBeatSteps.has(b.id) ? allBeatSteps.get(b.id)! : null;
+    }
+
     public getMaxSteps(b: Beat): number {
-        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxSteps : 0;
+        const beatSteps = this._getBeatSteps(b);
+        return beatSteps ? beatSteps.maxSteps : 0;
     }
 
     public getMaxStepsNote(b: Beat): Note | null {
-        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.maxStepsNote : null;
+        const beatSteps = this._getBeatSteps(b);
+        return beatSteps ? beatSteps.maxStepsNote : null;
     }
 
     public getMinSteps(b: Beat): number {
-        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minSteps : 0;
+        const beatSteps = this._getBeatSteps(b);
+        return beatSteps ? beatSteps.minSteps : 0;
     }
 
     public getMinStepsNote(b: Beat): Note | null {
-        return this._beatSteps.has(b.id) ? this._beatSteps.get(b.id)!.minStepsNote : null;
+        const beatSteps = this._getBeatSteps(b);
+        return beatSteps ? beatSteps.minStepsNote : null;
     }
 
     public static calculateNoteSteps(clef: Clef, spelling: ResolvedSpelling): number {
@@ -267,16 +300,48 @@ export class AccidentalHelper {
         return steps;
     }
 
+    public static calculateRestDisplaySteps(bar: Bar, tone: number, octave: number): number {
+        let noteValue = (octave + 1) * 12 + tone;
+        switch (bar.clefOttava) {
+            case Ottavia._15ma:
+                noteValue -= 24;
+                break;
+            case Ottavia._8va:
+                noteValue -= 12;
+                break;
+            case Ottavia._8vb:
+                noteValue += 12;
+                break;
+            case Ottavia._15mb:
+                noteValue += 24;
+                break;
+        }
+
+        const spelling = ModelUtils.resolveSpelling(bar.keySignature, noteValue, NoteAccidentalMode.Default);
+        return AccidentalHelper.calculateNoteSteps(bar.clef, spelling);
+    }
+
+    private _getAppliedScoreSteps(): Map<number, number> {
+        let appliedScoreSteps = this._appliedScoreSteps;
+        if (!appliedScoreSteps) {
+            appliedScoreSteps = new Map<number, number>();
+            this._appliedScoreSteps = appliedScoreSteps;
+        }
+        return appliedScoreSteps;
+    }
+
     public getNoteSteps(n: Note): number {
-        return this._appliedScoreSteps.get(n.id)!;
+        return this._getAppliedScoreSteps().get(n.id)!;
     }
 
     public getNoteStepsForValue(rawValue: number, searchForNote: boolean = false): number {
-        if (this._appliedScoreStepsByValue.has(rawValue)) {
-            return this._appliedScoreStepsByValue.get(rawValue)!;
+        const appliedScoreStepsByValue = this._appliedScoreStepsByValue;
+        if (appliedScoreStepsByValue !== null && appliedScoreStepsByValue.has(rawValue)) {
+            return appliedScoreStepsByValue.get(rawValue)!;
         }
-        if (searchForNote && this._notesByValue.has(rawValue)) {
-            return this.getNoteSteps(this._notesByValue.get(rawValue)!);
+        const notesByValue = this._notesByValue;
+        if (searchForNote && notesByValue !== null && notesByValue.has(rawValue)) {
+            return this.getNoteSteps(notesByValue.get(rawValue)!);
         }
         return 0;
     }

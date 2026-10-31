@@ -12,6 +12,7 @@ import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { Slur } from '@coderline/alphatab/model/Slur';
+import type { SlurSegment } from '@coderline/alphatab/model/SlurSegment';
 import { SlurSegmentKind } from '@coderline/alphatab/model/SlurSegmentKind';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
@@ -24,6 +25,8 @@ import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
+import type { IObjectReader } from '@coderline/alphatab/io/IObjectReader';
+import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
 import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
@@ -204,43 +207,46 @@ export class Note {
     }
 
     public get isStringed(): boolean {
-        return this.string >= 0;
+        return !Number.isNaN(this.string) && !Number.isNaN(this.fret);
     }
 
     /**
      * Gets or sets the fret on which this note is played on the instrument.
      * 0 is the nut.
      */
-    public fret: number = -1;
+    public fret: number = Number.NaN;
 
     /**
      * Gets or sets the string number where the note is placed.
      * 1 is the lowest string on the guitar and the bottom line on the tablature.
      * It then increases the the number of strings on available on the track.
+     * On pitched notes (no fret) the string is only an annotation shown via {@link showStringNumber}
+     * and has no effect on playback. Staves without tuning assume a standard 6 string instrument for this case.
      */
-    public string: number = -1;
+    public string: number = Number.NaN;
 
     /**
      * Gets or sets whether the string number for this note should be shown.
+     * For pitched notes this requires {@link string} to be set.
      */
     public showStringNumber: boolean = false;
 
     public get isPiano(): boolean {
-        return !this.isStringed && this.octave >= 0 && this.tone >= 0;
+        return !this.isStringed && !Number.isNaN(this.octave) && !Number.isNaN(this.tone);
     }
 
     /**
      * Gets or sets the octave on which this note is played.
      */
-    public octave: number = -1;
+    public octave: number = Number.NaN;
 
     /**
      * Gets or sets the tone of this note within the octave.
      */
-    public tone: number = -1;
+    public tone: number = Number.NaN;
 
     public get isPercussion(): boolean {
-        return !this.isStringed && this.percussionArticulation >= 0;
+        return !Number.isNaN(this.percussionArticulation);
     }
 
     /**
@@ -358,7 +364,7 @@ export class Note {
      * - 126 Ride (middle)
      * - 127 Ride (bell)
      */
-    public percussionArticulation: number = -1;
+    public percussionArticulation: number = Number.NaN;
 
     /**
      * Gets or sets whether this note is visible on the music sheet.
@@ -557,6 +563,13 @@ export class Note {
     public trillSpeed: Duration = Duration.ThirtySecond;
 
     /**
+     * Gets or sets whether a separate trill starts on this note.
+     * If set, the trill does not continue a trill on the previous beat.
+     * @since 1.9.0
+     */
+    public isTrillStart: boolean = false;
+
+    /**
      * Gets or sets the percentual duration of the note relative to the overall beat duration.
      */
     public durationPercent: number = 1;
@@ -618,6 +631,15 @@ export class Note {
     public effectSlur: Slur | null = null;
 
     /**
+     * The {@link SlurSegment} of the effect slur chain starting at this note
+     * (hammer-on, pull-off or legato slide to the next note). Populated by `finish()`.
+     * @clone_ignore
+     * @json_ignore
+     * @internal
+     */
+    public effectSlurSegment: SlurSegment | null = null;
+
+    /**
      * The ornament applied on the note.
      */
     public ornament: NoteOrnament = NoteOrnament.None;
@@ -633,10 +655,24 @@ export class Note {
     }
 
     public static getStringTuning(staff: Staff, noteString: number): number {
-        if (staff.tuning.length > 0) {
+        if (staff.tuning.length > 0 && noteString >= 0) {
             return staff.tuning[staff.tuning.length - (noteString - 1) - 1];
         }
         return 0;
+    }
+
+    /**
+     * The number of strings assumed for string number annotations on staves without tuning.
+     */
+    private static readonly _defaultAnnotationStringCount: number = 6;
+
+    /**
+     * Gets the number of strings to which {@link string} relates on the given staff.
+     * Staves without tuning assume a standard 6 string instrument (used for string number annotations on pitched notes).
+     * @internal
+     */
+    public static getStringCount(staff: Staff): number {
+        return staff.tuning.length > 0 ? staff.tuning.length : Note._defaultAnnotationStringCount;
     }
 
     public get realValue(): number {
@@ -657,19 +693,16 @@ export class Note {
         const transpositionPitch = applyTranspositionPitch ? this.beat.voice.bar.staff.transpositionPitch : 0;
 
         if (applyHarmonic) {
-            let realValue = this.calculateRealValue(applyTranspositionPitch, false);
-            if (this.isStringed) {
-                if (this.harmonicType === HarmonicType.Natural) {
-                    realValue = this.harmonicPitch + this.stringTuning - transpositionPitch;
-                } else {
-                    realValue += this.harmonicPitch;
-                }
+            const realValue = this.calculateRealValue(applyTranspositionPitch, false);
+            if (this.isStringed && this.harmonicType === HarmonicType.Natural) {
+                return this.harmonicPitch + this.stringTuning - transpositionPitch;
             }
-            return realValue;
+            return realValue + this.harmonicPitch;
         }
 
         if (this.isPercussion) {
-            return this.percussionArticulation;
+            const art = PercussionMapper.getArticulation(this);
+            return art !== null ? art.outputMidiNumber : this.percussionArticulation;
         }
         if (this.isStringed) {
             return this.fret + this.stringTuning - transpositionPitch;
@@ -680,84 +713,16 @@ export class Note {
         return 0;
     }
 
+    /**
+     * The interval in semitones the harmonic sounds above the played pitch. Natural harmonics are relative to the open string
+     * and therefore need a string, the other types are an interval above the played note on any pitched note.
+     */
     public get harmonicPitch(): number {
-        if (this.harmonicType === HarmonicType.None || !this.isStringed) {
+        const hasHarmonicPitch = this.isStringed || (this.isPiano && this.harmonicType !== HarmonicType.Natural);
+        if (this.harmonicType === HarmonicType.None || !hasHarmonicPitch) {
             return 0;
         }
-        const value: number = this.harmonicValue;
-        // add semitones to reach corresponding harmonic frets
-        if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
-            return 36;
-        }
-        if (ModelUtils.isAlmostEqualTo(value, 2.7)) {
-            // Fret 3 2nd octave + minor seventh
-            return 34;
-        }
-        if (value < 3) {
-            // no natural harmonics below fret 3
-            return 0;
-        }
-        if (value <= 3.5) {
-            // Fret 3 2nd octave + fifth
-            return 31;
-        }
-        if (value <= 4) {
-            return 28;
-        }
-        if (value <= 5) {
-            return 24;
-        }
-        if (value <= 6) {
-            return 34;
-        }
-        if (value <= 7) {
-            return 19;
-        }
-        if (value <= 8.5) {
-            return 36;
-        }
-        if (value <= 9) {
-            return 28;
-        }
-        if (value <= 10) {
-            return 34;
-        }
-        if (value <= 11) {
-            return 0;
-        }
-        if (value <= 12) {
-            return 12;
-        }
-        if (value < 14) {
-            // fret 13,14 stay
-            return 0;
-        }
-        if (value <= 15) {
-            return 34;
-        }
-        if (value <= 16) {
-            return 28;
-        }
-        if (value <= 17) {
-            return 36;
-        }
-        if (value <= 18) {
-            return 0;
-        }
-        if (value <= 19) {
-            return 19;
-        }
-        if (value <= 21) {
-            //  20,21 stay
-            return 0;
-        }
-        if (value <= 22) {
-            return 36;
-        }
-        if (value <= 24) {
-            return 24;
-        }
-        return 0;
+        return ModelUtils.harmonicValueToPitch(this.harmonicValue);
     }
 
     public get initialBendValue(): number {
@@ -918,6 +883,7 @@ export class Note {
                 }
                 break;
         }
+        this.effectSlurSegment = null;
         let effectSlurDestination: Note | null = null;
         let effectSlurSegmentKind: SlurSegmentKind | null = null;
         if (this.isHammerPullOrigin && this.hammerPullDestination) {
@@ -937,12 +903,14 @@ export class Note {
 
                 if (effectSlurSegmentKind !== null && chainOrigin.effectSlur !== null) {
                     chainOrigin.effectSlur.destinationNote = effectSlurDestination;
-                    chainOrigin.effectSlur.segments.push({
+                    const segment: SlurSegment = {
                         fromNote: this,
                         toNote: effectSlurDestination,
                         kind: effectSlurSegmentKind,
                         text: null
-                    });
+                    };
+                    chainOrigin.effectSlur.segments.push(segment);
+                    this.effectSlurSegment = segment;
                 }
             } else {
                 this.isEffectSlurOrigin = true;
@@ -955,12 +923,14 @@ export class Note {
                 slur.originNote = this;
                 slur.destinationNote = effectSlurDestination;
                 if (effectSlurSegmentKind !== null) {
-                    slur.segments.push({
+                    const segment: SlurSegment = {
                         fromNote: this,
                         toNote: effectSlurDestination,
                         kind: effectSlurSegmentKind,
                         text: null
-                    });
+                    };
+                    slur.segments.push(segment);
+                    this.effectSlurSegment = segment;
                 }
                 this.effectSlur = slur;
             }
@@ -1023,7 +993,7 @@ export class Note {
                         }
                     }
                 } else {
-                    Logger.warning('Model', 'Unsupported bend type detected, fallback to custom', null);
+                    Logger.warning('Model', 'Unsupported bend type detected, fallback to custom');
                 }
             } else if (points!.length === 3) {
                 const origin: BendPoint = points[0];
@@ -1171,7 +1141,7 @@ export class Note {
                     return noteOnString;
                 }
             } else {
-                if (note.octave === -1 && note.tone === -1) {
+                if (Number.isNaN(note.octave) && Number.isNaN(note.tone)) {
                     // if the note has no value (e.g. alphaTex dash tie), we try to find a matching
                     // note on the previous beat by index.
                     if (note.index < previousBeat.notes.length) {
@@ -1267,89 +1237,129 @@ export class Note {
     /**
      * @internal
      */
-    public toJson(o: Map<string, unknown>) {
+    public toJson(w: IObjectWriter) {
         // inject linked note ids into JSON
         if (this.tieDestination !== null) {
-            o.set('tiedestinationnoteid', this.tieDestination.id);
+            w.prop('tiedestinationnoteid');
+            w.writeNumber(this.tieDestination.id);
         }
         if (this.tieOrigin !== null) {
-            o.set('tieoriginnoteid', this.tieOrigin.id);
+            w.prop('tieoriginnoteid');
+            w.writeNumber(this.tieOrigin.id);
         }
         if (this.slurDestination !== null) {
-            o.set('slurdestinationnoteid', this.slurDestination.id);
+            w.prop('slurdestinationnoteid');
+            w.writeNumber(this.slurDestination.id);
         }
         if (this.slurOrigin !== null) {
-            o.set('sluroriginnoteid', this.slurOrigin.id);
+            w.prop('sluroriginnoteid');
+            w.writeNumber(this.slurOrigin.id);
         }
         if (this.hammerPullOrigin !== null) {
-            o.set('hammerpulloriginnoteid', this.hammerPullOrigin.id);
+            w.prop('hammerpulloriginnoteid');
+            w.writeNumber(this.hammerPullOrigin.id);
         }
         if (this.hammerPullDestination !== null) {
-            o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
+            w.prop('hammerpulldestinationnoteid');
+            w.writeNumber(this.hammerPullDestination.id);
         }
-
         if (this.slideTarget !== null) {
-            o.set('slidetargetnoteid', this.slideTarget.id);
+            w.prop('slidetargetnoteid');
+            w.writeNumber(this.slideTarget.id);
         }
         if (this.slideOrigin !== null) {
-            o.set('slideoriginnoteid', this.slideOrigin.id);
+            w.prop('slideoriginnoteid');
+            w.writeNumber(this.slideOrigin.id);
         }
     }
 
     /**
      * @internal
      */
-    public setProperty(property: string, v: unknown): boolean {
+    public afterFromJson() {
+        // 1.8 and earlier write all of these with -1 for unset values, later versions omit unset values,
+        // which are read as NaN
+        if (
+            Number.isNaN(this.fret) ||
+            Number.isNaN(this.string) ||
+            Number.isNaN(this.octave) ||
+            Number.isNaN(this.tone) ||
+            Number.isNaN(this.percussionArticulation)
+        ) {
+            return;
+        }
+
+        if (this.string === -1) {
+            this.string = Number.NaN;
+            if (this.fret === -1) {
+                this.fret = Number.NaN;
+            }
+        }
+        if (this.octave === -1) {
+            this.octave = Number.NaN;
+        }
+        if (this.tone === -1) {
+            this.tone = Number.NaN;
+        }
+        if (this.percussionArticulation === -1) {
+            this.percussionArticulation = Number.NaN;
+        }
+    }
+
+    /**
+     * @internal
+     */
+    public setProperty(property: string, r: IObjectReader): boolean {
         switch (property) {
             case 'tiedestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.tieDestinationNoteId = v as number;
+                this._noteIdBag.tieDestinationNoteId = r.readNumber();
                 return true;
             case 'tieoriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.tieOriginNoteId = v as number;
+                this._noteIdBag.tieOriginNoteId = r.readNumber();
                 return true;
 
             case 'slurdestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slurDestinationNoteId = v as number;
+                this._noteIdBag.slurDestinationNoteId = r.readNumber();
                 return true;
             case 'sluroriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slurOriginNoteId = v as number;
+                this._noteIdBag.slurOriginNoteId = r.readNumber();
                 return true;
 
             case 'hammerpulloriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.hammerPullOriginNoteId = v as number;
+                this._noteIdBag.hammerPullOriginNoteId = r.readNumber();
                 return true;
             case 'hammerpulldestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.hammerPullDestinationNoteId = v as number;
+                this._noteIdBag.hammerPullDestinationNoteId = r.readNumber();
                 return true;
             case 'slidetargetnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slideTargetNoteId = v as number;
+                this._noteIdBag.slideTargetNoteId = r.readNumber();
                 return true;
             case 'slideoriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slideOriginNoteId = v as number;
+                this._noteIdBag.slideOriginNoteId = r.readNumber();
                 return true;
         }
         return false;

@@ -1,0 +1,70 @@
+---
+title: "Special tracks"
+description: "Drums, percussion, piano grand staff, string instruments with unusual tunings."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 80
+keywords:
+  - alphaTab
+  - drums
+  - piano
+  - special tracks
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Not every track is a six-string guitar. alphaTab detects drum kits, percussion staves, keyboards, and alternate tunings and renders each with the convention its instrument expects.
+
+## Drum notation {#drums}
+
+Drum tracks are the five-line staves that show a kit part with piece-specific noteheads — x-heads for cymbals, normal heads for toms, slashed heads for the snare — so a drummer can identify each piece without a legend. alphaTab hides the tab staff on drum tracks because it carries no useful information.
+
+<AlphaTab file="/files/features/Drums.gp5" />
+
+## Percussion multi-line staves {#percussion}
+
+Percussion tracks other than the full kit render on staves with one, two, three, or five lines, matching the number of distinct pitches the part uses — the single-line staff for a shaker, the five-line staff for a mallet part. Each line maps to a percussion instrument defined in the source file.
+
+<AlphaTab file="/files/features/Percussion.gp" tracks="all" />
+
+## Piano grand staff {#piano}
+
+Piano tracks render as a grand staff — treble clef above, bass clef below, joined by a brace. The brace is the curly SMuFL glyph that ties the two hands into a single instrument. Voices split across the two staves as the source file specifies.
+
+<AlphaTab file="/files/features/Piano.gpx" />
+
+## Unusual tunings and multi-track tuning display {#tunings}
+
+Alternate tunings — drop D on a rock rhythm guitar, DADGAD on a Celtic fingerstyle line, open G on a slide part, or seven- and eight-string layouts on metal charts — render with the string pitches listed above the first system. Every track shows its own tuning, so a multi-track score with mixed tunings stays legible.
+
+<AlphaTab file="/files/features/Tuning.gp5" />
+
+## Show it in code
+
+The instrument-specific rendering is automatic — alphaTab reads the track's channel and staff configuration from the source file. To hide the tuning label above a stringed track, flip the `GuitarTuning` element off:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.GuitarTuning, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target.
+
+## Where to look next
+
+- [Drum and percussion notation](./drum-tabs) — deeper coverage of the drum staff itself.
+- [Multi-track and grand staff](./multi-track-rendering) — how alphaTab lays out several tracks together.
+- [Tuning display](./tuning-display) — the stylesheet knobs that control where the tuning label lives.
+- [Bracket extend mode](./bracket-extend-mode) — how the accolade groups mixed-instrument tracks.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the settings entry point for the element map.
+- [`NotationElement`](/docs/reference/types/notationelement) — the enumeration of togglable elements.

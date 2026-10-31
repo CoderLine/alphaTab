@@ -1,0 +1,84 @@
+---
+title: "Export audio to WAV"
+description: "Render PCM samples from the score with `exportAudio`, encode the chunks to WAV, download or persist the result."
+sidebar_custom_props:
+  since: "1.6"
+  feature_chapter: audio
+  feature_order: 10
+keywords:
+  - alphaTab
+  - audio
+  - WAV
+  - PCM
+  - export
+  - Float32Array
+---
+
+import { AudioExportSample } from '@site/src/components/AudioExportSample';
+
+Bake a slowed-down study track a student can loop in any audio player. Generate audio previews for every song in a catalogue so browsers can hear before they load the notation. Render backing tracks a live performer can trigger from a phone. `AlphaTabApi.exportAudio(options)` runs the alphaTab synthesizer offline and hands you the raw PCM samples — alphaTab produces the samples, your code encodes them into whatever container you want. This page walks the full pipeline: configure the export, pull chunks, wrap them in a WAV header, download the result.
+
+<AudioExportSample />
+
+The demo synthesizes the full score, wraps the samples in a WAV file, and pipes the resulting blob URL into an `<audio>` element. Read the source under `src/components/AudioExportSample/` for the complete implementation.
+
+## Pull-based rendering
+
+`exportAudio` returns an `IAudioExporter`. The exporter follows an asynchronous pull pattern — you call `render(milliseconds)` in a loop and receive one `AudioExportChunk` per call. Each chunk carries a stereo interleaved `Float32Array` at the sample rate you configured. When the song ends, `render` returns `undefined`.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
+});
+
+api.scoreLoaded.on(async () => {
+  const options = new alphaTab.synth.AudioExportOptions();
+  options.sampleRate = 44100;
+  options.masterVolume = 1;
+
+  const exporter = await api.exportAudio(options);
+  const chunks = [];
+  try {
+    while (true) {
+      const chunk = await exporter.render(500);
+      if (chunk === undefined) break;
+      chunks.push(chunk.samples);
+    }
+  } finally {
+    exporter.destroy();
+  }
+
+  const wavUrl = encodeWav(chunks, options.sampleRate);
+  triggerDownload(wavUrl, `${api.score.title || 'Untitled'}.wav`);
+});
+```
+
+`getAlphaTabContainer()` is the platform-specific render target. `encodeWav` and `triggerDownload` are your code — the samples are format-agnostic.
+
+## Options that shape the export
+
+`AudioExportOptions` mirrors the runtime mixer, but with export-specific defaults:
+
+- `soundFonts` — SF2 buffers to load into the offline synth. If omitted, the exporter reuses whatever the current synthesizer already has loaded.
+- `sampleRate` — output rate in Hz. Defaults to `44100`.
+- `masterVolume`, `metronomeVolume` — mix knobs applied to the offline synth. Metronome defaults to `0`; enable it to bake the click into the render.
+- `playbackRange` — limit the export to a tick range. Omit for the whole song.
+- `trackVolume`, `trackTranspositionPitches` — per-track mix and pitch shift, keyed by track index. Applied on top of the score's own settings.
+- `useSyncPoints` — when `true`, sync-point timing is respected. Turn off for the score's original tempo map.
+
+## Encode the chunks to WAV
+
+WAV wants a 44-byte header followed by the raw samples. alphaTab emits IEEE-float samples in stereo interleaved order, so the format tag is `3` (WAVE_FORMAT_IEEE_FLOAT) and each sample stays 32 bits. The `<AudioExportSample>` component above lists the full encoder — copy the `createWavSampleUrl` function into your project.
+
+Hand the chunks to a codec library (LAME, OggEncoder, Opus) instead when you want MP3, OGG, or Opus output. A 4-minute stereo song at 44.1 kHz is roughly 84 MB of float PCM, so encode as chunks arrive rather than buffering the whole song.
+
+## Where to look next
+
+- [Play, pause, stop](/docs/features/play-sync/play-pause-stop) — the live playback counterpart to offline export.
+- [Backing-track audio](/docs/features/play-sync/backing-track-audio) — combine exported audio with sync points for hybrid playback.
+- [`AlphaTabApi.exportAudio`](/docs/reference/api/exportaudio) and the [`player.playerMode`](/docs/reference/settings/player/playermode) that has to be enabled for it.
+- [`AudioExportOptions`](/docs/reference/types/synth/audioexportoptions), [`AudioExportChunk`](/docs/reference/types/synth/audioexportchunk), and [`IAudioExporter`](/docs/reference/types/synth/iaudioexporter) in the API reference.

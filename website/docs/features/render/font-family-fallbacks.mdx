@@ -1,0 +1,70 @@
+---
+title: "Font family fallbacks"
+description: "Multiple families with graceful fallback."
+sidebar_custom_props:
+  feature_chapter: fonts
+  feature_order: 50
+  since: "1.2"
+keywords:
+  - alphaTab
+  - font
+  - fallback
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Give any text font a list of families and alphaTab walks the list until it finds one the platform has installed. Use fallback chains whenever a preferred font may not load — a web font that a slow network never delivers, a font not yet registered on Skia, or a rare typeface that only some readers happen to have installed. The score stays readable instead of collapsing to a system default.
+
+<AlphaTab
+  tex={true}
+  settings={{
+    display: {
+      resources: {
+        titleFont: '32px "Missing Font", "Georgia", serif',
+        subTitleFont: '20px "Also Missing", "Georgia", serif',
+      },
+    },
+  }}
+>{Riffs.ORNAMENTS_MELODY}</AlphaTab>
+
+## How the list is resolved
+
+Fallback is CSS-style: the first family that resolves on the host wins, the rest are ignored. Quote any family whose name contains spaces, and end the list with a generic keyword — `serif`, `sans-serif`, `monospace` — so the score stays readable on hosts that ship none of your preferred families.
+
+You can express a `Font` in three shapes and each one supports fallback:
+
+- **CSS shorthand string** — `'bold italic 20px "Playfair Display", Georgia, serif'`. alphaTab parses this the same way a browser does.
+- **JSON object** — `{ families: ['Playfair Display', 'Georgia', 'serif'], size: 20, style: 'Italic', weight: 'Bold' }`.
+- **`Font` instance** — `Font.withFamilyList(['Playfair Display', 'Georgia', 'serif'], 20, ...)` for programmatic construction.
+
+The Web backend hands the family list to CSS as-is, so browser font matching does the work. The Skia backend (used on .NET and Android via alphaSkia) walks the list in order and uses the first family registered through `registerAlphaSkiaCustomFont`.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  display: {
+    resources: {
+      titleFont: 'bold 32px "Playfair Display", Georgia, "Times New Roman", serif',
+      wordsFont: '14px "Inter", "Helvetica Neue", Arial, sans-serif',
+      tablatureFont: '13px "JetBrains Mono", "SF Mono", Consolas, monospace',
+    },
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+The same fallback rule applies to the deprecated `family` getter for backward compatibility — assigning a comma-separated string parses into the `families` array. New code should read and write `families` directly.
+
+## Where to look next
+
+- [Custom text fonts](/docs/features/render/custom-text-fonts) — every text field you can target.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — register families for the .NET and Android backends.
+- [`Font`](/docs/reference/types/model/font) in the reference.

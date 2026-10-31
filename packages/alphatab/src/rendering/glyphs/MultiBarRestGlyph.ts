@@ -1,8 +1,8 @@
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { NumberGlyph } from '@coderline/alphatab/rendering/glyphs/NumberGlyph';
+import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 
 /**
  * @internal
@@ -18,6 +18,8 @@ export class MultiBarRestGlyph extends Glyph {
 
     private _numberGlyph: MusicFontSymbol[] = [];
     private _numberTop = 0;
+    private _numberInkTop = 0;
+    private _numberWidth = 0;
     constructor() {
         super(0, 0);
     }
@@ -32,8 +34,19 @@ export class MultiBarRestGlyph extends Glyph {
         this._numberTop = (this.renderer as LineBarRenderer).getLineY(-1.5);
 
         const numberGlyphTop = smufl.glyphTop.get(this._numberGlyph[0])!;
+        this._numberWidth = this._numberGlyph.reduce((p, c) => p + smufl.glyphWidths.get(c)!, 0);
+        this._numberInkTop = this._numberTop - numberGlyphTop;
         this.renderer.registerOverflowTop(Math.abs(this._numberTop) + numberGlyphTop);
+    }
 
+    /**
+     * Emits the bar count above the staff into the renderer's bar-local skyline.
+     * @param base The renderer-local x of the parent of this glyph.
+     */
+    public emitSkyline(base: number): void {
+        const top = this.y + this._numberInkTop;
+        const center = base + this.x + this.width / 2;
+        this.renderer.insertSkylineTop(center - this._numberWidth / 2, center + this._numberWidth / 2, -top);
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

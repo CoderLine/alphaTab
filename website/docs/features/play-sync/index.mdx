@@ -1,0 +1,30 @@
+---
+title: Play & sync
+description: Drive playback with alphaTab's synth, shape the feel with mixer and metronome controls, and sync to external audio, video, or MIDI streams.
+keywords:
+  - alphaTab
+  - playback
+  - synth
+  - mixer
+  - sync
+  - MIDI
+---
+
+import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
+import chapters from './_chapters';
+
+alphaTab ships a full playback stack — a TinySoundFont-based synthesizer, a per-track mixer, a metronome and count-in, and hooks into the host platform's audio backend. On top of that, sync points let you drive the cursor from an external backing track, a video, or a MIDI-out pipeline.
+
+Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
+
+{chapters.map((chapter) => (
+  <section key={chapter.id}>
+    <h2 id={chapter.anchor ?? chapter.id}>{chapter.label}</h2>
+    {chapter.description ? <p>{chapter.description}</p> : null}
+    <FeatureChapterGrid
+      group="play-sync"
+      chapter={chapter.id}
+      defaultAccent={chapter.defaultAccent}
+    />
+  </section>
+))}

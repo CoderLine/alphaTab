@@ -27,7 +27,6 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
     private _preNoteParenthesis: GhostNoteContainerGlyph | null = null;
     private _postNoteParenthesis: GhostNoteContainerGlyph | null = null;
     public isEmpty: boolean = true;
-    private _groupId: string;
 
     public override get scale(): number {
         return EngravingSettings.GraceScale;
@@ -45,10 +44,9 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         return BeamDirection.Up;
     }
 
-    public constructor(groupId: string, beat: Beat, showParenthesis: boolean = false) {
+    public constructor(beat: Beat, showParenthesis: boolean = false) {
         super();
         this._beat = beat;
-        this._groupId = groupId;
         this._showParenthesis = showParenthesis;
         if (showParenthesis) {
             this._preNoteParenthesis = new GhostNoteContainerGlyph(true);
@@ -57,13 +55,6 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
     }
 
     protected override getScoreChordNoteHeadInfo(): ScoreChordNoteHeadInfo {
-        const staff = this._beat.voice.bar.staff;
-        const key = `score.noteheads.${this._groupId}.${staff.track.index}.${staff.index}.${this._beat.absoluteDisplayStart}`;
-        let existing = this.renderer.staff!.getSharedLayoutData<ScoreChordNoteHeadInfo | undefined>(key, undefined);
-        if (!existing) {
-            existing = new ScoreChordNoteHeadInfo(this.direction);
-            this.renderer.staff!.setSharedLayoutData(key, existing);
-        }
         return new ScoreChordNoteHeadInfo(this.direction);
     }
 
@@ -115,10 +106,10 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             x += this._preNoteParenthesis!.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
         }
         if (!this._accidentals.isEmpty) {
-            x += this._accidentals.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
-            this._accidentals.x = x;
             this._accidentals.renderer = this.renderer;
             this._accidentals.doLayout();
+            x += this.renderer.smuflMetrics.bendNoteHeadElementPadding;
+            this._accidentals.x = x;
             x += this._accidentals.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
         }
         this.noteStartX = x;

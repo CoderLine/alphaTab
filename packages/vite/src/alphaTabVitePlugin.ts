@@ -1,22 +1,13 @@
-import { detectionGlobalPlugin } from '@coderline/alphatab-vite/detectionGlobalPlugin';
+import type { Plugin } from 'vite';
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
-import type { Plugin } from './bridge';
 import { copyAssetsPlugin } from './copyAssetsPlugin';
+import { detectionGlobalPlugin } from './detectionGlobalPlugin';
 import { importMetaUrlPlugin } from './importMetaPlugin';
-import { workerPlugin } from './workerPlugin';
 
 /**
  * @public
  */
-export function alphaTab(options?: AlphaTabVitePluginOptions) {
-    const plugins: Plugin[] = [];
-
+export function alphaTab(options?: AlphaTabVitePluginOptions): Plugin[] {
     options ??= {};
-
-    plugins.push(detectionGlobalPlugin());
-    plugins.push(importMetaUrlPlugin(options));
-    plugins.push(workerPlugin(options));
-    plugins.push(copyAssetsPlugin(options));
-
-    return plugins;
+    return [detectionGlobalPlugin(), importMetaUrlPlugin(options), copyAssetsPlugin(options)];
 }

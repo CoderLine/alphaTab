@@ -38,11 +38,67 @@ export interface RenderingResourcesJson {
      */
     engravingSettings?: EngravingSettingsJson;
     /**
+     * The font to use for displaying the songs copyright information in the header of the music sheet.
+     * @defaultValue `bold 12px Arial, sans-serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreCopyright}
+     * @json_read_only
+     */
+    copyrightFont?: FontJson;
+    /**
+     * The font to use for displaying the songs title in the header of the music sheet.
+     * @defaultValue `32px Georgia, serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreTitle}
+     * @json_read_only
+     */
+    titleFont?: FontJson;
+    /**
+     * The font to use for displaying the songs subtitle in the header of the music sheet.
+     * @defaultValue `20px Georgia, serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreSubTitle}
+     * @json_read_only
+     */
+    subTitleFont?: FontJson;
+    /**
+     * The font to use for displaying the lyrics information in the header of the music sheet.
+     * @defaultValue `15px Arial, sans-serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreWords}
+     * @json_read_only
+     */
+    wordsFont?: FontJson;
+    /**
+     * The font to use for displaying beat time information in the music sheet.
+     * @defaultValue `12px Georgia, serif`
+     * @since 1.4.0
+     * @deprecated use {@link elementFonts} with {@link NotationElement.EffectBeatTimer}
+     * @json_read_only
+     */
+    timerFont?: FontJson;
+    /**
+     * The font to use for displaying the directions texts.
+     * @defaultValue `14px Georgia, serif`
+     * @since 1.4.0
+     * @deprecated use {@link elementFonts} with {@link NotationElement.EffectDirections}
+     * @json_read_only
+     */
+    directionsFont?: FontJson;
+    /**
+     * The font to use for displaying the fretboard numbers in chord diagrams.
+     * @defaultValue `11px Arial, sans-serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with {@link NotationElement.ChordDiagramFretboardNumbers}
+     * @json_read_only
+     */
+    fretboardNumberFont?: FontJson;
+    /**
      * Unused, see deprecation note.
      * @defaultValue `14px Georgia, serif`
      * @since 0.9.6
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     * @json_ignore
+     * @json_read_only
      */
     fingeringFont?: FontJson;
     /**
@@ -50,17 +106,33 @@ export interface RenderingResourcesJson {
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     * @json_ignore
+     * @json_read_only
      */
     inlineFingeringFont?: FontJson;
+    /**
+     * The font to use for section marker labels shown above the music sheet.
+     * @defaultValue `bold 14px Georgia, serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with {@link NotationElement.EffectMarker}
+     * @json_read_only
+     */
+    markerFont?: FontJson;
     /**
      * Ununsed, see deprecation note.
      * @defaultValue `italic 12px Georgia, serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with the respective
-     * @json_ignore
+     * @json_read_only
      */
     effectFont?: FontJson;
+    /**
+     * The font to use for displaying the bar numbers above the music sheet.
+     * @defaultValue `11px Arial, sans-serif`
+     * @since 0.9.6
+     * @deprecated use {@link elementFonts} with {@link NotationElement.BarNumber}
+     * @json_read_only
+     */
+    barNumberFont?: FontJson;
     /**
      * The fonts used by individual elements. Check `defaultFonts` for the elements which have custom fonts.
      * Removing fonts from this map can lead to unexpected side effects and errors. Only update it with new values.

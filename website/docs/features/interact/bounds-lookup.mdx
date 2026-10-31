@@ -1,0 +1,83 @@
+---
+title: "Bounds lookup"
+description: "`api.boundsLookup` maps every rendered beat and note to a screen rectangle so you can hit-test and paint overlays on top of the score."
+sidebar_custom_props:
+  feature_chapter: bounds
+  feature_order: 10
+keywords:
+  - alphaTab
+  - bounds
+  - boundsLookup
+  - hit-testing
+  - overlay
+---
+
+import { BoundsLookupViewer } from '@site/src/components/BoundsLookupViewer';
+
+Live annotations pinned above a beat, a lasso selector across a phrase, a live-comment marker that follows the notation through re-layouts — any UI that has to line up with the rendered score reads from the same lookup. After every render, `api.boundsLookup` exposes a hierarchical index of the rendered geometry — staff systems, master bars, bars, beats, notes — with pixel-accurate rectangles at every level. Use it to hit-test a mouse position, place an overlay on a beat, or draw a custom marker on top of the notation.
+
+<BoundsLookupViewer>{`
+\\track "Guitar"
+:8 15.2 17.2 15.2 17.2 |
+15.2 17.2 15.2 17.2 |
+`}</BoundsLookupViewer>
+
+## The hierarchy
+
+`boundsLookup.staffSystems` is the root. Each level below narrows the region:
+
+- **`staffSystems`** — the rows of staves flowing down the page.
+- **`bars(1)`** — a master bar across every track's staves.
+- **`bars(2)`** — a single track's slice of that master bar.
+- **`beats`** — the beats inside that bar.
+- **`notes`** — the individual note heads or tab numbers. Only populated when `core.includeNoteBounds` is `true`.
+
+Every level exposes two rectangles: `visualBounds` (the inked area) and `realBounds` (the inked area plus surrounding whitespace up to neighboring elements). Note bounds additionally carry `noteHeadBounds`.
+
+## Look up a position
+
+`getBeatAtPos(x, y)` returns the beat under a screen coordinate. `getNoteAtPos(beat, x, y)` narrows it to the note head or tab number when per-note bounds are enabled. `findBeat(beat)` goes the other direction — give it a `Beat`, get its rectangle back.
+
+## Draw an overlay
+
+Wait for `postRenderFinished`, read `boundsLookup`, find the target beat, and place an absolutely positioned element on top of the render container.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.postRenderFinished.on(() => {
+  const lookup = api.boundsLookup;
+  if (!lookup) {
+    return;
+  }
+  const firstBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+  const bounds = lookup.findBeat(firstBeat);
+  if (!bounds) {
+    return;
+  }
+
+  const marker = document.createElement('div');
+  marker.style.position = 'absolute';
+  marker.style.left = `${bounds.visualBounds.x}px`;
+  marker.style.top = `${bounds.visualBounds.y}px`;
+  marker.style.width = `${bounds.visualBounds.w}px`;
+  marker.style.height = `${bounds.visualBounds.h}px`;
+  marker.style.background = 'rgba(66, 109, 157, 0.25)';
+  marker.style.pointerEvents = 'none';
+  container.appendChild(marker);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Beat visibility and note bounds](./beat-visibility-and-note-bounds) — opt into per-note precision and check whether a beat is on-screen.
+- [Reacting to beat and note clicks](./reacting-to-beat-and-note-clicks) — the same lookup powers the built-in click events.
+- [`boundsLookup`](/docs/reference/api/boundslookup) and [`postRenderFinished`](/docs/reference/api/postrenderfinished) in the API reference.
+- [`BoundsLookup`](/docs/reference/types/rendering/boundslookup), [`BeatBounds`](/docs/reference/types/rendering/beatbounds), [`MasterBarBounds`](/docs/reference/types/rendering/masterbarbounds), and [`Bounds`](/docs/reference/types/rendering/bounds) in the types reference.

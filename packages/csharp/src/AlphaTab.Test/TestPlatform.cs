@@ -18,7 +18,8 @@ static partial class TestPlatform
         var currentDir = new DirectoryInfo(System.Environment.CurrentDirectory);
         while (currentDir != null)
         {
-            if (currentDir.GetDirectories(".git").Length == 1)
+            var dotGit = Path.Combine(currentDir.FullName, ".git");
+            if (Directory.Exists(dotGit) || File.Exists(dotGit))
             {
                 return Path.Join(currentDir.FullName, "packages", "alphatab");
             }

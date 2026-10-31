@@ -1,0 +1,153 @@
+---
+title: Installation (Android)
+description: Install alphaTab in a Kotlin Android project via Maven Central, then render music notation in a native activity.
+keywords:
+  - alphaTab
+  - Android
+  - Kotlin
+  - Maven
+  - Gradle
+  - AlphaTabView
+  - music notation
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+alphaTab on Android renders and plays music notation in native apps built with Kotlin. It ships an `AlphaTabView` for classic Android layouts.
+
+## Install
+
+alphaTab is published on Maven Central under the coordinates `net.alphatab:alphaTab`:
+
+- Release versions: [central.sonatype.com/artifact/net.alphatab/alphaTab](https://central.sonatype.com/artifact/net.alphatab/alphaTab)
+- Pre-release snapshots: [central.sonatype.com/repository/maven-snapshots](https://central.sonatype.com/repository/maven-snapshots/)
+
+Add the dependency to your build system:
+
+<Tabs
+  defaultValue="gradle-kotlin"
+  values={[
+    { label: 'Gradle (Kotlin)', value: 'gradle-kotlin' },
+    { label: 'Gradle (Groovy)', value: 'gradle-groovy' },
+    { label: 'Maven', value: 'maven' }
+  ]}>
+<TabItem value="gradle-kotlin">
+
+```kotlin
+repositories {
+    google()
+    mavenCentral()
+    // Pre-release snapshots:
+    // maven("https://central.sonatype.com/repository/maven-snapshots/")
+}
+
+dependencies {
+    implementation("net.alphatab:alphaTab:1.6.1")
+    // Pre-release snapshots:
+    // implementation("net.alphatab:alphaTab:1.7.0-SNAPSHOT")
+}
+```
+
+</TabItem>
+<TabItem value="gradle-groovy">
+
+```groovy
+repositories {
+    google()
+    mavenCentral()
+    // Pre-release snapshots:
+    // maven {
+    //     url = "https://central.sonatype.com/repository/maven-snapshots/"
+    // }
+}
+
+dependencies {
+    implementation "net.alphatab:alphaTab:1.6.1"
+    // Pre-release snapshots:
+    // implementation "net.alphatab:alphaTab:1.7.0-SNAPSHOT"
+}
+```
+
+</TabItem>
+<TabItem value="maven">
+
+```xml
+<project>
+    <dependencies>
+        <dependency>
+            <groupId>net.alphatab</groupId>
+            <artifactId>alphaTab</artifactId>
+            <version>1.6.1</version>
+            <!-- Pre-release snapshots: -->
+            <!-- <version>1.7.0-SNAPSHOT</version> -->
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+</TabItem>
+</Tabs>
+
+## Render your first score
+
+Once alphaTab is on the classpath, add the `AlphaTabView` control to any layout. This example places it inside a `ConstraintLayout` that fills the activity:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="net.alphatab.android.MainActivity">
+
+    <alphaTab.AlphaTabView
+        android:id="@+id/alphatab_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+Get a reference to the view from your activity and use its `api` property to drive alphaTab:
+
+```kotlin
+import alphaTab.AlphaTabView
+
+class MainActivity : ComponentActivity() {
+    private lateinit var alphaTabView: AlphaTabView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        alphaTabView = findViewById(R.id.alphatab_view)
+        val api = alphaTabView.api
+        // load a score, subscribe to events, drive playback here
+    }
+}
+```
+
+More samples live at [github.com/CoderLine/alphaTabSamplesAndroid](https://github.com/CoderLine/alphaTabSamplesAndroid/).
+
+## Jetpack Compose
+
+alphaTab does not currently ship a Compose control. Two options:
+
+- Vote on the [roadmap issue](https://github.com/CoderLine/alphaTab/issues/1475) to signal demand.
+- [Wrap the classic `AlphaTabView`](https://developer.android.com/develop/ui/compose/libraries) inside a Compose tree using `AndroidView`.
+
+## Dependencies
+
+alphaTab on Android carries a small number of third-party dependencies:
+
+- **Rendering.** Either the built-in Android `Canvas` or [alphaSkia](https://github.com/CoderLine/alphaSkia), which wraps the Skia engine used by Chrome. alphaSkia is the recommended engine and is significantly faster than the platform canvas.
+- **Async.** `org.jetbrains.kotlinx:kotlinx-coroutines-core` powers alphaTab's asynchronous operations.
+
+Reach out on GitHub if you need alphaTab wired to a different UI framework or audio backend.

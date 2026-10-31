@@ -1,0 +1,94 @@
+@use '../landing/breakpoints' as *;
+
+// ─── Header ─────────────────────────────────────────────────────────
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
+
+  @include mobile {
+    flex-wrap: wrap;
+  }
+}
+
+.headerSpacer {
+  flex: 1;
+}
+
+.headerGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerDivider {
+  width: 1px;
+  height: 20px;
+  background: var(--at-line);
+
+  @include mobile { display: none; }
+}
+
+.docChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(520px, 60vw);
+  padding: 6px 10px 6px 12px;
+  border: 1px solid var(--at-line);
+  border-radius: 10px;
+  background: var(--at-surface);
+  color: var(--at-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--at-shadow-sm);
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--at-accent) 40%, var(--at-line));
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 1px;
+  }
+
+  @include mobile {
+    max-width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+.docDot,
+.menuDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--at-muted);
+}
+
+.docText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.docFile {
+  font-family: var(--at-font-mono);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.docTitle {
+  font-size: 11px;
+  color: var(--at-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

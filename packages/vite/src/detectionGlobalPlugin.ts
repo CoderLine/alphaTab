@@ -1,5 +1,5 @@
 import MagicString from 'magic-string';
-import type { Plugin, ResolvedConfig } from './bridge';
+import type { Plugin, ResolvedConfig } from 'vite';
 
 const marker = '__ALPHATAB_VITE__';
 
@@ -12,7 +12,7 @@ export function detectionGlobalPlugin(): Plugin {
         name: 'vite-plugin-alphatab-global',
 
         configResolved(config) {
-            resolvedConfig = config as ResolvedConfig;
+            resolvedConfig = config;
         },
 
         shouldTransformCachedModule({ code }) {

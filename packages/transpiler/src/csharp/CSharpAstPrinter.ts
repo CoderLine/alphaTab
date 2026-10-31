@@ -1,6 +1,6 @@
-import * as cs from './CSharpAst';
 import * as ts from 'typescript';
 import AstPrinterBase from '../AstPrinterBase';
+import * as cs from '../ir/Ir';
 
 export default class CSharpAstPrinter extends AstPrinterBase {
     private _keywords: Set<string> = new Set<string>([
@@ -225,7 +225,15 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.write(m.name);
         if (m.initializer) {
             this.write(' = ');
-            this.writeExpression(m.initializer);
+            let init = m.initializer;
+            while (
+                cs.isCastExpression(init) &&
+                cs.isPrimitiveTypeNode(init.type) &&
+                (init.type as cs.PrimitiveTypeNode).type === cs.PrimitiveType.Double
+            ) {
+                init = init.expression;
+            }
+            this.writeExpression(init);
         }
         this.writeLine(',');
     }
@@ -241,6 +249,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
         if (d.isAbstract) {
             this.write('abstract ');
+        }
+
+        if (d.isStatic) {
+            this.write('static ');
         }
 
         this.write(`class ${d.name}`);
@@ -507,7 +519,17 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writePropertyAccessor(accessor: cs.PropertyAccessorDeclaration) {
         this.write(accessor.keyword);
-        this.writeBody(accessor.body);
+        if (accessor.valueParameterName && accessor.body && cs.isBlock(accessor.body)) {
+            this.writeLine();
+            this.beginBlock();
+            this.writeLine(`var ${accessor.valueParameterName} = value;`);
+            for (const s of accessor.body.statements) {
+                this.writeStatement(s);
+            }
+            this.endBlock();
+        } else {
+            this.writeBody(accessor.body);
+        }
     }
 
     protected writeFieldDeclarat1on(d: cs.FieldDeclaration) {
@@ -515,7 +537,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeAttributes(d);
         this.writeVisibility(d.visibility);
 
-        if (this._context.isConst(d)) {
+        if (this._context.symbols.isConst(d)) {
             this.write('const ');
         } else {
             if (d.isStatic) {
@@ -544,168 +566,22 @@ export default class CSharpAstPrinter extends AstPrinterBase {
     ) {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
-                if (forTypeConstraint) {
-                    switch ((type as cs.PrimitiveTypeNode).type) {
-                        case cs.PrimitiveType.Bool:
-                        case cs.PrimitiveType.Int:
-                        case cs.PrimitiveType.Double:
-                            this.write('struct');
-                            break;
-                        case cs.PrimitiveType.Object:
-                        case cs.PrimitiveType.String:
-                        case cs.PrimitiveType.Void:
-                            this.write('class');
-                            break;
-                    }
-                } else {
-                    switch ((type as cs.PrimitiveTypeNode).type) {
-                        case cs.PrimitiveType.Bool:
-                            this.write('bool');
-                            break;
-                        case cs.PrimitiveType.Double:
-                            this.write('double');
-                            break;
-                        case cs.PrimitiveType.Int:
-                            this.write('int');
-                            break;
-                        case cs.PrimitiveType.Object:
-                            this.write('object');
-                            break;
-                        case cs.PrimitiveType.String:
-                            this.write('string');
-                            break;
-                        case cs.PrimitiveType.Void:
-                            this.write('void');
-                            break;
-                        case cs.PrimitiveType.Var:
-                            this.write('var');
-                            break;
-                        case cs.PrimitiveType.Long:
-                            this.write('long');
-                            break;
-                    }
-                }
-
+                this._writePrimitiveType(type as cs.PrimitiveTypeNode, forTypeConstraint);
                 break;
             case cs.SyntaxKind.ArrayTypeNode:
-                const arrayType = type as cs.ArrayTypeNode;
-                if (asNativeArray) {
-                    this.writeType(arrayType.elementType);
-                    this.write('[]');
-                } else {
-                    const isDynamicArray =
-                        cs.isPrimitiveTypeNode(arrayType.elementType) &&
-                        arrayType.elementType.type === cs.PrimitiveType.Object;
-                    if (isDynamicArray && !forNew) {
-                        this.write('System.Collections.IList');
-                    } else {
-                        if (forNew) {
-                            this.write('AlphaTab.Collections.List<');
-                        } else {
-                            this.write('System.Collections.Generic.IList<');
-                        }
-                        this.writeType(arrayType.elementType);
-                        this.write('>');
-                    }
-                }
-
+                this._writeArrayType(type as cs.ArrayTypeNode, forNew, asNativeArray);
                 break;
             case cs.SyntaxKind.MapTypeNode:
-                const mapType = type as cs.MapTypeNode;
-                if (!mapType.keyType && !mapType.valueType) {
-                    this.write('System.Collections.IDictionary');
-                } else {
-                    if (!mapType.valueIsValueType) {
-                        if (forNew) {
-                            this.write('AlphaTab.Collections.Map<');
-                        } else {
-                            this.write('AlphaTab.Collections.IMap<');
-                        }
-                    } else {
-                        if (forNew) {
-                            this.write('AlphaTab.Collections.ValueTypeMap<');
-                        } else {
-                            this.write('AlphaTab.Collections.IValueTypeMap<');
-                        }
-                    }
-                    this.writeType(mapType.keyType!);
-                    this.write(', ');
-                    this.writeType(mapType.valueType!);
-                    this.write('>');
-                }
-
+                this._writeMapType(type as cs.MapTypeNode, forNew);
                 break;
             case cs.SyntaxKind.ArrayTupleNode:
-                const arrayTupleType = type as cs.ArrayTupleNode;
-                this.write('AlphaTab.Core.ArrayTuple<');
-                this.writeCommaSeparated(arrayTupleType.types, p => this.writeType(p));
-                this.write('>');
+                this._writeArrayTupleType(type as cs.ArrayTupleNode);
                 break;
             case cs.SyntaxKind.FunctionTypeNode:
-                const functionType = type as cs.FunctionTypeNode;
-                if (
-                    cs.isPrimitiveTypeNode(functionType.returnType) &&
-                    functionType.returnType.type === cs.PrimitiveType.Void
-                ) {
-                    this.write('System.Action');
-                    if (functionType.parameterTypes.length > 0) {
-                        this.write('<');
-                        this.writeCommaSeparated(functionType.parameterTypes, p => this.writeType(p));
-                        this.write('>');
-                    }
-                } else {
-                    this.write('System.Func');
-                    this.write('<');
-                    if (functionType.parameterTypes.length > 0) {
-                        this.writeCommaSeparated(functionType.parameterTypes, p => this.writeType(p));
-                        this.write(', ');
-                        this.writeType(functionType.returnType);
-                    } else {
-                        this.writeType(functionType.returnType);
-                    }
-                    this.write('>');
-                }
+                this._writeFunctionType(type as cs.FunctionTypeNode);
                 break;
             case cs.SyntaxKind.TypeReference:
-                const typeReference = type as cs.TypeReference;
-                let isAsyncVoid = false;
-
-                const targetType = (type as cs.TypeReference).reference;
-                let typeArguments = typeReference.typeArguments;
-                if (typeof targetType === 'string') {
-                    if (forNew && targetType === this._context.makeIterableType() && typeArguments) {
-                        this.writeType(typeArguments[0]);
-                        this.write('[]');
-                        typeArguments = undefined;
-                    } else {
-                        this.write(targetType);
-                    }
-                } else {
-                    if (typeReference.isAsync) {
-                        this.write('System.Threading.Tasks.Task');
-                        if (!cs.isPrimitiveTypeNode(targetType) || targetType.type !== cs.PrimitiveType.Void) {
-                            this.write('<');
-                            this.writeType(targetType, forNew);
-                        } else {
-                            isAsyncVoid = true;
-                        }
-                    } else {
-                        this.writeType(targetType, forNew);
-                    }
-                }
-
-                if (!isAsyncVoid) {
-                    if (typeArguments && typeArguments.length > 0) {
-                        this.write('<');
-                        this.writeCommaSeparated(typeArguments, p => this.writeType(p));
-                        this.write('>');
-                    }
-
-                    if (typeReference.isAsync) {
-                        this.write('>');
-                    }
-                }
-
+                this._writeTypeReference(type as cs.TypeReference, forNew);
                 break;
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
@@ -723,11 +599,163 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write(this._context.getFullName((type as cs.EnumMember).parent as cs.NamedTypeDeclaration));
                 break;
             default:
+                // Load-bearing debug fallthrough: if any future TypeNode kind escapes the
+                // resolve-types pass without being handled above, we emit a syntactically
+                // invalid `TODO: <kind>` marker so the offending type surfaces in the
+                // generated .cs source instead of failing silently. Snapshot tests today
+                // contain no such marker.
                 this.write(`TODO: ${cs.SyntaxKind[type.nodeType]}`);
                 break;
         }
         if (type.isNullable && !forNew && !forTypeConstraint) {
             this.write('?');
+        }
+    }
+
+    private _writePrimitiveType(type: cs.PrimitiveTypeNode, forTypeConstraint: boolean): void {
+        if (forTypeConstraint) {
+            switch (type.type) {
+                case cs.PrimitiveType.Bool:
+                case cs.PrimitiveType.Int:
+                case cs.PrimitiveType.Double:
+                    this.write('struct');
+                    break;
+                case cs.PrimitiveType.Object:
+                case cs.PrimitiveType.String:
+                case cs.PrimitiveType.Void:
+                    this.write('class');
+                    break;
+            }
+            return;
+        }
+        switch (type.type) {
+            case cs.PrimitiveType.Bool:
+                this.write('bool');
+                break;
+            case cs.PrimitiveType.Double:
+                this.write('double');
+                break;
+            case cs.PrimitiveType.Int:
+                this.write('int');
+                break;
+            case cs.PrimitiveType.Object:
+                this.write('object');
+                break;
+            case cs.PrimitiveType.String:
+                this.write('string');
+                break;
+            case cs.PrimitiveType.Void:
+                this.write('void');
+                break;
+            case cs.PrimitiveType.Var:
+                this.write('var');
+                break;
+            case cs.PrimitiveType.Long:
+                this.write('long');
+                break;
+        }
+    }
+
+    private _writeArrayType(type: cs.ArrayTypeNode, forNew: boolean, asNativeArray: boolean): void {
+        if (asNativeArray) {
+            this.writeType(type.elementType);
+            this.write('[]');
+            return;
+        }
+        const isDynamicArray =
+            cs.isPrimitiveTypeNode(type.elementType) && type.elementType.type === cs.PrimitiveType.Object;
+        if (isDynamicArray && !forNew) {
+            this.write('System.Collections.IList');
+            return;
+        }
+        this.write(forNew ? 'AlphaTab.Collections.List<' : 'System.Collections.Generic.IList<');
+        this.writeType(type.elementType);
+        this.write('>');
+    }
+
+    private _writeMapType(type: cs.MapTypeNode, forNew: boolean): void {
+        if (!type.keyType && !type.valueType) {
+            this.write('System.Collections.IDictionary');
+            return;
+        }
+        // Recompute valueIsValueType at print time — at construction time the
+        // value type may have been an unresolved LazyTypeRef and defaulted to
+        // false. By print time the value type has resolved through
+        // ResolveTypesPass and the value-type check is reliable.
+        const valueIsValueType = this._context.isPrimitiveOrEnumType(type.valueType!);
+        if (!valueIsValueType) {
+            this.write(forNew ? 'AlphaTab.Collections.Map<' : 'AlphaTab.Collections.IMap<');
+        } else {
+            this.write(forNew ? 'AlphaTab.Collections.ValueTypeMap<' : 'AlphaTab.Collections.IValueTypeMap<');
+        }
+        this.writeType(type.keyType!);
+        this.write(', ');
+        this.writeType(type.valueType!);
+        this.write('>');
+    }
+
+    private _writeArrayTupleType(type: cs.ArrayTupleNode): void {
+        this.write('AlphaTab.Core.ArrayTuple<');
+        this.writeCommaSeparated(type.types, p => this.writeType(p));
+        this.write('>');
+    }
+
+    private _writeFunctionType(type: cs.FunctionTypeNode): void {
+        const isVoid = cs.isPrimitiveTypeNode(type.returnType) && type.returnType.type === cs.PrimitiveType.Void;
+        if (isVoid) {
+            this.write('System.Action');
+            if (type.parameterTypes.length > 0) {
+                this.write('<');
+                this.writeCommaSeparated(type.parameterTypes, p => this.writeType(p));
+                this.write('>');
+            }
+            return;
+        }
+        this.write('System.Func<');
+        if (type.parameterTypes.length > 0) {
+            this.writeCommaSeparated(type.parameterTypes, p => this.writeType(p));
+            this.write(', ');
+        }
+        this.writeType(type.returnType);
+        this.write('>');
+    }
+
+    private _writeTypeReference(type: cs.TypeReference, forNew: boolean): void {
+        let isAsyncVoid = false;
+        const targetType = type.reference;
+        let typeArguments = type.typeArguments;
+
+        if (typeof targetType === 'string') {
+            if (forNew && targetType === this._context.makeIterableType() && typeArguments) {
+                this.writeType(typeArguments[0]);
+                this.write('[]');
+                typeArguments = undefined;
+            } else {
+                this.write(targetType);
+            }
+        } else {
+            if (type.isAsync) {
+                this.write('System.Threading.Tasks.Task');
+                if (!cs.isPrimitiveTypeNode(targetType) || targetType.type !== cs.PrimitiveType.Void) {
+                    this.write('<');
+                    this.writeType(targetType, forNew);
+                } else {
+                    isAsyncVoid = true;
+                }
+            } else {
+                this.writeType(targetType, forNew);
+            }
+        }
+
+        if (!isAsyncVoid) {
+            if (typeArguments && typeArguments.length > 0) {
+                this.write('<');
+                this.writeCommaSeparated(typeArguments, p => this.writeType(p));
+                this.write('>');
+            }
+            if (type.isAsync) {
+                this.write('>');
+            }
         }
     }
 
@@ -849,7 +877,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             });
             this.write(')');
         } else {
-            this._context.addCsNodeDiagnostics(expr, 'Unknown array type', ts.DiagnosticCategory.Error);
+            this._context.addNodeDiagnostics(expr, 'Unknown array type', ts.DiagnosticCategory.Error);
         }
     }
 
@@ -887,7 +915,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write(a.label);
                 this.write(' = ');
                 this.writeExpression(a.expression);
-                this.writeLine(",");
+                this.writeLine(',');
             }
 
             this.endBlock();

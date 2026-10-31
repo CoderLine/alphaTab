@@ -87,6 +87,7 @@ export class RenderingResources {
      * @defaultValue `bold 12px Arial, sans-serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreCopyright}
+     * @json_read_only
      */
     public get copyrightFont(): Font {
         return this.elementFonts.get(NotationElement.ScoreCopyright)!;
@@ -103,6 +104,7 @@ export class RenderingResources {
      * @defaultValue `32px Georgia, serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreTitle}
+     * @json_read_only
      */
     public get titleFont(): Font {
         return this.elementFonts.get(NotationElement.ScoreTitle)!;
@@ -120,6 +122,7 @@ export class RenderingResources {
      * @defaultValue `20px Georgia, serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreSubTitle}
+     * @json_read_only
      */
     public get subTitleFont(): Font {
         return this.elementFonts.get(NotationElement.ScoreSubTitle)!;
@@ -137,6 +140,7 @@ export class RenderingResources {
      * @defaultValue `15px Arial, sans-serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with {@link NotationElement.ScoreWords}
+     * @json_read_only
      */
     public get wordsFont(): Font {
         return this.elementFonts.get(NotationElement.ScoreWords)!;
@@ -154,6 +158,7 @@ export class RenderingResources {
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
      * @deprecated use {@link elementFonts} with {@link NotationElement.EffectBeatTimer}
+     * @json_read_only
      */
     public get timerFont(): Font {
         return this.elementFonts.get(NotationElement.EffectBeatTimer)!;
@@ -171,6 +176,7 @@ export class RenderingResources {
      * @defaultValue `14px Georgia, serif`
      * @since 1.4.0
      * @deprecated use {@link elementFonts} with {@link NotationElement.EffectDirections}
+     * @json_read_only
      */
     public get directionsFont(): Font {
         return this.elementFonts.get(NotationElement.EffectDirections)!;
@@ -188,6 +194,7 @@ export class RenderingResources {
      * @defaultValue `11px Arial, sans-serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with {@link NotationElement.ChordDiagramFretboardNumbers}
+     * @json_read_only
      */
     public get fretboardNumberFont(): Font {
         return this.elementFonts.get(NotationElement.ChordDiagramFretboardNumbers)!;
@@ -205,7 +212,7 @@ export class RenderingResources {
      * @defaultValue `14px Georgia, serif`
      * @since 0.9.6
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     * @json_ignore
+     * @json_read_only
      */
     public fingeringFont: Font = RenderingResources._effectFont;
 
@@ -214,7 +221,7 @@ export class RenderingResources {
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
      * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
-     * @json_ignore
+     * @json_read_only
      */
     public inlineFingeringFont: Font = RenderingResources._effectFont;
 
@@ -223,6 +230,7 @@ export class RenderingResources {
      * @defaultValue `bold 14px Georgia, serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with {@link NotationElement.EffectMarker}
+     * @json_read_only
      */
     public get markerFont(): Font {
         return this.elementFonts.get(NotationElement.EffectMarker)!;
@@ -240,7 +248,7 @@ export class RenderingResources {
      * @defaultValue `italic 12px Georgia, serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with the respective
-     * @json_ignore
+     * @json_read_only
      */
     public effectFont: Font = RenderingResources._effectFont;
 
@@ -249,6 +257,7 @@ export class RenderingResources {
      * @defaultValue `11px Arial, sans-serif`
      * @since 0.9.6
      * @deprecated use {@link elementFonts} with {@link NotationElement.BarNumber}
+     * @json_read_only
      */
     public get barNumberFont(): Font {
         return this.elementFonts.get(NotationElement.BarNumber)!;

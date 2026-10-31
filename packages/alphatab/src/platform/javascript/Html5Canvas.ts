@@ -227,7 +227,33 @@ export class Html5Canvas implements ICanvas {
     }
 
     public fillText(text: string, x: number, y: number): void {
+        if (this._context.textBaseline === 'hanging') {
+            y += this._hangingBaselineCorrection();
+        }
         this._context.fillText(text, x, y);
+    }
+
+    private _hangingBaselineCorrections = new Map<string, number>();
+
+    /**
+     * Browsers place the 'hanging' baseline differently (Chromium: 0.8 of the font ascent above the alphabetic
+     * baseline, Firefox: 0.6 em), so text drawn at the top would sit at different heights.
+     * Returns the vertical offset which moves it to the Chromium placement the layout is built against.
+     */
+    private _hangingBaselineCorrection(): number {
+        const font = this._context.font;
+        let correction = this._hangingBaselineCorrections.get(font);
+        if (correction === undefined) {
+            // measured with the 'hanging' baseline: alphabeticBaseline is the (negative) distance down to the alphabetic baseline
+            const metrics = this._context.measureText('');
+            const ascent = metrics.fontBoundingBoxAscent - metrics.alphabeticBaseline;
+            correction = 0.8 * ascent + metrics.alphabeticBaseline;
+            if (!Number.isFinite(correction)) {
+                correction = 0;
+            }
+            this._hangingBaselineCorrections.set(font, correction);
+        }
+        return correction;
     }
 
     public measureText(text: string): MeasuredText {

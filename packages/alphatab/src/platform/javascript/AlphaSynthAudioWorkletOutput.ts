@@ -9,6 +9,7 @@ import type {
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
+import { PlayedFramesAccumulator } from '@coderline/alphatab/synth/ds/PlayedFramesAccumulator';
 
 /**
  * @target web
@@ -79,6 +80,7 @@ export class AlphaSynthWebWorklet {
                 private _bufferCount: number = 0;
                 private _requestedBufferCount: number = 0;
                 private _isStopped = false;
+                private _playedFrames: PlayedFramesAccumulator;
 
                 constructor(options: AudioWorkletNodeOptions) {
                     super(options);
@@ -92,6 +94,11 @@ export class AlphaSynthWebWorklet {
                     );
                     this._circularBuffer = new CircularSampleBuffer(
                         AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
+                    );
+                    this._playedFrames = new PlayedFramesAccumulator(
+                        Math.round(
+                            ((options.processorOptions.positionUpdateIntervalInMilliseconds ?? 0) * sampleRate) / 1000
+                        )
                     );
 
                     this.port.addEventListener('message', e => this._handleMessage(e));
@@ -108,11 +115,21 @@ export class AlphaSynthWebWorklet {
                             this._requestedBufferCount--;
                             break;
                         case 'alphaSynth.output.resetSamples':
+                            this._reportPlayedFrames(this._playedFrames.flush());
                             this._circularBuffer.clear();
                             break;
                         case 'alphaSynth.output.stop':
                             this._isStopped = true;
                             break;
+                    }
+                }
+
+                private _reportPlayedFrames(frames: number) {
+                    if (frames > 0) {
+                        this.port.postMessage({
+                            cmd: 'alphaSynth.output.samplesPlayed',
+                            samples: frames
+                        });
                     }
                 }
 
@@ -157,10 +174,16 @@ export class AlphaSynthWebWorklet {
                         }
                     }
 
-                    this.port.postMessage({
-                        cmd: 'alphaSynth.output.samplesPlayed',
-                        samples: samplesFromBuffer / SynthConstants.AudioChannels
-                    });
+                    const playedFrames = this._playedFrames.add(
+                        left.length,
+                        samplesFromBuffer / SynthConstants.AudioChannels
+                    );
+                    if (playedFrames !== PlayedFramesAccumulator.NothingToReport) {
+                        this.port.postMessage({
+                            cmd: 'alphaSynth.output.samplesPlayed',
+                            samples: playedFrames
+                        });
+                    }
                     this._requestBuffers();
 
                     return this._circularBuffer.count > 0 || !this._isStopped;
@@ -203,7 +226,21 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     private readonly _settings: Settings;
     private _boundHandleMessage: (e: MessageEvent<IAlphaSynthWorkerMessage>) => void;
 
+    /**
+     * The events received between a play call and the creation of its worklet.
+     */
     private _pendingEvents?: IAlphaSynthWorkerMessage[];
+
+    /**
+     * The worklet is created asynchronously while play, pause and destroy are synchronous.
+     * Their audio graph operations are chained here to run in the order of the calls.
+     */
+    private _operations: Promise<void> = Promise.resolve();
+
+    /**
+     * Aborted on destroy, to stop waiting for a worklet load which might never complete.
+     */
+    private readonly _destroyed = new AbortController();
 
     public constructor(settings: Settings) {
         super();
@@ -218,44 +255,98 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     }
 
     public override play(): void {
-        super.play();
+        // resuming the context must happen synchronously within the user interaction
+        this.activate();
         const ctx = this.context!;
 
-        // clear any pending events buffered from previous playback rounds
-        // we just want the events which come in after the play call until the worklet is created
-        if (this._pendingEvents) {
-            this._pendingEvents = undefined;
+        // we just want the events which come in after this play call until its worklet is created
+        const pendingEvents: IAlphaSynthWorkerMessage[] = [];
+        this._pendingEvents = pendingEvents;
+
+        this._enqueue(() => this._start(ctx, pendingEvents));
+    }
+
+    public override pause(): void {
+        this._pendingEvents = undefined;
+        this._enqueue(() => this._stop());
+    }
+
+    public override destroy(): void {
+        // a pending worklet load must not delay the destroy
+        this._destroyed.abort();
+        this.pause();
+        // the context must only be closed after the pending operations completed
+        this._enqueue(() => super.destroy());
+    }
+
+    private _enqueue(operation: () => void | Promise<void>): void {
+        this._operations = this._operations.then(operation).catch(e => {
+            Logger.error('WebAudio', `Audio Worklet operation failed: reason=${e}`);
+        });
+    }
+
+    /**
+     * Loads the worklet module.
+     * @returns false if the output was destroyed before the load completed.
+     */
+    private _loadWorklet(ctx: AudioContext): Promise<boolean> {
+        const signal = this._destroyed.signal;
+        return new Promise<boolean>((resolve, reject) => {
+            if (signal.aborted) {
+                resolve(false);
+                return;
+            }
+            const load = BrowserUiFacade.createAlphaSynthAudioWorklet(ctx, this._settings);
+            const onAbort = () => resolve(false);
+            signal.addEventListener('abort', onAbort, { once: true });
+            load.then(() => resolve(true), reject).finally(() => signal.removeEventListener('abort', onAbort));
+        });
+    }
+
+    private async _start(ctx: AudioContext, pendingEvents: IAlphaSynthWorkerMessage[]): Promise<void> {
+        if (!(await this._loadWorklet(ctx))) {
+            // destroyed while loading
+            return;
         }
 
-        // create a script processor node which will replace the silence with the generated audio
-        BrowserUiFacade.createAlphaSynthAudioWorklet(ctx, this._settings).then(
-            () => {
-                this._worklet = new AudioWorkletNode(ctx!, 'alphatab', {
-                    numberOfOutputs: 1,
-                    outputChannelCount: [2],
-                    processorOptions: {
-                        bufferTimeInMilliseconds: this._bufferTimeInMilliseconds
-                    }
-                }) as AudioWorkletNode<IAlphaSynthWorkerMessage>;
-
-                this._worklet.port.addEventListener('message', this._boundHandleMessage);
-                this._worklet.port.start();
-                this.source!.connect(this._worklet);
-                this.source!.start(0);
-                this._worklet.connect(ctx!.destination);
-
-                const pending = this._pendingEvents;
-                if (pending) {
-                    for (const e of pending) {
-                        this._worklet.port.postMessage(e);
-                    }
-                    this._pendingEvents = undefined;
-                }
-            },
-            (reason: any) => {
-                Logger.error('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
+        // create a worklet node which will replace the silence with the generated audio
+        const worklet = new AudioWorkletNode(ctx, 'alphatab', {
+            numberOfOutputs: 1,
+            outputChannelCount: [2],
+            processorOptions: {
+                bufferTimeInMilliseconds: this._bufferTimeInMilliseconds,
+                positionUpdateIntervalInMilliseconds: this._settings.player.positionUpdateIntervalInMilliseconds
             }
-        );
+        }) as AudioWorkletNode<IAlphaSynthWorkerMessage>;
+        this._worklet = worklet;
+        worklet.port.addEventListener('message', this._boundHandleMessage);
+        worklet.port.start();
+
+        // created and started together: base pause() must only ever see a started source
+        this.createSource(ctx);
+        this.source!.start(0);
+        this.source!.connect(worklet);
+        worklet.connect(ctx.destination);
+
+        for (const e of pendingEvents) {
+            worklet.port.postMessage(e);
+        }
+        if (this._pendingEvents === pendingEvents) {
+            this._pendingEvents = undefined;
+        }
+    }
+
+    private _stop(): void {
+        super.pause();
+        const worklet = this._worklet;
+        if (worklet) {
+            worklet.port.postMessage({
+                cmd: 'alphaSynth.output.stop'
+            });
+            worklet.port.removeEventListener('message', this._boundHandleMessage);
+            worklet.disconnect();
+        }
+        this._worklet = null;
     }
 
     private _handleMessage(e: MessageEvent<IAlphaSynthWorkerMessage>) {
@@ -271,26 +362,13 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
         }
     }
 
-    public override pause(): void {
-        super.pause();
-        if (this._worklet) {
-            this._worklet.port.postMessage({
-                cmd: 'alphaSynth.output.stop'
-            });
-            this._worklet.port.removeEventListener('message', this._boundHandleMessage);
-            this._worklet.disconnect();
-        }
-        this._worklet = null;
-        this._pendingEvents = undefined;
-    }
-
     private _postWorkerMessage(message: IAlphaSynthWorkerMessage) {
-        const worklet = this._worklet;
-        if (worklet) {
-            worklet.port.postMessage(message);
+        // while a worklet is being created, the events are buffered for it
+        const pendingEvents = this._pendingEvents;
+        if (pendingEvents) {
+            pendingEvents.push(message);
         } else {
-            this._pendingEvents ??= [];
-            this._pendingEvents.push(message);
+            this._worklet?.port.postMessage(message);
         }
     }
 

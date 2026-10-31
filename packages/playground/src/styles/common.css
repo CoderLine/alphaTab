@@ -20,17 +20,6 @@
 
 :root {
     --at-accent: #4972a1;
-    --at-accent-hover: #5588c7;
-    --at-footer-bg: #436d9d;
-    --at-footer-fg: #ffffff;
-    --at-divider: rgba(255, 255, 255, 0.18);
-    --at-sidebar-bg: #f7f7f7;
-    --at-overlay-bg: rgba(0, 0, 0, 0.5);
-    --at-track-active-bg: rgba(0, 0, 0, 0.03);
-    --at-cursor-beat: rgba(64, 64, 255, 0.75);
-    --at-cursor-bar: rgba(255, 242, 0, 0.25);
-    --at-selection: rgba(64, 64, 255, 0.2);
-    --at-highlight: #0078ff;
 }
 
 *,
@@ -64,20 +53,21 @@ button {
     font-family: inherit;
 }
 
+/* The cursors and highlights alphaTab renders into the score. */
 .at-cursor-bar {
-    background: var(--at-cursor-bar);
+    background: rgba(255, 242, 0, 0.25);
 }
 
 .at-selection div {
-    background: var(--at-selection);
+    background: rgba(64, 64, 255, 0.2);
 }
 
 .at-cursor-beat {
-    background: var(--at-cursor-beat);
+    background: rgba(64, 64, 255, 0.75);
     width: 3px;
 }
 
 .at-highlight * {
-    fill: var(--at-highlight);
-    stroke: var(--at-highlight);
+    fill: #0078ff;
+    stroke: #0078ff;
 }

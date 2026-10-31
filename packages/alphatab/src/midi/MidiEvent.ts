@@ -198,8 +198,9 @@ export abstract class AlphaTabSysExEvent extends MidiEvent {
 }
 
 /**
- * Represents a metronome event. This event is emitted by the synthesizer only during playback and
- * is typically not part of the midi file itself.
+ * Represents a metronome event. alphaTab places these events bar by bar into the midi files generated for playback
+ * (respecting repeats, time signatures and pick-up bars). They are not written into standard midi files (SMF1 mode).
+ * For midi files without these events the synthesizer generates them during playback according to the time signatures.
  * @public
  */
 export class AlphaTabMetronomeEvent extends AlphaTabSysExEvent {
@@ -299,10 +300,16 @@ export abstract class NoteEvent extends MidiEvent {
         this.noteVelocity = noteVelocity;
     }
 
+    /**
+     * @deprecated Use individual properties to access data.
+     */
     public override get data1(): number {
         return this.noteKey;
     }
 
+    /**
+     * @deprecated Use individual properties to access data.
+     */
     public override get data2(): number {
         return this.noteVelocity;
     }
@@ -375,10 +382,16 @@ export class ControlChangeEvent extends MidiEvent {
         s.writeByte(this.value & 0xff);
     }
 
+    /**
+     * @deprecated Use individual properties to access data.
+     */
     public override get data1(): number {
         return this.controller as number;
     }
 
+    /**
+     * @deprecated Use individual properties to access data.
+     */
     public override get data2(): number {
         return this.value;
     }
@@ -410,6 +423,9 @@ export class ProgramChangeEvent extends MidiEvent {
         s.writeByte(this.program & 0xff);
     }
 
+    /**
+     * @deprecated Use individual properties to access data.
+     */
     public override get data1(): number {
         return this.program;
     }
@@ -484,10 +500,16 @@ export class PitchBendEvent extends MidiEvent {
         s.writeByte((this.value >> 7) & 0x7f);
     }
 
+    /**
+     * @deprecated Use individual properties to access data.
+     */
     public override get data1(): number {
         return this.value & 0x7f;
     }
 
+    /**
+     * @deprecated Use individual properties to access data.
+     */
     public override get data2(): number {
         return (this.value >> 7) & 0x7f;
     }

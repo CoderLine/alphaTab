@@ -42,4 +42,12 @@ describe('ColorTests', () => {
 
         expect(color!.rgba).toBe('rgba(246,78,6,0)');
     });
+
+    it('fromJson-null', () => {
+        expect(Color.fromJson(null)).toBe(null);
+    });
+
+    it('toJson-fromJson-null', () => {
+        expect(Color.fromJson(Color.toJson(null))).toBe(null);
+    });
 });

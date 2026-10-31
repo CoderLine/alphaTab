@@ -11,7 +11,6 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 interface TestResultEntry {
     originalFile: string;
     newFile: string;
-    diffFile: string;
 }
 
 function removeLeadingSlash(s: string): string {
@@ -63,8 +62,7 @@ function crawlNewReferenceFiles(testDataPath: string): TestResultEntry[] {
                 } else if (entry.isFile() && entry.name.endsWith('.new.png')) {
                     out.push({
                         originalFile: `${name}/${entry.name.replace('.new.png', '.png')}`,
-                        newFile: `${name}/${entry.name}`,
-                        diffFile: `${name}/${entry.name.replace('.new.png', '.diff.png')}`
+                        newFile: `${name}/${entry.name}`
                     });
                 }
             }

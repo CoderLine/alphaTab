@@ -1,14 +1,22 @@
 {
     "name": "@coderline/alphatab",
-    "version": "1.8.4",
-    "description": "alphaTab is a music notation and guitar tablature rendering library",
+    "version": "1.9.0",
+    "description": "Render and play interactive sheet music and guitar tablature from Guitar Pro, MusicXML, Capella and alphaTex, in the browser, Node.js, .NET and Android.",
     "keywords": [
-        "guitar",
         "music-notation",
-        "music-sheet",
-        "html5",
+        "sheet-music",
+        "guitar-tablature",
+        "tablature",
+        "guitar",
+        "guitar-pro",
+        "musicxml",
+        "alphatex",
+        "score",
+        "midi",
+        "soundfont",
+        "synthesizer",
         "svg",
-        "guitar-tablature"
+        "canvas"
     ],
     "homepage": "https://alphatab.net",
     "bugs": {
@@ -18,12 +26,24 @@
     "license": "MPL-2.0",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/coderline/alphaTab.git"
+        "url": "git+https://github.com/CoderLine/alphaTab.git"
     },
     "type": "module",
     "main": "dist/alphaTab.js",
     "module": "dist/alphaTab.mjs",
     "typings": "dist/alphaTab.d.ts",
+    "peerDependencies": {
+        "@coderline/alphatab-vite": "^1.9.0",
+        "@coderline/alphatab-webpack": "^1.9.0"
+    },
+    "peerDependenciesMeta": {
+        "@coderline/alphatab-vite": {
+            "optional": true
+        },
+        "@coderline/alphatab-webpack": {
+            "optional": true
+        }
+    },
     "exports": {
         ".": {
             "types": "./dist/alphaTab.d.ts",
@@ -40,6 +60,18 @@
             "import": "./dist/alphaTab.vite.mjs",
             "require": "./dist/alphaTab.vite.js"
         },
+        "./core": {
+            "types": "./dist/alphaTab.d.ts",
+            "import": "./dist/alphaTab.core.mjs"
+        },
+        "./worker": {
+            "types": "./dist/alphaTab.worker.d.ts",
+            "import": "./dist/alphaTab.worker.mjs"
+        },
+        "./worklet": {
+            "types": "./dist/alphaTab.worklet.d.ts",
+            "import": "./dist/alphaTab.worklet.mjs"
+        },
         "./soundfont/*": "./dist/soundfont/*",
         "./font/*": "./dist/font/*"
     },
@@ -51,6 +83,7 @@
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
         "prepack": "tsx scripts/prepack.mts",
+        "attribution-outlines": "tsx scripts/attribution-outlines.ts && biome format --write src/rendering/glyphs/AttributionOutlines.ts",
         "bravura-smufl": "tsx scripts/smufl-metadata.ts font/bravura/bravura_metadata.json font/bravura/bravura_alphatab_metadata.json true",
         "generate-typescript": "rimraf src/generated && tsx scripts/generate-typescript.ts",
         "build": "npm run generate-typescript && vite build --mode esm && vite build --mode umd",
@@ -59,18 +92,19 @@
         "test-accept-reference": "tsx scripts/accept-new-reference-files.ts"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.4.15",
+        "@biomejs/biome": "^2.6.3",
         "@coderline/alphaskia": "^3.5.147",
         "@coderline/alphaskia-linux": "^3.5.147",
         "@coderline/alphaskia-windows": "^3.5.147",
-        "@types/node": "^25.9.1",
+        "@types/node": "^26.6.5",
+        "opentype.js": "^2.0.0",
         "rimraf": "^6.1.3",
         "tslib": "^2.8.1",
-        "tsx": "^4.22.3",
+        "tsx": "^4.23.15",
         "typescript": "^6.0.3",
-        "vite": "^8.0.14",
-        "vite-plugin-static-copy": "^4.1.0",
-        "vitest": "^4.1.7"
+        "vite": "^8.3.5",
+        "vite-plugin-static-copy": "^4.1.1",
+        "vitest": "^5.0.5"
     },
     "files": [
         "/dist/alphaTab*.js",

@@ -1,0 +1,83 @@
+---
+title: "Settings to JSON"
+description: "Serialize a `Settings` instance to JSON with `JsonConverter` for user preferences, defaults, and worker transport."
+sidebar_custom_props:
+  since: "1.2"
+  feature_chapter: serialization
+  feature_order: 20
+keywords:
+  - alphaTab
+  - JSON
+  - serialization
+  - settings
+  - preferences
+---
+
+import { SettingsJsonDemo } from '@site/src/components/SettingsJsonDemo';
+
+Remember a user's zoom, layout mode, and colour palette across sessions. Ship tenant-specific defaults from a backend so every reader in an organisation opens the same view. Synchronise settings from the main thread into a Web Worker without hand-rolling a schema. `JsonConverter` serializes a full `Settings` instance — every notation flag, display option, and player toggle — into a plain JavaScript object, and reads it back the same way.
+
+<SettingsJsonDemo showCode={false} />
+
+Tweak the knobs above and watch the JSON blob refresh in real time. The pattern below persists whatever the user changed and rehydrates it on the next visit.
+
+## Round-trip in code
+
+`JsonConverter` exposes four entry points for settings. On Web, `settingsToJson` and `jsonToSettings` are one-liners; on all runtimes, the object-based forms work identically:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+// Serialize
+const settings = new alphaTab.Settings();
+settings.display.scale = 1.2;
+settings.player.playerMode = alphaTab.PlayerMode.EnabledSynthesizer;
+settings.notation.elements.set(alphaTab.NotationElement.EffectFingering, false);
+
+const jsObject = alphaTab.model.JsonConverter.settingsToJsObject(settings);
+const jsonString = alphaTab.model.JsonConverter.settingsToJson(settings);
+localStorage.setItem('alphaTab.settings', jsonString);
+
+// Deserialize
+const stored = localStorage.getItem('alphaTab.settings');
+if (stored) {
+  const restored = alphaTab.model.JsonConverter.jsonToSettings(stored);
+
+  const container = getAlphaTabContainer();
+  const api = new alphaTab.AlphaTabApi(container, restored);
+}
+```
+
+`getAlphaTabContainer()` is the platform-specific render target.
+
+The static entry points come in matched pairs:
+
+- `settingsToJson(settings)` / `jsonToSettings(json)` — Web-only, string in and out.
+- `settingsToJsObject(settings)` / `jsObjectToSettings(obj)` — every runtime, plain-object in and out. Reach for these when you want to post the object to a Web Worker, embed it in a larger JSON payload, or store it in IndexedDB without an intermediate string.
+
+Under the hood both pairs route through `SettingsSerializer.toJson` and `SettingsSerializer.fromJson`, the generated serializer that mirrors every `Settings` property one-for-one.
+
+## Partial payloads
+
+`jsObjectToSettings` (and its string sibling `jsonToSettings`) accepts a partial JSON payload — anything the object leaves out keeps the default from a freshly constructed `Settings`. That means a store of overrides only has to contain the properties the user actually changed:
+
+```js
+// The stored payload only carries what the user tweaked.
+const overridesJson = '{"display":{"scale":1.4}}';
+
+const settings = alphaTab.model.JsonConverter.jsonToSettings(overridesJson);
+// settings.display.scale === 1.4
+// every other property is the built-in default
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, settings);
+```
+
+Enums come back as their numeric representation, matching the runtime enum values — no manual coercion needed.
+
+## Where to look next
+
+- [Score to JSON and back](score-to-json) — the sibling call for the `Score` model.
+- [`Settings`](/docs/reference/settings) — the full settings surface the serializer covers.
+- [`api.settings`](/docs/reference/api/settings) — how to hand the deserialized instance back to a running API.
+- [`JsonConverter`](/docs/reference/types/model/jsonconverter) in the API reference — the methods `settingsToJson`, `jsonToSettings`, and `settingsToJsObject` live here.

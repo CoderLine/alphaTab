@@ -48,6 +48,12 @@ exports[`AlphaTexLexerTest > basic-tokens 8`] = `
 ]
 `;
 
+exports[`AlphaTexLexerTest > basic-tokens 9`] = `
+[
+  At (1,1) -> (1,2),
+]
+`;
+
 exports[`AlphaTexLexerTest > errors > at001 1`] = `[]`;
 
 exports[`AlphaTexLexerTest > errors > at001 2`] = `

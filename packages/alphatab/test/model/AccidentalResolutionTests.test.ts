@@ -125,4 +125,59 @@ describe('AccidentalResolutionTests', () => {
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, true, null);
         expect(accidental).toBe(AccidentalType.SharpQuarterNoteUp);
     });
+
+    it('forced modes keep every written spelling', () => {
+        // index: accidental offset + 2
+        const modes = [
+            NoteAccidentalMode.ForceDoubleFlat,
+            NoteAccidentalMode.ForceFlat,
+            NoteAccidentalMode.ForceNatural,
+            NoteAccidentalMode.ForceSharp,
+            NoteAccidentalMode.ForceDoubleSharp
+        ];
+        for (const ks of allKeySignatures) {
+            for (let degree = 0; degree < 7; degree++) {
+                for (let offset = -2; offset <= 2; offset++) {
+                    for (let octave = 0; octave < 9; octave++) {
+                        const noteValue = (octave + 1) * 12 + degreeSemitones[degree] + offset;
+                        const spelling = ModelUtils.resolveSpelling(ks, noteValue, modes[offset + 2]);
+                        const context = `ks=${ks} degree=${degree} offset=${offset} octave=${octave}`;
+                        expect(spelling.degree, context).toBe(degree);
+                        expect(spelling.accidentalOffset, context).toBe(offset);
+                        expect(spelling.octave, context).toBe(octave);
+                    }
+                }
+            }
+        }
+    });
+
+    it('simplify keeps only spelling hints which change the spelling', () => {
+        // F# in F major: default spelling is Gb
+        expect(ModelUtils.simplifyAccidentalMode(KeySignature.F, 66, NoteAccidentalMode.ForceSharp)).toBe(
+            NoteAccidentalMode.ForceSharp
+        );
+        // Bb in F major: default spelling is Bb
+        expect(ModelUtils.simplifyAccidentalMode(KeySignature.F, 70, NoteAccidentalMode.ForceFlat)).toBe(
+            NoteAccidentalMode.Default
+        );
+        // B natural in Gb major: default spelling is Cb
+        expect(ModelUtils.simplifyAccidentalMode(KeySignature.Gb, 71, NoteAccidentalMode.ForceNatural)).toBe(
+            NoteAccidentalMode.ForceNatural
+        );
+        // C natural in C major
+        expect(ModelUtils.simplifyAccidentalMode(KeySignature.C, 60, NoteAccidentalMode.ForceNatural)).toBe(
+            NoteAccidentalMode.Default
+        );
+        // G with a sharp hint has no sharp spelling, the default spelling is used anyhow
+        expect(ModelUtils.simplifyAccidentalMode(KeySignature.C, 67, NoteAccidentalMode.ForceSharp)).toBe(
+            NoteAccidentalMode.Default
+        );
+        // ForceNone affects the accidental, not the spelling
+        expect(ModelUtils.simplifyAccidentalMode(KeySignature.C, 61, NoteAccidentalMode.ForceNone)).toBe(
+            NoteAccidentalMode.ForceNone
+        );
+        expect(ModelUtils.simplifyAccidentalMode(KeySignature.C, 61, NoteAccidentalMode.Default)).toBe(
+            NoteAccidentalMode.Default
+        );
+    });
 });

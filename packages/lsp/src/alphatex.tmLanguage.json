@@ -15,7 +15,8 @@
                 { "include": "#literal" },
                 { "include": "#expression" },
                 { "include": "#punctuation-pipe" },
-                { "include": "#punctuation-dot" }
+                { "include": "#punctuation-dot" },
+                { "include": "#punctuation-at" }
             ]
         },
         "string": {
@@ -125,14 +126,15 @@
         },
         "identifier": {
             "name": "variable.identifier.alphatex",
-            "match": "[^/\"'-\\.:\\(\\)\\{\\}\\|\\*\\\\\\s][^/\"'\\.:\\(\\)\\{\\}\\|\\*\\\\\\s]+",
+            "match": "[^@/\"'-\\.:\\(\\)\\{\\}\\|\\*\\\\\\s][^@/\"'\\.:\\(\\)\\{\\}\\|\\*\\\\\\s]+",
             "captures": { "0": { "name": "variable.identifier.alphatex" } }
         },
         "punctuation": {
             "patterns": [
                 { "include": "#punctuation-dot" },
                 { "include": "#punctuation-pipe" },
-                { "include": "#punctuation-asterisk" }
+                { "include": "#punctuation-asterisk" },
+                { "include": "#punctuation-at" }
             ]
         },
         "punctuation-pipe": {
@@ -146,6 +148,10 @@
         "punctuation-asterisk": {
             "name": "punctuation.asterisk.alphatex",
             "match": "\\*"
+        },
+        "punctuation-at": {
+            "name": "punctuation.at.alphatex",
+            "match": "@"
         }
     }
 }

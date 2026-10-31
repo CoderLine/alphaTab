@@ -6,6 +6,20 @@ public interface IMapEntryInternal {
     public var next: Int
 }
 
+/**
+ * Key equality of JavaScript `Map` and `Set` (SameValueZero): `NaN` equals `NaN`.
+ */
+internal inline fun sameValueZero(a: Double, b: Double): Boolean {
+    return a == b || (a.isNaN() && b.isNaN())
+}
+
+/**
+ * Key equality of JavaScript `Map` and `Set` (SameValueZero) for boxed keys: `-0.0` equals `0.0`.
+ */
+internal fun sameValueZero(a: Any?, b: Any?): Boolean {
+    return a == b || (a is Double && b is Double && a == 0.0 && b == 0.0)
+}
+
 internal inline fun
     <reified TEntryType, reified TInternalEntryType : IMapEntryInternal, reified TKey>
     MapBase<TEntryType, TInternalEntryType>.findEntryInternal(
@@ -77,6 +91,38 @@ internal inline fun
     buckets[targetBucket] = index
 }
 
+internal inline fun
+    <reified TEntryType, reified TInternalEntryType : IMapEntryInternal, reified TKey>
+    MapBase<TEntryType, TInternalEntryType>.deleteInternal(
+    key: TKey,
+    keyEquals: (entry: TInternalEntryType, key: TKey) -> Boolean
+) {
+    val buckets = _buckets ?: return
+    val entries = this.entries
+    val hashCode = key.hashCode() and 0x7FFFFFFF
+    val bucket = hashCode % buckets.size
+    var last = -1
+    var i = buckets[bucket]
+    while (i >= 0) {
+        val entry = entries[i]
+        if (entry.hashCode == hashCode && keyEquals(entry, key)) {
+            if (last < 0) {
+                buckets[bucket] = entry.next
+            } else {
+                entries[last].next = entry.next
+            }
+            entry.hashCode = -1
+            entry.next = _freeList
+            entry.reset()
+            _freeList = i
+            _freeCount++
+            return
+        }
+
+        last = i
+        i = entry.next
+    }
+}
 
 public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal> :
     Iterable<TEntryType> {
@@ -128,34 +174,6 @@ public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal
         return newBuckets
     }
 
-    protected fun deleteInternal(keyHashCode: Int) {
-        val buckets = _buckets
-        if (buckets != null) {
-            val hashCode = keyHashCode and 0x7FFFFFFF
-            val bucket = hashCode % buckets.size
-            var last = -1
-            var i = buckets[bucket]
-            while (i >= 0) {
-                if (entries[i].hashCode == hashCode) {
-                    if (last < 0) {
-                        buckets[bucket] = entries[i].next
-                    } else {
-                        entries[last].next = entries[i].next
-                    }
-                    entries[i].hashCode = -1
-                    entries[i].next = _freeList
-                    entries[i].reset()
-                    _freeList = i
-                    _freeCount++
-                    return
-                }
-
-                last = i
-                i = entries[i].next
-            }
-        }
-    }
-
     public fun clear() {
         if (_count > 0) {
             _buckets?.fill(-1)
@@ -173,24 +191,20 @@ public abstract class MapBase<TEntryType, TInternalEntryType : IMapEntryInternal
     private class MapIterator<TEntryType, TInternalEntryType : IMapEntryInternal>
         (private val map: MapBase<TEntryType, TInternalEntryType>) : Iterator<TEntryType> {
         private var _entryIndex = 0
-        private var _index = 0
 
         override fun hasNext(): Boolean {
-            return _index < map.size
+            while (_entryIndex < map._count && map.entries[_entryIndex].hashCode < 0) {
+                _entryIndex++
+            }
+            return _entryIndex < map._count
         }
 
         @Suppress("UNCHECKED_CAST")
         override fun next(): TEntryType {
-            while (_entryIndex < map._count) {
-                if (map.entries[_entryIndex].hashCode >= 0) {
-                    val currentValue = map.entries[_entryIndex] as TEntryType
-                    _entryIndex++
-                    _index++
-                    return currentValue
-                }
-                _entryIndex++
+            if (!hasNext()) {
+                throw NoSuchElementException("Map has no more elements")
             }
-            throw NoSuchElementException("Map has no more elements")
+            return map.entries[_entryIndex++] as TEntryType
         }
     }
 

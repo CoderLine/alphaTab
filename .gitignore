@@ -6,3 +6,4 @@ temp/
 *.user
 *.tgz
 /playground/
+.npmrc

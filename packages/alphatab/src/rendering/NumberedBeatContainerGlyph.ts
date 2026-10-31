@@ -10,7 +10,6 @@ import {
 } from '@coderline/alphatab/rendering/glyphs/NumberedDashBeatContainerGlyph';
 import { NumberedSlurGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedSlurGlyph';
 import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
-import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 
 /**
  * @internal
@@ -64,19 +63,23 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
         super.doLayout();
     }
 
-    public override buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number) {
-        super.buildBoundingsLookup(barBounds, cx, cy);
+    protected override getBoundsVisualWidth(visualX: number, width: number): number {
         // extend bounds to include dashes
         const dashes = this._dashes;
         if (dashes) {
-            const beatBounds = barBounds.beats[barBounds.beats.length - 1];
             const lastDash = dashes[dashes.length - 1];
-            const visualEndX = lastDash.x + lastDash.contentWidth;
-            beatBounds.visualBounds.w = visualEndX - beatBounds.visualBounds.x;
-
-            const realEnd = lastDash.x + lastDash.width;
-            beatBounds.realBounds.w = realEnd - beatBounds.realBounds.x;
+            return lastDash.x + lastDash.contentWidth - visualX;
         }
+        return width;
+    }
+
+    protected override getBoundsRealWidth(realX: number, width: number): number {
+        const dashes = this._dashes;
+        if (dashes) {
+            const lastDash = dashes[dashes.length - 1];
+            return lastDash.x + lastDash.width - realX;
+        }
+        return width;
     }
 
     protected override createTies(n: Note): void {

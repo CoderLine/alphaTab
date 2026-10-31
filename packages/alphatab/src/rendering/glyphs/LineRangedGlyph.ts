@@ -1,8 +1,8 @@
 import type { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { TextBaseline, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { type ICanvas, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@coderline/alphatab/rendering/glyphs/GroupedEffectGlyph';
-import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 
 /**
  * @internal
@@ -26,10 +26,22 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
             this.forceGroupedRendering = true;
         }
         super.doLayout();
-        this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.elementFonts.get(this._fontElement)!;
-        const size = this.renderer.scoreRenderer.canvas!.measureText(this._label);
+        const scoreRenderer = this.renderer.scoreRenderer;
+        const canvas = scoreRenderer.canvas!;
+        canvas.font = this.renderer.resources.elementFonts.get(this._fontElement)!;
+        const size = scoreRenderer.layout!.textMeasures.measureText(canvas, this._label);
         this.height = size.height;
         this._labelWidth = size.width;
+    }
+
+    public override getBoundingBoxLeft(): number {
+        return this.x - this._labelWidth / 2;
+    }
+
+    public override getBoundingBoxRight(): number {
+        const labelRight = this.x + this._labelWidth / 2;
+        const groupedRight = super.getBoundingBoxRight();
+        return labelRight > groupedRight ? labelRight : groupedRight;
     }
 
     protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {

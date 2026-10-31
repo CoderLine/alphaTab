@@ -46,4 +46,39 @@ describe('SpecialNotesTests', () => {
     it('beaming-mode', async () => {
         await VisualTestHelper.runVisualTest('special-notes/beaming-mode.gp');
     });
+
+    it('beaming-anacrusis', async () => {
+        // the pick-up forms the end of a full bar: first eighth is the offbeat of beat 1, the others form beat 2
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\ts 2 4
+            \\ac C4.8 D4.8 E4.8 |
+            F4.4 G4.4 |
+            A4.8 B4.8 C5.8 D5.8 |
+            C4.2
+            `,
+            'test-data/visual-tests/special-notes/beaming-anacrusis.png'
+        );
+    });
+
+    it('full-bar-notes-rests', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+                C4 {slur s1} | C4 {slur s1} .1 | r.4 | r.1
+                \\ts(3 8) C4{slur S2}.4 {d} | C4 {slur S2} |
+                \\ts(4 4) C4{gr} C4.1
+            `,
+            'test-data/visual-tests/special-notes/full-bar-notes-rests.png'
+        );
+    });
+
+    it('full-bar-notes-pickup', async () => {
+        // the pick-up quarter is a single beat spanning its (shortened) bar but is not a full-bar note
+        await VisualTestHelper.runVisualTestTex(
+            `
+                \\ac C4.4 | C4.1 | r.1 | D4.4
+            `,
+            'test-data/visual-tests/special-notes/full-bar-notes-pickup.png'
+        );
+    });
 });

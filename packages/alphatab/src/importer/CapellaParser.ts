@@ -550,7 +550,7 @@ export class CapellaParser {
     }
 
     private _voiceStates: Map<string, CapellaVoiceState> = new Map();
-    private _currentVoiceState!: CapellaVoiceState;
+    private _currentVoiceState: CapellaVoiceState = new CapellaVoiceState();
     private _currentBar!: Bar;
     private _currentVoice!: Voice;
 
@@ -572,7 +572,7 @@ export class CapellaParser {
         element: XmlNode
     ) {
         const voiceStateKey = `${staffId}_${voiceIndex}`;
-        if (this._currentVoiceState && !this._currentVoiceState.currentBarComplete) {
+        if (!this._currentVoiceState.currentBarComplete) {
             this._currentBar.masterBar.isAnacrusis = true;
         }
 
@@ -704,11 +704,13 @@ export class CapellaParser {
                             chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
                         }
                         this._parseDuration(chordBeat, c.findChildElement('duration')!);
-                        chordBeat.updateDurations();
-                        this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
                         this._currentVoice.addBeat(chordBeat);
 
                         this._parseChord(chordBeat, c);
+
+                        // the duration depends on the voice and the notes (full-bar rest detection)
+                        chordBeat.updateDurations();
+                        this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
 
                         if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
                             this._currentVoiceState.currentBarComplete = true;
@@ -718,9 +720,9 @@ export class CapellaParser {
                         const restBeat = this._parseRestDurations(c.findChildElement('duration')!);
                         if (restBeat) {
                             this._initFromPreviousBeat(restBeat, this._currentVoice);
+                            this._currentVoice.addBeat(restBeat);
                             restBeat.updateDurations();
                             this._currentVoiceState.currentPosition += restBeat.playbackDuration;
-                            this._currentVoice.addBeat(restBeat);
 
                             if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
                                 this._currentVoiceState.currentBarComplete = true;
@@ -1300,11 +1302,11 @@ export class CapellaParser {
             switch (c.localName) {
                 // encodingSoftware ignored
                 case 'author':
-                    this.score.tab = c.firstChild!.innerText;
+                    this.score.tab = c.innerText;
                     break;
                 // keywords ignored
                 case 'comment':
-                    this.score.notices = c.firstChild!.innerText;
+                    this.score.notices = c.innerText;
                     break;
             }
         }

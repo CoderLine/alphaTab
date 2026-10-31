@@ -1,0 +1,66 @@
+---
+title: "Auto-scroll modes"
+description: "Pick how alphaTab keeps the played bar on screen — Continuous, OffScreen, Smooth, or Off — and force a scroll on demand."
+sidebar_custom_props:
+  feature_chapter: scroll
+  feature_order: 10
+keywords:
+  - alphaTab
+  - scroll
+  - auto-scroll
+  - ScrollMode
+  - scrollToCursor
+---
+
+import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+The scroll style that fits a follow-along viewer is different from what fits a practice page or a karaoke-style teleprompter. `player.scrollMode` picks between four strategies for keeping the played bar on screen — continuous flow, only-when-off-screen, smooth glide, or off entirely. Pick a pill in the demo below to see the mode change while the score plays inside a bounded scroll pane.
+
+<ScrollModeSwitch showCode={false} tex={Riffs.BACH_PRELUDE_C_LONG} />
+
+## The four modes
+
+`ScrollMode` values, ordered by how aggressively they scroll:
+
+- **`Continuous`** — scroll to the played bar every time the bar changes. The playhead stays anchored, the score flows past. Default.
+- **`OffScreen`** — scroll only when the played bar leaves the viewport. The score sits still until the reader falls off the page, then jumps to catch up. Good for practice UIs where the reader wants to read ahead.
+- **`Smooth`** — the viewport glides across each system at the tempo of the music. alphaTab bypasses native smooth scroll and drives the animation itself so the motion matches the beat. Available for both vertical and horizontal layouts.
+- **`Off`** — no automatic scrolling. Wire your own scroll UI, or let the user pan freely.
+
+The right mode depends on the surface. Continuous suits a follow-along viewer. OffScreen suits practice pages with hand-controlled scrolling. Smooth suits karaoke-style single-line scrolling.
+
+## Forcing a scroll manually
+
+`api.scrollToCursor()` scrolls to the current beat immediately, regardless of the mode — useful for a "back to playhead" button or after the reader manually pans away.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    scrollMode: alphaTab.ScrollMode.OffScreen,
+  },
+});
+
+document.getElementById('back-to-playhead').addEventListener('click', () => {
+  api.scrollToCursor();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Scroll target and offsets](./scroll-target-and-offsets) — choose the element that scrolls and tune the offsets.
+- [A custom scroll handler](./custom-scroll-handler) — replace the scroll strategy entirely.
+- [Lazy loading](./lazy-loading) — how off-screen chunks stay out of the DOM until the scroll approaches them.
+- [`scrollMode`](/docs/reference/settings/player/scrollmode) and [`scrollToCursor()`](/docs/reference/api/scrolltocursor) in the reference, plus the [`ScrollMode`](/docs/reference/types/scrollmode) enum.

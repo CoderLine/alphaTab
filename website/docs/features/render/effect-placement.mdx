@@ -1,0 +1,85 @@
+---
+title: "Effect placement"
+description: "How alphaTab places annotations such as texts, chord names, dynamics, palm mute and let ring against the outline of the notation, and which settings control their clearances."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 45
+  since: "1.9"
+keywords:
+  - alphaTab
+  - effects
+  - annotations
+  - skyline
+  - collision
+  - spacing
+  - engraving
+---
+
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+Annotations such as texts, chord names, dynamics, palm-mute and let-ring brackets, vibrato lines, and hammer-on, pull-off and slide labels sit as close to the notes as the notation allows. alphaTab measures the actual outline of every staff and moves an annotation away from the staff only where a note, stem, beam or another annotation is in the way. Dense guitar charts and lead sheets stay compact. One display setting controls the gap around annotation rows, and three engraving settings control the minimum clearances between staves, beats and bar lines.
+
+<AlphaTexSample player={true}>{`
+\\track "Guitar"
+\\staff {score tabs}
+:8 (0.5 2.4){ch "Am" dy mf} 2.3{lr} 1.2{lr} 0.1{lr} 1.2 2.3{txt "rit."} :4 2.4 |
+:8 0.6{pm} 0.6{pm} 3.6{pm} 0.6{pm} :16 12.1{txt "solo" h} 15.1{h} 12.1 14.2 :8 17.1{v} 12.1 |
+:8 3.6{pm} 5.6{pm} 3.6{pm} 5.6{pm} :4 (5.5 7.4){ch "D5" dy f} 0.6
+`}</AlphaTexSample>
+
+The chord name `Am` and the text `rit.` sit right above the staff because the notes under them are low. In the second bar the high sixteenth notes push the hammer-on and pull-off labels up, and `solo` stacks above those labels. The palm-mute brackets sit directly above the tab staff because the notes on the low strings leave that space free.
+
+## How annotations find their place {#skyline}
+
+alphaTab records the outline of each staff above and below it: noteheads, stems, beams, flags, ties and every annotation already placed. This outline is called the skyline. Each new annotation is placed against the skyline over its own horizontal range, not against the highest point of the whole system.
+
+- Within one bar, all annotations of one kind share one row. The row only moves as far from the staff as the notation under those annotations requires.
+- Different kinds of annotations stack on top of each other when they overlap horizontally. Markers attached to notes, such as hammer-on/pull-off labels, taps, pick strokes, harmonics or fingering, share a row where they leave gaps between each other.
+- Labels of hammer-ons, pull-offs and slides keep their whole slur segment clear. Markers attached to a beat keep the noteheads and stems of that beat clear.
+
+This placement is always active. Up to 1.8, every kind of annotation took a row spanning the whole system above or below the staff, so existing scores render with annotations closer to the notes since 1.9.0.
+
+## Band padding: `effectBandPaddingBottom` {#band-padding}
+
+[`display.effectBandPaddingBottom`](/docs/reference/settings/display/effectbandpaddingbottom) is the clearance between an annotation row and the staff, or the row it stacks on. For rows above the staff it is the gap below the row, for rows below the staff the gap above it. The same value is the gap between two stacked rows.
+
+The default is `5` since 1.9.0 (`2` before). Raise it for more air between annotations and notes, lower it for tighter charts.
+
+## Engraving clearances {#clearances}
+
+Three settings on [`display.resources.engravingSettings`](/docs/reference/types/renderingresources/#engravingsettings) define the minimum distances that keep notation from touching. Each adds space only where content would otherwise come closer than the value; everywhere else the layout stays unchanged. The values are in pixels before `display.scale` is applied. With the default Bravura settings one staff space is `9` pixels.
+
+- [`staffContentPadding`](/docs/reference/types/engravingsettings/#staffcontentpadding) — the minimum vertical gap between the content of two adjacent staves, for example a stem below the standard notation staff and a fret number above the tab staff. Default: one staff space.
+- [`beatContentPadding`](/docs/reference/types/engravingsettings/#beatcontentpadding) — the minimum horizontal gap between the content of two adjacent beats, for example a notehead and the accidental or grace notes of the next beat. Default: half a staff space.
+- [`barlineContentPadding`](/docs/reference/types/engravingsettings/#barlinecontentpadding) — the minimum horizontal gap between the content of the last beat in a bar and the bar line. Default: one staff space.
+
+`beatContentPadding` and `barlineContentPadding` feed into the minimum width of a bar. They matter when a bar is squeezed, for example on a narrow screen. When a bar still does not fit into the available width, alphaTab compresses it below its minimum and logs a warning that names the bar and the missing width.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  display: {
+    effectBandPaddingBottom: 8,
+    resources: {
+      engravingSettings: {
+        staffContentPadding: 18,
+        beatContentPadding: 6,
+      },
+    },
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Density and spacing](./density-and-spacing) — the horizontal spacing model that decides where the notes go before annotations are placed.
+- [Effects and articulations](./coverage-effects-articulations) — every effect that takes part in this placement, one demo each.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide whole annotation categories through `notation.elements`.
+- [`EngravingSettings`](/docs/reference/types/engravingsettings) — the full list of engraving metrics.

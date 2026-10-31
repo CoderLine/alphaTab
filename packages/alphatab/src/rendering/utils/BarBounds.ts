@@ -67,9 +67,23 @@ export class BarBounds {
         this.realBounds.scaleWith(scale);
         this.visualBounds.scaleWith(scale);
 
-        this.beats.sort((a, b) => a.realBounds.x - b.realBounds.x);
+        this.sortBeats();
         for (const b of this.beats) {
             b.finish(scale);
+        }
+    }
+
+    /**
+     * Orders the beats by their x-position, keeping the order of beats at the same position.
+     * @internal
+     */
+    public sortBeats(): void {
+        const beats = this.beats;
+        for (let i = 1; i < beats.length; i++) {
+            if (beats[i].realBounds.x < beats[i - 1].realBounds.x) {
+                beats.sort((a, b) => a.realBounds.x - b.realBounds.x);
+                return;
+            }
         }
     }
 }

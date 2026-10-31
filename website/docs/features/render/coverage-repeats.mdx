@@ -1,0 +1,115 @@
+---
+title: "Repeats and structural elements"
+description: "Repeats, alternate endings, D.C./D.S., segno, coda, markers, and the order in which the player follows them."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 50
+keywords:
+  - alphaTab
+  - repeats
+  - structural
+  - playback order
+  - alternate endings
+  - da capo
+  - dal segno
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+Repeats, jumps, and section markers drive how a score reads across systems. alphaTab picks them up from the source file and renders each with its standard engraving convention.
+
+## Simple repeats {#repeats}
+
+Repeat barlines are the thick double bars with a dot pattern that tell the player to replay a passage. When the passage repeats more than twice, alphaTab draws the count above the closing barline so the reader knows how many times through — the standard way to notate the four-bar chorus that plays three times.
+
+<AlphaTab file="/files/features/Repeats.gp5" settings={ { staveProfile: 'score' } } />
+
+## Alternate endings {#alternate-endings}
+
+Alternate endings are the numbered brackets above a repeated section that select a different bar on each pass — the "first time, second time" convention used at the tail of every verse-chorus form. Each ending's numeric label indicates which pass through the repeat plays that bar.
+
+<AlphaTab file="/files/features/AlternateEndings.gp5" settings={ { staveProfile: 'score' } } />
+
+## D.C. and D.S. {#dc-ds}
+
+Da capo (`D.C.`) and dal segno (`D.S.`) directions are the "back to the top" and "back to the segno" jump instructions that keep long forms readable without physically repeating bars. alphaTab renders them as text labels above the target barline and honors `D.C.`, `D.C. al Fine`, `D.C. al Coda`, `D.S.`, `D.S. al Fine`, and `D.S. al Coda` from the source file.
+
+<AlphaTab file="/files/features/directions-simple.gp" />
+
+## Segno and coda {#segno-coda}
+
+Segno and coda are the target glyphs the `D.S.` and `al Coda` directions jump to — the segno paired with `D.S.`, the coda paired with `al Coda` on the second pass. alphaTab renders both as the standard SMuFL glyphs above the staff at their target bars, and draws `Fine` as text.
+
+<AlphaTab file="/files/features/directions-simple.gp" />
+
+## Section markers {#markers}
+
+Section markers are the labeled text tags above a bar that name a formal section — `Intro`, `Verse`, `Chorus`, `Bridge`. alphaTab renders them above the staff at the marked bar, drawn from the marker text in the source file.
+
+<AlphaTab file="/files/features/Markers.gp5" />
+
+## Playback order *(new in 1.9)* {#playback-order}
+
+The player, the cursor and MIDI export follow repeats, alternate endings and jumps in the same order. Since 1.9.0 these rules apply:
+
+- Each D.C. and D.S. direction is taken once. When playback reaches it a second time, it continues with the next bar.
+- After a jump, repeats play as their final pass: the passage plays once, and of its alternate endings only the last one, the same way MuseScore plays it.
+- Repeat passes are counted per repeat group. A repeat sign in several alternate endings plays every ending once, as in Guitar Pro 8.
+- A jump inside a repeat, or on its closing bar, is taken on the final pass, after all repeats have played, as in Guitar Pro 8 and MuseScore.
+- A jump on an alternate ending that playback skips is not taken.
+- MusicXML files that write D.C., D.S., To Coda, Coda, Segno and Fine as attributes of a `<sound>` element inside a `<direction>` (the way MuseScore exports them) play these jumps instead of only showing the text.
+
+Press play in the next demo and follow the cursor. Bar 1 opens a repeat, bars 2 and 3 are the first and second ending, bar 3 carries `Fine`, and bar 4 ends with `D.C. al Fine`. The playback order is bars 1 2 1 3 4 1 3: after the D.C. the repeat plays as its final pass, so bar 1 continues straight into the second ending, where `Fine` ends the piece.
+
+<AlphaTexSample player={true}>{`
+\\track "Guitar"
+\\staff {score}
+\\ro :4 C4 D4 E4 F4 |
+\\ae 1 \\rc 2 G4 F4 E4 D4 |
+\\ae 2 \\jump fine G4 E4 :2 C4 |
+\\jump daCapoAlFine :4 A4 G4 F4 E4
+`}</AlphaTexSample>
+
+In the next demo `D.C. al Coda` sits on the closing bar of a repeat. It is taken after the repeat has played, and the second time through `To Coda` jumps to the coda. The playback order is bars 1 2 3 1 2 3 1 2 4.
+
+<AlphaTexSample player={true} settings={{display:{systemsLayoutMode:"UseModelLayout"}}}>{`
+\\track "Guitar" { defaultSystemsLayout 3 }
+\\staff {score}
+\\ro :4 C4 D4 E4 F4 |
+\\jump daCoda G4 A4 B4 C5 |
+\\rc 2 \\jump daCapoAlCoda C5 B4 A4 G4 |
+\\jump coda :2 C4 C4
+`}</AlphaTexSample>
+
+In alphaTex, repeats and jumps are written with the bar metadata [`\ro`](/docs/alphatex/bar-metadata#ro), [`\rc`](/docs/alphatex/bar-metadata#rc), [`\ae`](/docs/alphatex/bar-metadata#ae) and [`\jump`](/docs/alphatex/bar-metadata#jump).
+
+## Show it in code
+
+Every structural element above is on by default. To hide one category — for example, section markers in a compact printout — set its `notation.elements` entry to `false`:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.EffectMarker, false],
+      [alphaTab.NotationElement.EffectDirections, false],
+      [alphaTab.NotationElement.RepeatCount, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target. See [`NotationElement`](/docs/reference/types/notationelement) for every togglable category.
+
+## Where to look next
+
+- [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
+- [Multi-bar rests](./multi-bar-rests) — collapse the empty stretches that often sit between repeat markers on ensemble parts.
+- [Rendering a slice](./bar-range) — pair `startBar` / `barCount` with repeats to preview a section.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the settings entry point for the element map.
+- [`NotationElement`](/docs/reference/types/notationelement) — the full enumeration.

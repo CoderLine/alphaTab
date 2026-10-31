@@ -37,6 +37,9 @@ export class BoundsLookup {
                     const b = new Map<string, unknown>();
                     b.set('visualBounds', BoundsLookup._boundsToJson(bar.visualBounds));
                     b.set('realBounds', BoundsLookup._boundsToJson(bar.realBounds));
+                    b.set('barIndex', bar.bar.index);
+                    b.set('staffIndex', bar.bar.staff.index);
+                    b.set('trackIndex', bar.bar.staff.track.index);
                     const bBeats: Map<string, unknown>[] = [];
                     b.set('beats', bBeats);
                     for (const beat of bar.beats) {
@@ -95,6 +98,13 @@ export class BoundsLookup {
                     const b: BarBounds = new BarBounds();
                     b.visualBounds = BoundsLookup._boundsFromJson(bar.get('visualBounds') as Map<string, unknown>);
                     b.realBounds = BoundsLookup._boundsFromJson(bar.get('realBounds') as Map<string, unknown>);
+                    // absent in JSON written by older versions
+                    if (bar.has('barIndex')) {
+                        b.bar =
+                            score.tracks[bar.get('trackIndex') as number].staves[bar.get('staffIndex') as number].bars[
+                                bar.get('barIndex') as number
+                            ];
+                    }
                     mb.addBar(b);
                     for (const beat of bar.get('beats') as Map<string, unknown>[]) {
                         const bb: BeatBounds = new BeatBounds();
@@ -146,7 +156,10 @@ export class BoundsLookup {
         return json;
     }
 
-    private _beatLookup: Map<number, BeatBounds[]> = new Map();
+    /** The first registered bounds of every beat. */
+    private _beatLookup: Map<number, BeatBounds> = new Map();
+    /** All bounds of the beats registered more than once or queried through {@link findBeats}. */
+    private _beatLookupAll: Map<number, BeatBounds[]> = new Map();
     private _masterBarLookup: Map<number, MasterBarBounds> = new Map();
     private _currentStaffSystem: StaffSystemBounds | null = null;
     /**
@@ -212,12 +225,20 @@ export class BoundsLookup {
 
         // drop beat entries whose beats belong to cleared bars.
         for (const key of Array.from(this._beatLookup.keys())) {
-            const list = this._beatLookup.get(key)!;
+            const list = this._beatLookupAll.get(key);
+            if (list === undefined) {
+                if (this._beatLookup.get(key)!.beat.voice.bar.index >= masterBarIndex) {
+                    this._beatLookup.delete(key);
+                }
+                continue;
+            }
             const filtered = list.filter(b => b.beat.voice.bar.index < masterBarIndex);
             if (filtered.length === 0) {
                 this._beatLookup.delete(key);
+                this._beatLookupAll.delete(key);
             } else if (filtered.length !== list.length) {
-                this._beatLookup.set(key, filtered);
+                this._beatLookup.set(key, filtered[0]);
+                this._beatLookupAll.set(key, filtered);
             }
         }
 
@@ -255,10 +276,18 @@ export class BoundsLookup {
      * @param bounds The beat bounds to add.
      */
     public addBeat(bounds: BeatBounds): void {
-        if (!this._beatLookup.has(bounds.beat.id)) {
-            this._beatLookup.set(bounds.beat.id, []);
+        const id = bounds.beat.id;
+        const first = this._beatLookup.get(id);
+        if (first === undefined) {
+            this._beatLookup.set(id, bounds);
+            return;
         }
-        this._beatLookup.get(bounds.beat.id)?.push(bounds);
+        const all = this._beatLookupAll.get(id);
+        if (all !== undefined) {
+            all.push(bounds);
+        } else {
+            this._beatLookupAll.set(id, [first, bounds]);
+        }
     }
 
     /**
@@ -267,10 +296,7 @@ export class BoundsLookup {
      * @returns The master bar bounds if it was rendered, or null if no boundary information is available.
      */
     public findMasterBarByIndex(index: number): MasterBarBounds | null {
-        if (this._masterBarLookup.has(index)) {
-            return this._masterBarLookup.get(index)!;
-        }
-        return null;
+        return this._masterBarLookup.get(index) ?? null;
     }
 
     /**
@@ -279,11 +305,7 @@ export class BoundsLookup {
      * @returns The master bar bounds if it was rendered, or null if no boundary information is available.
      */
     public findMasterBar(bar: MasterBar): MasterBarBounds | null {
-        const id: number = bar.index;
-        if (this._masterBarLookup.has(id)) {
-            return this._masterBarLookup.get(id)!;
-        }
-        return null;
+        return this._masterBarLookup.get(bar.index) ?? null;
     }
 
     /**
@@ -292,8 +314,7 @@ export class BoundsLookup {
      * @returns The beat bounds if it was rendered, or null if no boundary information is available.
      */
     public findBeat(beat: Beat): BeatBounds | null {
-        const all = this.findBeats(beat);
-        return all ? all[0] : null;
+        return this._beatLookup.get(beat.id) ?? null;
     }
 
     /**
@@ -302,11 +323,18 @@ export class BoundsLookup {
      * @returns The beat bounds if it was rendered, or null if no boundary information is available.
      */
     public findBeats(beat: Beat): BeatBounds[] | null {
-        const id: number = beat.id;
-        if (this._beatLookup.has(id)) {
-            return this._beatLookup.get(id)!;
+        const id = beat.id;
+        const all = this._beatLookupAll.get(id);
+        if (all !== undefined) {
+            return all;
         }
-        return null;
+        const first = this._beatLookup.get(id);
+        if (first === undefined) {
+            return null;
+        }
+        const single = [first];
+        this._beatLookupAll.set(id, single);
+        return single;
     }
 
     /**
@@ -359,13 +387,15 @@ export class BoundsLookup {
      * @returns The note at the given position within the beat.
      */
     public getNoteAtPos(beat: Beat, x: number, y: number): Note | null {
-        const beatBounds = this.findBeats(beat);
-        if (beatBounds) {
-            for (const b of beatBounds) {
-                const note = b.findNoteAtPos(x, y);
-                if (note) {
-                    return note;
-                }
+        const all = this._beatLookupAll.get(beat.id);
+        if (all === undefined) {
+            const first = this._beatLookup.get(beat.id);
+            return first !== undefined ? first.findNoteAtPos(x, y) : null;
+        }
+        for (const b of all) {
+            const note = b.findNoteAtPos(x, y);
+            if (note) {
+                return note;
             }
         }
         return null;

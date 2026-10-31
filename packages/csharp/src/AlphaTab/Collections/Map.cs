@@ -58,6 +58,15 @@ public class Map<TKey, TValue> : Dictionary<TKey, TValue>, IMap<TKey, TValue>
             this[entry.V0] = entry.V1;
         }
     }
+
+    public Map(params ArrayTuple<TKey, TValue>[] entries)
+    {
+        foreach (var entry in entries)
+        {
+            this[entry.V0] = entry.V1;
+        }
+    }
+
     public Map(IEnumerable<KeyValuePair<TKey, TValue>> entries)
     {
         foreach (var entry in entries)

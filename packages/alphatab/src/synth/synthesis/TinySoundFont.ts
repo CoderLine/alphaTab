@@ -1402,13 +1402,13 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
                                         (!isPercussion && instrumentPrograms.has(phdr.preset));
 
                                     if (!shouldLoadSamples) {
-                                        Logger.debug(
+                                        Logger.trace(
                                             'AlphaSynth',
                                             `Skipping load of unused sample ${shdr.sampleName} for preset ${phdr.presetName} (bank ${preset.bank} program ${preset.presetNumber})`
                                         );
                                         zoneRegion.samples = new Float32Array(0);
                                     } else if ((shdr.sampleType & 0x01) !== 0) {
-                                        Logger.debug(
+                                        Logger.trace(
                                             'AlphaSynth',
                                             `Loading of used sample ${shdr.sampleName} for preset ${phdr.presetName} (bank ${preset.bank} program ${preset.presetNumber})`
                                         );

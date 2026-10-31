@@ -61,12 +61,12 @@ public class DoubleObjectMap<TValue> :
 
     public fun has(key: Double): Boolean {
         return findEntryInternal(key,
-            { entry, k -> entry.key == k }) >= 0
+            { entry, k -> sameValueZero(entry.key, k) }) >= 0
     }
 
     public fun get(key: Double): TValue? {
         val i = findEntryInternal(key,
-            { entry, k -> entry.key == k })
+            { entry, k -> sameValueZero(entry.key, k) })
         if (i >= 0) {
             return entries[i].value
         }
@@ -83,12 +83,12 @@ public class DoubleObjectMap<TValue> :
             key, value as Any,
             { entry, k -> entry.key = k },
             { entry, v -> entry.value = v as TValue },
-            { entry, k -> entry.key == k }
+            { entry, k -> sameValueZero(entry.key, k) }
         )
     }
 
     public fun delete(key: Double) {
-        deleteInternal(key.hashCode())
+        deleteInternal(key, { entry, k -> sameValueZero(entry.key, k) })
     }
 
     private var _values: ValueCollection<TValue>? = null

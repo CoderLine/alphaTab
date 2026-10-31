@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <part-list>
+    <score-part id="P1">
+      <part-name>Hard Left Full</part-name>
+      <score-instrument id="P1-I1">
+        <instrument-name>Flute</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P1-I1">
+        <midi-channel>1</midi-channel>
+        <midi-program>74</midi-program>
+        <volume>100</volume>
+        <pan>-90</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Right Quieter</part-name>
+      <score-instrument id="P2-I1">
+        <instrument-name>Cello</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P2-I1">
+        <midi-channel>2</midi-channel>
+        <midi-program>43</midi-program>
+        <volume>62.5</volume>
+        <pan>45</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P3">
+      <part-name>Center Low</part-name>
+      <score-instrument id="P3-I1">
+        <instrument-name>Horn</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P3-I1">
+        <midi-channel>3</midi-channel>
+        <midi-program>61</midi-program>
+        <volume>25</volume>
+        <pan>0</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P4">
+      <part-name>Hard Right Muted</part-name>
+      <score-instrument id="P4-I1">
+        <instrument-name>Contrabass</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P4-I1">
+        <midi-channel>4</midi-channel>
+        <midi-program>44</midi-program>
+        <volume>0</volume>
+        <pan>90</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P5">
+      <part-name>Between Steps</part-name>
+      <score-instrument id="P5-I1">
+        <instrument-name>Viola</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P5-I1">
+        <midi-channel>5</midi-channel>
+        <midi-program>42</midi-program>
+        <volume>33</volume>
+        <pan>-30</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P6">
+      <part-name>Two Instruments</part-name>
+      <score-instrument id="P6-I1">
+        <instrument-name>Trumpet</instrument-name>
+      </score-instrument>
+      <score-instrument id="P6-I2">
+        <instrument-name>Muted Trumpet</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P6-I1">
+        <midi-channel>6</midi-channel>
+        <midi-program>57</midi-program>
+        <volume>50</volume>
+        <pan>10</pan>
+      </midi-instrument>
+      <midi-instrument id="P6-I2">
+        <midi-channel>6</midi-channel>
+        <midi-program>60</midi-program>
+        <volume>90</volume>
+        <pan>-80</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P7">
+      <part-name>No Mixer Values</part-name>
+      <score-instrument id="P7-I1">
+        <instrument-name>Clarinet</instrument-name>
+      </score-instrument>
+      <midi-instrument id="P7-I1">
+        <midi-channel>7</midi-channel>
+        <midi-program>72</midi-program>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note><pitch><step>A</step><octave>5</octave></pitch><duration>4</duration><type>whole</type></note>
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>F</sign><line>4</line></clef>
+      </attributes>
+      <note><pitch><step>D</step><octave>3</octave></pitch><duration>4</duration><type>whole</type></note>
+    </measure>
+  </part>
+  <part id="P3">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note><pitch><step>F</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note>
+    </measure>
+  </part>
+  <part id="P4">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>F</sign><line>4</line></clef>
+      </attributes>
+      <note><pitch><step>E</step><octave>2</octave></pitch><duration>4</duration><type>whole</type></note>
+    </measure>
+  </part>
+  <part id="P5">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>C</sign><line>3</line></clef>
+      </attributes>
+      <note><pitch><step>C</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note>
+    </measure>
+  </part>
+  <part id="P6">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note><pitch><step>B</step><alter>-1</alter><octave>4</octave></pitch><duration>4</duration><type>whole</type></note>
+    </measure>
+  </part>
+  <part id="P7">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <time><beats>4</beats><beat-type>4</beat-type></time>
+        <clef><sign>G</sign><line>2</line></clef>
+      </attributes>
+      <note><pitch><step>G</step><octave>4</octave></pitch><duration>4</duration><type>whole</type></note>
+    </measure>
+  </part>
+</score-partwise>

@@ -8,6 +8,7 @@ import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@coderline/alphatab/model/Score';
+import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import type { Settings } from '@coderline/alphatab/Settings';
@@ -76,6 +77,24 @@ export class ModelUtils {
 
     public static getIndex(duration: Duration): number {
         return ModelUtils._durationIndices.get(duration)!;
+    }
+
+    /**
+     * Converts a {@link Automation.ratioPosition} within the given bar into a midi tick offset relative to the bar start.
+     * @remarks
+     * The ratio is relative to the full duration of the time signature, also in pick-up bars which are shorter.
+     * This matches Guitar Pro which stores e.g. 0.5 for an automation on the 3rd eighth note of a 3/8 pick-up in 2/4.
+     */
+    public static ratioPositionToTick(masterBar: MasterBar, ratioPosition: number): number {
+        return masterBar.calculateDuration(false) * ratioPosition;
+    }
+
+    /**
+     * Converts a midi tick offset relative to the bar start into a {@link Automation.ratioPosition}.
+     * See {@link ratioPositionToTick} for the convention.
+     */
+    public static tickToRatioPosition(masterBar: MasterBar, tick: number): number {
+        return tick / masterBar.calculateDuration(false);
     }
 
     public static keySignatureIsFlat(ks: number): boolean {
@@ -376,6 +395,87 @@ export class ModelUtils {
         }
     }
 
+    /**
+     * Gets the interval in semitones a harmonic sounds above the played pitch when touching the string
+     * at the given harmonic value (the fret position of the node).
+     * @param value The harmonic value.
+     */
+    public static harmonicValueToPitch(value: number): number {
+        // add semitones to reach corresponding harmonic frets
+        if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
+            return 36;
+        }
+        if (ModelUtils.isAlmostEqualTo(value, 2.7)) {
+            // Fret 3 2nd octave + minor seventh
+            return 34;
+        }
+        if (value < 3) {
+            // no natural harmonics below fret 3
+            return 0;
+        }
+        if (value <= 3.5) {
+            // Fret 3 2nd octave + fifth
+            return 31;
+        }
+        if (value <= 4) {
+            return 28;
+        }
+        if (value <= 5) {
+            return 24;
+        }
+        if (value <= 6) {
+            return 34;
+        }
+        if (value <= 7) {
+            return 19;
+        }
+        if (value <= 8.5) {
+            return 36;
+        }
+        if (value <= 9) {
+            return 28;
+        }
+        if (value <= 10) {
+            return 34;
+        }
+        if (value <= 11) {
+            return 0;
+        }
+        if (value <= 12) {
+            return 12;
+        }
+        if (value < 14) {
+            // fret 13,14 stay
+            return 0;
+        }
+        if (value <= 15) {
+            return 34;
+        }
+        if (value <= 16) {
+            return 28;
+        }
+        if (value <= 17) {
+            return 36;
+        }
+        if (value <= 18) {
+            return 0;
+        }
+        if (value <= 19) {
+            return 19;
+        }
+        if (value <= 21) {
+            //  20,21 stay
+            return 0;
+        }
+        if (value <= 22) {
+            return 36;
+        }
+        if (value <= 24) {
+            return 24;
+        }
+        return 0;
+    }
+
     public static clamp(value: number, min: number, max: number): number {
         if (value <= min) {
             return min;
@@ -550,6 +650,24 @@ export class ModelUtils {
         return headerFooterStyle;
     }
 
+    public static backfillStaffVoices(staff: Staff, targetVoiceCount: number): void {
+        for (let bi = 0; bi < staff.bars.length - 1; bi++) {
+            const priorBar = staff.bars[bi];
+            while (priorBar.voices.length < targetVoiceCount) {
+                ModelUtils.appendPlaceholderVoice(priorBar);
+            }
+        }
+    }
+
+    public static appendPlaceholderVoice(bar: Bar): void {
+        const voice: Voice = new Voice();
+        bar.addVoice(voice);
+        const beat: Beat = new Beat();
+        beat.isEmpty = true;
+        beat.duration = Duration.Quarter;
+        voice.addBeat(beat);
+    }
+
     /**
      * Performs some general consolidations of inconsistencies on the given score like
      * missing bars, beats, duplicated midi channels etc
@@ -627,12 +745,7 @@ export class ModelUtils {
                     }
 
                     for (let i = 0; i < voiceCount; i++) {
-                        const v = new Voice();
-                        bar.addVoice(v);
-
-                        const emptyBeat: Beat = new Beat();
-                        emptyBeat.isEmpty = true;
-                        v.addBeat(emptyBeat);
+                        ModelUtils.appendPlaceholderVoice(bar);
                     }
                 }
             }
@@ -1032,6 +1145,33 @@ export class ModelUtils {
         };
     }
 
+    /**
+     * Returns the simplest accidental mode which results in the same rendering as the given one.
+     * The forced modes are only spelling hints: when the hint resolves to the spelling which
+     * {@link NoteAccidentalMode.Default} would choose anyhow, the hint is not needed.
+     * The rendering only uses the accidental mode via {@link resolveSpelling} and checks for
+     * {@link NoteAccidentalMode.ForceNone}. If this changes, this method has to be adapted.
+     * @param keySignature The key signature of the bar holding the note.
+     * @param noteValue The display value of the note.
+     * @param accidentalMode The accidental mode of the note.
+     */
+    public static simplifyAccidentalMode(
+        keySignature: KeySignature,
+        noteValue: number,
+        accidentalMode: NoteAccidentalMode
+    ): NoteAccidentalMode {
+        if (accidentalMode === NoteAccidentalMode.Default || accidentalMode === NoteAccidentalMode.ForceNone) {
+            return accidentalMode;
+        }
+
+        const forced = ModelUtils.resolveSpelling(keySignature, noteValue, accidentalMode);
+        const preferred = ModelUtils.resolveSpelling(keySignature, noteValue, NoteAccidentalMode.Default);
+        if (forced.degree === preferred.degree && forced.accidentalOffset === preferred.accidentalOffset) {
+            return NoteAccidentalMode.Default;
+        }
+        return accidentalMode;
+    }
+
     public static computeAccidental(
         keySignature: KeySignature,
         accidentalMode: NoteAccidentalMode,
@@ -1129,5 +1269,19 @@ export class ModelUtils {
         return keySignatureType === KeySignatureType.Minor
             ? ModelUtils._minorKeySignatureTonicDegrees[ksi]
             : ModelUtils._majorKeySignatureTonicDegrees[ksi];
+    }
+
+    /** True iff the staff's first note isn't stringed. Empty staves return false. */
+    public static staffNotesAreNotStringed(staff: Staff) {
+        for (const bar of staff.bars) {
+            for (const voice of bar.voices) {
+                for (const beat of voice.beats) {
+                    for (const note of beat.notes) {
+                        return !note.isStringed;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

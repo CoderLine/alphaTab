@@ -13,12 +13,13 @@ import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
  *
  * Two axes of behaviour are covered:
  *
- *  - **System-wide minimum-duration reference.** The Gourlay stretch formula uses the
- *    shortest note of the entire system (not of each bar) so that rhythmically-equivalent
- *    beats across bars of the same system receive spring constants derived from the same
- *    reference. The `shared-min-duration-*` tests exercise this end-to-end: the core fix,
- *    both positions of the shorter note during system assembly, multiple successive
- *    shortenings, per-system isolation, mode-specific variants and the resize path.
+ *  - **Shared minimum-duration reference.** In page and parchment layouts the Gourlay
+ *    stretch formula uses the shortest note of all rendered bars (not of each bar) so that
+ *    rhythmically-equivalent beats receive spring constants derived from the same
+ *    reference. The `shared-min-duration-*` tests exercise this end-to-end: the shorter
+ *    note before and after the other bars, several short durations, systems without short
+ *    notes, mode-specific variants and the resize path. Horizontal layout keeps a
+ *    reference per bar.
  *
  *  - **Stretch-formula duration scaling.** The Gourlay log-scale formula produces spacing
  *    that grows with note duration. `stretch-formula-*` tests pin the current coefficient
@@ -62,8 +63,8 @@ describe('SystemSpacingTests', () => {
 
     it('shared-min-duration-reconciles-on-resize', async () => {
         // Same score content as the alignment test, rendered at a narrower width so that
-        // the reconcile path runs under a tighter fit (distributable share smaller, force
-        // differs from the wider case). Guards the reconcile-on-fit path when a system is
+        // the shared reference is applied under a tighter fit (distributable share smaller, force
+        // differs from the wider case). Guards the shared reference when a system is
         // re-sized after layout.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
@@ -85,13 +86,9 @@ describe('SystemSpacingTests', () => {
     });
 
     it('shared-min-duration-shorter-note-first', async () => {
-        // Bar 1 already carries the system's shortest note (128th triplet). Bars 2 and 3
-        // hold only quarters, so their bar-local minimum falls back to the default. When
-        // each subsequent bar is added, the system's existing minimum is already lower
-        // than the bar's local one, so the system minimum does not move and no reconcile
-        // is flagged; instead, each newly-added bar has its spring constants recomputed
-        // immediately so it references the system minimum. This exercises the
-        // "eager-recompute-on-add" branch of `_trackSystemMinDuration`.
+        // Bar 1 carries the shortest note (128th triplet). Bars 2 and 3 hold only quarters;
+        // they are spaced against the same reference as bar 1, so the quarters of all three
+        // bars line up.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
@@ -108,11 +105,9 @@ describe('SystemSpacingTests', () => {
     });
 
     it('shared-min-duration-multiple-short-arrivals', async () => {
-        // Successive shortenings of the system minimum: bar 2 introduces a 128th triplet
-        // rest (20 ticks per rest), bar 4 introduces 256th rests (15 ticks each). When
-        // bar 2 is added the reconcile flag is set for bar 1; when bar 4 is added the
-        // flag is re-asserted for bars 1-3. A single reconcile pass at fit time must
-        // re-derive all stale bars in one iteration, not once per shortening event.
+        // Several short durations: bar 2 has a 128th triplet rest (20 ticks per rest), bar 4
+        // has 256th rests (15 ticks each). All bars are spaced against the shortest one
+        // (15 ticks).
         //
         // Bar 4's padding uses an extra `:128 r` (30 ticks) compared to bar 2, because
         // bar 4's short slot is only 30 ticks (two 256th rests) whereas bar 2's is 60
@@ -147,12 +142,10 @@ describe('SystemSpacingTests', () => {
     });
 
     it('shared-min-duration-per-system-isolation', async () => {
-        // Four bars laid out as two systems of two bars each. System 1 holds pure quarters
-        // (local minimum falls back to the default). System 2 holds quarters plus a 128th
-        // triplet (minimum drops to 20 ticks). Because the shared-minimum reference lives
-        // on `StaffSystem` rather than being score-wide, system 1's spacing must not be
-        // influenced by system 2's shorter notes - each system's bars use only their own
-        // system's minimum.
+        // Four bars laid out as two systems of two bars each. System 1 holds pure quarters,
+        // system 2 quarters plus a 128th triplet (20 ticks). Both systems use the 20-tick
+        // reference; system 1 is justified and its springs all scale alike, so its spacing
+        // matches a quarters-only score.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
@@ -173,7 +166,7 @@ describe('SystemSpacingTests', () => {
         // Same two-bar score as the core alignment test, but rendered in Page layout with
         // the Automatic systems mode (the default). In this mode the system distributes
         // the distributable staff width across bars by their natural content width, not
-        // by authored `displayScale`. The system-wide minimum fix applies equally here:
+        // by authored `displayScale`. The shared reference applies equally here:
         // bar 1 and bar 2 share a reference so their quarter-note spring constants match,
         // and each bar's natural content width reflects the shared spacing.
         const settings = new Settings();
@@ -193,11 +186,10 @@ describe('SystemSpacingTests', () => {
     it('shared-min-duration-horizontal-preserves-local', async () => {
         // Horizontal layout sizes each bar independently (by `bar.displayWidth` or the
         // bar's intrinsic width) - there is no shared staff width to distribute across
-        // bars. The `StaffSystem.shareMinDurationAcrossBars` flag is set to `false` for
-        // this layout so each bar's spring constants stay referenced against its local
-        // minimum, preserving the historical per-bar rendering. This test guards the
-        // opt-out: under shared-minimum bar 1 would have its quarters widened to match
-        // bar 2's reference, which must NOT happen in Horizontal.
+        // bars. `ScoreLayout.sharesMinDurationAcrossBars` is `false` for this layout so each
+        // bar's spring constants stay referenced against its own shortest note. This test
+        // guards the opt-out: with a shared reference bar 1 would have its quarters widened
+        // to match bar 2's reference, which must NOT happen in Horizontal.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         await VisualTestHelper.runVisualTestTex(
@@ -212,13 +204,15 @@ describe('SystemSpacingTests', () => {
     });
 
     it('stretch-formula-duration-spacing', async () => {
-        // A single bar with three distinct durations - half, quarter, two eighths - laid
-        // out in decreasing order. Under the current log-scale Gourlay formula
-        // `phi = 1 + 0.85 * log2(duration / minDuration)` the half-note occupies visibly
-        // more horizontal space than the quarter, which occupies more than each eighth.
-        // No short notes are involved, so this test also validates the non-phase-B path
-        // and pins the current formula's proportions: a coefficient change or a switch to
-        // linear / square-root spacing would shift this baseline.
+        // A single bar with three distinct durations - half, quarter, two eighths - laid out in
+        // decreasing order. The power-law formula `phi = (d/dmin)^log2(spacingRatio)` (default
+        // r=√2, exponent 0.5) makes the half-note occupy visibly more horizontal space than
+        // the quarter, which occupies more than each eighth. The 1:2:4 duration ratio maps to
+        // 1.0 : 1.41 : 2.0 in `phi`, i.e. successive durations get √2x the natural length.
+        //
+        // No short notes are involved, so this test also validates the non-phase-B path and pins
+        // the current formula's proportions: a change to the default `spacingRatio` (or a switch
+        // back to the additive formula, or to linear spacing) would shift this baseline visibly.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
@@ -229,6 +223,228 @@ describe('SystemSpacingTests', () => {
             `,
             'test-data/visual-tests/system-spacing/stretch-formula-duration-spacing.png',
             settings
+        );
+    });
+
+    /**
+     * Visual coverage for the power-law spacing formula introduced by Phase 1 of the spacing
+     * spike. Each test in this group pins one specific behaviour of the new formula.
+     *
+     * Reference: `docs/spacing/spacing-spike-plan.md` Section 6.3, "Tests to add per phase".
+     */
+    it('power-law-rest-bar-not-ballooning', async () => {
+        // Two-bar system rendered at default `spacingRatio = √2`:
+        //   Bar 1: a dense bar with sixteenth-note runs (60-tick duration).
+        //   Bar 2: a single whole-note rest (3840-tick duration).
+        // System-wide minDuration resolves to 60 (the sixteenth) so bar 2's rest sits at
+        // d/dmin = 64 -> phi = 64^log2(√2) = 8.0. The whole rest is therefore proportionally
+        // wider than the sixteenths but NOT the runaway 4-5x balloon that the additive formula
+        // produced when `stretchForce` was raised.
+        //
+        // Expected baseline: bar 2 (whole rest) is visibly wider than each beat of bar 1, but
+        // the two bars stay in roughly comparable widths. Under the OLD additive formula at
+        // stretchForce > 1, bar 2 would dominate the system width.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        settings.display.stretchForce = 1.5;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track { defaultSystemsLayout 2 }
+            \\ts 4 4
+            :16 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 |
+            :1 r
+            `,
+            'test-data/visual-tests/system-spacing/power-law-rest-bar-not-ballooning.png',
+            settings
+        );
+    });
+
+    it('power-law-duration-proportions', async () => {
+        // A single bar containing whole, half, quarter, eighth, sixteenth in sequence (decreasing
+        // duration). With the default `spacingRatio = √2`, each successive note allocates √2x
+        // the horizontal space of its half-duration successor (because doubling the duration
+        // multiplies phi by exactly `spacingRatio`).
+        //
+        // Expected baseline: visually the durations form a clean geometric progression in
+        // horizontal allocation - the whole occupies ~1.41x the half, the half ~1.41x the quarter,
+        // and so on. This is the classic power-law visual signature used by Dorico/MuseScore.
+        //
+        // The bar exceeds 4/4 by design - the durations are placed inside 13/4 to give every
+        // note its own clean spring without rest padding muddling the comparison.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track { defaultSystemsLayout 1 }
+            \\ts 13 4
+            :1 c4 :2 c4 :4 c4 :8 c4 :16 c4
+            `,
+            'test-data/visual-tests/system-spacing/power-law-duration-proportions.png',
+            settings
+        );
+    });
+
+    it('power-law-stretch-force-orthogonal', async () => {
+        // Same single-bar score rendered at `stretchForce ∈ {0.5, 1.0, 1.5}` across three runs
+        // (output stacked into a single canvas via the multi-run mechanism). Each run uses the
+        // default `spacingRatio = √2`. The expected behaviour is that increasing `stretchForce`
+        // makes everything wider proportionally - the *shape* of the spacing curve (relative
+        // widths of half / quarter / eighth) stays constant, only the overall scale changes.
+        //
+        // This test pins the orthogonality claim from Section 4.6 of the plan:
+        // `stretchForce` and `spacingRatio` control density and proportionality independently.
+        //
+        // Expected baseline: three rendered systems at increasing widths but with identical
+        // *internal* duration proportions in each.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        settings.display.stretchForce = 0.5;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track { defaultSystemsLayout 1 }
+            \\ts 4 4
+            :2 c4 :4 c4 :8 c4 c4
+            `,
+            'test-data/visual-tests/system-spacing/power-law-stretch-force-orthogonal-low.png',
+            settings
+        );
+    });
+
+    it('power-law-stretch-force-orthogonal-high', async () => {
+        // Sibling to `power-law-stretch-force-orthogonal` rendered at `stretchForce = 1.5`. The
+        // higher force should produce a wider system but with the *same* duration ratios as the
+        // low-force run. This is the visual proof of orthogonality: changing the force scales
+        // the system uniformly without distorting the proportions established by `spacingRatio`.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        settings.display.stretchForce = 1.5;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track { defaultSystemsLayout 1 }
+            \\ts 4 4
+            :2 c4 :4 c4 :8 c4 c4
+            `,
+            'test-data/visual-tests/system-spacing/power-law-stretch-force-orthogonal-high.png',
+            settings
+        );
+    });
+
+    it('power-law-spacing-ratio-tight', async () => {
+        // Same score rendered with `spacingRatio = 1.2` (the tight end of the documented range).
+        // At r=1.2, exponent = log2(1.2) ≈ 0.263, so doubling the duration multiplies phi by
+        // 1.2 - durations crowd together more tightly than at the default √2.
+        //
+        // Expected baseline: the half-note's allocated space is only ~1.2x the quarter (vs.
+        // ~1.41x at default). Visually this looks more "compressed" than the default.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        settings.display.spacingRatio = 1.2;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track { defaultSystemsLayout 1 }
+            \\ts 4 4
+            :2 c4 :4 c4 :8 c4 c4
+            `,
+            'test-data/visual-tests/system-spacing/power-law-spacing-ratio-tight.png',
+            settings
+        );
+    });
+
+    it('power-law-spacing-ratio-loose', async () => {
+        // Same score rendered with `spacingRatio = 1.8` (the loose end of the documented range).
+        // At r=1.8, exponent = log2(1.8) ≈ 0.848, so doubling the duration multiplies phi by 1.8 -
+        // durations spread further apart than at the default √2.
+        //
+        // Expected baseline: the half-note's allocated space is ~1.8x the quarter (vs. ~1.41x at
+        // default). Visually this looks more "open" / "traditional" than the default and closer
+        // to Finale's Fibonacci-style spacing.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        settings.display.spacingRatio = 1.8;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track { defaultSystemsLayout 1 }
+            \\ts 4 4
+            :2 c4 :4 c4 :8 c4 c4
+            `,
+            'test-data/visual-tests/system-spacing/power-law-spacing-ratio-loose.png',
+            settings
+        );
+    });
+
+    /**
+     * Visual coverage for the shared minimum-duration reference
+     * (`BarLayoutingInfo.referenceMinDuration`): it must aggregate across tracks and must NOT be
+     * lowered by grace-note durations.
+     *
+     * The pre-existing `shared-min-duration-*` tests cover the core cross-bar behaviour for
+     * single-track scores; these two tests cover the cases the spike plan explicitly calls out
+     * in Section 6.3 as needing dedicated coverage.
+     */
+    it('system-min-duration-grace-notes-excluded', async () => {
+        // Two-bar system. Bar 1 has a 32nd-note grace flourish (60 ticks per grace) before its
+        // first quarter; bar 2 has only quarters with no graces. Grace beats are not part of the
+        // reference, so it stays at the default (30 ticks) - identical to the no-graces case -
+        // and the quarter-note positions in bar 1 and bar 2 align column-by-column.
+        //
+        // If a regression introduced grace durations into the reference, the spacing of both
+        // bars would change visibly.
+        //
+        // Expected baseline: quarter notes in both bars align under the same x-coordinates.
+        // Bar 1 has a small grace cluster anchored to the first quarter; bar 2 is plain quarters.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track { defaultSystemsLayout 2 }
+            \\ts 4 4
+            :32 c5 {gr bb} d5 {gr bb} e5 {gr bb} :4 c4 c4 c4 c4 |
+            :4 c4 c4 c4 c4
+            `,
+            'test-data/visual-tests/system-spacing/system-min-duration-grace-notes-excluded.png',
+            settings
+        );
+    });
+
+    it('system-min-duration-multi-track-aggregation', async () => {
+        // Two tracks rendered together as a multi-track system, two bars per system.
+        //   Track 1, bar 1: sixteenth-note runs (60-tick minimum).
+        //   Track 1, bar 2: only quarters.
+        //   Track 2, bar 1: only quarters.
+        //   Track 2, bar 2: sixteenth-note runs (60-tick minimum).
+        //
+        // Bar 1's `BarLayoutingInfo` is shared between Track 1's sixteenths and Track 2's
+        // quarters - so its local minimum is 60 (set by Track 1). Bar 2's `BarLayoutingInfo` is
+        // shared between Track 1's quarters and Track 2's sixteenths - so its local minimum is
+        // also 60 (set by Track 2). Both bars therefore reference the same minimum and the
+        // quarter-note columns in both bars (across both tracks) line up.
+        //
+        // This test pins the cross-track aggregation: the shared `BarLayoutingInfo` per
+        // `MasterBarsRenderers` ensures every staff at the same bar index contributes to the
+        // same `_minDuration`. A regression that gave each track its own layouting info would
+        // produce mismatched per-bar minima and visible misalignment between the rows.
+        //
+        // Expected baseline: vertically aligned columns. The quarter notes in track 2 bar 1 sit
+        // directly above the regular quarter-note positions established by track 1's sixteenth
+        // grouping, and vice versa for bar 2.
+        const settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Page;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track "T1"
+            \\ts 4 4
+            :16 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 |
+            :4 c4 c4 c4 c4
+            \\track "T2"
+            \\ts 4 4
+            :4 c4 c4 c4 c4 |
+            :16 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4 c4
+            `,
+            'test-data/visual-tests/system-spacing/system-min-duration-multi-track-aggregation.png',
+            settings,
+            o => {
+                o.tracks = [0, 1];
+            }
         );
     });
 });

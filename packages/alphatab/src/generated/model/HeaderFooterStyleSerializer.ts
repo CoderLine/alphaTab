@@ -4,40 +4,41 @@
 // the code is regenerated.
 // </auto-generated>
 import { HeaderFooterStyle } from "@coderline/alphatab/model/Score";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { TextAlign } from "@coderline/alphatab/platform/ICanvas";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class HeaderFooterStyleSerializer {
-    public static fromJson(obj: HeaderFooterStyle, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["template", "isvisible", "textalign"]);
+    public static read(obj: HeaderFooterStyle, reader: IObjectReader): void {
+        reader.readRecord(HeaderFooterStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.template = r.readString();
+                    return true;
+                case 1:
+                    obj.isVisible = r.readValue() as boolean | undefined;
+                    return true;
+                case 2:
+                    obj.textAlign = JsonHelper.parseEnum<TextAlign>(r.readValue(), TextAlign)!;
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: HeaderFooterStyle | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => HeaderFooterStyleSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: HeaderFooterStyle | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("template", obj.template);
-        o.set("isvisible", obj.isVisible);
-        o.set("textalign", obj.textAlign as number);
-        return o;
-    }
-    public static setProperty(obj: HeaderFooterStyle, property: string, v: unknown): boolean {
-        switch (property) {
-            case "template":
-                obj.template = v! as string;
-                return true;
-            case "isvisible":
-                obj.isVisible = v as boolean | undefined;
-                return true;
-            case "textalign":
-                obj.textAlign = JsonHelper.parseEnum<TextAlign>(v, TextAlign)!;
-                return true;
-        }
-        return false;
+        w.startObject(HeaderFooterStyleSerializer._fields);
+        w.stringField(0, obj.template);
+        w.valueField(1, obj.isVisible);
+        w.numberField(2, obj.textAlign as number);
+        w.endObject();
     }
 }

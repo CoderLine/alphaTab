@@ -5,6 +5,8 @@ import { EndOfReaderError, OverflowError } from '@coderline/alphatab/io/IReadabl
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { Direction } from '@coderline/alphatab/model/Direction';
+import { Duration } from '@coderline/alphatab/model/Duration';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
@@ -150,6 +152,23 @@ describe('Gp5ImporterTest', () => {
         // only Check reading
     });
 
+    it('empty-voice-placeholder', async () => {
+        // the file stores a dotted quarter on the empty beat of the empty bar
+        const serenade = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/serenade.gp5')).readScore();
+        const emptyBar = serenade.tracks[3].staves[0].bars[69].voices[0];
+        expect(emptyBar.isEmpty).toBe(true);
+        expect(emptyBar.beats.length).toBe(1);
+        expect(emptyBar.beats[0].duration).toBe(Duration.Quarter);
+        expect(emptyBar.beats[0].dots).toBe(0);
+
+        // the file stores a sixteenth on the empty beat of the empty second voice
+        const nightwish = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/nightwish.gp5')).readScore();
+        const emptyVoice = nightwish.tracks[10].staves[0].bars[53].voices[1];
+        expect(emptyVoice.isEmpty).toBe(true);
+        expect(emptyVoice.beats.length).toBe(1);
+        expect(emptyVoice.beats[0].duration).toBe(Duration.Quarter);
+    });
+
     it('strings', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/strings.gp5');
         const score: Score = reader.readScore();
@@ -210,6 +229,36 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[7].name).toBe('Track 8');
         expect(score.tracks[8].name).toBe('Percussion');
     });
+
+    it('note-duration-percent', async () => {
+        const otherEffects = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/other-effects.gp5')
+        ).readScore();
+        const beats = otherEffects.tracks[0].staves[0].bars[0].voices[0].beats;
+        expect(beats[0].notes[0].durationPercent).toBe(0.75);
+        expect(beats[1].notes[0].durationPercent).toBe(0.5);
+
+        const canon = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5')).readScore();
+        expect(canon.tracks[0].staves[0].bars[24].voices[0].beats[1].notes[0].durationPercent).toBe(0.75);
+        expect(canon.tracks[2].staves[0].bars[12].voices[0].beats[1].notes[0].durationPercent).toBe(2);
+        expect(canon.tracks[3].staves[0].bars[144].voices[0].beats[0].notes[0].durationPercent).toBeCloseTo(2 / 3, 12);
+        expect(canon.tracks[0].staves[0].bars[24].voices[0].beats[0].notes[0].durationPercent).toBe(1);
+    });
+
+    it('percussion-grace-notes', async () => {
+        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5');
+        const score: Score = reader.readScore();
+        const beats = score.tracks[4].staves[0].bars[18].voices[0].beats;
+
+        // flam: the grace note stores the drum key as fret like the main note
+        expect(beats[2].graceType).toBe(GraceType.BeforeBeat);
+        expect(beats[2].notes.length).toBe(1);
+        expect(beats[2].notes[0].isPercussion).toBe(true);
+        expect(beats[2].notes[0].isStringed).toBe(false);
+        expect(PercussionMapper.getArticulation(beats[2].notes[0])!.outputMidiNumber).toBe(38);
+        expect(PercussionMapper.getArticulation(beats[3].notes[0])!.outputMidiNumber).toBe(38);
+    });
+
     it('beat-text-lyrics', async () => {
         const settings = new Settings();
         settings.importer.beatTextAsLyrics = true;
@@ -540,6 +589,44 @@ describe('Gp5ImporterTest', () => {
 
         expect(score.tracks[1].playbackInfo.program).toBe(25);
         expect(score.tracks[1].playbackInfo.bank).toBe(77);
+    });
+
+    it('out-of-range-midi-port-and-channel', async () => {
+        const original = await TestPlatform.loadFile('test-data/guitarpro5/score-info.gp5');
+
+        // int32 port and channel of the first track header
+        const portOffset = 1452;
+
+        const variants: [number, number][] = [
+            [0, 1],
+            [5, 1],
+            [1, 0],
+            [1, 17]
+        ];
+        for (const [port, channel] of variants) {
+            const data = new Uint8Array(original.length);
+            data.set(original, 0);
+            // little-endian int32 values below 256
+            for (let i = 0; i < 8; i++) {
+                data[portOffset + i] = 0;
+            }
+            data[portOffset] = port;
+            data[portOffset + 4] = channel;
+
+            const score = GpImporterTestHelper.prepareImporterWithBytes(data).readScore();
+            expect(score.tracks.length).toBe(2);
+            expect(score.tracks[0].playbackInfo.volume).toBe(15);
+            expect(score.tracks[0].playbackInfo.balance).toBe(8);
+            expect(score.tracks[0].playbackInfo.program).toBe(0);
+            expect(score.tracks[1].playbackInfo.program).toBe(25);
+        }
+    });
+
+    it('drum-tablature-follows-staff-flags', async () => {
+        // Guitar Pro shows the drum tablature of this file, its staff flags enable it
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/percussion-all.gp5')).readScore();
+        expect(score.tracks[0].staves[0].isPercussion).toBe(true);
+        expect(score.tracks[0].staves[0].showTablature).toBe(true);
     });
 
     it('tuning-bass-clef', async () => {

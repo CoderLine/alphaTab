@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media.Animation;
 using AlphaTab.Platform;
 
@@ -22,26 +23,80 @@ namespace AlphaTab.Wpf
             MouseDown = new DelegatedEventEmitter<IMouseEventArgs>(
                 value =>
                 {
-                    Control.MouseDown += (sender, args) => value(new WpfMouseEventArgs(args));
+                    AttachMouseHandlers();
+                    _mouseDown += value;
                 },
-                value => { }
+                value => { _mouseDown -= value; }
             );
 
             MouseMove = new DelegatedEventEmitter<IMouseEventArgs>(
                 value =>
                 {
-                    Control.MouseMove += (sender, args) => value(new WpfMouseEventArgs(args));
+                    AttachMouseHandlers();
+                    _mouseMove += value;
                 },
-                value => { }
+                value => { _mouseMove -= value; }
             );
 
             MouseUp = new DelegatedEventEmitter<IMouseEventArgs>(
                 value =>
                 {
-                    Control.MouseUp += (sender, args) => value(new WpfMouseEventArgs(args));
+                    AttachMouseHandlers();
+                    _mouseUp += value;
                 },
-                value => { }
+                value => { _mouseUp -= value; }
             );
+        }
+
+        private Action<IMouseEventArgs>? _mouseDown;
+        private Action<IMouseEventArgs>? _mouseMove;
+        private Action<IMouseEventArgs>? _mouseUp;
+        private bool _mouseHandlersAttached;
+        private bool _isPressed;
+
+        private void AttachMouseHandlers()
+        {
+            if (_mouseHandlersAttached)
+            {
+                return;
+            }
+
+            _mouseHandlersAttached = true;
+
+            Control.MouseDown += (sender, args) =>
+            {
+                if (args.ChangedButton == MouseButton.Left && !_isPressed && Control.CaptureMouse())
+                {
+                    _isPressed = true;
+                }
+
+                _mouseDown?.Invoke(new WpfMouseEventArgs(args));
+            };
+
+            Control.MouseMove += (sender, args) => _mouseMove?.Invoke(new WpfMouseEventArgs(args));
+
+            Control.MouseUp += (sender, args) =>
+            {
+                if (args.ChangedButton == MouseButton.Left && _isPressed)
+                {
+                    // cleared before releasing so LostMouseCapture does not report this press a second time
+                    _isPressed = false;
+                    Control.ReleaseMouseCapture();
+                }
+
+                _mouseUp?.Invoke(new WpfMouseEventArgs(args));
+            };
+
+            Control.LostMouseCapture += (sender, args) =>
+            {
+                if (!_isPressed)
+                {
+                    return;
+                }
+
+                _isPressed = false;
+                _mouseUp?.Invoke(new WpfMouseEventArgs(args));
+            };
         }
 
         public double Width

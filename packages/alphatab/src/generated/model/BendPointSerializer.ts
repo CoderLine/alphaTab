@@ -4,35 +4,35 @@
 // the code is regenerated.
 // </auto-generated>
 import { BendPoint } from "@coderline/alphatab/model/BendPoint";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class BendPointSerializer {
-    public static fromJson(obj: BendPoint, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["offset", "value"]);
+    public static read(obj: BendPoint, reader: IObjectReader): void {
+        reader.readRecord(BendPointSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.offset = r.readNumber();
+                    return true;
+                case 1:
+                    obj.value = r.readNumber();
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: BendPoint | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BendPointSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: BendPoint | null): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("offset", obj.offset);
-        o.set("value", obj.value);
-        return o;
-    }
-    public static setProperty(obj: BendPoint, property: string, v: unknown): boolean {
-        switch (property) {
-            case "offset":
-                obj.offset = v! as number;
-                return true;
-            case "value":
-                obj.value = v! as number;
-                return true;
-        }
-        return false;
+        w.startObject(BendPointSerializer._fields);
+        w.numberField(0, obj.offset);
+        w.numberField(1, obj.value);
+        w.endObject();
     }
 }

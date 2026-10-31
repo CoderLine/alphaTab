@@ -144,6 +144,64 @@ describe('BoundsLookupPartialUpdate', () => {
         expect(lookup.findBeat(clearedBeat)).toBe(null);
     });
 
+    it('beat lookup lists every registration of a beat in order', () => {
+        const score = buildScore(2, 1);
+        const lookup = new BoundsLookup();
+        const system = new StaffSystemBounds();
+        system.visualBounds = makeBounds(0, 0, 1000, 100);
+        system.realBounds = makeBounds(0, 0, 1000, 200);
+        lookup.addStaffSystem(system);
+        const staff = score.tracks[0].staves[0];
+        const registered: BeatBounds[] = [];
+        // bar 0 is registered by three staves (e.g. score, tab and slash), bar 1 by one
+        for (let i = 0; i < 2; i++) {
+            const mb = new MasterBarBounds();
+            mb.index = i;
+            mb.visualBounds = makeBounds(i * 100, 0, 100, 100);
+            mb.realBounds = makeBounds(i * 100, 0, 100, 200);
+            mb.lineAlignedBounds = makeBounds(i * 100, 0, 100, 100);
+            lookup.addMasterBar(mb);
+            const staves = i === 0 ? 3 : 1;
+            for (let s = 0; s < staves; s++) {
+                const bb = new BarBounds();
+                bb.bar = staff.bars[i];
+                bb.visualBounds = makeBounds(i * 100, s * 30, 100, 30);
+                bb.realBounds = makeBounds(i * 100, s * 30, 100, 30);
+                mb.addBar(bb);
+                const beatBounds = new BeatBounds();
+                beatBounds.beat = staff.bars[i].voices[0].beats[0];
+                beatBounds.visualBounds = makeBounds(i * 100, s * 30, 20, 30);
+                beatBounds.realBounds = makeBounds(i * 100, s * 30, 20, 30);
+                bb.addBeat(beatBounds);
+                registered.push(beatBounds);
+            }
+        }
+
+        const multi = staff.bars[0].voices[0].beats[0];
+        const all = lookup.findBeats(multi)!;
+        expect(all.length).toBe(3);
+        expect(all[0]).toBe(registered[0]);
+        expect(all[1]).toBe(registered[1]);
+        expect(all[2]).toBe(registered[2]);
+        expect(lookup.findBeat(multi)).toBe(registered[0]);
+        expect(lookup.findBeats(multi)).toBe(all);
+
+        const single = staff.bars[1].voices[0].beats[0];
+        expect(lookup.findBeat(single)).toBe(registered[3]);
+        const singleAll = lookup.findBeats(single)!;
+        expect(singleAll.length).toBe(1);
+        expect(singleAll[0]).toBe(registered[3]);
+        expect(lookup.findBeats(single)).toBe(singleAll);
+
+        lookup.clearFromMasterBar(1);
+        expect(lookup.findBeat(single)).toBe(null);
+        expect(lookup.findBeats(single)).toBe(null);
+        expect(lookup.findBeats(multi)!.length).toBe(3);
+        lookup.clearFromMasterBar(0);
+        expect(lookup.findBeat(multi)).toBe(null);
+        expect(lookup.findBeats(multi)).toBe(null);
+    });
+
     it('clearFromMasterBar + re-register preserves already-scaled bounds and scales only new ones', () => {
         const score = buildScore(10, 2);
         const lookup = populateLookup(score, 5);

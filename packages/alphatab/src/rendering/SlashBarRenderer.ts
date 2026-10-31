@@ -1,14 +1,18 @@
 import { type Bar, BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
+import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import type { Note } from '@coderline/alphatab/model/Note';
+import type { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { LineBarRenderer } from '@coderline/alphatab/rendering//LineBarRenderer';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
+import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
-import { SpacingGlyph } from '@coderline/alphatab/rendering/glyphs/SpacingGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { SlashBeatContainerGlyph } from '@coderline/alphatab/rendering/SlashBeatContainerGlyph';
+import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
+import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
@@ -21,13 +25,34 @@ export class SlashBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'slash';
 
     public simpleWhammyOverflow: number = 0;
-    private _isOnlySlash: boolean;
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
-        // ignore numbered notation here
-        this._isOnlySlash = !bar.staff.showTablature && !bar.staff.showStandardNotation;
         this.helpers.preferredBeamDirection = BeamDirection.Up;
+    }
+
+    public override resolveKeySignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.slashDisplay?.keySignature,
+            this.bar.staff.slashConfig?.keySignature,
+            this.bar.staff.track.score.stylesheet.slashConfig.keySignature
+        );
+    }
+
+    public override resolveTimeSignatureDisplay(): ElementDisplay {
+        return StaffDisplayResolver.merge(
+            this.bar.slashDisplay?.timeSignature,
+            this.bar.staff.slashConfig?.timeSignature,
+            this.bar.staff.track.score.stylesheet.slashConfig.timeSignature
+        );
+    }
+
+    protected override resolveBarNumberDisplay(): BarNumberDisplay {
+        return (
+            this.bar.slashDisplay?.barNumber ??
+            this.bar.staff.slashConfig?.barNumber ??
+            this.bar.staff.track.score.stylesheet.slashConfig.barNumber!
+        );
     }
 
     public override get repeatsBarSubElement(): BarSubElement {
@@ -76,8 +101,24 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
-        if (this.voiceContainer.tupletGroups.size > 0) {
+        const tupletGroups = this.voiceContainer.tupletGroups;
+        if (tupletGroups && tupletGroups.size > 0) {
             this.registerOverflowTop(this.tupletSize);
+        }
+    }
+
+    protected override emitHelperSkyline(h: BeamingHelper): void {
+        super.emitHelperSkyline(h);
+        if (h.hasTuplet) {
+            // Tuplets can span multiple helpers — emit once per group, from its first beat.
+            const group = h.beats[0].tupletGroup!;
+            if (group.beats.length > 0 && group.beats[0] === h.beats[0]) {
+                const xStart = this.getBeatX(group.beats[0], BeatXPosition.PreNotes);
+                const xEnd = this.getBeatX(group.beats[group.beats.length - 1], BeatXPosition.PostNotes);
+                if (xEnd > xStart) {
+                    this.insertSkylineTop(xStart, xEnd, this.tupletSize);
+                }
+            }
         }
     }
 
@@ -108,10 +149,14 @@ export class SlashBarRenderer extends LineBarRenderer {
         return BeamDirection.Up;
     }
 
+    protected override buildLineHeaderKey(key: HeaderKey): void {
+        this.buildTimeSignatureHeaderKey(key);
+    }
+
     protected override createLinePreBeatGlyphs(): void {
-        // Key signature
+        const timeSignatureDisplay = this.resolveTimeSignatureDisplay();
         if (
-            this._isOnlySlash &&
+            StaffDisplayResolver.isPrimaryForElement(this.staff!, timeSignatureDisplay) &&
             (!this.bar.previousBar ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.timeSignatureNumerator !==
@@ -123,14 +168,11 @@ export class SlashBarRenderer extends LineBarRenderer {
                     this.bar.masterBar.isFreeTime &&
                     this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
         ) {
-            this.createStartSpacing();
             this._createTimeSignatureGlyphs();
         }
     }
 
     private _createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-
         const masterBar = this.bar.masterBar;
         const g = new ScoreTimeSignatureGlyph(
             0,
@@ -177,8 +219,12 @@ export class SlashBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
-        canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.SlashStem, beat);
+        try {
+            canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 
     protected override paintBeamHelper(

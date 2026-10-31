@@ -1,53 +1,28 @@
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
-import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
-import type { Settings } from '@coderline/alphatab/Settings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { GuitarGolpeGlyph } from '@coderline/alphatab/rendering/glyphs/GuitarGolpeGlyph';
 
 /**
  * @internal
  */
-export class GolpeEffectInfo extends EffectInfo {
-    private _type: GolpeType;
-
-    public constructor(type: GolpeType) {
-        super();
-        this._type = type;
-    }
-
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectGolpe;
-    }
-
-    public override get effectId(): string {
-        return `${super.effectId}.${GolpeType[this._type]}`;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return false;
-    }
-
-    public get canShareBand(): boolean {
-        return true;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.SingleOnBeat;
-    }
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
-        return beat.golpe === this._type;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
-        return new GuitarGolpeGlyph(0, 0, true);
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
-        return false;
-    }
+export function createGolpeEffectInfo(type: GolpeType): EffectInfo {
+    return {
+        effectId: `EffectGolpe.${GolpeType[type]}`,
+        notationElement: NotationElement.EffectGolpe,
+        hideOnMultiTrack: false,
+        sizingMode: EffectBarGlyphSizing.SingleOnBeat,
+        shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
+            return beat.golpe === type;
+        },
+        createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph => {
+            return new GuitarGolpeGlyph(0, 0, true);
+        },
+        canExpand: (_from: Beat, _to: Beat): boolean => false,
+        placementCategory: EffectBandPlacementCategory.NoteAttached
+    };
 }

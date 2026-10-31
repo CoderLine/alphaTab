@@ -364,6 +364,7 @@ export class Beat {
     /**
      * Gets a value indicating whether this beat is fade-in.
      * @deprecated Use `fade`
+     * @json_read_only
      */
     public get fadeIn(): boolean {
         return this.fade === FadeType.FadeIn;
@@ -423,6 +424,20 @@ export class Beat {
      * Whether this beat should rendered and played as "dead slapped".
      */
     public deadSlapped: boolean = false;
+
+    /**
+     * Gets or sets the chromatic tone value (0–11) of the pitch at which this rest should be displayed.
+     * A value of NaN means use the default position formula.
+     * @since 1.9.0
+     */
+    public restDisplayTone: number = Number.NaN;
+
+    /**
+     * Gets or sets the octave at which this rest should be displayed.
+     * Only relevant when {@link restDisplayTone} is set. NaN means use the default position formula.
+     * @since 1.9.0
+     */
+    public restDisplayOctave: number = Number.NaN;
 
     /**
      * Gets or sets the brush type applied to the notes of this beat.
@@ -551,6 +566,7 @@ export class Beat {
     /**
      * The speed of the tremolo.
      * @deprecated Set {@link tremoloPicking} instead.
+     * @json_read_only
      */
     public get tremoloSpeed(): Duration | null {
         const tremolo = this.tremoloPicking;
@@ -656,6 +672,16 @@ export class Beat {
      * Gets or sets the dynamics applied to this beat.
      */
     public dynamics: DynamicValue = DynamicValue.F;
+
+    /**
+     * Whether a dynamics marking with the {@link dynamics} of this beat is shown.
+     * @remarks
+     * If not set, a marking is shown where the dynamics change.
+     * Formats encoding the written markings (e.g. MusicXML) set it, as the dynamics in effect can differ
+     * from the shown markings: e.g. a single marking on a piano applies to both staves.
+     * @since 1.9.0
+     */
+    public showDynamics?: boolean;
 
     /**
      * Gets or sets a value indicating whether the beam direction should be inverted.
@@ -809,7 +835,7 @@ export class Beat {
         note.beat = this;
         note.index = this.notes.length;
         this.notes.push(note);
-        if (note.isStringed) {
+        if (note.string >= 0 ) {
             this.noteStringLookup.set(note.string, note);
         }
     }
@@ -818,7 +844,7 @@ export class Beat {
         const index: number = this.notes.indexOf(note);
         if (index >= 0) {
             this.notes.splice(index, 1);
-            if (note.isStringed) {
+            if (note.string >= 0) {
                 this.noteStringLookup.delete(note.string);
             }
         }
@@ -1169,6 +1195,9 @@ export class Beat {
             const cloneBeat: Beat = BeatCloner.clone(this);
             cloneBeat.id = Beat._globalBeatId++;
             cloneBeat.pickStroke = PickStroke.None;
+            if (cloneBeat.showDynamics === true) {
+                cloneBeat.showDynamics = false;
+            }
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
                 const cloneNote: Note = cloneBeat.notes[i];
                 const note: Note = this.notes[i];

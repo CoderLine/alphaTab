@@ -1,37 +1,23 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
+import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
+import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
 import { AlternateEndingsGlyph } from '@coderline/alphatab/rendering/glyphs/AlternateEndingsGlyph';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
-import { EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
-import type { Settings } from '@coderline/alphatab/Settings';
-import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 /**
  * @internal
  */
-export class AlternateEndingsEffectInfo extends EffectInfo {
-    public get notationElement(): NotationElement {
-        return NotationElement.EffectAlternateEndings;
-    }
-
-    public get hideOnMultiTrack(): boolean {
-        return true;
-    }
-
-    public get canShareBand(): boolean {
-        return false;
-    }
-
-    public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.FullBar;
-    }
-
-    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
+export const alternateEndingsEffectInfo: EffectInfo = {
+    effectId: 'EffectAlternateEndings',
+    notationElement: NotationElement.EffectAlternateEndings,
+    hideOnMultiTrack: true,
+    sizingMode:EffectBarGlyphSizing.FullBar,
+    shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
         return beat.voice.index === 0 && beat.index === 0 && beat.voice.bar.masterBar.alternateEndings !== 0;
-    }
-
-    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    },
+    createNewGlyph: (_renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         const masterBar = beat.voice.bar.masterBar;
         const openLine =
             masterBar.previousMasterBar === null ||
@@ -51,9 +37,10 @@ export class AlternateEndingsEffectInfo extends EffectInfo {
             masterBar.previousMasterBar!.alternateEndings > 0;
 
         return new AlternateEndingsGlyph(0, 0, masterBar.alternateEndings, openLine, closeLine, indent);
-    }
-
-    public canExpand(_from: Beat, _to: Beat): boolean {
+    },
+    canExpand: (_from: Beat, _to: Beat): boolean => {
         return true;
-    }
+    },
+    // Voltas share one baseline across the system (Gould Ch.11).
+    placementCategory: EffectBandPlacementCategory.HorizontalRow
 }

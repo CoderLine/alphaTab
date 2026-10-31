@@ -1,0 +1,187 @@
+# Builds the website against the published npm packages of the given dist-tag and deploys it to
+# docs-deploy.alphaTab.net. Only the private react/ui packages are built from source.
+on:
+  workflow_call:
+    inputs:
+      channel:
+        description: next or stable
+        type: string
+        required: true
+      npm_tag:
+        description: The npm dist-tag the website builds against
+        type: string
+        required: true
+      deploy_branch:
+        description: The deploy target on docs-deploy.alphaTab.net (develop or main)
+        type: string
+        required: true
+      expected_versions:
+        description: JSON object of npm packages and the versions their dist-tag has to serve before the build starts
+        type: string
+        default: ''
+      dry_run:
+        type: boolean
+        default: false
+    secrets:
+      DEPLOY_TOKEN:
+        description: Bearer token of docs-deploy.alphaTab.net
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    if: inputs.channel == 'stable' && !inputs.dry_run
+    runs-on: ubuntu-latest
+    # required reviewer approves once the staged npm release is promoted
+    environment: website-stable
+    steps:
+      - run: echo "Stable website build approved"
+
+  build:
+    needs: gate
+    if: ${{ !cancelled() && (needs.gate.result == 'success' || needs.gate.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+
+      - id: versions
+        name: Resolve published versions
+        run: |
+          set -euo pipefail
+          view() { npm view "$1@$NPM_TAG" version --prefer-online 2>/dev/null || true; }
+          # npm accepts a publish minutes before the registry serves it, and per package at different times
+          resolve() {
+            local key="$1" name="$2" expected current
+            expected=$(jq -r --arg name "$name" '.[$name] // empty' <<< "$EXPECTED")
+            current=$(view "$name")
+            if [ -n "$expected" ]; then
+              for attempt in $(seq 1 40); do
+                if [ "$current" = "$expected" ]; then break; fi
+                echo "$name@$NPM_TAG is '$current', waiting for '$expected' ($attempt/40)"
+                sleep 15
+                current=$(view "$name")
+              done
+              if [ "$current" != "$expected" ]; then
+                echo "::error::$name@$NPM_TAG is '$current', expected '$expected'"
+                exit 1
+              fi
+            elif [ -z "$current" ]; then
+              echo "::error::$name@$NPM_TAG could not be resolved"
+              exit 1
+            fi
+            echo "$key=$current" | tee -a "$GITHUB_OUTPUT"
+          }
+
+          resolve alphatab @coderline/alphatab
+          resolve lsp @coderline/alphatab-language-server
+          resolve monaco @coderline/alphatab-monaco
+          resolve webpack @coderline/alphatab-webpack
+        env:
+          NPM_TAG: ${{ inputs.npm_tag }}
+          EXPECTED: ${{ inputs.expected_versions || '{}' }}
+
+      - uses: actions/cache@v6
+        with:
+          path: ~/.npm
+          key: npm-website-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-website-${{ runner.os }}-
+      # building react from source needs the alphaTab sources and the shared build tooling
+      - run: >
+          npm ci --include-workspace-root -w website -w packages/ui
+          -w packages/react -w packages/alphatab -w packages/transpiler -w packages/tooling
+
+      - run: |
+          npm run generate-typescript
+          npm run build -w packages/react
+
+      # The workspace links then resolve to exactly the published bytes. Nested node_modules stay in place.
+      - name: Replace workspace packages with the published tarballs
+        run: |
+          set -euo pipefail
+          replace() {
+            local dir="packages/$1" spec="$2@$3"
+            local tarball
+            tarball=$(npm pack "$spec" --pack-destination "$RUNNER_TEMP" --json | jq -r '.[0].filename')
+            find "$dir" -mindepth 1 -maxdepth 1 ! -name node_modules -exec rm -rf {} +
+            tar -xzf "$RUNNER_TEMP/$tarball" -C "$dir" --strip-components=1
+            echo "$dir <- $spec"
+          }
+          replace alphatab @coderline/alphatab "$ALPHATAB"
+          replace lsp @coderline/alphatab-language-server "$LSP"
+          replace monaco @coderline/alphatab-monaco "$MONACO"
+          replace webpack @coderline/alphatab-webpack "$WEBPACK"
+        env:
+          ALPHATAB: ${{ steps.versions.outputs.alphatab }}
+          LSP: ${{ steps.versions.outputs.lsp }}
+          MONACO: ${{ steps.versions.outputs.monaco }}
+          WEBPACK: ${{ steps.versions.outputs.webpack }}
+
+      - run: npm run generate-alphatabdoc -w website
+      # npm ci recreates node_modules, so the build caches are restored after it
+      - uses: actions/cache/restore@v6
+        with:
+          path: |
+            website/.docusaurus
+            website/node_modules/.cache
+          key: docusaurus-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: docusaurus-${{ runner.os }}-
+      # the reference docs are generated above; --ignore-scripts skips the prebuild generation
+      - run: npm run build -w website --ignore-scripts
+      - uses: actions/upload-artifact@v7
+        with:
+          name: website
+          path: website/build
+          if-no-files-found: error
+          retention-days: 3
+
+  deploy:
+    needs: build
+    if: ${{ !cancelled() && needs.build.result == 'success' && !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    environment:
+      name: website
+      url: ${{ inputs.deploy_branch == 'main' && 'https://alphatab.net' || 'https://next.alphatab.net' }}
+    concurrency:
+      group: website-deploy-${{ inputs.deploy_branch }}
+      cancel-in-progress: false
+    steps:
+      - name: Check the channel matches the ref
+        run: |
+          case "$CHANNEL:$DEPLOY_BRANCH:$GITHUB_REF" in
+            next:develop:refs/heads/develop) ;;
+            stable:main:refs/heads/main | stable:main:refs/tags/v*) ;;
+            *)
+              echo "::error::Refusing to deploy channel '$CHANNEL' to '$DEPLOY_BRANCH' from '$GITHUB_REF'"
+              exit 1
+              ;;
+          esac
+        env:
+          CHANNEL: ${{ inputs.channel }}
+          DEPLOY_BRANCH: ${{ inputs.deploy_branch }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: website
+          path: build
+      - name: Package Zip
+        run: zip -qq -r ../website.zip . && ls -l ../website.zip
+        working-directory: build
+      - name: Push Zip To Server
+        run: |
+          if [ -z "$DEPLOY_TOKEN" ]; then
+            echo "::error::The DEPLOY_TOKEN secret is empty"
+            exit 1
+          fi
+          curl --request POST \
+          --url https://docs-deploy.alphaTab.net/ \
+          --header "authorization: Bearer $DEPLOY_TOKEN" \
+          --header "branch: $DEPLOY_BRANCH" \
+          -F 'website=@./website.zip' \
+          --fail-with-body
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          DEPLOY_BRANCH: ${{ inputs.deploy_branch }}

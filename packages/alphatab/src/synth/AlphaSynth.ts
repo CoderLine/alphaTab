@@ -30,7 +30,6 @@ import { PlayerStateChangedEventArgs } from '@coderline/alphatab/synth/PlayerSta
 import { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 import { Hydra } from '@coderline/alphatab/synth/soundfont/Hydra';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
-import type { Preset } from '@coderline/alphatab/synth/synthesis/Preset';
 import type { SynthEvent } from '@coderline/alphatab/synth/synthesis/SynthEvent';
 import { TinySoundFont } from '@coderline/alphatab/synth/synthesis/TinySoundFont';
 
@@ -235,14 +234,14 @@ export class AlphaSynthBase implements IAlphaSynth {
             return null;
         });
 
-        Logger.debug('AlphaSynth', 'Creating output');
+        Logger.trace('AlphaSynth', 'Creating output');
         this._output = output;
 
-        Logger.debug('AlphaSynth', 'Creating synthesizer');
+        Logger.trace('AlphaSynth', 'Creating synthesizer');
         this.synthesizer = synthesizer;
         this.sequencer = new MidiFileSequencer(this.synthesizer);
 
-        Logger.debug('AlphaSynth', 'Opening output');
+        Logger.trace('AlphaSynth', 'Opening output');
         this.output.ready.on(() => {
             this.isReady = true;
             (this.ready as EventEmitter).trigger();
@@ -334,7 +333,7 @@ export class AlphaSynthBase implements IAlphaSynth {
 
     private _playInternal() {
         if (this.sequencer.isPlayingOneTimeMidi) {
-            Logger.debug('AlphaSynth', 'Cancelling one time midi');
+            Logger.trace('AlphaSynth', 'Cancelling one time midi');
             this._stopOneTimeMidi();
         }
 
@@ -411,12 +410,15 @@ export class AlphaSynthBase implements IAlphaSynth {
     public resetSoundFonts(): void {
         this.stop();
         this.synthesizer.resetPresets();
-        this._loadedSoundFonts = [];
+        this.loadedSoundFonts = [];
         this.isSoundFontLoaded = false;
         (this.soundFontLoaded as EventEmitter).trigger();
     }
 
-    private _loadedSoundFonts: Hydra[] = [];
+    /**
+     * @internal
+     */
+    protected loadedSoundFonts: Hydra[] = [];
 
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this.pause();
@@ -427,9 +429,9 @@ export class AlphaSynthBase implements IAlphaSynth {
             const soundFont: Hydra = new Hydra();
             soundFont.load(input);
             if (!append) {
-                this._loadedSoundFonts = [];
+                this.loadedSoundFonts = [];
             }
-            this._loadedSoundFonts.push(soundFont);
+            this.loadedSoundFonts.push(soundFont);
 
             this.isSoundFontLoaded = true;
             (this.soundFontLoaded as EventEmitter).trigger();
@@ -448,7 +450,7 @@ export class AlphaSynthBase implements IAlphaSynth {
             const programs = this.sequencer.instrumentPrograms;
             const percussionKeys = this.sequencer.percussionKeys;
             let append = false;
-            for (const soundFont of this._loadedSoundFonts) {
+            for (const soundFont of this.loadedSoundFonts) {
                 this.synthesizer.loadPresets(soundFont, programs, percussionKeys, append);
                 append = true;
             }
@@ -555,7 +557,7 @@ export class AlphaSynthBase implements IAlphaSynth {
                 } else if (this.synthesizer.activeVoiceCount > 0) {
                     // smooth stop
                     if (!this._synthStopping) {
-                        Logger.debug('AlphaSynth', 'Signaling synth to stop all voices (all samples played)');
+                        Logger.trace('AlphaSynth', 'Signaling synth to stop all voices (all samples played)');
                         this.synthesizer.noteOffAll(true);
                         this._synthStopping = true;
                     }
@@ -569,7 +571,7 @@ export class AlphaSynthBase implements IAlphaSynth {
                 // the output still has to play some samples, signal the synth to stop
                 // to eventually bring the voices down to 0 and stop playing
                 if (!this._synthStopping) {
-                    Logger.debug('AlphaSynth', 'Signaling synth to stop all voices (not all samples played)');
+                    Logger.trace('AlphaSynth', 'Signaling synth to stop all voices (not all samples played)');
                     this.synthesizer.noteOffAll(true);
                     this._synthStopping = true;
                 }
@@ -615,12 +617,17 @@ export class AlphaSynthBase implements IAlphaSynth {
 
         this._tickPosition = args.currentTick;
 
-        const mode = this.sequencer.isPlayingMain ? 'main' : this.sequencer.isPlayingCountIn ? 'count-in' : 'one-time';
-
-        Logger.debug(
-            'AlphaSynth',
-            `Position changed: (time: ${args.currentTime}/${args.endTime}, tick: ${args.currentTick}/${args.endTick}, Active Voices: ${this.synthesizer.activeVoiceCount} (${mode}), Tempo original: ${this.sequencer.currentTempo}, Tempo modified: ${this.sequencer.modifiedTempo})`
-        );
+        if (Logger.isTraceEnabled) {
+            const mode = this.sequencer.isPlayingMain
+                ? 'main'
+                : this.sequencer.isPlayingCountIn
+                  ? 'count-in'
+                  : 'one-time';
+            Logger.trace(
+                'AlphaSynth',
+                `Position changed: (time: ${args.currentTime}/${args.endTime}, tick: ${args.currentTick}/${args.endTick}, Active Voices: ${this.synthesizer.activeVoiceCount} (${mode}), Tempo original: ${this.sequencer.currentTempo}, Tempo modified: ${this.sequencer.modifiedTempo})`
+            );
+        }
 
         if (this.sequencer.isPlayingMain) {
             this._currentPosition = args;
@@ -746,7 +753,10 @@ export class AlphaSynth extends AlphaSynthBase {
                 exporter.loadSoundFont(f);
             }
         } else {
-            exporter.loadPresets((this.synthesizer as TinySoundFont).presets);
+            // the synthesizer only holds the presets its own song uses
+            for (const soundFont of this.loadedSoundFonts) {
+                exporter.loadHydra(soundFont);
+            }
         }
 
         if (options.playbackRange) {
@@ -804,20 +814,19 @@ export class AlphaSynthAudioExporter implements IAlphaSynthAudioExporter {
         const input: ByteBuffer = ByteBuffer.fromBuffer(data);
         const soundFont: Hydra = new Hydra();
         soundFont.load(input);
+        this.loadHydra(soundFont);
+    }
 
+    /**
+     * Loads the presets used by the exported song from the given sound font.
+     * @param soundFont The parsed sound font.
+     * @internal
+     */
+    public loadHydra(soundFont: Hydra) {
         const programs = this._sequencer.instrumentPrograms;
         const percussionKeys = this._sequencer.percussionKeys;
 
         this._synth.loadPresets(soundFont, programs, percussionKeys, true);
-    }
-
-    /**
-     * Loads the specified presets.
-     * @param presets The presets to use.
-     * @internal
-     */
-    public loadPresets(presets: Preset[] | null) {
-        this._synth.presets = presets;
     }
 
     /**

@@ -1,0 +1,54 @@
+.handles {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1001;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.handle {
+    position: absolute;
+    pointer-events: auto;
+    cursor: ew-resize;
+    background: var(--at-accent, #7cb9ff);
+    width: 4px;
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+    display: none;
+
+    &::before {
+        content: ' ';
+        display: block;
+        background: var(--at-accent, #7cb9ff);
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        left: 50%;
+        top: 0;
+        transform: translate(-50%, -50%);
+        position: absolute;
+    }
+}
+
+.handleEnd {
+    &::before {
+        top: auto;
+        bottom: 0;
+        transform: translate(-50%, 50%);
+    }
+}
+
+.handleActive {
+    display: block;
+}
+
+.handle:hover,
+.handleDragging {
+    opacity: 1;
+}
+
+.dragging * {
+    cursor: ew-resize !important;
+}

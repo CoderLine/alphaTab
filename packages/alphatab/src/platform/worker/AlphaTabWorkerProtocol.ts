@@ -15,15 +15,18 @@ import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/Positio
  */
 export type IAlphaTabWorkerMessage =
     // main -> worker
-    | { cmd: 'alphaTab.initialize'; settings: Map<string, unknown> }
-    | { cmd: 'alphaTab.updateSettings'; settings: Map<string, unknown> }
+    // settings: Map trees, plain-object trees (PlainObjectWriter) on web
+    // score: a Map tree, on web a MessagePack Uint8Array (WorkerScoreEncoding) sent in the transfer list
+    | { cmd: 'alphaTab.initialize'; settings: unknown }
+    | { cmd: 'alphaTab.updateSettings'; settings: unknown }
     | { cmd: 'alphaTab.render'; renderHints: RenderHints | undefined }
     | { cmd: 'alphaTab.resizeRender' }
     | { cmd: 'alphaTab.renderResult'; resultId: string }
     | { cmd: 'alphaTab.setWidth'; width: number }
     | {
           cmd: 'alphaTab.renderScore';
-          score: Map<string, unknown> | null;
+          scoreId: number;
+          score: unknown;
           trackIndexes: number[] | null;
           fontSizes: Map<string, FontSizeDefinition>;
           renderHints: RenderHints | undefined;
@@ -33,7 +36,11 @@ export type IAlphaTabWorkerMessage =
     | { cmd: 'alphaTab.partialRenderFinished'; result: RenderFinishedEventArgs }
     | { cmd: 'alphaTab.partialLayoutFinished'; result: RenderFinishedEventArgs }
     | { cmd: 'alphaTab.renderFinished'; result: RenderFinishedEventArgs }
-    | { cmd: 'alphaTab.postRenderFinished'; boundsLookup: Map<string, unknown> | null }
+    | { cmd: 'alphaTab.postRenderFinished'; scoreId: number; boundsLookup: Map<string, unknown> | null }
+    // web only: a BoundsLookupWire Float64Array, sent in the transfer list
+    | { cmd: 'alphaTab.postRenderFinishedWire'; scoreId: number; boundsLookup: unknown }
+    // sent after every 'alphaTab.resizeRender', also when it produced no render
+    | { cmd: 'alphaTab.resizeRenderFinished' }
     | { cmd: 'alphaTab.error'; error: Error };
 
 /**

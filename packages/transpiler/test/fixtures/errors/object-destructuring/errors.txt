@@ -1,0 +1,1 @@
+input.ts:14:15: Object destructuring binding ({ x, y } = obj) is not supported. See SYNTAX.md for the workaround.

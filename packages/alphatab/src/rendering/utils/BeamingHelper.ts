@@ -9,7 +9,7 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
-import type { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 
 /**
@@ -57,8 +57,8 @@ export class BeamingHelper {
      */
     public hasTuplet: boolean = false;
 
-    public slashBeats: Beat[] = [];
-    public restBeats: Beat[] = [];
+    public slashBeats: Beat[] | null = null;
+    public restBeats: Beat[] | null = null;
 
     public lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
@@ -68,6 +68,10 @@ export class BeamingHelper {
 
     public invertBeamDirection: boolean = false;
     public preferredBeamDirection: BeamDirection | null = null;
+    /**
+     * The stem direction the standard notation renderer computed when finishing this helper.
+     */
+    public beamDirection: BeamDirection = BeamDirection.Up;
     public graceType: GraceType = GraceType.None;
 
     public get isRestBeamHelper(): boolean {
@@ -101,12 +105,17 @@ export class BeamingHelper {
     public constructor(staff: Staff, renderer: BarRendererBase, beamingRuleLookup: BeamingRuleLookup) {
         this._staff = staff;
         this._renderer = renderer;
-        this.beats = [];
         this._beamingRuleLookup = beamingRuleLookup;
     }
 
-    public alignWithBeats() {
-        this.drawingInfos.clear();
+    /**
+     * Invalidates cached drawing infos. The emit path (`emitHelperSkyline` →
+     * `_computeBeamingBounds` → `ensureBeamDrawingInfo`) repopulates them
+     * with post-spring X.
+     */
+    public invalidateDrawingInfos() {
+        this._drawingInfoUpValid = false;
+        this._drawingInfoDownValid = false;
     }
 
     public finish(): void {
@@ -182,22 +191,31 @@ export class BeamingHelper {
             }
 
             if (!beat.isRest) {
-                if (this.isRestBeamHelper) {
-                    this.beats = [];
+                if (this.beats.length === 0) {
+                    this.beats = [beat];
+                } else if (this.isRestBeamHelper) {
+                    this.beats[0] = beat;
+                } else {
+                    this.beats.push(beat);
                 }
-                this.beats.push(beat);
                 this._checkNote(beat.minNote);
                 this._checkNote(beat.maxNote);
                 if (this.shortestDuration < beat.duration) {
                     this.shortestDuration = beat.duration;
                 }
             } else if (this.beats.length === 0) {
-                this.beats.push(beat);
+                this.beats = [beat];
             } else {
+                if (!this.restBeats) {
+                    this.restBeats = [];
+                }
                 this.restBeats.push(beat);
             }
 
             if (beat.slashed) {
+                if (!this.slashBeats) {
+                    this.slashBeats = [];
+                }
                 this.slashBeats.push(beat);
             }
         }
@@ -279,8 +297,10 @@ export class BeamingHelper {
         }
 
         // check if they are on the same group as per rule definitions
-        const groupId1 = this._beamingRuleLookup.calculateGroupIndex(start1);
-        const groupId2 = this._beamingRuleLookup.calculateGroupIndex(start2);
+        // (pick-up bars form the end of a full bar, the rules apply to their position in the nominal meter)
+        const anacrusisOffset = m1.masterBar.anacrusisOffset;
+        const groupId1 = this._beamingRuleLookup.calculateGroupIndex(start1 + anacrusisOffset);
+        const groupId2 = this._beamingRuleLookup.calculateGroupIndex(start2 + anacrusisOffset);
         return groupId1 === groupId2;
     }
 
@@ -299,13 +319,41 @@ export class BeamingHelper {
         return ModelUtils.getIndex(a.duration) - 2 - barIndex > 0 && ModelUtils.getIndex(b.duration) - 2 - barIndex > 0;
     }
 
-    public get beatOfLowestNote(): Beat {
-        return this.lowestNoteInHelper!.beat;
+    /**
+     * Per-direction beam drawing info, created on first use and reused across
+     * layout cycles; `*Valid=false` means callers must re-initialize before reading.
+     */
+    private _drawingInfoUp: BeamingHelperDrawInfo | null = null;
+    private _drawingInfoDown: BeamingHelperDrawInfo | null = null;
+    private _drawingInfoUpValid: boolean = false;
+    private _drawingInfoDownValid: boolean = false;
+
+    public getDrawingInfo(direction: BeamDirection): BeamingHelperDrawInfo {
+        if (direction === BeamDirection.Up) {
+            let up = this._drawingInfoUp;
+            if (!up) {
+                up = new BeamingHelperDrawInfo();
+                this._drawingInfoUp = up;
+            }
+            return up;
+        }
+        let down = this._drawingInfoDown;
+        if (!down) {
+            down = new BeamingHelperDrawInfo();
+            this._drawingInfoDown = down;
+        }
+        return down;
     }
 
-    public get beatOfHighestNote(): Beat {
-        return this.highestNoteInHelper!.beat;
+    public hasDrawingInfo(direction: BeamDirection): boolean {
+        return direction === BeamDirection.Up ? this._drawingInfoUpValid : this._drawingInfoDownValid;
     }
 
-    public drawingInfos: Map<BeamDirection, BeamingHelperDrawInfo> = new Map<BeamDirection, BeamingHelperDrawInfo>();
+    public markDrawingInfoValid(direction: BeamDirection): void {
+        if (direction === BeamDirection.Up) {
+            this._drawingInfoUpValid = true;
+        } else {
+            this._drawingInfoDownValid = true;
+        }
+    }
 }

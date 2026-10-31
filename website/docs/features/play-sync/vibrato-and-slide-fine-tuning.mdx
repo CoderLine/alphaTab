@@ -1,0 +1,76 @@
+---
+title: "Vibrato and slide fine-tuning"
+description: "Timing parameters for how the synth interprets vibrato and slide effects."
+sidebar_custom_props:
+  feature_chapter: feel
+  feature_order: 30
+keywords:
+  - alphaTab
+  - vibrato
+  - slide
+---
+
+import { TransportControls } from '@site/src/components/PlaySync';
+
+Matching the synth's expression to a specific guitar tone — a subtle bluesy vibrato for a Strat, a wide whammy sweep for a metal solo — comes down to tuning a handful of numbers. alphaTab treats vibrato and slides as procedural gestures: the synth generates the wobble or the pitch sweep from parameters, not from a recorded sample. Adjust those parameters to shape how aggressive, how fast, and how far each effect travels.
+
+<TransportControls file="/files/features/Vibrato.gp5" showCode={false} />
+
+## Vibrato: four flavors, two knobs each
+
+alphaTab distinguishes four vibrato types, each with a wavelength (in MIDI ticks) and an amplitude (in semitones):
+
+- `noteWideLength` / `noteWideAmplitude` — slow, wide vibrato applied per note. Default `240` ticks and `1` semitone.
+- `noteSlightLength` / `noteSlightAmplitude` — fast, subtle vibrato applied per note. Default `360` / `0.5`.
+- `beatWideLength` / `beatWideAmplitude` — whammy-style wide vibrato over the whole beat. Default `480` / `2`.
+- `beatSlightLength` / `beatSlightAmplitude` — whammy-style subtle vibrato over the whole beat. Default `480` / `2`.
+
+Larger amplitudes push the vibrato further out of tune; shorter wavelengths make it flutter faster. `480` ticks equals one quarter note at the standard resolution.
+
+## Slides: how far and how long
+
+Simple slides (slide-in-above, slide-in-below, slide-out-above, slide-out-below) are pitch-only ornaments — alphaTab needs to pick an offset and a slice of the note duration to run the slide over.
+
+- `simpleSlidePitchOffset` — quarter-tone offset for simple slides. Default `6` (that is 1.5 semitones, i.e. three fret positions).
+- `simpleSlideDurationRatio` — the portion of the note duration the slide occupies. Default `0.25`.
+- `shiftSlideDurationRatio` — the portion of the note used by shift and legato slides that connect two notated pitches. Default `0.5`, meaning the slide starts halfway through the source note and lands on the target.
+
+Pick-slide gestures are not tuned — alphaTab does not synthesize them.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
+    vibrato: {
+      noteWideLength: 200,
+      noteWideAmplitude: 1.5,
+      noteSlightLength: 320,
+      noteSlightAmplitude: 0.4,
+      beatWideLength: 480,
+      beatWideAmplitude: 2.5,
+    },
+    slide: {
+      simpleSlidePitchOffset: 8,
+      simpleSlideDurationRatio: 0.3,
+      shiftSlideDurationRatio: 0.6,
+    },
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+Both nested objects are mutable at runtime. Change a value on `api.settings.player.vibrato` and call `api.updateSettings()` to push it into the synth.
+
+## Where to look next
+
+- [`player.vibrato`](/docs/reference/settings/player/vibrato) and [`player.slide`](/docs/reference/settings/player/slide) in the settings reference.
+- [Triplet feel (swing)](triplet-feel-swing) — the other playback-feel knob for rhythm interpretation.
+- [SongBook mode](songbook-mode) — related timing knobs for songbook-style bends and dips.
+- [Effects and articulations](/docs/features/render/coverage-effects-articulations) — the notation side of vibrato, slides, and their cousins.

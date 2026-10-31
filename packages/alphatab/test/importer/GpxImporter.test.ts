@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { type GpxFile, GpxFileSystem } from '@coderline/alphatab/importer/GpxFileSystem';
 import { GpxImporter } from '@coderline/alphatab/importer/GpxImporter';
+import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { OverflowError } from '@coderline/alphatab/io/IReadable';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { Settings } from '@coderline/alphatab/Settings';
 import { Logger } from '@coderline/alphatab/Logger';
@@ -21,7 +25,7 @@ describe('GpxImporterTest', () => {
 
     it('file-system-compressed', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro6/file-system-compressed.gpx');
-        const fileSystem: GpxFileSystem = new GpxFileSystem();
+        const fileSystem: GpxFileSystem = new GpxFileSystem(new Settings().importer.maxDecodingBufferSize);
         fileSystem.load(ByteBuffer.fromBuffer(data));
         const names: string[] = [
             'score.gpif',
@@ -37,6 +41,85 @@ describe('GpxImporterTest', () => {
             expect(file.fileName).toBe(names[i]);
             expect(file.fileSize).toBe(sizes[i]);
         }
+    });
+
+    /**
+     * Builds a BCFS container with one score.gpif entry. Sector indices are relative to the data after the header.
+     */
+    function buildBcfsContainer(
+        sectorCount: number,
+        entrySector: number,
+        fileSize: number,
+        sectorPointers: number[]
+    ): Uint8Array {
+        const buffer = ByteBuffer.fromBuffer(new Uint8Array(4 + sectorCount * 0x1000));
+        buffer.write(IOHelper.stringToBytes('BCFS'), 0, 4);
+        const entry = 4 + entrySector * 0x1000;
+        buffer.position = entry;
+        IOHelper.writeInt32LE(buffer, 2);
+        buffer.write(IOHelper.stringToBytes('score.gpif'), 0, 10);
+        buffer.position = entry + 0x8c;
+        IOHelper.writeInt32LE(buffer, fileSize);
+        buffer.position = entry + 0x94;
+        for (const pointer of sectorPointers) {
+            IOHelper.writeInt32LE(buffer, pointer);
+        }
+        return buffer.toArray();
+    }
+
+    function loadFileSystem(data: Uint8Array): GpxFileSystem {
+        const fileSystem: GpxFileSystem = new GpxFileSystem(new Settings().importer.maxDecodingBufferSize);
+        fileSystem.load(ByteBuffer.fromBuffer(data));
+        return fileSystem;
+    }
+
+    it('file-system-sector-before-entry', () => {
+        const fileSystem = loadFileSystem(buildBcfsContainer(3, 2, 1, [1]));
+        expect(fileSystem.files.length).toBe(1);
+        expect(fileSystem.files[0].fileName).toBe('score.gpif');
+    });
+
+    it('file-system-negative-sector', () => {
+        expect(() => loadFileSystem(buildBcfsContainer(3, 2, 1, [-1]))).toThrow(UnsupportedFormatError);
+    });
+
+    it('file-system-sector-past-end', () => {
+        expect(() => loadFileSystem(buildBcfsContainer(3, 2, 1, [3]))).toThrow(UnsupportedFormatError);
+    });
+
+    it('file-system-unterminated-sector-list', () => {
+        const pointers: number[] = [];
+        for (let i = 0; i < (0x1000 - 0x94) / 4; i++) {
+            pointers.push(1);
+        }
+        expect(() => loadFileSystem(buildBcfsContainer(3, 2, 1, pointers))).toThrow(UnsupportedFormatError);
+    });
+
+    it('file-system-negative-file-size', () => {
+        expect(() => loadFileSystem(buildBcfsContainer(3, 2, -1, [1]))).toThrow(UnsupportedFormatError);
+    });
+
+    it('file-system-file-size-exceeds-container', () => {
+        expect(() => loadFileSystem(buildBcfsContainer(3, 2, 0x7fffffff, [1]))).toThrow(UnsupportedFormatError);
+    });
+
+    it('file-system-decompressed-size-exceeds-limit', () => {
+        const buffer = ByteBuffer.empty();
+        buffer.write(IOHelper.stringToBytes('BCFZ'), 0, 4);
+        IOHelper.writeInt32LE(buffer, 0x7fffffff);
+        expect(() => loadFileSystem(buffer.toArray())).toThrow(OverflowError);
+    });
+
+    it('file-system-decompressed-size-below-header', () => {
+        const buffer = ByteBuffer.empty();
+        buffer.write(IOHelper.stringToBytes('BCFZ'), 0, 4);
+        IOHelper.writeInt32LE(buffer, 2);
+        expect(() => loadFileSystem(buffer.toArray())).toThrow(UnsupportedFormatError);
+    });
+
+    it('score-loader-malformed-gpx-terminates', () => {
+        const data = buildBcfsContainer(3, 2, 1, [1]);
+        expect(() => ScoreLoader.loadScoreFromBytes(data)).toThrow(UnsupportedFormatError);
     });
 
     it('score-info', async () => {
@@ -286,5 +369,37 @@ describe('GpxImporterTest', () => {
     it('slash', async () => {
         const score = (await prepareImporterWithFile('guitarpro6/slash.gpx')).readScore();
         GpImporterTestHelper.checkSlash(score);
+    });
+
+    it('synthesized-fingering-keeps-ties', async () => {
+        const score = (await prepareImporterWithFile('conversion/full-song.gpx')).readScore();
+        let ties = 0;
+        for (const track of score.tracks) {
+            for (const staff of track.staves) {
+                for (const bar of staff.bars) {
+                    for (const voice of bar.voices) {
+                        for (const beat of voice.beats) {
+                            for (const note of beat.notes) {
+                                if (note.isTieDestination && note.tieOrigin !== null) {
+                                    expect(note.tieOrigin.string).toBe(note.string);
+                                    expect(note.tieOrigin.realValue).toBe(note.realValue);
+                                    ties++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        expect(ties).toBeGreaterThan(0);
+    });
+
+    it('drum-tablature-follows-part-configuration', async () => {
+        const score = (await prepareImporterWithFile('conversion/full-song.gpx')).readScore();
+        const drums = score.tracks[10].staves[0];
+        expect(drums.isPercussion).toBe(true);
+        // the PartConfiguration of this file enables standard notation and tablature on the drum track
+        expect(drums.showTablature).toBe(true);
+        expect(drums.showStandardNotation).toBe(true);
     });
 });

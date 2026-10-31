@@ -1,0 +1,136 @@
+@use '../styles/breakpoints' as *;
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: var(--at-code-surface);
+  color: var(--at-syntax-plain);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 41px;
+  padding: 0 8px 0 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--at-font-mono);
+  font-size: 11.5px;
+  color: var(--at-syntax-punctuation);
+  flex-shrink: 0;
+}
+
+.fileName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--at-syntax-plain);
+}
+
+.modified {
+  color: var(--at-syntax-number);
+  font-size: 9px;
+}
+
+.spacer { flex: 1; }
+
+.headerBtn {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--at-radius-sm);
+  background: none;
+  color: var(--at-syntax-plain);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover { border-color: var(--at-accent); }
+}
+
+.close {
+  margin-left: auto;
+  display: inline-flex;
+  padding: 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--at-syntax-punctuation);
+  cursor: pointer;
+
+  .headerBtn + & { margin-left: 0; }
+
+  &:hover {
+    color: var(--at-syntax-plain);
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.status {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 0 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-syntax-punctuation);
+  overflow: hidden;
+}
+
+.meta {
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  @include not-desktop { display: none; }
+}
+
+.placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 28px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--at-syntax-plain);
+
+  p { margin: 0; max-width: 34ch; }
+
+  svg { color: var(--at-syntax-keyword); }
+}
+
+.placeholderNote {
+  font-size: 12px;
+  color: var(--at-syntax-comment);
+}
+
+.convertBtn {
+  margin-top: 6px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--at-cta-accent);
+  color: var(--at-cta-bg);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; cursor: progress; }
+}

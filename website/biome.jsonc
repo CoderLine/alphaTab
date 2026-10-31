@@ -1,0 +1,26 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+    "root": false,
+    "extends": "//",
+    "files": {
+        "includes": ["*.ts", "*.mts", "src/**", "scripts/**", "docs/**/_chapters.ts", "!**/*.scss"]
+    },
+    // The site keeps its own code style; biome is used as a linter only.
+    "formatter": {
+        "enabled": false
+    },
+    "assist": {
+        "enabled": false
+    },
+    "linter": {
+        "rules": {
+            "a11y": "off",
+            "suspicious": {
+                "noArrayIndexKey": "off"
+            },
+            "correctness": {
+                "useExhaustiveDependencies": "off"
+            }
+        }
+    }
+}
