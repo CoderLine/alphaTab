@@ -735,6 +735,18 @@ async function createConfig(): Promise<Config> {
             };
 
         return {
+          module: {
+            rules: [
+              {
+                // Monaco's fallback for hosts without MonacoEnvironment.getWorker: webpack would copy
+                // the unbundled module, whose relative imports do not exist, into the build root.
+                // The editor always passes its own bundled worker, so the URL only has to be valid.
+                test: /[\\/]monaco-editor[\\/]esm[\\/]vs[\\/]editor[\\/]common[\\/]services[\\/]editorWebWorkerMain\.js$/,
+                dependency: "url",
+                type: "asset/inline",
+              },
+            ],
+          },
           plugins: [
             // Copy the Font and SoundFont Files to the output
             new AlphaTabWebPackPlugin({
