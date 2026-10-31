@@ -617,6 +617,7 @@ function getDeclarationReferenceUrl(
         (element as ts.EnumMember).name!.getText().toLowerCase()
       );
     case ts.SyntaxKind.TypeParameter:
+    case ts.SyntaxKind.Parameter:
       return "";
     default:
       cconsole.error(
@@ -631,8 +632,12 @@ function getDeclarationReferenceUrl(
 
   if (warnOnMissingReference) {
     cconsole.error(
-      "Failed to resolve reference link for declaration ",
-      element
+      "Failed to resolve reference link for declaration",
+      ts.SyntaxKind[element.kind],
+      "at",
+      element.getSourceFile().fileName,
+      element.getSourceFile().getLineAndCharacterOfPosition(element.pos),
+      element.getText()
     );
   }
   return "";
