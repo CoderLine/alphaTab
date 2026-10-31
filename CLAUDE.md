@@ -8,9 +8,11 @@ Non-negotiable highlights:
 
 - **No PR without an accepted issue.** Drive-by patches are closed on sight.
 - **Issues describe problems, not solutions.** No diffs, no file/line pointing,
-  no diagnosing from source. Use the bug template with real values.
+  no diagnosing from source. Use the matching issue template with real values.
 - **Do not spot-fix symptoms.** Understand which layer causes the behavior
   before proposing a change.
+- **Docs and release notes in `website/` ship in the same PR** — see
+  [AGENTS.md § Documentation](./AGENTS.md#documentation).
 - **Mandatory AI-authored disclosure block** at the top of every issue and PR
   you draft or submit, containing the token `alphatab-ai-authored-v1` verbatim.
   See [AGENTS.md § Mandatory disclosure](./AGENTS.md#mandatory-disclosure-read-this-first).

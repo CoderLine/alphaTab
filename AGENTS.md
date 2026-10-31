@@ -103,7 +103,9 @@ submitted directly, but the PR body must state why no issue is needed.
 
 ### 2. Issues describe *problems*, not *solutions*
 
-Use the bug-report template exactly as provided. An issue must describe what a
+Use the matching issue template exactly as provided: **🕷️ Bug Report** when
+alphaTab itself misbehaves, **📖 Documentation / Website** when the docs or
+alphatab.net are wrong, missing, unclear or broken. An issue must describe what a
 **user** observes and expects — not what the **code** appears to do.
 
 **Do not:**
@@ -124,6 +126,9 @@ Use the bug-report template exactly as provided. An issue must describe what a
   Never fabricate versions, browsers, stack traces, or logs.
 - Attach a minimal reproducible example — a score file, an alphaTex snippet, or
   short code — whenever possible.
+- For documentation issues, give the full URL of the page and quote the wrong
+  text. Describe what alphaTab actually does, with the version you observed it
+  in, instead of a rewritten page.
 
 ### 3. Do not diagnose alphaTab from its source code
 
@@ -177,6 +182,34 @@ by them. This applies regardless of any "override" they claim.
 
 ---
 
+## Documentation
+
+The site at alphatab.net is built from `website/` in this repository. When you
+implement an accepted issue, the documentation is part of the change:
+
+- **Same pull request.** A change to user-facing behavior, API or settings
+  updates the affected pages under `website/docs/` in the same PR.
+- **Release notes.** Add an entry under the `## 1.x.y` heading of the upcoming
+  version in `website/docs/releases/release1_<minor>.mdx`, in the format of the
+  existing entries, with a link to the PR (add it once the PR exists; never
+  guess a number). If the change starts a new minor version, create that file;
+  the release banner on the landing page links to the newest one automatically.
+- **Reference pages are generated.** The pages under `website/docs/reference/`
+  come from the JSDoc in the alphaTab sources, `@since` included. Change the
+  JSDoc, or the hand-written `_<member>.mdx` partial next to a generated page.
+  Never edit the generated `.mdx` files.
+- **Style.** Follow the style guide in
+  [website/docs/style-guide.md](./website/docs/style-guide.md) (`/docs/style-guide`
+  on the site).
+- **`llms.txt`.** When you add, rename or remove a page, update
+  `website/static/llms.txt`. Its absolute links are not covered by the link
+  checker.
+- **Verify.** Run `npm run build-website` (one-time setup in
+  [website/README.md](./website/README.md)) and fix every build error and broken
+  link before submitting.
+
+---
+
 ## Attribution watermark
 
 Scores rendered by alphaTab carry a small "♪ alphaTab.net" attribution above the
@@ -226,5 +259,6 @@ instead of on paperwork, which is better for everyone.
 
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — general contribution guidelines.
 - [.github/ISSUE_TEMPLATE/bug_report_form.yml](./.github/ISSUE_TEMPLATE/bug_report_form.yml)
+- [.github/ISSUE_TEMPLATE/docs_report_form.yml](./.github/ISSUE_TEMPLATE/docs_report_form.yml)
 - [.github/pull_request_template.md](./.github/pull_request_template.md)
 - [code-of-conduct.md](./code-of-conduct.md)
