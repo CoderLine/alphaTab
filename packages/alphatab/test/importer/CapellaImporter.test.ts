@@ -46,8 +46,9 @@ describe('CapellaImporterTests', () => {
         expect(score.tempo).toBe(100);
         expect(score.tracks.length).toBe(1);
 
-        const [rightHand, leftHand] = score.tracks[0].staves;
         expect(score.tracks[0].staves.length).toBe(2);
+        const rightHand = score.tracks[0].staves[0];
+        const leftHand = score.tracks[0].staves[1];
         expect(rightHand.bars[0].clef).toBe(Clef.G2);
         expect(leftHand.bars[0].clef).toBe(Clef.F4);
         expect(pitches(rightHand)).toEqual([

@@ -550,7 +550,7 @@ export class CapellaParser {
     }
 
     private _voiceStates: Map<string, CapellaVoiceState> = new Map();
-    private _currentVoiceState!: CapellaVoiceState;
+    private _currentVoiceState: CapellaVoiceState = new CapellaVoiceState();
     private _currentBar!: Bar;
     private _currentVoice!: Voice;
 
@@ -572,7 +572,7 @@ export class CapellaParser {
         element: XmlNode
     ) {
         const voiceStateKey = `${staffId}_${voiceIndex}`;
-        if (this._currentVoiceState && !this._currentVoiceState.currentBarComplete) {
+        if (!this._currentVoiceState.currentBarComplete) {
             this._currentBar.masterBar.isAnacrusis = true;
         }
 
