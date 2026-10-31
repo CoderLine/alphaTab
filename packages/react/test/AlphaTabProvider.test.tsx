@@ -663,6 +663,60 @@ describe('AlphaTabProvider', () => {
     });
 });
 
+describe('AlphaTabHost', () => {
+    it('passes HTML attributes to the scroll element', () => {
+        const onScroll = vi.fn();
+        render(
+            <StrictMode>
+                <AlphaTabProvider>
+                    <AlphaTabHost
+                        id="score"
+                        className="scroll"
+                        style={{ height: '300px', overflow: 'auto' }}
+                        aria-label="Score"
+                        tabIndex={0}
+                        onScroll={onScroll}
+                        mountClassName="mount"
+                    />
+                </AlphaTabProvider>
+            </StrictMode>
+        );
+        const live = liveApis()[0];
+        const scroll = live.element.closest('.scroll') as HTMLElement;
+        expect(live.settings.player.scrollElement).toBe(scroll);
+        expect(scroll.id).toBe('score');
+        expect(scroll.style.height).toBe('300px');
+        expect(scroll.style.overflow).toBe('auto');
+        expect(scroll.getAttribute('aria-label')).toBe('Score');
+        expect(scroll.tabIndex).toBe(0);
+        scroll.dispatchEvent(new Event('scroll'));
+        expect(onScroll).toHaveBeenCalledTimes(1);
+        expect(live.element.className).toBe('mount');
+    });
+
+    it('warns when a provider gets a second host', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const { rerender } = render(
+            <StrictMode>
+                <AlphaTabProvider>
+                    <AlphaTabHost />
+                </AlphaTabProvider>
+            </StrictMode>
+        );
+        expect(warn).not.toHaveBeenCalled();
+        rerender(
+            <StrictMode>
+                <AlphaTabProvider>
+                    <AlphaTabHost />
+                    <AlphaTabHost />
+                </AlphaTabProvider>
+            </StrictMode>
+        );
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('one <AlphaTabHost>'));
+        warn.mockRestore();
+    });
+});
+
 describe('useAlphaTabEvent', () => {
     function Listener({ onScore }: { onScore: (score: unknown) => void }) {
         useAlphaTabEvent('scoreLoaded', score => onScore(score));

@@ -236,6 +236,21 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
             }
         }, [bothSources]);
 
+        const [registerHost] = useState(() => {
+            let hosts = 0;
+            return () => {
+                hosts++;
+                if (hosts > 1) {
+                    warnInDevelopment(
+                        '<AlphaTabProvider> takes one <AlphaTabHost>; the hosts compete for the API elements.'
+                    );
+                }
+                return () => {
+                    hosts--;
+                };
+            };
+        });
+
         useImperativeHandle(ref, () => handle, [handle]);
 
         const context = useMemo<AlphaTabContextValue>(
@@ -243,9 +258,10 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
                 api,
                 elements: { scrollElement, mountElement },
                 setScrollElement,
-                setMountElement
+                setMountElement,
+                registerHost
             }),
-            [api, scrollElement, mountElement]
+            [api, scrollElement, mountElement, registerHost]
         );
 
         return <AlphaTabContext.Provider value={context}>{props.children}</AlphaTabContext.Provider>;

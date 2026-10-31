@@ -1,12 +1,12 @@
-import type { ReactNode } from 'react';
+import { type HTMLAttributes, type ReactNode, useEffect } from 'react';
 import { useAlphaTabContext } from './context';
 
 /**
- * Props of {@link AlphaTabHost}.
+ * Props of {@link AlphaTabHost}. Standard HTML attributes, including `className`, `style`, `id`,
+ * ARIA and event handler props, apply to the scroll element.
  */
-export interface AlphaTabHostProps {
-    /** Class of the outermost element, which alphaTab scrolls during playback. */
-    className?: string;
+export interface AlphaTabHostProps
+    extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'dangerouslySetInnerHTML'> {
     /** Class of the element alphaTab renders into. */
     mountClassName?: string;
     /**
@@ -19,17 +19,19 @@ export interface AlphaTabHostProps {
 /**
  * The DOM elements of the nearest {@link AlphaTabProvider}'s API: a scroll element containing a
  * `position: relative` wrapper with the mount element and the optional overlay. It may sit anywhere
- * below the provider; each provider takes exactly one host.
+ * below the provider; each provider takes exactly one host, and a second one logs a warning in
+ * development.
  *
  * The scroll element becomes `player.scrollElement`, so give it a bounded size and `overflow: auto`
  * when the score should scroll inside it rather than with the page, or override the setting in
  * {@link AlphaTabProviderProps.configureSettings}. React renders no children into the mount element;
  * its content belongs to alphaTab.
  */
-export function AlphaTabHost({ className, mountClassName, overlay }: AlphaTabHostProps) {
-    const { setScrollElement, setMountElement } = useAlphaTabContext('<AlphaTabHost>');
+export function AlphaTabHost({ mountClassName, overlay, ...scrollProps }: AlphaTabHostProps) {
+    const { setScrollElement, setMountElement, registerHost } = useAlphaTabContext('<AlphaTabHost>');
+    useEffect(registerHost, [registerHost]);
     return (
-        <div ref={setScrollElement} className={className}>
+        <div {...scrollProps} ref={setScrollElement}>
             <div style={{ position: 'relative' }}>
                 <div ref={setMountElement} className={mountClassName} />
                 {overlay}

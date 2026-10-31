@@ -18,6 +18,8 @@ export interface AlphaTabContextValue {
     readonly elements: AlphaTabElements;
     readonly setScrollElement: (element: HTMLElement | null) => void;
     readonly setMountElement: (element: HTMLElement | null) => void;
+    /** Counts a mounted host; the returned function uncounts it. */
+    readonly registerHost: () => () => void;
 }
 
 /** @internal */
