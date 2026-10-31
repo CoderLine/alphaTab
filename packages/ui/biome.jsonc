@@ -1,0 +1,39 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+    "root": false,
+    "extends": "//",
+    "files": {
+        "includes": ["*.ts", "src/**", "test/**", "!**/*.scss"]
+    },
+    "formatter": {
+        "includes": ["*.ts", "src/**", "test/**", "!**/*.scss"]
+    },
+    "linter": {
+        "includes": ["*.ts", "src/**", "test/**", "!**/*.scss"],
+        "rules": {
+            "style": {
+                "noRestrictedImports": {
+                    "level": "error",
+                    "options": {
+                        "patterns": [
+                            {
+                                "group": ["@docusaurus/**", "@site/**", "@theme/**", "@theme-original/**"],
+                                "message": "@coderline/alphatab-ui serves several hosts: no Docusaurus imports; hosts pass what it needs through the UiEnvironment."
+                            },
+                            {
+                                "group": ["@coderline/alphatab-ui", "@coderline/alphatab-ui/**", "src/**"],
+                                "message": "Import other modules of @coderline/alphatab-ui by relative path."
+                            }
+                        ]
+                    }
+                }
+            },
+            "a11y": {
+                // Icons are decorative; the controls around them carry the label.
+                "noSvgWithoutTitle": "off",
+                // Groups and radios are styled ARIA roles on purpose; fieldset and input would need resets.
+                "useSemanticElements": "off"
+            }
+        }
+    }
+}

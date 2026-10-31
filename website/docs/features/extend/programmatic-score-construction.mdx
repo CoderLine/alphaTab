@@ -1,0 +1,114 @@
+---
+title: "Programmatic score construction"
+description: "Instantiate the alphaTab model classes directly and render a score built entirely in code — no importer, no source file."
+sidebar_custom_props:
+  feature_chapter: model
+  feature_order: 10
+keywords:
+  - alphaTab
+  - model
+  - score
+  - programmatic
+  - Score
+  - Track
+---
+
+import { ProgrammaticScoreExample } from '@site/src/components/ProgrammaticScoreExample';
+
+Generating a warm-up exercise on the fly, converting a proprietary format into alphaTab's model, or emitting etudes from a music-theory tool — none of these have a source file to import. Instantiate `Score`, `Track`, `Staff`, `Bar`, `Voice`, `Beat`, and `Note`, wire them together, and hand the root `Score` to `api.renderScore()`. No file format, no importer, no round-trip through alphaTex.
+
+<ProgrammaticScoreExample showCode={false} />
+
+The demo above is built entirely from `new alphaTab.model.Score()` and its children — no file, no alphaTex, no importer. One `Track`, one `Staff`, two `Bar`s, eight beats, then a single `api.renderScore(score)` call. The same construction, line for line, appears in the sample below.
+
+## Model shape
+
+Every score built from scratch follows the same tree:
+
+- `Score` — the root. Holds `masterBars` (shared time signature, tempo, repeats) and `tracks`.
+- `MasterBar` — one per bar of music, added to `Score.masterBars`. Sets time signature and tempo automations.
+- `Track` — one per instrument. Holds `staves`.
+- `Staff` — one per notation view (standard notation staff, tablature staff). Holds `bars` and tuning.
+- `Bar` — one per masterBar, added to `Staff.bars`. Holds `voices` and clef.
+- `Voice` — one per polyphonic voice within a bar. Holds `beats`.
+- `Beat` — one per rhythmic event. Holds `notes` (or is a rest) and carries `duration` and `dots`.
+- `Note` — one pitched note. Carries `string` + `fret` for tab, or `octave` + `tone` for pitched non-tab staves.
+
+Each level's collection has a corresponding `add*` method (`score.addTrack(track)`, `track.addStaff(staff)`, and so on) that also sets parent references and indices. Use the setters, not the arrays directly.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const score = new alphaTab.model.Score();
+score.title = 'Built in code';
+
+// Two shared master bars in 4/4. The initial tempo lives on the first
+// master bar as a tempo automation — Score.tempo itself is derived.
+for (let i = 0; i < 2; i++) {
+  const masterBar = new alphaTab.model.MasterBar();
+  masterBar.timeSignatureNumerator = 4;
+  masterBar.timeSignatureDenominator = 4;
+  score.addMasterBar(masterBar);
+}
+score.masterBars[0].tempoAutomations.push(
+  alphaTab.model.Automation.buildTempoAutomation(false, 0, 120, 2),
+);
+
+// One guitar track, one staff, standard six-string tuning (high E → low E).
+const track = new alphaTab.model.Track();
+track.name = 'Guitar';
+track.shortName = 'Gtr';
+score.addTrack(track);
+
+const staff = new alphaTab.model.Staff();
+staff.stringTuning.tunings = [64, 59, 55, 50, 45, 40];
+track.addStaff(staff);
+
+// One bar per master bar, one voice per bar.
+for (let i = 0; i < score.masterBars.length; i++) {
+  const bar = new alphaTab.model.Bar();
+  staff.addBar(bar);
+
+  const voice = new alphaTab.model.Voice();
+  bar.addVoice(voice);
+
+  // Four quarter-note beats per bar, ascending then descending the third string.
+  // Note.string is 1-based counted from the lowest string.
+  const frets = i === 0 ? [3, 5, 7, 8] : [8, 7, 5, 3];
+  for (const fret of frets) {
+    const beat = new alphaTab.model.Beat();
+    beat.duration = alphaTab.model.Duration.Quarter;
+    voice.addBeat(beat);
+
+    const note = new alphaTab.model.Note();
+    note.string = 4;
+    note.fret = fret;
+    beat.addNote(note);
+  }
+}
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container);
+
+// Compute ties, tick positions, and other derived state before rendering.
+score.finish(api.settings);
+
+api.renderScore(score);
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Post-construction finalization
+
+Calling `score.finish(settings)` derives ties, resolves tuplet durations, computes measure end positions, and links repeat groups. Until finish runs, fields like `Note.realValue`, resolved `Beat.duration`, and master-bar tick positions are unset. Run it explicitly before you hand the score to `renderScore()` — the sample above does this via `score.finish(api.settings)`.
+
+For scores serialized to JSON, run `finish` first so the JSON snapshot carries the finalized model.
+
+## Where to look next
+
+- [Traversing and mutating the model](/docs/features/extend/traversing-and-mutating-the-model) — the mirror workflow: walk and rewrite a loaded score instead of building one from scratch.
+- [`Score`](/docs/reference/types/model/score), [`MasterBar`](/docs/reference/types/model/masterbar), [`Track`](/docs/reference/types/model/track), [`Staff`](/docs/reference/types/model/staff), [`Bar`](/docs/reference/types/model/bar), [`Voice`](/docs/reference/types/model/voice), [`Beat`](/docs/reference/types/model/beat), and [`Note`](/docs/reference/types/model/note) in the model reference.
+- [`Duration`](/docs/reference/types/model/duration) and [`Automation`](/docs/reference/types/model/automation) — the enum used for `Beat.duration` and the helper behind the tempo automation on the first master bar.
+- [`renderScore`](/docs/reference/api/renderscore) — the entry point that accepts a hand-built score.

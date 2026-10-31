@@ -60,6 +60,18 @@
             "import": "./dist/alphaTab.vite.mjs",
             "require": "./dist/alphaTab.vite.js"
         },
+        "./core": {
+            "types": "./dist/alphaTab.d.ts",
+            "import": "./dist/alphaTab.core.mjs"
+        },
+        "./worker": {
+            "types": "./dist/alphaTab.worker.d.ts",
+            "import": "./dist/alphaTab.worker.mjs"
+        },
+        "./worklet": {
+            "types": "./dist/alphaTab.worklet.d.ts",
+            "import": "./dist/alphaTab.worklet.mjs"
+        },
         "./soundfont/*": "./dist/soundfont/*",
         "./font/*": "./dist/font/*"
     },

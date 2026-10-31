@@ -1,0 +1,53 @@
+---
+title: "Guitar Pro (3 through 8)"
+description: "One page covering every GP version, what each ships, and how alphaTab picks the right importer. Cross-links to per-version compatibility under `/docs/formats/`."
+sidebar_custom_props:
+  feature_chapter: formats
+  feature_order: 10
+keywords:
+  - alphaTab
+  - Guitar Pro
+  - format
+---
+
+import { GpVersionSwitcher } from '@site/src/components/GpVersionSwitcher';
+
+The files your users hand you may be any of GP3 through GP8 — three distinct container generations spanning two decades of Guitar Pro releases. One importer path handles all of them: point `core.file` at the file and alphaTab picks the matching importer from the bytes.
+
+<GpVersionSwitcher showCode={false} />
+
+## The formats at a glance
+
+Three generations of Guitar Pro use three different container strategies. alphaTab sniffs the input bytes on load and dispatches to the matching importer — you point at the file and receive a `Score` back.
+
+- **GP3, GP4, GP5 (.gp3 / .gp4 / .gp5)** — proprietary binary streams. GP4 has an official partial spec from Arobas; the rest was reverse-engineered from test files. Coverage is mature: notation, effects, per-track mixing, master bar structure, RSE settings. Older files sometimes stored lyrics in beat texts — see [Tuning importer behavior](./tuning-importer-behavior) for the `beatTextAsLyrics` flag that recovers them.
+- **GP6 (.gpx)** — the first XML-based generation, wrapped in a custom container that behaves like a compressed filesystem. Inside sit `score.gpif` (the notation XML), `BinaryStylesheet`, `PartConfiguration`, and `LayoutConfiguration`. alphaTab reads the notation and the stylesheet knobs it understands.
+- **GP7 and GP8 (.gp)** — a standard ZIP archive holding `Content/score.gpif` plus the stylesheet and configuration blobs from GP6. GP8 uses the same envelope as GP7 with additional payloads (embedded audio) and evolved `score.gpif` semantics for new features. alphaTab covers both with a single importer.
+
+Every version shares the same notation model on the alphaTab side, so tracks, bars, beats, notes, effects, and playback data behave identically once loaded — the differences are in what the source file was able to encode.
+
+## Show it in code
+
+The load call is version-agnostic. Point `core.file` at the file and alphaTab picks the right importer.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+To load from bytes instead (fetched, uploaded, or read from disk), see [Load from bytes](./load-from-bytes).
+
+## Where to look next
+
+- [Guitar Pro 8 compatibility](/docs/formats/guitar-pro-8) — feature-by-feature support table for GP8.
+- [Guitar Pro 7 compatibility](/docs/formats/guitar-pro-7) — the same table for GP7.
+- [Guitar Pro 6 compatibility](/docs/formats/guitar-pro-6) — GPX-specific coverage notes.
+- [Guitar Pro 3-5 compatibility](/docs/formats/guitar-pro-3-5) — the binary generation, including format quirks.
+- [Tuning importer behavior](./tuning-importer-behavior) — `beatTextAsLyrics`, encoding hints, and the other importer knobs relevant to old GP files.
+- [`core.file`](/docs/reference/settings/core/file) and [`api.load`](/docs/reference/api/load) in the reference.

@@ -1,0 +1,25 @@
+@use '../../components/landing/breakpoints' as *;
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--at-muted);
+  text-decoration: none;
+  font-family: var(--at-font-mono);
+  font-size: 12.5px;
+  transition: background-color 120ms ease, color 120ms ease;
+
+  &:hover {
+    background: var(--at-surface-alt);
+    color: var(--at-ink);
+    text-decoration: none;
+  }
+}
+
+.count {
+  // Match the design: star count only on desktop; tablet shows icon-only.
+  @include tablet { display: none; }
+}

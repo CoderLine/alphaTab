@@ -43,13 +43,23 @@
         "test-web": "npm run test"
     },
     "peerDependencies": {
+        "@rspack/core": "^1.7.0 || ^2.0.0",
         "webpack": "^5.0.0"
+    },
+    "peerDependenciesMeta": {
+        "@rspack/core": {
+            "optional": true
+        },
+        "webpack": {
+            "optional": true
+        }
     },
     "engines": {
         "node": ">=20.19.0"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.6.3",
+        "@rspack/core": "^1.7.12",
         "@types/node": "^26.6.5",
         "html-webpack-plugin": "^5.6.6",
         "rimraf": "^6.1.3",

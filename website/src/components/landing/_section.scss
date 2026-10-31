@@ -1,0 +1,44 @@
+@use './breakpoints' as *;
+
+// Drop-in section scaffolding used by every Landing* section root.
+// Each section root applies `.section` to pick up these tokens, then
+// reads `var(--section-pad-y)` etc. in its own SCSS module.
+
+@mixin section-tokens {
+  --container-max: 1280px;
+  --container-pad-x: 40px;
+  --section-pad-y: 80px;
+
+  --h1-size: 56px;
+  --h2-size: 36px;
+  --h3-size: 18px;
+  --lede-size: 18px;
+  --body-size: 14px;
+  --mono-size: 11px;
+
+  @include tablet {
+    --container-pad-x: 28px;
+    --section-pad-y: 56px;
+    --h1-size: 44px;
+    --h2-size: 28px;
+    --h3-size: 17px;
+    --lede-size: 17px;
+  }
+
+  @include mobile {
+    --container-pad-x: 16px;
+    --section-pad-y: 40px;
+    --h1-size: 36px;
+    --h2-size: 22px;
+    --h3-size: 16.5px;
+    --lede-size: 15px;
+    --body-size: 13.5px;
+  }
+}
+
+@mixin section-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-pad-x);
+  padding-right: var(--container-pad-x);
+}

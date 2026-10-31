@@ -1,0 +1,99 @@
+.flyout {
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  // Opens upward from the transport bar; keep header and footer below the sticky navbar.
+  max-height: calc(100vh - var(--at-host-offset, 0px) - 120px);
+  scroll-margin-top: calc(var(--at-host-offset, 0px) + 12px);
+  background: var(--at-surface);
+  border: 1px solid var(--at-line);
+  border-radius: 12px;
+  box-shadow: var(--at-shadow-lg);
+  color: var(--at-ink);
+  position: relative;
+  font-family: 'Noto Sans', system-ui, sans-serif;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--at-line);
+}
+
+.headerIcon {
+  color: var(--at-accent);
+}
+
+.headerTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.closeBtn {
+  background: transparent;
+  border: none;
+  color: var(--at-muted);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 0;
+
+  &:hover {
+    color: var(--at-ink);
+  }
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--at-line);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--at-surface-alt);
+  border-radius: 0 0 12px 12px;
+}
+
+.hint {
+  font-family: var(--at-font-mono);
+  font-size: 10.5px;
+  color: var(--at-muted);
+}
+
+.resetBtn {
+  padding: 5px 10px;
+  border: 1px solid var(--at-line);
+  border-radius: 6px;
+  background: var(--at-surface);
+  color: var(--at-ink-soft);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.pointer {
+  position: absolute;
+  bottom: -6px;
+  right: 18px;
+  width: 12px;
+  height: 12px;
+  background: var(--at-surface-alt);
+  border-right: 1px solid var(--at-line);
+  border-bottom: 1px solid var(--at-line);
+  transform: rotate(45deg);
+}
+
+.groupNote {
+  font-size: 11.5px;
+  color: var(--at-muted);
+}

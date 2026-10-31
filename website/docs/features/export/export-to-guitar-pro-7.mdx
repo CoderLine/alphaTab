@@ -1,0 +1,81 @@
+---
+title: "Export to Guitar Pro 7"
+description: "Write `.gp` files with `Gp7Exporter`, wire the resulting bytes into a browser download."
+sidebar_custom_props:
+  since: "1.2"
+  feature_chapter: score-formats
+  feature_order: 10
+keywords:
+  - alphaTab
+  - Guitar Pro
+  - GP7
+  - export
+  - exporter
+---
+
+import { Gp7ExporterDemo } from '@site/src/components/Gp7ExporterDemo';
+
+Let a user edit a score inside your app and hand them back a `.gp` file they can open in Guitar Pro. Convert an imported MusicXML archive into the format guitarists actually share. Save the currently loaded arrangement to your backend as a Guitar Pro container. `Gp7Exporter` covers each of those flows — point it at `api.score` and `api.settings`, and it returns a `Uint8Array` ready to persist, upload, or offer as a download.
+
+<Gp7ExporterDemo showCode={false} />
+
+The score above is what a Guitar Pro export produces. Round-tripping alphaTab-only features (custom sub-element colors, stylesheet flags Guitar Pro does not know) falls back to the closest GP7 approximation the format allows.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on(() => {
+  const exporter = new alphaTab.exporter.Gp7Exporter();
+  const data = exporter.export(api.score, api.settings);
+
+  const fileName = (api.score.title || 'Untitled') + '.gp';
+  const url = URL.createObjectURL(
+    new Blob([data], { type: 'application/octet-stream' })
+  );
+
+  const a = document.createElement('a');
+  a.download = fileName;
+  a.href = url;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+```
+
+`getAlphaTabContainer()` is the platform-specific step — a `<div>` on Web, an `AlphaTab` control on .NET, an `AlphaTabView` on Android. The exporter itself runs on every runtime; only the download link is browser-specific. On .NET or Android, write the byte array to disk with the native file API instead.
+
+## What the exporter emits
+
+`Gp7Exporter` builds the full `.gp` container:
+
+- `Content/score.gpif` — the GPIF XML with tracks, staves, bars, beats, notes, and effects.
+- `Content/BinaryStylesheet` — the score-level stylesheet Guitar Pro reads on load.
+- `Content/PartConfiguration` and `Content/LayoutConfiguration` — visibility and layout hints per part.
+- The backing-track asset, when the loaded score carries one.
+
+Guitar Pro 7 and Guitar Pro 8 both open the resulting file. Any GP8-only additions the source score used are downgraded to their GP7 equivalent where possible.
+
+Since 1.9.0 the exporter also handles the following:
+
+- The system layout (bars per system) is written in the form Guitar Pro expects, so the multi-track view in Guitar Pro 8 opens the file.
+- Every note gets a string and fret, also on staves without a tuning such as piano parts or MusicXML imports. Guitar Pro requires both on every note.
+- Guitar Pro supports four voices per bar. Voices with a higher index move into unused slots. When all four slots are taken, the remaining voices are dropped and a warning is logged.
+- Notes keep their spelling in every key, for example a B♭ in F major stays a B♭.
+- The tuning display mode of the stylesheet (tuning above the score or on the staff lines) is written to the binary stylesheet. See [Tuning display](/docs/features/render/tuning-display).
+- Percussion notes keep their string, so drum tablature survives the round trip. See [Drum and percussion notation](/docs/features/render/drum-tabs).
+- The exporter works on a copy of the score. `api.score` stays unchanged.
+
+## Where to look next
+
+- [Export to alphaTex](export-to-alphatex) — write the score as text instead of a binary container.
+- [Score to JSON and back](score-to-json) — round-trip the in-memory model for storage or transport.
+- [`api.score`](/docs/reference/api/score) and [`api.settings`](/docs/reference/api/settings) — the inputs the exporter reads.
+- [`Gp7Exporter`](/docs/reference/types/exporter/gp7exporter) and its base [`ScoreExporter`](/docs/reference/types/exporter/scoreexporter) in the API reference.

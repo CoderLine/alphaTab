@@ -1,0 +1,159 @@
+.reflow {
+  --reflow-staff-line: color-mix(in srgb, var(--at-ink) 45%, transparent);
+  --reflow-frame-border: color-mix(in srgb, var(--at-ink) 22%, transparent);
+  --reflow-chrome: color-mix(in srgb, var(--at-ink) 5%, var(--at-surface));
+
+  padding: 10px 12px 0;
+  border-radius: 8px;
+  background: var(--at-bg);
+}
+
+// Tall enough for the phone width, where the six bars take three systems.
+.stage {
+  height: 120px;
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  border: 1px solid var(--reflow-frame-border);
+  border-radius: 6px;
+  background: var(--at-surface);
+  box-shadow:
+    0 1px 2px rgba(13, 22, 38, 0.06),
+    0 6px 16px -8px rgba(13, 22, 38, 0.25);
+  animation: reflow-resize 10s ease-in-out infinite;
+}
+
+@keyframes reflow-resize {
+  0%,
+  16% { width: 100%; }
+  28%,
+  46% { width: 70%; }
+  58%,
+  76% { width: 42%; }
+  90%,
+  100% { width: 100%; }
+}
+
+.chrome {
+  display: flex;
+  gap: 3px;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--reflow-frame-border);
+  border-radius: 5px 5px 0 0;
+  background: var(--reflow-chrome);
+
+  span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--reflow-frame-border);
+  }
+}
+
+.page {
+  padding: 6px 8px 4px;
+  overflow: hidden;
+}
+
+.title {
+  width: 32%;
+  max-width: 64px;
+  height: 4px;
+  margin: 0 auto 2px;
+  border-radius: 2px;
+  background: var(--at-ink);
+  opacity: 0.35;
+}
+
+.system {
+  display: flex;
+
+  svg {
+    display: block;
+    flex: none;
+  }
+}
+
+.grip {
+  position: absolute;
+  top: 50%;
+  right: -3px;
+  width: 5px;
+  height: 20px;
+  margin-top: -10px;
+  border-radius: 3px;
+  background: var(--at-accent);
+}
+
+.ruler {
+  position: relative;
+  height: 20px;
+  margin-top: 6px;
+  border-top: 1px solid var(--reflow-frame-border);
+}
+
+.stop {
+  position: absolute;
+  top: 5px;
+  transform: translateX(-100%);
+  padding-right: 4px;
+  font-family: var(--at-font-mono);
+  font-size: 9px;
+  line-height: 1;
+  color: var(--at-muted);
+  animation: 10s ease-in-out infinite;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: 0;
+    width: 1px;
+    height: 6px;
+    background: var(--reflow-frame-border);
+  }
+}
+
+// Each label lights up while the frame holds at its width; timings mirror `reflow-resize`.
+.phone { animation-name: stop-phone; }
+.tablet { animation-name: stop-tablet; }
+.desktop { animation-name: stop-desktop; }
+
+@media (prefers-reduced-motion: reduce) {
+  .frame {
+    animation: none;
+    width: 70%;
+  }
+
+  .stop { animation: none; }
+  .tablet { color: var(--at-accent); }
+}
+
+@keyframes stop-phone {
+  0%,
+  54% { color: var(--at-muted); }
+  58%,
+  76% { color: var(--at-accent); }
+  82%,
+  100% { color: var(--at-muted); }
+}
+
+@keyframes stop-tablet {
+  0%,
+  24% { color: var(--at-muted); }
+  28%,
+  46% { color: var(--at-accent); }
+  52%,
+  100% { color: var(--at-muted); }
+}
+
+@keyframes stop-desktop {
+  0%,
+  16% { color: var(--at-accent); }
+  22%,
+  86% { color: var(--at-muted); }
+  90%,
+  100% { color: var(--at-accent); }
+}

@@ -1,0 +1,78 @@
+---
+title: "SongBook mode"
+description: "Songbook-specific bend and dip durations."
+sidebar_custom_props:
+  feature_chapter: feel
+  feature_order: 40
+keywords:
+  - alphaTab
+  - songbook
+  - bend
+---
+
+import * as alphaTab from '@coderline/alphatab';
+import { ToggleSettingDemo } from '@site/src/components/PlaySync';
+
+When the goal is a chart that reads like the Real Book — bends drawn as compact hooks, dips notated as instant events at the corner of a beat, chord symbols above the staff — flip on `SongBook` notation mode and alphaTab reshapes both the render and the playback to match. On the audio side, two millisecond-based settings control how snappy those bend and dip events sound when the mode is on.
+
+<ToggleSettingDemo
+  tex={`\\title "Bend and grace showcase"
+\\tempo 90
+.
+\\track "Guitar"
+:4 5.3{b (0 4)} 7.3{b (0 4 0)} :2 5.3{b (0 4 4 0)} |
+:8 7.3 {gr bb} 5.3 7.3 {gr ob} 8.3 :4 7.3 :2 5.3{b (0 4)} |
+:4 5.3{sl} 7.3 5.3{sl} 3.3 |
+:4 5.3{b (0 8 0)} :2 3.3 :4 5.3 |
+:4 3.3 {gr bb} 5.3{b (0 4)} 7.3{b (0 4 4 0)} 5.3 |
+:1 3.3{b (0 4)} |`}
+  settingPath="notation.notationMode"
+  label="SongBook notation mode"
+  onValue={alphaTab.NotationMode.SongBook}
+  offValue={alphaTab.NotationMode.GuitarPro}
+  defaultOn={false}
+  reload={true}
+  showCode={false}
+/>
+
+## Two durations, always in milliseconds
+
+- `player.songBookBendDuration` — how long a songbook bend takes to reach its target pitch. Default `75` ms.
+- `player.songBookDipDuration` — how long a whammy dip takes to descend and rise back. Default `150` ms.
+
+These are milliseconds, not MIDI ticks. Bends and dips in songbook style should feel identical at any tempo, so alphaTab measures them against wall-clock time instead of the score's time base.
+
+Lower values sharpen the attack — the bend snaps almost instantly to its target. Higher values soften it into an audible glissando. Values above ~250 ms start to blur the note the bend is attached to; the songbook idiom breaks down.
+
+## When these settings apply
+
+The two durations only take effect when `notation.notationMode` is set to `SongBook`. In the default `GuitarPro` notation mode, bends and dips render and play as full gestures over the note's duration, and these knobs have no effect. Setting them without switching the notation mode is safe — they wait for the mode to change.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  notation: {
+    notationMode: alphaTab.NotationMode.SongBook,
+  },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
+    songBookBendDuration: 60,
+    songBookDipDuration: 120,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [`player.songBookBendDuration`](/docs/reference/settings/player/songbookbendduration) and [`player.songBookDipDuration`](/docs/reference/settings/player/songbookdipduration) in the settings reference.
+- [`notation.notationMode`](/docs/reference/settings/notation/notationmode) — the notation-mode switch that activates these values.
+- [`NotationMode`](/docs/reference/types/notationmode) enum — the `GuitarPro` and `SongBook` values the setting accepts.
+- [Vibrato and slide fine-tuning](vibrato-and-slide-fine-tuning) — related synth-timing knobs.
+- [Triplet feel (swing)](triplet-feel-swing) — the other playback-feel toggle in this chapter.

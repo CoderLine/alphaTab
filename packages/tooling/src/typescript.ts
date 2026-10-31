@@ -194,6 +194,48 @@ function findTypeReferences(file: ts.SourceFile, names: string[]): Set<string> {
     return found;
 }
 
+/** Whether the file exports anything; `export {}`, which only marks a file as module, counts if `withEmpty` is set. */
+function hasExports(file: ts.SourceFile, withEmpty: boolean) {
+    return file.statements.some(e => {
+        if (ts.isExportDeclaration(e)) {
+            return (
+                withEmpty ||
+                e.moduleSpecifier !== undefined ||
+                !e.exportClause ||
+                !ts.isNamedExports(e.exportClause) ||
+                e.exportClause.elements.length > 0
+            );
+        }
+        return ts.canHaveModifiers(e) && e.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
+    });
+}
+
+const declarationTargets = ['', '.d.ts', '.d.mts', '/index.d.ts'];
+
+/**
+ * The relative module specifiers and reference paths of the declaration file `file` that do not resolve to a
+ * declaration file inside `rootDir`.
+ */
+export function unresolvedRelativeImports(file: string, content: string, rootDir: string): string[] {
+    const info = ts.preProcessFile(content, true, true);
+    const unresolved: string[] = [];
+    for (const { fileName } of [...info.importedFiles, ...info.referencedFiles]) {
+        if (!fileName.startsWith('.')) {
+            continue;
+        }
+        const target = path.resolve(path.dirname(file), fileName).replace(/\.[cm]?js$/, '');
+        const relative = path.relative(rootDir, target);
+        const inside = !relative.startsWith('..') && !path.isAbsolute(relative);
+        const resolves = declarationTargets.some(
+            ext => /\.d\.[cm]?ts$/.test(target + ext) && fs.existsSync(target + ext)
+        );
+        if (!inside || !resolves) {
+            unresolved.push(fileName);
+        }
+    }
+    return unresolved;
+}
+
 export async function createApiDtsFiles(
     dtsBaseDir: string,
     dtsFiles: string[],
@@ -231,7 +273,8 @@ export async function createApiDtsFiles(
         host: ts.createCompilerHost(parsedCommandLine.options)
     });
 
-    let sourceFiles = dtsFiles.map(f => program.getSourceFile(f)!);
+    const originalSourceFiles = dtsFiles.map(f => program.getSourceFile(f)!);
+    let sourceFiles = originalSourceFiles;
 
     const checker = program.getTypeChecker();
 
@@ -256,13 +299,9 @@ export async function createApiDtsFiles(
         return filtered;
     });
 
-    // Pass 3: filter any files which do not have any exports
-    sourceFiles = sourceFiles.filter(s =>
-        s.statements.some(
-            e =>
-                ts.isExportDeclaration(e) ||
-                (ts.canHaveModifiers(e) && e.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword))
-        )
+    // Pass 3: filter any files which do not have any exports, or lost all of them in pass 1
+    sourceFiles = sourceFiles.filter(
+        (s, i) => hasExports(s, true) && (hasExports(s, false) || !hasExports(originalSourceFiles[i], false))
     );
 
     // Pass 4(todo): Collect and Filter any unused imports from externals
@@ -273,6 +312,7 @@ export async function createApiDtsFiles(
         noEmitHelpers: true
     });
 
+    const written: [file: string, content: string][] = [];
     for (const s of sourceFiles) {
         const result = printer.printFile(s);
         const relativePath = path.relative(dtsBaseDir, s.fileName);
@@ -280,5 +320,12 @@ export async function createApiDtsFiles(
         const parent = path.dirname(outputFile);
         await fs.promises.mkdir(parent, { recursive: true });
         await fs.promises.writeFile(outputFile, result);
+        written.push([outputFile, result]);
+    }
+
+    for (const [file, content] of written) {
+        for (const specifier of unresolvedRelativeImports(file, content, outDir)) {
+            logger.error(`${file}: '${specifier}' does not resolve to a declaration file of the package`);
+        }
     }
 }

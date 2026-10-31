@@ -1,0 +1,174 @@
+.wrapper {
+  position: relative;
+}
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-background-surface-color);
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.transportButtons {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.iconButton {
+  min-width: 2.25rem;
+  padding: 0.25rem 0.6rem;
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.timeReadout {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.9rem;
+  min-width: 7.5rem;
+}
+
+.progressTrack {
+  flex: 1 1 8rem;
+  height: 6px;
+  background: var(--ifm-color-emphasis-300);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--ifm-color-primary);
+  transition: width 100ms linear;
+}
+
+.extras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-background-surface-color);
+  margin-bottom: 0.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.85rem;
+}
+
+.fieldRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.value {
+  font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-color-emphasis-700);
+}
+
+.caption {
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+  margin-top: 0.35rem;
+}
+
+.badge {
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-800);
+  font-size: 0.75rem;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.mixerRow {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) 3fr auto auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  font-size: 0.85rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.mixerBtn {
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.8rem;
+
+  &.active {
+    background: var(--ifm-color-primary);
+    color: var(--ifm-color-white);
+    border-color: var(--ifm-color-primary);
+  }
+}
+
+.transposeGroup {
+  display: flex;
+  gap: 0.15rem;
+  align-items: center;
+}
+
+.midiLog {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  background: var(--ifm-background-surface-color);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+
+  > div {
+    padding: 0.05rem 0;
+    animation: fadeIn 0.3s ease-out;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0.3; }
+  to { opacity: 1; }
+}
+
+.notice {
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--ifm-color-warning);
+  background: var(--ifm-color-warning-contrast-background);
+  color: var(--ifm-color-warning-contrast-foreground);
+  font-size: 0.85rem;
+  margin-bottom: 0.75rem;
+}
+
+.videoElement {
+  width: 100%;
+  max-height: 300px;
+  background: black;
+}

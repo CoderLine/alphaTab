@@ -1,63 +1,96 @@
 name: Build
-on: 
+on:
   push:
-    branches: 
+    branches:
       - develop
       - main
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # web-dist artifact and cache content; the artifact root is packages/
+  WEB_DIST_PATHS: |
+    packages/alphatab/dist
+    packages/lsp/dist
+    packages/monaco/dist
+    packages/webpack/dist
+    packages/vite/dist
+    packages/react/dist
+
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      core: ${{ steps.areas.outputs.core }}
+      webpkgs: ${{ steps.areas.outputs.webpkgs }}
+      csharp: ${{ steps.areas.outputs.csharp }}
+      kotlin: ${{ steps.areas.outputs.kotlin }}
+      player: ${{ steps.areas.outputs.player }}
+      website: ${{ steps.areas.outputs.website }}
+      playground: ${{ steps.areas.outputs.playground }}
+      github: ${{ steps.areas.outputs.github }}
+      lint: ${{ steps.areas.outputs.lint }}
+      lint_workspaces: ${{ steps.areas.outputs.lint_workspaces }}
+      build_web: ${{ steps.areas.outputs.build_web }}
+      build_website: ${{ steps.areas.outputs.build_website }}
+      test_web: ${{ steps.areas.outputs.test_web }}
+      web_tests: ${{ steps.areas.outputs.web_tests }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # pull requests diff the merge commit against its first parent
+          fetch-depth: 2
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      - id: areas
+        run: node scripts/ci-areas.mts --event "$EVENT_NAME" --before "$BEFORE" --head HEAD
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+
   lint:
     name: Linting and TypeCheck
+    needs: changes
+    if: needs.changes.outputs.lint == 'true'
     runs-on: ubuntu-latest
+    env:
+      WORKSPACES: ${{ needs.changes.outputs.lint_workspaces }}
     steps:
       - uses: actions/checkout@v7
-        with: 
-          fetch-depth: 100
       - uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
-          cache: 'npm'
-      - run: npm install
-      - run: npm run generate-typescript
-      - run: npm run lint-ci
-        if: ${{ always() }}
-      - run: npm run typecheck
-        if: ${{ always() }}
-
-  build_web:
-    name: Build and Test Web
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with: 
-            fetch-depth: 100
-      - uses: actions/setup-node@v7
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build-web
-      - run: npm run test-web
-        id: test
-      - run: npm run build-language-server
-      - run: npm run build-monaco
-      - uses: actions/upload-artifact@v7
-        if: ${{ failure() && steps.test.conclusion == 'failure' }}
-        with: 
-          name: test-results-web
-          path: |
-            packages/alphatab/test-data/**/*.new.png
-            packages/alphatab/test-data/**/*.diff.png
+          cache: ${{ needs.changes.outputs.lint_workspaces != '' && 'npm' || '' }}
+      - run: npm ci $WORKSPACES --include-workspace-root
+        if: env.WORKSPACES != ''
+      - id: generate
+        run: npm run generate-typescript
+        if: env.WORKSPACES != ''
+      - run: npm run lint $WORKSPACES --if-present -- --reporter=github
+        if: ${{ !cancelled() && steps.generate.outcome == 'success' }}
+      - run: npm run typecheck $WORKSPACES --if-present
+        if: ${{ !cancelled() && steps.generate.outcome == 'success' }}
+      - run: node --test 'scripts/*.test.mts'
+        if: ${{ !cancelled() && needs.changes.outputs.core == 'true' }}
+      - run: node --test '.github/scripts/*.test.mjs'
+        if: ${{ !cancelled() && needs.changes.outputs.github == 'true' }}
 
   build_csharp:
     name: Build and Test C#
+    needs: changes
+    if: needs.changes.outputs.core == 'true' || needs.changes.outputs.csharp == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with: 
-          fetch-depth: 100
       - uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
@@ -65,7 +98,7 @@ jobs:
       - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: '8'
-      - run: npm ci
+      - run: npm ci -w packages/alphatab -w packages/transpiler -w packages/tooling -w packages/csharp --include-workspace-root
       - run: npm run build-csharp
       - run: npm run test-ci-csharp
         id: test
@@ -79,13 +112,14 @@ jobs:
 
   build_kotlin:
     name: Build and Test Kotlin
+    needs: changes
+    if: needs.changes.outputs.core == 'true' || needs.changes.outputs.kotlin == 'true'
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       checks: write
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 100
       - uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
@@ -97,12 +131,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: false
-      - run: npm ci
+      - run: npm ci -w packages/alphatab -w packages/transpiler -w packages/tooling -w packages/kotlin --include-workspace-root
       - run: npm run build-kotlin
       - run: npm run test-kotlin
         id: test
       - uses: dorny/test-reporter@v3
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         with:
           name: Kotlin Tests
           path: 'packages/kotlin/**/build/test-results/**/*.xml'
@@ -115,3 +149,187 @@ jobs:
             packages/alphatab/test-data/**/*.new.png
             packages/alphatab/test-data/**/*.diff.png
       - run: ./packages/kotlin/src/gradlew --stop
+
+  build_web:
+    name: Build Web
+    needs: changes
+    if: needs.changes.outputs.build_web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # keyed on the checked-out sources, before anything is generated or installed; a cached dist
+      # passed the published types check of the script version in its key
+      - id: dist-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.WEB_DIST_PATHS }}
+          # one indentation level throughout, so the folded scalar joins the lines with spaces
+          key: >-
+            web-dist-${{ runner.os }}-${{ hashFiles(
+            'packages/alphatab/src/**', 'packages/lsp/src/**', 'packages/monaco/src/**',
+            'packages/webpack/src/**', 'packages/vite/src/**', 'packages/react/src/**',
+            'packages/alphatex/src/**', 'packages/tooling/src/**', 'packages/transpiler/src/**',
+            'scripts/check-published-types.mts',
+            'packages/alphatab/font/**', 'packages/alphatab/bundler/**', 'packages/alphatab/scripts/**',
+            'packages/*/vite.config.ts', 'packages/*/package.json', 'packages/*/tsconfig.json',
+            'tsconfig.base.json', 'package.json', 'package-lock.json',
+            '!**/node_modules/**', '!**/test-data/**', '!**/test/**'
+            ) }}
+      - uses: actions/setup-node@v7
+        if: steps.dist-cache.outputs.cache-hit != 'true'
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - id: workspaces
+        if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: |
+          args=""
+          for ws in packages/alphatab packages/alphatex packages/transpiler packages/tooling packages/lsp packages/monaco packages/webpack packages/vite packages/react; do
+            if [ -f "$ws/package.json" ]; then args="$args -w $ws"; fi
+          done
+          echo "args=$args" >> "$GITHUB_OUTPUT"
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: npm ci $WORKSPACES --include-workspace-root
+        env:
+          WORKSPACES: ${{ steps.workspaces.outputs.args }}
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: npm run build-web
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: npm run build-language-server
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: npm run build-monaco
+      - if: steps.dist-cache.outputs.cache-hit != 'true' && hashFiles('packages/react/package.json') != ''
+        run: npm run build -w packages/react
+      - if: steps.dist-cache.outputs.cache-hit != 'true'
+        run: node scripts/check-published-types.mts
+      - uses: actions/cache/save@v6
+        if: steps.dist-cache.outputs.cache-hit != 'true' && github.event_name != 'pull_request'
+        with:
+          path: ${{ env.WEB_DIST_PATHS }}
+          key: ${{ steps.dist-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-dist
+          path: ${{ env.WEB_DIST_PATHS }}
+          if-no-files-found: error
+          retention-days: 1
+
+  test_web:
+    name: Test Web (${{ matrix.name }})
+    needs: [changes, build_web]
+    if: needs.changes.outputs.test_web == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # the legs and the areas selecting them are webTestLegs in scripts/ci-areas.mts
+      matrix: ${{ fromJSON(needs.changes.outputs.web_tests) }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+      - run: npm ci $WORKSPACES --include-workspace-root
+        env:
+          WORKSPACES: ${{ matrix.install }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-dist
+          path: packages
+      - run: npm run generate-typescript
+      - id: test
+        run: npm run test-web $WORKSPACES
+        env:
+          WORKSPACES: ${{ matrix.test }}
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
+        with:
+          name: test-results-web-${{ matrix.id }}
+          path: |
+            packages/alphatab/test-data/**/*.new.png
+            packages/alphatab/test-data/**/*.diff.png
+
+  website:
+    name: Build Website
+    needs: [changes, build_web]
+    if: needs.changes.outputs.build_website == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      # own key: the core jobs' npm cache holds no Docusaurus packages
+      - id: npm-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.npm
+          key: npm-website-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-website-${{ runner.os }}-
+      - id: workspaces
+        run: |
+          args="-w website"
+          if [ -f packages/ui/package.json ]; then args="$args -w packages/ui"; fi
+          echo "args=$args" >> "$GITHUB_OUTPUT"
+      - run: npm ci $WORKSPACES --include-workspace-root
+        env:
+          WORKSPACES: ${{ steps.workspaces.outputs.args }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-dist
+          path: packages
+      # npm ci recreates node_modules, so the build caches are restored after it
+      - id: docusaurus-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            website/.docusaurus
+            website/node_modules/.cache
+          key: docusaurus-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: docusaurus-${{ runner.os }}-
+      - id: generate
+        run: npm run generate-alphatabdoc -w website
+      - run: npm run lint -w website
+        if: ${{ !cancelled() && steps.generate.outcome == 'success' }}
+      - run: npm run typecheck -w website
+        if: ${{ !cancelled() && steps.generate.outcome == 'success' }}
+      # the reference docs are generated above; --ignore-scripts skips the prebuild generation
+      - id: build
+        if: ${{ !cancelled() && steps.generate.outcome == 'success' }}
+        run: npm run build -w website --ignore-scripts
+      - uses: actions/cache/save@v6
+        if: ${{ !cancelled() && steps.npm-cache.outputs.cache-hit != 'true' && github.event_name != 'pull_request' }}
+        with:
+          path: ~/.npm
+          key: ${{ steps.npm-cache.outputs.cache-primary-key }}
+      - uses: actions/cache/save@v6
+        if: ${{ steps.build.outcome == 'success' && steps.docusaurus-cache.outputs.cache-hit != 'true' && github.event_name != 'pull_request' }}
+        with:
+          path: |
+            website/.docusaurus
+            website/node_modules/.cache
+          key: ${{ steps.docusaurus-cache.outputs.cache-primary-key }}
+      - uses: actions/upload-artifact@v7
+        if: steps.build.outcome == 'success'
+        with:
+          name: website
+          path: website/build
+          if-no-files-found: error
+          retention-days: 3
+
+  ci_ok:
+    name: ci_ok
+    needs: [changes, lint, build_csharp, build_kotlin, build_web, test_web, website]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - if: >-
+          needs.changes.result != 'success' ||
+          contains(needs.*.result, 'failure') ||
+          contains(needs.*.result, 'cancelled')
+        run: |
+          echo "::error::Required jobs did not succeed: $RESULTS"
+          exit 1
+        env:
+          RESULTS: ${{ toJSON(needs.*.result) }}
+      - run: echo "All required jobs succeeded or were not needed for this change."

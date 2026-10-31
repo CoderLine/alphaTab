@@ -16,6 +16,10 @@ on:
       dry_run:
         type: boolean
         default: false
+    outputs:
+      alphatab_version:
+        description: The @coderline/alphatab version published by this run; empty if it was not published
+        value: ${{ jobs.build.outputs.alphatab_version }}
 
 
 jobs:
@@ -24,9 +28,11 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    outputs:
+      alphatab_version: ${{ steps.publish.outputs.alphatab_version }}
     steps:
       - uses: actions/checkout@v7
-        with: 
+        with:
           fetch-depth: 100
       - uses: actions/setup-node@v7
         with:
@@ -35,11 +41,15 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - run: npm run update-version -- ${{inputs.version}}
-      - run: npm ci
+      - run: >
+          npm ci --include-workspace-root
+          -w packages/alphatab -w packages/alphatex -w packages/transpiler -w packages/tooling
+          -w packages/lsp -w packages/monaco -w packages/webpack -w packages/vite
       - run: npm run build-web
       - run: npm run build-language-server
       - run: npm run build-monaco
 
       - run: npm run nightly-pack -- --platform web --force ${{ inputs.force }}
       - run: npm install -g npm@11
-      - run: npm run nightly-publish -- --platform web --force ${{ inputs.force }} --tag ${{ inputs.npm_tag }} --stage ${{ inputs.stage }} --dry-run ${{ inputs.dry_run }}
+      - id: publish
+        run: npm run nightly-publish -- --platform web --force ${{ inputs.force }} --tag ${{ inputs.npm_tag }} --stage ${{ inputs.stage }} --dry-run ${{ inputs.dry_run }}

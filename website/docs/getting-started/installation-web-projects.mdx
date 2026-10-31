@@ -1,0 +1,134 @@
+---
+title: Installing in web projects
+description: Choose the alphaTab setup for your bundler or framework, compare how often each setup loads alphaTab's core, and learn what every setup needs.
+keywords:
+  - alphaTab
+  - install
+  - bundler
+  - framework
+  - webpack
+  - Rspack
+  - Vite
+  - Web Worker
+  - Audio Worklet
+---
+
+import BundleStructure from '@site/static/img/getting-started/alphatab-bundle-structure.svg';
+
+This page tells you which alphaTab setup fits your bundler or framework and what every setup has in common.
+
+```bash
+npm install @coderline/alphatab
+```
+
+With webpack, Rspack, Rsbuild or Vite, also install the plugin for your bundler and register it in its config:
+
+```bash
+npm install --save-dev @coderline/alphatab-webpack   # webpack, Rspack, Rsbuild
+npm install --save-dev @coderline/alphatab-vite      # Vite
+```
+
+```js
+// vite.config.js
+import { defineConfig } from 'vite';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+export default defineConfig({
+    plugins: [alphaTab()]
+});
+```
+
+Without a bundler, load alphaTab from a CDN as shown in [Installation (Web)](installation-web).
+
+## Choose your setup {#choose}
+
+Find your bundler or framework and follow its page. Every setup listed here was verified with a sample project in [alphaTabSamplesWeb](https://github.com/CoderLine/alphaTabSamplesWeb): the score renders in a Web Worker and plays through the Audio Worklet.
+
+"Core copies" counts how many copies of alphaTab's core (about 1.2 MiB minified, 300 kB gzipped) the browser downloads. One is the target: the page, the Web Workers and the Audio Worklet then share a single file.
+
+### Bundlers {#bundlers}
+
+| Bundler | Integration | Core copies | Sample |
+| --- | --- | --- | --- |
+| webpack 5 (5.90 or later) | [`@coderline/alphatab-webpack`](installation-webpack) | 1 | [`bundler-webpack-5`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-webpack-5) |
+| Rspack 1.7 and 2 | [`@coderline/alphatab-webpack`](installation-webpack#rspack) | 1 | [`bundler-rspack-1`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-rspack-1), [`bundler-rspack-2`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-rspack-2) |
+| Rsbuild 1.7 and 2 | [`@coderline/alphatab-webpack`](installation-webpack#rsbuild) via `tools.rspack` | 1 | [`bundler-rsbuild-2`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-rsbuild-2) |
+| Vite 6, 7 and 8 | [`@coderline/alphatab-vite`](installation-vite) | 1 | [`bundler-vite-6`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-vite-6), [`bundler-vite-7`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-vite-7), [`bundler-vite-8`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-vite-8) |
+| esbuild | [own worker and worklet entries](installation-other-bundlers#esbuild) | 1 | [`bundler-esbuild`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-esbuild) |
+| Rollup 4 | [own worker and worklet entries](installation-other-bundlers#rollup) | 1 | [`bundler-rollup-4`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-rollup-4) |
+| Parcel 2 | [own worker and worklet entries](installation-other-bundlers#parcel) | 3 | [`bundler-parcel-2`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-parcel-2) |
+| Turbopack (Next.js) | [no plugin, copied ES module for the worklet](installation-react#turbopack) | 2 | [`nextjs-16-turbopack`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/nextjs-16-turbopack) |
+| No bundler | [ES module or UMD script from a CDN](installation-web) | 1 | [`browser-simple-esm`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/browser-simple-esm) |
+
+### Frameworks {#frameworks}
+
+| Framework | Bundler | Core copies | Page |
+| --- | --- | --- | --- |
+| React 18 and 19 | Vite | 1 | [React and Next.js](installation-react#vite) |
+| Next.js 15 and 16 | webpack | 1 (`next dev`: 3) | [React and Next.js](installation-react#nextjs) |
+| Next.js 16 | Turbopack | 2 | [React and Next.js](installation-react#turbopack) |
+| Vue 3 | Vite | 1 | [Vue and Nuxt](installation-vue#vite) |
+| Nuxt 3 and 4 | Vite | 1 | [Vue and Nuxt](installation-vue#nuxt) |
+| Angular 20, 21 and 22 | application builder (esbuild) | 1 | [Angular](installation-angular#application-builder) |
+| Angular 22 | webpack (`@angular-builders/custom-webpack`) | 2 | [Angular](installation-angular#webpack) |
+| Svelte 5 | Vite | 1 | [Svelte and SvelteKit](installation-svelte#vite) |
+| SvelteKit 3 | Vite | 1 | [Svelte and SvelteKit](installation-svelte#sveltekit) |
+| Solid 1.9 | Vite | 1 | [Solid](installation-solid) |
+
+## How alphaTab loads its code {#bundle-structure}
+
+alphaTab runs in three places: the page, a Web Worker for rendering and synthesis, and an Audio Worklet for the audio output. The package entry `alphaTab.mjs` imports the library from `alphaTab.core.mjs`. It starts the worker and the worklet from two small entry files, which import the same core:
+
+<div className="text--center"><BundleStructure role="img" aria-labelledby="alphatab-bundle-structure-title" style={{ maxWidth: "100%", height: "auto" }} /></div>
+
+alphaTab references the entry files in the standard form bundlers understand:
+
+```js
+new Worker(new URL('./alphaTab.worker.mjs', import.meta.url), { type: 'module' });
+alphaTabWorklet.addModule(new URL('./alphaTab.worklet.mjs', import.meta.url));
+```
+
+Without a bundler, the browser loads these files as they are and fetches the core once. A bundler has to do three things to get the same result:
+
+- turn the worker URL into a worker entry;
+- turn the worklet URL into a worklet entry, which most bundlers do not support;
+- put the core into one chunk that the page, the worker and the worklet all load.
+
+The webpack and Vite plugins do all three. For other bundlers you own the worker and worklet entries yourself, through the `@coderline/alphatab/core`, `@coderline/alphatab/worker` and `@coderline/alphatab/worklet` exports; see [Installation (other bundlers)](installation-other-bundlers).
+
+## What every setup needs {#requirements}
+
+### Create alphaTab in the browser only {#client-only}
+
+alphaTab needs the DOM, Web Workers and Web Audio. In frameworks with server-side rendering, create the `AlphaTabApi` in a hook that only runs in the browser: `useEffect` in React, `onMounted` in Vue, `afterNextRender` in Angular, `onMount` in Svelte and Solid. Destroy it with `api.destroy()` when the component unmounts. Importing `@coderline/alphatab` on the server is safe; only creating the API needs the browser.
+
+### Point alphaTab to the font and the SoundFont {#assets}
+
+alphaTab loads the Bravura music font and a SoundFont at runtime. The plugins copy both into your build output, as `font/` and `soundfont/` at its root. Set the two locations in the settings:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const element = document.getElementById('alphaTab');
+const api = new alphaTab.AlphaTabApi(element, {
+    core: {
+        fontDirectory: '/font/'
+    },
+    player: {
+        enablePlayer: true,
+        soundFont: '/soundfont/sonivox.sf2'
+    }
+});
+```
+
+- [`player.soundFont`](/docs/reference/settings/player/soundfont) has no default. Set it whenever the player is enabled.
+- [`core.fontDirectory`](/docs/reference/settings/core/fontdirectory) defaults to a `font/` folder next to the script that contains alphaTab's core. That matches the plugin's copy only when the bundler writes its scripts to the root of the output. Vite writes them to `assets/` and Rsbuild to `static/js/`, so set `fontDirectory` there. If nothing renders and the network panel shows failed font requests, this setting is the cause.
+- Prefix both paths with the base path of your app if it is not served from `/`, for example `import.meta.env.BASE_URL` with Vite.
+
+### Load every entry file {#entry-files}
+
+With webpack and Rspack, alphaTab's core is a chunk of its own that the page loads next to your entry script. HTML generated by `HtmlWebpackPlugin`, `HtmlRspackPlugin`, Rsbuild or Next.js includes it. If you write the `<script>` tags yourself, include every file of the entrypoint, not only `main.js`.
+
+## Samples {#samples}
+
+[alphaTabSamplesWeb](https://github.com/CoderLine/alphaTabSamplesWeb) has a minimal project for every setup on this page. Each sample renders a Guitar Pro file, plays it back, and explains its setup in its README.

@@ -1,0 +1,97 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.hero {
+  position: relative;
+  border-bottom: 1px solid var(--at-line);
+  overflow: hidden;
+  background: var(--at-bg);
+
+  --hero-pad-top: 72px;
+  --hero-pad-bot: 48px;
+  --h1-to-lede: 24px;
+  --lede-to-cta: 36px;
+  --cta-to-demo: 64px;
+  @include section-tokens;
+
+  @include tablet {
+    --hero-pad-top: 56px;
+    --hero-pad-bot: 40px;
+    --h1-to-lede: 20px;
+    --lede-to-cta: 28px;
+    --cta-to-demo: 48px;
+  }
+
+  @include mobile {
+    --hero-pad-top: 40px;
+    --hero-pad-bot: 28px;
+    --h1-to-lede: 16px;
+    --lede-to-cta: 24px;
+    --cta-to-demo: 36px;
+  }
+}
+
+.inner {
+  @include section-container;
+  padding-top: var(--hero-pad-top);
+  padding-bottom: var(--hero-pad-bot);
+  position: relative;
+}
+
+.h1 {
+  font-size: var(--h1-size, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  margin: 0;
+  text-wrap: balance;
+  color: var(--at-ink);
+}
+
+.h1Line1 {
+  // Inline on desktop (with trailing space), block on smaller screens to
+  // force the natural break the design specifies.
+  @include not-desktop { display: block; }
+}
+
+.h1Muted {
+  color: var(--at-muted);
+}
+
+.h1Highlight {
+  color: var(--at-ink);
+  background: linear-gradient(transparent 70%, var(--at-accent-soft-strong) 70%);
+
+  @include desktop { white-space: nowrap; }
+}
+
+.lede {
+  font-size: var(--lede-size, 18px);
+  line-height: 1.5;
+  color: var(--at-ink-soft);
+  margin: var(--h1-to-lede) 0 0;
+  text-wrap: pretty;
+}
+
+.ctas {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--lede-to-cta);
+
+  @include mobile {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+
+    & > * {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+.stage {
+  margin-top: var(--cta-to-demo);
+}

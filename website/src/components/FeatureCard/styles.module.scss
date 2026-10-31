@@ -1,0 +1,208 @@
+.grid {
+  display: grid;
+  gap: 0.9rem;
+  margin: 1rem 0 2rem;
+}
+
+.grid2 {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.grid3 {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 0.75rem;
+  background: var(--ifm-card-background-color, var(--ifm-background-surface-color));
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--fc-accent);
+    opacity: 0.85;
+  }
+}
+
+.cardLink:hover,
+.cardLink:focus-visible {
+  border-color: var(--fc-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  color: inherit;
+
+  .arrow {
+    transform: translateX(2px);
+    color: var(--fc-accent);
+  }
+}
+
+.visual {
+  background: var(--ifm-color-emphasis-100);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  padding: 0.5rem;
+  overflow: hidden;
+  max-height: 200px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.body {
+  padding: 0.9rem 1.1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex-grow: 1;
+}
+
+.iconBadge {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fc-accent-tint);
+  color: var(--fc-accent);
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.since {
+  font-size: 0.72rem;
+  color: var(--ifm-color-emphasis-600);
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.hook {
+  margin: 0.1rem 0 0;
+  font-size: 0.88rem;
+  color: var(--ifm-color-emphasis-800);
+  line-height: 1.4;
+}
+
+.footer {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.platforms {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  font-size: 0.68rem;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  background: var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-800);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: var(--ifm-color-emphasis-500);
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+/* Accent palette — tuned for both light and dark mode via CSS custom properties */
+.accent_sky {
+  --fc-accent: #0ea5e9;
+  --fc-accent-tint: rgba(14, 165, 233, 0.12);
+}
+.accent_violet {
+  --fc-accent: #8b5cf6;
+  --fc-accent-tint: rgba(139, 92, 246, 0.14);
+}
+.accent_amber {
+  --fc-accent: #f59e0b;
+  --fc-accent-tint: rgba(245, 158, 11, 0.16);
+}
+.accent_emerald {
+  --fc-accent: #10b981;
+  --fc-accent-tint: rgba(16, 185, 129, 0.14);
+}
+.accent_rose {
+  --fc-accent: #ef4444;
+  --fc-accent-tint: rgba(239, 68, 68, 0.14);
+}
+.accent_slate {
+  --fc-accent: #64748b;
+  --fc-accent-tint: rgba(100, 116, 139, 0.14);
+}
+
+[data-theme='dark'] {
+  .accent_sky {
+    --fc-accent: #38bdf8;
+    --fc-accent-tint: rgba(56, 189, 248, 0.2);
+  }
+  .accent_violet {
+    --fc-accent: #a78bfa;
+    --fc-accent-tint: rgba(167, 139, 250, 0.22);
+  }
+  .accent_amber {
+    --fc-accent: #fbbf24;
+    --fc-accent-tint: rgba(251, 191, 36, 0.22);
+  }
+  .accent_emerald {
+    --fc-accent: #34d399;
+    --fc-accent-tint: rgba(52, 211, 153, 0.22);
+  }
+  .accent_rose {
+    --fc-accent: #f87171;
+    --fc-accent-tint: rgba(248, 113, 113, 0.22);
+  }
+  .accent_slate {
+    --fc-accent: #94a3b8;
+    --fc-accent-tint: rgba(148, 163, 184, 0.22);
+  }
+}

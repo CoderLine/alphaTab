@@ -1,0 +1,67 @@
+---
+title: "Seeking by tick and time"
+description: "`tickPosition` vs `timePosition`, `endTick` / `endTime`."
+sidebar_custom_props:
+  feature_chapter: transport
+  feature_order: 40
+keywords:
+  - alphaTab
+  - seek
+  - tick
+  - time
+---
+
+import { SeekDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Two very different UIs move the same playhead: a chapter-marker list that jumps to bar 12 wants ticks (a score coordinate that stays put across tempo changes), and a video cursor overlay that drives the score wants milliseconds (a wall-clock coordinate that tracks the video's own time base). alphaTab exposes the playhead in both units — pick the one that matches the UI you're wiring up.
+
+<SeekDemo
+  tex={Riffs.BACH_PRELUDE_C_LONG}
+  showCode={false}
+/>
+
+## Tick vs time
+
+- **`tickPosition`** — read or write the playhead in MIDI ticks. Ticks are model-accurate: bar 12 beat 2 sits at the same tick every time you load the score, regardless of tempo, count-in, or `playbackSpeed`. Use ticks when the UI reasons about score structure — jumping to a section, snapping to a beat, or persisting bookmarks.
+- **`timePosition`** — read or write the playhead in milliseconds of playback. Time is wall-clock: it advances with the audio and reflects any tempo changes and speed modifiers. Use time when the UI reasons about elapsed audio — a progress bar, an mm:ss readout, or synchronization with an external clock.
+
+`endTick` and `endTime` give the total length of the current MIDI in each unit. Divide the current value by the end to compute a normalized progress `0..1` for either kind of slider.
+
+## The position event
+
+`playerPositionChanged` fires on every internal tick update. The event args carry `currentTick`, `endTick`, `currentTime`, `endTime`, and an `isSeek` flag that distinguishes an ordinary time step from a jump you (or another handler) triggered.
+
+Update the progress UI from the event; don't poll `tickPosition` on a timer.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
+});
+
+const progress = document.getElementById('progress');
+
+api.playerPositionChanged.on((args) => {
+  progress.value = args.currentTime / args.endTime;
+});
+
+progress.addEventListener('input', () => {
+  api.timePosition = progress.value * api.endTime;
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Looping a section](./looping-a-section) — `playbackRange` uses the same tick coordinate system.
+- [The MIDI event stream](./midi-event-stream) — subscribe to per-event ticks for finer-grained wiring than `playerPositionChanged`.
+- [Playback cursor](/docs/features/interact/cursor-and-element-highlighting) — the visual counterpart to `playerPositionChanged`.
+- [`tickPosition`](/docs/reference/api/tickposition), [`timePosition`](/docs/reference/api/timeposition), [`endTick`](/docs/reference/api/endtick), [`endTime`](/docs/reference/api/endtime), and [`playerPositionChanged`](/docs/reference/api/playerpositionchanged) reference entries.

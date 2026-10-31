@@ -1,0 +1,15 @@
+.landing {
+  background: var(--at-bg);
+  color: var(--at-ink);
+  font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.1px;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+:global(.navbar__title) {
+  display: none;
+}
+
+:global(.aa-Autocomplete) {
+  width: 250px;
+}

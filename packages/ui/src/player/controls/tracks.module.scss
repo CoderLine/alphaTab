@@ -1,0 +1,247 @@
+.headerLink {
+  border: none;
+  background: transparent;
+  color: var(--at-accent);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  padding: 2px 4px;
+
+  &:hover { text-decoration: underline; }
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.empty {
+  padding: 16px;
+  color: var(--at-muted);
+  font-size: 12px;
+}
+
+.track {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--at-muted);
+}
+
+.trackShown {
+  background: var(--at-surface-alt);
+  border-color: var(--at-line-soft);
+  color: var(--at-ink);
+}
+
+.trackMuted .trackTitle {
+  text-decoration: line-through;
+  text-decoration-color: var(--at-muted);
+}
+
+.trackHead {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+}
+
+.visibility,
+.mixBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--at-muted);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: var(--at-ink);
+    background: var(--at-surface);
+  }
+
+  &:disabled { cursor: not-allowed; opacity: 0.5; }
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 1px;
+  }
+}
+
+.trackShown .visibility { color: var(--track-color); }
+
+.mixBtn {
+  width: 24px;
+  height: 22px;
+  font-family: var(--at-font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  border-color: var(--at-line);
+}
+
+.mixBtnMute {
+  background: color-mix(in srgb, var(--at-danger) 15%, transparent);
+  border-color: color-mix(in srgb, var(--at-danger) 50%, transparent);
+  color: var(--at-danger);
+
+  &:hover:not(:disabled) { color: var(--at-danger); }
+}
+
+.mixBtnSolo {
+  background: color-mix(in srgb, var(--at-track-orange) 18%, transparent);
+  border-color: color-mix(in srgb, var(--at-track-orange) 55%, transparent);
+  color: var(--at-track-orange);
+
+  &:hover:not(:disabled) { color: var(--at-track-orange); }
+}
+
+.trackName {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover { background: var(--at-surface); }
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 1px;
+  }
+}
+
+.trackDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--track-color, var(--at-muted));
+  opacity: 0.45;
+
+  .trackShown & { opacity: 1; }
+}
+
+.trackLabel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.trackTitle {
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackMeta {
+  font-family: var(--at-font-mono);
+  font-size: 10px;
+  color: var(--at-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:empty { display: none; }
+}
+
+.caret {
+  flex-shrink: 0;
+  color: var(--at-muted);
+  transform: rotate(-90deg);
+  transition: transform 120ms ease;
+}
+
+.caretOpen { transform: rotate(0deg); }
+
+.trackDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 10px 12px 34px;
+}
+
+.control {
+  display: grid;
+  grid-template-columns: 66px 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--at-ink-soft);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  padding: 3px 8px;
+  border: 1px solid var(--at-line);
+  border-radius: 999px;
+  background: var(--at-surface);
+  color: var(--at-muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+
+  &:disabled { cursor: not-allowed; }
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 1px;
+  }
+}
+
+.chipOn {
+  border-color: color-mix(in srgb, var(--at-accent) 50%, transparent);
+  background: var(--at-accent-soft);
+  color: var(--at-accent);
+}
+
+.details {
+  flex: 1;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+  font-size: 11.5px;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  dt { color: var(--at-muted); }
+
+  dd {
+    margin: 0;
+    color: var(--at-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.mono { font-family: var(--at-font-mono); font-size: 10.5px; }

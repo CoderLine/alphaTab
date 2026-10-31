@@ -1,0 +1,37 @@
+.wrapper {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 90%;
+}
+
+.pills {
+  margin: 0;
+}
+
+.readout {
+  margin-bottom: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  background: var(--ifm-background-surface-color);
+  font-size: 90%;
+  font-variant-numeric: tabular-nums;
+}
+
+.negative {
+  color: var(--ifm-color-danger);
+}
+
+.scroller {
+  max-height: 480px;
+  overflow: auto;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+}

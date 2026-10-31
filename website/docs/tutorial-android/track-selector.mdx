@@ -1,0 +1,716 @@
+---
+title: Track Selector
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Adding a ViewModel with custom bindings
+
+To ensure our application persists the state properly we will use a ViewModel to hold our data and synchronize it with the UI. 
+In case the activity is re-created (e.g. on rotation) we can re-initialize the UI with the correct state.
+
+Read more about viewmodels here: https://developer.android.com/topic/libraries/architecture/viewmodel
+
+We add a new class to the project which holds our settings and the track list to be displayed.
+
+```kotlin
+package net.alphatab.tutorial.android
+
+import alphaTab.Settings
+import alphaTab.model.Score
+import alphaTab.model.Track
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import kotlin.contracts.ExperimentalContracts
+
+@ExperimentalUnsignedTypes
+@ExperimentalContracts
+class MainViewModel  : ViewModel() {
+    val score = MutableLiveData<Score?>()
+    val tracks = MutableLiveData<List<Track>?>()
+    val settings = MutableLiveData<Settings>().apply {
+        value = Settings().apply {
+            this.player.enableCursor = true
+            this.player.enablePlayer = true
+            this.player.enableUserInteraction = true
+            this.display.barCountPerPartial = 4.0
+            this.display.resources.barNumberFont
+        }
+    }
+}
+```
+
+And in the UI we hook up the correct viewmodel bindings: 
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+    ....
+    // highlight-next-line
+    private lateinit var mViewModel: MainViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        ...
+        // highlight-start
+        mViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        mViewModel.settings.observe(this) {
+            mAlphaTabView.settings = it
+        }
+        mViewModel.tracks.observe(this) {
+            mAlphaTabView.tracks = it
+            val first = it?.firstOrNull()
+            if (first != null) {
+                mTrackName.text = first.name
+                mSongName.text = "${first.score.title} - ${first.score.artist}"
+            }
+        }
+        // highlight-end
+    }
+
+    private val mOpenFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+        ...
+        try {
+            // highlight-start
+            mViewModel.score.value = score
+            mViewModel.tracks.value = arrayListOf(score.tracks[0])
+            // highlight-end
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to render file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, "Failed to render file: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+```
+
+With this change you will notice that you can rotate the phone and still see the right information displayed.
+
+<img src="/img/tutorial-android/viewmodel-rotated.png" />
+
+## Preparing some styles
+
+For the sake of styling we add some styles to our code. This code should not act as a reference
+how to properly style controls in android but is rather a simplistic approach for this tutorial.
+
+<Tabs
+  defaultValue="themes"
+  values={[
+    { label: 'res/values/themes/themes.xml', value: 'themes', }
+  ]
+}>
+<TabItem value="themes">
+
+In this file we add a custom style for our popup control button setting various alignment and coloring bits.
+
+```xml
+    <style name="PopupButton" parent="Widget.Material3.Button">
+        <item name="iconPadding">0dp</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="iconTint">#FF436d9d</item>
+        <item name="iconGravity">top</item>
+        <item name="iconSize">24dp</item>
+        <item name="backgroundTint">#dedede</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#000</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingHorizontal">8dp</item>
+    </style>
+```
+</TabItem>
+
+</Tabs>
+
+## Preparing the Control Popup
+
+As written in the previous chapter we will put all controls (beside the play button) inside a popup window.
+Therefore we have to create first a new layout which we can show as popup. It will feature some buttons on the top and 
+a track list on the remaining space. 
+
+The code for the popup we will put into an own class. 
+
+
+<Tabs
+  defaultValue="xml"
+  values={[
+    { label: 'popup_controls.xml', value: 'xml', },
+    { label: 'ControlsPopupWindow.kt', value: 'kotlin', },
+  ]
+}>
+<TabItem value="xml">
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardcodedText"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <HorizontalScrollView
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
+        android:background="@color/design_default_color_background"
+        android:layout_alignParentStart="true"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentStart="true"
+            android:padding="4dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/back"
+                style="@style/PopupButton"
+                app:icon="@drawable/baseline_arrow_back_48"
+                app:iconSize="48dp"
+                app:iconGravity="textStart"
+                app:iconTint="@color/black"
+                android:layout_marginHorizontal="8dp"
+                android:padding="0dp"
+                app:backgroundTint="@android:color/transparent"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/openFile"
+                style="@style/PopupButton"
+                app:icon="@drawable/baseline_file_open_24"
+                android:text="Open File" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+    
+    <ListView
+        android:id="@+id/trackList"
+        android:background="@color/design_default_color_background"
+        android:layout_width="match_parent"
+        android:layout_below="@id/buttons"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        >
+
+    </ListView>
+
+</RelativeLayout>
+```
+
+</TabItem>
+<TabItem value="kotlin">
+
+There is quite a bit of code here but nothing specific or special to alphaTab:
+
+* We initialize the UI of the popup. 
+* We add a listener to the open file button which calls over a handler to trigger the file open.
+* We add a listener to the list view and fill the selected track into the viewmodel.
+
+To keep it simple we keep the file open logic in the MainActivity and just trigger it from the popup. This way we can keep using `registerForActivityResult` but in a 
+proper app you would use better ways of decoupling the logic.
+
+```kotlin
+package net.alphatab.tutorial.android
+
+import alphaTab.model.Track
+import android.annotation.SuppressLint
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.PopupWindow
+import android.widget.TextView
+import com.google.android.material.button.MaterialButton
+import kotlin.contracts.ExperimentalContracts
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+@SuppressLint("InflateParams")
+class ControlsPopupWindow(
+    context: Context,
+    private val mainViewModel: MainViewModel,
+    onOpenFile: () -> Unit
+) : PopupWindow(context) {
+    private val mOpenButton: MaterialButton
+    private val mTrackList: ListView
+
+    init {
+        val view = LayoutInflater.from(context).inflate(R.layout.popup_controls, null)
+
+        mOpenButton = view.findViewById(R.id.openFile)
+        mOpenButton.setOnClickListener {
+            onOpenFile()
+            dismiss()
+        }
+
+        mTrackList = view.findViewById(R.id.trackList)
+        mTrackList.adapter = TrackListAdapter(context, mainViewModel.score.value?.tracks?.toList() ?: emptyList())
+        mTrackList.setOnItemClickListener { _, _, position, _ ->
+            mainViewModel.tracks.value =
+                mutableListOf((mTrackList.adapter as TrackListAdapter).getItem(position)!!)
+            dismiss()
+        }
+
+        view.findViewById<MaterialButton>(R.id.back).setOnClickListener {
+            dismiss()
+        }
+
+        contentView = view
+    }
+
+    class TrackListAdapter(context: Context, tracks: List<Track>) :
+        ArrayAdapter<Track>(context, android.R.layout.simple_list_item_1, tracks) {
+
+        private val mInflater: LayoutInflater = LayoutInflater.from(context)
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view =
+                convertView ?: mInflater.inflate(android.R.layout.simple_list_item_1, parent, false)
+
+            if (view !is TextView) {
+                throw IllegalStateException("Expected simple_list_item_1 to be a TextView")
+            }
+
+            val item = getItem(position)
+            view.text = item!!.name
+            return view
+        }
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Connecting the popup 
+
+Now we need to change the MainActivity to show the popup window and react on the listeners to update the UI. 
+We modify the MainActivity accordingly: 
+
+```kotlin
+findViewById<View>(R.id.info).setOnClickListener {
+    val popup = ControlsPopupWindow(
+        this, mViewModel,
+    ) {
+        mOpenFile.launch(arrayOf("*/*"))
+    }
+    popup.width = ViewGroup.LayoutParams.MATCH_PARENT
+    popup.height = ViewGroup.LayoutParams.MATCH_PARENT
+    popup.showAtLocation(mAlphaTabView, Gravity.CENTER, 0, 0)
+}
+
+```
+
+## Result
+
+<img src="/img/tutorial-android/popup-open.png" width="300" />
+<img src="/img/tutorial-android/popup-track-selector.png" width="300" />
+<img src="/img/tutorial-android/track-selector-other-track.png" width="300" />
+
+## Final Files
+
+<Tabs
+  defaultValue="activity_main"
+  values={[
+    { label: 'activity_main.xml', value: 'activity_main', },
+    { label: 'popup_controls.xml', value: 'popup_controls', },
+    { label: 'MainActivity.kt', value: 'MainActivity', },
+    { label: 'MainViewModel.kt', value: 'MainViewModel', },
+    { label: 'ControlsPopupWindow.kt', value: 'ControlsPopupWindow', },
+    { label: 'res/values/themes/themes.xml', value: 'themes', },
+  ]
+}>
+<TabItem value="activity_main">
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText"
+    tools:context=".MainActivity">
+
+    <alphaTab.AlphaTabView
+        android:id="@+id/alphatab"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="6dp"
+        android:padding="6dp"
+        android:background="#436d9d"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <LinearLayout
+            android:id="@+id/info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/controls"
+            android:orientation="vertical"
+            >
+            <TextView
+                android:id="@+id/trackName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Track Name"
+                android:textColor="@color/white" />
+            <TextView
+                android:id="@+id/songName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Song Name - Artist Name"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_alignParentEnd="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/playPause"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:textColor="@color/white"
+                android:paddingHorizontal="7dp"
+                android:contentDescription="Play/Pause"
+                android:src="@drawable/baseline_play_arrow_24" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+</TabItem>
+<TabItem value="popup_controls">
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardcodedText"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <HorizontalScrollView
+        android:id="@+id/buttons"
+        android:layout_width="match_parent"
+        android:background="@color/design_default_color_background"
+        android:layout_alignParentStart="true"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentStart="true"
+            android:padding="4dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/back"
+                style="@style/PopupButton"
+                app:icon="@drawable/baseline_arrow_back_48"
+                app:iconSize="48dp"
+                app:iconGravity="textStart"
+                app:iconTint="@color/black"
+                android:layout_marginHorizontal="8dp"
+                android:padding="0dp"
+                app:backgroundTint="@android:color/transparent"
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/openFile"
+                style="@style/PopupButton"
+                app:icon="@drawable/baseline_file_open_24"
+                android:text="Open File" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+    
+    <ListView
+        android:id="@+id/trackList"
+        android:background="@color/design_default_color_background"
+        android:layout_width="match_parent"
+        android:layout_below="@id/buttons"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        >
+
+    </ListView>
+
+</RelativeLayout>
+```
+
+</TabItem>
+<TabItem value="MainActivity">
+
+```kotlin
+package net.alphatab.tutorial.android
+
+import alphaTab.AlphaTabView
+import alphaTab.core.ecmaScript.Uint8Array
+import alphaTab.importer.ScoreLoader
+import alphaTab.model.Score
+import android.annotation.SuppressLint
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import java.io.ByteArrayOutputStream
+import kotlin.contracts.ExperimentalContracts
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+@SuppressLint("SetTextI18n")
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var mAlphaTabView: AlphaTabView
+    private lateinit var mTrackName: TextView
+    private lateinit var mSongName: TextView
+
+    private lateinit var mViewModel: MainViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        mAlphaTabView = findViewById(R.id.alphatab)
+        mTrackName = findViewById(R.id.trackName)
+        mSongName = findViewById(R.id.songName)
+        findViewById<View>(R.id.info).setOnClickListener {
+            val popup = ControlsPopupWindow(
+                this, mViewModel,
+            ) {
+                mOpenFile.launch(arrayOf("*/*"))
+            }
+            popup.width = ViewGroup.LayoutParams.MATCH_PARENT
+            popup.height = ViewGroup.LayoutParams.MATCH_PARENT
+            popup.showAtLocation(mAlphaTabView, Gravity.CENTER, 0, 0)
+        }
+
+        mViewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        mViewModel.settings.observe(this) {
+            mAlphaTabView.settings = it
+        }
+        mViewModel.tracks.observe(this) {
+            mAlphaTabView.tracks = it
+            val first = it?.firstOrNull()
+            if (first != null) {
+                mTrackName.text = first.name
+                mSongName.text = "${first.score.title} - ${first.score.artist}"
+            }
+        }
+    }
+
+    private val mOpenFile = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+        val uri = it ?: return@registerForActivityResult
+        val score: Score
+        try {
+            val fileData = readFileData(uri)
+            score = ScoreLoader.loadScoreFromBytes(fileData, mAlphaTabView.settings)
+            Log.i("AlphaTab", "File loaded: ${score.title}")
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to load file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, "Failed to load file: ${e.message}", Toast.LENGTH_LONG).show()
+            return@registerForActivityResult
+        }
+
+        try {
+            mViewModel.score.value = score
+            mViewModel.tracks.value = arrayListOf(score.tracks[0])
+        } catch (e: Exception) {
+            Log.e("AlphaTab", "Failed to render file: $e, ${e.stackTraceToString()}")
+            Toast.makeText(this, "Failed to render file: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun readFileData(uri: Uri): Uint8Array {
+        val inputStream = contentResolver.openInputStream(uri)
+        inputStream.use {
+            ByteArrayOutputStream().use {
+                inputStream!!.copyTo(it)
+                return Uint8Array(it.toByteArray().asUByteArray())
+            }
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="MainViewModel">
+
+```kotlin
+package net.alphatab.tutorial.android
+
+import alphaTab.Settings
+import alphaTab.model.Score
+import alphaTab.model.Track
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import kotlin.contracts.ExperimentalContracts
+
+@ExperimentalUnsignedTypes
+@ExperimentalContracts
+class MainViewModel  : ViewModel() {
+    val score = MutableLiveData<Score?>()
+    val tracks = MutableLiveData<List<Track>?>()
+    val settings = MutableLiveData<Settings>().apply {
+        value = Settings().apply {
+            this.player.enableCursor = true
+            this.player.enablePlayer = true
+            this.player.enableUserInteraction = true
+            this.display.barCountPerPartial = 4.0
+            this.display.resources.barNumberFont
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="ControlsPopupWindow">
+
+```kotlin
+package net.alphatab.tutorial.android
+
+import alphaTab.model.Track
+import android.annotation.SuppressLint
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.PopupWindow
+import android.widget.TextView
+import com.google.android.material.button.MaterialButton
+import kotlin.contracts.ExperimentalContracts
+
+@OptIn(ExperimentalContracts::class, ExperimentalUnsignedTypes::class)
+@SuppressLint("InflateParams")
+class ControlsPopupWindow(
+    context: Context,
+    private val mainViewModel: MainViewModel,
+    onOpenFile: () -> Unit
+) : PopupWindow(context) {
+    private val mOpenButton: MaterialButton
+    private val mTrackList: ListView
+
+    init {
+        val view = LayoutInflater.from(context).inflate(R.layout.popup_controls, null)
+
+        mOpenButton = view.findViewById(R.id.openFile)
+        mOpenButton.setOnClickListener {
+            onOpenFile()
+            dismiss()
+        }
+
+        mTrackList = view.findViewById(R.id.trackList)
+        mTrackList.adapter = TrackListAdapter(context, mainViewModel.score.value?.tracks?.toList() ?: emptyList())
+        mTrackList.setOnItemClickListener { _, _, position, _ ->
+            mainViewModel.tracks.value =
+                mutableListOf((mTrackList.adapter as TrackListAdapter).getItem(position)!!)
+            dismiss()
+        }
+
+        view.findViewById<MaterialButton>(R.id.back).setOnClickListener {
+            dismiss()
+        }
+
+        contentView = view
+    }
+
+    class TrackListAdapter(context: Context, tracks: List<Track>) :
+        ArrayAdapter<Track>(context, android.R.layout.simple_list_item_1, tracks) {
+
+        private val mInflater: LayoutInflater = LayoutInflater.from(context)
+
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view =
+                convertView ?: mInflater.inflate(android.R.layout.simple_list_item_1, parent, false)
+
+            if (view !is TextView) {
+                throw IllegalStateException("Expected simple_list_item_1 to be a TextView")
+            }
+
+            val item = getItem(position)
+            view.text = item!!.name
+            return view
+        }
+    }
+}
+```
+
+</TabItem>
+<TabItem value="themes">
+
+```xml
+<resources xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <!-- Base application theme. -->
+    <style name="Base.Theme.AlphaTabTutorial" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+    <style name="Theme.AlphaTabTutorial" parent="Base.Theme.AlphaTabTutorial" />
+
+    <style name="PopupButton" parent="Widget.Material3.Button">
+        <item name="iconPadding">0dp</item>
+        <item name="cornerRadius">0dp</item>
+        <item name="iconTint">#FF436d9d</item>
+        <item name="iconGravity">top</item>
+        <item name="iconSize">24dp</item>
+        <item name="backgroundTint">#dedede</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#000</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginEnd">4dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingHorizontal">8dp</item>
+    </style>
+</resources>
+```
+
+</TabItem>
+</Tabs>

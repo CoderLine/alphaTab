@@ -1,0 +1,173 @@
+---
+title: Vue and Nuxt
+description: Use alphaTab in Vue 3 with Vite and in Nuxt 3 and 4 with server-side rendering, keep the API out of Vue's reactivity, and serve the font and SoundFont.
+keywords:
+  - alphaTab
+  - Vue
+  - Nuxt
+  - Vite
+  - SSR
+  - shallowRef
+---
+
+alphaTab has no Vue wrapper: a component creates the `AlphaTabApi` on a template ref when it is mounted and destroys it when it is unmounted. This page shows that component with Vite and with Nuxt.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev @coderline/alphatab-vite
+```
+
+## Vue with Vite {#vite}
+
+Register the alphaTab plugin next to the Vue plugin in `vite.config.ts`:
+
+```ts
+import { alphaTab } from '@coderline/alphatab-vite';
+import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+    plugins: [vue(), alphaTab()]
+});
+```
+
+Create the component in `src/App.vue`:
+
+```html
+<script setup lang="ts">
+import { AlphaTabApi, synth } from '@coderline/alphatab';
+import { onMounted, onUnmounted, ref, shallowRef, useTemplateRef } from 'vue';
+
+const scoreElement = useTemplateRef<HTMLDivElement>('score');
+const api = shallowRef<AlphaTabApi>();
+const playerReady = ref(false);
+const playing = ref(false);
+
+onMounted(() => {
+    const instance = new AlphaTabApi(scoreElement.value!, {
+        core: {
+            file: `${import.meta.env.BASE_URL}song.gp`,
+            fontDirectory: `${import.meta.env.BASE_URL}font/`
+        },
+        player: {
+            enablePlayer: true,
+            enableCursor: true,
+            soundFont: `${import.meta.env.BASE_URL}soundfont/sonivox.sf2`
+        }
+    });
+    instance.playerReady.on(() => (playerReady.value = true));
+    instance.playerStateChanged.on(e => (playing.value = e.state === synth.PlayerState.Playing));
+    api.value = instance;
+});
+
+onUnmounted(() => {
+    api.value?.destroy();
+    api.value = undefined;
+});
+</script>
+
+<template>
+    <button type="button" :disabled="!playerReady" @click="api?.playPause()">
+        {{ playing ? 'Pause' : 'Play' }}
+    </button>
+    <div ref="score"></div>
+</template>
+```
+
+- **`shallowRef`, not `ref`.** `ref()` makes its value deeply reactive. Vue would wrap the API and every object reached through it, such as the score model, the settings and the renderer, in proxies. That costs performance and lets alphaTab's internals run on proxies instead of its own objects. Only the UI state uses `ref()`.
+- **Lifecycle.** The template ref points to the element in `onMounted`; `onUnmounted` destroys the API.
+- **Asset paths.** Vite writes the scripts to `assets/`, so `core.fontDirectory` and `player.soundFont` point to the copies the plugin makes, prefixed with `import.meta.env.BASE_URL`.
+
+See [Installation (Vite)](installation-vite) for the plugin. Sample: [`vue-3-vite`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/vue-3-vite).
+
+## Nuxt {#nuxt}
+
+Nuxt builds with Vite, so it uses the same plugin. Nitro serves the font and the SoundFont, in `nuxt.config.ts`:
+
+```ts
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+const alphaTabDist = path.dirname(createRequire(import.meta.url).resolve('@coderline/alphatab'));
+
+export default defineNuxtConfig({
+    vite: {
+        plugins: [alphaTab({ assetOutputDir: false })]
+    },
+    nitro: {
+        publicAssets: [
+            { baseURL: 'font', dir: path.join(alphaTabDist, 'font'), maxAge: 60 * 60 * 24 * 7 },
+            { baseURL: 'soundfont', dir: path.join(alphaTabDist, 'soundfont'), maxAge: 60 * 60 * 24 * 7 }
+        ]
+    }
+});
+```
+
+- **`vite.plugins`** registers the plugin for the client build: page, workers and worklet share one core chunk.
+- **`nitro.publicAssets`** serves `/font/` and `/soundfont/` straight from `node_modules/@coderline/alphatab/dist` in development and copies them into `.output/public` on `nuxt build`. The plugin's own copy is disabled with `assetOutputDir: false`: Nuxt turns Vite's `publicDir` off, so the plugin has no default target. If you let the plugin copy into `public/` instead, note that Nitro picks up `public/` only if it exists when the build starts.
+
+Create the component as a client-only component, `app/components/ScoreViewer.client.vue` (Nuxt 3: `components/ScoreViewer.client.vue`):
+
+```html
+<script setup lang="ts">
+import { AlphaTabApi, synth } from '@coderline/alphatab';
+
+const { app } = useRuntimeConfig();
+const scoreElement = useTemplateRef<HTMLDivElement>('score');
+const api = shallowRef<AlphaTabApi>();
+const playerReady = ref(false);
+const playing = ref(false);
+
+onMounted(async () => {
+    await nextTick();
+    if (!scoreElement.value) {
+        return;
+    }
+    const instance = new AlphaTabApi(scoreElement.value, {
+        core: {
+            file: `${app.baseURL}song.gp`,
+            fontDirectory: `${app.baseURL}font/`
+        },
+        player: {
+            enablePlayer: true,
+            enableCursor: true,
+            soundFont: `${app.baseURL}soundfont/sonivox.sf2`
+        }
+    });
+    instance.playerReady.on(() => (playerReady.value = true));
+    instance.playerStateChanged.on(e => (playing.value = e.state === synth.PlayerState.Playing));
+    api.value = instance;
+});
+
+onUnmounted(() => {
+    api.value?.destroy();
+    api.value = undefined;
+});
+</script>
+
+<template>
+    <div>
+        <button type="button" :disabled="!playerReady" @click="api?.playPause()">
+            {{ playing ? 'Pause' : 'Play' }}
+        </button>
+        <div ref="score"></div>
+    </div>
+</template>
+```
+
+Use it from `app/app.vue`:
+
+```html
+<template>
+    <ScoreViewer />
+</template>
+```
+
+- **`.client.vue`.** Nuxt renders the component only in the browser and leaves it out of the server bundle, so alphaTab is neither imported nor run during server-side rendering. `<ClientOnly>` around a normal component also skips rendering on the server, but the server bundle still imports alphaTab.
+- **`nextTick()`.** A `.client` component renders its template only after it is mounted, so the template ref is set one tick later.
+- **Base URL.** The paths are prefixed with `useRuntimeConfig().app.baseURL` and follow a custom base URL such as `NUXT_APP_BASE_URL=/sub/`.
+
+`nuxt build` warns that a chunk is larger than 500 kB; that is alphaTab's core, about 300 kB gzipped.
+
+Samples: [`nuxt-4`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/nuxt-4), [`nuxt-3`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/nuxt-3).

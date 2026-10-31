@@ -1,0 +1,30 @@
+# Redeploys the website without publishing packages: docs-only changes, and docs hotfixes on main
+# (back-merge those to develop).
+name: Website
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        description: next (develop → next.alphatab.net) or stable (main → alphatab.net)
+        options:
+          - next
+          - stable
+        default: next
+      dry_run:
+        type: boolean
+        description: Build the website without deploying it
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  website:
+    uses: ./.github/workflows/~publish_website.yml
+    with:
+      channel: ${{ inputs.channel }}
+      npm_tag: ${{ inputs.channel == 'stable' && 'latest' || 'alpha' }}
+      deploy_branch: ${{ inputs.channel == 'stable' && 'main' || 'develop' }}
+      dry_run: ${{ inputs.dry_run }}

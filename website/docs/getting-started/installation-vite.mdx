@@ -1,0 +1,145 @@
+---
+title: Installation (Vite)
+description: Bundle alphaTab with Vite 6, 7 or 8 using @coderline/alphatab-vite, so the page, the Web Workers and the Audio Worklet share one alphaTab core.
+keywords:
+  - alphaTab
+  - Vite
+  - Rolldown
+  - bundler
+  - Web Worker
+  - Audio Worklet
+  - plugin
+---
+
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.3.0" />
+
+`@coderline/alphatab-vite` bundles alphaTab with Vite 6, 7 and 8, and with the frameworks built on Vite.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev @coderline/alphatab-vite
+```
+
+Register the plugin in `vite.config.ts`:
+
+```ts
+import { defineConfig } from 'vite';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+export default defineConfig({
+    plugins: [alphaTab()]
+});
+```
+
+Then use alphaTab with the normal import and point it to the copied font and SoundFont:
+
+```ts
+import * as alphaTab from '@coderline/alphatab';
+
+const element = document.getElementById('alphaTab')!;
+const api = new alphaTab.AlphaTabApi(element, {
+    core: {
+        file: `${import.meta.env.BASE_URL}song.gp`,
+        fontDirectory: `${import.meta.env.BASE_URL}font/`
+    },
+    player: {
+        enablePlayer: true,
+        soundFont: `${import.meta.env.BASE_URL}soundfont/sonivox.sf2`
+    }
+});
+```
+
+Samples: [`bundler-vite-6`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-vite-6), [`bundler-vite-7`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-vite-7), [`bundler-vite-8`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-vite-8).
+
+## What the plugin does {#what}
+
+- Emits alphaTab's Web Worker and Audio Worklet as chunks of the main build. The page, the workers and the worklet import the same `alphaTab.core-[hash].js` chunk. The URLs are written relative to the chunk that references them, so a relative `base`, `renderBuiltUrl` and the server builds of SvelteKit and Nuxt keep working.
+- In the dev server, excludes alphaTab from dependency pre-bundling, so the worker and the worklet load the same `alphaTab.core.mjs` module as the page.
+- Copies the Bravura font and the SoundFonts into Vite's `publicDir` (`public/font/`, `public/soundfont/`) when the dev server or a build starts. They are served in development and end up in `dist/font/` and `dist/soundfont/`. List the two folders in `.gitignore`; they are generated.
+
+See [How alphaTab loads its code](installation-web-projects#bundle-structure) for the structure the plugin reproduces.
+
+## Font and SoundFont locations {#assets}
+
+Vite writes the scripts to `assets/`, while the font is copied to the root of the output. alphaTab looks for the font next to its script by default, so a production build without `core.fontDirectory` requests `/assets/font/` and renders nothing. The dev server hides the problem, because it serves alphaTab from `node_modules`, where a `font/` folder exists.
+
+Prefix `core.fontDirectory` and `player.soundFont` with `import.meta.env.BASE_URL`. The paths then follow any [`base`](https://vite.dev/config/shared-options.html#base), including a relative `base: './'` served from a sub-path.
+
+## Chunk size warning {#chunk-size}
+
+`vite build` warns that `alphaTab.core-[hash].js` is larger than 500 kB. That is the whole library, about 300 kB gzipped. Raise the limit to silence the warning:
+
+```ts
+import { defineConfig } from 'vite';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+export default defineConfig({
+    plugins: [alphaTab()],
+    build: {
+        chunkSizeWarningLimit: 1500
+    }
+});
+```
+
+## Plugin options {#configure-plugin}
+
+Pass options to `alphaTab()`. All of them are optional.
+
+### `alphaTabSourceDir` {#alphatabsourcedir}
+
+The folder the plugin copies the font and the SoundFonts from. Defaults to the `dist` folder of the installed `@coderline/alphatab`.
+
+```ts
+import path from 'node:path';
+import { defineConfig } from 'vite';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+export default defineConfig({
+    plugins: [
+        alphaTab({
+            alphaTabSourceDir: path.resolve('../../node_modules/@coderline/alphatab/dist')
+        })
+    ]
+});
+```
+
+### `assetOutputDir` {#assetoutputdir}
+
+Where the plugin copies `font/` and `soundfont/` to. Defaults to Vite's `publicDir`. Set it to `false` to skip the copy, for example when the framework serves the files itself (see [Nuxt](installation-vue#nuxt)).
+
+```ts
+import { defineConfig } from 'vite';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+export default defineConfig({
+    plugins: [alphaTab({ assetOutputDir: false })]
+});
+```
+
+### `audioWorklets` and `webWorkers` {#workers}
+
+Both default to `true`. Set one to `false` if another plugin bundles alphaTab's worklet or worker.
+
+```ts
+import { defineConfig } from 'vite';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+export default defineConfig({
+    plugins: [alphaTab({ audioWorklets: false, webWorkers: false })]
+});
+```
+
+:::warning
+Without a worklet, set [`player.outputMode`](/docs/reference/settings/player/outputmode) to the ScriptProcessor output. Without a worker, alphaTab renders and synthesizes on the main thread; set [`core.useWorkers`](/docs/reference/settings/core/useworkers) to `false`.
+:::
+
+## Frameworks on Vite {#frameworks}
+
+- React: [React and Next.js](installation-react#vite)
+- Vue and Nuxt: [Vue and Nuxt](installation-vue)
+- Svelte and SvelteKit: [Svelte and SvelteKit](installation-svelte)
+- Solid: [Solid](installation-solid)
+
+Angular's application builder uses Vite only for its dev server and has no plugin API; see [Angular](installation-angular).

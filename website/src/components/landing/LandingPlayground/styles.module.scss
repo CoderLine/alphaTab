@@ -1,0 +1,144 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.section {
+  background: var(--at-surface-alt);
+  border-bottom: 1px solid var(--at-line);
+  @include section-tokens;
+}
+
+.inner {
+  @include section-container;
+  padding-top: var(--section-pad-y);
+  padding-bottom: var(--section-pad-y);
+}
+
+.headAction {
+  @include mobile { display: none; }
+}
+
+.mobileCta {
+  display: none;
+  margin-top: 18px;
+
+  @include mobile { display: block; }
+}
+
+// ─── Editor ─────────────────────────────────────────────────────────
+.editorSidebar {
+  flex-basis: clamp(300px, 38%, 460px);
+  display: flex;
+  flex-direction: column;
+  background: var(--at-code-surface);
+}
+
+.editorPane {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--at-code-surface);
+}
+
+.editorHeader {
+  padding: 0 10px 0 14px;
+  min-height: 37px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-syntax-punctuation);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editorFileName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--at-syntax-plain);
+}
+
+.resetBtn {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--at-radius-sm);
+  background: none;
+  color: var(--at-syntax-plain);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover { border-color: var(--at-accent); }
+}
+
+.editorBody {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 300px;
+
+  @include mobile {
+    flex: 0 0 auto;
+    height: 240px;
+    min-height: 0;
+  }
+}
+
+// ─── Render status ──────────────────────────────────────────────────
+.renderBar {
+  padding: 0 18px;
+  min-height: 37px;
+  border-bottom: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+
+  @include mobile { padding: 0 12px; }
+}
+
+.renderMeta {
+  flex-shrink: 0;
+  @include not-desktop { display: none; }
+}
+
+.spacer { flex: 1; }
+
+// ─── Phone preset picker ────────────────────────────────────────────
+.mobilePresetBar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.mobilePresetPill {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface);
+  color: var(--at-muted);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &[aria-pressed='true'] {
+    border-color: var(--at-accent);
+    background: var(--at-accent-soft);
+    color: var(--at-ink);
+    font-weight: 600;
+  }
+}
+

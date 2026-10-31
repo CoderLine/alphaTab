@@ -1,0 +1,81 @@
+---
+title: "Special notes"
+description: "Harmonics, ghost notes, dead notes, tied notes."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 70
+keywords:
+  - alphaTab
+  - harmonics
+  - ghost notes
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Guitar and bass parts use several note types that go beyond a normal pitched note. alphaTab renders each with the head shape, glyph, or annotation its convention expects.
+
+## Natural harmonics {#natural-harmonics}
+
+Natural harmonics — the bell-like overtones produced by lightly touching a string over the 5th, 7th, or 12th fret — render with a diamond-shaped notehead on the standard staff and an `N.H.` marker above the beat. The tab number stays on the touched fret.
+
+<AlphaTab tex={true}>{`
+\\track "Guitar"
+:4 12.3{nh} 12.4{nh} :2 (12.3{nh} 12.4{nh}) |
+:4 7.3{nh} 7.4{nh} :2 (7.3{nh} 7.4{nh})
+`}</AlphaTab>
+
+## Artificial and tap harmonics {#artificial-harmonics}
+
+Artificial (`A.H.`), pinch (`P.H.`), tap (`T.H.`), and semi (`S.H.`) harmonics extend the natural harmonic to any pitch on the fretboard — the squeal on a metal solo, the chime on a jazz-fusion melody. alphaTab uses the same diamond head with distinct labels above the beat and prints the sounding fret in parentheses next to the touched fret.
+
+<AlphaTab tex={true}>{`
+\\track "Guitar"
+:4 3.3{ah} :8 5.3{ph} 7.3{th} :4 12.3{sh} 5.3{ah} |
+:4 7.3{ph} :8 12.3{th} 5.3{sh} :4 3.3{ah} 3.3
+`}</AlphaTab>
+
+## Ghost notes {#ghost-notes}
+
+Ghost notes — the almost-inaudible articulation notes used to fill out a funk or hip-hop bassline — render with the fret number wrapped in parentheses on the tab staff. On the standard staff the notehead keeps its normal shape but reads as quieter.
+
+<AlphaTab file="/files/features/GhostNotes.gp5" />
+
+## Dead notes {#dead-notes}
+
+Dead notes are the percussive muted attacks common on funk-guitar rhythm chops — a strum with no defined pitch, only rhythmic drive. alphaTab renders them as an `x` in place of the fret number or notehead.
+
+<AlphaTab file="/files/features/DeadNotes.gp5" />
+
+## Tied notes across bars {#tied-notes}
+
+Tied notes carry a single pitch across two written durations, most often across a barline where the composer needs the note to sustain through the downbeat. alphaTab renders each tie as a curved slur joining two noteheads, and when a tie crosses into a bar with a different key signature, it draws the correct accidental on the tied note so the pitch stays unambiguous.
+
+<AlphaTab file="/files/features/TiedNotes.gp5" />
+
+## Show it in code
+
+The note types above are always drawn — they belong to the note itself. To strip the effect band labels for harmonics (`N.H.`, `A.H.`, `T.H.`) from a compact printout, hide the `EffectHarmonics` element:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.EffectHarmonics, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target.
+
+## Where to look next
+
+- [Effects and articulations](./coverage-effects-articulations) — bends, vibrato, palm mute, and other articulation labels.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
+- [Grace notes, tuplets, and ornaments](./coverage-grace-tuplets-ornaments) — the sibling coverage page for the small notes that decorate a melody.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the settings entry point for the element map.
+- [`NotationElement`](/docs/reference/types/notationelement) — every togglable element key.

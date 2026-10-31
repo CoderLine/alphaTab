@@ -72,6 +72,15 @@
             "@coderline/alphatab-monaco": [
                 "${configDir}/../monaco/src/alphaTab.monaco"
             ],
+            "@coderline/alphatab-react/*": [
+                "${configDir}/../react/src/*"
+            ],
+            "@coderline/alphatab-react": [
+                "${configDir}/../react/src/index"
+            ],
+            "@coderline/alphatab-ui": [
+                "${configDir}/../ui/src/index"
+            ],
             "@coderline/alphatab-alphatex/*": [
                 "${configDir}/../alphatex/src/*"
             ],
@@ -92,8 +101,9 @@
             "${configDir}/node_modules/@types",
             "${configDir}/types",
         ],
-        // include all @types/* packages found in `typeRoots` as ambient.
-        "types": ["*"],
+        // The hoisted root node_modules/@types also holds the website's
+        // dependencies; only the listed ones become ambient.
+        "types": ["node"],
     },
     "include": [
         "${configDir}/*.ts",

@@ -56,6 +56,42 @@
     "main": "./dist/alphaTab.monaco.mjs",
     "types": "./dist/alphaTab.monaco.d.ts",
     "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/alphaTab.monaco.d.ts",
+            "default": "./dist/alphaTab.monaco.mjs"
+        },
+        "./alphatex": {
+            "types": "./dist/alphatex.d.ts",
+            "default": "./dist/alphatex.mjs"
+        },
+        "./lsp": {
+            "types": "./dist/lsp.d.ts",
+            "default": "./dist/lsp.mjs"
+        },
+        "./lspMonacoMappings": {
+            "types": "./dist/lspMonacoMappings.d.ts",
+            "default": "./dist/lspMonacoMappings.mjs"
+        },
+        "./textmate": {
+            "types": "./dist/textmate.d.ts",
+            "default": "./dist/textmate.mjs"
+        },
+        "./types": {
+            "types": "./dist/types.d.ts",
+            "default": "./dist/types.mjs"
+        },
+        "./worker": {
+            "types": "./dist/worker.d.ts",
+            "default": "./dist/worker.mjs"
+        },
+        "./dist/*.mjs": "./dist/*.mjs",
+        "./dist/*": {
+            "types": "./dist/*.d.ts",
+            "default": "./dist/*.mjs"
+        },
+        "./package.json": "./package.json"
+    },
     "files": [
         "/dist/",
         "!/dist/types/",

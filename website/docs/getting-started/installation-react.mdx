@@ -1,0 +1,319 @@
+---
+title: React and Next.js
+description: Use alphaTab in React with Vite and in Next.js with webpack or Turbopack, create the API in an effect, and serve the font and SoundFont.
+keywords:
+  - alphaTab
+  - React
+  - Next.js
+  - Turbopack
+  - Vite
+  - webpack
+  - SSR
+---
+
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+alphaTab has no React wrapper: a component creates the `AlphaTabApi` on a DOM element in an effect and destroys it in the cleanup. This page shows that component with Vite and with Next.js.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev @coderline/alphatab-vite
+```
+
+## React with Vite {#vite}
+
+Register the alphaTab plugin next to the React plugin in `vite.config.ts`:
+
+```ts
+import { alphaTab } from '@coderline/alphatab-vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+    plugins: [react(), alphaTab()]
+});
+```
+
+Create the component in `src/App.tsx`:
+
+```tsx
+import { AlphaTabApi, synth } from '@coderline/alphatab';
+import { useEffect, useRef, useState } from 'react';
+
+export function App() {
+    const elementRef = useRef<HTMLDivElement>(null);
+    const apiRef = useRef<AlphaTabApi | null>(null);
+    const [playerReady, setPlayerReady] = useState(false);
+    const [playing, setPlaying] = useState(false);
+
+    useEffect(() => {
+        const api = new AlphaTabApi(elementRef.current!, {
+            core: {
+                file: `${import.meta.env.BASE_URL}song.gp`,
+                fontDirectory: `${import.meta.env.BASE_URL}font/`
+            },
+            player: {
+                enablePlayer: true,
+                enableCursor: true,
+                soundFont: `${import.meta.env.BASE_URL}soundfont/sonivox.sf2`
+            }
+        });
+        apiRef.current = api;
+        api.playerReady.on(() => setPlayerReady(true));
+        api.playerStateChanged.on(e => setPlaying(e.state === synth.PlayerState.Playing));
+
+        return () => {
+            api.destroy();
+            apiRef.current = null;
+            setPlayerReady(false);
+            setPlaying(false);
+        };
+    }, []);
+
+    return (
+        <>
+            <button type="button" disabled={!playerReady} onClick={() => apiRef.current?.playPause()}>
+                {playing ? 'Pause' : 'Play'}
+            </button>
+            <div ref={elementRef} />
+        </>
+    );
+}
+```
+
+- **Effect and cleanup.** alphaTab needs the element, so it is created in `useEffect` and destroyed in the cleanup. In development, `StrictMode` runs the effect twice; the cleanup leaves the second instance as the only one, and you see the first instance's workers start and stop in the network panel.
+- **Ref, not state.** The `AlphaTabApi` is a mutable object whose changes must not re-render the component, so it lives in a ref. Only the UI state lives in React state, updated from alphaTab's events.
+- **Asset paths.** Vite writes the scripts to `assets/`, so alphaTab cannot find the font next to its script. `core.fontDirectory` and `player.soundFont` point to the copies the plugin makes, prefixed with `import.meta.env.BASE_URL` for deployments with a [`base`](https://vite.dev/config/shared-options.html#base).
+
+The same code works with React 18.3. See [Installation (Vite)](installation-vite) for the plugin. Sample: [`react-19-vite`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/react-19-vite).
+
+## Next.js with webpack {#nextjs}
+
+Next.js runs webpack plugins only with webpack: the default of Next.js 15, and `--webpack` with Next.js 16. This is the recommended setup for Next.js, with one alphaTab core in production builds.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev @coderline/alphatab-webpack
+```
+
+Register the plugin in `next.config.ts`:
+
+```ts
+import { AlphaTabWebPackPlugin } from '@coderline/alphatab-webpack';
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+    webpack(config) {
+        config.plugins.push(
+            new AlphaTabWebPackPlugin({
+                assetOutputDir: 'public/alphatab'
+            })
+        );
+        return config;
+    }
+};
+
+export default nextConfig;
+```
+
+With Next.js 16, select webpack in `package.json`:
+
+```json
+{
+    "scripts": {
+        "dev": "next dev --webpack",
+        "build": "next build --webpack",
+        "start": "next start"
+    }
+}
+```
+
+Keep the page a server component and render a client component, `src/app/page.tsx`:
+
+```tsx
+import { ScoreViewer } from './ScoreViewer';
+
+export default function Home() {
+    return (
+        <main>
+            <ScoreViewer />
+        </main>
+    );
+}
+```
+
+The client component `src/app/ScoreViewer.tsx`:
+
+```tsx
+'use client';
+
+import { AlphaTabApi, synth } from '@coderline/alphatab';
+import { useEffect, useRef, useState } from 'react';
+
+export function ScoreViewer() {
+    const elementRef = useRef<HTMLDivElement>(null);
+    const apiRef = useRef<AlphaTabApi | null>(null);
+    const [playerReady, setPlayerReady] = useState(false);
+    const [playing, setPlaying] = useState(false);
+
+    useEffect(() => {
+        const api = new AlphaTabApi(elementRef.current!, {
+            core: {
+                file: '/song.gp',
+                fontDirectory: '/alphatab/font/'
+            },
+            player: {
+                enablePlayer: true,
+                enableCursor: true,
+                soundFont: '/alphatab/soundfont/sonivox.sf2'
+            }
+        });
+        apiRef.current = api;
+        api.playerReady.on(() => setPlayerReady(true));
+        api.playerStateChanged.on(e => setPlaying(e.state === synth.PlayerState.Playing));
+
+        return () => {
+            api.destroy();
+            apiRef.current = null;
+            setPlayerReady(false);
+            setPlaying(false);
+        };
+    }, []);
+
+    return (
+        <>
+            <button type="button" disabled={!playerReady} onClick={() => apiRef.current?.playPause()}>
+                {playing ? 'Pause' : 'Play'}
+            </button>
+            <div ref={elementRef} />
+        </>
+    );
+}
+```
+
+- **Client component, effect.** A client component is still rendered on the server and prerendered at build time. `ScoreViewer` therefore creates alphaTab in `useEffect`, which runs only in the browser. Importing `@coderline/alphatab` on the server is safe.
+- **`assetOutputDir: 'public/alphatab'`.** Next.js serves static files from `public/`, also in development; files the plugin emits into the webpack output are not served by `next dev`. The folder is generated on every build and dev start; list it in `.gitignore`.
+- **`basePath`.** Prefix the asset paths with your [`basePath`](https://nextjs.org/docs/app/api-reference/config/next-config-js/basePath) if you set one.
+- **Server compilation.** The `webpack()` hook runs for the client and the server. The plugin only matters for the client and is harmless on the server.
+
+Without `--webpack`, Next.js 16 stops with "This build is using Turbopack, with a `webpack` config and no `turbopack` config".
+
+`next dev` turns webpack's chunk splitting off, so in development the page, the worker and the worklet each load their own unminified copy of the core. `next build` loads one shared core.
+
+Samples: [`nextjs-16-webpack`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/nextjs-16-webpack), [`nextjs-15-webpack`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/nextjs-15-webpack).
+
+## Next.js with Turbopack {#turbopack}
+
+<SinceBadge since="1.9.0" />
+
+Turbopack runs no webpack plugins. alphaTab detects Turbopack and starts its workers in the form Turbopack bundles, sharing the core chunk with the page. Turbopack does not bundle Audio Worklets, so under Turbopack alphaTab loads its worklet from [`core.scriptFile`](/docs/reference/settings/core/scriptfile), a copy of its unbundled ES module.
+
+```bash
+npm install @coderline/alphatab
+```
+
+Copy what Turbopack does not handle into `public/alphatab/` with `scripts/copy-alphatab-assets.mjs`:
+
+```js
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const dist = path.dirname(fileURLToPath(import.meta.resolve('@coderline/alphatab')));
+const target = path.resolve('public/alphatab');
+
+fs.rmSync(target, { recursive: true, force: true });
+fs.mkdirSync(target, { recursive: true });
+for (const entry of ['font', 'soundfont', 'alphaTab.mjs', 'alphaTab.core.mjs']) {
+    fs.cpSync(path.join(dist, entry), path.join(target, entry), { recursive: true });
+}
+```
+
+Run it before every dev start and build, in `package.json`:
+
+```json
+{
+    "scripts": {
+        "predev": "node scripts/copy-alphatab-assets.mjs",
+        "dev": "next dev",
+        "prebuild": "node scripts/copy-alphatab-assets.mjs",
+        "build": "next build",
+        "start": "next start"
+    }
+}
+```
+
+Use the `ScoreViewer` component from [Next.js with webpack](#nextjs) and add `core.scriptFile`:
+
+```tsx
+'use client';
+
+import { AlphaTabApi, synth } from '@coderline/alphatab';
+import { useEffect, useRef, useState } from 'react';
+
+export function ScoreViewer() {
+    const elementRef = useRef<HTMLDivElement>(null);
+    const apiRef = useRef<AlphaTabApi | null>(null);
+    const [playerReady, setPlayerReady] = useState(false);
+    const [playing, setPlaying] = useState(false);
+
+    useEffect(() => {
+        const api = new AlphaTabApi(elementRef.current!, {
+            core: {
+                file: '/song.gp',
+                fontDirectory: '/alphatab/font/',
+                scriptFile: '/alphatab/alphaTab.mjs'
+            },
+            player: {
+                enablePlayer: true,
+                enableCursor: true,
+                soundFont: '/alphatab/soundfont/sonivox.sf2'
+            }
+        });
+        apiRef.current = api;
+        api.playerReady.on(() => setPlayerReady(true));
+        api.playerStateChanged.on(e => setPlaying(e.state === synth.PlayerState.Playing));
+
+        return () => {
+            api.destroy();
+            apiRef.current = null;
+            setPlayerReady(false);
+            setPlaying(false);
+        };
+    }, []);
+
+    return (
+        <>
+            <button type="button" disabled={!playerReady} onClick={() => apiRef.current?.playPause()}>
+                {playing ? 'Pause' : 'Play'}
+            </button>
+            <div ref={elementRef} />
+        </>
+    );
+}
+```
+
+**`basePath`.** Next.js applies [`basePath`](https://nextjs.org/docs/app/api-reference/config/next-config-js/basePath) to the bundled workers, but not to URLs into `public/`. Prefix `core.file`, `core.fontDirectory`, `core.scriptFile` and `player.soundFont` with it. To read it in the component, expose it in `next.config.ts`:
+
+```ts
+import type { NextConfig } from 'next';
+
+const basePath = '/sub';
+
+const nextConfig: NextConfig = {
+    basePath,
+    env: { NEXT_PUBLIC_BASE_PATH: basePath }
+};
+
+export default nextConfig;
+```
+
+and build the URLs from it, for example ``scriptFile: `${process.env.NEXT_PUBLIC_BASE_PATH}/alphatab/alphaTab.mjs` ``.
+
+Limitations:
+
+- **Two copies of the core.** The page and the workers share one chunk; the worklet loads the copied, unminified `alphaTab.core.mjs` (about 2.5 MB).
+- Without `core.scriptFile`, playback fails with "Could not detect alphaTab script file, cannot initialize audio worklet"; rendering works.
+- The copied files come from the installed package and are refreshed on every dev start and build, so they match the bundled version.
+
+Sample: [`nextjs-16-turbopack`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/nextjs-16-turbopack).

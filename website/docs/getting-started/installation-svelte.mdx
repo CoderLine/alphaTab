@@ -1,0 +1,147 @@
+---
+title: Svelte and SvelteKit
+description: Use alphaTab in Svelte 5 with Vite and in SvelteKit with server-side rendering, create the API in onMount, and serve the font and SoundFont.
+keywords:
+  - alphaTab
+  - Svelte
+  - SvelteKit
+  - Vite
+  - SSR
+  - runes
+---
+
+alphaTab has no Svelte wrapper: a component creates the `AlphaTabApi` on a bound element in `onMount` and destroys it in the function `onMount` returns. This page shows that component with Vite and with SvelteKit.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev @coderline/alphatab-vite
+```
+
+## Svelte with Vite {#vite}
+
+Register the alphaTab plugin next to the Svelte plugin in `vite.config.ts`:
+
+```ts
+import { alphaTab } from '@coderline/alphatab-vite';
+import { svelte } from '@sveltejs/vite-plugin-svelte';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+    plugins: [svelte(), alphaTab()]
+});
+```
+
+Create the component in `src/App.svelte`:
+
+```html
+<script lang="ts">
+    import { AlphaTabApi, synth } from '@coderline/alphatab';
+    import { onMount } from 'svelte';
+
+    let element: HTMLDivElement;
+    let api: AlphaTabApi | undefined;
+    let playerReady = $state(false);
+    let playing = $state(false);
+
+    onMount(() => {
+        const instance = new AlphaTabApi(element, {
+            core: {
+                file: `${import.meta.env.BASE_URL}song.gp`,
+                fontDirectory: `${import.meta.env.BASE_URL}font/`
+            },
+            player: {
+                enablePlayer: true,
+                enableCursor: true,
+                soundFont: `${import.meta.env.BASE_URL}soundfont/sonivox.sf2`
+            }
+        });
+        instance.playerReady.on(() => (playerReady = true));
+        instance.playerStateChanged.on(e => (playing = e.state === synth.PlayerState.Playing));
+        api = instance;
+
+        return () => {
+            instance.destroy();
+            api = undefined;
+        };
+    });
+</script>
+
+<button type="button" disabled={!playerReady} onclick={() => api?.playPause()}>
+    {playing ? 'Pause' : 'Play'}
+</button>
+<div bind:this={element}></div>
+```
+
+- **Plain variable, not `$state`.** A `$state` object is wrapped in a deep reactive proxy, which would reach into alphaTab's internals. Only the UI state uses `$state`.
+- **Asset paths.** Vite writes the scripts to `assets/`, so `core.fontDirectory` and `player.soundFont` point to the copies the plugin makes, prefixed with `import.meta.env.BASE_URL`.
+
+See [Installation (Vite)](installation-vite) for the plugin. Sample: [`svelte-5-vite`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/svelte-5-vite).
+
+## SvelteKit {#sveltekit}
+
+SvelteKit 3 takes its configuration in the options of the `sveltekit()` plugin. Add the alphaTab plugin next to it in `vite.config.ts`:
+
+```ts
+import { alphaTab } from '@coderline/alphatab-vite';
+import adapter from '@sveltejs/adapter-node';
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+    plugins: [
+        sveltekit({
+            adapter: adapter()
+        }),
+        alphaTab()
+    ]
+});
+```
+
+The plugin copies the font and the SoundFont into `static/font/` and `static/soundfont/`, which SvelteKit serves at `/font/` and `/soundfont/`. List both folders in `.gitignore`.
+
+Create the page in `src/routes/+page.svelte`:
+
+```html
+<script lang="ts">
+    import { AlphaTabApi, synth } from '@coderline/alphatab';
+    import { onMount } from 'svelte';
+
+    let element: HTMLDivElement;
+    let api: AlphaTabApi | undefined;
+    let playerReady = $state(false);
+    let playing = $state(false);
+
+    onMount(() => {
+        const instance = new AlphaTabApi(element, {
+            core: {
+                file: '/song.gp',
+                fontDirectory: '/font/'
+            },
+            player: {
+                enablePlayer: true,
+                enableCursor: true,
+                soundFont: '/soundfont/sonivox.sf2'
+            }
+        });
+        instance.playerReady.on(() => (playerReady = true));
+        instance.playerStateChanged.on(e => (playing = e.state === synth.PlayerState.Playing));
+        api = instance;
+
+        return () => {
+            instance.destroy();
+            api = undefined;
+        };
+    });
+</script>
+
+<button type="button" disabled={!playerReady} onclick={() => api?.playPause()}>
+    {playing ? 'Pause' : 'Play'}
+</button>
+<div bind:this={element}></div>
+```
+
+- **`onMount`** runs only in the browser. On the server the page renders the disabled button and an empty container. Importing `@coderline/alphatab` on the server is safe.
+- **`paths.base`.** If the app is deployed under a base path, include it in the three settings, for example with `asset()` from `$app/paths`.
+- **Runtime dependency.** The Node server imports `@coderline/alphatab` when it renders the page, so keep it in `dependencies`.
+
+Sample: [`sveltekit-3`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/sveltekit-3).

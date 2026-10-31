@@ -1,0 +1,130 @@
+---
+title: "Bar numbers"
+description: "Bar numbering with pick-up bars, custom numbers and texts, and display on every bar, the first bar of each system, or nowhere."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 90
+  since: "1.9"
+keywords:
+  - alphaTab
+  - bar numbers
+  - measure numbers
+  - anacrusis
+  - pick-up
+  - stylesheet
+  - alphaTex
+---
+
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+Bar numbers let readers find their place during rehearsal and match a printout to a recording or a teacher's instructions. alphaTab numbers the bars of the score, skips pick-up bars, and lets you restart the count or replace a number with your own text, for example to label an inserted bar `1a`. Separate display modes choose whether the numbers appear on every bar, on the first bar of each system, or not at all.
+
+<AlphaTexSample player={true}>{`
+\\defaultBarNumberDisplay allBars
+\\track
+\\staff {score}
+\\ac :4 G4 |
+:4 C5 D5 E5 C5 |
+\\barNumber "1a" :4 D5 E5 F5 D5 |
+\\barNumber 2 :2 E5 C5 |
+:1 C5
+`}</AlphaTexSample>
+
+The pick-up bar has no number. The third bar shows the text `1a`, the fourth bar restarts the count at 2, and the last bar continues with 3.
+
+## How bars are counted
+
+Bar numbers belong to the master bar, so every track and staff shows the same number for the same bar. alphaTab counts from 1:
+
+- Pick-up bars ([`MasterBar.isAnacrusis`](/docs/reference/types/model/masterbar/#isanacrusis), `\ac` in alphaTex) get no number and do not count.
+- [`MasterBar.customBarNumber`](/docs/reference/types/model/masterbar/#custombarnumber) sets the number of a bar. The following bars continue counting from it.
+- [`MasterBar.customBarNumberText`](/docs/reference/types/model/masterbar/#custombarnumbertext) replaces the displayed number with a text. The bar still counts, so the next bar continues the sequence as if the number were shown.
+
+The read-only [`MasterBar.barNumber`](/docs/reference/types/model/masterbar/#barnumber) returns the resulting number (`NaN` for pick-up bars) and [`MasterBar.barNumberText`](/docs/reference/types/model/masterbar/#barnumbertext) returns the text alphaTab draws. Custom numbers can repeat or jump, so do not use `barNumber` to look up bars; use [`MasterBar.index`](/docs/reference/types/model/masterbar/#index) instead.
+
+alphaTab computes the numbers in [`Score.finish`](/docs/reference/types/model/score/#finish). After you change `customBarNumber` in code, call `score.finish(settings)` again before rendering. A changed `customBarNumberText` takes effect without it.
+
+## Custom numbers and texts in alphaTex
+
+`\barNumber` sets the number or text of the current bar:
+
+- `\barNumber 10` — this bar is number 10, the next one 11.
+- `\barNumber "1a"` — this bar shows `1a` and counts as the next number in sequence.
+
+A bar with `\barNumber` always shows its number, regardless of the display mode.
+
+## Display modes
+
+By default alphaTab draws the number on the first bar of each system (`FirstOfSystem`). If a system starts with a pick-up bar, that system shows no number.
+
+<AlphaTexSample player={true} settings={{ display: { layoutMode: "parchment" } }}>{`
+\\track { defaultSystemsLayout 3 }
+\\staff {score}
+\\ac :4 G4 |
+:4 C5 D5 E5 C5 | :4 D5 E5 F5 D5 | :2 E5 C5 |
+:4 C5 D5 E5 C5 | :4 D5 E5 F5 D5 | :1 C5
+`}</AlphaTexSample>
+
+The [`BarNumberDisplay`](/docs/reference/types/model/barnumberdisplay) values:
+
+- `FirstOfSystem` — the first bar of every system (default).
+- `AllBars` — every bar. This was the default up to alphaTab 1.8; set `\defaultBarNumberDisplay allBars` or the score-wide configuration below to restore it.
+- `Hide` — no bar numbers.
+
+Set the mode on three levels:
+
+- Score-wide: [`\defaultBarNumberDisplay`](/docs/alphatex/score-metadata#defaultbarnumberdisplay) in alphaTex, or the `barNumber` field of [`RenderStylesheet.scoreConfig`](/docs/reference/types/model/renderstylesheet/#scoreconfig), `tabConfig`, `slashConfig` and `numberedConfig` in code.
+- Per staff: the `barNumber` property of [`\staffDisplay`](/docs/alphatex/staff-metadata#staffdisplay), or `Staff.scoreConfig.barNumber` and its siblings.
+- Per bar: [`\barNumberDisplay`](/docs/alphatex/bar-metadata#barnumberdisplay) or the `barNumber` property of [`\barDisplay`](/docs/alphatex/bar-metadata#bardisplay), or `Bar.scoreDisplay.barNumber` and its siblings.
+
+[Staff element display](./staff-element-display) explains how these levels combine and how to set the mode per staff type. To remove bar numbers everywhere, regardless of these settings, turn off `NotationElement.BarNumber` in [`notation.elements`](./coverage-toggle-elements).
+
+## Placement
+
+The number sits above the start barline of its bar, centered on the barline. alphaTab draws it once per system, above the topmost visible staff. It does not take horizontal space in the bar, and the clef, key signature and time signature columns line up across the staves of a system.
+
+## File import
+
+The MusicXML importer reads the `number` attribute of each `<measure>`. A numeric value that breaks the sequence becomes `customBarNumber`, a non-numeric value becomes `customBarNumberText`, and measures marked `implicit="yes"` become pick-up bars without a number. `<measure-numbering>` in `<print>` sets the display mode.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  const { BarNumberDisplay } = alphaTab.model;
+  const stylesheet = score.stylesheet;
+
+  // Number every bar on every staff type.
+  for (const config of [
+    stylesheet.scoreConfig,
+    stylesheet.tabConfig,
+    stylesheet.slashConfig,
+    stylesheet.numberedConfig,
+  ]) {
+    config.barNumber = BarNumberDisplay.AllBars;
+  }
+
+  // Show "2a" on the third bar and restart counting at 10 on the fifth bar.
+  score.masterBars[2].customBarNumberText = '2a';
+  score.masterBars[4].customBarNumber = 10;
+  score.finish(api.settings);
+
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Staff element display](./staff-element-display) — bar numbers, clefs, key and time signatures per staff type.
+- [Toggling notation elements off](./coverage-toggle-elements) — the global `BarNumber` switch.
+- [`\barNumber`](/docs/alphatex/bar-metadata#barnumber), [`\barNumberDisplay`](/docs/alphatex/bar-metadata#barnumberdisplay), [`\defaultBarNumberDisplay`](/docs/alphatex/score-metadata#defaultbarnumberdisplay) and [`\ac`](/docs/alphatex/bar-metadata#ac) in the alphaTex reference.
+- [`MasterBar`](/docs/reference/types/model/masterbar) and [`BarNumberDisplay`](/docs/reference/types/model/barnumberdisplay) in the model reference.

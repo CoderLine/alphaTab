@@ -3,6 +3,7 @@ import { appendFileSync, existsSync, readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { exit } from 'node:process';
 import { type ParseArgsOptionsConfig, parseArgs } from 'node:util';
+import { isWebsiteRelevant } from './ci-areas.mts';
 
 const options: ParseArgsOptionsConfig = {
     platform: {
@@ -25,24 +26,28 @@ const options: ParseArgsOptionsConfig = {
     }
 };
 
+function getFeatureCommits() {
+    const featureCommits = execSync(
+        "git log --since='26 hours ago' --pretty=format:'%H;%an <%ae>' --perl-regexp --author='^((?!dependabot).*)$'",
+        {
+            encoding: 'utf-8'
+        }
+    )
+        .split('\n')
+        .filter(l => l.trim().length > 0)
+        .map(l => {
+            const p = l.split(';');
+            return { hash: p[0], author: p[1] };
+        });
+
+    console.info('Detected following feature commits', featureCommits);
+    return featureCommits;
+}
+
 function getChangedPackages(force: boolean) {
     const packages = new Set<string>();
     if (!force) {
-        // get all commits since 26 hours
-        const featureCommits = execSync(
-            "git log --since='26 hours ago' --pretty=format:'%H;%an <%ae>' --perl-regexp --author='^((?!dependabot).*)$'",
-            {
-                encoding: 'utf-8'
-            }
-        )
-            .split('\n')
-            .filter(l => l.trim().length > 0)
-            .map(l => {
-                const p = l.split(';');
-                return { hash: p[0], author: p[1] };
-            });
-
-        console.info('Detected following feature commits', featureCommits);
+        const featureCommits = getFeatureCommits();
         if (featureCommits.length === 0) {
             console.info('No feature commits, no packages changed');
             return packages;
@@ -55,9 +60,9 @@ function getChangedPackages(force: boolean) {
             }).split('\n');
 
             for (const file of files) {
-                const packageName = file.split('/')[1];
-                if (packageName) {
-                    packages.add(packageName);
+                const parts = file.split('/');
+                if (parts[0] === 'packages' && parts.length > 2) {
+                    packages.add(parts[1]);
                 }
             }
         }
@@ -86,6 +91,32 @@ function getChangedPackages(force: boolean) {
     return packages;
 }
 
+/**
+ * The website redeploys when the window changed the site itself or a package it ships. The window is diffed as a
+ * whole, so changes that only arrive through merge commits are included.
+ */
+function hasWebsiteChanges(force: boolean) {
+    if (force) {
+        return true;
+    }
+    if (getFeatureCommits().length === 0) {
+        console.info('No feature commits, website unchanged');
+        return false;
+    }
+
+    const base = execSync("git rev-list -1 --before='26 hours ago' HEAD", { encoding: 'utf-8' }).trim();
+    if (!base) {
+        console.info('No commit older than 26 hours in the checked out history, treating the website as changed');
+        return true;
+    }
+
+    const relevant = execSync(`git diff --name-only ${base} HEAD`, { encoding: 'utf-8' })
+        .split('\n')
+        .filter(f => f.length > 0 && isWebsiteRelevant(f));
+    console.info('Detected following website relevant changes', relevant);
+    return relevant.length > 0;
+}
+
 function exec(command: string, cwd: string) {
     console.info(`executing command ${command} in ${cwd}`);
     execSync(command, { stdio: 'inherit', cwd });
@@ -103,6 +134,9 @@ function publish(platform: string, packages: Set<string>, dryRun: boolean) {
                     resolve(import.meta.dirname, '../packages', packageName)
                 );
             }
+            // the website build waits until the registry serves this version
+            const published = !dryRun && packages.has('alphatab');
+            writeOutput(`alphatab_version=${published ? readPackageVersion('alphatab') : ''}`);
             break;
         }
         case 'dotnet': {
@@ -173,11 +207,19 @@ function check(platform: string, packages: Set<string>) {
             break;
     }
 
-    const hasChangesOutput = `has_changes=${hasChanges ? 'true' : 'false'}`;
+    writeOutput(`has_changes=${hasChanges ? 'true' : 'false'}`);
+}
+
+function readPackageVersion(packageName: string): string {
+    const packageJson = resolve(import.meta.dirname, '../packages', packageName, 'package.json');
+    return JSON.parse(readFileSync(packageJson, 'utf-8')).version;
+}
+
+function writeOutput(line: string) {
     if (process.env.GITHUB_OUTPUT) {
-        appendFileSync(process.env.GITHUB_OUTPUT, hasChangesOutput);
+        appendFileSync(process.env.GITHUB_OUTPUT, `${line}\n`);
     } else {
-        console.info(hasChangesOutput);
+        console.info(line);
     }
 }
 
@@ -185,6 +227,16 @@ const args = parseArgs({
     options,
     strict: true
 }).values;
+
+if (args.platform === 'website') {
+    if (args.mode !== 'check') {
+        console.error('The website platform only supports --mode check');
+        exit(1);
+    }
+    writeOutput(`has_changes=${hasWebsiteChanges(args.force === 'true') ? 'true' : 'false'}`);
+    exit(0);
+}
+
 const packages = getChangedPackages(args.force === 'true');
 
 switch (args.mode) {

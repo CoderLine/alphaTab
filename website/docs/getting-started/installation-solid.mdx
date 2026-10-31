@@ -1,0 +1,77 @@
+---
+title: Solid
+description: Use alphaTab in Solid with Vite, create the API in onMount, destroy it in onCleanup, and serve the font and SoundFont.
+keywords:
+  - alphaTab
+  - Solid
+  - SolidJS
+  - Vite
+---
+
+alphaTab has no Solid wrapper: a component creates the `AlphaTabApi` on a ref'd element in `onMount` and destroys it in `onCleanup`.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev @coderline/alphatab-vite
+```
+
+Register the alphaTab plugin next to the Solid plugin in `vite.config.ts`:
+
+```ts
+import { alphaTab } from '@coderline/alphatab-vite';
+import { defineConfig } from 'vite';
+import solid from 'vite-plugin-solid';
+
+export default defineConfig({
+    plugins: [solid(), alphaTab()]
+});
+```
+
+Create the component in `src/App.tsx`:
+
+```tsx
+import { AlphaTabApi, synth } from '@coderline/alphatab';
+import { createSignal, onCleanup, onMount } from 'solid-js';
+
+export default function App() {
+    let element!: HTMLDivElement;
+    let api: AlphaTabApi | undefined;
+    const [playerReady, setPlayerReady] = createSignal(false);
+    const [playing, setPlaying] = createSignal(false);
+
+    onMount(() => {
+        api = new AlphaTabApi(element, {
+            core: {
+                file: `${import.meta.env.BASE_URL}song.gp`,
+                fontDirectory: `${import.meta.env.BASE_URL}font/`
+            },
+            player: {
+                enablePlayer: true,
+                enableCursor: true,
+                soundFont: `${import.meta.env.BASE_URL}soundfont/sonivox.sf2`
+            }
+        });
+        api.playerReady.on(() => setPlayerReady(true));
+        api.playerStateChanged.on(e => setPlaying(e.state === synth.PlayerState.Playing));
+    });
+
+    onCleanup(() => {
+        api?.destroy();
+        api = undefined;
+    });
+
+    return (
+        <>
+            <button type="button" disabled={!playerReady()} onClick={() => api?.playPause()}>
+                {playing() ? 'Pause' : 'Play'}
+            </button>
+            <div ref={element}></div>
+        </>
+    );
+}
+```
+
+- **Plain variable for the API.** Only the UI state lives in signals, updated from alphaTab's events.
+- **Asset paths.** Vite writes the scripts to `assets/`, so `core.fontDirectory` and `player.soundFont` point to the copies the plugin makes, prefixed with `import.meta.env.BASE_URL`.
+
+See [Installation (Vite)](installation-vite) for the plugin. Sample: [`solid-1-vite`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/solid-1-vite).

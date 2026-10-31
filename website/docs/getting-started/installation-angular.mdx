@@ -1,0 +1,192 @@
+---
+title: Angular
+description: Use alphaTab in Angular 20 to 22 with the application builder by loading it unbundled through an import map, or with the webpack builder and @coderline/alphatab-webpack.
+keywords:
+  - alphaTab
+  - Angular
+  - application builder
+  - esbuild
+  - webpack
+  - SSR
+  - import map
+---
+
+alphaTab has no Angular wrapper: a component creates the `AlphaTabApi` on a view child in `afterNextRender` and destroys it with `DestroyRef`. This page shows the setup for Angular's default application builder and for its webpack builder.
+
+```bash
+npm install @coderline/alphatab
+```
+
+## Application builder {#application-builder}
+
+Angular's default builder (`@angular/build:application`, esbuild) has no plugin API, bundles `new Worker(new URL(...))` only in your own code, not inside dependencies, and has no Audio Worklet support. If alphaTab is imported and bundled normally, the production build still references `./alphaTab.worker.mjs` next to `main-[hash].js`, the file does not exist, and the score never renders, without an error. `ng serve` hides the problem, because its Vite pre-bundling resolves the worker URL.
+
+Keep alphaTab out of the bundle and let the browser load its ES modules instead. The page, the workers and the worklet then share one `alphaTab.core.min.mjs`. In `angular.json`, under `projects.<app>.architect.build.options`:
+
+```json
+{
+    "externalDependencies": ["@coderline/alphatab"],
+    "index": {
+        "input": "src/index.html",
+        "preloadInitial": false
+    },
+    "assets": [
+        { "glob": "**/*", "input": "public" },
+        { "glob": "**/*", "input": "node_modules/@coderline/alphatab/dist/font", "output": "font" },
+        { "glob": "sonivox.sf3", "input": "node_modules/@coderline/alphatab/dist/soundfont", "output": "soundfont" },
+        {
+            "glob": "alphaTab.{min.mjs,core.min.mjs,worker.min.mjs,worklet.min.mjs}",
+            "input": "node_modules/@coderline/alphatab/dist",
+            "output": "alphatab"
+        }
+    ]
+}
+```
+
+Map the package name to the copy with an import map in `src/index.html`:
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <base href="/">
+  <script type="importmap">{ "imports": { "@coderline/alphatab": "/alphatab/alphaTab.min.mjs" } }</script>
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+```
+
+Create the component in `src/app/app.ts`:
+
+```ts
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import * as alphaTab from '@coderline/alphatab';
+
+@Component({
+    selector: 'app-root',
+    template: `
+        <button type="button" [disabled]="!playerReady()" (click)="playPause()">{{ playing() ? 'Pause' : 'Play' }}</button>
+        <div #alphaTab></div>
+    `
+})
+export class App {
+    private readonly element = viewChild.required<ElementRef<HTMLDivElement>>('alphaTab');
+    private api?: alphaTab.AlphaTabApi;
+    protected readonly playerReady = signal(false);
+    protected readonly playing = signal(false);
+
+    constructor() {
+        afterNextRender(() => {
+            const api = new alphaTab.AlphaTabApi(this.element().nativeElement, {
+                core: {
+                    file: '/song.gp',
+                    fontDirectory: '/font/'
+                },
+                player: {
+                    enablePlayer: true,
+                    enableCursor: true,
+                    soundFont: '/soundfont/sonivox.sf3'
+                }
+            });
+            api.playerReady.on(() => this.playerReady.set(true));
+            api.playerStateChanged.on(e => this.playing.set(e.state === alphaTab.synth.PlayerState.Playing));
+            this.api = api;
+        });
+        inject(DestroyRef).onDestroy(() => this.api?.destroy());
+    }
+
+    protected playPause() {
+        this.api?.playPause();
+    }
+}
+```
+
+- **`externalDependencies`** keeps `import ... from '@coderline/alphatab'` as a bare import in the browser and the server bundle. TypeScript still checks against the installed package, and the initial bundle stays small enough for the default budgets.
+- **`assets`** copies alphaTab's minified ES modules to `/alphatab/`, the font to `/font/` and the SoundFont to `/soundfont/`. `alphaTab.min.mjs` imports `alphaTab.core.min.mjs` and starts `alphaTab.worker.min.mjs` and `alphaTab.worklet.min.mjs` from next to itself, which import the same core. For debugging, copy `alphaTab.{mjs,core.mjs,worker.mjs,worklet.mjs}` and map the package to `/alphatab/alphaTab.mjs` instead; each set references only its own files.
+- **`preloadInitial: false`.** Otherwise the production build adds `<link rel="modulepreload" href="@coderline/alphatab">`, which browsers do not resolve through the import map; it fails with a MIME type error.
+- **`afterNextRender`** runs only in the browser, after hydration, so the component also works with server-side rendering. The server renders the button and an empty container. With Zone.js (the Angular 20 default), create alphaTab inside `NgZone.runOutsideAngular` so its timers and frequent events do not trigger change detection.
+
+With server-side rendering:
+
+- The server bundle imports `@coderline/alphatab` from `node_modules` at runtime, so deploy the server with its installed dependencies.
+- The files under `/alphatab/` keep their names across alphaTab versions. The generated `server.ts` serves static files with `maxAge: '1y'`; give `/alphatab/` a shorter cache lifetime or a versioned folder so browsers fetch new files after an update.
+
+Samples: [`angular-22-esbuild`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/angular-22-esbuild) (server-side rendering), [`angular-21-esbuild`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/angular-21-esbuild), [`angular-20-esbuild`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/angular-20-esbuild) (Zone.js).
+
+### Alternatives {#application-builder-alternatives}
+
+Two other setups work with the application builder, each loading the core more often:
+
+| Setup | Core copies |
+| --- | --- |
+| alphaTab external with an import map (above) | 1 |
+| Bundle `@coderline/alphatab` normally and copy `alphaTab.core.mjs`, `alphaTab.worker.mjs` and `alphaTab.worklet.mjs` to the output root (`"output": "/"`); raise the `initial` budget to about 1.5 MB | 2 |
+| Own worker entry with `import '@coderline/alphatab/worker'`, the app imports `@coderline/alphatab/core` and calls `Environment.initializeMain`; the worklet loads copied `alphaTab.worklet.mjs` and `alphaTab.core.mjs` | 3 |
+
+## Webpack builder {#webpack}
+
+Projects that stay on Angular's webpack-based browser builder inject `@coderline/alphatab-webpack` with [`@angular-builders/custom-webpack`](https://www.npmjs.com/package/@angular-builders/custom-webpack). Angular deprecated its webpack support in version 22; use the application builder for new projects.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev @coderline/alphatab-webpack @angular-builders/custom-webpack @angular-devkit/build-angular
+```
+
+Point the `build` and `serve` targets in `angular.json` to the custom builder:
+
+```json
+{
+    "build": {
+        "builder": "@angular-builders/custom-webpack:browser",
+        "options": {
+            "customWebpackConfig": { "path": "./webpack.config.js" },
+            "outputPath": "dist/my-app",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [{ "glob": "**/*", "input": "public" }]
+        },
+        "configurations": {
+            "production": {
+                "budgets": [{ "type": "initial", "maximumWarning": "1.5MB", "maximumError": "2MB" }],
+                "outputHashing": "all"
+            }
+        }
+    },
+    "serve": {
+        "builder": "@angular-builders/custom-webpack:dev-server",
+        "configurations": {
+            "production": { "buildTarget": "my-app:build:production" },
+            "development": { "buildTarget": "my-app:build:development" }
+        },
+        "defaultConfiguration": "development"
+    }
+}
+```
+
+Register the plugin in `webpack.config.js` and turn the shared core chunk off:
+
+```js
+const { AlphaTabWebPackPlugin } = require('@coderline/alphatab-webpack');
+
+module.exports = {
+    plugins: [new AlphaTabWebPackPlugin()],
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                alphaTabCore: false
+            }
+        }
+    }
+};
+```
+
+- The browser builder takes `main`, not `browser`, as the entry option.
+- **`alphaTabCore: false` is required.** Angular's browser builder writes only its own named chunks (`runtime`, `polyfills`, `main`, …) into `index.html`. The plugin's shared core chunk would never load, and the app would not start, showing a blank page without an error. Without the chunk, the core is bundled into `main` and once more into a chunk the workers and the worklet share: two copies.
+- The plugin bundles the worker and the worklet although Angular turns webpack's worker parsing off; it re-enables it for alphaTab's modules only, and copies the font to `/font/` and the SoundFont to `/soundfont/`.
+- **Budgets.** `main` contains alphaTab, about 1.4 MB raw and 280 kB transferred, so the `initial` budget is raised.
+
+Use the component from the [application builder](#application-builder) section. Sample: [`angular-22-webpack`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/angular-22-webpack).

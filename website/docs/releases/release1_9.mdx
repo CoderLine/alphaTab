@@ -1,0 +1,464 @@
+---
+title: v1.9
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+## 1.9.0
+
+This release gives the alphaTab attribution a smaller, quieter place in the score, reworks note spacing and the placement of annotations, adds per-staff control over clefs, key and time signatures and bar numbers, plays repeats and jumps in the right order, imports MusicXML files more faithfully, and loads alphaTab's core once for the page, its workers and its Audio Worklet with webpack, Rspack and Vite. The [upgrade notes](#upgrade-notes) at the end list the visual changes, changed defaults and deprecations.
+
+### Attribution
+
+#### render: a smaller, quieter attribution
+
+The "rendered by alphaTab" line below the score is replaced by a small "♪ alphaTab.net" above the top staff at the end of the first system. It is drawn in the staff line color and adds no extra line. Songs with up to 10 bars and at most 2 tracks show no attribution at all.
+
+<AlphaTab tex={true} player={false}>{`
+:8 C4 D4 E4 F4 G4 A4 B4 C5 | C5 B4 A4 G4 F4 E4 D4 C4 | :4 E4 G4 C5 E5 | :2 (C4 E4 G4) (C5 E5 G5) |
+:8 G5 F5 E5 D5 C5 B4 A4 G4 | :1 C4 |
+:8 C4 D4 E4 F4 G4 A4 B4 C5 | C5 B4 A4 G4 F4 E4 D4 C4 | :4 E4 G4 C5 E5 | :2 (C4 E4 G4) (C5 E5 G5) |
+:8 G5 F5 E5 D5 C5 B4 A4 G4 | :1 C4
+`}</AlphaTab>
+
+Many projects hid the attribution without our consent and without crediting alphaTab elsewhere. The attribution is now part of how the score is drawn and much harder to remove; there is no setting to turn it off. If you have permission for a different credit and the new placement does not fit, [get in touch](/docs/attribution#request).
+
+The new [Attribution](/docs/attribution) page explains [why we ask for credit](/docs/attribution#why), which [alternative credits](/docs/attribution#alternatives) work, and offers [logos and badges](/docs/attribution#logos) to download.
+
+#### license: planned move to CPAL-1.0 or similar
+
+A future release will move from MPL-2.0 to an open-source license with an attribution clause. The choice is not settled yet; [CPAL-1.0](https://opensource.org/license/cpal_1-0) is the best fit we see so far. alphaTab stays open source and free, also for commercial use, and releases under MPL-2.0, including this one, stay under MPL-2.0. See [what changes](/docs/attribution#license-cpal).
+
+### Music Notation
+
+#### render: power-law note spacing and last-system justification
+https://github.com/CoderLine/alphaTab/pull/2749
+
+alphaTab spaces notes with a power-law model, the approach Dorico, MuseScore and Finale use: doubling a duration multiplies its width by [`display.spacingRatio`](/docs/reference/settings/display/spacingratio). The default is `Math.SQRT2` (about 1.414, as in Dorico); values are clamped to 1.2–2.0. Whole notes and rest bars follow the same ratio, so how much of a system they take depends on `spacingRatio`. [`display.stretchForce`](/docs/reference/settings/display/stretchforce) still sets the overall density.
+
+The same four bars with `spacingRatio` 1.2 (first) and the default (second):
+
+<AlphaTab tex={true} settings={{ display: { spacingRatio: 1.2 } }}>{`
+\\hideDynamics
+:1 C4 | :2 C4 C4 | :4 C4 C4 C4 C4 | :8 C4 C4 C4 C4 C4 C4 C4 C4
+`}</AlphaTab>
+
+<AlphaTab tex={true}>{`
+\\hideDynamics
+:1 C4 | :2 C4 C4 | :4 C4 C4 C4 C4 | :8 C4 C4 C4 C4 C4 C4 C4 C4
+`}</AlphaTab>
+
+[`display.lastSystemFillThreshold`](/docs/reference/settings/display/lastsystemfillthreshold) decides when the last system stretches to the full width: once its natural width reaches the given fraction of the available width. `1` (default) never stretches it, `0` always does, and values between `0.4` and `0.7` behave like Dorico and MuseScore. It replaces [`display.justifyLastSystem`](/docs/reference/settings/display/justifylastsystem).
+
+Full demo and all options: [Density and spacing](/docs/features/render/density-and-spacing).
+
+Thanks to [@AvaTheArchitect](https://github.com/AvaTheArchitect) for the discussion that led to this.
+
+#### render: effect placement against the notation
+https://github.com/CoderLine/alphaTab/pull/2750
+
+Texts, chord names, dynamics, palm-mute and let-ring brackets and the other annotations are placed against the outline of the notation (the skyline) instead of in rows spanning the whole system. An annotation moves away from the staff only where a note, stem, beam or another annotation is in the way. Charts with many annotations need less vertical space.
+
+<AlphaTexSample player={true}>{`
+\\track "Guitar"
+\\staff {score tabs}
+:8 (0.5 2.4){ch "Am" dy mf} 2.3{lr} 1.2{lr} 0.1{lr} 1.2 2.3{txt "rit."} :4 2.4 |
+:8 0.6{pm} 0.6{pm} 3.6{pm} 0.6{pm} :16 12.1{txt "solo" h} 15.1{h} 12.1 14.2 :8 17.1{v} 12.1
+`}</AlphaTexSample>
+
+`Am` and `rit.` sit right above the low notes of the first bar, while the high sixteenth notes in the second bar push the labels and `solo` up. The placement is always active. [`display.effectBandPaddingBottom`](/docs/reference/settings/display/effectbandpaddingbottom) sets the gap between an annotation row and the staff or the row below it.
+
+Full demo and all options: [Effect placement](/docs/features/render/effect-placement#skyline).
+
+#### notation: per-staff display of clefs, key and time signatures, bar numbers and tab rests
+https://github.com/CoderLine/alphaTab/pull/2752
+https://github.com/CoderLine/alphaTab/pull/2946
+
+Each staff type (standard notation, tablature, slash and numbered notation) has its own configuration for the elements it can draw: clef, key signature, time signature, bar numbers and, on tablature, rests. Each element can be hidden, drawn only on the topmost staff type of a staff, or drawn only in the first system. You set this score-wide on the stylesheet ([`RenderStylesheet.scoreConfig`](/docs/reference/types/model/renderstylesheet/#scoreconfig) and its siblings), per staff ([`Staff.scoreConfig`](/docs/reference/types/model/staff/#scoreconfig)) or per bar ([`Bar.scoreDisplay`](/docs/reference/types/model/bar/#scoredisplay)). The values are [`ElementDisplay`](/docs/reference/types/model/elementdisplay) records.
+
+<AlphaTexSample player={true}>{`
+\\staff {score tabs}
+\\staffDisplay tabs { clefVisibility false tsPlacement allStaves restsPlacement allStaves }
+:4 3.3 r 0.2 1.2 | 3.2 1.2 r 0.2
+`}</AlphaTexSample>
+
+The tab staff drops its TAB clef and repeats the time signature and the rests, which alphaTab otherwise draws only on the standard notation staff above it. The defaults render as before, apart from bar numbers (see the next item).
+
+Full demo and all options: [Staff element display](/docs/features/render/staff-element-display#score-staff-and-bar-level).
+
+#### notation: bar numbering with pick-up bars, custom numbers and texts
+https://github.com/CoderLine/alphaTab/pull/2907
+
+Bar numbers belong to the master bar. Pick-up bars get no number and do not count. [`MasterBar.customBarNumber`](/docs/reference/types/model/masterbar/#custombarnumber) restarts the count, and [`MasterBar.customBarNumberText`](/docs/reference/types/model/masterbar/#custombarnumbertext) shows a text such as `1a` instead of the number. In alphaTex, [`\barNumber`](/docs/alphatex/bar-metadata#barnumber) sets either one.
+
+<AlphaTexSample player={true}>{`
+\\defaultBarNumberDisplay allBars
+\\ac :4 G4 |
+:2 C5 E5 |
+\\barNumber "1a" :2 D5 F5 |
+\\barNumber 5 :1 C5
+`}</AlphaTexSample>
+
+The pick-up bar has no number, the third bar shows `1a`, and the last bar restarts the count at 5. By default, alphaTab now numbers only the first bar of each system. The number is centered above the start barline and no longer adds space at the start of the bar. Clef, key signature and time signature line up across the staves of a system. The MusicXML importer reads the `number` attribute of each measure.
+
+Full demo and all options: [Bar numbers](/docs/features/render/bar-numbers#display-modes).
+
+#### notation: tuning on the staff lines
+https://github.com/CoderLine/alphaTab/pull/2742
+
+alphaTab can write the note name of each open string at the left end of its tab line on the first system, instead of the tuning block above the score. This matches the "tuning before staff" option in Guitar Pro. Select it with [`RenderStylesheet.tuningDisplayMode`](/docs/reference/types/model/renderstylesheet/#tuningdisplaymode) set to `TuningDisplayMode.Staff`, or with [`\tuningDisplayMode staff`](/docs/alphatex/score-metadata#tuningdisplaymode) in alphaTex. [`display.inlineTuningPaddingRight`](/docs/reference/settings/display/inlinetuningpaddingright) sets the gap between the labels and the staff.
+
+<AlphaTexSample player={true}>{`
+\\tuningDisplayMode staff
+\\track "Guitar"
+\\staff { tabs }
+\\tuning (E4 B3 G3 D3 A2 D2)
+:8 0.6 2.4 0.3 2.2 0.1 2.2 0.3 2.4
+`}</AlphaTexSample>
+
+Guitar Pro 7 and 8 files store the mode in their stylesheet; alphaTab reads it and the Guitar Pro 7 exporter writes it.
+
+Full demo and all options: [Tuning display](/docs/features/render/tuning-display#tuning-on-staff).
+
+Thanks to [@kulek1](https://github.com/kulek1) for contributing this feature, and to [@AvaTheArchitect](https://github.com/AvaTheArchitect) for the discussion that led to it.
+
+#### notation: drum tablature
+https://github.com/CoderLine/alphaTab/pull/2591
+
+Percussion staves can render as a drum tablature, as in Guitar Pro and TuxGuitar. Each drum piece sits on a line, and the number on the line is its articulation number. Turn it on with [`Staff.showTablature`](/docs/reference/types/model/staff/#showtablature), or with `\staff { score tabs }` in alphaTex. In alphaTex, `@` assigns the line of a percussion note: `SnareHit@3` places the snare on line 3.
+
+<AlphaTexSample player={true}>{`
+\\track "Drums" { instrument percussion }
+\\staff { score tabs }
+\\clef neutral
+\\articulation defaults
+:4 (KickHit@5 HiHatClosed@1) (SnareHit@3 HiHatClosed@1) (KickHit@5 HiHatClosed@1) (SnareHit@3 HiHatClosed@1)
+`}</AlphaTexSample>
+
+Guitar Pro 7 and 8 files keep the line of every drum note on import and export.
+
+Full demo and all options: [Drum and percussion notation](/docs/features/render/drum-tabs#drum-tablature).
+
+Thanks to [@leocaseiro](https://github.com/leocaseiro) for contributing this feature, and to [@sugizo](https://github.com/sugizo) for the discussion that led to it.
+
+#### notation: hammer-on, pull-off and slide labels above the staff
+https://github.com/CoderLine/alphaTab/pull/2945
+https://github.com/CoderLine/alphaTab/pull/2943
+
+The `H`, `P` and `sl.` labels introduced in 1.8.3 are drawn above the staff instead of on the slur arcs, on standard notation, tablature and numbered notation. Each beat gets one label, centered on its slur segment; different labels on one beat stack. A segment across a system break is labeled on the first system only. Regular slurs carry no label.
+
+Slurs between chords follow Behind Bars and Guitar Pro: on standard notation one slur joins the outer noteheads of the chord, on tablature each beat gets at most one arc above and one below. On narrow screens these slurs no longer disappear.
+
+<AlphaTexSample player={true}>{`
+\\staff {score tabs}
+:4 r r 5.3{h} 7.3{h} | 5.3 r r (5.1{h} 5.2{sl}) | (7.1 9.2) r r r
+`}</AlphaTexSample>
+
+Hide the labels with [`NotationElement.EffectHammerOnPullOffText`](/docs/reference/types/notationelement#effecthammeronpullofftext) and [`NotationElement.EffectSlideText`](/docs/reference/types/notationelement#effectslidetext) in [`notation.elements`](/docs/reference/settings/notation/elements).
+
+Full demo and all options: [Effects and articulations](/docs/features/render/coverage-effects-articulations#slide-labels).
+
+Thanks to [@shimabox](https://github.com/shimabox) for reporting the problem with slurs between chords.
+
+#### notation: centered full-bar notes and rests
+https://github.com/CoderLine/alphaTab/pull/2781
+
+When a bar holds a single beat that lasts the whole bar, alphaTab centers it in the bar together with its annotations, following Behind Bars. This applies when every staff and voice rendered in the bar has one such beat; other bars keep the regular positioning.
+
+<AlphaTexSample player={true}>{`
+\\hideDynamics
+:1 C5 | r.1 | \\ts (3 4) :2 C5{d} | r.2{d}
+`}</AlphaTexSample>
+
+Full demo and all options: [Rests and full-bar notes](/docs/features/render/coverage-rests#centered).
+
+Thanks to [@comus111](https://github.com/comus111) for the discussion that led to this.
+
+#### notation: rest position per beat
+https://github.com/CoderLine/alphaTab/pull/2721
+
+A rest can take the staff position of a given pitch instead of the automatic one. In alphaTex, write the beat property [`restDisplayPitch`](/docs/alphatex/beat-properties#restdisplaypitch); in the model, set [`Beat.restDisplayTone`](/docs/reference/types/model/beat/#restdisplaytone) and [`Beat.restDisplayOctave`](/docs/reference/types/model/beat/#restdisplayoctave). The position follows the clef and works per voice.
+
+<AlphaTexSample player={true}>{`
+\\hideDynamics
+:4 r C5 r C5 | r{restDisplayPitch A5} C5 r{restDisplayPitch E4} C5
+`}</AlphaTexSample>
+
+The first bar shows the automatic positions, the second bar moves the rests to A5 and E4. alphaTab does not read rest positions from Guitar Pro or MusicXML files, and the alphaTex exporter does not write `restDisplayPitch`.
+
+Full demo and all options: [Rests and full-bar notes](/docs/features/render/coverage-rests#rest-position).
+
+Thanks to [@roscopeeco](https://github.com/roscopeeco) for contributing this feature.
+
+#### Other changes
+
+* render: ties and slurs that continue on a new system start after the clef, key signature and time signature instead of at the left edge of the staff ([#2800](https://github.com/CoderLine/alphaTab/pull/2800), thanks [@GiovanniSlabs](https://github.com/GiovanniSlabs) for contributing this fix)
+* render: tab staves with slashed beats render stems, beams and dots in place when [`notation.rhythmMode`](/docs/reference/settings/notation/rhythmmode) shows tab rhythm, instead of failing or drawing them at the top of the staff ([#2916](https://github.com/CoderLine/alphaTab/pull/2916), thanks [@zyk-mjzs](https://github.com/zyk-mjzs))
+* render: the minimum bar width is computed correctly, and the new engraving settings [`beatContentPadding`](/docs/reference/types/engravingsettings/#beatcontentpadding) and [`barlineContentPadding`](/docs/reference/types/engravingsettings/#barlinecontentpadding) keep accidentals, grace notes and flags clear of the next beat and the barline; a bar that must be squeezed below its minimum logs a warning ([#2943](https://github.com/CoderLine/alphaTab/pull/2943), see [Engraving clearances](/docs/features/render/effect-placement#clearances))
+
+### Player
+
+#### player: repeats, alternate endings and jumps play in the right order
+https://github.com/CoderLine/alphaTab/pull/2915
+https://github.com/CoderLine/alphaTab/pull/2895
+https://github.com/CoderLine/alphaTab/pull/2917
+https://github.com/CoderLine/alphaTab/pull/2929
+
+The player, the cursor and MIDI export follow one set of rules for repeats and jumps:
+
+* Each D.C. and D.S. is taken once. Before, a coda placed before the bar that jumps back could make playback loop forever.
+* After a jump, repeats play as their final pass: the passage plays once, with only its last alternate ending, as in MuseScore.
+* Repeat passes are counted per repeat group, so with Guitar Pro style repeat counts a repeat sign in several alternate endings plays every ending once, as in Guitar Pro 8. MusicXML files whose endings each close with a backward repeat but give no `times` can play fewer endings.
+* A jump inside a repeat, or on its closing bar, is taken after all repeat passes.
+* A jump on an alternate ending that playback skips is not taken.
+* MusicXML files that write jumps and markers as `<sound>` attributes inside a `<direction>`, as MuseScore exports them, play these jumps.
+
+<AlphaTexSample player={true}>{`
+\\track "Guitar"
+\\staff {score}
+\\ro :4 C4 D4 E4 F4 |
+\\ae 1 \\rc 2 G4 F4 E4 D4 |
+\\ae 2 \\jump fine G4 E4 :2 C4 |
+\\jump daCapoAlFine :4 A4 G4 F4 E4
+`}</AlphaTexSample>
+
+This plays bars 1 2 1 3 4 1 3: after the D.C. the repeat plays as its final pass, so bar 1 continues into the second ending, where `Fine` ends the piece.
+
+Full demo and all options: [Repeats and structural elements](/docs/features/render/coverage-repeats#playback-order).
+
+Thanks to [@AnshulJ999](https://github.com/AnshulJ999) and [@gabbe](https://github.com/gabbe) for reporting these problems, and to [@noy-solvin](https://github.com/noy-solvin) for contributing the fix for repeats in alternate endings.
+
+#### player: pick-up bars for metronome, count-in and beaming
+https://github.com/CoderLine/alphaTab/pull/2939
+
+alphaTab treats a pick-up bar as the end of a full bar. Beaming, triplet feel and metronome clicks follow the beats of the time signature. The count-in counts one full bar and continues up to the beat where playback starts, also when you start in the middle of a bar.
+
+<AlphaTexSample player={true}>{`
+\\ts (2 4)
+\\ac C4.8 D4.8 E4.8 |
+F4.4 G4.4 |
+A4.8 B4.8 C5.8 D5.8
+`}</AlphaTexSample>
+
+The pick-up holds the last three eighths of a 2/4 bar: C keeps its own flag, and D and E are beamed as beat 2. The same change corrects beat timers with several tracks and tempo changes within a bar, and reading [`MidiFile.events`](/docs/reference/types/midi/midifile) with `MidiFileFormat.MultiTrack` no longer overflows the stack.
+
+Full demo and all options: [Count-in and metronome](/docs/features/play-sync/count-in-and-metronome#pick-up-bars).
+
+Thanks to [@AlbinoBJJ](https://github.com/AlbinoBJJ) for reporting this problem.
+
+#### integration: separate settings for seek, range selection and click reset
+https://github.com/CoderLine/alphaTab/pull/2779
+
+Three settings replace [`player.enableUserInteraction`](/docs/reference/settings/player/enableuserinteraction):
+
+* [`player.enableSeekToClick`](/docs/reference/settings/player/enableseektoclick) moves the playhead to the clicked beat.
+* [`player.enablePlaybackRangeSelection`](/docs/reference/settings/player/enableplaybackrangeselection) selects a playback range by dragging.
+* [`player.resetPlaybackRangeOnClick`](/docs/reference/settings/player/resetplaybackrangeonclick) clears the range on a plain click. With `false`, a click keeps the range and seeks within it.
+
+All three default to `true`. A drag creates a range only once it reaches another beat; a press and release on the same beat counts as a click, even if the mouse moved a little.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'), {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    enableSeekToClick: true,
+    enablePlaybackRangeSelection: true,
+    resetPlaybackRangeOnClick: false,
+  },
+});
+```
+
+Full demo and all options: [Enabling and disabling interaction](/docs/features/interact/enabling-and-disabling-interaction#keep-the-range-on-click).
+
+Thanks to [@AvaTheArchitect](https://github.com/AvaTheArchitect) for the discussion that led to this.
+
+#### Other changes
+
+* player: pausing, or switching quickly between play and pause, before the Audio Worklet has loaded no longer fails with `Failed to execute 'stop' on 'AudioScheduledSourceNode'` or stalls playback ([#2911](https://github.com/CoderLine/alphaTab/pull/2911), thanks [@kulek1](https://github.com/kulek1))
+* player: a [`midiLoaded`](/docs/reference/api/midiloaded) handler registered after the MIDI was loaded is called right away instead of overflowing the stack ([#2928](https://github.com/CoderLine/alphaTab/pull/2928), thanks [@gabbe](https://github.com/gabbe))
+* player: a [`customScrollHandler`](/docs/reference/api/customscrollhandler) is called also when [`player.scrollMode`](/docs/reference/settings/player/scrollmode) is `Off` ([2889cac](https://github.com/CoderLine/alphaTab/commit/2889cac4e359a41b6f24a82034e6f6ba4f9f4c4f))
+* player: changing [`player.enableAnimatedBeatCursor`](/docs/reference/settings/player/enableanimatedbeatcursor) at runtime switches the cursor ([9a23e14](https://github.com/CoderLine/alphaTab/commit/9a23e14da4dc346c709927a9fe85d3d5b769826a))
+* integration: a mouse press that ends outside the score, or is lost through a window switch or an Android touch cancel, ends with one mouse-up event; before, the press stayed active, extended the selection on hover and turned off auto-scrolling ([#2951](https://github.com/CoderLine/alphaTab/pull/2951), thanks [@kulek1](https://github.com/kulek1))
+
+### alphaTex Extensions
+
+#### alphaTex: staff display tags
+https://github.com/CoderLine/alphaTab/pull/2946
+
+Three tags express the staff element display settings: [`\defaultStaffDisplay`](/docs/alphatex/score-metadata#defaultstaffdisplay) for the whole score, [`\staffDisplay`](/docs/alphatex/staff-metadata#staffdisplay) for the current staff and [`\barDisplay`](/docs/alphatex/bar-metadata#bardisplay) for the current bar. Each takes optional staff types (`score`, `tabs`, `slash`, `numbered`, several in parentheses) and a property list such as `clefVisibility`, `tsPlacement` or `barNumber`. The alphaTex exporter writes these settings, so they survive a round trip.
+
+<AlphaTexSample player={true}>{`
+\\staff {score tabs}
+:4 3.3 r 0.2 1.2 |
+\\barDisplay tabs { tsPlacement allStaves } \\ts (3 4) 3.3 0.2 r | 1.2 r 0.2
+`}</AlphaTexSample>
+
+Only the change to 3/4 is restated on the tab staff.
+
+Full demo and all options: [Staff element display](/docs/features/render/staff-element-display#alphatex).
+
+#### Other changes
+
+* alphaTex: [`\barNumber`](/docs/alphatex/bar-metadata#barnumber) sets a custom bar number or text ([#2907](https://github.com/CoderLine/alphaTab/pull/2907))
+* alphaTex: [`\tuningDisplayMode`](/docs/alphatex/score-metadata#tuningdisplaymode) places the tuning above the score or on the staff lines ([#2742](https://github.com/CoderLine/alphaTab/pull/2742), thanks [@kulek1](https://github.com/kulek1))
+* alphaTex: the beat property [`restDisplayPitch`](/docs/alphatex/beat-properties#restdisplaypitch) positions a rest ([#2721](https://github.com/CoderLine/alphaTab/pull/2721), thanks [@roscopeeco](https://github.com/roscopeeco))
+* alphaTex: percussion notes take their tablature line after `@`, as in `SnareHit@3`, and the exporter writes it ([#2591](https://github.com/CoderLine/alphaTab/pull/2591), thanks [@leocaseiro](https://github.com/leocaseiro); see [Drum tablature](/docs/features/render/drum-tabs#drum-tablature))
+* alphaTex: the note property [`string`](/docs/alphatex/note-properties#string) shows a string number on pitched notes, as in `a4{string 1}` ([#2913](https://github.com/CoderLine/alphaTab/pull/2913), thanks [@magmasystems](https://github.com/magmasystems))
+* alphaTex: harmonic values can be fractional, as in `3.3{ah 2.4}`, so exported files with such values load again ([#2941](https://github.com/CoderLine/alphaTab/pull/2941), thanks [@stewacide](https://github.com/stewacide))
+* alphaTex: the exporter writes [`acc`](/docs/alphatex/note-properties#acc) only where the accidental changes the spelling ([#2931](https://github.com/CoderLine/alphaTab/pull/2931), thanks [@gabbe](https://github.com/gabbe))
+* alphaTex: `basicEditorLspIntegration` of `@coderline/alphatab-monaco` answers only for its editor's model, so several editors can each use a language server, and returns a disposable; `diagnosticsDelay` and `completionRange` tune diagnostics and completions (see [Monaco](/docs/alphatex/monaco#setup-the-monaco-lsp-integration))
+* alphaTex: `@coderline/alphatab-language-server` and `@coderline/alphatab-monaco` bundle and run again; the language server has separate entry points for browsers and Node.js ([#2830](https://github.com/CoderLine/alphaTab/pull/2830); see [Language server](/docs/alphatex/lsp), [Monaco](/docs/alphatex/monaco) and the [package changes](#package-changes))
+
+### MusicXML Extensions
+
+#### musicxml: note spelling from step and alter
+https://github.com/CoderLine/alphaTab/pull/2931
+
+Notes without a printed `<accidental>`, for example a repeated note in a bar or a note tied over the barline, were spelled from the key signature. An F♯ in F major became a G♭, a B in G♭ major became a C♭, and ties joined noteheads on different staff positions. alphaTab now spells every note from `<step>` and `<alter>`, as MuseScore and Verovio do.
+
+<AlphaTab file="/files/releases/1.9/accidental-spelling.xml" />
+
+In bar 1 the second F♯ stays on the F line, bars 2 and 3 tie the same notehead, and in bar 4 the B in G♭ major stays a B♮. The same change fixes the spellings the Guitar Pro exporter writes.
+
+Thanks to [@gabbe](https://github.com/gabbe) for reporting this problem.
+
+#### musicxml: more faithful import
+
+Full list of supported elements: [MusicXML feature table](/docs/formats/musicxml#feature-table).
+
+* musicxml: let ring, palm mute, wedges, octave shifts, slash notation and endings are paired per part, staff and number, so they end where the file says, and let ring and palm mute are audible ([#2938](https://github.com/CoderLine/alphaTab/pull/2938), thanks [@ppisljar](https://github.com/ppisljar))
+* musicxml: `<string>` on a staff without tuning, as in classical guitar parts, becomes a string number on the pitched note instead of silencing the whole score ([#2913](https://github.com/CoderLine/alphaTab/pull/2913), thanks [@magmasystems](https://github.com/magmasystems))
+* musicxml: `x` noteheads and `<play><mute>` become dead notes on fretted parts, and ties on transposed staves are kept ([#2914](https://github.com/CoderLine/alphaTab/pull/2914), thanks [@ppisljar](https://github.com/ppisljar))
+* musicxml: `<fingering>` uses left-hand numbering on instruments other than piano, so a 1 is the index finger instead of the thumb ([#2927](https://github.com/CoderLine/alphaTab/pull/2927), thanks [@magmasystems](https://github.com/magmasystems))
+* musicxml: D.C., D.S., To Coda, Coda, Segno and Fine written as `<sound>` attributes inside a `<direction>` are played as jumps ([#2929](https://github.com/CoderLine/alphaTab/pull/2929), thanks [@gabbe](https://github.com/gabbe))
+* musicxml: `<metronome>` with a beat unit other than a quarter, or with dots, gives the right tempo, and a `<sound tempo>` in the same direction takes precedence. The tempo mark shows the converted quarter-note value, for example `♩ = 189` for a dotted quarter at 126 ([#2910](https://github.com/CoderLine/alphaTab/pull/2910), thanks [@magmasystems](https://github.com/magmasystems))
+* musicxml: harmonics written as base, touching and sounding notes, as Guitar Pro 8 exports them, become one harmonic note; in alphaTex, artificial and other harmonics on pitched notes such as `C4{ah 12}` sound and render ([#2947](https://github.com/CoderLine/alphaTab/pull/2947), thanks [@parvanitis15](https://github.com/parvanitis15))
+* musicxml: notes with an `<instrument>` reference are treated as percussion only when that instrument is unpitched or the staff is a percussion staff ([#2777](https://github.com/CoderLine/alphaTab/pull/2777), thanks [@ldupoueyUB](https://github.com/ldupoueyUB))
+* musicxml: high voice numbers are packed into consecutive voices per staff ([#2831](https://github.com/CoderLine/alphaTab/pull/2831))
+* musicxml: the `number` attribute of each measure sets custom bar numbers and texts, and implicit measures become pick-up bars ([#2907](https://github.com/CoderLine/alphaTab/pull/2907); see [Bar numbers](/docs/features/render/bar-numbers#file-import))
+
+### Guitar Pro Extensions
+
+#### exporter: files Guitar Pro opens correctly
+https://github.com/CoderLine/alphaTab/pull/2774
+https://github.com/CoderLine/alphaTab/pull/2832
+https://github.com/CoderLine/alphaTab/pull/2831
+https://github.com/CoderLine/alphaTab/pull/2931
+
+Files written by the [Guitar Pro 7 exporter](/docs/reference/types/exporter/gp7exporter) open correctly in Guitar Pro 7 and 8:
+
+* The system layout is written in the form Guitar Pro expects. Before, the multi-track view of Guitar Pro 8 broke and its memory use grew without bound.
+* Every note gets a string and fret, also on staves without a tuning such as piano parts or MusicXML imports.
+* Voices beyond the four Guitar Pro supports move into free slots or are dropped with a warning, instead of crashing Guitar Pro.
+* Notes keep their spelling in every key, for example a B♭ in F major.
+* The exporter works on a copy of the score and leaves `api.score` unchanged.
+
+Full demo and all options: [Export to Guitar Pro 7](/docs/features/export/export-to-guitar-pro-7#what-the-exporter-emits).
+
+Thanks to [@chenkigba](https://github.com/chenkigba) for contributing the system layout fix.
+
+#### importer: windows-1252 decoding for Guitar Pro 3–5
+https://github.com/CoderLine/alphaTab/pull/2774
+
+Guitar Pro 3–5 files store texts in the code page of the author's system. alphaTab decodes them with the new setting [`importer.gp3To5encoding`](/docs/reference/settings/importer/gp3to5encoding), `windows-1252` by default, so umlauts and other accented characters in titles and lyrics load correctly. A value other than `utf-8` in [`importer.encoding`](/docs/reference/settings/importer/encoding) still takes precedence.
+
+Full demo and all options: [Tuning importer behavior](/docs/features/import-load/tuning-importer-behavior#importerencoding-and-importergp3to5encoding).
+
+Thanks to [@chenkigba](https://github.com/chenkigba) for contributing this change.
+
+#### Other changes
+
+* importer/exporter: the tuning display mode of Guitar Pro 7 and 8 files is read and written ([#2742](https://github.com/CoderLine/alphaTab/pull/2742), thanks [@kulek1](https://github.com/kulek1); see [Tuning display](/docs/features/render/tuning-display#tuning-on-staff))
+* importer/exporter: the drum tablature lines of Guitar Pro 7 and 8 files are kept on import and export ([#2591](https://github.com/CoderLine/alphaTab/pull/2591), thanks [@leocaseiro](https://github.com/leocaseiro); see [Drum tablature](/docs/features/render/drum-tabs#drum-tablature))
+
+### Bundlers and Frameworks
+
+#### bundlers: one alphaTab core for the page, the workers and the worklet
+
+With webpack, Rspack and Vite, the page, the Web Workers and the Audio Worklet load alphaTab's core from one shared chunk instead of a copy each, so the browser downloads and compiles about 1.2 MiB (minified) once instead of up to three times. alphaTab starts its worker with the standard `new Worker(new URL('./alphaTab.worker.mjs', import.meta.url), { type: 'module' })` and its worklet from `alphaTab.worklet.mjs`, both importing `alphaTab.core.mjs`.
+
+The new page [Installing in web projects](/docs/getting-started/installation-web-projects) lists the setup for every bundler and framework with the number of core copies each one loads, and links to a verified sample project for each. New pages cover [other bundlers](/docs/getting-started/installation-other-bundlers), [React and Next.js](/docs/getting-started/installation-react), [Vue and Nuxt](/docs/getting-started/installation-vue), [Angular](/docs/getting-started/installation-angular), [Svelte and SvelteKit](/docs/getting-started/installation-svelte) and [Solid](/docs/getting-started/installation-solid).
+
+#### webpack: Rspack and Rsbuild support
+
+`@coderline/alphatab-webpack` works with webpack 5 (5.90 or later), Rspack 1.7 and 2, and Rsbuild through `tools.rspack`. It bundles alphaTab's worker and worklet as entries and moves the core into an `alphaTabCore` split chunk. For that it sets `optimization.usedExports` to `'global'` in production builds when you did not set it. See [Installation (webpack, Rspack, Rsbuild)](/docs/getting-started/installation-webpack).
+
+#### vite: worker and worklet as chunks of the main build
+
+`@coderline/alphatab-vite` emits alphaTab's worker and worklet as chunks of the main build, sharing the core chunk with the page, and supports Vite 6, 7 and 8. The URLs are written relative to the chunk that references them, so a relative `base`, `renderBuiltUrl`, SvelteKit and Nuxt 4 work. In the dev server, alphaTab is excluded from dependency pre-bundling. See [Installation (Vite)](/docs/getting-started/installation-vite).
+
+#### integration: entries for bundlers without a plugin
+
+The new exports `@coderline/alphatab/core`, `@coderline/alphatab/worker` and `@coderline/alphatab/worklet` let your app own alphaTab's worker and worklet entries. `@coderline/alphatab/core` exports the full API and starts nothing on its own; you register the worker and worklet with [`Environment.initializeMain`](/docs/features/extend/worker-and-worklet-initialization). [Installation (other bundlers)](/docs/getting-started/installation-other-bundlers) shows the setup for esbuild, Rollup and Parcel.
+
+#### bundlers: Turbopack detection
+
+alphaTab detects Turbopack ([`Environment.isTurbopackBundled`](/docs/reference/types/environment), also printed by `Environment.printEnvironmentInfo()`) and starts its workers in the form Turbopack bundles, sharing the core chunk with the page. Turbopack does not bundle Audio Worklets, so there alphaTab loads its worklet from [`core.scriptFile`](/docs/reference/settings/core/scriptfile). See [Next.js with Turbopack](/docs/getting-started/installation-react#turbopack).
+
+#### Other changes
+
+* bundlers: the minified files reference each other: `alphaTab.min.mjs` imports `alphaTab.core.min.mjs` and starts `alphaTab.worker.min.mjs` and `alphaTab.worklet.min.mjs`, which import the minified core too, so a CDN or copied setup loads only minified files.
+* player: without a detectable script file, loading the Audio Worklet fails with the error "Could not detect alphaTab script file, cannot initialize audio worklet".
+
+### Improvements & Bugfixes
+
+* render: the horizontal layout with [`display.scale`](/docs/reference/settings/display/scale) above 1 gets its full size, so the end of the score is visible and scrolls with the playhead ([#2894](https://github.com/CoderLine/alphaTab/pull/2894), thanks [@leocaseiro](https://github.com/leocaseiro) for contributing this fix and [@fiskpinne](https://github.com/fiskpinne) for reporting it)
+* render: rendering is faster ([#2751](https://github.com/CoderLine/alphaTab/pull/2751))
+* platform: alphaTab reads and writes zip archives and decodes SF3 SoundFonts with its own Deflate and Vorbis implementations, so the package no longer carries four third-party license notices ([#2950](https://github.com/CoderLine/alphaTab/pull/2950))
+* integration: the [`ICursorHandler`](/docs/reference/types/icursorhandler) type is exported ([3d1f1bf](https://github.com/CoderLine/alphaTab/commit/3d1f1bf2ef720849e024e98657fc816bb2983c26)), together with the two built-in handlers `ToNextBeatAnimatingCursorHandler` (used when [`player.enableAnimatedBeatCursor`](/docs/reference/settings/player/enableanimatedbeatcursor) is on) and `NonAnimatingCursorHandler`, so a custom handler can delegate to them
+
+### Upgrade Notes
+
+#### Visual changes
+
+* The "rendered by alphaTab" line below the score is gone, so scores lose a line at the bottom. See [Attribution](#attribution).
+* Horizontal spacing changes in every score with the power-law model ([#2749](https://github.com/CoderLine/alphaTab/pull/2749)). Adjust it with [`display.spacingRatio`](/docs/reference/settings/display/spacingratio) and [`display.stretchForce`](/docs/reference/settings/display/stretchforce); see [Density and spacing](/docs/features/render/density-and-spacing).
+* Annotations sit closer to the notes ([#2750](https://github.com/CoderLine/alphaTab/pull/2750)). The default of [`display.effectBandPaddingBottom`](/docs/reference/settings/display/effectbandpaddingbottom) changes from `2` to `5`; raise or lower it to change the gap. See [Effect placement](/docs/features/render/effect-placement#band-padding).
+* The default of [`display.staffPaddingLeft`](/docs/reference/settings/display/staffpaddingleft) changes from `2` to `6` ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)). Set it to `2` for the previous padding.
+* Notes and rests that fill a whole bar are centered ([#2781](https://github.com/CoderLine/alphaTab/pull/2781)), and hammer-on, pull-off and slide labels sit above the staff ([#2945](https://github.com/CoderLine/alphaTab/pull/2945)). Hide the labels through [`notation.elements`](/docs/reference/settings/notation/elements); see [Effects and articulations](/docs/features/render/coverage-effects-articulations#slide-labels).
+
+#### Changed defaults
+
+* Bar numbers appear on the first bar of each system instead of on every bar ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)). Restore numbers on every bar with [`\defaultBarNumberDisplay allBars`](/docs/alphatex/score-metadata#defaultbarnumberdisplay) in alphaTex, or set `barNumber` to `BarNumberDisplay.AllBars` on the four staff configurations of the stylesheet. See [Bar numbers](/docs/features/render/bar-numbers#display-modes).
+* The engraving setting [`preBeatGlyphSpacing`](/docs/reference/types/engravingsettings/#prebeatglyphspacing) changes from 0.5 to 0.6 staff spaces (4.5 to 5.4 at the default size), and the new `staffContentPadding` (1 staff space) keeps the content of neighbouring staves apart ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)).
+* Guitar Pro 3–5 files are decoded with [`importer.gp3To5encoding`](/docs/reference/settings/importer/gp3to5encoding), `windows-1252` by default, instead of UTF-8 ([#2774](https://github.com/CoderLine/alphaTab/pull/2774)). Set it to `utf-8` for the previous decoding. A value other than `utf-8` in `importer.encoding` still takes precedence. See [Tuning importer behavior](/docs/features/import-load/tuning-importer-behavior#importerencoding-and-importergp3to5encoding).
+* A drag creates a playback range only once it reaches another beat, and a click that seeks while a range stays active is clamped to the range ([#2779](https://github.com/CoderLine/alphaTab/pull/2779)). See [Enabling and disabling interaction](/docs/features/interact/enabling-and-disabling-interaction#keep-the-range-on-click).
+
+#### Deprecations
+
+The deprecated members still work.
+
+* [`player.enableUserInteraction`](/docs/reference/settings/player/enableuserinteraction): use [`player.enableSeekToClick`](/docs/reference/settings/player/enableseektoclick), [`player.enablePlaybackRangeSelection`](/docs/reference/settings/player/enableplaybackrangeselection) and [`player.resetPlaybackRangeOnClick`](/docs/reference/settings/player/resetplaybackrangeonclick). Setting it writes all three ([#2779](https://github.com/CoderLine/alphaTab/pull/2779)). See [Migrating from `enableUserInteraction`](/docs/features/interact/enabling-and-disabling-interaction#migrating-from-enableuserinteraction).
+* [`display.justifyLastSystem`](/docs/reference/settings/display/justifylastsystem): use [`display.lastSystemFillThreshold`](/docs/reference/settings/display/lastsystemfillthreshold). `true` maps to `0`, `false` to `1` ([#2749](https://github.com/CoderLine/alphaTab/pull/2749)).
+* [`RenderStylesheet.barNumberDisplay`](/docs/reference/types/model/renderstylesheet/#barnumberdisplay) and [`Bar.barNumberDisplay`](/docs/reference/types/model/bar/#barnumberdisplay): use the `barNumber` field of the staff configurations and bar overrides. Setting the old fields writes all four staff types ([#2752](https://github.com/CoderLine/alphaTab/pull/2752)). See [Deprecated bar number fields](/docs/features/render/staff-element-display#deprecated-bar-number-fields).
+
+#### For integrations
+
+* With `@coderline/alphatab-webpack`, alphaTab's core is a chunk of its own that the page loads next to your entry script. HTML generated by `HtmlWebpackPlugin`, `HtmlRspackPlugin`, Rsbuild or Next.js includes it. A hand-written `<script>` list must include every file of the entrypoint, and hosts that only inject chunks they know by name, such as Angular's webpack builder, set `optimization.splitChunks.cacheGroups.alphaTabCore = false`. See [Optimization settings](/docs/getting-started/installation-webpack#optimization).
+* `@coderline/alphatab-webpack` sets `optimization.usedExports` to `'global'` in production builds when you did not set it, and warns when it is `true`, which bundles the core twice.
+* With Vite and Rsbuild, the scripts are emitted into a subfolder (`assets/`, `static/js/`), so set [`core.fontDirectory`](/docs/reference/settings/core/fontdirectory) to the font the plugin copies; see [Point alphaTab to the font and the SoundFont](/docs/getting-started/installation-web-projects#assets).
+* Unset values of [`Note.fret`](/docs/reference/types/model/note/#fret), [`Note.string`](/docs/reference/types/model/note/#string), [`Note.octave`](/docs/reference/types/model/note/#octave), [`Note.tone`](/docs/reference/types/model/note/#tone) and [`Note.percussionArticulation`](/docs/reference/types/model/note/#percussionarticulation) are `NaN` instead of `-1` ([#2591](https://github.com/CoderLine/alphaTab/pull/2591)). Replace `=== -1` checks with [`note.isStringed`](/docs/reference/types/model/note/#isstringed), [`note.isPercussion`](/docs/reference/types/model/note/#ispercussion), [`note.isPiano`](/docs/reference/types/model/note/#ispiano) or `Number.isNaN(...)`. A percussion note in a drum tablature is both percussion and stringed.
+* Custom [`IMidiFileHandler`](/docs/reference/types/midi/imidifilehandler) implementations need the new member [`addMetronome(tick, counter, durationInTicks)`](/docs/reference/types/midi/imidifilehandler/#addmetronome); handlers that write standard MIDI files can ignore the call. In pick-up bars, [`Automation.ratioPosition`](/docs/reference/types/model/automation/#ratioposition) is relative to the full bar of the time signature, as Guitar Pro writes it ([#2939](https://github.com/CoderLine/alphaTab/pull/2939)).
+* [`AutomationType.Bank`](/docs/reference/types/model/automationtype) changes from `4` to `5`; in 1.8 it had the same value as `AutomationType.SyncPoint`. Score JSON written by 1.8 stores bank changes as `4`, which 1.9 loads as sync points ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)).
+* Guitar Pro 3–5 files: each track gets the MIDI port and channel stored in the file and its own [`PlaybackInformation`](/docs/reference/types/model/playbackinformation). [`port`](/docs/reference/types/model/playbackinformation/#port) is zero-based (1.8 kept the one-based value of the file), and [`primaryChannel`](/docs/reference/types/model/playbackinformation/#primarychannel) can differ from 1.8, for example `2` instead of `4`. Programs, volume, balance and the notes do not change, and two tracks that 1.8 played on one channel get a channel each. Code that addresses MIDI channels or ports per track sees the new numbers ([#2774](https://github.com/CoderLine/alphaTab/pull/2774)).
+* Settings JSON ([`RenderingResourcesJson`](/docs/reference/types/json/renderingresourcesjson)) accepts the deprecated fonts `copyrightFont`, `titleFont`, `subTitleFont`, `wordsFont`, `timerFont`, `directionsFont`, `fretboardNumberFont`, `markerFont` and `barNumberFont` and applies them as the properties of the same name do; 1.8 ignored them in JSON. `effectFont`, `fingeringFont` and `inlineFingeringFont` are still accepted and still have no effect ([#2749](https://github.com/CoderLine/alphaTab/pull/2749)).
+* The SVG output is no longer identical between two renders of the same score: the staff lines of the bar with the attribution and the attribution itself are written as one path in a random order. The drawn result is the same. Compare rendered images instead of SVG strings.
+* alphaTex AST consumers: the values of [`AlphaTexNodeType`](/docs/reference/types/importer/alphatex/alphatexnodetype) are renumbered, so compare against the enum members instead of numbers, and `AlphaTexNoteNode.noteStringDot` is now [`noteStringSeparator`](/docs/reference/types/importer/alphatex/alphatexnotenode/#notestringseparator) of type `IAlphaTexStringSeparatorNode` ([#2591](https://github.com/CoderLine/alphaTab/pull/2591)).
+
+#### Package changes
+
+* `@coderline/alphatab-vite/workerPlugin` is removed. Register `alphaTab()` from `@coderline/alphatab-vite`; it covers the worker and the worklet.
+* `@coderline/alphatab-vite` accepts Vite `^6 || ^7 || ^8` as peer dependency.
+* `@coderline/alphatab-webpack` declares `webpack` (`^5.0.0`) and `@rspack/core` (`^1.7.0 || ^2.0.0`) as optional peer dependencies; install the one your project builds with.
+* `@coderline/alphatab` exports `./core`, `./worker` and `./worklet`. Bundlers that resolve package `exports` find them without configuration; Parcel needs `packageExports` enabled.
+* `@coderline/alphatab-webpack` declares webpack as a peer dependency (`^5.0.0`) instead of a dependency. Install webpack in your project if it is not there yet ([#2806](https://github.com/CoderLine/alphaTab/pull/2806)).
+* `@coderline/alphatab-language-server` has separate entry points for browsers and Node.js ([#2830](https://github.com/CoderLine/alphaTab/pull/2830)):
+  * Import `startWebWorkerLanguageServer` from `@coderline/alphatab-language-server/server/browser` and `startNodeLanguageServer` from `@coderline/alphatab-language-server/server/node`. The package root resolves to the browser entry only for bundlers that apply the `browser` condition; TypeScript with `moduleResolution: "bundler"` does not, and reports that the root has no `startWebWorkerLanguageServer`.
+  * `main`, `types` and `bin` point to `dist/index.node.*` instead of `dist/server.*`. Paths into `dist` are not exported; use the entry points above.
+  * `startWebWorkerLanguageServer` takes a `LanguageServerMessagePort`: any `MessagePort`, `Worker` or worker `self` fits, and its declaration type checks with either the DOM or the WebWorker library.
+* `@coderline/alphatab-monaco` exports its modules as subpaths: `@coderline/alphatab-monaco/lsp`, `/lspMonacoMappings`, `/alphatex`, `/textmate`, `/types` and `/worker`. Imports of `@coderline/alphatab-monaco/dist/<module>` keep working (see [Monaco](/docs/alphatex/monaco)).
+* Major dependency updates: `vscode-languageserver` 9 to 11 in `@coderline/alphatab-language-server` (`@coderline/alphatab-monaco` now declares it too), `monaco-editor` 0.55 to 0.57 in `@coderline/alphatab-monaco`, and `magic-string` 0.30 to 1 in `@coderline/alphatab-vite`.

@@ -1,0 +1,95 @@
+---
+title: "AlphaTabView on Android"
+description: "Embed in Android layouts (Views)."
+sidebar_custom_props:
+  feature_chapter: hosting
+  feature_order: 10
+  feature_platforms: [android]
+keywords:
+  - alphaTab
+  - Android
+  - AlphaTabView
+  - Kotlin
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Embedding alphaTab in a native Android app goes through `AlphaTabView` — a Kotlin `View` you position via XML or code that hosts the same rendering and playback engine as the web build. Every score format alphaTab supports, every setting, and every event on `AlphaTabApi` is available exactly as it is elsewhere.
+
+<AlphaTab tex={true}>{Riffs.STEADY_PULSE}</AlphaTab>
+
+Rendered here on the Web backend. On Android, `AlphaTabView` produces the identical output through the same `AlphaTabApi` surface — see the Kotlin below.
+
+## Add the view to a layout
+
+Declare the control inside any Android layout XML. Give it an id so the activity can obtain a reference:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <alphaTab.AlphaTabView
+        android:id="@+id/alphatab_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+```
+
+## Drive it from Kotlin
+
+Resolve the view, reach for its `api` property, and use the same `AlphaTabApi` surface the other platforms expose. Loading, rendering, event subscription, and playback all run through it:
+
+```kotlin
+import alphaTab.AlphaTabView
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+
+class MainActivity : ComponentActivity() {
+    private lateinit var alphaTabView: AlphaTabView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        alphaTabView = findViewById(R.id.alphatab_view)
+        val api = alphaTabView.api
+
+        api.load("file:///android_asset/scores/song.gp")
+
+        api.scoreLoaded.on { score ->
+            // apply styles, subscribe to playback events, adjust settings
+        }
+    }
+}
+```
+
+## Jetpack Compose
+
+There is no first-party Compose control today. Wrap `AlphaTabView` in an `AndroidView` composable to embed it inside a Compose tree:
+
+```kotlin
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.viewinterop.AndroidView
+
+@Composable
+fun AlphaTabScore(onReady: (alphaTab.AlphaTabView) -> Unit) {
+    AndroidView(
+        factory = { context -> alphaTab.AlphaTabView(context).also(onReady) },
+    )
+}
+```
+
+## Where to look next
+
+- [Installation (Android)](/docs/getting-started/installation-android) — Gradle setup, Maven coordinates, and the first-render walkthrough.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — how to register titles, lyrics, and fingering fonts on the Android Skia backend.
+- [WPF and WinForms controls](/docs/features/extend/wpf-and-winforms-controls) — the sibling native hosts on .NET.
+- [Custom UI facade](/docs/features/extend/custom-ui-facade) — if you need alphaTab in a UI framework it has no shipped control for.
+- [alphaTabSamplesAndroid](https://github.com/CoderLine/alphaTabSamplesAndroid) — worked sample activities that exercise the full API surface.

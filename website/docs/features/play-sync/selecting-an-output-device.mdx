@@ -1,0 +1,81 @@
+---
+title: "Selecting an output device (Web)"
+description: "`enumerateOutputDevices` and `setOutputDevice` on the web platform."
+sidebar_custom_props:
+  feature_chapter: synthesis
+  feature_order: 50
+  feature_platforms: [web]
+keywords:
+  - alphaTab
+  - output device
+  - Web Audio
+---
+
+import { OutputDeviceDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+A desktop user has a USB audio interface plugged in for practice, Bluetooth headphones for the couch, and the built-in speakers for casual listening — they want to pick where alphaTab's audio comes out. Build a device dropdown, hand the selection back to alphaTab, and the audio graph re-routes without stopping playback.
+
+<OutputDeviceDemo
+  tex={Riffs.GREENSLEEVES}
+  showCode={false}
+/>
+
+**Web-only.** Runs against the browser's [Audio Output Devices API](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/sinkId) — the same experimental `setSinkId` support used by `<audio>` and `<video>` elements. Browser coverage is uneven; see [caniuse](https://caniuse.com/mdn-api_audiocontext_sinkid). On .NET the output device is chosen through [NAudio](naudio-net); on Android through [AudioTrack](audiotrack-android). Point native readers at those pages.
+
+## Three async methods
+
+- `api.enumerateOutputDevices()` — returns a `Promise<ISynthOutputDevice[]>`. Each device exposes `deviceId` and `label`. Requesting the list triggers a browser permission prompt when needed; without permission you get an empty array.
+- `api.setOutputDevice(device)` — accepts one of the returned entries or `null` to fall back to the system default. Returns a `Promise` that resolves once the audio graph is rewired.
+- `api.getOutputDevice()` — returns the device previously set through `setOutputDevice`, or `null` when alphaTab is still on the default. Useful for restoring UI state after a page reload.
+
+Devices can appear and disappear at runtime — a Bluetooth headset connects, a USB interface unplugs. Enumerate again when you know the environment changed, or listen for the `navigator.mediaDevices.devicechange` event and refresh your dropdown from there.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
+  },
+});
+
+async function buildDeviceDropdown(select) {
+  const devices = await api.enumerateOutputDevices();
+  select.replaceChildren();
+  const defaultOption = new Option('System default', '');
+  select.append(defaultOption);
+  for (const device of devices) {
+    select.append(new Option(device.label, device.deviceId));
+  }
+
+  const current = await api.getOutputDevice();
+  select.value = current ? current.deviceId : '';
+
+  select.addEventListener('change', async () => {
+    const picked = devices.find((d) => d.deviceId === select.value) ?? null;
+    await api.setOutputDevice(picked);
+  });
+}
+
+navigator.mediaDevices.addEventListener('devicechange', () => {
+  buildDeviceDropdown(document.querySelector('#audio-out'));
+});
+
+buildDeviceDropdown(document.querySelector('#audio-out'));
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — on Web that's a `<div>` alphaTab attaches to.
+
+## Where to look next
+
+- [`api.enumerateOutputDevices`](/docs/reference/api/enumerateoutputdevices), [`api.setOutputDevice`](/docs/reference/api/setoutputdevice), and [`api.getOutputDevice`](/docs/reference/api/getoutputdevice) in the reference.
+- [`ISynthOutputDevice`](/docs/reference/types/synth/isynthoutputdevice) — the shape of each entry returned by `enumerateOutputDevices`.
+- [Web Audio and AudioWorklet](web-audio-and-audioworklet) — the browser audio backend the routing decision applies to.
+- [NAudio (.NET)](naudio-net) and [AudioTrack (Android)](audiotrack-android) — the equivalent routing story on the other runtimes.
+- [Audio buffer size](audio-buffer-size) — pair a routing change with a matching buffer adjustment when latency matters.

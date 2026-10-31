@@ -1,0 +1,53 @@
+// Sized by the parent: the editor fills whatever box it is given.
+.root {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  font-family: var(--at-font-mono);
+}
+
+.host {
+  position: absolute;
+  inset: 0;
+  font-family: var(--at-font-mono);
+}
+
+.hostLoading {
+  visibility: hidden;
+}
+
+// Mirrors Monaco's padding and line metrics so the swap does not shift text vertically.
+.fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 16px 18px 16px 52px;
+  border: 0;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--at-syntax-plain);
+  caret-color: var(--at-syntax-plain);
+  font-family: var(--at-font-mono);
+  font-size: 13px;
+  line-height: 21px;
+  white-space: pre;
+  overflow: auto;
+  tab-size: 2;
+
+  .compact & {
+    font-size: 12px;
+    line-height: 19px;
+    white-space: pre-wrap;
+  }
+}
+
+// Suggest, hover and signature widgets cover every page layer, including a maximized player.
+.overflowHost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--at-z-overlay, 1000);
+}

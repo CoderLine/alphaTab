@@ -1,0 +1,53 @@
+---
+title: "Page layout"
+description: "The default LayoutMode.Page; bars flowing into rows, when to use."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 10
+keywords:
+  - alphaTab
+  - layout
+  - page
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+import { BoundedScoreFrame } from '@site/src/components/BoundedScoreFrame';
+
+Page layout flows bars into rows and stacks the rows vertically, the way sheet music prints on paper. Reach for it when publishing a lead sheet, when building a mobile viewer that has to reflow narrower on a phone, or any time the reader expects rows that wrap and a page that scrolls vertically. It is the default across every runtime.
+
+<BoundedScoreFrame>
+  <AlphaTab tex={true} settings={{ display: { layoutMode: 'page' } }}>{Riffs.BACH_PRELUDE_C_LONG}</AlphaTab>
+</BoundedScoreFrame>
+
+## How the engine decides where a row ends
+
+alphaTab measures the natural width of every bar, then packs as many bars as fit into the available container width. When the next bar would overflow, it opens a new system. This means:
+
+- The container width drives the row count. A wider container fits more bars per row, a narrower one fits fewer, and alphaTab reflows on resize.
+- Bar count per row is not fixed by the file. If the source is a Guitar Pro file with a saved systems layout and you want that layout honored, use [Parchment layout](./parchment-layout) instead.
+- The overall density is tunable through `display.stretchForce` and `display.spacingRatio`, and the final row can be tuned through `display.lastSystemFillThreshold`. See [Density and spacing](./density-and-spacing).
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  display: {
+    layoutMode: alphaTab.LayoutMode.Page,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Horizontal layout](./horizontal-layout) — the single-row alternative for timeline UIs.
+- [Parchment layout](./parchment-layout) — honor the systems layout embedded in the source file.
+- [Density and spacing](./density-and-spacing) — tune the row fill, note spacing, and last-system justification.
+- [`display.layoutMode`](/docs/reference/settings/display/layoutmode) reference entry.

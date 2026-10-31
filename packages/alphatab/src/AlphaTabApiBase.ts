@@ -436,6 +436,9 @@ export class AlphaTabApiBase<TSettings> {
         this._setupClickHandling();
         // delay rendering to allow ui to hook up with events first.
         this.uiFacade.beginInvoke(() => {
+            if (this._isDestroyed) {
+                return;
+            }
             this.uiFacade.initialRender();
         });
     }

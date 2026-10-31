@@ -30,4 +30,4 @@ Fixes #
 
 ## Further details
 - [ ] This is a breaking change
-- [ ] This change will require update of the documentation/website
+- [ ] Docs / release notes updated in `website/`

@@ -1,0 +1,315 @@
+---
+title: Importer and Parser
+description: Use the alphaTex importer and parser directly to access diagnostics and the abstract syntax tree behind the loaded score.
+keywords:
+  - alphaTex
+  - importer
+  - parser
+  - AST
+  - diagnostics
+since: 1.7.0
+---
+
+When you import alphaTex into alphaTab, the loader parses the source and, on success, hands you the resulting [data model](/docs/reference/score.mdx). Calling the alphaTex importer and parser directly exposes more detail — including the abstract syntax tree.
+
+This lower-level access powers tooling and integrations built on top of alphaTex. The [alphaTab language server](./lsp) uses the same components.
+
+> [!NOTE]
+> The samples below are TypeScript. The C# and Kotlin APIs mirror them — adjust the naming conventions to match your language.
+
+## Importer
+
+The importer is the main component for loading alphaTex into a full [data model](/docs/reference/score.mdx). It is available via `alphaTab.importers.AlphaTexImporter`. A minimal use looks like:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+// create importer
+const importer = new alphaTab.importer.AlphaTabImporter();
+importer.initFromString(`
+\\title "Hello World"
+C4 * 4
+`, new alphaTab.Settings());
+// load score
+const score = importer.readScore();
+
+console.log(score.title); // will print "Hello World"
+```
+
+### Diagnostics 
+
+The importer runs in two phases:
+
+1. Parse the AST using `alphaTab.importer.alphaTex.AlphaTexImporter`.
+2. Map the AST to the data model.
+
+On success the importer returns the score and exposes non-error diagnostics for inspection. On failure it throws an exception and returns no score.
+
+The exception is always an `alphaTab.importer.UnsupportedFormatError` with a short textual description of the failure. When the failure came from error diagnostics (parse errors, for example), the inner exception (`cause`) is an `alphaTab.importer.AlphaTexErrorWithDiagnostics` that exposes every diagnostic.
+
+These exceptions exist for callers that go through the higher-level loader. When you call the importer or parser yourself, read the diagnostics off the importer directly.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+function printDiagnostic(a:alphaTab.importer.alphaTex.AlphaTexDiagnostic) {
+    const severityText = alphaTab.importer.alphaTex.AlphaTexDiagnosticsSeverity[a.severity];
+
+    const startText = a.start ? `Ln ${a.start.Line}, Col ${a.start.col}`: '';
+    const endText = a.end ? `Ln ${a.end.Line}, Col ${a.end.col}`: '';
+    const fullMessage = `[${severityText}] [AT${a.code}] ${a.message} (${startText} -> ${endText})`;
+    
+    switch(a.severity) {
+        case alphaTab.importer.alphaTex.AlphaTexDiagnosticsSeverity.Hint:
+        console.info(fullMessage)
+        break;
+        case alphaTab.importer.alphaTex.AlphaTexDiagnosticsSeverity.Warning:
+        console.warn(fullMessage)
+        break;
+        case alphaTab.importer.alphaTex.AlphaTexDiagnosticsSeverity.Error:
+        console.error(fullMessage)
+        break;
+    }
+}
+
+// create importer
+const importer = new alphaTab.importer.AlphaTabImporter();
+importer.initFromString(`
+\\invalid alphatex
+`, new alphaTab.Settings());
+try {
+    // load score
+    const score = importer.readScore();
+} catch(e) {
+    console.error('Error parsing alphaTex: ', (e as Error).message);
+
+    console.error('Lexer diagnostics: ');
+    for(const d of importer.lexerDiagnostics) {
+        printDiagnostic(d);
+    }
+
+    console.error('Parser diagnostics: ');
+    for(const d of importer.parserDiagnostics) {
+        printDiagnostic(d);
+    }
+
+    console.error('Semantic diagnostics: ');
+    for(const d of importer.semanticDiagnostics) {
+        printDiagnostic(d);
+    }
+}
+```
+
+Each diagnostic carries the source range it maps to, a severity, a technical code identifying the error, and a textual message.
+
+### AST
+
+The importer also exposes the abstract syntax tree of the parsed source. The AST is available even for partially parsed code.
+
+The example below walks the tree recursively and prints every node to the console:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const importer = new alphaTab.importer.AlphaTexImporter();
+importer.initFromString(`
+\\title "Hello World"
+C4 * 4
+`, new alphaTab.Settings());
+const score = importer.readScore();
+const astNode = importer.scoreNode;
+
+// a basic recursive node visitor printing the nodes
+function visitNode(name:string, node:alphaTab.importer.alphaTex.IAlphaTexAstNode | undefined, indent:number) {
+    const indentText = '  '.repeat(indent);
+    const prefix = name ? `${indentText} ${name}:` : indentText;
+    if(!node) {
+        console.log(`${prefix} undefined`);
+        return;
+    }
+
+    const startText = a.start ? `Ln ${a.start.Line}, Col ${a.start.col}`: '';
+    const endText = a.end ? `Ln ${a.end.Line}, Col ${a.end.col}`: '';
+    const baseMessage = `${prefix} ${alphaTab.importer.alphaTex.AlphaTexNodeType[node.type]} (${startText} -> ${endText})`;
+
+    switch(node.nodeType) {
+        // Tokens
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Dot:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Backslash:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.DoubleBackslash:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Pipe:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.LBrace:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.RBrace:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.LParen:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.RParen:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Colon:
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Asterisk:
+            console.log(baseMessage);
+            break;
+
+        // General Nodes
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Ident:
+            console.log(`${baseMessage} ${(node as alphaTab.importer.alphaTex.AlphaTexIdentifier).text}`);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Tag:
+            console.log(`${baseMessage}`);
+            const identifier = (node as alphaTab.importer.alphaTex.AlphaTexIdentifier):
+            visitNode('prefix' identifier.prefix, ident + 1);
+            visitNode('tag', identifier.tag, ident + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Meta :
+            console.log(`${baseMessage}`);
+            const meta = (node as alphaTab.importer.alphaTex.AlphaTexMetaDataNode);
+            visitNode('tag', meta.tag, ident + 1);
+            visitNode('arguments', meta.arguments, ident + 1);
+            visitNode('properties', meta.properties, ident + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Arguments:
+            console.log(`${baseMessage}`);
+            const args = (node as alphaTab.importer.alphaTex.AlphaTexArgumentList);
+
+            visitNode('openParenthesis', args.openParenthesis, ident + 1);
+            for(const [i,a] of args.arguments.entries()) {
+                visitNode(`arguments[${i}]`, a, ident + 1);
+            }
+            visitNode('closeParenthesis', args.closeParenthesis, ident + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Props:
+            console.log(`${baseMessage}`);
+            const props = (node as alphaTab.importer.alphaTex.AlphaTexPropertiesNode);
+
+            visitNode('openBrace', props.openBrace, ident + 1);
+            for(const [i,p] of props.properties.entries()) {
+                visitNode(`properties[${i}]`, p, ident + 1);
+            }
+            visitNode('closeBrace', args.closeBrace, ident + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Prop:
+            console.log(`${baseMessage}`);
+            const props = (node as alphaTab.importer.alphaTex.AlphaTexPropertyNode);
+
+            visitNode('property', props.property, ident + 1);
+            visitNode('arguments', props.arguments, ident + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Number:
+            console.log(`${baseMessage} ${(node as alphaTab.importer.alphaTex.AlphaTexNumberLiteral).value}`);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.String:
+            console.log(`${baseMessage} ${(node as alphaTab.importer.alphaTex.AlphaTexStringLiteral).text}`);
+            break;
+
+        // Semantic Nodes
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Score:
+            console.log(`${baseMessage}`);
+            const score = (node as alphaTab.importer.alphaTex.AlphaTexScoreNode);
+            for(const [i,b] of score.bars.entries()) {
+                visitNode(`bars[${i}]`, b, indent + 1);
+            }
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Bar:
+            console.log(`${baseMessage}`);
+            const bar = (node as alphaTab.importer.alphaTex.AlphaTexBarNode);
+            for(const [i,m] of bar.metaData.entries()) {
+                visitNode(`metaData[${i}]`, m, indent + 1);
+            }
+            for(const [i,b] of bar.beats.entries()) {
+                visitNode(`beats[${i}]`, b, indent + 1);
+            }
+            visitNode(bar.pipe, indent + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Beat:
+            console.log(`${baseMessage}`);
+            const beat = (node as alphaTab.importer.alphaTex.AlphaTexBeatNode);
+            visitNode('durationChange', beat.durationChange, indent + 1);
+            for(const [i,n] of beat.notes.entries()) {
+                visitNode(`notes[${i}]`, n, indent + 1);
+            }
+            visitNode('rest', beat.rest, indent + 1);
+            visitNode('durationDot', beat.durationDot, indent + 1);
+            visitNode('durationValue', beat.durationValue, indent + 1);
+            visitNode('beatMultiplier', beat.beatMultiplier, indent + 1);
+            visitNode('beatMultiplierValue', beat.beatMultiplierValue, indent + 1);
+            visitNode('beatEffects', beat.beatEffects, indent + 1);
+            break;
+
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Duration:
+            console.log(`${baseMessage}`);
+            const duration = (node as alphaTab.importer.alphaTex.AlphaTexBeatDurationChangeNode);
+            visitNode('colon', duration.colon, indent + 1);
+            visitNode('value', duration.value, indent + 1);
+            visitNode('properties', duration.properties, indent + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.NoteList:
+            console.log(`${baseMessage}`);
+            const noteList = (node as alphaTab.importer.alphaTex.AlphaTexNoteListNode);
+            visitNode('openParenthesis', noteList.openParenthesis, indent + 1);
+            for(const [i,n] of noteList.notes.entries()) {
+                visitNode(`notes[${i}]`, n, indent + 1);
+            }
+            visitNode('closeParenthesis', noteList.openParenthesis, indent + 1);
+            break;
+        case alphaTab.importer.alphaTex.AlphaTexNodeType.Note:
+            console.log(`${baseMessage}`);
+            const note = (node as alphaTab.importer.alphaTex.AlphaTexNoteNode);
+            visitNode('noteValue', noteList.noteValue, indent + 1);
+            visitNode('noteStringDot', noteList.noteStringDot, indent + 1);
+            visitNode('noteString', noteList.noteString, indent + 1);
+            visitNode('noteEffects', noteList.noteEffects, indent + 1);
+            break;
+    }
+}
+
+visitNode('', astNode, 0);
+```
+
+The output of the above code is: 
+
+```
+ Score (Ln 1, Col 1 -> Ln 3, Col 11)
+   bars[0]: Bar (Ln 2, Col 5 -> Ln 3, Col 11)
+     metaData[0]: Meta (Ln 2, Col 5 -> Ln 2, Col 24)
+       tag: Tag (Ln 2, Col 5 -> Ln 2, Col 11)
+         prefix: Backslash (Ln 2, Col 5 -> Ln 2, Col 6)
+         tag: Ident (Ln 2, Col 6 -> Ln 2, Col 11) title
+       arguments: Arguments (Ln 2, Col 12 -> Ln 2, Col 24)
+         openParenthesis: undefined
+         arguments[0]: String (Ln 2, Col 12 -> Ln 2, Col 24) Hello World
+         closeParenthesis: undefined
+       properties: undefined
+     beats[0]: Beat (Ln 3, Col 5 -> Ln 3, Col 11)
+       durationChange: undefined
+       notes: NoteList (Ln 3, Col 5 -> Ln 3, Col 7)
+         openParenthesis: undefined
+         notes[0]: Note (Ln 3, Col 5 -> Ln 3, Col 7)
+           noteValue: Ident (Ln 3, Col 5 -> Ln 3, Col 7) C4
+           noteStringDot: undefined
+           noteString: undefined
+           noteEffects: undefined
+         closeParenthesis: undefined
+       rest: undefined
+       durationDot: undefined
+       durationValue: undefined
+       beatMultiplier: Asterisk (Ln 3, Col 8 -> Ln 3, Col 9)
+       beatMultiplierValue: Number (Ln 3, Col 10 -> Ln 3, Col 11) 4
+       beatEffects: undefined
+     pipe: undefined
+```
+
+From here, the AST is yours to walk however your tooling needs.
+
+## Parser
+
+Below the importer sits the parser, available via `alphaTab.importer.alphaTex.AlphaTexParser`. It gives you the AST without running the semantic mapping to the data model:
+
+```ts
+import * as alphaTab from '@coderline/alphatab';
+
+const parser = alphaTab.importer.alphaTex.AlphaTexParser(`
+\\title "Hello World"
+C4 * 4
+`);
+
+const ast = parser.read();
+const lexerDiagnostics = parser.lexerDiagnostics;
+const parserDiagnostics = parser.parserDiagnostics;
+```

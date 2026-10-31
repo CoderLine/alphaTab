@@ -1,0 +1,48 @@
+---
+title: "System sign separator"
+description: "Diagonal separator glyph between systems."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 60
+keywords:
+  - alphaTab
+  - system separator
+  - stylesheet
+---
+
+import { SystemSeparatorDemo } from '@site/src/components/SystemSeparatorDemo';
+
+Draw the traditional double-slash sign between systems on the same page. The glyph gives the reader's eye a hard break between the end of one system and the start of the next — a convention long modern scores use so a sight-reader does not accidentally read across into the next line. It also helps on dense multi-track pages where staves stack close together.
+
+<SystemSeparatorDemo showCode={false} />
+
+## What the flag does
+
+[`score.stylesheet.useSystemSignSeparator`](/docs/reference/types/model/renderstylesheet/#usesystemsignseparator) is a boolean, off by default. When `true`, the renderer draws a diagonal `//` glyph in the right margin between the end of a system and the start of the next one. The glyph is a visual cue only — layout, spacing, and bar numbering stay unchanged.
+
+Turn it on when systems sit close together vertically and the reader might otherwise miss the line break. Skip it on parts with generous vertical padding, where the whitespace already signals the break.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  score.stylesheet.useSystemSignSeparator = true;
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Bracket extend mode](/docs/features/render/bracket-extend-mode) — the left-edge marker of a system boundary.
+- [Density and spacing](/docs/features/render/density-and-spacing) — controls how much vertical space sits between systems.
+- [`useSystemSignSeparator`](/docs/reference/types/model/renderstylesheet/#usesystemsignseparator) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

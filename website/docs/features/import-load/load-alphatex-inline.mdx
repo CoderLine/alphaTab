@@ -1,0 +1,75 @@
+---
+title: "Load alphaTex inline"
+description: "Writing score content in the DOM or through `api.tex()`; demo with a short tex snippet."
+sidebar_custom_props:
+  feature_chapter: loading
+  feature_order: 30
+keywords:
+  - alphaTab
+  - alphaTex
+  - inline
+---
+
+import { AlphaTexLivePreview } from '@site/src/components/AlphaTexLivePreview';
+
+Embed a short exercise into a lesson page, let an educator type notation into a CMS field, wire up a live-preview playground where the reader edits alphaTex and watches it render — you write the score directly in your page or your code, with no file and no importer plumbing.
+
+<AlphaTexLivePreview showCode={false} />
+
+## Two ways to feed alphaTex
+
+Set `core.tex: true` on construction and alphaTab reads the container element's text content as alphaTex source. The score renders on the first tick without any imperative call. Use this when the tex is authored alongside the markup — inside a `<div>` in your HTML, a JSX template, a CMS field.
+
+Call `api.tex(text)` post-construction when the source lives in code, a textarea, or an editor state. The method reparses on every call, so wiring it to an `input` event gives you a live preview. The optional second argument picks which tracks render, matching `api.load()`.
+
+Either path routes through `AlphaTexImporter` and fires the same `scoreLoaded` event as any other load.
+
+## What alphaTex looks like
+
+alphaTex is alphaTab's plain-text notation format. A minimal snippet declares metadata with backslash commands, then lists beats grouped by voices and bars:
+
+```text
+\title "Two bars"
+\tempo 90
+.
+:4 3.3 5.3 :8 7.3 8.3 7.3 5.3 |
+:4 3.3.4 | 
+```
+
+The full grammar is documented under [alphaTex](/docs/alphatex/introduction).
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+// Path 1: source lives in the DOM element.
+// <div id="alphaTab">\title "In markup" . :4 3.3 5.3 7.3 8.3</div>
+const container = getAlphaTabContainer();
+const inlineApi = new alphaTab.AlphaTabApi(container, {
+  core: { tex: true },
+});
+
+// Path 2: source lives in code and can change at runtime.
+const editableApi = new alphaTab.AlphaTabApi(container, {});
+editableApi.tex(`
+  \\title "From code"
+  \\tempo 120
+  .
+  :8 3.3 5.3 7.3 8.3
+`);
+
+document.querySelector('#tex-input').addEventListener('input', (e) => {
+  editableApi.tex(e.target.value);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target. `core.tex: true` is Web-only because it reads the DOM element's text; on .NET and Android call `api.tex(text)` with the source string instead.
+
+## Where to look next
+
+- [alphaTex introduction](/docs/alphatex/introduction) — full syntax reference.
+- [Direct importer use](direct-importer-use) — `ScoreLoader.loadAlphaTex()` returns a `Score` without an API.
+- [Reacting to a loaded score](reacting-to-loaded-score) — the `scoreLoaded` event fires the same way for `tex` input.
+- [`core.tex`](/docs/reference/settings/core/tex) and [`api.tex`](/docs/reference/api/tex) in the reference.
+- [`AlphaTexImporter`](/docs/reference/types/importer/alphateximporter) — the underlying parser.

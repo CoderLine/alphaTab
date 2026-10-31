@@ -1,0 +1,66 @@
+---
+title: "Load from a URL"
+description: "`core.file` and `api.load(url)`; demo loads a `.gp` from `/static/files/`."
+sidebar_custom_props:
+  feature_chapter: loading
+  feature_order: 10
+keywords:
+  - alphaTab
+  - load
+  - url
+---
+
+import { UrlLoadSwitcher } from '@site/src/components/UrlLoadSwitcher';
+
+Guitar Pro files hosted on your CDN, a library dropdown that lets learners jump between exercises, a shared-score link on a lesson page — anywhere the score lives at a URL, alphaTab fetches it, picks the right importer, and renders it.
+
+<UrlLoadSwitcher showCode={false} />
+
+## Two entry points
+
+Use `core.file` at construction time when the URL is known up front. alphaTab starts the fetch as soon as the API is created, so the first render arrives without an extra round-trip through your code:
+
+- Pass the URL in the initial settings and the score loads before your first user interaction.
+- Set it declaratively from a template, a config file, or a route parameter.
+
+Use `api.load(url)` when the URL comes from user action — a track picker, a drag-and-drop replacement, a "load another file" button. The same method also accepts bytes and `Score` model instances, so a single handler covers every input path.
+
+Both paths run the same fetch pipeline internally and fire `scoreLoaded` on completion. Attach your post-load setup once and it handles either entry point.
+
+## Browser fetch, not universal
+
+URL loading uses the browser `XMLHttpRequest`. It works in every Web target and follows the page's origin and CORS rules. On Node.js, .NET, and Android the URL path is not wired up — read the bytes yourself and pass them through `api.load(bytes)` instead. The `readScoreFile()` placeholder in the [bytes page](load-from-bytes) covers that pattern.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/song.gp',
+  },
+});
+
+api.scoreLoaded.on((score) => {
+  console.log(`Loaded ${score.title} by ${score.artist}`);
+});
+api.error.on((error) => {
+  console.warn('alphaTab could not load the score:', error.message);
+});
+
+// Later, swap to a different file without recreating the API.
+document.querySelector('#load-prelude').addEventListener('click', () => {
+  api.load('/scores/prelude.gp');
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. On non-Web platforms replace the URL string with the byte array your host produced.
+
+## Where to look next
+
+- [Load from bytes](load-from-bytes) — the pattern for Node.js, backends, and post-fetch pipelines.
+- [Reacting to a loaded score](reacting-to-loaded-score) — the `scoreLoaded` event and post-load setup.
+- [Handling load errors](handling-load-errors) — what the `error` event delivers when a fetch fails.
+- [`core.file`](/docs/reference/settings/core/file), [`api.load`](/docs/reference/api/load), and [`api.scoreLoaded`](/docs/reference/api/scoreloaded) in the reference.

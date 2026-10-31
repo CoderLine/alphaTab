@@ -1,0 +1,300 @@
+@use '../components/landing/breakpoints' as *;
+
+.page {
+  background: var(--at-bg);
+  color: var(--at-ink);
+  font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.1px;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 64px 40px 96px;
+
+  @include tablet { padding: 48px 28px 72px; }
+  @include mobile { padding: 32px 16px 56px; }
+}
+
+// ─── Hero ────────────────────────────────────────────────────────
+.hero {
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--at-line-soft);
+}
+
+.eyebrow {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--at-accent);
+  margin-bottom: 14px;
+}
+
+.title {
+  margin: 0;
+  font-size: 48px;
+  line-height: 1.08;
+  letter-spacing: -1.4px;
+  font-weight: 700;
+  color: var(--at-ink);
+
+  @include mobile { font-size: 34px; letter-spacing: -0.8px; }
+}
+
+.lede {
+  margin: 14px 0 0;
+  max-width: 640px;
+  font-size: 18px;
+  line-height: 1.55;
+  color: var(--at-ink-soft);
+
+  @include mobile { font-size: 16px; }
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+%cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover { text-decoration: none; }
+}
+
+.ctaPrimary {
+  @extend %cta;
+  background: var(--at-accent);
+  color: #fff;
+
+  &:hover { color: #fff; filter: brightness(1.08); }
+}
+
+.ctaSecondary {
+  @extend %cta;
+  border: 1px solid var(--at-line);
+  color: var(--at-ink);
+  background: var(--at-surface);
+
+  &:hover { color: var(--at-ink); border-color: var(--at-ink-muted); }
+}
+
+// ─── Filters ─────────────────────────────────────────────────────
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 28px 0 24px;
+}
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--at-line);
+  border-radius: 999px;
+  background: var(--at-surface);
+  color: var(--at-ink-soft);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover { border-color: var(--at-ink-muted); }
+}
+
+.filterActive {
+  background: var(--at-ink);
+  border-color: var(--at-ink);
+  color: var(--at-bg);
+
+  &:hover { border-color: var(--at-ink); }
+}
+
+.filterCount {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+// ─── Grid ────────────────────────────────────────────────────────
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--at-line);
+  border-radius: 14px;
+  background: var(--at-surface);
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--story-accent) 45%, var(--at-line));
+    box-shadow: 0 18px 40px -28px rgba(13, 22, 38, 0.35);
+  }
+}
+
+.tileVisual {
+  display: block;
+  aspect-ratio: 920 / 448;
+  max-width: 100%;
+  background: var(--at-surface-alt);
+  border-bottom: 1px solid var(--at-line);
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    display: block;
+  }
+}
+
+.tileFallback {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(150deg, color-mix(in srgb, var(--story-accent) 10%, transparent), var(--at-surface-alt));
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+}
+
+.tileBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px 18px 18px;
+}
+
+.tileHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tileName {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+
+  a {
+    color: var(--at-ink);
+    text-decoration: none;
+
+    &:hover { color: var(--story-accent); }
+  }
+}
+
+.featured {
+  font-family: var(--at-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--story-accent);
+  border: 1px solid color-mix(in srgb, var(--story-accent) 40%, transparent);
+  border-radius: 999px;
+  padding: 1px 7px;
+}
+
+.tileType {
+  margin-top: 2px;
+  font-family: var(--at-font-mono);
+  font-size: 11.5px;
+  color: var(--at-muted);
+}
+
+.tileDescription {
+  margin: 10px 0 14px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--at-ink-soft);
+  flex: 1;
+}
+
+.tileTags {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  li {
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--at-surface-alt);
+    color: var(--at-ink-soft);
+  }
+}
+
+.tileLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--at-line-soft);
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--story-accent);
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.empty {
+  padding: 40px 0;
+  color: var(--at-muted);
+}
+
+// ─── How to get listed ───────────────────────────────────────────
+.listing {
+  margin-top: 56px;
+  padding: 28px 32px;
+  border: 1px dashed var(--at-line);
+  border-radius: 14px;
+  background: var(--at-surface-alt);
+
+  @include mobile { padding: 20px; }
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 20px;
+    color: var(--at-ink-soft);
+    line-height: 1.6;
+  }
+
+  li + li { margin-top: 6px; }
+}

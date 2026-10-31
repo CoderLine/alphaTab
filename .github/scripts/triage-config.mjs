@@ -4,8 +4,8 @@
 //   * .github/scripts/triage.mjs             (event-triggered rule check)
 //   * .github/scripts/close-unaddressed.mjs  (scheduled auto-close)
 //
-// Edit here to change the deadline, label metadata, or the close-message
-// texts. Rule detection lives in triage.mjs; the warning-comment framing
+// Edit here to change the deadline, label metadata, the template registry,
+// or the close-message texts. Rule detection lives in triage.mjs; the warning-comment framing
 // lives there too.
 
 // ── Timing ───────────────────────────────────────────────────────────────
@@ -43,6 +43,31 @@ export const labelDefs = {
 // AI-authored disclosure marker (see AGENTS.md). Rule detection patterns
 // live next to their rules in triage.mjs.
 export const aiDisclosureToken = 'alphatab-ai-authored-v1';
+
+// Issue forms in .github/ISSUE_TEMPLATE. triage.mjs reads the section
+// headers from each form at runtime; `name` must equal the form's `name:`.
+// `purpose` completes "use <name> (<purpose>)" in the no-template message.
+export const issueTemplates = [
+    {
+        id: 'bug',
+        name: '🕷️ Bug Report',
+        file: 'bug_report_form.yml',
+        purpose: 'alphaTab behaves wrong'
+    },
+    {
+        id: 'docs',
+        name: '📖 Documentation / Website',
+        file: 'docs_report_form.yml',
+        purpose: 'the docs or site are wrong'
+    }
+];
+
+// The `### ` section headers of .github/pull_request_template.md, which the
+// triage job does not check out. triage.test.mjs keeps the two in sync.
+export const pullRequestHeaders = ['Issues', 'Proposed changes', 'Checklist', 'AI authorship disclosure'];
+
+// Pull requests that only touch these paths need no linked issue.
+export const docsOnlyPathPrefixes = ['website/docs/', 'website/static/'];
 
 // NOTE: the list of `author_association` values that skip triage entirely
 // (OWNER / COLLABORATOR / MEMBER) is hardcoded in contribution-rules.yml so

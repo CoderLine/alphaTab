@@ -90,6 +90,8 @@ The .NET and Kotlin libraries are transpiled from the same TypeScript source, so
 - [Tutorials](https://alphatab.net/docs/tutorials): build a complete player step by step.
 - [llms.txt](https://alphatab.net/llms.txt): an index of the documentation for AI assistants.
 
+The documentation source lives in [`website/`](website/) and changes together with the code it describes.
+
 ## Community
 
 - **Built with alphaTab:** browse community projects, from practice apps to score editors, in [Show and tell](https://github.com/CoderLine/alphaTab/discussions/categories/show-and-tell).

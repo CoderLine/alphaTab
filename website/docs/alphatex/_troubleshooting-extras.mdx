@@ -1,0 +1,108 @@
+Your file did not load and you are staring at a code like `AT207`. This page is where you find the fix.
+
+## How errors surface
+
+When alphaTab parses your file, it collects diagnostics in three bags — one from the lexer, one from the parser, and one from semantic analysis. On failure, alphaTab throws an [`AlphaTexErrorWithDiagnostics`](./importer) that carries every collected message. Depending on how you loaded the file, the diagnostics land in one of three places:
+
+- **Editor tooling (Monaco, VS Code):** the [language server](./lsp) surfaces each diagnostic as a red or yellow squiggle at the exact position in your source. Hover for the message.
+- **`AlphaTabApi` at runtime:** subscribe to the [`error`](/docs/reference/api/error) event. The error object exposes `lexerDiagnostics`, `parserDiagnostics`, and `semanticDiagnostics` — each is an `AlphaTexDiagnosticBag`.
+- **Browser console:** with default settings, alphaTab logs every diagnostic through its `Logger`. Set [`logLevel`](/docs/reference/settings/core/loglevel) to `debug` if you want the full trace.
+
+Every message carries an AT-code. The code is the fastest lookup key — search this page for `AT207`, `AT215`, and so on.
+
+## Top failure modes
+
+Most alphaTex files that fail to load trip one of these six patterns. Each shows the shape of the source that breaks, followed by the shape that works.
+
+### Unterminated string (AT006)
+
+The lexer reached the end of the file while still inside a double-quoted string.
+
+```plain title="Broken"
+\title "Iron Waltz
+\tempo 90
+```
+
+```plain title="Fixed"
+\title "Iron Waltz"
+\tempo 90
+```
+
+Close the quote. If the quote is intentional inside a title, escape it as `\"` or wrap the whole title in a different delimiter.
+
+### Fret note without string (AT207)
+
+A number followed by a beat separator has no string number. Fret notation on a guitar staff needs both — write `12.2`, not `12`.
+
+```plain title="Broken"
+:4 12 14 15
+```
+
+```plain title="Fixed"
+:4 12.2 14.2 15.2
+```
+
+Add `.<string>` after every fret. If you meant [pitched notes](./document-structure#pitched-notes) instead, the file now needs a `\staff` prelude that declares pitched notation.
+
+### String number out of range (AT208)
+
+The string number in `fret.string` is higher than the tuning declares. A six-string tuning caps out at `.6`.
+
+```plain title="Broken"
+\tuning e5 b4 g4 d4 a3 e3
+:4 5.7
+```
+
+```plain title="Fixed"
+\tuning e5 b4 g4 d4 a3 e3
+:4 5.6
+```
+
+Check your [`\tuning`](./staff-metadata#tuning) length. Seven strings need seven pitches in `\tuning`; the string index is 1-based.
+
+### Note kind does not match the staff (AT215 / AT216 / AT218)
+
+Pitched note values (`c4`, `g#3`, ...) land on a fretted staff, or `fret.string` values land on a pitched staff, or percussion articulations mix with either.
+
+```plain title="Broken"
+\track "Guitar"
+:4 c4 e4 g4
+```
+
+```plain title="Fixed"
+\track "Guitar"
+\staff{ pitched }
+:4 c4 e4 g4
+```
+
+Match the note syntax to the staff. Guitar tab uses `fret.string`; pitched staves use note names with octave; percussion uses the articulation name or number.
+
+### Bad color format (AT213)
+
+Colors accept `#RRGGBB`, `#RRGGBBAA`, `rgb(...)`, `rgba(...)`, or a named color. Anything else fails.
+
+```plain title="Broken"
+\track "Lead" { color "bright-red" }
+```
+
+```plain title="Fixed"
+\track "Lead" { color "#ff3333" }
+```
+
+Convert your color to hex or use one of the [named CSS colors](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color).
+
+### Legacy argument shapes (AT301 / AT303)
+
+alphaTex 1.7 wraps multi-value arguments in parentheses. Older sources that list values bare still parse, but the warning fires until you upgrade the source.
+
+```plain title="Warns"
+\ts 3 4
+```
+
+```plain title="Clean"
+\ts (3 4)
+```
+
+The same shape applies to any [metadata tag](./syntax#metadata-tag) or [property](./syntax#property) that takes more than one value.
+
+For the full list — every code the lexer and parser can raise, its raw message template, and its severity — see the categories below.

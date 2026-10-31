@@ -1,0 +1,61 @@
+---
+title: Configuration (Android)
+description: Configure alphaTab in a Kotlin Android project — access the API, pass settings, subscribe to events, and drive playback.
+keywords:
+  - alphaTab
+  - configuration
+  - Android
+  - Kotlin
+  - settings
+  - events
+  - API
+  - AlphaTabView
+---
+
+The `AlphaTabView` is the entry point to alphaTab on Android. Every setting, event, and API call flows through the `api` property it exposes. This page walks through the four surfaces — setup, settings, events, and API.
+
+## Setup
+
+Add the `AlphaTabView` to your layout and grab a reference to it in the activity. The [installation page](installation-android#render-your-first-score) shows the full XML and Kotlin.
+
+For non-UI backgrounds — services, background workers, or custom controls — use the low-level classes directly instead of the view. The [Kotlin sources on GitHub](https://github.com/CoderLine/alphaTab/tree/develop/src.kotlin) show how the `AlphaTabView` is built and can be used as a reference for a bespoke wrapper.
+
+## Settings
+
+The `AlphaTabView` exposes a `settings` property. Mutating it does not trigger a re-render automatically — call `api.updateSettings()` to apply the changes:
+
+```kotlin
+alphaTabView.settings.display.layoutMode = LayoutMode.Page
+alphaTabView.api.updateSettings()
+```
+
+The view also exposes a `tracks` property. Assign it to change which tracks are rendered.
+
+The [Settings reference](/docs/reference/settings) documents every option.
+
+## Events
+
+Subscribe with `.on(handler)` and unsubscribe with `.off(handler)`:
+
+```kotlin
+alphaTabView.api.playedBeatChanged.on { beat ->
+    updateFretboard(beat)
+}
+
+alphaTabView.api.scoreLoaded.on { score ->
+    Log.i("alphaTab", "Loaded: ${score.title}")
+}
+```
+
+The [API reference](/docs/reference/api) lists every event alphaTab exposes.
+
+## API
+
+The high-level API is available on `alphaTabView.api`. Use it to load scores, drive playback, and query state:
+
+```kotlin
+alphaTabView.api.tex("\\title \"Hello alphaTab\" . 3.3*4")
+alphaTabView.api.playPause()
+```
+
+See the [full API reference](/docs/reference/api) for every method.

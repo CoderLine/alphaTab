@@ -44,7 +44,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          sparse-checkout: .github/scripts
+          # triage.mjs reads the issue forms to know their section headers.
+          sparse-checkout: |
+            .github/scripts
+            .github/ISSUE_TEMPLATE
           sparse-checkout-cone-mode: false
 
       - name: Apply labels

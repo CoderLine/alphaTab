@@ -1,0 +1,88 @@
+---
+title: "Lyrics"
+description: "Multi-verse lyrics aligned to beats."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 60
+keywords:
+  - alphaTab
+  - lyrics
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Lyrics render below the staff with each syllable positioned under the beat it belongs to. alphaTab reads lyric lines from the source file or accepts them programmatically through the API.
+
+## Aligning to beats {#alignment}
+
+Each lyric syllable sits under its target beat — the way songbook vocal lines are typeset so a singer reads word and melody at the same glance. Hyphens between syllables indicate a continuation across beats, and underscores extend a syllable across held notes.
+
+<AlphaTab tex={true}>{`
+\\title "Amazing Grace"
+\\tempo 76
+\\ts 3 4
+\\track "Vocals"
+\\lyrics "A-ma-zing grace how sweet the sound that saved a wretch like me"
+.
+:4 G3 :8 C4 :4 E4 | :4 D4 :8 C4 :4 E4 | :4 D4 :8 C4 :4 A3 | :2. G3 |
+:4 G3 :8 C4 :4 E4 | :4 D4 :8 C4 :4 E4 | :4 D4 :8 C4 :4 A3 | :2. G3
+`}</AlphaTab>
+
+## Multi-verse handling {#multi-verse}
+
+Multiple verses stack below the staff, one line per verse — the way hymnals and folk songbooks fit two, three, or four sets of words under a single melodic line. alphaTab preserves the order the source file provides. Pass extra strings to alphaTex's `\lyrics` directive to add verses.
+
+<AlphaTab tex={true}>{`
+\\title "Two verses"
+\\tempo 80
+\\track "Vocals"
+\\lyrics "First verse falls on the down-beats"
+\\lyrics "Se-cond verse rides the same phrase"
+.
+:4 G3 :8 C4 :4 E4 D4 | :4 C4 :8 D4 :4 E4 C4
+`}</AlphaTab>
+
+## Rendering fonts {#fonts}
+
+Lyrics use a dedicated font entry so a chart can restyle them without touching the rest of the score — the typical case for a hymnal that pairs a serif melody with a large sans-serif lyric line. Point `display.resources.wordsFont` at any registered family to change size, weight, or face.
+
+<AlphaTab tex={true}
+  settings={ { display: { resources: { wordsFont: '20px "Georgia", serif' } } } }
+>{`
+\\title "Styled lyrics"
+\\tempo 80
+\\track "Vocals"
+\\lyrics "Ly-rics ren-der in Ge-or-gia se-rif be-low"
+.
+:4 G3 :8 C4 :4 E4 D4 | :4 C4 :8 D4 :4 E4 C4
+`}</AlphaTab>
+
+See [Custom text fonts](./custom-text-fonts) for the full list of font slots and [Font family fallbacks](./font-family-fallbacks) for handling missing families.
+
+## Show it in code
+
+Lyrics render on by default. To hide them from a printout — for instance, an instrumental lead sheet — flip the `EffectLyrics` element off:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  notation: {
+    elements: new Map([
+      [alphaTab.NotationElement.EffectLyrics, false],
+    ]),
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target. Lyrics can also be attached at runtime through the [`Lyrics`](/docs/reference/types/model/lyrics) model on the [model reference](/docs/reference/score).
+
+## Where to look next
+
+- [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
+- [Custom text fonts](./custom-text-fonts) — configure the lyric font family and size.
+- [Font family fallbacks](./font-family-fallbacks) — handle missing font families gracefully.
+- [`notation.elements`](/docs/reference/settings/notation/elements) — the settings entry point for the element map.
+- [`Lyrics`](/docs/reference/types/model/lyrics) — the model type for attaching lyrics programmatically.

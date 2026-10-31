@@ -1,0 +1,57 @@
+---
+title: "Bracket extend mode"
+description: "How instrument brackets span multiple staves."
+sidebar_custom_props:
+  feature_chapter: stylesheet
+  feature_order: 40
+keywords:
+  - alphaTab
+  - bracket
+  - stylesheet
+---
+
+import { BracketModeSwitch } from '@site/src/components/BracketModeSwitch';
+
+Instrument brackets (the straight vertical lines that group staves of an ensemble) and grand-staff braces (the curly SMuFL glyph that joins the two hands of a piano) sit at the left edge of every system. `bracketExtendMode` picks the grouping rule — the same score can render with a bracket per track for the reader who wants to focus on one instrument, or with a single bracket across the two-guitar section when the arrangement should read as one instrument family.
+
+<BracketModeSwitch showCode={false} />
+
+## The three modes
+
+[`score.stylesheet.bracketExtendMode`](/docs/reference/types/model/renderstylesheet/#bracketextendmode) takes a [`BracketExtendMode`](/docs/reference/types/model/bracketextendmode):
+
+- `NoBrackets` — no brackets or braces are drawn. Use this for stripped-down handouts, single-track charts, or when brackets fight your custom left-margin layout.
+- `GroupStaves` — draws a bracket per track and a brace across the two staves of a grand-staff track (piano). This is the default and matches Guitar Pro's out-of-the-box look.
+- `GroupSimilarInstruments` — groups tracks that share the same MIDI program under a single bracket. Two distortion guitars end up under one bracket; a grand-staff piano still shows its brace and breaks any surrounding bracket. Grouping is program-based; there is no custom-group API today.
+
+## When to prefer each
+
+Pick `GroupStaves` for the traditional per-track look. Pick `GroupSimilarInstruments` for ensemble scores where multiple players share an instrument family and the reader benefits from seeing that structure at a glance. Pick `NoBrackets` for single-track output or when the enclosing UI already communicates track grouping.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  score.stylesheet.bracketExtendMode =
+    alphaTab.model.BracketExtendMode.GroupSimilarInstruments;
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Track name policies](/docs/features/render/track-name-policies) — the label block that sits next to the bracket.
+- [Multi-bar rests](/docs/features/render/multi-bar-rests) — how the bracket interacts with hidden or collapsed staves.
+- [System sign separator](/docs/features/render/system-sign-separator) — the right-edge marker of a system boundary.
+- [`bracketExtendMode`](/docs/reference/types/model/renderstylesheet/#bracketextendmode) and [`showSingleStaffBrackets`](/docs/reference/types/model/renderstylesheet/#showsinglestaffbrackets) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`BracketExtendMode`](/docs/reference/types/model/bracketextendmode) — the enum reference.
+- [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.

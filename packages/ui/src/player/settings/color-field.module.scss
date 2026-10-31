@@ -1,0 +1,181 @@
+$checker: repeating-conic-gradient(#c9ced6 0 25%, #fff 0 50%) 0 0 / 8px 8px;
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  flex-shrink: 0;
+  width: 26px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--at-line);
+  border-radius: 5px;
+  cursor: pointer;
+  // The checkerboard shows through translucent colors.
+  background: linear-gradient(var(--swatch), var(--swatch)), $checker;
+
+  &:focus-visible,
+  &[aria-expanded='true'] {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 1px;
+  }
+}
+
+.alpha {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--at-accent);
+}
+
+.alphaValue {
+  width: 34px;
+  text-align: right;
+  font-family: var(--at-font-mono);
+  font-size: 10.5px;
+  color: var(--at-muted);
+}
+
+.popover {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background: var(--at-surface);
+  border: 1px solid var(--at-line);
+  border-radius: 10px;
+  box-shadow: var(--at-shadow-lg);
+  color: var(--at-ink);
+}
+
+.area {
+  position: relative;
+  height: 150px;
+  border-radius: 6px;
+  cursor: crosshair;
+  touch-action: none;
+  background:
+    linear-gradient(to top, #000, transparent),
+    linear-gradient(to right, #fff, var(--hue));
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 2px;
+  }
+}
+
+.areaThumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+}
+
+.sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+%track {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 12px;
+  margin: 0;
+  border-radius: 999px;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  &::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: transparent;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    outline-offset: 2px;
+  }
+}
+
+.hue {
+  @extend %track;
+  background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.alphaTrack {
+  @extend %track;
+  background: linear-gradient(to right, transparent, var(--opaque)), $checker;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--at-line);
+  border-radius: 6px;
+  background: linear-gradient(var(--swatch), var(--swatch)), $checker;
+}
+
+.hex {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--at-line);
+  border-radius: 6px;
+  background: var(--at-surface-alt);
+  color: var(--at-ink);
+  font-family: var(--at-font-mono);
+  font-size: 12px;
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    border-color: transparent;
+  }
+
+  &[aria-invalid='true'] { border-color: var(--at-danger); }
+}
+
+.eyeDropper {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--at-line);
+  border-radius: 6px;
+  background: var(--at-surface);
+  color: var(--at-muted);
+  cursor: pointer;
+
+  &:hover { color: var(--at-ink); }
+}

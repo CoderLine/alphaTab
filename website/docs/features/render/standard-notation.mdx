@@ -1,0 +1,64 @@
+---
+title: "Standard notation"
+description: "The traditional five-line staff, showStandardNotation."
+sidebar_custom_props:
+  feature_chapter: notation-types
+  feature_order: 10
+keywords:
+  - alphaTab
+  - standard notation
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Standard notation is what most Western-trained readers expect — a five-line staff, clef, key signature, and pitched noteheads with stems. Use it for piano, vocal, or ensemble scores whose audience reads pitches directly; pair it with a tab staff for a guitar chart that has to serve both readers of the same file.
+
+<AlphaTab tex={true}>{`
+\\title "Chord progression"
+\\tempo 88
+\\track "Guitar"
+  \\staff{score}
+  :2 (3.6 2.5 0.4 0.3 0.2 3.1) :2 (0.6 2.5 2.4 0.3 0.2 0.1) |
+  :2 (3.5 2.4 0.3 1.2 0.1) :2 (0.4 2.3 3.2 2.1) |
+  :2 (3.6 2.5 0.4 0.3 0.2 3.1) :2 (0.5 2.4 2.3 1.2 0.1) |
+  :1 (3.6 2.5 0.4 0.3 0.2 3.1)
+`}</AlphaTab>
+
+## When to show, when to hide
+
+Every `Staff` starts with `showStandardNotation = true`. For a piano or a vocal line you keep it on and turn `showTablature` off. For a guitar chart aimed at players who read tab, do the opposite — hide the score staff and leave tablature (plus rhythm indicators) alone. For arrangements you want to read both ways, keep both staves visible; they render stacked in the order alphaTab derives from the source file.
+
+Two side facts worth knowing:
+
+- `standardNotationLineCount` overrides the default five. Percussion staves use 1, 2, or 3 lines; the setting also lets you build custom staves for hand-percussion, single-line rhythm parts, or historical notations.
+- `displayTranspositionPitch` on a `Staff` shifts the notes on the standard staff without changing playback pitch. Guitar scores use `-12` so the notation sits inside the staff instead of hovering above it.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      staff.showStandardNotation = true;
+      staff.showTablature = false;
+    }
+  }
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Guitar tablature](/docs/features/render/guitar-tablature) — pair the standard staff with a tab staff.
+- [Multi-track and grand staff](/docs/features/render/multi-track-rendering) — combining multiple standard staves for piano or ensemble scores.
+- [`Staff.showStandardNotation`](/docs/reference/types/model/staff), [`Staff.standardNotationLineCount`](/docs/reference/types/model/staff), and [`Staff.displayTranspositionPitch`](/docs/reference/types/model/staff) in the model reference.
+- [`display.staveProfile`](/docs/reference/settings/display/staveprofile) — pick a preset combination of staves at construction time.

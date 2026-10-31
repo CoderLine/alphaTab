@@ -1,0 +1,228 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.band {
+  border-bottom: 1px solid var(--at-line);
+  background: var(--at-surface);
+  @include section-tokens;
+}
+
+.inner {
+  @include section-container;
+  padding-top: 32px;
+  padding-bottom: 28px;
+
+  @include mobile {
+    padding-top: 28px;
+    padding-bottom: 26px;
+  }
+}
+
+.formatsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 40px;
+  align-items: flex-start;
+
+  @include tablet { gap: 24px; }
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+}
+
+.formatList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.formatLabelRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.formatLabel {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+}
+
+.formatRule {
+  flex: 1;
+  height: 1px;
+  background: var(--at-line);
+}
+
+.formatItems {
+  display: flex;
+  gap: 10px 26px;
+  flex-wrap: wrap;
+  row-gap: 10px;
+
+  // Tablet and mobile: stack as a single vertical column rather than
+  // wrapping randomly when the column happens to be narrow.
+  @include not-desktop {
+    flex-direction: column;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  @include mobile { gap: 8px; }
+}
+
+.formatItem {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+
+  @include not-desktop { width: 100%; }
+}
+
+.formatDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  align-self: center;
+}
+
+.formatName {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--at-ink);
+
+  @include mobile { font-size: 13px; }
+}
+
+.formatMeta {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+}
+
+.pivot {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  position: relative;
+  min-width: 80px;
+
+  @include mobile { display: none; }
+}
+
+.pivotLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--at-line);
+  z-index: 0;
+}
+
+.pivotChip {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  text-align: center;
+  padding: 6px 10px;
+  border: 1px dashed var(--at-line);
+  border-radius: 6px;
+  background: var(--at-bg);
+  position: relative;
+  z-index: 1;
+}
+
+.statsRow {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--at-line-soft);
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 32px;
+  align-items: center;
+
+  // Tablet + mobile: stack the "At a glance" eyebrow above the stats grid,
+  // so the stats get the full container width and don't crush.
+  @include not-desktop {
+    display: block;
+    margin-top: 30px;
+    padding-top: 24px;
+  }
+}
+
+.statsLabel {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+
+  @include not-desktop { margin-bottom: 14px; }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+
+  // 4-col on desktop; 2×2 on tablet and mobile so the numbers + labels have
+  // room to breathe.
+  @include not-desktop {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 20px;
+  }
+
+  @include mobile {
+    gap: 18px 16px;
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 0;
+  border-left: none;
+
+  // Desktop only: vertical dividers between the 4 horizontal stats.
+  @include desktop {
+    &:not(:first-child) {
+      border-left: 1px solid var(--at-line);
+      padding-left: 24px;
+    }
+  }
+}
+
+.statNum {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -1.2px;
+  color: var(--at-ink);
+
+  @include not-desktop { font-size: 26px; }
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--at-ink);
+  margin-top: 4px;
+
+  @include mobile { font-size: 12.5px; }
+}
+
+.statMeta {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+}

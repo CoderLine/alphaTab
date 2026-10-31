@@ -1,0 +1,87 @@
+---
+title: "Custom UI facade"
+description: "Implement `IUiFacade` for a host alphaTab does not know about."
+sidebar_custom_props:
+  feature_chapter: hosting
+  feature_order: 30
+keywords:
+  - alphaTab
+  - IUiFacade
+  - hosting
+  - platform
+  - extension
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Hosting alphaTab in a UI framework it does not know about — WinUI, MAUI, Avalonia, a mobile framework, a game engine, a custom canvas layer — means implementing `IUiFacade`, the contract alphaTab uses to talk to its host. Every shipped platform already provides one: `BrowserUiFacade` on the web, WPF and WinForms facades on .NET, `AndroidUiFacade` on Android. Ship your own facade to reach anywhere else.
+
+<AlphaTab tex={true}>{Riffs.AM_VERSE_CHORUS}</AlphaTab>
+
+Rendered here through [`BrowserUiFacade`](https://github.com/CoderLine/alphaTab/blob/main/packages/alphatab/src/platform/javascript/BrowserUiFacade.ts) — the browser's implementation of the interface. On any other host, your own `IUiFacade` produces the same output through the same `AlphaTabApiBase`. This page is a meta demo: you are looking at the interface you will implement, as implemented by alphaTab for the browser.
+
+## What the facade does
+
+The facade is the platform-specific glue between the framework-agnostic engine and the host UI. Everything else — score model, importers, layout, synthesis, event dispatch — is portable and lives above this line. The facade covers eight concerns:
+
+- **Root container and canvas.** `rootContainer` exposes the host's root element. `createCanvasElement` returns the container into which alphaTab appends partial render results.
+- **Lifecycle.** `initialize` receives the `AlphaTabApiBase` and settings when the API boots. `destroy` tears down whatever the facade wired up.
+- **Render output.** `beginAppendRenderResults` and `beginUpdateRenderResults` receive `RenderFinishedEventArgs` batches and translate them into host draw operations. `createWorkerRenderer` returns the `IScoreRenderer` — worker-based if `areWorkersSupported` is true, main-thread otherwise.
+- **Playback pipeline.** `createWorkerPlayer`, `createWorkerAudioExporter`, and `createBackingTrackPlayer` build the synth and export workers. Return `null` where a facility is unavailable.
+- **Cursors and highlights.** `createCursors`, `destroyCursors`, `highlightElements`, and `removeHighlights` maintain the moving playback cursor and beat highlights.
+- **Scroll and selection.** `getScrollContainer`, `getOffset`, `scrollToX`, `scrollToY`, `stopScrolling`, `setCanvasOverflow`, and `createSelectionElement` cover auto-scroll behavior and click-drag selection.
+- **Async and threading.** `beginInvoke` marshals work onto the UI thread. `throttle` produces a debounced action used by `resizeThrottle`.
+- **Score and SoundFont ingest.** `load` and `loadSoundFont` accept host-native data objects (file handles, streams) and dispatch to the appropriate importer.
+
+Two events round out the contract: `canRenderChanged` fires once every asset the host needs (fonts, images) is ready, and `rootContainerBecameVisible` fires when a previously hidden root enters the layout.
+
+## Show it in code
+
+The full interface has around thirty members. This sketch outlines the skeleton — a real implementation copies the structure of `BrowserUiFacade` and swaps the browser primitives for your host:
+
+```ts
+import * as alphaTab from '@coderline/alphatab/core';
+
+class CustomUiFacade implements alphaTab.platform.IUiFacade<alphaTab.Settings> {
+  public readonly rootContainer: alphaTab.platform.IContainer;
+  public readonly areWorkersSupported = false;
+  public readonly resizeThrottle = 10;
+  public readonly canRenderChanged = new alphaTab.EventEmitter();
+  public readonly rootContainerBecameVisible = new alphaTab.EventEmitter();
+
+  private _api!: alphaTab.AlphaTabApiBase<alphaTab.Settings>;
+
+  public constructor(root: alphaTab.platform.IContainer) {
+    this.rootContainer = root;
+  }
+
+  public get canRender() { return true; }
+
+  public initialize(
+    api: alphaTab.AlphaTabApiBase<alphaTab.Settings>,
+    settings: alphaTab.Settings,
+  ) {
+    this._api = api;
+  }
+
+  public destroy() { /* release host resources */ }
+  public createCanvasElement() { /* return host container */ }
+  public beginAppendRenderResults(r) { /* draw partial */ }
+  // ...remaining members
+}
+
+const container = getAlphaTabContainer();
+const facade = new CustomUiFacade(container);
+const api = new alphaTab.AlphaTabApiBase(facade, new alphaTab.Settings());
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — on a custom host, this is whatever container object your facade wraps.
+
+## Where to look next
+
+- [`IUiFacade`](/docs/reference/types/platform/iuifacade) — every method, every property, every event.
+- [`BrowserUiFacade` source](https://github.com/CoderLine/alphaTab/blob/main/packages/alphatab/src/platform/javascript/BrowserUiFacade.ts) — the reference implementation to model yours after.
+- [AlphaTabView on Android](/docs/features/extend/alphatabview-android) and [WPF and WinForms controls](/docs/features/extend/wpf-and-winforms-controls) — the sibling native hosts, each backed by its own facade.
+- [Worker and worklet initialization](/docs/features/extend/worker-and-worklet-initialization) — if your host supports Web Workers, wire them here alongside the facade.

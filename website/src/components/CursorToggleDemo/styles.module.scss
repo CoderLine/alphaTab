@@ -1,0 +1,96 @@
+.wrapper {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 90%;
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+
+  input {
+    margin: 0;
+  }
+}
+
+.pills {
+  margin: 0;
+}
+
+// Theme: neon — bright glow cursor and highlight
+.themeNeon {
+  :global(.at-cursor-bar) {
+    background: rgba(0, 255, 200, 0.18);
+    box-shadow: inset 0 0 0 1px rgba(0, 255, 200, 0.6);
+  }
+  :global(.at-cursor-beat) {
+    background: #00ffc8;
+    width: 3px;
+    box-shadow: 0 0 8px #00ffc8;
+  }
+  :global(.at-highlight *) {
+    fill: #00ffc8 !important;
+    stroke: #00ffc8 !important;
+  }
+}
+
+// Adorner used by the custom cursor handler demo.
+.cursorPill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 44px;
+  height: 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ff3d7f, #ff8a3d);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 0 4px 12px rgba(255, 61, 127, 0.4);
+  pointer-events: none;
+  will-change: transform;
+  z-index: 5;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -5px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid #ff8a3d;
+  }
+}
+
+// Theme: highlighter — soft yellow marker feel
+.themeHighlighter {
+  :global(.at-cursor-bar) {
+    background: rgba(255, 235, 59, 0.35);
+  }
+  :global(.at-cursor-beat) {
+    background: rgba(255, 152, 0, 0.9);
+    width: 4px;
+  }
+  :global(.at-highlight *) {
+    fill: #f57c00 !important;
+    stroke: #f57c00 !important;
+  }
+}

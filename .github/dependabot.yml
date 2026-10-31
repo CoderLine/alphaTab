@@ -7,7 +7,7 @@ updates:
       - platform-javascript
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
     # Keeps ranges that already allow the new version, such as the
     # peerDependencies of the published packages.
     versioning-strategy: increase-if-necessary
@@ -18,6 +18,10 @@ updates:
       - dependency-name: "typescript"
         versions: [">=7.0.0"]
     groups:
+      # before the dependency-type groups: a dependency joins the first group it matches
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
       production-dependencies:
         dependency-type: "production"
         patterns:
