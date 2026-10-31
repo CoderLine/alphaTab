@@ -11,6 +11,8 @@ keywords:
   - plugin
 ---
 
+import BundleStructure from '@site/static/img/getting-started/alphatab-bundle-structure.svg';
+
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import { SinceBadge } from '@site/src/components/SinceBadge';
@@ -35,15 +37,7 @@ That is normally the only change WebPack needs. The plugin copies Bravura and th
 
 alphaTab spawns [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) and [Audio Worklets](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_AudioWorklet) at runtime to keep rendering and audio synthesis off the main thread. Without a bundler, alphaTab loads these workers directly from `./alphaTab.worker.[m]js` and `./alphaTab.worklet.[m]js`:
 
-```mermaid
-flowchart LR
-    app.mjs-- import -->alphaTab.mjs
-    alphaTab.mjs-- new Worker -->alphaTab.worker.mjs
-    alphaTab.mjs-- import -->alphaTab.core.mjs
-    alphaTab.mjs-- audioWorklet.addModule -->alphaTab.worklet.mjs
-    alphaTab.worker.mjs-- import -->alphaTab.core.mjs
-    alphaTab.worklet.mjs-- import -->alphaTab.core.mjs
-```
+<div className="text--center"><BundleStructure role="img" aria-labelledby="alphatab-bundle-structure-title" style={{ maxWidth: "100%", height: "auto" }} /></div>
 
 WebPack may split and rename these files during bundling. The plugin ensures the worker and worklet entry points resolve correctly in the production build and that the runtime assets ship with the output.
 

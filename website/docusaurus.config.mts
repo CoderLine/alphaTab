@@ -201,12 +201,10 @@ async function createConfig(): Promise<Config> {
   },
 
   markdown: {
-    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: "warn",
     }
   },
-  themes: ["@docusaurus/theme-mermaid"],
   clientModules: ["./src/clientModules/revealActiveSidebarLink.ts"],
 
   presets: [

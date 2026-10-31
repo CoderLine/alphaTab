@@ -27,7 +27,6 @@
     "@docusaurus/core": "3.10.2",
     "@docusaurus/plugin-client-redirects": "3.10.2",
     "@docusaurus/preset-classic": "3.10.2",
-    "@docusaurus/theme-mermaid": "3.10.2",
     "@docusaurus/theme-search-algolia": "3.10.2",
     "@fontsource/noto-sans": "^5.1.1",
     "@fontsource/noto-serif": "^5.1.1",
