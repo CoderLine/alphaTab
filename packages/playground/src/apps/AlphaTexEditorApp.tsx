@@ -6,18 +6,23 @@ import { DemoPlayerView } from '../player/DemoPlayerView';
 import { playerSettings, singleSampleDocuments } from '../player/environment';
 import { DevGlobals } from '../player/mount';
 
-const DEFAULT_TEX = `\\title "Canon Rock"
-\\subtitle "JerryC"
-\\tempo 90
-
-:2 19.2{v f} 17.2{v f} |
-15.2{v f} 14.2{v f}|
-12.2{v f} 10.2{v f}|
-12.2{v f} 14.2{v f}.4 :8 15.2 17.2 |
-14.1.2 :8 17.2 15.1 14.1{h} 17.2 |
-15.2{v d}.4 :16 17.2{h} 15.2 :8 14.2 14.1 17.1{b(0 4 4 0)}.4 |
-15.1.8 :16 14.1{tu 3} 15.1{tu 3} 14.1{tu 3} :8 17.2 15.1 14.1 :16 12.1{tu 3} 14.1{tu 3} 12.1{tu 3} :8 15.2 14.2 |
-12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}`;
+const DEFAULT_TEX = `\\title "Iron Waltz"
+\\subtitle "Intro Build"
+\\artist "alphaTab"
+\\tempo 196
+\\track ("Lead Guitar" "Lead Gtr.") { instrument distortionguitar }
+\\tuning (Eb4 Bb3 Gb3 Db3 Ab2 Eb2)
+\\ts (3 4)
+\\section "Intro Build"
+7.1.4{dy f} 14.1.8 12.2 14.2 12.2 |
+:16 11.1{b (0 2)} -.1{b (2 0)} :8 11.1 12.2.4 :8 11.1 12.1 |
+:16 11.1{h} 12.1{h} :8 11.1 12.2 14.2 16.2 14.2 |
+2.1.4 4.1 6.1{v} |
+7.1.4 7.2.8 7.1 9.1 7.1 |
+:16 11.1{b (0 2)} -.1{b (2 0)} :8 11.1 12.2.4 :8 11.1 12.1 |
+11.1.8 12.1 11.1 9.1 7.1 6.1 |
+2.1.4 4.1 6.1{v}
+`;
 
 const TEX_EXTENSIONS = /\.(alphatex|atex|tex|txt)$/i;
 
@@ -28,7 +33,7 @@ const SETTINGS: alphaTab.json.SettingsJson = {
 };
 
 const DOCUMENTS = singleSampleDocuments(
-    { id: 'canon-rock', fileName: 'canon-rock.alphatex', color: 'var(--at-accent)', source: { tex: DEFAULT_TEX } },
+    { id: 'iron-waltz', fileName: 'iron-waltz.alphatex', color: 'var(--at-accent)', source: { tex: DEFAULT_TEX } },
     { sessionKey: 'alphatab.playground.alphatex-editor.document' }
 );
 
