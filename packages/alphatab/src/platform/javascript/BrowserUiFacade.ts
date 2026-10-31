@@ -94,6 +94,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _totalResultCount: number = 0;
     private _initialTrackIndexes: number[] | null = null;
     private _intersectionObserver: IntersectionObserver;
+    private _isDestroyed: boolean = false;
     private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
     private _resultIdToElementLookup: Map<string, ResultPlaceholder> = new Map<string, ResultPlaceholder>();
     private _webFont!: RegisteredWebFont;
@@ -287,6 +288,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public destroy(): void {
+        this._isDestroyed = true;
+        this._intersectionObserver.disconnect();
         const element = (this.rootContainer as HtmlElementContainer).element;
         element.innerHTML = '';
         this._detachedPartials.clear();
@@ -409,6 +412,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         });
 
         const initialRender = () => {
+            if (this._isDestroyed) {
+                return;
+            }
             // rendering was possibly delayed due to invisible element
             // in this case we need the correct width for autosize
             this._api.renderer.width = this.rootContainer.width | 0;
@@ -420,10 +426,16 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 ScoreLoader.loadScoreAsync(
                     this._file,
                     s => {
+                        if (this._isDestroyed) {
+                            return;
+                        }
                         this._api.renderScore(s, this._initialTrackIndexes ?? undefined);
                         this._initialTrackIndexes = null;
                     },
                     e => {
+                        if (this._isDestroyed) {
+                            return;
+                        }
                         this._api.onError(e as Error);
                     },
                     this._api.settings

@@ -25,6 +25,12 @@ import { describe, expect, it } from 'vitest';
  */
 class DestroyTestUiFacade extends TestUiFacade {
     public player: AlphaSynth | null = null;
+    public initialRenderCalls = 0;
+
+    public override initialRender(): void {
+        this.initialRenderCalls++;
+        super.initialRender();
+    }
 
     public override createWorkerPlayer(): IAlphaSynth | null {
         const player = new AlphaSynth(new TestOutput(), 500);
@@ -74,6 +80,20 @@ describe('AlphaTabApiDestroyTests', () => {
         log.length = 0;
         return { api, facade };
     }
+
+    it('skips-initial-render-when-destroyed-before-it-runs', async () => {
+        const settings = new Settings();
+        settings.core.engine = 'svg';
+        const destroyed = new DestroyTestUiFacade();
+        new AlphaTabApiBase<unknown>(destroyed, settings).destroy();
+        const alive = new DestroyTestUiFacade();
+        const api = new AlphaTabApiBase<unknown>(alive, new Settings());
+        await flush();
+
+        expect(destroyed.initialRenderCalls).toBe(0);
+        expect(alive.initialRenderCalls).toBe(1);
+        api.destroy();
+    });
 
     it('releases-model-references', async () => {
         const log: string[] = [];
