@@ -26,13 +26,8 @@ export const DEMOS: DemoEntry[] = [
     {
         href: '/demos/youtube-sync/',
         title: 'YouTube Sync',
-        description: 'Plays an alphaTab score in step with a YouTube video using the EnabledExternalMedia player mode.'
-    },
-    {
-        href: '/demos/player-position-rate/',
-        title: 'Player Position Rate',
         description:
-            'Fast songs with a live switch of the player position update interval, showing position updates, beat changes and skipped beats per second.'
+            'Plays an alphaTab score in step with a YouTube video using the EnabledExternalMedia player mode.'
     },
     {
         href: '/demos/test-results/',
