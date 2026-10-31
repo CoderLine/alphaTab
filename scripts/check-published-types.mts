@@ -38,15 +38,6 @@ const workerDeclarations: Record<string, string[]> = {
     '@coderline/alphatab-language-server': ['dist/server/browser.d.ts']
 };
 
-/**
- * Declaration files, relative to their package, that need the globals of both the DOM and the WebWorker library,
- * which TypeScript cannot combine. Only their module specifiers are checked.
- */
-const unscopedDeclarations: Record<string, string[]> = {
-    // the alphaTab API next to the web worker server
-    '@coderline/alphatab-language-server': ['dist/index.browser.d.ts']
-};
-
 /** Third-party packages a consumer installs next to ours: compiler, environment types and optional peers. */
 const consumerDependencies = ['typescript@^6.0.3', '@types/node', '@types/react@^19'];
 
@@ -279,19 +270,12 @@ function main() {
         const filesOf = (listed: Record<string, string[]>) =>
             new Set((listed[pkg.name] ?? []).map(f => path.join(packageRoot, f)));
         const workerFiles = filesOf(workerDeclarations);
-        const unscopedFiles = filesOf(unscopedDeclarations);
-        const environmentOf = (file: string) =>
-            unscopedFiles.has(file) ? undefined : workerFiles.has(file) ? worker : page;
+        const environmentOf = (file: string) => (workerFiles.has(file) ? worker : page);
         for (const file of declarations) {
             for (const message of checkSpecifiers(packageRoot, file, readFileSync(file, 'utf-8'), existsSync)) {
                 findings.push({ file: path.relative(consumerDir, file), message });
             }
-            const environment = environmentOf(file);
-            if (environment) {
-                environment.files.push(file);
-            } else {
-                console.warn(`${path.relative(consumerDir, file)}: not type checked, see unscopedDeclarations`);
-            }
+            environmentOf(file).files.push(file);
         }
 
         for (const [subpath, types] of exportedTypes(pkg)) {
@@ -299,7 +283,7 @@ function main() {
                 if (!existsSync(file)) {
                     findings.push({ file: `${pkg.name}/package.json`, message: `types of '${specifier}' are missing` });
                 } else {
-                    environmentOf(file)?.imports.push(path.posix.join(pkg.name, specifier));
+                    environmentOf(file).imports.push(path.posix.join(pkg.name, specifier));
                 }
             }
         }
