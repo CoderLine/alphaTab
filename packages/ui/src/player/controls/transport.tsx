@@ -4,7 +4,7 @@ import { usePlayerControls, usePlayerState } from '../PlayerProvider';
 import { PlaybackStatusLine } from '../playback-settings';
 import { Scrubber } from './scrubber';
 import { Slider } from '../primitives/flyout-controls';
-import { formatTime } from '../../state/format-time';
+import { formatTime } from '../../state/format';
 import {
     IconCountIn,
     IconMetronome,

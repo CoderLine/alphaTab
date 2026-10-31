@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import { SOUNDFONTS, selectSoundFont, usePlaybackPreferences, useSoundFontLibrary, type SoundFontEntry } from '../../state/playback';
+import { usePlaybackPreferences, useSoundFontLibrary, useUiEnvironment } from '../../environment';
+import type { SoundFontEntry } from '../../state/playback';
 import { IconExternalLink, IconInfo } from '../icons';
 import { soundFontStatusText } from './format';
 import styles from './styles.module.scss';
@@ -59,15 +60,28 @@ function AttributionInfo({ entry }: { entry: SoundFontEntry }): React.ReactEleme
     );
 }
 
-/** The site-wide SoundFont choice, with per-SoundFont download state and attribution. */
-export function SoundFontList(): React.ReactElement {
+/**
+ * The SoundFont preference of the environment, with per-SoundFont download state and attribution.
+ * Picking a SoundFont starts its download right away. Renders nothing without a SoundFont provider.
+ */
+export function SoundFontList(): React.ReactElement | null {
+    const { soundFonts, playbackPreferences } = useUiEnvironment();
     const preferences = usePlaybackPreferences();
     const library = useSoundFontLibrary();
+    if (!soundFonts) {
+        return null;
+    }
+    const select = (entry: SoundFontEntry) => {
+        playbackPreferences.setSoundFont(entry.id);
+        soundFonts.load(entry.id).catch(() => {
+            // Failure is reported through the per-SoundFont status.
+        });
+    };
 
     return (
         <div role="radiogroup" aria-label="Synthesizer SoundFont" className={styles.rows}>
-            {SOUNDFONTS.map((entry) => {
-                const state = library[entry.id];
+            {soundFonts.entries.map((entry) => {
+                const state = library[entry.id] ?? { status: 'available', loaded: 0, total: entry.sizeBytes };
                 const selected = preferences.soundFontId === entry.id;
                 const progress =
                     state.status === 'downloading' && state.total > 0 ? state.loaded / state.total : null;
@@ -78,7 +92,7 @@ export function SoundFontList(): React.ReactElement {
                             role="radio"
                             aria-checked={selected}
                             className={styles.rowMain}
-                            onClick={() => selectSoundFont(entry.id)}
+                            onClick={() => select(entry)}
                         >
                             <span className={styles.radio} aria-hidden="true" />
                             <span className={styles.rowText}>

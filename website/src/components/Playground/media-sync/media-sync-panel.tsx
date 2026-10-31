@@ -28,7 +28,7 @@ import {
     MenuItem,
     Panel,
 } from '@coderline/alphatab-ui';
-import type { PlaygroundDocumentState } from '../use-playground-document';
+import type { ScoreDocumentState } from '@coderline/alphatab-ui';
 import { extractYouTubeVideoId } from './media/youtube-media';
 import { useMediaSync, type MediaKind } from './media-sync-context';
 import { generateSyncCode } from './model/codegen';
@@ -39,7 +39,7 @@ import styles from './media-sync.module.scss';
 const AUDIO_ACCEPT = 'audio/*,.mp3,.ogg,.oga,.opus,.wav,.flac,.m4a,.aac,.webm';
 
 interface MediaSyncPanelProps {
-    doc: PlaygroundDocumentState;
+    doc: ScoreDocumentState;
     onClose: () => void;
 }
 

@@ -1,17 +1,42 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-    usePlayerControls,
-    usePlayerSelector,
-    type BackingTrackSource,
-    type ScoreSource,
-    type TexLoadResult,
-} from '@coderline/alphatab-ui';
-import { DEFAULT_SAMPLE_ID, findSample, type PlaygroundSample } from './sources';
-import { buildPlaygroundUrl, parsePlaygroundUrl, type PlaygroundLinkTarget, type TrackSelection } from './url-state';
+import { usePlayerControls, usePlayerSelector } from '../player/PlayerProvider';
+import type { BackingTrackSource, ScoreSource } from '../state/playback/score-source';
+import type { TexLoadResult } from '../state/store';
 
 const TEX_RENDER_DELAY_MS = 250;
 const URL_UPDATE_DELAY_MS = 600;
 const TEX_EXTENSIONS = /\.(alphatex|atex|tex|txt)$/i;
+
+export type TrackSelection = number[] | 'all';
+
+/** A score a {@link ScoreDocumentAdapter} offers by id. */
+export interface ScoreSample {
+    id: string;
+    fileName: string;
+    /** CSS color of the document marker. */
+    color: string;
+    source: ScoreSource;
+}
+
+/** A score that a link can reopen. */
+export type ScoreLinkTarget =
+    | { sample: string; tracks?: TrackSelection }
+    | { url: string; tracks?: TrackSelection }
+    | { tex: string; tracks?: TrackSelection };
+
+/** What {@link useScoreDocument} needs from its host: the samples and, optionally, page links. */
+export interface ScoreDocumentAdapter {
+    findSample(id: string): ScoreSample | undefined;
+    /** The sample opened when neither the page address nor an earlier visit names a document. */
+    defaultSampleId: string;
+    /** The score the current page address names, `null` for none. */
+    readLink?(): Promise<ScoreLinkTarget | null>;
+    /**
+     * A page address (path, query and hash) that reopens `target`. With it, the open document is
+     * mirrored into the address bar and `buildShareUrl` returns links.
+     */
+    buildLink?(target: ScoreLinkTarget): Promise<string>;
+}
 
 interface DocumentBase {
     /** Changes whenever a different document is opened, never while one is edited. */
@@ -22,7 +47,7 @@ interface DocumentBase {
     initialTracks: TrackSelection;
 }
 
-export type PlaygroundDocument =
+export type ScoreDocument =
     | (DocumentBase & {
           kind: 'binary';
           source: ScoreSource;
@@ -31,21 +56,21 @@ export type PlaygroundDocument =
       })
     | (DocumentBase & {
           kind: 'tex';
-          /** Text as opened; `text` in `PlaygroundDocumentState` is the edited one. */
+          /** Text as opened; `text` in `ScoreDocumentState` is the edited one. */
           originalText: string;
           sampleId?: string;
           backingTrack?: BackingTrackSource;
       });
 
-export interface PlaygroundDocumentState {
-    document: PlaygroundDocument | null;
+export interface ScoreDocumentState {
+    document: ScoreDocument | null;
     /** Current alphaTex source for `tex` documents. */
     text: string;
     setText: (text: string) => void;
     /** Result of the last alphaTex parse; `null` before the first one and for binary documents. */
     texResult: (TexLoadResult & { text: string }) | null;
     loadError: string | null;
-    openSample: (sample: PlaygroundSample) => void;
+    openSample: (sample: ScoreSample) => void;
     openFile: (file: File) => Promise<void>;
     /** Opens `text` as a new alphaTex document, e.g. a converted file. */
     openTex: (fileName: string, text: string) => void;
@@ -61,13 +86,13 @@ let nextDocumentId = 1;
  * The open document outside React state, so a remount of the player (switching the music font)
  * reopens it, including local files and unsaved alphaTex edits, which the URL cannot carry.
  */
-let remembered: { document: PlaygroundDocument; text: string } | null = null;
+let remembered: { document: ScoreDocument; text: string } | null = null;
 
 function fileNameOfUrl(url: string): string {
     return decodeURIComponent(url.split(/[?#]/)[0].split('/').pop() || 'score');
 }
 
-function documentForSample(sample: PlaygroundSample, tracks: TrackSelection): PlaygroundDocument {
+function documentForSample(sample: ScoreSample, tracks: TrackSelection): ScoreDocument {
     const base = { id: nextDocumentId++, fileName: sample.fileName, color: sample.color, initialTracks: tracks };
     if (sample.source.tex !== undefined) {
         return {
@@ -81,7 +106,7 @@ function documentForSample(sample: PlaygroundSample, tracks: TrackSelection): Pl
     return { ...base, kind: 'binary', source: sample.source, link: { sample: sample.id } };
 }
 
-function documentForTarget(target: PlaygroundLinkTarget | null): PlaygroundDocument {
+function documentForTarget(target: ScoreLinkTarget | null, adapter: ScoreDocumentAdapter): ScoreDocument {
     const tracks = target?.tracks ?? 'all';
     if (target && 'tex' in target) {
         return {
@@ -104,18 +129,27 @@ function documentForTarget(target: PlaygroundLinkTarget | null): PlaygroundDocum
             link: { url: target.url },
         };
     }
-    const sample = findSample(target && 'sample' in target ? target.sample : null) ?? findSample(DEFAULT_SAMPLE_ID)!;
+    const named = target && 'sample' in target ? adapter.findSample(target.sample) : undefined;
+    const sample = named ?? adapter.findSample(adapter.defaultSampleId);
+    if (!sample) {
+        throw new Error(`The default sample ${adapter.defaultSampleId} does not exist`);
+    }
     return documentForSample(sample, tracks);
 }
 
-/** Opens, loads and links the Playground's score. Must be used inside `<AlphaTabPlayer>`. */
-export function usePlaygroundDocument(): PlaygroundDocumentState {
+/**
+ * The score document of a player view: opens samples, files and alphaTex, loads them through the
+ * store (alphaTex re-renders on every edit, keeping the viewport), and with `adapter.buildLink`
+ * keeps the page address and share links in sync. The open document survives a remount of the
+ * player within the page. Must be used inside `<PlayerProvider>`; keep `adapter` stable.
+ */
+export function useScoreDocument(adapter: ScoreDocumentAdapter): ScoreDocumentState {
     const controls = usePlayerControls();
     const renderedTracks = usePlayerSelector((s) => s.renderedTracks);
     const trackCount = usePlayerSelector((s) => s.tracks.length);
-    const [document, setDocument] = useState<PlaygroundDocument | null>(null);
+    const [document, setDocument] = useState<ScoreDocument | null>(null);
     const [text, setText] = useState('');
-    const [texResult, setTexResult] = useState<PlaygroundDocumentState['texResult']>(null);
+    const [texResult, setTexResult] = useState<ScoreDocumentState['texResult']>(null);
     const [loadError, setLoadError] = useState<string | null>(null);
 
     const renderedRef = useRef(renderedTracks);
@@ -123,7 +157,7 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
     const trackCountRef = useRef(trackCount);
     trackCountRef.current = trackCount;
 
-    const open = useCallback((next: PlaygroundDocument) => {
+    const open = useCallback((next: ScoreDocument) => {
         setLoadError(null);
         setTexResult(null);
         setDocument(next);
@@ -132,20 +166,20 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
 
     useEffect(() => {
         let cancelled = false;
-        void parsePlaygroundUrl(window.location).then((target) => {
+        void (adapter.readLink?.() ?? Promise.resolve(null)).then((target) => {
             if (cancelled) { return; }
-            // A link always wins; a plain /playground continues with the last document of this visit.
+            // A link always wins; an address without one continues with the last document of this page.
             if (!target && remembered) {
                 setDocument(remembered.document);
                 setText(remembered.text);
                 return;
             }
-            open(documentForTarget(target));
+            open(documentForTarget(target, adapter));
         });
         return () => {
             cancelled = true;
         };
-    }, [open]);
+    }, [open, adapter]);
 
     useEffect(() => {
         if (!document) { return; }
@@ -170,7 +204,10 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
             const rendered = renderedRef.current.map((t) => t.index);
             const allRendered = rendered.length > 0 && rendered.length === trackCountRef.current;
             const tracks = first || rendered.length === 0 ? document.initialTracks : allRendered ? 'all' : rendered;
-            setTexResult({ text, ...controls.loadTex(text, { tracks, backingTrack: document.backingTrack }) });
+            setTexResult({
+                text,
+                ...controls.loadTex(text, { tracks, backingTrack: document.backingTrack, reuseViewport: !first }),
+            });
         };
         if (first) {
             render();
@@ -180,7 +217,7 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
         return () => clearTimeout(timer);
     }, [controls, document, text]);
 
-    const openSample = useCallback((sample: PlaygroundSample) => open(documentForSample(sample, 'all')), [open]);
+    const openSample = useCallback((sample: ScoreSample) => open(documentForSample(sample, 'all')), [open]);
 
     const openFile = useCallback(
         async (file: File) => {
@@ -229,7 +266,7 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
         return rendered;
     }, []);
 
-    const linkTarget = useCallback((): PlaygroundLinkTarget | null => {
+    const linkTarget = useCallback((): ScoreLinkTarget | null => {
         if (!document) { return null; }
         const tracks = currentTracks();
         if (document.kind === 'binary') { return document.link ? { ...document.link, tracks } : null; }
@@ -239,19 +276,20 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
 
     const buildShareUrl = useCallback(async () => {
         const target = linkTarget();
-        if (!target) { return null; }
-        return new URL(await buildPlaygroundUrl(target, window.location.pathname), window.location.origin).toString();
-    }, [linkTarget]);
+        if (!target || !adapter.buildLink) { return null; }
+        return new URL(await adapter.buildLink(target), window.location.origin).toString();
+    }, [linkTarget, adapter]);
 
     // Mirror the document into the address bar so a reload reopens it (local binary files cannot be).
     const renderedKey = renderedTracks.map((t) => t.index).join(',');
     useEffect(() => {
-        if (!document) { return; }
+        const buildLink = adapter.buildLink;
+        if (!document || !buildLink) { return; }
         let cancelled = false;
         const timer = setTimeout(() => {
             const target = linkTarget();
             const path = window.location.pathname;
-            const next = target ? buildPlaygroundUrl(target, path) : Promise.resolve(path);
+            const next = target ? buildLink(target) : Promise.resolve(path);
             void next.then((url) => {
                 if (!cancelled && url !== window.location.pathname + window.location.search + window.location.hash) {
                     window.history.replaceState(window.history.state, '', url);
@@ -262,7 +300,7 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
             cancelled = true;
             clearTimeout(timer);
         };
-    }, [document, linkTarget, renderedKey]);
+    }, [document, linkTarget, renderedKey, adapter]);
 
     return { document, text, setText, texResult, loadError, openSample, openFile, openTex, reload, buildShareUrl };
 }

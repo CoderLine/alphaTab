@@ -61,7 +61,7 @@ export const LandingPlayground: React.FC = () => {
         />
 
         <div ref={frameRef}>
-          <PlayerProvider settingsPreset="landing" settings={PLAYER_SHELL_SETTINGS}>
+          <PlayerProvider fonts="noto" settings={PLAYER_SHELL_SETTINGS}>
             <PlaygroundPlayer active={nearViewport} preset={preset} onSelectPreset={selectPreset} text={text} onTextChange={setText} />
           </PlayerProvider>
         </div>

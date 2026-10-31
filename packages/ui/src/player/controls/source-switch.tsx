@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import { playbackPreferences, usePlaybackPreferences, type PlaybackSourcePreference, type PlaybackState } from '../../state/playback';
+import { usePlaybackPreferences, useUiEnvironment } from '../../environment';
+import type { PlaybackSourcePreference, PlaybackState } from '../../state/playback';
 import { IconWaveform } from '../icons';
 import styles from './source-switch.module.scss';
 
@@ -19,6 +20,7 @@ const SITE_WIDE = 'Applies to every player on this site';
  * it, e.g. on opening a file without a backing track.
  */
 export const SourceSwitch: React.FC<SourceSwitchProps> = ({ playback, compact = false }) => {
+    const { playbackPreferences } = useUiEnvironment();
     const preferences = usePlaybackPreferences();
     const available = playback.hasBackingTrack;
     const source = playback.target ?? playback.effective;

@@ -1,5 +1,8 @@
+import type * as alphaTab from '@coderline/alphatab';
 import type { Settings, model } from '@coderline/alphatab';
-import type { AlphaTabModule } from '@site/src/alphatab-react/module';
+
+/** The alphaTab module namespace; entries read enums and model classes from it. */
+type AlphaTabModule = typeof alphaTab;
 
 /** A setting value as stored in overrides: plain JSON, colors as CSS strings, fonts as CSS font shorthands. */
 export type SettingValue = number | boolean | string;
@@ -249,16 +252,16 @@ export function buildSchema(module: AlphaTabModule): SchemaGroup[] {
                 {
                     ...plain('display.barsPerRow', 'Bars per system', { type: 'range', min: 0, max: 16, step: 1, format: (v) => (v === 0 ? 'auto' : String(v)) }),
                     // alphaTab uses -1 for "automatic"; 0 is not a valid count, so the slider's 0 maps to it.
-                    read: (s) => Math.max(0, s.display.barsPerRow),
-                    write: (s, v) => {
+                    read: (s: Settings) => Math.max(0, s.display.barsPerRow),
+                    write: (s: Settings, v: SettingValue) => {
                         s.display.barsPerRow = (v as number) <= 0 ? -1 : (v as number);
                     },
                 },
                 plain('display.startBar', 'Start bar', { type: 'number', min: 1, step: 1 }),
                 {
                     ...plain('display.barCount', 'Bar count', { type: 'number', min: 0, step: 1 }, 'render', '0 shows all bars'),
-                    read: (s) => Math.max(0, s.display.barCount),
-                    write: (s, v) => {
+                    read: (s: Settings) => Math.max(0, s.display.barCount),
+                    write: (s: Settings, v: SettingValue) => {
                         s.display.barCount = (v as number) <= 0 ? -1 : (v as number);
                     },
                 },

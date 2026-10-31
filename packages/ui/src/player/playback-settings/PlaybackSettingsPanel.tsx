@@ -1,5 +1,5 @@
 import type React from 'react';
-import { soundFontLibrary, useSoundFontLibrary } from '../../state/playback';
+import { useSoundFontLibrary, useUiEnvironment } from '../../environment';
 import { PlaybackSourceToggle } from './PlaybackSourceToggle';
 import { SoundFontList } from './SoundFontList';
 import panelStyles from './panel.module.scss';
@@ -9,8 +9,9 @@ interface PlaybackSettingsPanelProps {
     showRemoveDownloads?: boolean;
 }
 
-/** The site-wide playback settings; the same panel in the navbar menu and in player settings. */
+/** The playback preferences of the environment; the SoundFont sections need a SoundFont provider. */
 export function PlaybackSettingsPanel({ showRemoveDownloads = true }: PlaybackSettingsPanelProps): React.ReactElement {
+    const { soundFonts } = useUiEnvironment();
     const library = useSoundFontLibrary();
     const anyStored = Object.values(library).some((s) => s.status === 'stored');
 
@@ -21,17 +22,19 @@ export function PlaybackSettingsPanel({ showRemoveDownloads = true }: PlaybackSe
                 <PlaybackSourceToggle />
                 <p className={panelStyles.hint}>Applies to every player on this site. Some demos use a fixed source.</p>
             </section>
-            <section className={panelStyles.section}>
-                <h3 className={panelStyles.title}>Synthesizer SoundFont</h3>
-                <SoundFontList />
-            </section>
-            {showRemoveDownloads && (
+            {soundFonts && (
+                <section className={panelStyles.section}>
+                    <h3 className={panelStyles.title}>Synthesizer SoundFont</h3>
+                    <SoundFontList />
+                </section>
+            )}
+            {soundFonts && showRemoveDownloads && (
                 <footer className={panelStyles.footer}>
                     <button
                         type="button"
                         className={panelStyles.clear}
                         disabled={!anyStored}
-                        onClick={() => void soundFontLibrary.clearStored()}
+                        onClick={() => void soundFonts?.clearStored()}
                     >
                         Remove downloaded SoundFonts
                     </button>

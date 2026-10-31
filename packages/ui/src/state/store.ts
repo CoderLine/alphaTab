@@ -1,7 +1,7 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { AlphaTabApi, importer, model, Settings } from '@coderline/alphatab';
-import type { ColorMode } from '@docusaurus/theme-common';
-import type { AlphaTabModule } from '@site/src/alphatab-react/module';
-import { applyAlphaTabSettings, applyPlayerDefaults, applyTheme, type AlphaTabPreset } from './settings';
+import { exportWav } from './audio-export';
+import { applyBaseSettings, applyThemeColors, type BaseSettingsOptions, type UiTheme } from './settings';
 import {
     PlaybackController,
     initialPlaybackState,
@@ -67,6 +67,18 @@ export interface LoadSourceOptions {
 export interface LoadTexOptions extends LoadSourceOptions {
     /** Backing track the alphaTex belongs to, see `ScoreSource.backingTrack`. */
     backingTrack?: BackingTrackSource;
+    /**
+     * Keeps the scroll position and the rendered area of the previous render, e.g. while the
+     * alphaTex is being edited.
+     */
+    reuseViewport?: boolean;
+}
+
+/** Construction options of a {@link PlayerStore}. */
+export interface PlayerStoreOptions {
+    /** What the base settings depend on; `resetSettings` and `createDefaultSettings` start from them. */
+    base: BaseSettingsOptions;
+    playback: PlaybackControllerOptions;
 }
 
 export interface PlayerStoreState {
@@ -147,13 +159,18 @@ export interface TexLoadResult {
     diagnostics: TexDiagnostic[];
 }
 
+/**
+ * The application state of one alphaTab API: player snapshot, bar table, tempo markers, loop range,
+ * per-track mix and view settings, plus the playback-source management of a {@link PlaybackController}.
+ * Attach it right after the API is created and destroy it before the API; it never destroys the API.
+ * `subscribe` and `getSnapshot` follow the `useSyncExternalStore` contract.
+ */
 export class PlayerStore {
     private snapshot: PlayerStoreState = { ...initialPlayerStoreState };
     private readonly subscribers = new Set<() => void>();
     private pendingRender = false;
     private rafHandle = 0;
-    private colorMode: ColorMode;
-    private preset: AlphaTabPreset;
+    private readonly base: BaseSettingsOptions;
     private readonly playback: PlaybackController;
     private loadToken = 0;
     private readonly settingsLayers = new Set<(settings: Settings) => void>();
@@ -164,14 +181,10 @@ export class PlayerStore {
 
     constructor(
         private readonly api: AlphaTabApi,
-        private readonly module: AlphaTabModule,
-        colorMode: ColorMode,
-        preset: AlphaTabPreset = 'docs',
-        playbackOptions: PlaybackControllerOptions = { fixedSource: false, ownSoundFont: false },
+        options: PlayerStoreOptions,
     ) {
-        this.colorMode = colorMode;
-        this.preset = preset;
-        this.playback = new PlaybackController(api, module, playbackOptions);
+        this.base = { ...options.base };
+        this.playback = new PlaybackController(api, options.playback);
         this.playback.subscribe(() => this.update({ playback: this.playback.getSnapshot() }));
         this.wireEvents();
         this.snapshot = {
@@ -308,13 +321,13 @@ export class PlayerStore {
 
     setLayoutMode(mode: LayoutModeKey): void {
         this.api.settings.display.layoutMode =
-            mode === 'page' ? this.module.LayoutMode.Page : this.module.LayoutMode.Horizontal;
+            mode === 'page' ? alphaTab.LayoutMode.Page : alphaTab.LayoutMode.Horizontal;
         this.updateView({ layoutMode: mode });
         this.scheduleApply();
     }
 
     setStaveProfile(profile: StaveProfileKey): void {
-        const { StaveProfile } = this.module;
+        const { StaveProfile } = alphaTab;
         this.api.settings.display.staveProfile =
             profile === 'score' ? StaveProfile.Score :
             profile === 'tab'   ? StaveProfile.Tab :
@@ -364,7 +377,7 @@ export class PlayerStore {
 
     /**
      * Registers settings that are re-applied on top of the base settings whenever the store
-     * rebuilds them (color mode switch, reset). Applies `layer` right away. Returns the unregister function.
+     * rebuilds them (theme switch, reset). Applies `layer` right away. Returns the unregister function.
      */
     addSettingsLayer(layer: (settings: Settings) => void): () => void {
         this.settingsLayers.add(layer);
@@ -377,28 +390,37 @@ export class PlayerStore {
 
     /** A fresh copy of the settings this store starts from, e.g. to read default values. */
     createDefaultSettings(): Settings {
-        const settings = new this.module.Settings();
-        applyAlphaTabSettings(this.module, settings, { colorMode: this.colorMode, preset: this.preset });
-        applyPlayerDefaults(this.module, settings);
+        const settings = new alphaTab.Settings();
+        applyBaseSettings(settings, this.base);
         return settings;
     }
 
-    applyColorMode(colorMode: ColorMode): void {
-        if (this.colorMode === colorMode) { return; }
-        this.colorMode = colorMode;
-        applyTheme(this.module, this.api.settings, colorMode);
+    /** Switches the notation colors to `theme` and re-applies the settings layers on top. */
+    setTheme(theme: UiTheme): void {
+        if (this.base.theme === theme) { return; }
+        this.base.theme = theme;
+        applyThemeColors(this.api.settings, theme);
+        this.base.layer?.(this.api.settings);
         for (const layer of this.settingsLayers) { layer(this.api.settings); }
+        this.scheduleApply();
+    }
+
+    /**
+     * Replaces the host layer of the base settings (see `BaseSettingsOptions.layer`), applies it and
+     * re-applies the settings layers on top.
+     */
+    setBaseLayer(layer: ((settings: Settings) => void) | undefined): void {
+        if (this.base.layer === layer) { return; }
+        this.base.layer = layer;
+        layer?.(this.api.settings);
+        for (const registered of this.settingsLayers) { registered(this.api.settings); }
         this.scheduleApply();
     }
 
     resetSettings(): void {
         // Player mode and SoundFont belong to the playback controller, not to the visual defaults.
         const { playerMode, soundFont } = this.api.settings.player;
-        applyAlphaTabSettings(this.module, this.api.settings, {
-            colorMode: this.colorMode,
-            preset: this.preset,
-        });
-        applyPlayerDefaults(this.module, this.api.settings);
+        applyBaseSettings(this.api.settings, this.base);
         const defaults = this.createDefaultSettings();
         this.api.settings.display.scale = defaults.display.scale;
         this.api.settings.display.staveProfile = defaults.display.staveProfile;
@@ -495,7 +517,7 @@ export class PlayerStore {
                 buffer = new Uint8Array(await response.arrayBuffer());
             }
             if (token !== this.loadToken) { return; }
-            const score = this.module.importer.ScoreLoader.loadScoreFromBytes(buffer, this.api.settings);
+            const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(buffer, this.api.settings);
             this.playback.setSource(source);
             this.api.renderScore(score, resolveTrackIndexes(score, options.tracks));
         } else if (source.tex) {
@@ -515,7 +537,7 @@ export class PlayerStore {
      */
     loadTex(tex: string, options: LoadTexOptions = {}): TexLoadResult {
         ++this.loadToken;
-        const importer = new this.module.importer.AlphaTexImporter();
+        const importer = new alphaTab.importer.AlphaTexImporter();
         importer.logErrors = false;
         importer.initFromString(tex, this.api.settings);
         let score: model.Score | null = null;
@@ -541,13 +563,26 @@ export class PlayerStore {
 
         if (this.snapshot.isPlaying) { this.api.stop(); }
         this.playback.setSource({ tex, backingTrack: options.backingTrack });
-        this.api.renderScore(score, resolveTrackIndexes(score, options.tracks));
+        this.api.renderScore(
+            score,
+            resolveTrackIndexes(score, options.tracks),
+            options.reuseViewport ? { reuseViewport: true } : undefined,
+        );
         return { rendered: true, diagnostics };
     }
 
     /** Retries the preferred playback source after a backing-track failure. */
     retryPlayback(): void {
         this.playback.retry();
+    }
+
+    /**
+     * Renders the song with the synthesizer and the current mix, metronome and playback range into
+     * a WAV file; see `exportWav`. Rejects with an `AbortError` once `signal` aborts.
+     */
+    async exportAudio(onProgress: (fraction: number) => void, signal: AbortSignal): Promise<Uint8Array> {
+        const soundFont = await this.playback.soundFontForExport();
+        return exportWav(this.api, this.snapshot, { onProgress, signal, soundFont });
     }
 
     getApi(): AlphaTabApi { return this.api; }
@@ -576,7 +611,7 @@ export class PlayerStore {
 
     private readView(): Pick<PlayerViewSettings, 'layoutMode' | 'staveProfile' | 'scale' | 'highlight'> {
         const { display, player } = this.api.settings;
-        const { StaveProfile, LayoutMode } = this.module;
+        const { StaveProfile, LayoutMode } = alphaTab;
         return {
             layoutMode: display.layoutMode === LayoutMode.Horizontal ? 'scroll' : 'page',
             staveProfile:
@@ -637,7 +672,7 @@ export class PlayerStore {
 
     private syncPlaybackScroll(): void {
         const player = this.api.settings.player;
-        const { ScrollMode } = this.module;
+        const { ScrollMode } = alphaTab;
         if (this.scrollDuringPlayback && this.snapshot.isPlaying) {
             if (player.scrollMode !== ScrollMode.Off) { return; }
             player.scrollMode = ScrollMode.Continuous;
@@ -653,7 +688,7 @@ export class PlayerStore {
     }
 
     private wireEvents(): void {
-        const { synth } = this.module;
+        const { synth } = alphaTab;
 
         this.unsubscribers.push(this.api.settingsUpdated.on(() => this.refreshView()));
 
@@ -759,7 +794,7 @@ export class PlayerStore {
     }
 
     private toTexDiagnostic(d: importer.alphaTex.AlphaTexDiagnostic): TexDiagnostic {
-        const { AlphaTexDiagnosticsSeverity } = this.module.importer.alphaTex;
+        const { AlphaTexDiagnosticsSeverity } = alphaTab.importer.alphaTex;
         const severity: TexDiagnosticSeverity =
             d.severity === AlphaTexDiagnosticsSeverity.Error ? 'error' :
             d.severity === AlphaTexDiagnosticsSeverity.Warning ? 'warning' :

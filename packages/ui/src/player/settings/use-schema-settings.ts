@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useColorMode } from '@docusaurus/theme-common';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { usePlayerControls, usePlayerSelector } from '../PlayerProvider';
-import { useAlphaTabModule } from '@site/src/alphatab-react/module';
-import type { PlayerViewSettings } from '../../state/store';
-import { useMusicFont } from '@site/src/components/Playground/music-font';
-import { usePersistedState } from '../use-persisted-state';
+import * as alphaTab from '@coderline/alphatab';
 import type { Settings } from '@coderline/alphatab';
-import type { AlphaTabModule } from '@site/src/alphatab-react/module';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useUiEnvironment } from '../../environment';
+import type { PlayerViewSettings } from '../../state/store';
+import { usePlayerControls, usePlayerSelector } from '../PlayerProvider';
+import { usePersistedState } from '../use-persisted-state';
 import { buildQuickEntries, buildSchema, type SchemaEntry, type SchemaGroup, type SettingsEntry, type SettingValue } from './schema';
 
 const RENDER_DEBOUNCE_MS = 120;
@@ -15,18 +13,23 @@ const RENDER_DEBOUNCE_MS = 120;
 type Overrides = Record<string, SettingValue>;
 type PersistedView = Pick<PlayerViewSettings, 'scale' | 'playbackSpeed' | 'masterVolume' | 'highlight'>;
 
-/**
- * Where the Playground differs from the site-wide player defaults: the notation follows the
- * playback, and the engraving matches the selected music font.
- */
-function applyPlaygroundBase(settings: Settings, module: AlphaTabModule, smuflMetadata: unknown): void {
-    settings.player.scrollMode = module.ScrollMode.Continuous;
+/** Where a full settings view differs from the base player settings: the notation follows the playback. */
+function applyFollowPlayback(settings: Settings): void {
+    settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
     // Keeps a bit of the system above the cursor in view instead of scrolling it flush to the top edge.
     settings.player.scrollOffsetY = -24;
-    if (smuflMetadata) { settings.display.resources.engravingSettings.fillFromSmufl(smuflMetadata as never); }
 }
 
-export interface PlaygroundSettings {
+export interface SchemaSettingsOptions {
+    /** Imports the open score again, for settings the importer reads. */
+    onReload: () => void;
+    /** Storage key of the persisted overrides. */
+    overridesKey?: string;
+    /** Storage key of the persisted zoom, speed, volume and highlighting. */
+    viewKey?: string;
+}
+
+export interface SchemaSettings {
     groups: SchemaGroup[];
     /** Layout and stave profile, for the quick section. */
     quick: SettingsEntry[];
@@ -40,21 +43,25 @@ export interface PlaygroundSettings {
 }
 
 /**
- * Settings model of the Playground: the "Advanced" overrides are persisted per browser and
- * survive color-mode switches; stylesheet entries edit the loaded score. Mount once.
+ * The settings model behind {@link SettingsPanel}: every alphaTab setting of the schema, with the
+ * overrides persisted in the environment's storage. Overrides survive theme switches and resets of
+ * the base settings; stylesheet entries edit the loaded score. Mount once per player.
  */
-export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings {
+export function useSchemaSettings({
+    onReload,
+    overridesKey = 'alphatab.playground-settings.v1',
+    viewKey = 'alphatab.playground-view.v1'
+}: SchemaSettingsOptions): SchemaSettings {
     const store = usePlayerControls();
     const api = useAlphaTabApi();
-    const module = useAlphaTabModule();
-    const { colorMode } = useColorMode();
+    const module = alphaTab;
+    const { theme, settingsLayer } = useUiEnvironment();
     const score = usePlayerSelector((s) => s.currentScore);
     const scoreRevision = usePlayerSelector((s) => s.scoreRevision);
     const view = usePlayerSelector((s) => s.view);
-    const { metadata: smuflMetadata } = useMusicFont();
 
-    const groups = useMemo(() => (module ? buildSchema(module) : []), [module]);
-    const quick = useMemo(() => (module ? buildQuickEntries(module) : []), [module]);
+    const groups = useMemo(() => buildSchema(module), [module]);
+    const quick = useMemo(() => buildQuickEntries(module), [module]);
     const entries = useMemo(
         () => new Map<string, SchemaEntry>([...quick, ...groups.flatMap((g) => g.entries)].map((e) => [e.id, e])),
         [groups, quick],
@@ -62,37 +69,36 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
     const onReloadRef = useRef(onReload);
     onReloadRef.current = onReload;
 
-    const [overrides, setOverrides] = usePersistedState<Overrides>('alphatab.playground-settings.v1', {});
+    const [overrides, setOverrides] = usePersistedState<Overrides>(overridesKey, {});
     const overridesRef = useRef(overrides);
     overridesRef.current = overrides;
 
     const defaults = useMemo(() => {
         const result: Overrides = {};
-        if (!store || !module) { return result; }
+        if (!store) { return result; }
         const settings = store.createDefaultSettings();
-        applyPlaygroundBase(settings, module, smuflMetadata);
+        applyFollowPlayback(settings);
         for (const entry of entries.values()) {
             if (entry.effect !== 'stylesheet') { result[entry.id] = entry.read(settings); }
         }
         return result;
-        // Theme colors are part of the defaults.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [store, module, entries, colorMode, smuflMetadata]);
+        // The theme colors and the host layer are part of the defaults.
+    }, [store, entries, theme, settingsLayer]);
 
     // Re-applied by the store after it rebuilds base settings (theme switch, reset).
     useEffect(() => {
-        if (!store || !module) { return; }
+        if (!store) { return; }
         store.setScrollDuringPlayback(false);
         return store.addSettingsLayer((settings) => {
-            applyPlaygroundBase(settings, module, smuflMetadata);
+            applyFollowPlayback(settings);
             for (const [id, value] of Object.entries(overridesRef.current)) {
                 const entry = entries.get(id);
                 if (entry && entry.effect !== 'stylesheet') { entry.write(settings, value, module); }
             }
         });
-    }, [store, module, entries, smuflMetadata]);
+    }, [store, module, entries]);
 
-    const [savedView, setSavedView] = usePersistedState<PersistedView | null>('alphatab.playground-view.v1', null);
+    const [savedView, setSavedView] = usePersistedState<PersistedView | null>(viewKey, null);
     const viewRestored = useRef(false);
     useEffect(() => {
         if (!store || viewRestored.current) { return; }
@@ -116,7 +122,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
 
     const applyEntry = useCallback(
         (entry: SchemaEntry, value: SettingValue) => {
-            if (!store || !api || !module) { return; }
+            if (!store || !api) { return; }
             if (entry.effect === 'stylesheet') {
                 store.mutateScore((s) => entry.write(s, value));
                 return;
@@ -176,7 +182,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
     );
 
     const resetAll = useCallback(() => {
-        if (!store || !api || !module) { return; }
+        if (!store || !api) { return; }
         const effects = new Set<string>();
         for (const id of Object.keys(overridesRef.current)) {
             const entry = entries.get(id);

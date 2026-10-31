@@ -1,8 +1,5 @@
-import { formatMegabytes, type PlaybackPreparation, type SoundFontEntry, type SoundFontState } from '../../state/playback';
-
-export function formatPercent(loaded: number, total: number): string {
-    return total > 0 ? `${Math.min(100, Math.round((loaded / total) * 100))} %` : '…';
-}
+import { formatMegabytes, formatPercent } from '../../state/format';
+import type { PlaybackPreparation, SoundFontEntry, SoundFontState } from '../../state/playback';
 
 export function soundFontStatusText(entry: SoundFontEntry, state: SoundFontState): string {
     switch (state.status) {

@@ -1,29 +1,34 @@
 import React, { useEffect, useState } from 'react';
+import * as alphaTab from '@coderline/alphatab';
 import type { synth } from '@coderline/alphatab';
 import clsx from 'clsx';
 import { useAlphaTabApi } from '@coderline/alphatab-react';
 import { usePlayerControls, usePlayerSelector } from '../PlayerProvider';
-import { useAlphaTabModule } from '@site/src/alphatab-react/module';
 import { PlaybackSettingsPanel } from '../playback-settings';
 import { Slider } from '../primitives/flyout-controls';
 import { IconCaret, IconReset, IconSearch, IconSliders } from '../icons';
 import { Segmented } from '../primitives/segmented';
-import { MUSIC_FONTS, useMusicFont, type MusicFontId } from '@site/src/components/Playground/music-font';
 import { Panel } from '../primitives/panel';
 import { ColorField } from './color-field';
 import { FontField, NumberField, Select, Switch, TextField } from './controls';
 import type { SchemaEntry, SchemaGroup, SettingValue } from './schema';
-import type { PlaygroundSettings } from './use-playground-settings';
+import type { SchemaSettings } from './use-schema-settings';
 import styles from './settings.module.scss';
 
 const SYNTH_ONLY = 'Needs the synthesizer';
 
-interface SettingsPanelProps {
-    settings: PlaygroundSettings;
+export interface SettingsPanelProps {
+    settings: SchemaSettings;
     onClose: () => void;
+    /**
+     * Further rows of the quick settings grid as {@link QuickSettingRow}s, e.g. a host's music-font
+     * switch.
+     */
+    quickExtras?: React.ReactNode;
 }
 
-export const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, onClose }) => {
+/** Every alphaTab setting, searchable and grouped, below quick access to the common ones. */
+export const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, onClose, quickExtras }) => {
     const [query, setQuery] = useState('');
     const [openGroups, setOpenGroups] = useState<Set<string>>(() => new Set());
     const hasScore = usePlayerSelector((s) => s.currentScore !== null);
@@ -61,7 +66,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, onClose 
                 </>
             }
         >
-            {!normalized && <QuickSettings settings={settings} />}
+            {!normalized && <QuickSettings settings={settings} extras={quickExtras} />}
 
             <div className={styles.search}>
                 <IconSearch size={13} aria-hidden="true" />
@@ -110,16 +115,29 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, onClose 
     );
 };
 
+/** A row of {@link SettingsPanelProps.quickExtras}: a label and its control. */
+export const QuickSettingRow: React.FC<{ label: string; title?: string; children: React.ReactNode }> = ({
+    label,
+    title,
+    children
+}) => (
+    <>
+        <span className={styles.label} title={title}>
+            {label}
+        </span>
+        {children}
+    </>
+);
+
 function matches(entry: SchemaEntry, group: SchemaGroup, query: string): boolean {
     return `${group.title} ${entry.label} ${entry.id}`.toLowerCase().includes(query);
 }
 
-const QuickSettings: React.FC<{ settings: PlaygroundSettings }> = ({ settings }) => {
+const QuickSettings: React.FC<{ settings: SchemaSettings; extras: React.ReactNode }> = ({ settings, extras }) => {
     const controls = usePlayerControls();
     const view = usePlayerSelector((s) => s.view);
     const effective = usePlayerSelector((s) => s.playback.effective);
     const synthOnly = effective !== null && effective !== 'synthesizer' ? SYNTH_ONLY : null;
-    const { musicFont, setMusicFont } = useMusicFont();
 
     return (
         <div className={styles.quick}>
@@ -147,13 +165,7 @@ const QuickSettings: React.FC<{ settings: PlaygroundSettings }> = ({ settings })
                 />
                 <span className={styles.label}>Highlight</span>
                 <Switch label="Highlight played notes" value={view.highlight} onChange={(b) => controls?.setEnableHighlight(b)} />
-                <span className={styles.label} title="Switching reloads the player">Music font</span>
-                <Select
-                    label="Music font"
-                    value={Object.keys(MUSIC_FONTS).indexOf(musicFont)}
-                    options={Object.entries(MUSIC_FONTS).map(([, f], i) => ({ value: i, label: `${f.label} (${f.description})` }))}
-                    onChange={(i) => setMusicFont(Object.keys(MUSIC_FONTS)[i] as MusicFontId)}
-                />
+                {extras}
                 <OutputDeviceSelect />
             </div>
         </div>
@@ -223,8 +235,7 @@ const OutputDeviceSelect: React.FC = () => {
     );
 };
 
-const SettingRow: React.FC<{ entry: SchemaEntry; settings: PlaygroundSettings; quick?: boolean }> = ({ entry, settings, quick }) => {
-    const module = useAlphaTabModule();
+const SettingRow: React.FC<{ entry: SchemaEntry; settings: SchemaSettings; quick?: boolean }> = ({ entry, settings, quick }) => {
     const value = settings.valueOf(entry);
     const overridden = settings.isOverridden(entry);
     if (value === undefined) { return null; }
@@ -278,7 +289,7 @@ const SettingRow: React.FC<{ entry: SchemaEntry; settings: PlaygroundSettings; q
                     label={entry.label}
                     value={value as string}
                     onChange={set}
-                    validate={(v) => !!module?.model.Font.fromJson(v)}
+                    validate={(v) => !!alphaTab.model.Font.fromJson(v)}
                 />
             );
             break;

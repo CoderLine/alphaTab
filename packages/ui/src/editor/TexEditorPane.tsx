@@ -1,18 +1,17 @@
 import type React from 'react';
 import { useRef } from 'react';
 import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react/module';
 import { usePlayerSelector } from '../player/PlayerProvider';
 import { AlphaTexEditor, type AlphaTexEditorHandle } from './AlphaTexEditor';
 import { RenderStatus, describeScore } from './render-status';
 import { IconClose, IconCode, IconFileMusic } from '../player/icons';
 import { NOT_DESKTOP_QUERY, useMediaQuery } from '../player/primitives/use-media-query';
-import { withExtension } from '../state/download';
-import type { PlaygroundDocumentState } from '@site/src/components/Playground/use-playground-document';
+import { exportAlphaTex, withExtension } from '../state/exports';
+import type { ScoreDocumentState } from './use-score-document';
 import styles from './tex-editor-pane.module.scss';
 
 interface TexEditorPaneProps {
-    doc: PlaygroundDocumentState;
+    doc: ScoreDocumentState;
     onClose: () => void;
 }
 
@@ -78,16 +77,14 @@ export const TexEditorPane: React.FC<TexEditorPaneProps> = ({ doc, onClose }) =>
     );
 };
 
-const ConvertPlaceholder: React.FC<{ doc: PlaygroundDocumentState }> = ({ doc }) => {
+const ConvertPlaceholder: React.FC<{ doc: ScoreDocumentState }> = ({ doc }) => {
     const api = useAlphaTabApi();
-    const module = useAlphaTabModule();
     const score = usePlayerSelector((s) => s.currentScore);
     const fileName = doc.document?.fileName ?? 'score';
 
     const convert = () => {
-        if (!api?.score || !module) { return; }
-        const tex = new module.exporter.AlphaTexExporter().exportToString(api.score, api.settings);
-        doc.openTex(withExtension(fileName, 'alphatex'), tex);
+        if (!api?.score) { return; }
+        doc.openTex(withExtension(fileName, 'alphatex'), exportAlphaTex(api));
     };
 
     return (

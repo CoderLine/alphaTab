@@ -1,10 +1,10 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { AlphaTabApi, ICursorHandler, model, platform, rendering } from '@coderline/alphatab';
-import type { AlphaTabModule } from '@site/src/alphatab-react/module';
-import { fetchWithProgress, type DownloadProgress } from './fetch-with-progress';
-import { playbackPreferences } from './preferences';
+import { type DownloadProgress, fetchWithProgress } from './fetch-with-progress';
+import type { PlaybackPreferencesStore } from './preferences';
 import type { ScoreSource, SyncPointSource } from './score-source';
-import { soundFontLibrary } from './soundfont-library';
-import type { SoundFontId } from './soundfont-registry';
+import type { SoundFontId } from './soundfont-entry';
+import type { SoundFontProvider } from './soundfont-library';
 
 export type PlaybackSourceKind = 'synthesizer' | 'backingTrack' | 'externalMedia';
 
@@ -34,8 +34,12 @@ export interface PlaybackState {
 export interface PlaybackControllerOptions {
     /** The instance sets its own `player.playerMode`. */
     fixedSource: boolean;
-    /** The instance loads its own SoundFont. */
+    /** The instance loads its own SoundFont; implied without `soundFonts`. */
     ownSoundFont: boolean;
+    /** Supplies the SoundFont the preferences select. */
+    soundFonts: SoundFontProvider | null;
+    /** The source and SoundFont preferences of the host. */
+    preferences: PlaybackPreferencesStore;
 }
 
 export const initialPlaybackState: PlaybackState = {
@@ -142,7 +146,7 @@ function errorMessage(e: unknown): string {
 /**
  * Owns the playback lifecycle of one `AlphaTabApi`: decides between
  * synthesizer and backing track from the file, the instance options and the
- * site-wide preferences, prepares only what that source needs, and applies it
+ * host's preferences, prepares only what that source needs, and applies it
  * with an explicit alphaTab `PlayerMode`. UI code reads `PlaybackState` and
  * never changes player modes directly.
  */
@@ -171,12 +175,17 @@ export class PlaybackController {
     private hold: PositionHold | null = null;
     private playerSubscribed = false;
     private sourceOverride: PlaybackSourceKind | null = null;
+    private readonly soundFonts: SoundFontProvider | null;
+    private readonly preferences: PlaybackPreferencesStore;
+    private readonly ownSoundFont: boolean;
 
     constructor(
         private readonly api: AlphaTabApi,
-        private readonly module: AlphaTabModule,
         private readonly options: PlaybackControllerOptions,
     ) {
+        this.ownSoundFont = options.ownSoundFont || !options.soundFonts;
+        this.soundFonts = this.ownSoundFont ? null : options.soundFonts;
+        this.preferences = options.preferences;
         this.state = { ...initialPlaybackState, isFixed: options.fixedSource };
         this.ensurePlayerSubscription();
         this.unsubscribers.push(
@@ -184,10 +193,20 @@ export class PlaybackController {
             // Fired right after alphaTab (re)creates a player for a score, so a player created outside this controller is noticed.
             api.midiLoad.on(() => this.ensurePlayerSubscription()),
             api.playerReady.on(this.onReadyForPlayback),
-            playbackPreferences.subscribe(() => this.reconcile()),
-            soundFontLibrary.subscribe(this.onLibraryChanged),
+            this.preferences.subscribe(() => this.reconcile()),
         );
+        if (this.soundFonts) {
+            this.unsubscribers.push(this.soundFonts.subscribe(this.onLibraryChanged));
+        }
         this.reconcile();
+    }
+
+    /**
+     * The SoundFont an audio export should render with: the preferred one when this controller
+     * supplies SoundFonts, otherwise `undefined` for the one loaded into the synthesizer.
+     */
+    async soundFontForExport(): Promise<Uint8Array | undefined> {
+        return this.soundFonts ? this.soundFonts.load(this.preferences.getSnapshot().soundFontId) : undefined;
     }
 
     readonly subscribe = (listener: () => void): (() => void) => {
@@ -224,12 +243,12 @@ export class PlaybackController {
     attachBackingTrack(audio: Uint8Array): void {
         const score = this.score;
         if (!score) { return; }
-        const backingTrack = new this.module.model.BackingTrack();
+        const backingTrack = new alphaTab.model.BackingTrack();
         backingTrack.rawAudioFile = audio;
         score.backingTrack = backingTrack;
         this.backingTrackFailed = false;
         this.patch({ notice: null });
-        if (this.api.actualPlayerMode === this.module.PlayerMode.EnabledBackingTrack) {
+        if (this.api.actualPlayerMode === alphaTab.PlayerMode.EnabledBackingTrack) {
             this.api.loadMidiForScore();
         }
         this.reconcile();
@@ -237,7 +256,7 @@ export class PlaybackController {
 
     /** Destroys and recreates the player in its current mode, keeping the position and resuming playback. */
     rebuildPlayer(): void {
-        const { PlayerMode } = this.module;
+        const { PlayerMode } = alphaTab;
         const mode = this.api.actualPlayerMode;
         if (mode === PlayerMode.Disabled) { return; }
         this.holdPosition();
@@ -422,12 +441,12 @@ export class PlaybackController {
     }
 
     private isPlaying(): boolean {
-        return this.api.playerState === this.module.synth.PlayerState.Playing;
+        return this.api.playerState === alphaTab.synth.PlayerState.Playing;
     }
 
     private readonly onLibraryChanged = (): void => {
         if (this.state.preparing?.kind !== 'soundFont') { return; }
-        const progress = soundFontLibrary.getSnapshot()[playbackPreferences.getSnapshot().soundFontId];
+        const progress = this.soundFonts?.getSnapshot()[this.preferences.getSnapshot().soundFontId];
         if (progress) {
             this.patch({ preparing: { kind: 'soundFont', loaded: progress.loaded, total: progress.total } });
         }
@@ -446,7 +465,7 @@ export class PlaybackController {
         if (this.sourceOverride === 'backingTrack') {
             return this.hasBackingTrack() && !this.backingTrackFailed ? 'backingTrack' : 'synthesizer';
         }
-        const preference = playbackPreferences.getSnapshot().source;
+        const preference = this.preferences.getSnapshot().source;
         if (preference === 'synthesizer' || !this.hasBackingTrack() || this.backingTrackFailed) {
             return 'synthesizer';
         }
@@ -454,7 +473,7 @@ export class PlaybackController {
     }
 
     private effectiveSource(): PlaybackSourceKind | null {
-        const { PlayerMode } = this.module;
+        const { PlayerMode } = alphaTab;
         switch (this.api.actualPlayerMode) {
             case PlayerMode.EnabledSynthesizer:
                 return 'synthesizer';
@@ -469,7 +488,7 @@ export class PlaybackController {
 
     /** Mode for a freshly loaded score: playable right away if possible, otherwise no player until prepared. */
     private initialModeFor(score: model.Score): number {
-        const { PlayerMode } = this.module;
+        const { PlayerMode } = alphaTab;
         const target = this.resolveTarget();
         if (target === 'externalMedia') {
             return PlayerMode.EnabledExternalMedia;
@@ -478,8 +497,8 @@ export class PlaybackController {
             return PlayerMode.EnabledBackingTrack;
         }
         const synthReady =
-            this.options.ownSoundFont ||
-            (this.fontBytes !== null && this.fontId === playbackPreferences.getSnapshot().soundFontId);
+            this.ownSoundFont ||
+            (this.fontBytes !== null && this.fontId === this.preferences.getSnapshot().soundFontId);
         if (target === 'synthesizer' && synthReady) {
             return PlayerMode.EnabledSynthesizer;
         }
@@ -508,18 +527,19 @@ export class PlaybackController {
     }
 
     private async applySynthesizer(generation: number): Promise<void> {
-        if (!this.options.ownSoundFont) {
-            const id = playbackPreferences.getSnapshot().soundFontId;
+        const soundFonts = this.soundFonts;
+        if (soundFonts) {
+            const id = this.preferences.getSnapshot().soundFontId;
             if (this.fontId !== id || !this.fontBytes) {
-                if (!soundFontLibrary.isInMemory(id)) {
-                    const progress = soundFontLibrary.getSnapshot()[id];
+                if (!soundFonts.isInMemory(id)) {
+                    const progress = soundFonts.getSnapshot()[id];
                     this.patch({
                         preparing: { kind: 'soundFont', loaded: progress?.loaded ?? 0, total: progress?.total ?? 0 },
                     });
                 }
                 let bytes: Uint8Array;
                 try {
-                    bytes = await soundFontLibrary.load(id);
+                    bytes = await soundFonts.load(id);
                 } catch (e) {
                     if (generation !== this.generation) { return; }
                     this.patch({ preparing: null, notice: `SoundFont could not be loaded: ${errorMessage(e)}` });
@@ -599,14 +619,14 @@ export class PlaybackController {
         } else if (!hasSyncPoints(score)) {
             throw new Error('the score has no sync points');
         }
-        const attached = new this.module.model.BackingTrack();
+        const attached = new alphaTab.model.BackingTrack();
         attached.rawAudioFile = audio;
         score.backingTrack = attached;
     }
 
     /** Switches alphaTab to the given source, keeping the position. Returns whether a new player was requested. */
     private switchMode(kind: PlaybackSourceKind): boolean {
-        const { PlayerMode } = this.module;
+        const { PlayerMode } = alphaTab;
         const mode =
             kind === 'synthesizer' ? PlayerMode.EnabledSynthesizer :
             kind === 'backingTrack' ? PlayerMode.EnabledBackingTrack :
@@ -627,8 +647,8 @@ export class PlaybackController {
     }
 
     private feedSoundFont(): void {
-        if (this.options.ownSoundFont || !this.fontBytes || this.loadedFontId === this.fontId) { return; }
-        if (this.api.actualPlayerMode !== this.module.PlayerMode.EnabledSynthesizer) { return; }
+        if (this.ownSoundFont || !this.fontBytes || this.loadedFontId === this.fontId) { return; }
+        if (this.api.actualPlayerMode !== alphaTab.PlayerMode.EnabledSynthesizer) { return; }
         if (!this.api.player?.isReady) { return; }
         // The synthesizer pauses itself to swap SoundFonts and reports ready again once the presets are loaded.
         this.resumeAfterReady ||= this.isPlaying();

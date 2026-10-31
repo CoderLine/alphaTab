@@ -1,10 +1,18 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { AlphaTabApi } from '@coderline/alphatab';
 import { defaultTrackMix, type PlayerStoreState } from './store';
-import { playbackPreferences, soundFontLibrary } from './playback';
-import type { AlphaTabModule } from '@site/src/alphatab-react/module';
 
 const SAMPLE_RATE = 44100;
 const CHUNK_MS = 500;
+
+export interface WavExportOptions {
+    /** Receives the rendered fraction of the song, 0..1. */
+    onProgress?: (fraction: number) => void;
+    /** Stops the export; the promise then rejects with an `AbortError`. */
+    signal?: AbortSignal;
+    /** The SoundFont to render with; without one, the synthesizer's loaded SoundFont is used. */
+    soundFont?: Uint8Array;
+}
 
 /**
  * Renders the song with the synthesizer, applying the current mix (volumes, mute/solo, transposition),
@@ -12,46 +20,54 @@ const CHUNK_MS = 500;
  */
 export async function exportWav(
     api: AlphaTabApi,
-    module: AlphaTabModule,
     state: Pick<PlayerStoreState, 'tracks' | 'trackMix' | 'view'>,
-    onProgress: (fraction: number) => void,
-    signal: AbortSignal,
+    options: WavExportOptions = {}
 ): Promise<Uint8Array> {
-    const options = new module.synth.AudioExportOptions();
-    options.sampleRate = SAMPLE_RATE;
-    options.useSyncPoints = false;
-    options.masterVolume = state.view.masterVolume;
-    options.metronomeVolume = state.view.metronome ? 1 : 0;
-    if (api.playbackRange) { options.playbackRange = api.playbackRange; }
-    // The site loads SoundFonts itself, so the synthesizer settings carry none the exporter could use.
-    options.soundFonts = [await soundFontLibrary.load(playbackPreferences.getSnapshot().soundFontId)];
+    const { onProgress, signal, soundFont } = options;
+    const exportOptions = new alphaTab.synth.AudioExportOptions();
+    exportOptions.sampleRate = SAMPLE_RATE;
+    exportOptions.useSyncPoints = false;
+    exportOptions.masterVolume = state.view.masterVolume;
+    exportOptions.metronomeVolume = state.view.metronome ? 1 : 0;
+    if (api.playbackRange) {
+        exportOptions.playbackRange = api.playbackRange;
+    }
+    if (soundFont) {
+        exportOptions.soundFonts = [soundFont];
+    }
 
-    const anySolo = state.tracks.some((t) => state.trackMix[t.index]?.solo);
+    const anySolo = state.tracks.some(t => state.trackMix[t.index]?.solo);
     for (const track of state.tracks) {
         const mix = state.trackMix[track.index] ?? defaultTrackMix;
         const audible = !mix.mute && (!anySolo || mix.solo);
-        options.trackVolume.set(track.index, audible ? mix.volume : 0);
-        options.trackTranspositionPitches.set(track.index, state.view.transpose + mix.transpose);
+        exportOptions.trackVolume.set(track.index, audible ? mix.volume : 0);
+        exportOptions.trackTranspositionPitches.set(track.index, state.view.transpose + mix.transpose);
     }
 
-    const exporter = await api.exportAudio(options);
+    const exporter = await api.exportAudio(exportOptions);
     const chunks: Float32Array[] = [];
     try {
-        while (!signal.aborted) {
+        while (!signal?.aborted) {
             const chunk = await exporter.render(CHUNK_MS);
-            if (!chunk) { break; }
+            if (!chunk) {
+                break;
+            }
             chunks.push(chunk.samples);
-            if (chunk.endTime > 0) { onProgress(Math.min(1, chunk.currentTime / chunk.endTime)); }
+            if (chunk.endTime > 0) {
+                onProgress?.(Math.min(1, chunk.currentTime / chunk.endTime));
+            }
         }
     } finally {
         exporter.destroy();
     }
-    if (signal.aborted) { throw new DOMException('Export cancelled', 'AbortError'); }
+    if (signal?.aborted) {
+        throw new DOMException('Export cancelled', 'AbortError');
+    }
     return encodeWav(chunks, SAMPLE_RATE);
 }
 
-/** Interleaved stereo float samples → WAVE_FORMAT_IEEE_FLOAT file. */
-function encodeWav(chunks: Float32Array[], sampleRate: number): Uint8Array {
+/** Encodes interleaved stereo float samples as a `WAVE_FORMAT_IEEE_FLOAT` file. */
+export function encodeWav(chunks: readonly Float32Array[], sampleRate: number): Uint8Array {
     const channels = 2;
     const bytesPerSample = 4;
     const sampleCount = chunks.reduce((n, c) => n + c.length, 0);
@@ -59,7 +75,9 @@ function encodeWav(chunks: Float32Array[], sampleRate: number): Uint8Array {
     const bytes = new Uint8Array(44 + dataSize);
     const view = new DataView(bytes.buffer);
     const ascii = (offset: number, text: string) => {
-        for (let i = 0; i < text.length; i++) { bytes[offset + i] = text.charCodeAt(i); }
+        for (let i = 0; i < text.length; i++) {
+            bytes[offset + i] = text.charCodeAt(i);
+        }
     };
     ascii(0, 'RIFF');
     view.setUint32(4, 36 + dataSize, true);

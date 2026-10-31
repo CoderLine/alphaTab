@@ -1,73 +1,60 @@
+import * as alphaTab from '@coderline/alphatab';
 import type { Settings } from '@coderline/alphatab';
-import type { ColorMode } from '@docusaurus/theme-common';
-import type { AlphaTabModule } from '@site/src/alphatab-react/module';
+
+export type UiTheme = 'light' | 'dark';
+
+/** The text fonts of the rendered score: alphaTab's own, or Noto Sans and Noto Serif. */
+export type ScoreFonts = 'default' | 'noto';
+
+/** What the settings every player starts from depend on. */
+export interface BaseSettingsOptions {
+    theme: UiTheme;
+    fonts: ScoreFonts;
+    /** `core.fontDirectory`; `undefined` keeps alphaTab's own lookup. */
+    fontDirectory?: string;
+    /** The playback controller supplies the SoundFont, so `player.soundFont` stays unset. */
+    suppliedSoundFont: boolean;
+    /** Host settings applied last, e.g. a music font or URL-driven debug options. */
+    layer?: (settings: Settings) => void;
+}
 
 /**
- * Which opinionated defaults to lay down on top of alphaTab's factory
- * settings. `landing` matches the marketing page's chrome (Noto fonts,
- * dark-mode aware colors). `docs` gives feature demos a neutral baseline
- * that lets alphaTab's own defaults shine.
+ * Writes the settings every player starts from into `settings`: the theme colors and fonts, a
+ * disabled player (the playback controller enables it), page layout without scrolling, and the
+ * cursor and element highlighting.
  */
-export type AlphaTabPreset = 'landing' | 'docs';
-
-export interface AlphaTabPlayerSettings {
-    colorMode: ColorMode;
-    preset?: AlphaTabPreset;
-}
-
-export function applyAlphaTabSettings(
-    module: AlphaTabModule,
-    settings: Settings,
-    options: AlphaTabPlayerSettings,
-): void {
-    const preset = options.preset ?? 'docs';
-
-    settings.core.fontDirectory = '/font/';
-    // Supplied as bytes by the PlaybackController from the site-wide SoundFont preference.
-    settings.player.soundFont = null;
-    settings.player.scrollMode = module.ScrollMode.Off;
-    settings.player.playerMode = module.PlayerMode.Disabled;
-
-    if (typeof window !== 'undefined') {
-        const params = new URL(window.location.href).searchParams;
-        settings.fillFromJson({
-            core: {
-                logLevel: (params.get('loglevel') ?? 'info') as keyof typeof module.LogLevel,
-            },
-        });
+export function applyBaseSettings(settings: Settings, options: BaseSettingsOptions): void {
+    if (options.fontDirectory !== undefined) {
+        settings.core.fontDirectory = options.fontDirectory;
     }
-
-    applyThemeColors(module, settings, options.colorMode);
-    if (preset === 'landing') {
-        applyFontFamily(settings);
+    if (options.suppliedSoundFont) {
+        settings.player.soundFont = null;
     }
-}
-
-/** Player-level defaults every `<PlayerProvider>` starts from, on top of `applyAlphaTabSettings`. */
-export function applyPlayerDefaults(module: AlphaTabModule, settings: Settings): void {
-    // Without an author-set mode the PlaybackController picks and enables the source.
-    settings.player.playerMode = module.PlayerMode.Disabled;
-    settings.display.layoutMode = module.LayoutMode.Page;
-    settings.player.scrollMode = module.ScrollMode.Off;
+    settings.player.playerMode = alphaTab.PlayerMode.Disabled;
+    settings.player.scrollMode = alphaTab.ScrollMode.Off;
     settings.player.enableCursor = true;
     settings.player.enableElementHighlighting = true;
+    settings.display.layoutMode = alphaTab.LayoutMode.Page;
+    applyThemeColors(settings, options.theme);
+    if (options.fonts === 'noto') {
+        applyNotoFonts(settings);
+    }
+    options.layer?.(settings);
 }
 
-export function applyTheme(module: AlphaTabModule, settings: Settings, colorMode: ColorMode): void {
-    applyThemeColors(module, settings, colorMode);
-}
-
-function applyThemeColors(module: AlphaTabModule, settings: Settings, colorMode: ColorMode): void {
-    const defaults = new module.Settings().display.resources;
+/** Sets the notation colors for `theme`; `light` restores alphaTab's defaults. */
+export function applyThemeColors(settings: Settings, theme: UiTheme): void {
+    const defaults = new alphaTab.Settings().display.resources;
     const r = settings.display.resources;
+    const color = (value: string) => alphaTab.model.Color.fromJson(value)!;
 
-    if (colorMode === 'dark') {
-        r.staffLineColor = module.model.Color.fromJson('rgb(90, 90, 90)')!;
-        r.barSeparatorColor = module.model.Color.fromJson('rgb(221, 221, 238)')!;
-        r.barNumberColor = module.model.Color.fromJson('rgb(225, 50, 56)')!;
-        r.mainGlyphColor = module.model.Color.fromJson('rgb(255,255,255)')!;
-        r.secondaryGlyphColor = module.model.Color.fromJson('rgba(255,255,255,0.4)')!;
-        r.scoreInfoColor = module.model.Color.fromJson('rgb(255,255,255)')!;
+    if (theme === 'dark') {
+        r.staffLineColor = color('rgb(90, 90, 90)');
+        r.barSeparatorColor = color('rgb(221, 221, 238)');
+        r.barNumberColor = color('rgb(225, 50, 56)');
+        r.mainGlyphColor = color('rgb(255,255,255)');
+        r.secondaryGlyphColor = color('rgba(255,255,255,0.4)');
+        r.scoreInfoColor = color('rgb(255,255,255)');
     } else {
         r.staffLineColor = defaults.staffLineColor;
         r.barSeparatorColor = defaults.barSeparatorColor;
@@ -78,7 +65,8 @@ function applyThemeColors(module: AlphaTabModule, settings: Settings, colorMode:
     }
 }
 
-function applyFontFamily(settings: Settings): void {
+/** Sets the text fonts of the score to Noto Sans and Noto Serif, which the host must load. */
+export function applyNotoFonts(settings: Settings): void {
     const r = settings.display.resources;
     r.copyrightFont.families = ['Noto Sans'];
     r.titleFont.families = ['Noto Serif'];

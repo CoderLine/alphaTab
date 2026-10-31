@@ -1,6 +1,5 @@
-import { useSyncExternalStore } from 'react';
 import { fetchWithProgress } from './fetch-with-progress';
-import { SOUNDFONTS, findSoundFont, type SoundFontEntry, type SoundFontId } from './soundfont-registry';
+import type { SoundFontEntry, SoundFontId } from './soundfont-entry';
 
 /**
  * - `available`: not downloaded on this device
@@ -20,44 +19,77 @@ export interface SoundFontState {
 
 export type SoundFontLibrarySnapshot = Readonly<Record<SoundFontId, SoundFontState>>;
 
-const CACHE_NAME = 'alphatab-soundfonts-v1';
+/**
+ * Supplies SoundFont bytes to the players of a host and reports the state of each SoundFont.
+ * `subscribe`, `getSnapshot` and `getServerSnapshot` follow the `useSyncExternalStore` contract and
+ * are called without `this`.
+ */
+export interface SoundFontProvider {
+    /** The SoundFonts users can pick from, in display order; never empty. */
+    readonly entries: readonly SoundFontEntry[];
+    /** The entry of `id`, or the default entry for unknown ids. */
+    find(id: SoundFontId | null | undefined): SoundFontEntry;
+    /** Resolves to the bytes of the SoundFont; rejects when it cannot be obtained. */
+    load(id: SoundFontId): Promise<Uint8Array>;
+    /** Whether `load(id)` resolves without cache or network access. */
+    isInMemory(id: SoundFontId): boolean;
+    /** Removes every persisted SoundFont. Bytes already handed out stay valid. */
+    clearStored(): Promise<void>;
+    subscribe(listener: () => void): () => void;
+    getSnapshot(): SoundFontLibrarySnapshot;
+    getServerSnapshot(): SoundFontLibrarySnapshot;
+}
+
+export interface SoundFontLibraryOptions {
+    /** The SoundFonts of the host; the first one is the default unless `defaultId` names another. */
+    entries: readonly SoundFontEntry[];
+    defaultId?: SoundFontId;
+    /** Name of the Cache Storage cache the downloads persist in; `null` keeps them in memory only. */
+    cacheName?: string | null;
+}
 
 function absoluteUrl(url: string): string {
     return new URL(url, window.location.href).href;
 }
 
-async function openCache(): Promise<Cache | null> {
-    if (typeof caches === 'undefined') { return null; }
-    try {
-        return await caches.open(CACHE_NAME);
-    } catch {
-        return null;
-    }
-}
-
-function initialSnapshot(): SoundFontLibrarySnapshot {
+function initialSnapshot(entries: readonly SoundFontEntry[]): SoundFontLibrarySnapshot {
     const snapshot: Record<SoundFontId, SoundFontState> = {};
-    for (const entry of SOUNDFONTS) {
+    for (const entry of entries) {
         snapshot[entry.id] = { status: 'available', loaded: 0, total: entry.sizeBytes };
     }
     return snapshot;
 }
 
-const serverSnapshot = initialSnapshot();
-
 /**
- * Site-wide owner of SoundFont downloads and their persistence. Knows nothing
- * about players: it hands out bytes and reports per-SoundFont status.
- *
- * Bytes stay in memory for the most recently loaded SoundFont only; anything
- * else is re-read from Cache Storage on demand.
+ * The default {@link SoundFontProvider}: downloads SoundFonts on demand and persists them in Cache
+ * Storage. Bytes stay in memory for the most recently loaded SoundFont only; anything else is
+ * re-read from the cache on demand.
  */
-class SoundFontLibrary {
-    private snapshot: SoundFontLibrarySnapshot = initialSnapshot();
+export class SoundFontLibrary implements SoundFontProvider {
+    readonly entries: readonly SoundFontEntry[];
+    private readonly defaultEntry: SoundFontEntry;
+    private readonly cacheName: string | null;
+    private readonly serverSnapshot: SoundFontLibrarySnapshot;
+    private snapshot: SoundFontLibrarySnapshot;
     private readonly listeners = new Set<() => void>();
     private readonly inMemory = new Map<SoundFontId, Promise<Uint8Array>>();
     private readonly resolved = new Set<SoundFontId>();
     private probed = false;
+
+    constructor(options: SoundFontLibraryOptions) {
+        if (options.entries.length === 0) {
+            throw new Error('A SoundFont library needs at least one entry');
+        }
+        this.entries = options.entries;
+        this.defaultEntry = options.entries.find(e => e.id === options.defaultId) ?? options.entries[0];
+        this.cacheName = options.cacheName === undefined ? 'alphatab-soundfonts-v1' : options.cacheName;
+        this.serverSnapshot = initialSnapshot(options.entries);
+        this.snapshot = this.serverSnapshot;
+    }
+
+    find(id: SoundFontId | null | undefined): SoundFontEntry {
+        return this.entries.find(e => e.id === id) ?? this.defaultEntry;
+    }
 
     readonly subscribe = (listener: () => void): (() => void) => {
         this.listeners.add(listener);
@@ -68,11 +100,11 @@ class SoundFontLibrary {
     };
 
     readonly getSnapshot = (): SoundFontLibrarySnapshot => this.snapshot;
-    readonly getServerSnapshot = (): SoundFontLibrarySnapshot => serverSnapshot;
+    readonly getServerSnapshot = (): SoundFontLibrarySnapshot => this.serverSnapshot;
 
     /** Bytes of the SoundFont, from memory, the persistent cache, or the network (in that order). */
     load(id: SoundFontId): Promise<Uint8Array> {
-        const entry = findSoundFont(id);
+        const entry = this.find(id);
         let pending = this.inMemory.get(entry.id);
         if (!pending) {
             pending = this.loadUncached(entry);
@@ -90,14 +122,14 @@ class SoundFontLibrary {
 
     /** Whether the bytes are already held in memory, so `load(id)` needs no cache or network access. */
     isInMemory(id: SoundFontId): boolean {
-        return this.resolved.has(findSoundFont(id).id);
+        return this.resolved.has(this.find(id).id);
     }
 
     /** Removes every persisted SoundFont. Bytes already handed to players are unaffected. */
     async clearStored(): Promise<void> {
-        if (typeof caches !== 'undefined') {
+        if (this.cacheName !== null && typeof caches !== 'undefined') {
             try {
-                await caches.delete(CACHE_NAME);
+                await caches.delete(this.cacheName);
             } catch {
                 // Nothing persisted that we could remove.
             }
@@ -114,7 +146,7 @@ class SoundFontLibrary {
     }
 
     private async loadUncached(entry: SoundFontEntry): Promise<Uint8Array> {
-        const cache = await openCache();
+        const cache = await this.openCache();
         const key = absoluteUrl(entry.url);
         if (cache) {
             try {
@@ -191,10 +223,10 @@ class SoundFontLibrary {
         if (this.probed || typeof window === 'undefined') { return; }
         this.probed = true;
         void (async () => {
-            const cache = await openCache();
+            const cache = await this.openCache();
             if (!cache) { return; }
             try {
-                const registered = new Map(SOUNDFONTS.map((s) => [absoluteUrl(s.url), s]));
+                const registered = new Map(this.entries.map((s) => [absoluteUrl(s.url), s]));
                 for (const request of await cache.keys()) {
                     const entry = registered.get(request.url);
                     if (!entry) {
@@ -209,6 +241,17 @@ class SoundFontLibrary {
         })();
     }
 
+    private async openCache(): Promise<Cache | null> {
+        if (this.cacheName === null || typeof caches === 'undefined') {
+            return null;
+        }
+        try {
+            return await caches.open(this.cacheName);
+        } catch {
+            return null;
+        }
+    }
+
     private setState(id: SoundFontId, state: SoundFontState): void {
         this.snapshot = { ...this.snapshot, [id]: state };
         this.emit();
@@ -217,14 +260,4 @@ class SoundFontLibrary {
     private emit(): void {
         for (const listener of this.listeners) { listener(); }
     }
-}
-
-export const soundFontLibrary = new SoundFontLibrary();
-
-export function useSoundFontLibrary(): SoundFontLibrarySnapshot {
-    return useSyncExternalStore(
-        soundFontLibrary.subscribe,
-        soundFontLibrary.getSnapshot,
-        soundFontLibrary.getServerSnapshot,
-    );
 }

@@ -1,28 +1,28 @@
 import { useCallback, useEffect, useState } from 'react';
-
-function read<T>(key: string, fallback: T): T {
-    try {
-        const raw = window.localStorage.getItem(key);
-        return raw === null ? fallback : (JSON.parse(raw) as T);
-    } catch {
-        return fallback;
-    }
-}
+import { useUiEnvironment } from '../environment';
 
 /**
- * `useState` mirrored to `localStorage` under `key`. Falls back to in-memory state when storage is
- * unavailable (private windows, blocked site data). Browser-only: the Playground never renders on the server.
+ * `useState` mirrored as JSON to the environment's `PreferencesStorage` under `key`. Values
+ * that cannot be read back fall back to `fallback`. Reads storage on the first render, so render it
+ * in the browser only.
  */
 export function usePersistedState<T>(key: string, fallback: T): [T, (next: T | ((prev: T) => T)) => void] {
-    const [value, setValue] = useState<T>(() => read(key, fallback));
+    const { storage } = useUiEnvironment();
+    const [value, setValue] = useState<T>(() => {
+        const raw = storage.getItem(key);
+        if (raw === null) {
+            return fallback;
+        }
+        try {
+            return JSON.parse(raw) as T;
+        } catch {
+            return fallback;
+        }
+    });
 
     useEffect(() => {
-        try {
-            window.localStorage.setItem(key, JSON.stringify(value));
-        } catch {
-            // Storage full or blocked; the in-memory value still works for this visit.
-        }
-    }, [key, value]);
+        storage.setItem(key, JSON.stringify(value));
+    }, [storage, key, value]);
 
     const set = useCallback((next: T | ((prev: T) => T)) => setValue(next), []);
     return [value, set];

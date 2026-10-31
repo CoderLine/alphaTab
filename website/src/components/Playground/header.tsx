@@ -1,32 +1,23 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    usePlayerControls,
     usePlayerSelector,
+    ExportMenu,
     IconCheck,
-    IconClose,
     IconChevronDown,
     IconCode,
-    IconDownload,
-    IconFileMusic,
     IconLink,
-    IconPrinter,
     IconSliders,
     IconTracks,
     IconUpload,
     IconWaveform,
-    exportWav,
-    downloadBytes,
-    withExtension,
     IconButton,
     Menu,
     MenuItem,
     MenuLabel,
+    type ScoreDocument,
 } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
 import { isIOS } from '@site/src/utils';
 import { PLAYGROUND_SAMPLES, type PlaygroundSample } from './sources';
-import type { PlaygroundDocument } from './use-playground-document';
 import styles from './playground.module.scss';
 
 export type PanelId = 'editor' | 'tracks' | 'settings' | 'sync';
@@ -38,7 +29,7 @@ const FILE_ACCEPT = [
 ].join(',');
 
 interface PlaygroundHeaderProps {
-    document: PlaygroundDocument | null;
+    document: ScoreDocument | null;
     panels: Record<PanelId, boolean>;
     onTogglePanel: (panel: PanelId) => void;
     onOpenSample: (sample: PlaygroundSample) => void;
@@ -153,13 +144,13 @@ export const PlaygroundHeader: React.FC<PlaygroundHeaderProps> = ({
                     <IconUpload size={14} aria-hidden="true" />
                 </IconButton>
                 <ShareButton buildShareUrl={buildShareUrl} document={document} />
-                <ExportMenu document={document} />
+                <ExportMenu fileName={document?.fileName} />
             </div>
         </header>
     );
 };
 
-const ShareButton: React.FC<{ document: PlaygroundDocument | null; buildShareUrl: () => Promise<string | null> }> = ({
+const ShareButton: React.FC<{ document: ScoreDocument | null; buildShareUrl: () => Promise<string | null> }> = ({
     document,
     buildShareUrl,
 }) => {
@@ -196,131 +187,5 @@ const ShareButton: React.FC<{ document: PlaygroundDocument | null; buildShareUrl
         >
             {copied ? <IconCheck size={13} aria-hidden="true" /> : <IconLink size={13} aria-hidden="true" />}
         </IconButton>
-    );
-};
-
-const ExportMenu: React.FC<{ document: PlaygroundDocument | null }> = ({ document }) => {
-    const api = useAlphaTabApi();
-    const module = useAlphaTabModule();
-    const store = usePlayerControls();
-    const currentScore = usePlayerSelector((s) => s.currentScore);
-    const fileName = document?.fileName ?? 'score';
-    const disabled = !api || !module || !currentScore;
-    const [audioProgress, setAudioProgress] = useState<number | null>(null);
-    const abortRef = useRef<AbortController | null>(null);
-    useEffect(() => () => abortRef.current?.abort(), []);
-
-    const exportAudio = async () => {
-        if (!api || !module || !store) { return; }
-        const abort = new AbortController();
-        abortRef.current = abort;
-        setAudioProgress(0);
-        try {
-            const wav = await exportWav(api, module, store.getSnapshot(), setAudioProgress, abort.signal);
-            downloadBytes(withExtension(fileName, 'wav'), wav, 'audio/wav');
-        } catch (e) {
-            if (!abort.signal.aborted) { console.error('[Playground] Audio export failed', e); }
-        } finally {
-            if (abortRef.current === abort) { abortRef.current = null; }
-            setAudioProgress(null);
-        }
-    };
-
-    const midi = (format: number) => api!.downloadMidi(format);
-
-    return (
-        <>
-            {audioProgress !== null && (
-                <IconButton
-                    label="Cancel the audio export"
-                    text={`Audio ${Math.round(audioProgress * 100)}%`}
-                    variant="outline"
-                    onClick={() => abortRef.current?.abort()}
-                >
-                    <IconClose size={10} aria-hidden="true" />
-                </IconButton>
-            )}
-            <Menu
-                align="end"
-                trigger={(props) => (
-                    <IconButton label="Export" text="Export" variant="primary" disabled={disabled} {...props}>
-                        <IconDownload size={14} aria-hidden="true" />
-                    </IconButton>
-                )}
-            >
-                {(close) => (
-                    <>
-                        <MenuLabel>Score</MenuLabel>
-                        <MenuItem
-                            icon={<IconFileMusic size={13} />}
-                            detail=".gp"
-                            title="Guitar Pro 7+, including the backing track and sync points"
-                            onSelect={() => {
-                                close();
-                                const bytes = new module!.exporter.Gp7Exporter().export(api!.score!, api!.settings);
-                                downloadBytes(withExtension(fileName, 'gp'), bytes);
-                            }}
-                        >
-                            Guitar Pro
-                        </MenuItem>
-                        <MenuItem
-                            icon={<IconCode size={13} />}
-                            detail=".alphatex"
-                            onSelect={() => {
-                                close();
-                                const tex = new module!.exporter.AlphaTexExporter().exportToString(api!.score!, api!.settings);
-                                downloadBytes(withExtension(fileName, 'alphatex'), tex, 'text/plain');
-                            }}
-                        >
-                            alphaTex
-                        </MenuItem>
-                        <MenuItem
-                            icon={<IconPrinter size={13} />}
-                            onSelect={() => {
-                                close();
-                                api!.print();
-                            }}
-                        >
-                            Print…
-                        </MenuItem>
-                        <MenuLabel>Audio</MenuLabel>
-                        <MenuItem
-                            icon={<IconWaveform size={12} />}
-                            detail=".wav"
-                            disabled={audioProgress !== null}
-                            title="Renders the synthesizer with the current mix, metronome and playback range"
-                            onSelect={() => {
-                                close();
-                                void exportAudio();
-                            }}
-                        >
-                            Audio
-                        </MenuItem>
-                        <MenuItem
-                            icon={<IconWaveform size={12} />}
-                            detail=".mid"
-                            title="One MIDI track with a channel per instrument"
-                            onSelect={() => {
-                                close();
-                                midi(module!.midi.MidiFileFormat.SingleTrackMultiChannel);
-                            }}
-                        >
-                            MIDI
-                        </MenuItem>
-                        <MenuItem
-                            icon={<IconWaveform size={12} />}
-                            detail=".mid"
-                            title="One MIDI track per instrument"
-                            onSelect={() => {
-                                close();
-                                midi(module!.midi.MidiFileFormat.MultiTrack);
-                            }}
-                        >
-                            MIDI, track per instrument
-                        </MenuItem>
-                    </>
-                )}
-            </Menu>
-        </>
     );
 };

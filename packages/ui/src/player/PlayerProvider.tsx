@@ -1,34 +1,30 @@
+import type * as alphaTab from '@coderline/alphatab';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabElements } from '@coderline/alphatab-react';
 import {
     createContext,
+    type ReactNode,
     useCallback,
     useContext,
     useEffect,
     useRef,
     useState,
-    useSyncExternalStore,
-    type ReactNode,
+    useSyncExternalStore
 } from 'react';
-import * as alphaTab from '@coderline/alphatab';
-import {
-    AlphaTabHost,
-    AlphaTabProvider,
-    useAlphaTabApi,
-    useAlphaTabElements,
-} from '@coderline/alphatab-react';
-import { useColorMode } from '@docusaurus/theme-common';
-import { applyAlphaTabSettings, applyPlayerDefaults, type AlphaTabPreset } from '../state/settings';
-import { PlayerStore, initialPlayerStoreState, type PlayerStoreState } from '../state/store';
-import { SelectionHandles } from './controls/selection-handles';
+import { type UiEnvironment, useUiEnvironment } from '../environment';
+import type { ScoreSource } from '../state/playback/score-source';
+import { applyBaseSettings, type BaseSettingsOptions, type ScoreFonts } from '../state/settings';
 import { registerForSpacebar } from '../state/spacebar-playback';
+import { initialPlayerStoreState, PlayerStore, type PlayerStoreState } from '../state/store';
+import { SelectionHandles } from './controls/selection-handles';
 
 // Split so that components using only the store do not re-render on every state change.
-const AlphaTabStoreContext = createContext<PlayerStore | null | undefined>(undefined);
-const AlphaTabStateContext = createContext<PlayerStoreState>(initialPlayerStoreState);
+const PlayerStoreContext = createContext<PlayerStore | null | undefined>(undefined);
+const PlayerStateContext = createContext<PlayerStoreState>(initialPlayerStoreState);
 
-function useAlphaTabStoreContext(): PlayerStore | null {
-    const store = useContext(AlphaTabStoreContext);
+function usePlayerStoreContext(caller: string): PlayerStore | null {
+    const store = useContext(PlayerStoreContext);
     if (store === undefined) {
-        throw new Error('useAlphaTab* hooks must be used inside <PlayerProvider>');
+        throw new Error(`${caller} must be used inside <PlayerProvider>`);
     }
     return store;
 }
@@ -37,71 +33,122 @@ const noopSubscribe = () => () => {};
 const noopSnapshot = () => initialPlayerStoreState;
 
 export interface PlayerProviderProps {
-    /** URL of a `.gp`/`.gp5`/`.gpx`/`.musicxml`/`.capx` to load on mount. */
+    /** URL of a file in any format alphaTab imports. Changing it loads the new file. Takes precedence over `tex`. */
     file?: string;
-    /** Inline alphaTex source to load on mount. Mutually exclusive with `file`. */
+    /** alphaTex source. Changing it loads the new source. */
     tex?: string;
-    /** Initial track selection. `'all'` shows every track. */
+    /** Tracks rendered by the initial score; `'all'` shows every track. */
     tracks?: number[] | 'all';
     /**
-     * Extra alphaTab settings deep-merged over the preset defaults at
-     * construction time. Changes at runtime are applied via
-     * `settings.fillFromJson` + `updateSettings()` + `render()`.
+     * alphaTab settings merged over the base settings. Changes are applied to the living API with
+     * `settings.fillFromJson`, `updateSettings()` and `render()`.
      */
     settings?: alphaTab.json.SettingsJson;
     /**
-     * Enable the synth player. Defaults to `true`. Pages that only need a
-     * static render (layout demos, notation catalogues) can pass `false` to
-     * skip the audio-worklet setup and the SoundFont fetch.
+     * Enables playback, `true` by default. `false` keeps the player disabled, for pages that only
+     * render, which skips the audio setup and the SoundFont download.
      */
     player?: boolean;
+    /** The text fonts of the score; `noto` expects the host to load Noto Sans and Noto Serif. */
+    fonts?: ScoreFonts;
     /**
-     * Which opinionated defaults to apply. `docs` (default) is a neutral
-     * baseline for the docs site; `landing` layers the marketing chrome on.
-     */
-    settingsPreset?: AlphaTabPreset;
-    /**
-     * The page loads SoundFonts itself (e.g. SoundFont API demos), so the
-     * site-wide SoundFont preference is not applied. Implied when `settings`
-     * sets `player.soundFont`.
+     * The instance loads its own SoundFont, so the environment's SoundFont preference does not
+     * apply. Implied when `settings` sets `player.soundFont` or the environment has no SoundFont provider.
      */
     ownSoundFont?: boolean;
     children: ReactNode;
 }
 
+interface LatestProps {
+    env: UiEnvironment;
+    settings: alphaTab.json.SettingsJson | undefined;
+    player: boolean;
+    fonts: ScoreFonts;
+    ownSoundFont: boolean;
+    file: string | undefined;
+    tex: string | undefined;
+    tracks: number[] | 'all' | undefined;
+}
+
+function ownsSoundFont(p: LatestProps): boolean {
+    return p.ownSoundFont || !!p.settings?.player?.soundFont || !p.env.soundFonts;
+}
+
+function baseOptions(p: LatestProps): BaseSettingsOptions {
+    return {
+        theme: p.env.theme,
+        fonts: p.fonts,
+        fontDirectory: p.env.fontDirectory,
+        suppliedSoundFont: !ownsSoundFont(p),
+        layer: p.env.settingsLayer
+    };
+}
+
+function sourceOf(file: string | undefined, tex: string | undefined): ScoreSource | null {
+    return file ? { url: file } : tex ? { tex } : null;
+}
+
+function load(store: PlayerStore, source: ScoreSource, tracks: number[] | 'all' | undefined): void {
+    if (source.tex !== undefined) {
+        const result = store.loadTex(source.tex, { tracks });
+        if (!result.rendered) {
+            console.error('[alphaTab-ui] The alphaTex has errors', result.diagnostics);
+        }
+        return;
+    }
+    store.loadSource(source, { tracks }).catch((e: unknown) => {
+        console.error('[alphaTab-ui] Failed to load the score', e);
+    });
+}
+
+/**
+ * Creates an alphaTab API and its {@link PlayerStore} for the {@link PlayerHost} below it and
+ * provides both to its subtree, see {@link usePlayerState} and {@link usePlayerControls}. Settings
+ * come from the {@link UiEnvironment}, the `fonts` choice and the `settings` patch; scores load
+ * through the store. Changing `player`, `fonts` or `ownSoundFont` recreates the API.
+ */
 export function PlayerProvider({
     file,
     tex,
     tracks,
     settings,
     player = true,
-    settingsPreset = 'docs',
+    fonts = 'default',
     ownSoundFont = false,
-    children,
+    children
 }: PlayerProviderProps) {
+    const env = useUiEnvironment();
     const [store, setStore] = useState<PlayerStore | null>(null);
-    const { colorMode } = useColorMode();
 
-    // The provider calls these once per API instance with the props of the preceding render.
-    const latest = useRef({ colorMode, settings, player, settingsPreset, ownSoundFont });
-    latest.current = { colorMode, settings, player, settingsPreset, ownSoundFont };
+    // The API is created with the props of the render that precedes it.
+    const latest = useRef<LatestProps>({ env, settings, player, fonts, ownSoundFont, file, tex, tracks });
+    latest.current = { env, settings, player, fonts, ownSoundFont, file, tex, tracks };
+    const loaded = useRef<{ file?: string; tex?: string }>({});
 
     const configureSettings = useCallback((s: alphaTab.Settings) => {
-        applyAlphaTabSettings(alphaTab, s, {
-            colorMode: latest.current.colorMode,
-            preset: latest.current.settingsPreset,
-        });
-        applyPlayerDefaults(alphaTab, s);
+        applyBaseSettings(s, baseOptions(latest.current));
     }, []);
 
     const onApi = useCallback((api: alphaTab.AlphaTabApi) => {
         const current = latest.current;
         const playerSettings = current.settings?.player;
-        const created = new PlayerStore(api, alphaTab, current.colorMode, current.settingsPreset, {
-            fixedSource: !current.player || playerSettings?.playerMode !== undefined,
-            ownSoundFont: current.ownSoundFont || !!playerSettings?.soundFont,
+        const created = new PlayerStore(api, {
+            base: baseOptions(current),
+            playback: {
+                fixedSource: !current.player || playerSettings?.playerMode !== undefined,
+                ownSoundFont: ownsSoundFont(current),
+                soundFonts: current.env.soundFonts,
+                preferences: current.env.playbackPreferences
+            }
         });
-        if (playerSettings?.scrollMode !== undefined) { created.setScrollDuringPlayback(false); }
+        if (playerSettings?.scrollMode !== undefined) {
+            created.setScrollDuringPlayback(false);
+        }
+        loaded.current = { file: current.file, tex: current.tex };
+        const source = sourceOf(current.file, current.tex);
+        if (source) {
+            load(created, source, current.tracks);
+        }
         setStore(created);
         return () => {
             created.destroy();
@@ -110,66 +157,55 @@ export function PlayerProvider({
     }, []);
 
     useEffect(() => {
-        if (store) { store.applyColorMode(colorMode); }
-    }, [store, colorMode]);
+        store?.setTheme(env.theme);
+    }, [store, env.theme]);
 
-    // Runtime file/tex switches after mount.
-    const initialFile = useRef(file);
-    const initialTex = useRef(tex);
     useEffect(() => {
-        if (!store) { return; }
-        if (file !== initialFile.current) {
-            initialFile.current = file;
-            if (file) {
-                void store.loadScoreFromUrl(file);
-            }
-        }
-    }, [store, file]);
+        store?.setBaseLayer(env.settingsLayer);
+    }, [store, env.settingsLayer]);
+
     useEffect(() => {
-        if (!store) { return; }
-        if (tex !== initialTex.current) {
-            initialTex.current = tex;
-            if (tex) {
-                store.loadScoreFromTex(tex);
-            }
+        if (!store || (file === loaded.current.file && tex === loaded.current.tex)) {
+            return;
         }
-    }, [store, tex]);
+        loaded.current = { file, tex };
+        const source = sourceOf(file, tex);
+        if (source) {
+            load(store, source, latest.current.tracks);
+        }
+    }, [store, file, tex]);
 
     const state = useSyncExternalStore(
         store ? store.subscribe : noopSubscribe,
         store ? store.getSnapshot : noopSnapshot,
-        noopSnapshot,
+        noopSnapshot
     );
 
     return (
         <AlphaTabProvider
             // These props shape the store and the playback source, which are bound to one API instance.
-            key={`${player}:${settingsPreset}:${ownSoundFont}`}
+            key={`${player}:${fonts}:${ownSoundFont}`}
             configureSettings={configureSettings}
             settings={settings}
-            file={file}
-            tex={file || !tex ? undefined : tex}
-            tracks={tracks}
-            onApi={onApi}
-        >
-            <AlphaTabStoreContext.Provider value={store}>
-                <AlphaTabStateContext.Provider value={state}>
+            onApi={onApi}>
+            <PlayerStoreContext.Provider value={store}>
+                <PlayerStateContext.Provider value={state}>
                     <SpacebarPlayback />
                     {children}
-                </AlphaTabStateContext.Provider>
-            </AlphaTabStoreContext.Provider>
+                </PlayerStateContext.Provider>
+            </PlayerStoreContext.Provider>
         </AlphaTabProvider>
     );
 }
 
-// Temporary: register with the global spacebar-playPause coordinator so
-// authors can audibly step through demos without one focus target per
-// player. Uses the scroll element as the "container" for visibility scoring.
+// Spacebar toggles the most visible player, so pages with many players need no focus target per player.
 function SpacebarPlayback() {
     const api = useAlphaTabApi();
     const { scrollElement } = useAlphaTabElements();
     useEffect(() => {
-        if (!api || !scrollElement) { return; }
+        if (!api || !scrollElement) {
+            return;
+        }
         return registerForSpacebar(scrollElement, api);
     }, [api, scrollElement]);
     return null;
@@ -181,12 +217,13 @@ function SelectionHandlesOverlay() {
     return <SelectionHandles api={api ?? undefined} mountElement={mountElement} />;
 }
 
-interface PlayerHostProps {
+export interface PlayerHostProps {
     className?: string;
-    /** When true, wraps the score in draggable start/end selection handles. */
+    /** Draggable start and end handles on the selected playback range. */
     withSelectionHandles?: boolean;
 }
 
+/** The element the score of the surrounding {@link PlayerProvider} renders into. */
 export function PlayerHost({ className, withSelectionHandles = false }: PlayerHostProps) {
     return (
         <AlphaTabHost
@@ -197,17 +234,12 @@ export function PlayerHost({ className, withSelectionHandles = false }: PlayerHo
 }
 
 export interface PlayerScoreProps extends Omit<PlayerProviderProps, 'children'> {
-    /** Class name forwarded to the canvas wrapper. */
+    /** Class of the host element. */
     className?: string;
-    /** Show the draggable selection handles used for range selection. */
     withSelectionHandles?: boolean;
 }
 
-/**
- * One-shot convenience: mounts `<PlayerProvider>` + `<PlayerHost>`
- * in a single JSX line. Ideal for MDX pages that only need a rendered
- * score with no chrome.
- */
+/** A {@link PlayerProvider} with its {@link PlayerHost} and no controls. */
 export function PlayerScore({ className, withSelectionHandles, ...playerProps }: PlayerScoreProps) {
     return (
         <PlayerProvider {...playerProps}>
@@ -218,8 +250,8 @@ export function PlayerScore({ className, withSelectionHandles, ...playerProps }:
 
 /** The full player state; the component re-renders on every change, including playback position updates. */
 export function usePlayerState(): PlayerStoreState {
-    useAlphaTabStoreContext();
-    return useContext(AlphaTabStateContext);
+    usePlayerStoreContext('usePlayerState');
+    return useContext(PlayerStateContext);
 }
 
 /**
@@ -227,16 +259,17 @@ export function usePlayerState(): PlayerStoreState {
  * (compared with `Object.is`). The selector must return stable references, e.g. `(s) => s.view`.
  */
 export function usePlayerSelector<T>(selector: (state: PlayerStoreState) => T): T {
-    const store = useAlphaTabStoreContext();
+    const store = usePlayerStoreContext('usePlayerSelector');
     const selectorRef = useRef(selector);
     selectorRef.current = selector;
     const getSnapshot = useCallback(
         () => selectorRef.current(store ? store.getSnapshot() : initialPlayerStoreState),
-        [store],
+        [store]
     );
     return useSyncExternalStore(store ? store.subscribe : noopSubscribe, getSnapshot, getSnapshot);
 }
 
+/** The store of the surrounding {@link PlayerProvider}; `null` until its API exists. */
 export function usePlayerControls(): PlayerStore | null {
-    return useAlphaTabStoreContext();
+    return usePlayerStoreContext('usePlayerControls');
 }

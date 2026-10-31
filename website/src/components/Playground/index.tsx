@@ -9,7 +9,8 @@ import {
     useMediaQuery,
     TexEditorPane,
     SettingsPanel,
-    usePlaygroundSettings,
+    useSchemaSettings,
+    useScoreDocument,
     TrackPanel,
     Transport,
     ResizeHandle,
@@ -19,9 +20,9 @@ import {
 import { PlaygroundHeader, type PanelId } from './header';
 import { MediaSyncPanel } from './media-sync/media-sync-panel';
 import { MediaSyncProvider, useMediaSync } from './media-sync/media-sync-context';
-import { MusicFontProvider } from './music-font';
+import { MusicFontProvider, MusicFontSetting } from './music-font';
 import { YouTubeDock } from './media-sync/youtube-dock';
-import { usePlaygroundDocument } from './use-playground-document';
+import { PLAYGROUND_DOCUMENTS } from './sources';
 import styles from './playground.module.scss';
 
 const SIDE_PANELS: PanelId[] = ['editor', 'tracks', 'settings'];
@@ -42,19 +43,19 @@ const DEFAULT_LAYOUT: Layout = {
 export const Playground: React.FC = () => (
     <MusicFontProvider>
         {(font) => (
-            <PlayerProvider key={font.key} settingsPreset="landing" settings={font.settings}>
+            <PlayerProvider key={font.key} fonts="noto">
                 <MediaSyncProvider>
-                    <PlaygroundApp />
+                    <PlaygroundApp musicFont={<MusicFontSetting musicFont={font.musicFont} setMusicFont={font.setMusicFont} />} />
                 </MediaSyncProvider>
             </PlayerProvider>
         )}
     </MusicFontProvider>
 );
 
-const PlaygroundApp: React.FC = () => {
-    const doc = usePlaygroundDocument();
+const PlaygroundApp: React.FC<{ musicFont: React.ReactNode }> = ({ musicFont }) => {
+    const doc = useScoreDocument(PLAYGROUND_DOCUMENTS);
     const hasScore = usePlayerSelector((s) => s.currentScore !== null);
-    const settings = usePlaygroundSettings(doc.reload);
+    const settings = useSchemaSettings({ onReload: doc.reload });
     const { resetDocument } = useMediaSync();
     const isPhone = useMediaQuery(PHONE_QUERY);
     const [layout, setLayout] = usePersistedState<Layout>('alphatab.playground-layout.v1', DEFAULT_LAYOUT);
@@ -161,7 +162,7 @@ const PlaygroundApp: React.FC = () => {
 
                 {panels.settings && (
                     <aside className={clsx(styles.side, styles.settingsSide)}>
-                        <SettingsPanel settings={settings} onClose={() => closePanel('settings')} />
+                        <SettingsPanel settings={settings} onClose={() => closePanel('settings')} quickExtras={musicFont} />
                     </aside>
                 )}
 

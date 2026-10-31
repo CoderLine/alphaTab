@@ -9,6 +9,7 @@ import {
   PlayerHost,
   usePlayerControls,
   usePlayerState,
+  formatTime,
   type PlayerProviderProps,
 } from '@coderline/alphatab-ui';
 import styles from './styles.module.scss';
@@ -27,17 +28,10 @@ export interface TransportControlsProps {
   /**
    * Additional consumer components rendered inside the alphaTab provider,
    * between the transport bar and the score. Use hooks from
-   * `@site/src/alphatab-react` to react to state.
+   * `@coderline/alphatab-ui` to react to state.
    */
   children?: React.ReactNode;
 }
-
-const formatDuration = (ms: number) => {
-  const s = Math.max(0, Math.floor(ms / 1000));
-  const minutes = Math.floor(s / 60);
-  const seconds = s % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
 
 /**
  * Standalone transport strip — Play/Pause, Stop, time readout, progress bar.
@@ -73,7 +67,7 @@ export const TransportBar: React.FC = () => {
         </button>
       </div>
       <div className={styles.timeReadout}>
-        {formatDuration(currentTime)} / {formatDuration(safeEnd)}
+        {formatTime(currentTime)} / {formatTime(safeEnd)}
       </div>
       <div className={styles.progressTrack}>
         <div className={styles.progressFill} style={{ width: `${progress.toFixed(2)}%` }} />
