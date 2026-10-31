@@ -48,11 +48,10 @@ export const DEMO_FILES: DemoFile[] = [
         source: { tex: Riffs.BACH_PRELUDE_C_LONG },
     },
     {
-        id: 'drums',
-        label: 'etude.capx',
+        id: 'twinkle',
+        label: 'twinkle.capx',
         ext: 'capx',
         trackColor: 'var(--at-track-orange)',
-        // TODO: swap with a real /files/landing/etude.capx when staged.
-        source: { url: '/files/features/Drums.gp5' },
+        source: { url: '/files/twinkle-mozart.capx' },
     },
 ];
