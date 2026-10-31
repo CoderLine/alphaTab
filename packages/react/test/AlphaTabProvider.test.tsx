@@ -24,12 +24,18 @@ interface FakeApi {
     readonly id: number;
     readonly element: HTMLElement;
     readonly settings: FakeSettings;
+    /** The settings passed to the constructor, without `player.scrollElement`. */
     readonly initialSettings: unknown;
+    /** The mount element's text at construction. */
+    readonly initialText: string;
     destroyed: boolean;
-    score: object | null;
+    score: { tracks: unknown[] } | null;
     playerState: number;
+    readyForPlayback: boolean;
     readonly scoreLoaded: FakeEmitter;
+    readonly playerReady: FakeEmitter;
     readonly playerStateChanged: FakeEmitter;
+    readonly renderStarted: FakeEmitter;
     readonly updateSettings: ReturnType<typeof vi.fn>;
     readonly render: ReturnType<typeof vi.fn>;
 }
@@ -50,12 +56,23 @@ const fake = vi.hoisted(() => {
 });
 
 vi.mock('@coderline/alphatab', () => {
+    const noArg = Symbol('no argument');
+
+    /**
+     * Like alphaTab's emitters, `replay` yields what a new listener receives right away: `null` for
+     * nothing, `noArg` for a call without argument.
+     */
     class EventEmitter {
         public readonly listeners = new Set<(arg?: unknown) => void>();
         public onCalls = 0;
+        public constructor(private readonly _replay?: () => unknown) {}
         public on(listener: (arg?: unknown) => void) {
             this.onCalls++;
             this.listeners.add(listener);
+            const replayed = this._replay?.() ?? null;
+            if (replayed !== null) {
+                listener(replayed === noArg ? undefined : replayed);
+            }
             return () => {
                 this.listeners.delete(listener);
             };
@@ -72,7 +89,7 @@ vi.mock('@coderline/alphatab', () => {
 
     function merge(target: Record<string, unknown>, patch: Record<string, unknown>) {
         for (const [key, value] of Object.entries(patch)) {
-            if (value && typeof value === 'object' && !Array.isArray(value)) {
+            if (value && typeof value === 'object' && !Array.isArray(value) && !(value instanceof Map)) {
                 target[key] ??= {};
                 merge(target[key] as Record<string, unknown>, value as Record<string, unknown>);
             } else {
@@ -95,11 +112,20 @@ vi.mock('@coderline/alphatab', () => {
     class AlphaTabApi {
         public readonly id: number;
         public readonly initialSettings: unknown;
+        public readonly initialText: string;
         public destroyed = false;
-        public score: object | null = null;
+        public score: { tracks: unknown[] } | null = null;
         public playerState = 0;
-        public readonly scoreLoaded = new EventEmitter();
-        public readonly playerStateChanged = new EventEmitter();
+        public readyForPlayback = false;
+        public midiInfo: unknown = null;
+        public readonly scoreLoaded = new EventEmitter(() => this.score);
+        public readonly midiLoaded = new EventEmitter(() => this.midiInfo);
+        public readonly playerReady = new EventEmitter(() => (this.readyForPlayback ? noArg : null));
+        public readonly playerStateChanged = new EventEmitter(() => ({ state: this.playerState, stopped: false }));
+        public readonly playerPositionChanged = new EventEmitter(() => ({ currentTime: 0, endTime: 0 }));
+        public readonly renderStarted = new EventEmitter();
+        public readonly renderFinished = new EventEmitter();
+        public readonly error = new EventEmitter();
         public readonly updateSettings = vi.fn(() => fake.log.push(`updateSettings ${this.id}`));
         public readonly render = vi.fn(() => fake.log.push(`render ${this.id}`));
 
@@ -111,6 +137,7 @@ vi.mock('@coderline/alphatab', () => {
             this.initialSettings = JSON.parse(
                 JSON.stringify({ ...settings, player: { ...settings.player, scrollElement: undefined } })
             );
+            this.initialText = element.textContent ?? '';
             fake.apis.push(this as unknown as FakeApi);
             fake.log.push(`construct ${this.id}`);
         }
@@ -170,6 +197,8 @@ describe('AlphaTabProvider', () => {
             </Player>
         );
 
+        // The host's elements arrive after StrictMode's mount/unmount/mount cycle, so it creates one instance.
+        expect(fake.apis).toHaveLength(1);
         expect(liveApis()).toHaveLength(1);
         const live = liveApis()[0];
         expect(seen[seen.length - 1]).toBe(live);
@@ -232,14 +261,14 @@ describe('AlphaTabProvider', () => {
         render(<Player tex="\title Test ." />);
         const live = liveApis()[0];
         expect(live.settings.core.tex).toBe(true);
-        expect(live.element.textContent).toBe('\\title Test .');
+        expect(live.initialText).toBe('\\title Test .');
     });
 
     it('patches changed settings without recreating the API', async () => {
         const { rerender } = render(<Player settings={{ display: { scale: 1.5 } }} />);
         const live = liveApis()[0];
         const constructed = fake.apis.length;
-        live.score = {};
+        live.score = { tracks: [] };
 
         rerender(<Player settings={{ display: { scale: 1.5 } }} />);
         await nextFrame();
