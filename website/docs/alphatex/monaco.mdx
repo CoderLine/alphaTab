@@ -87,7 +87,7 @@ You can also create your own worker file in the project and start the language s
 
 ```ts title="lsp.worker.ts"
 // Variant 1
-import '@coderline/alphatab-monaco/dist/worker.mjs';
+import '@coderline/alphatab-monaco/worker';
 // Variant 2: 
 import { startWebWorkerLanguageServer } from '@coderline/alphatab-language-server/server/browser';
 
@@ -105,7 +105,7 @@ With the grammar registered and the editor created as shown above, connect the e
 by calling `basicEditorLspIntegration`. It provides diagnostics, completions, hovers and signature help for the editor's model.
 
 ```ts
-import { basicEditorLspIntegration } from '@coderline/alphatab-monaco/dist/lsp';
+import { basicEditorLspIntegration } from '@coderline/alphatab-monaco/lsp';
 
 const lspWorker = new Worker(new URL('./lsp.worker.ts', import.meta.url));
 await basicEditorLspIntegration(editor, lspWorker, { languageId: 'alphatex' });

@@ -29,7 +29,7 @@ import {
     monacoToLspContentChange,
     monacoToLspSignatureHelp,
     monacoToLspSignatureHelpTriggerKind,
-} from '@coderline/alphatab-monaco/dist/lspMonacoMappings';
+} from '@coderline/alphatab-monaco/lspMonacoMappings';
 import { ALPHATEX_LANGUAGE_ID, type MonacoApi } from './monaco-env';
 
 const MARKER_OWNER = 'alphatex-lsp';
