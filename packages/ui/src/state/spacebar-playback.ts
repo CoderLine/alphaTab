@@ -1,22 +1,14 @@
 import type * as alphaTab from '@coderline/alphatab';
 
 /**
- * Global spacebar-to-playPause coordinator.
+ * Space toggles play/pause of the most visible registered player, so a page with many
+ * players needs no focus target per player. One document-level `keydown` listener serves
+ * every registered player.
  *
- * Temporary QA convenience — pages that mount many `<AlphaTab>` demos would
- * otherwise need one focus target per demo to be keyboard-controllable. This
- * module keeps a live registry of every mounted alphaTab api + its container
- * element, and installs a single document-level `keydown` listener that
- * dispatches spacebar presses to whichever registered player is most visible
- * in the viewport.
- *
- * Behaviour:
- *   - Only spacebar (`code === 'Space'`) is intercepted.
- *   - Presses that originate inside an input / textarea / contenteditable
- *     element are ignored so authors can still type freely.
- *   - "Most visible" = the registered container whose intersection with the
- *     viewport has the largest area. If nothing is on-screen, the press is
- *     ignored (no scrolling hijack).
+ * - Only `code === 'Space'` without Ctrl, Meta or Alt is handled. Presses inside inputs,
+ *   textareas, selects, contenteditable or EditContext elements are left to the element.
+ * - "Most visible" is the registered container with the largest area inside the viewport.
+ *   When none is on screen, the press is not intercepted, so the page scrolls as usual.
  */
 
 interface Entry {
