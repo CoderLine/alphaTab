@@ -1,4 +1,3 @@
-import { DiagnosticSeverity } from '@coderline/alphatab-language-server/server/types';
 import * as monaco from 'monaco-editor';
 import {
     CompletionTriggerKind,
@@ -19,6 +18,7 @@ import type {
 import {
     CompletionItemKind,
     CompletionItemTag,
+    DiagnosticSeverity,
     InsertTextFormat,
     MarkedString,
     MarkupContent
