@@ -51,7 +51,10 @@ export {
     type TrackMix
 } from './state/store';
 
+export { CompactPlayer, type CompactPlayerProps } from './player/composites/CompactPlayer';
+export { PlayerView, type PlayerViewProps, type ResizablePanel } from './player/composites/PlayerView';
 export { ExportMenu, type ExportMenuProps } from './player/controls/export-menu';
+export { DropOverlay, RenderingOverlay } from './player/controls/overlays';
 export { Scrubber, type ScrubberProps } from './player/controls/scrubber';
 export { SelectionHandles } from './player/controls/selection-handles';
 export { SettingsFlyout, type SettingsFlyoutHandlers, type SettingsFlyoutState } from './player/controls/settings-flyout';
