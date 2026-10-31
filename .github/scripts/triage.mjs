@@ -176,6 +176,40 @@ function isDocsOnly(changedFiles) {
     );
 }
 
+// ── AI disclosure ────────────────────────────────────────────────────────
+
+// HTML comments (an unclosed one hides the rest of the body, as on GitHub).
+function withoutHtmlComments(body) {
+    return body.replace(/<!--[\s\S]*?(?:-->|$)/g, '');
+}
+
+/**
+ * Whether the body carries the disclosure token outside the places where the
+ * PR template itself mentions it: HTML comments and task-list items (with
+ * their indented continuation lines).
+ */
+export function hasDisclosureToken(body) {
+    const kept = [];
+    let inTaskItem = false;
+    for (const line of splitLines(withoutHtmlComments(body))) {
+        if (/^\s*[-*+]\s+\[[ xX]\]/.test(line)) {
+            inTaskItem = true;
+            continue;
+        }
+        if (inTaskItem && /^\s+\S/.test(line)) {
+            continue;
+        }
+        inTaskItem = false;
+        kept.push(line);
+    }
+    return kept.join('\n').includes(aiDisclosureToken);
+}
+
+// The PR template's "An AI agent contributed to this PR" checkbox, ticked.
+function declaresAiContribution(body) {
+    return /^\s*[-*+]\s+\[[xX]\]\s+An AI agent contributed\b/m.test(withoutHtmlComments(body));
+}
+
 // ── Rules ────────────────────────────────────────────────────────────────
 // A rule has:
 //   id          — stable machine identifier for logs / summaries.
@@ -238,6 +272,13 @@ const rules = [
         passes: ({ body }) => linkedIssuePattern.test(body),
         title: 'Link the issue this addresses',
         body: 'Reference it in the description with `Fixes #<n>` (or `Closes` / `Resolves`) so the change can be traced back to the discussion we agreed on.'
+    },
+    {
+        id: 'pr-ai-disclosure-missing',
+        appliesTo: 'pr',
+        passes: ({ body }) => !declaresAiContribution(body) || hasDisclosureToken(body),
+        title: 'Add the AI-authored disclosure block',
+        body: 'You ticked that an AI agent contributed to this PR. Please put the disclosure block from [AGENTS.md § Mandatory disclosure](https://github.com/CoderLine/alphaTab/blob/develop/AGENTS.md#mandatory-disclosure-read-this-first) at the very top of the description.'
     }
     // ─────────────────────────────────────────────────────────────────────
     // FUTURE: LLM-based rule — "issue talks about a solution, not a problem".
@@ -317,7 +358,8 @@ export default async function triage({ github, context, core }) {
             title: resolve(r.title),
             description: resolve(r.body)
         }));
-    const hasAiToken = body.includes(aiDisclosureToken);
+    const hasAiToken = hasDisclosureToken(body);
+    const hasAiCheckbox = isPr && declaresAiContribution(body);
 
     const hasAiCommitTrailer = isPr
         ? await prCommitsHaveAiTrailer(github, args.owner, args.repo, target.number)
@@ -412,11 +454,15 @@ export default async function triage({ github, context, core }) {
         await setLabel(labels.needsUpdates, false);
     }
 
-    if (hasAiToken || hasAiCommitTrailer) {
+    if (hasAiToken || hasAiCheckbox || hasAiCommitTrailer) {
         await setLabel(labels.aiAuthored, true);
     }
 
-    const aiSignals = [hasAiToken && 'disclosure token', hasAiCommitTrailer && 'commit trailer'].filter(Boolean);
+    const aiSignals = [
+        hasAiToken && 'disclosure token',
+        hasAiCheckbox && 'AI checkbox',
+        hasAiCommitTrailer && 'commit trailer'
+    ].filter(Boolean);
     core.summary
         .addHeading(`Triage: #${target.number} (${isPr ? 'PR' : 'issue'})`)
         .addRaw(isPr ? '' : `\nTemplate: ${ctx.template?.id ?? 'none'}\n`)

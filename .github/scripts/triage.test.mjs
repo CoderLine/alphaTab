@@ -304,3 +304,57 @@ describe('pull requests', () => {
         assert.ok(addedLabels(github).includes(labels.aiAuthored));
     });
 });
+
+describe('AI disclosure', () => {
+    const linkedTemplate = async () =>
+        (await readRepoFile('pull_request_template.md')).replace('Fixes #', 'Fixes #123');
+    const disclosureBlock = async () =>
+        (await readRepoFile('../AGENTS.md')).match(/## Mandatory disclosure[\s\S]*?```markdown\n([\s\S]*?)```/)[1];
+    const code = ['packages/alphatab/src/Settings.ts'];
+
+    it('ignores the token in the untouched PR template', async () => {
+        const body = await linkedTemplate();
+        assert.ok(body.includes(aiDisclosureToken));
+        const { github, core } = await runPr(body, code);
+        assert.deepEqual(core.violations(), []);
+        assert.deepEqual(addedLabels(github), []);
+    });
+
+    it('labels a PR with the disclosure block', async () => {
+        const body = `${await disclosureBlock()}\n${await linkedTemplate()}`;
+        const { github, core } = await runPr(body, code);
+        assert.deepEqual(core.violations(), []);
+        assert.deepEqual(addedLabels(github), [labels.aiAuthored]);
+    });
+
+    it('labels a ticked AI checkbox and asks for the missing block', async () => {
+        const body = (await linkedTemplate()).replace('- [ ] An AI agent contributed', '- [x] An AI agent contributed');
+        const { github, core } = await runPr(body, code);
+        assert.deepEqual(core.violations(), ['pr-ai-disclosure-missing']);
+        assert.ok(addedLabels(github).includes(labels.aiAuthored));
+
+        const { core: withBlock } = await runPr(`${await disclosureBlock()}\n${body}`, code);
+        assert.deepEqual(withBlock.violations(), []);
+    });
+
+    it('labels the one-line comment form', async () => {
+        const body = `${await linkedTemplate()}\n\n_AI-assisted (\`${aiDisclosureToken}\`) — drafted with help of an AI agent._`;
+        const { github } = await runPr(body, code);
+        assert.deepEqual(addedLabels(github), [labels.aiAuthored]);
+    });
+
+    it('ignores the token in an unclosed HTML comment', async () => {
+        const { github } = await runIssue(`${completeBug}\n\n<!-- ${aiDisclosureToken}`);
+        assert.deepEqual(addedLabels(github), []);
+    });
+
+    it('labels an issue with the disclosure block', async () => {
+        const body = renderIssue(bugHeaders, {
+            ...commonValues,
+            'AI authorship': 'AI-assisted (disclosure block included as described in AGENTS.md)',
+            'Current Behavior': `${await disclosureBlock()}\nThe tie is drawn below the staff.`
+        });
+        const { github } = await runIssue(body);
+        assert.ok(addedLabels(github).includes(labels.aiAuthored));
+    });
+});
