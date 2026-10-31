@@ -7,7 +7,7 @@ import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 ## 1.9.0
 
-This release gives the alphaTab attribution a smaller, quieter place in the score, reworks note spacing and the placement of annotations, adds per-staff control over clefs, key and time signatures and bar numbers, plays repeats and jumps in the right order, imports MusicXML files more faithfully, and loads alphaTab's core once for the page, its workers and its Audio Worklet with webpack, Rspack and Vite. The [upgrade notes](#upgrade-notes) at the end list the visual changes, changed defaults and deprecations.
+This release gives the alphaTab attribution a smaller, quieter place in the score, renders and resizes in about half the time and memory, reworks note spacing and the placement of annotations, adds per-staff control over clefs, key and time signatures and bar numbers, plays repeats and jumps in the right order, imports MusicXML files more faithfully, and loads alphaTab's core once for the page, its workers and its Audio Worklet with webpack, Rspack, Vite and Turbopack. Before the release we reviewed all of these changes again and fixed what the [review](#release-hardening) found. The website is rebuilt and now lives in the alphaTab repository. The [upgrade notes](#upgrade-notes) at the end list the visual changes, changed defaults and deprecations.
 
 ### Attribution
 
@@ -29,6 +29,39 @@ The new [Attribution](/docs/attribution) page explains [why we ask for credit](/
 #### license: planned move to CPAL-1.0 or similar
 
 A future release will move from MPL-2.0 to an open-source license with an attribution clause. The choice is not settled yet; [CPAL-1.0](https://opensource.org/license/cpal_1-0) is the best fit we see so far. alphaTab stays open source and free, also for commercial use, and releases under MPL-2.0, including this one, stay under MPL-2.0. See [what changes](/docs/attribution#license-cpal).
+
+### Performance
+
+#### render: faster layout, and resizes that match a fresh render
+https://github.com/CoderLine/alphaTab/pull/2997
+https://github.com/CoderLine/alphaTab/pull/2751
+
+The page and parchment layouts measure each bar once, decide the system breaks before they fill the systems, and reuse the systems on a resize. One rule decides which bars fit a system, for the first render, resizes and partial updates alike. A resize now gives the same result as a fresh render at that width: before, 40 % of our test cases differed, with forced line breaks one bar early, bar widths off by up to 0.5 px and shifted system heights.
+
+Compared with 1.8.4, the first render of a real song takes 28–36 % less time, a resize 13–39 % less, and both allocate about half the memory. On a dense score (216 bars, 20 staves), the rework alone brings:
+
+| | before the rework | 1.9.0 | change |
+|---|---|---|---|
+| First render (layout and paint, SVG in Node.js) | 200 ms | 105 ms | −47 % |
+| Resize 1300 → 800 px / 800 → 1300 px | 63 / 55 ms | 24 / 21 ms | −63 % / −60 % |
+| Memory allocated per first render | 233 MB | 114 MB | −51 % |
+| Memory allocated per resize | 58 / 48 MB | 19 / 12 MB | −67 % / −74 % |
+| Heap kept by a finished renderer | 152 MB | 53 MB | −65 % |
+| Browser renderer memory after scrolling through the score | 410 MB | 256 MB | −38 % |
+| Worker heap in the browser | 81–91 MB | 40–44 MB | about −50 % |
+| Time until the visible part is ready, load / resize | 777 / 243 ms | 541 / 108 ms | −30 % / −56 % |
+
+Full demo and all options: [Responsive resize](/docs/features/render/responsive-resize).
+
+#### browser: less work between the page, the worker and the player
+https://github.com/CoderLine/alphaTab/pull/2997
+
+* The score goes to the render worker as one transferred MessagePack buffer instead of a structured-cloned object tree, and the bounds lookup comes back as a transferred `Float64Array`.
+* With the render worker, resizes are coalesced while one is in progress: during a window drag, intermediate widths raise no render events (see [`IScoreRenderer.resizeRender`](/docs/reference/types/rendering/iscorerenderer/#resizerender)).
+* Parts of the score far out of view release their DOM and render again when they scroll back into view. Before, the whole rendered sheet stayed in memory after scrolling through it once. Beat highlights survive this re-render.
+* The MIDI is generated once per score load and player change instead of up to four times, and with a worker the score is sent for rendering before its MIDI is generated.
+* The Audio Worklet reports the played position every 10 ms instead of every 128-frame render quantum, which saves messages between the audio thread, the worker and the page. [`player.positionUpdateIntervalInMilliseconds`](/docs/reference/settings/player/positionupdateintervalinmilliseconds) sets the interval; `0` restores the previous behavior.
+* [`destroy()`](/docs/reference/api/destroy) releases the loaded score.
 
 ### Music Notation
 
@@ -196,6 +229,11 @@ Thanks to [@roscopeeco](https://github.com/roscopeeco) for contributing this fea
 * render: ties and slurs that continue on a new system start after the clef, key signature and time signature instead of at the left edge of the staff ([#2800](https://github.com/CoderLine/alphaTab/pull/2800), thanks [@GiovanniSlabs](https://github.com/GiovanniSlabs) for contributing this fix)
 * render: tab staves with slashed beats render stems, beams and dots in place when [`notation.rhythmMode`](/docs/reference/settings/notation/rhythmmode) shows tab rhythm, instead of failing or drawing them at the top of the staff ([#2916](https://github.com/CoderLine/alphaTab/pull/2916), thanks [@zyk-mjzs](https://github.com/zyk-mjzs))
 * render: the minimum bar width is computed correctly, and the new engraving settings [`beatContentPadding`](/docs/reference/types/engravingsettings/#beatcontentpadding) and [`barlineContentPadding`](/docs/reference/types/engravingsettings/#barlinecontentpadding) keep accidentals, grace notes and flags clear of the next beat and the barline; a bar that must be squeezed below its minimum logs a warning ([#2943](https://github.com/CoderLine/alphaTab/pull/2943), see [Engraving clearances](/docs/features/render/effect-placement#clearances))
+* render: numbered notation repeats `0` for rests longer than a quarter (`0 0`, `0 0 0 0`) instead of drawing the dashes of held notes ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* render: [voice colors](/docs/reference/types/model/voicestyle) reach stems, beams, flags, tuplets, effects, slur continuations and tab bends on several notes. A `null` entry in a style resets score elements, track names and the tuning in the header to their own defaults, and the system separator is drawn in the main glyph color by default ([#2997](https://github.com/CoderLine/alphaTab/pull/2997), see [Per-element colors](/docs/features/render/per-element-colors))
+* render: the bend labels of several bent notes on one beat are merged and stacked instead of drawn over each other ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* render: the triplet feel indication is drawn once per bar instead of once per voice and staff, and the capo once per staff ([#2992](https://github.com/CoderLine/alphaTab/pull/2992), thanks [@parvanitis15](https://github.com/parvanitis15))
+* render: dead-slapped beats of whole duration or longer, and beams made only of dead slaps, render instead of failing with `Cannot read properties of null (reading 'beat')` ([#2993](https://github.com/CoderLine/alphaTab/pull/2993), thanks [@yezhenbiao](https://github.com/yezhenbiao))
 
 ### Player
 
@@ -283,6 +321,9 @@ Thanks to [@AvaTheArchitect](https://github.com/AvaTheArchitect) for the discuss
 * player: a [`customScrollHandler`](/docs/reference/api/customscrollhandler) is called also when [`player.scrollMode`](/docs/reference/settings/player/scrollmode) is `Off` ([2889cac](https://github.com/CoderLine/alphaTab/commit/2889cac4e359a41b6f24a82034e6f6ba4f9f4c4f))
 * player: changing [`player.enableAnimatedBeatCursor`](/docs/reference/settings/player/enableanimatedbeatcursor) at runtime switches the cursor ([9a23e14](https://github.com/CoderLine/alphaTab/commit/9a23e14da4dc346c709927a9fe85d3d5b769826a))
 * integration: a mouse press that ends outside the score, or is lost through a window switch or an Android touch cancel, ends with one mouse-up event; before, the press stayed active, extended the selection on hover and turned off auto-scrolling ([#2951](https://github.com/CoderLine/alphaTab/pull/2951), thanks [@kulek1](https://github.com/kulek1))
+* player: with a [backing track](/docs/features/play-sync/backing-track-audio) or [external media](/docs/features/play-sync/video-sync), the playback position no longer falls further behind the audio over the song at tempos where a bar does not last a whole number of milliseconds, such as 148 BPM. Sync point times and beat timers keep their decimals ([#2960](https://github.com/CoderLine/alphaTab/pull/2960), thanks [@bj0rge](https://github.com/bj0rge))
+* player: fade in, fade out and volume swell ramp the expression controller (CC 11) instead of the channel volume (CC 7), so a fade scales the volume in effect. After a fade out or volume swell the track plays again with the voice's next note; before, it stayed silent until the end and [`changeTrackVolume`](/docs/reference/api/changetrackvolume) could not bring it back ([#2995](https://github.com/CoderLine/alphaTab/pull/2995), thanks [@yoyecros](https://github.com/yoyecros))
+* player: a local `initialAttenuation` in a SoundFont zone replaces the global value instead of adding to it, as the SoundFont 2.04 specification says, so affected presets are no longer too quiet ([#2994](https://github.com/CoderLine/alphaTab/pull/2994), thanks [@fanjink](https://github.com/fanjink))
 
 ### alphaTex Extensions
 
@@ -310,6 +351,8 @@ Full demo and all options: [Staff element display](/docs/features/render/staff-e
 * alphaTex: the note property [`string`](/docs/alphatex/note-properties#string) shows a string number on pitched notes, as in `a4{string 1}` ([#2913](https://github.com/CoderLine/alphaTab/pull/2913), thanks [@magmasystems](https://github.com/magmasystems))
 * alphaTex: harmonic values can be fractional, as in `3.3{ah 2.4}`, so exported files with such values load again ([#2941](https://github.com/CoderLine/alphaTab/pull/2941), thanks [@stewacide](https://github.com/stewacide))
 * alphaTex: the exporter writes [`acc`](/docs/alphatex/note-properties#acc) only where the accidental changes the spelling ([#2931](https://github.com/CoderLine/alphaTab/pull/2931), thanks [@gabbe](https://github.com/gabbe))
+* alphaTex: the millisecond offset of [`\sync`](/docs/alphatex/bar-metadata#sync) can have decimals, also in the form without parentheses: `\sync 1 0 1621.62` no longer splits into a sync point at 1621 ms and a note `62` ([#2960](https://github.com/CoderLine/alphaTab/pull/2960))
+* alphaTex: an export and re-import keeps empty Guitar Pro voices, their dynamics and the strings of Guitar Pro 7 and 8 drum notes ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
 * alphaTex: `basicEditorLspIntegration` of `@coderline/alphatab-monaco` answers only for its editor's model, so several editors can each use a language server, and returns a disposable; `diagnosticsDelay` and `completionRange` tune diagnostics and completions (see [Monaco](/docs/alphatex/monaco#setup-the-monaco-lsp-integration))
 * alphaTex: `@coderline/alphatab-language-server` and `@coderline/alphatab-monaco` bundle and run again; the language server has separate entry points for browsers and Node.js ([#2830](https://github.com/CoderLine/alphaTab/pull/2830); see [Language server](/docs/alphatex/lsp), [Monaco](/docs/alphatex/monaco) and the [package changes](#package-changes))
 
@@ -339,6 +382,7 @@ Full list of supported elements: [MusicXML feature table](/docs/formats/musicxml
 * musicxml: harmonics written as base, touching and sounding notes, as Guitar Pro 8 exports them, become one harmonic note; in alphaTex, artificial and other harmonics on pitched notes such as `C4{ah 12}` sound and render ([#2947](https://github.com/CoderLine/alphaTab/pull/2947), thanks [@parvanitis15](https://github.com/parvanitis15))
 * musicxml: notes with an `<instrument>` reference are treated as percussion only when that instrument is unpitched or the staff is a percussion staff ([#2777](https://github.com/CoderLine/alphaTab/pull/2777), thanks [@ldupoueyUB](https://github.com/ldupoueyUB))
 * musicxml: high voice numbers are packed into consecutive voices per staff ([#2831](https://github.com/CoderLine/alphaTab/pull/2831))
+* musicxml: a dynamic is shown at the next note of its staff (and voice, if given) instead of the next beat in the file, so it no longer appears on other staves and parts, and no `f` is drawn where the file writes none. Dynamics attached to notes (`<notations><dynamics>`) are shown too. For playback a dynamic applies to all staves of its part, as in MuseScore and Dorico; of two dynamics at the same position, the staff's own wins. The new [`Beat.showDynamics`](/docs/reference/types/model/beat/#showdynamics) carries this; other importers leave it unset and render as before ([#2996](https://github.com/CoderLine/alphaTab/pull/2996), thanks [@weblings](https://github.com/weblings))
 * musicxml: the `number` attribute of each measure sets custom bar numbers and texts, and implicit measures become pick-up bars ([#2907](https://github.com/CoderLine/alphaTab/pull/2907); see [Bar numbers](/docs/features/render/bar-numbers#file-import))
 
 ### Guitar Pro Extensions
@@ -374,28 +418,36 @@ Thanks to [@chenkigba](https://github.com/chenkigba) for contributing this chang
 
 * importer/exporter: the tuning display mode of Guitar Pro 7 and 8 files is read and written ([#2742](https://github.com/CoderLine/alphaTab/pull/2742), thanks [@kulek1](https://github.com/kulek1); see [Tuning display](/docs/features/render/tuning-display#tuning-on-staff))
 * importer/exporter: the drum tablature lines of Guitar Pro 7 and 8 files are kept on import and export ([#2591](https://github.com/CoderLine/alphaTab/pull/2591), thanks [@leocaseiro](https://github.com/leocaseiro); see [Drum tablature](/docs/features/render/drum-tabs#drum-tablature))
+* importer: a malformed GPX file whose data lies before its file entry no longer makes the import loop forever until it runs out of memory. Invalid sector pointers, truncated entries and file sizes outside the container fail with an [`UnsupportedFormatError`](/docs/reference/types/importer/unsupportedformaterror), and the decompressed size respects [`importer.maxDecodingBufferSize`](/docs/reference/settings/importer/maxdecodingbuffersize) ([#2991](https://github.com/CoderLine/alphaTab/pull/2991), thanks [@CaliLuke](https://github.com/CaliLuke))
+* importer: Guitar Pro 3–5 drum grace notes are read as percussion notes, the note duration percentage is read correctly (several files had broken values), and notes without a fingering get "unknown finger" ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* exporter: beat timers are written to Guitar Pro 7 files as whole milliseconds, as the format stores them ([#2960](https://github.com/CoderLine/alphaTab/pull/2960))
 
 ### Bundlers and Frameworks
 
 #### bundlers: one alphaTab core for the page, the workers and the worklet
+https://github.com/CoderLine/alphaTab/pull/2998
 
 With webpack, Rspack and Vite, the page, the Web Workers and the Audio Worklet load alphaTab's core from one shared chunk instead of a copy each, so the browser downloads and compiles about 1.2 MiB (minified) once instead of up to three times. alphaTab starts its worker with the standard `new Worker(new URL('./alphaTab.worker.mjs', import.meta.url), { type: 'module' })` and its worklet from `alphaTab.worklet.mjs`, both importing `alphaTab.core.mjs`.
 
 The new page [Installing in web projects](/docs/getting-started/installation-web-projects) lists the setup for every bundler and framework with the number of core copies each one loads, and links to a verified sample project for each. New pages cover [other bundlers](/docs/getting-started/installation-other-bundlers), [React and Next.js](/docs/getting-started/installation-react), [Vue and Nuxt](/docs/getting-started/installation-vue), [Angular](/docs/getting-started/installation-angular), [Svelte and SvelteKit](/docs/getting-started/installation-svelte) and [Solid](/docs/getting-started/installation-solid).
 
 #### webpack: Rspack and Rsbuild support
+https://github.com/CoderLine/alphaTab/pull/2998
 
 `@coderline/alphatab-webpack` works with webpack 5 (5.90 or later), Rspack 1.7 and 2, and Rsbuild through `tools.rspack`. It bundles alphaTab's worker and worklet as entries and moves the core into an `alphaTabCore` split chunk. For that it sets `optimization.usedExports` to `'global'` in production builds when you did not set it. See [Installation (webpack, Rspack, Rsbuild)](/docs/getting-started/installation-webpack).
 
 #### vite: worker and worklet as chunks of the main build
+https://github.com/CoderLine/alphaTab/pull/2998
 
 `@coderline/alphatab-vite` emits alphaTab's worker and worklet as chunks of the main build, sharing the core chunk with the page, and supports Vite 6, 7 and 8. The URLs are written relative to the chunk that references them, so a relative `base`, `renderBuiltUrl`, SvelteKit and Nuxt 4 work. In the dev server, alphaTab is excluded from dependency pre-bundling. See [Installation (Vite)](/docs/getting-started/installation-vite).
 
 #### integration: entries for bundlers without a plugin
+https://github.com/CoderLine/alphaTab/pull/2998
 
 The new exports `@coderline/alphatab/core`, `@coderline/alphatab/worker` and `@coderline/alphatab/worklet` let your app own alphaTab's worker and worklet entries. `@coderline/alphatab/core` exports the full API and starts nothing on its own; you register the worker and worklet with [`Environment.initializeMain`](/docs/features/extend/worker-and-worklet-initialization). [Installation (other bundlers)](/docs/getting-started/installation-other-bundlers) shows the setup for esbuild, Rollup and Parcel.
 
 #### bundlers: Turbopack detection
+https://github.com/CoderLine/alphaTab/pull/2998
 
 alphaTab detects Turbopack ([`Environment.isTurbopackBundled`](/docs/reference/types/environment), also printed by `Environment.printEnvironmentInfo()`) and starts its workers in the form Turbopack bundles, sharing the core chunk with the page. Turbopack does not bundle Audio Worklets, so there alphaTab loads its worklet from [`core.scriptFile`](/docs/reference/settings/core/scriptfile). See [Next.js with Turbopack](/docs/getting-started/installation-react#turbopack).
 
@@ -403,13 +455,87 @@ alphaTab detects Turbopack ([`Environment.isTurbopackBundled`](/docs/reference/t
 
 * bundlers: the minified files reference each other: `alphaTab.min.mjs` imports `alphaTab.core.min.mjs` and starts `alphaTab.worker.min.mjs` and `alphaTab.worklet.min.mjs`, which import the minified core too, so a CDN or copied setup loads only minified files.
 * player: without a detectable script file, loading the Audio Worklet fails with the error "Could not detect alphaTab script file, cannot initialize audio worklet".
+* webpack: `webWorkers: false` in the plugin options turns off the worker bundling again ([#2998](https://github.com/CoderLine/alphaTab/pull/2998)), and the build reports an error instead of hanging when the plugin cannot copy its font and SoundFont files ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* vite: the worker and worklet chunks are no longer manifest entries, so frameworks that inject every manifest entry into the page do not load them as page scripts ([#2998](https://github.com/CoderLine/alphaTab/pull/2998)). On Vite 8 they are minified, and the plugin's type declarations import Vite's `Plugin` type ([#2990](https://github.com/CoderLine/alphaTab/pull/2990))
+* bundlers: in the minified files, `Ottavia._8va` and the other enum members starting with an underscore are defined again, and enum values are inlined across modules, which saves about 10 KB gzip on the minified core ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+
+### Website
+https://github.com/CoderLine/alphaTab/pull/2998
+
+#### website: new landing page and playground
+
+The [landing page](/) opens with a full player on Iron Waltz, alphaTab's own demo song: file tabs, a track sidebar, a full-page mode and a switch between the backing track and the synthesizer. Below it, a live alphaTex section renders what you type in an editor with the alphaTex language server (completion, hover, signature help and diagnostics). "Open in Playground" takes the current file or your alphaTex along.
+
+The [Playground](/playground) is a standalone full-window page. Open a file by picker, drag and drop or from the samples. The URL keeps the state, so Share copies a link to it. It has a track panel with mute, solo, volume and transposition, searchable settings that cover every 1.9 setting, the alphaTex editor (Guitar Pro and other files convert to alphaTex), export to Guitar Pro, alphaTex, WAV, MIDI and print, and a media sync editor for audio files and YouTube videos ([Media Sync Editor](/docs/guides/media-sync-editor)).
+
+A headphones menu in the navigation bar picks backing track or synthesizer playback and the SoundFont for the whole site: "Standard" (Sonivox) or "High quality" (GeneralUser GS). The demos on the feature pages play only where playback is the point; rendering, import, export and layout demos are silent. Copyrighted demo material is replaced by public-domain arrangements and Iron Waltz.
+
+#### website: feature catalog and reworked docs
+
+* The [feature catalog](/docs/features) describes alphaTab by what you want to do, in six groups: import and load, render, play and sync, interact, export and extend. Each page has a purpose-built demo. The old showcase pages redirect to it.
+* [Installing in web projects](/docs/getting-started/installation-web-projects) and the pages per bundler and framework replace the old installation pages. The introduction, the getting-started pages and the contributing guide are rewritten.
+* New pages: [Attribution](/docs/attribution), [alphaTex troubleshooting](/docs/alphatex/troubleshooting) with every diagnostic code, a [Showcase](/showcase) of projects that use alphaTab, and [`llms.txt`](pathname:///llms.txt) for AI tools. `/docs/releases` always points to the newest release notes.
+* The migration section is retired; its pages redirect to the release notes and the getting-started pages. The file format pages are part of the API reference.
+* The generated API reference shows deprecation notices on settings, API members and types.
+
+#### website: part of the alphaTab repository
+
+The website moved from `CoderLine/alphaTabWebsite`, now archived, into the `website/` folder of the alphaTab repository, with its history. Documentation and release notes change in the same pull request as the code they describe, and "Edit this page" links point there. Report problems with the website or the documentation in the [alphaTab repository](https://github.com/CoderLine/alphaTab/issues/new/choose).
+
+The site is built with Docusaurus on Rspack, using `@coderline/alphatab-webpack`: a production build takes about 15 s instead of 34 s, and the dev server starts in about 2.5 s instead of 16 s with about 1 GB of memory instead of 2.7 GB. Each nightly and each release builds the site against the packages published from the same commit: nightlies go to [next.alphatab.net](https://next.alphatab.net), releases to alphatab.net.
+
+### Release hardening
+https://github.com/CoderLine/alphaTab/pull/2990
+
+Before cutting the release, we reviewed the 1.9 changes across rendering, importers, player and packaging. Each finding is fixed in the layer that causes it and comes with a test. Most items below go back to that review; the fixes listed in the sections above are not repeated here.
+
+**Rendering and layout**
+
+* Bend and whammy slurs and tab bends enter the [skyline](/docs/features/render/effect-placement#skyline) with their drawn shape, so "grad.", let ring and other labels no longer sit on them. Dynamics below the staff keep clear of accents.
+* Bars squeezed below their natural width take space from the widest gaps first and keep the minimum width of their content.
+* Full-bar notes are centered between the bar's start (clef, key and time signature) and its barline; pick-up bars and empty voices no longer prevent the centering.
+* Bars with only grace notes place them side by side, dense dynamics get horizontal room, and the ledger lines of neighbouring notes stay apart.
+* Beat texts, lyrics, free-time texts and dynamics are spaced only against their own staff; texts on other tracks no longer widen the bar.
+* Bar numbers show on multi-bar rests, are no longer clipped at partial boundaries in the horizontal layout, and with [`RenderStylesheet.hideEmptyStaves`](/docs/reference/types/model/renderstylesheet/#hideemptystaves) sit on the first visible track.
+* String-number circles are stacked by pitch, and adjacent separate trills are drawn as separate trills ([`Note.isTrillStart`](/docs/reference/types/model/note/#istrillstart) marks where one starts).
+* A two-voice unison whose note head is displaced by a second, and beams over rests only in numbered notation (for example a whole rest), render instead of failing.
+* Canvas text aligned at the top sits at the same height in Firefox as in Chromium.
+
+**Importers and model**
+
+* Unset note values (`NaN`, see [For integrations](#for-integrations)) survive a JSON round trip, and score JSON from 1.8 with `-1` loads as unset.
+* Guitar Pro 3–5: the MIDI port and channel are range-checked, a negative fret on a stringed staff becomes a dead note, and notes stored without a fret are dropped.
+* Drum tablature is shown according to the file: the staff flags in Guitar Pro 5, the part configuration in Guitar Pro 6–8. Files without the flag show no drum tablature.
+* Guitar Pro 6: ties survive on staves that get a generated fingering, and track pan and volume come from the RSE channel strip.
+* MusicXML: `measure-numbering` holds until the file changes it, a `<string>` without `<fret>` on a tuned staff gets its fret from the pitch, and notes without a tab position get no tab glyphs.
+* A custom bar number of `0` is respected.
+
+**Player and integration**
+
+* A custom cursor handler set while the cursors already exist is attached, and the previous handler is detached.
+* Changes of [`player.scrollMode`](/docs/reference/settings/player/scrollmode) through [`updateSettings()`](/docs/reference/api/updatesettings) take effect.
+* When the browser refuses to play a [backing track](/docs/features/play-sync/backing-track-audio), the player pauses instead of reporting that it plays.
+* With the worker renderer, bounds resolve against the score that was actually rendered, so a render started while `load()` is still running no longer throws.
+* [`exportAudio()`](/docs/reference/api/exportaudio) loads the SoundFont presets the exported song needs.
+
+**Packaging and platforms**
+
+* `@coderline/alphatab/vite` and `@coderline/alphatab/webpack` forward to `@coderline/alphatab-vite` and `@coderline/alphatab-webpack`, which `@coderline/alphatab` declares as optional peer dependencies.
+* `@coderline/alphatab-language-server` loads with `require`, its `bin` starts with a hashbang, and it and `@coderline/alphatab-monaco` declare the `vscode-languageserver` packages they import.
+* [`AlphaTexAtTokenNode`](/docs/reference/types/importer/alphatex/alphatexattokennode) is exported.
+* Deprecated members are marked `[Obsolete]` in C# and `@Deprecated` in Kotlin, with their documentation.
+* The settings reference documents the actual defaults of [`display.staffPaddingLeft`](/docs/reference/settings/display/staffpaddingleft) and [`display.systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode), and every API added in 1.9.0 is marked "since 1.9.0".
 
 ### Improvements & Bugfixes
 
 * render: the horizontal layout with [`display.scale`](/docs/reference/settings/display/scale) above 1 gets its full size, so the end of the score is visible and scrolls with the playhead ([#2894](https://github.com/CoderLine/alphaTab/pull/2894), thanks [@leocaseiro](https://github.com/leocaseiro) for contributing this fix and [@fiskpinne](https://github.com/fiskpinne) for reporting it)
-* render: rendering is faster ([#2751](https://github.com/CoderLine/alphaTab/pull/2751))
 * platform: alphaTab reads and writes zip archives and decodes SF3 SoundFonts with its own Deflate and Vorbis implementations, so the package no longer carries four third-party license notices ([#2950](https://github.com/CoderLine/alphaTab/pull/2950))
 * integration: the [`ICursorHandler`](/docs/reference/types/icursorhandler) type is exported ([3d1f1bf](https://github.com/CoderLine/alphaTab/commit/3d1f1bf2ef720849e024e98657fc816bb2983c26)), together with the two built-in handlers `ToNextBeatAnimatingCursorHandler` (used when [`player.enableAnimatedBeatCursor`](/docs/reference/settings/player/enableanimatedbeatcursor) is on) and `NonAnimatingCursorHandler`, so a custom handler can delegate to them
+* integration: with the horizontal layout, [`BoundsLookup.findBeats`](/docs/reference/types/rendering/boundslookup/#findbeats) returns each beat once instead of once per rendered partial, and a partial render that falls back to a full layout no longer adds its systems to the lookup twice ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* integration: errors while the worker reads a score reach the [`error`](/docs/reference/api/error) event ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* integration: the new log level [`LogLevel.Trace`](/docs/reference/types/loglevel) (`Logger.trace`) takes the internal flow details that were logged at debug level. The published JavaScript files contain no trace messages ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* model: the JSON converter accepts `null` colors and fonts, reads fonts from plain JSON objects and writes typed arrays as JSON arrays ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
+* platform: the IntersectionObserver fallback checks visibility on scroll and resize, GDI+ and Android skip rectangles of zero width, and on .NET and Android numbers are parsed as JavaScript's `parseInt` does. On Kotlin, `splice` on lists returns only the removed elements, and deleting from maps and sets compares keys ([#2997](https://github.com/CoderLine/alphaTab/pull/2997))
 
 ### Upgrade Notes
 
@@ -420,6 +546,8 @@ alphaTab detects Turbopack ([`Environment.isTurbopackBundled`](/docs/reference/t
 * Annotations sit closer to the notes ([#2750](https://github.com/CoderLine/alphaTab/pull/2750)). The default of [`display.effectBandPaddingBottom`](/docs/reference/settings/display/effectbandpaddingbottom) changes from `2` to `5`; raise or lower it to change the gap. See [Effect placement](/docs/features/render/effect-placement#band-padding).
 * The default of [`display.staffPaddingLeft`](/docs/reference/settings/display/staffpaddingleft) changes from `2` to `6` ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)). Set it to `2` for the previous padding.
 * Notes and rests that fill a whole bar are centered ([#2781](https://github.com/CoderLine/alphaTab/pull/2781)), and hammer-on, pull-off and slide labels sit above the staff ([#2945](https://github.com/CoderLine/alphaTab/pull/2945)). Hide the labels through [`notation.elements`](/docs/reference/settings/notation/elements); see [Effects and articulations](/docs/features/render/coverage-effects-articulations#slide-labels).
+* Numbered notation repeats `0` for rests longer than a quarter, voice colors reach stems, beams, flags and effects, and bend labels on one beat are stacked ([#2997](https://github.com/CoderLine/alphaTab/pull/2997)). The triplet feel indication appears once per bar ([#2992](https://github.com/CoderLine/alphaTab/pull/2992)).
+* MusicXML files show dynamics only where the file writes them, on the staff they belong to ([#2996](https://github.com/CoderLine/alphaTab/pull/2996)).
 
 #### Changed defaults
 
@@ -446,11 +574,19 @@ The deprecated members still work.
 * [`AutomationType.Bank`](/docs/reference/types/model/automationtype) changes from `4` to `5`; in 1.8 it had the same value as `AutomationType.SyncPoint`. Score JSON written by 1.8 stores bank changes as `4`, which 1.9 loads as sync points ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)).
 * Guitar Pro 3–5 files: each track gets the MIDI port and channel stored in the file and its own [`PlaybackInformation`](/docs/reference/types/model/playbackinformation). [`port`](/docs/reference/types/model/playbackinformation/#port) is zero-based (1.8 kept the one-based value of the file), and [`primaryChannel`](/docs/reference/types/model/playbackinformation/#primarychannel) can differ from 1.8, for example `2` instead of `4`. Programs, volume, balance and the notes do not change, and two tracks that 1.8 played on one channel get a channel each. Code that addresses MIDI channels or ports per track sees the new numbers ([#2774](https://github.com/CoderLine/alphaTab/pull/2774)).
 * Settings JSON ([`RenderingResourcesJson`](/docs/reference/types/json/renderingresourcesjson)) accepts the deprecated fonts `copyrightFont`, `titleFont`, `subTitleFont`, `wordsFont`, `timerFont`, `directionsFont`, `fretboardNumberFont`, `markerFont` and `barNumberFont` and applies them as the properties of the same name do; 1.8 ignored them in JSON. `effectFont`, `fingeringFont` and `inlineFingeringFont` are still accepted and still have no effect ([#2749](https://github.com/CoderLine/alphaTab/pull/2749)).
-* The SVG output is no longer identical between two renders of the same score: the staff lines of the bar with the attribution and the attribution itself are written as one path in a random order. The drawn result is the same. Compare rendered images instead of SVG strings.
+* The SVG output is no longer identical between two renders of the same score: the staff lines of the bar with the attribution and the attribution itself are written as one path in a random order. The SVG text also has no newlines between elements, black rectangles have no `fill` attribute, and single music symbols end with `;` ([#2997](https://github.com/CoderLine/alphaTab/pull/2997)). The drawn result is the same. Compare rendered images instead of SVG strings.
+* The page and its alphaTab worker must load the same alphaTab version: the messages between them changed (MessagePack score, flat bounds lookup) ([#2997](https://github.com/CoderLine/alphaTab/pull/2997)).
+* With the render worker, resizes requested while one is still running are combined into one resize with the latest width. The skipped widths raise no [`renderStarted`](/docs/reference/api/renderstarted), [`renderFinished`](/docs/reference/api/renderfinished) or [`postRenderFinished`](/docs/reference/api/postrenderfinished) events ([#2997](https://github.com/CoderLine/alphaTab/pull/2997)).
+* With the Audio Worklet, [`playerPositionChanged`](/docs/reference/api/playerpositionchanged) and [`midiEventsPlayed`](/docs/reference/api/midieventsplayed) fire at most every 10 ms by default. Set [`player.positionUpdateIntervalInMilliseconds`](/docs/reference/settings/player/positionupdateintervalinmilliseconds) to `0` for an update per render quantum ([#2997](https://github.com/CoderLine/alphaTab/pull/2997)).
+* Internal flow messages are logged at the new [`LogLevel.Trace`](/docs/reference/types/loglevel) instead of `Debug`, and the published JavaScript files do not contain them ([#2997](https://github.com/CoderLine/alphaTab/pull/2997)).
+* Fades write the expression controller (CC 11) into the generated MIDI instead of the channel volume (CC 7), and restore it with the voice's next note. MIDI files exported from alphaTab and custom [`IMidiFileHandler`](/docs/reference/types/midi/imidifilehandler) implementations see these events ([#2995](https://github.com/CoderLine/alphaTab/pull/2995)).
+* Sync point times, beat timers and other millisecond values derived from ticks keep their decimals instead of being cut to whole milliseconds ([#2960](https://github.com/CoderLine/alphaTab/pull/2960)).
+* C# and Kotlin: members deprecated in alphaTab carry `[Obsolete]` and `@Deprecated`, so code that uses them gets compiler warnings ([#2990](https://github.com/CoderLine/alphaTab/pull/2990)).
 * alphaTex AST consumers: the values of [`AlphaTexNodeType`](/docs/reference/types/importer/alphatex/alphatexnodetype) are renumbered, so compare against the enum members instead of numbers, and `AlphaTexNoteNode.noteStringDot` is now [`noteStringSeparator`](/docs/reference/types/importer/alphatex/alphatexnotenode/#notestringseparator) of type `IAlphaTexStringSeparatorNode` ([#2591](https://github.com/CoderLine/alphaTab/pull/2591)).
 
 #### Package changes
 
+* The npm packages are published from GitHub Actions through npm trusted publishing and carry provenance attestations, so you can check which commit and workflow built each version (`npm audit signatures`). Releases go live only after a maintainer approves them ([#2959](https://github.com/CoderLine/alphaTab/pull/2959)).
 * `@coderline/alphatab-vite/workerPlugin` is removed. Register `alphaTab()` from `@coderline/alphatab-vite`; it covers the worker and the worklet.
 * `@coderline/alphatab-vite` accepts Vite `^6 || ^7 || ^8` as peer dependency.
 * `@coderline/alphatab-webpack` declares `webpack` (`^5.0.0`) and `@rspack/core` (`^1.7.0 || ^2.0.0`) as optional peer dependencies; install the one your project builds with.
