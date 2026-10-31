@@ -49,7 +49,7 @@ const CARDS: FeatureCard[] = [
   {
     n: '06',
     t: 'Open core, three runtimes',
-    d: 'MPL-2.0 license. JavaScript for web, .NET for desktop and server, Kotlin for native Android. iOS in progress.',
+    d: 'MPL-2.0 license. JavaScript for web, .NET for desktop and server, Kotlin for native Android.',
     v: <Platforms />,
   },
 ];

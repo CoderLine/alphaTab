@@ -14,11 +14,9 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 
 Scores authored in Capella arrive as `.capx` archives — Capella's XML container format. alphaTab imports them so a Capella export opens in the same viewer as your Guitar Pro and MusicXML files, without a separate conversion step.
 
-:::info
-The Capella importer routes through the same content-sniffing load path as every other format. The preview below loads a curated Guitar Pro fixture for parity with sibling pages; point `core.file` at a `.capx` file in your own project to exercise the Capella importer end-to-end.
-:::
+The preview below loads a `.capx` file with the theme of Mozart's variations K. 265 on a piano grand staff, with lyrics under the right hand:
 
-<AlphaTab tex={false} file="/files/features/Chords.gp5" />
+<AlphaTab tex={false} file="/files/twinkle-mozart.capx" />
 
 ## Scope of the Capella importer
 
