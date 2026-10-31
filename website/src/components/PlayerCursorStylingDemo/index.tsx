@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { useAlphaTabModule } from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
@@ -125,7 +121,7 @@ export const PlayerCursorStylingDemo: React.FC<
   return (
     <div className="player-cursor-demo">
       <style>{activeCss}</style>
-      <AlphaTabPlayer file="/files/features/Chords.gp5" player={true}>
+      <PlayerProvider file="/files/features/Chords.gp5" player={true}>
         <PlayerStateWatcher onPlayingChange={setPlaying} />
         <div
           style={{
@@ -151,8 +147,8 @@ export const PlayerCursorStylingDemo: React.FC<
             ))}
           </ul>
         </div>
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="css">{activeCss}</CodeBlock> : null}
     </div>
   );

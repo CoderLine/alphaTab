@@ -2,7 +2,7 @@ import React from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Link from '@docusaurus/Link';
 import { Pill } from '../shared/pill';
-import { IconArrow } from '../shared/icons';
+import { IconArrow } from '@coderline/alphatab-ui';
 import styles from './styles.module.scss';
 
 interface Install {

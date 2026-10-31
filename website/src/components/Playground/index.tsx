@@ -1,21 +1,26 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
-import { AlphaTabCanvas, AlphaTabPlayer, useAlphaTabSelector } from '@site/src/alphatab-react';
-import { IconUpload } from '@site/src/components/landing/shared/icons';
-import { PHONE_QUERY, useMediaQuery } from '@site/src/components/landing/shared/use-media-query';
-import { TexEditorPane } from './editor/tex-editor-pane';
+import {
+    PlayerHost,
+    PlayerProvider,
+    usePlayerSelector,
+    IconUpload,
+    PHONE_QUERY,
+    useMediaQuery,
+    TexEditorPane,
+    SettingsPanel,
+    usePlaygroundSettings,
+    TrackPanel,
+    Transport,
+    ResizeHandle,
+    useFileDrop,
+    usePersistedState,
+} from '@coderline/alphatab-ui';
 import { PlaygroundHeader, type PanelId } from './header';
 import { MediaSyncPanel } from './media-sync/media-sync-panel';
 import { MediaSyncProvider, useMediaSync } from './media-sync/media-sync-context';
 import { MusicFontProvider } from './music-font';
 import { YouTubeDock } from './media-sync/youtube-dock';
-import { SettingsPanel } from './settings/settings-panel';
-import { usePlaygroundSettings } from './settings/use-playground-settings';
-import { TrackPanel } from './tracks/track-panel';
-import { Transport } from './transport';
-import { ResizeHandle } from './ui/resize-handle';
-import { useFileDrop } from './use-file-drop';
-import { usePersistedState } from './use-persisted-state';
 import { usePlaygroundDocument } from './use-playground-document';
 import styles from './playground.module.scss';
 
@@ -37,18 +42,18 @@ const DEFAULT_LAYOUT: Layout = {
 export const Playground: React.FC = () => (
     <MusicFontProvider>
         {(font) => (
-            <AlphaTabPlayer key={font.key} settingsPreset="landing" settings={font.settings}>
+            <PlayerProvider key={font.key} settingsPreset="landing" settings={font.settings}>
                 <MediaSyncProvider>
                     <PlaygroundApp />
                 </MediaSyncProvider>
-            </AlphaTabPlayer>
+            </PlayerProvider>
         )}
     </MusicFontProvider>
 );
 
 const PlaygroundApp: React.FC = () => {
     const doc = usePlaygroundDocument();
-    const hasScore = useAlphaTabSelector((s) => s.currentScore !== null);
+    const hasScore = usePlayerSelector((s) => s.currentScore !== null);
     const settings = usePlaygroundSettings(doc.reload);
     const { resetDocument } = useMediaSync();
     const isPhone = useMediaQuery(PHONE_QUERY);
@@ -131,7 +136,7 @@ const PlaygroundApp: React.FC = () => {
 
                 <main className={styles.main}>
                     <div className={clsx(styles.notation, texErrors.length > 0 && styles.notationDimmed)}>
-                        <AlphaTabCanvas className={styles.canvas} withSelectionHandles />
+                        <PlayerHost className={styles.canvas} withSelectionHandles />
                         {message && <div className={styles.notationMessage}>{message}</div>}
                         <YouTubeDock />
                     </div>

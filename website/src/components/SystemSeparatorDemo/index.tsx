@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface SystemSeparatorDemoProps {
@@ -59,10 +55,10 @@ export const SystemSeparatorDemo: React.FC<SystemSeparatorDemoProps> = ({
           Show system separator
         </label>
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
+      <PlayerProvider tex={DEMO_TEX} tracks="all" player={true}>
         <ApplySystemSeparator enabled={enabled} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

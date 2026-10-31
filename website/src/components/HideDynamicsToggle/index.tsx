@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface HideDynamicsToggleProps {
@@ -52,14 +48,14 @@ export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
           Hide dynamics
         </label>
       </div>
-      <AlphaTabPlayer
+      <PlayerProvider
         file="/files/features/Dynamics.gp5"
         player={true}
         settings={{ display: { barCount: 12 } }}
       >
         <ApplyHideDynamics hidden={hidden} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

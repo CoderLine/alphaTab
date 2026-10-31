@@ -1,10 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi } from "@coderline/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface ImporterKnobsDemoProps {
@@ -113,7 +110,7 @@ const Inner: React.FC<InnerProps> = ({
           </span>
         </div>
       </div>
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -136,7 +133,7 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer
+      <PlayerProvider
         player={true}
         settings={{ importer: { beatTextAsLyrics: false } }}
       >
@@ -146,7 +143,7 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
           encoding={encoding}
           setEncoding={setEncoding}
         />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

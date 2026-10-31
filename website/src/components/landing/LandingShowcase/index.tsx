@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import { SectionHeader } from '../section-header';
-import { IconArrow } from '../shared/icons';
+import { IconArrow } from '@coderline/alphatab-ui';
 import { ProjectCard } from './project-card';
 import { QuoteCard } from './quote-card';
 import { PressCard } from './press-card';

@@ -1,8 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { useSoundFontLibrary } from '@site/src/alphatab-react';
-import { PlaybackSettingsPanel } from '@site/src/components/PlaybackSettings';
-import { IconHeadphones } from '@site/src/components/landing/shared/icons';
+import { useSoundFontLibrary, PlaybackSettingsPanel, IconHeadphones } from '@coderline/alphatab-ui';
 import styles from './PlaybackSettingsNavbarItem.module.scss';
 
 interface Props {

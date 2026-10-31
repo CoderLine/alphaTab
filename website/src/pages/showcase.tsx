@@ -9,7 +9,7 @@ import {
   type ShowcaseTag,
 } from '@site/src/components/landing/LandingShowcase/stories-data';
 import { ProjectMark } from '@site/src/components/landing/LandingShowcase/project-mark';
-import { IconArrow, IconExternalLink } from '@site/src/components/landing/shared/icons';
+import { IconArrow, IconExternalLink } from '@coderline/alphatab-ui';
 import styles from './showcase.module.scss';
 
 type Project = Extract<ShowcaseStory, { cardType: 'project' }>;

@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
 
 type ModeName = "Score" | "Staff";
@@ -97,14 +93,14 @@ export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
           Hide tuning globally
         </label>
       </div>
-      <AlphaTabPlayer
+      <PlayerProvider
         file="/files/features/Tuning.gp5"
         player={true}
         settings={{ display: { barCount: 12 } }}
       >
         <ApplyTuning mode={mode} hidden={hidden} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

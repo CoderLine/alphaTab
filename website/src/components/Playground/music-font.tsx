@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { json } from '@coderline/alphatab';
-import { usePersistedState } from './use-persisted-state';
+import { usePersistedState } from '@coderline/alphatab-ui';
 
 export type MusicFontId = 'bravura' | 'petaluma';
 

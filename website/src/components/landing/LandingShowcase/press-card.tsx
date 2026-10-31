@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconExternalLink } from '../shared/icons';
+import { IconExternalLink } from '@coderline/alphatab-ui';
 import type { ShowcaseStory } from './stories-data';
 import styles from './press-card.module.scss';
 

@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls } from "@coderline/alphatab-ui";
 import { BACH_PRELUDE_C_LONG } from "@site/src/tex-riffs";
 
 export interface SpacingSlidersDemoProps {
@@ -26,7 +22,7 @@ function ApplySpacing({
   spacingRatio: number;
   lastSystemFillThreshold: number;
 }) {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   useEffect(() => {
     if (controls) {
       controls.updateSettings({
@@ -136,7 +132,7 @@ const api = new alphaTab.AlphaTabApi(container, {
           </span>
         </div>
       </div>
-      <AlphaTabPlayer
+      <PlayerProvider
         file={file}
         tex={texContent}
         player={true}
@@ -153,8 +149,8 @@ const api = new alphaTab.AlphaTabApi(container, {
           spacingRatio={spacingRatio}
           lastSystemFillThreshold={lastSystemFillThreshold}
         />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

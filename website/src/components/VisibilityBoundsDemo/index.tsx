@@ -2,13 +2,8 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabEvent,
-    useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -37,12 +32,12 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
     const api = useAlphaTabApi();
-    const state = useAlphaTabState();
+    const state = usePlayerState();
     const [includeNotes, setIncludeNotes] = useState(true);
     const [currentBeat, setCurrentBeat] = useState<alphaTab.model.Beat | null>(null);
     const [isVisible, setIsVisible] = useState<boolean | null>(null);
 
-    // The bounded scroll wrapper is the AlphaTabCanvas's outer div — alphaTab
+    // The bounded scroll wrapper is the PlayerHost's outer div — alphaTab
     // assigns it to `settings.player.scrollElement` during API construction.
     const getScroller = useCallback((): HTMLElement | null => {
         if (!api) { return null; }
@@ -211,7 +206,7 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
                 </strong>
             </div>
             <ApplyIncludeNoteBounds includeNotes={includeNotes} />
-            <AlphaTabCanvas className={styles.scroller} />
+            <PlayerHost className={styles.scroller} />
         </div>
     );
 };
@@ -230,8 +225,8 @@ export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
     };
 
     return (
-        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+        <PlayerProvider file={file} tex={tex} settings={settings}>
             <Inner showNoteHeadOverlay={showNoteHeadOverlay} />
-        </AlphaTabPlayer>
+        </PlayerProvider>
     );
 };

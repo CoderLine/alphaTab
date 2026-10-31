@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -16,7 +12,7 @@ export interface SpeedSliderDemoProps {
 }
 
 const SpeedSlider: React.FC = () => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const [speed, setSpeed] = useState(1);
 
   useEffect(() => {
@@ -56,10 +52,10 @@ const SpeedSlider: React.FC = () => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const SpeedSliderDemo: React.FC<SpeedSliderDemoProps> = ({ file, tex, showCode = true }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <PlayerProvider file={file} tex={tex}>
       <TransportBar />
       <SpeedSlider />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

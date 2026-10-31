@@ -2,13 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import type * as alphaTab from '@coderline/alphatab';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -51,7 +46,7 @@ const lastBeatOfBar = (
 };
 
 const LoopControls: React.FC = () => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const api = useAlphaTabApi();
   const [barCount, setBarCount] = useState(0);
   const [startBar, setStartBar] = useState(2);
@@ -177,10 +172,10 @@ const LoopControls: React.FC = () => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const LoopDemo: React.FC<LoopDemoProps> = ({ file, tex, showCode = true }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <PlayerProvider file={file} tex={tex}>
       <TransportBar />
       <LoopControls />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

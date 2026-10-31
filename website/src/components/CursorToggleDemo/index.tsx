@@ -2,12 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi } from "@coderline/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -172,7 +168,7 @@ const Inner: React.FC<InnerProps> = ({
     showCustomHandlerToggle,
 }) => {
     const api = useAlphaTabApi();
-    const state = useAlphaTabState();
+    const state = usePlayerState();
 
     const [enableCursor, setEnableCursor] = useState(true);
     const [enableHighlight, setEnableHighlight] = useState(true);
@@ -255,7 +251,7 @@ const Inner: React.FC<InnerProps> = ({
             {showCustomHandlerToggle && (
                 <AttachCustomCursor attached={customHandlerAttached} />
             )}
-            <AlphaTabCanvas />
+            <PlayerHost />
         </div>
     );
 };
@@ -278,12 +274,12 @@ export const CursorToggleDemo: React.FC<CursorToggleDemoProps> = ({
     };
 
     return (
-        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+        <PlayerProvider file={file} tex={tex} settings={settings}>
             <Inner
                 showThemeToggle={showThemeToggle}
                 showAnimationToggle={showAnimationToggle}
                 showCustomHandlerToggle={showCustomHandlerToggle}
             />
-        </AlphaTabPlayer>
+        </PlayerProvider>
     );
 };

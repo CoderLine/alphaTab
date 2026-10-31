@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { IconGithub } from '@site/src/components/landing/shared/icons';
+import { IconGithub } from '@coderline/alphatab-ui';
 import { useGithubStars } from '@site/src/components/landing/use-github-stars';
 import styles from './GitHubStarsLink.module.scss';
 

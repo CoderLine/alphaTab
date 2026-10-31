@@ -1,11 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi } from "@coderline/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface BytesLoadDemoProps {
@@ -53,7 +49,7 @@ const Inner: React.FC<InnerProps> = ({
   setFormat,
 }) => {
   const api = useAlphaTabApi();
-  const state = useAlphaTabState();
+  const state = usePlayerState();
   const score = state.currentScore;
   const scoreInfo = score
     ? {
@@ -115,7 +111,7 @@ const Inner: React.FC<InnerProps> = ({
           Reload from bytes
         </button>
       </div>
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -138,14 +134,14 @@ api.scoreLoaded.on((score) => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer player={true}>
+      <PlayerProvider player={true}>
         <Inner
           byteCount={byteCount}
           setByteCount={setByteCount}
           format={format}
           setFormat={setFormat}
         />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

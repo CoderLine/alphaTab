@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls } from "@coderline/alphatab-ui";
 import { FOLK_ARPEGGIO } from "@site/src/tex-riffs";
 
 export interface ZoomSliderDemoProps {
@@ -19,7 +15,7 @@ export interface ZoomSliderDemoProps {
 const DEFAULT_TEX = FOLK_ARPEGGIO;
 
 function ApplyScale({ scale }: { scale: number }) {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   useEffect(() => {
     if (controls) {
       controls.setScale(scale);
@@ -102,15 +98,15 @@ slider.addEventListener('change', (event) => {
           opacity: pendingScale === scale ? 1 : 0.6,
         }}
       >
-        <AlphaTabPlayer
+        <PlayerProvider
           file={file}
           tex={texContent}
           player={true}
           settings={{ display: { scale: 1.3 } }}
         >
           <ApplyScale scale={scale} />
-          <AlphaTabCanvas />
-        </AlphaTabPlayer>
+          <PlayerHost />
+        </PlayerProvider>
       </div>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>

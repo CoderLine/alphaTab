@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import { IconArrow } from '../shared/icons';
+import { IconArrow } from '@coderline/alphatab-ui';
 import { TabNotation } from '../shared/tab-notation';
 import { ProjectMark } from './project-mark';
 import type { ShowcaseStory } from './stories-data';

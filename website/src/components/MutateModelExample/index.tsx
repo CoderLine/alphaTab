@@ -1,12 +1,8 @@
 import React, { useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 
 const SCORE_URL = "/files/features/Chords.gp5";
 
@@ -147,7 +143,7 @@ const MutateModelInner: React.FC = () => {
       >
         Each button walks the six-level tree, mutates one field, and re-renders.
       </p>
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -155,9 +151,9 @@ const MutateModelInner: React.FC = () => {
 export const MutateModelExample: React.FC = () => {
   return (
     <div>
-      <AlphaTabPlayer file={SCORE_URL}>
+      <PlayerProvider file={SCORE_URL}>
         <MutateModelInner />
-      </AlphaTabPlayer>
+      </PlayerProvider>
     </div>
   );
 };

@@ -1,11 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabEvent,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 import CodeBlock from '@theme/CodeBlock';
 import styles from './styles.module.scss';
 
@@ -209,13 +205,13 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({
             ) : (
                 <audio ref={audioRef} src={src} controls autoPlay={false} />
             )}
-            <AlphaTabPlayer
+            <PlayerProvider
                 file={scoreFile}
                 settings={{ player: { playerMode: 'EnabledExternalMedia' } }}
             >
                 <ExternalMediaBridge media={mediaRef} />
-                <AlphaTabCanvas />
-            </AlphaTabPlayer>
+                <PlayerHost />
+            </PlayerProvider>
             {showCode && <CodeBlock language="typescript" title="TypeScript Code for this sample">
                 {[
                     `const media = document.querySelector('#${mediaType}-element');`,

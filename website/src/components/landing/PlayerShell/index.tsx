@@ -2,24 +2,25 @@ import React from 'react';
 import clsx from 'clsx';
 import type * as alphaTab from '@coderline/alphatab';
 import {
-    AlphaTabCanvas,
-    useAlphaTabState,
-    useAlphaTabControls,
-} from '@site/src/alphatab-react';
-import { PlaybackStatusLine } from '@site/src/components/PlaybackSettings';
-import {
+    PlayerHost,
+    usePlayerState,
+    usePlayerControls,
+    PlaybackStatusLine,
     IconPlay,
     IconPause,
     IconVolume,
     IconSettings,
     IconMaximize,
     IconMinimize,
-} from '../shared/icons';
-import { formatTime } from '../shared/format-time';
-import { PHONE_QUERY, useMediaQuery } from '../shared/use-media-query';
-import { Scrubber } from './scrubber';
-import { SettingsFlyout, type SettingsFlyoutState, type SettingsFlyoutHandlers } from './settings-flyout';
-import { SourceSwitch } from './source-switch';
+    formatTime,
+    PHONE_QUERY,
+    useMediaQuery,
+    Scrubber,
+    SettingsFlyout,
+    type SettingsFlyoutState,
+    type SettingsFlyoutHandlers,
+    SourceSwitch,
+} from '@coderline/alphatab-ui';
 import { useMaximize } from './use-maximize';
 import styles from './styles.module.scss';
 
@@ -71,8 +72,8 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     active = true,
     sourceSwitch = false,
 }) => {
-    const state = useAlphaTabState();
-    const controls = useAlphaTabControls();
+    const state = usePlayerState();
+    const controls = usePlayerControls();
     const isPhone = useMediaQuery(PHONE_QUERY);
     const [settingsOpen, setSettingsOpen] = React.useState(false);
 
@@ -171,7 +172,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         <>
             {notationHeader}
             <div className={clsx(isPhone ? styles.mobileNotation : styles.notationArea, notationDimmed && styles.notationDimmed)}>
-                {active && <AlphaTabCanvas className={styles.notationCanvas} />}
+                {active && <PlayerHost className={styles.notationCanvas} />}
                 {notationMessage && (
                     <div className={styles.notationMessage} aria-hidden="true">{notationMessage}</div>
                 )}

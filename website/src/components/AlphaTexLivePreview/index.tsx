@@ -1,10 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls } from "@coderline/alphatab-ui";
 import * as Riffs from "@site/src/tex-riffs";
 import styles from "./styles.module.scss";
 
@@ -20,7 +16,7 @@ interface InnerProps {
 }
 
 const Inner: React.FC<InnerProps> = ({ text, setText }) => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onChange = (value: string) => {
@@ -56,7 +52,7 @@ const Inner: React.FC<InnerProps> = ({ text, setText }) => {
         spellCheck={false}
         onChange={(e) => onChange(e.target.value)}
       />
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -80,9 +76,9 @@ document.getElementById('tex-input').addEventListener('input', (e) => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer tex={INITIAL_TEX} player={true}>
+      <PlayerProvider tex={INITIAL_TEX} player={true}>
         <Inner text={text} setText={setText} />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

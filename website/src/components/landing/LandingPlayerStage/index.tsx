@@ -4,31 +4,32 @@ import React from 'react';
 import clsx from 'clsx';
 import type { model } from '@coderline/alphatab';
 import {
-    AlphaTabPlayer,
-    useAlphaTabState,
-    useAlphaTabControls,
-} from '@site/src/alphatab-react';
-import {
+    PlayerProvider,
+    usePlayerState,
+    usePlayerControls,
     IconVolume,
     IconCaret,
     IconExternalLink,
     IconWaveform,
-} from '../shared/icons';
+    formatCapo,
+    formatKey,
+    formatTuning,
+    trackColor,
+} from '@coderline/alphatab-ui';
 import { PLAYER_SHELL_SETTINGS, PlayerShell, PlayerTab } from '../PlayerShell';
 import { OpenInPlaygroundLink } from '@site/src/components/Playground/open-in-playground';
 import { DEMO_FILES } from './demo-files';
-import { formatCapo, formatKey, formatTuning, trackColor } from '../shared/score-info';
 import styles from './styles.module.scss';
 
 export const LandingPlayerStage: React.FC = () => (
-    <AlphaTabPlayer settings={PLAYER_SHELL_SETTINGS}>
+    <PlayerProvider settings={PLAYER_SHELL_SETTINGS}>
         <LandingPlayerStageInner />
-    </AlphaTabPlayer>
+    </PlayerProvider>
 );
 
 const LandingPlayerStageInner: React.FC = () => {
-    const state = useAlphaTabState();
-    const controls = useAlphaTabControls();
+    const state = usePlayerState();
+    const controls = usePlayerControls();
 
     const [activeFileIndex, setActiveFileIndex] = React.useState(0);
     const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false);

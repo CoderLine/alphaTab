@@ -2,12 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi } from "@coderline/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -36,7 +32,7 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ renderCountVisible }) => {
     const api = useAlphaTabApi();
-    const state = useAlphaTabState();
+    const state = usePlayerState();
     const canvasWrapRef = useRef<HTMLDivElement>(null);
     const [lazy, setLazy] = useState(true);
     const [chunkCount, setChunkCount] = useState(0);
@@ -90,7 +86,7 @@ const Inner: React.FC<InnerProps> = ({ renderCountVisible }) => {
             </div>
             <ApplyLazyLoading lazy={lazy} />
             <div ref={canvasWrapRef}>
-                <AlphaTabCanvas className={styles.scroller} />
+                <PlayerHost className={styles.scroller} />
             </div>
         </div>
     );
@@ -107,8 +103,8 @@ export const LazyLoadingDemo: React.FC<LazyLoadingDemoProps> = ({
     };
 
     return (
-        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+        <PlayerProvider file={file} tex={tex} settings={settings}>
             <Inner renderCountVisible={renderCountVisible} />
-        </AlphaTabPlayer>
+        </PlayerProvider>
     );
 };

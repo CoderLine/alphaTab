@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabControls,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
 
 type Field =
@@ -37,7 +33,7 @@ export interface CoveragePaletteDemoProps {
 
 function ApplyPalette({ palette }: { palette: PaletteState }) {
   const api = useAlphaTabApi();
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const module = useAlphaTabModule();
   useEffect(() => {
     if (!api || !controls || !module) { return; }
@@ -122,7 +118,7 @@ export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
           </label>
         ))}
       </div>
-      <AlphaTabPlayer
+      <PlayerProvider
         file="/files/features/Chords.gp5"
         player={true}
         settings={{
@@ -138,8 +134,8 @@ export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
         }}
       >
         <ApplyPalette palette={palette} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

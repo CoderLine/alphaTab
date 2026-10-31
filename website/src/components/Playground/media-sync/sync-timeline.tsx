@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { useColorMode } from '@docusaurus/theme-common';
-import type { MediaElementLike } from '@site/src/alphatab-react';
+import type { MediaElementLike } from '@coderline/alphatab-ui';
 import { PEAK_BUCKET, type AudioAnalysis } from './model/audio';
 import { canToggle, moveMarker, toggleMarker } from './model/edit';
 import { isSyncPoint, type SyncMarker } from './model/timeline';

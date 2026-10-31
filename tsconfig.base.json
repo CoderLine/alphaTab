@@ -78,6 +78,9 @@
             "@coderline/alphatab-react": [
                 "${configDir}/../react/src/index"
             ],
+            "@coderline/alphatab-ui": [
+                "${configDir}/../ui/src/index"
+            ],
             "@coderline/alphatab-alphatex/*": [
                 "${configDir}/../alphatex/src/*"
             ],

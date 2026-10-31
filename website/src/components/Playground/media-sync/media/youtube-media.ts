@@ -1,4 +1,4 @@
-import type { MediaElementLike, MediaElementLikeEvent } from '@site/src/alphatab-react';
+import type { MediaElementLike, MediaElementLikeEvent } from '@coderline/alphatab-ui';
 
 interface YouTubePlayer {
     playVideo(): void;

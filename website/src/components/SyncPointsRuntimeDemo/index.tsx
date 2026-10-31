@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type * as alphaTab from '@coderline/alphatab';
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabEvent,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 import styles from './styles.module.scss';
 
 /**
@@ -172,13 +168,13 @@ export const SyncPointsRuntimeDemo: React.FC = () => {
                     Playing: <code>{shape}</code> — flip while paused or during playback; the cursor re-aligns immediately.
                 </span>
             </div>
-            <AlphaTabPlayer
+            <PlayerProvider
                 file={SCORE_URL}
                 settings={{ player: { playerMode: 'EnabledExternalMedia' } }}
             >
                 <InnerBridge audio={audioRef} shape={shape} />
-                <AlphaTabCanvas />
-            </AlphaTabPlayer>
+                <PlayerHost />
+            </PlayerProvider>
         </div>
     );
 };

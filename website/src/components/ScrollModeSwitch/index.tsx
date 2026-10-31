@@ -2,13 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabModule,
-    useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi } from "@coderline/alphatab-react";
+import { useAlphaTabModule } from "@site/src/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -109,7 +105,7 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ modes, showOffsetSliders, customHandler }) => {
     const api = useAlphaTabApi();
-    const state = useAlphaTabState();
+    const state = usePlayerState();
 
     const pillModes: Mode[] =
         customHandler === "center-bar" ? [...modes, "Center bar"] : modes;
@@ -201,7 +197,7 @@ const Inner: React.FC<InnerProps> = ({ modes, showOffsetSliders, customHandler }
                     nativeSmooth={nativeSmooth}
                 />
             )}
-            <AlphaTabCanvas className={styles.scroller} />
+            <PlayerHost className={styles.scroller} />
         </div>
     );
 };
@@ -221,12 +217,12 @@ export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
     };
 
     return (
-        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+        <PlayerProvider file={file} tex={tex} settings={settings}>
             <Inner
                 modes={modes}
                 showOffsetSliders={showOffsetSliders}
                 customHandler={customHandler}
             />
-        </AlphaTabPlayer>
+        </PlayerProvider>
     );
 };

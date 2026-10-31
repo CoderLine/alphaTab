@@ -2,11 +2,8 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import type * as alphaTab from '@coderline/alphatab';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -95,10 +92,10 @@ const OutputDeviceControls: React.FC = () => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const OutputDeviceDemo: React.FC<OutputDeviceDemoProps> = ({ file, tex, showCode = true }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <PlayerProvider file={file} tex={tex}>
       <TransportBar />
       <OutputDeviceControls />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

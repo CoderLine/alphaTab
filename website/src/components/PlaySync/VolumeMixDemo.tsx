@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -16,7 +12,7 @@ export interface VolumeMixDemoProps {
 }
 
 const VolumeMixControls: React.FC = () => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const [master, setMaster] = useState(1);
   const [metronome, setMetronome] = useState(0.3);
   const [countIn, setCountIn] = useState(0.7);
@@ -63,10 +59,10 @@ const VolumeMixControls: React.FC = () => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const VolumeMixDemo: React.FC<VolumeMixDemoProps> = ({ file, tex, showCode = true }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <PlayerProvider file={file} tex={tex}>
       <TransportBar />
       <VolumeMixControls />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

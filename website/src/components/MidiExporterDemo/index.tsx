@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
 
 export interface MidiExporterDemoProps {
@@ -143,10 +140,10 @@ export const MidiExporterDemo: React.FC<MidiExporterDemoProps> = ({
 }) => {
   return (
     <div>
-      <AlphaTabPlayer file="/files/features/Chords.gp5">
+      <PlayerProvider file="/files/features/Chords.gp5">
         <MidiExporterControls />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

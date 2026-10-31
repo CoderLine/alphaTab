@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { useAlphaTabModule } from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type PolicyName = "Hidden" | "FirstSystem" | "AllSystems";
@@ -133,14 +129,14 @@ export const TrackNamePolicyDemo: React.FC<TrackNamePolicyDemoProps> = ({
           </select>
         </label>
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
+      <PlayerProvider tex={DEMO_TEX} tracks="all" player={true}>
         <ApplyTrackNames
           policy={policy}
           mode={mode}
           orientation={orientation}
         />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

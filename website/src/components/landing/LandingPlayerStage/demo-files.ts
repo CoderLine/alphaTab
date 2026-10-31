@@ -1,5 +1,5 @@
 import * as Riffs from '@site/src/tex-riffs';
-import type { ScoreSource } from '@site/src/alphatab-react';
+import type { ScoreSource } from '@coderline/alphatab-ui';
 
 export interface DemoFile {
     /** Stable identifier, used in Playground links (`/playground?file=<id>`). */

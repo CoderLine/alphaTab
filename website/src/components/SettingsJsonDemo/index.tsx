@@ -1,12 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
 
 export interface SettingsJsonDemoProps {
@@ -196,7 +192,7 @@ const SettingsJsonInner: React.FC = () => {
           </span>
         </div>
       </div>
-      <AlphaTabCanvas />
+      <PlayerHost />
       <div
         style={{
           display: "flex",
@@ -259,13 +255,13 @@ export const SettingsJsonDemo: React.FC<SettingsJsonDemoProps> = ({
 }) => {
   return (
     <div>
-      <AlphaTabPlayer
+      <PlayerProvider
         file="/files/features/Chords.gp5"
         player={true}
         settings={{ display: { scale: 1.0 } }}
       >
         <SettingsJsonInner />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

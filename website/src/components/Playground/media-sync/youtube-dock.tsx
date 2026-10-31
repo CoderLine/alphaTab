@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import { IconChevronDown, IconYoutube } from '@site/src/components/landing/shared/icons';
-import { IconButton } from '../ui/icon-button';
+import { IconChevronDown, IconYoutube, IconButton } from '@coderline/alphatab-ui';
 import { YouTubeEmbed } from './media/youtube-embed';
 import { useMediaSync } from './media-sync-context';
 import styles from './media-sync.module.scss';

@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type Placement = "Top" | "Inline";
@@ -66,14 +62,14 @@ export const ChordDiagramLayoutSwitch: React.FC<
           </li>
         ))}
       </ul>
-      <AlphaTabPlayer
+      <PlayerProvider
         file="/files/features/Chords.gp5"
         player={true}
         settings={{ display: { barCount: 12 } }}
       >
         <ApplyPlacement placement={placement} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

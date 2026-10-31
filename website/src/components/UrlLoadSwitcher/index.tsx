@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
 import styles from "./styles.module.scss";
 
 export interface UrlLoadSwitcherProps {
@@ -21,8 +16,8 @@ interface InnerProps {
 }
 
 const Inner: React.FC<InnerProps> = ({ currentUrl, setCurrentUrl }) => {
-  const controls = useAlphaTabControls();
-  const state = useAlphaTabState();
+  const controls = usePlayerControls();
+  const state = usePlayerState();
   const score = state.currentScore;
   const meta = score
     ? {
@@ -70,7 +65,7 @@ const Inner: React.FC<InnerProps> = ({ currentUrl, setCurrentUrl }) => {
           <span> — {meta.artist}</span>
         </div>
       )}
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -93,9 +88,9 @@ document.getElementById('load-rhythm').addEventListener('click', () => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={CHORDS_URL} player={true}>
+      <PlayerProvider file={CHORDS_URL} player={true}>
         <Inner currentUrl={currentUrl} setCurrentUrl={setCurrentUrl} />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

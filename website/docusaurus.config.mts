@@ -730,7 +730,7 @@ async function createConfig(): Promise<Config> {
               // Monaco's root entry registers ~80 bundled languages; the site only needs alphaTex.
               "monaco-editor$": path.resolve(
                 context.siteDir,
-                "src/components/AlphaTexEditor/monaco-slim.ts"
+                "src/monaco-slim.ts"
               ),
             };
 

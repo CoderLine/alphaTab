@@ -1,12 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -154,14 +150,14 @@ export const SoundFontSwitcher: React.FC<SoundFontSwitcherProps> = ({
   showCode = true,
 }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex} settings={PLAYER_SETTINGS}>
+    <PlayerProvider file={file} tex={tex} settings={PLAYER_SETTINGS}>
       <TransportBar />
       <SoundFontControls
         options={options}
         allowCustomUrl={allowCustomUrl}
         append={append}
       />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

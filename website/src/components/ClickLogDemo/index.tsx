@@ -2,13 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabEvent,
-    useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import styles from "./styles.module.scss";
@@ -76,7 +71,7 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
     const api = useAlphaTabApi();
-    const state = useAlphaTabState();
+    const state = usePlayerState();
     const [entries, setEntries] = useState<LogEntry[]>([]);
     const [seekToClick, setSeekToClick] = useState(true);
     const [playbackRangeSelection, setPlaybackRangeSelection] = useState(true);
@@ -207,7 +202,7 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
                 />
             )}
             <div className={styles.grid}>
-                <AlphaTabCanvas className={styles.score} />
+                <PlayerHost className={styles.score} />
                 <div className={styles.log}>
                     <div className={styles.logHeader}>Event log</div>
                     <pre className={styles.logBody}>
@@ -247,8 +242,8 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
     };
 
     return (
-        <AlphaTabPlayer file={file} tex={tex} settings={settings}>
+        <PlayerProvider file={file} tex={tex} settings={settings}>
             <Inner showInteractionToggle={showInteractionToggle} />
-        </AlphaTabPlayer>
+        </PlayerProvider>
     );
 };

@@ -1,17 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  AlphaTabPlayer,
-  useAlphaTabState,
-  useAlphaTabControls,
+  PlayerProvider,
+  usePlayerState,
+  usePlayerControls,
   type TexDiagnostic,
   type TexLoadResult,
-} from '@site/src/alphatab-react';
-import { AlphaTexEditor, useNearViewport, type AlphaTexEditorHandle } from '@site/src/components/AlphaTexEditor';
-import { RenderStatus, describeScore } from '@site/src/components/AlphaTexEditor/render-status';
+  AlphaTexEditor,
+  useNearViewport,
+  type AlphaTexEditorHandle,
+  RenderStatus,
+  describeScore,
+  IconExternalLink,
+  IconFileMusic,
+  NOT_DESKTOP_QUERY,
+  useMediaQuery,
+} from '@coderline/alphatab-ui';
 import { SectionHeader } from '../section-header';
 import { Btn } from '../shared/btn';
-import { IconExternalLink, IconFileMusic } from '../shared/icons';
-import { NOT_DESKTOP_QUERY, useMediaQuery } from '../shared/use-media-query';
 import { PLAYER_SHELL_SETTINGS, PlayerShell, PlayerTab } from '../PlayerShell';
 import { usePlaygroundLink } from '@site/src/components/Playground/open-in-playground';
 import { PRESETS, type AlphaTexPreset } from './presets';
@@ -56,9 +61,9 @@ export const LandingPlayground: React.FC = () => {
         />
 
         <div ref={frameRef}>
-          <AlphaTabPlayer settingsPreset="landing" settings={PLAYER_SHELL_SETTINGS}>
+          <PlayerProvider settingsPreset="landing" settings={PLAYER_SHELL_SETTINGS}>
             <PlaygroundPlayer active={nearViewport} preset={preset} onSelectPreset={selectPreset} text={text} onTextChange={setText} />
-          </AlphaTabPlayer>
+          </PlayerProvider>
         </div>
 
         <div className={styles.mobileCta}>{openPlayground(true, false)}</div>
@@ -81,8 +86,8 @@ interface PlaygroundPlayerProps {
 
 /** Mounts the editor and the renderer only once `active`, so neither costs anything before the section is near. */
 const PlaygroundPlayer: React.FC<PlaygroundPlayerProps> = ({ active, preset, onSelectPreset: selectPreset, text, onTextChange: setText }) => {
-  const state = useAlphaTabState();
-  const controls = useAlphaTabControls();
+  const state = usePlayerState();
+  const controls = usePlayerControls();
   const compact = useMediaQuery(NOT_DESKTOP_QUERY);
   const editorRef = useRef<AlphaTexEditorHandle>(null);
 

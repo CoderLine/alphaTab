@@ -1,13 +1,8 @@
 'use client';
 
 import React from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -18,7 +13,7 @@ export interface SeekDemoProps {
 }
 
 const SeekControls: React.FC = () => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const api = useAlphaTabApi();
   const [tick, setTick] = React.useState(0);
   const [time, setTime] = React.useState(0);
@@ -57,10 +52,10 @@ const SeekControls: React.FC = () => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const SeekDemo: React.FC<SeekDemoProps> = ({ file, tex, showCode = true }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <PlayerProvider file={file} tex={tex}>
       <TransportBar />
       <SeekControls />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

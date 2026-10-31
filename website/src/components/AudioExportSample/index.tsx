@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from '@theme/CodeBlock';
 import './styles.module.scss';
 
@@ -125,10 +122,10 @@ const AudioExportControls: React.FC = () => {
 export const AudioExportSample: React.FC = () => {
     return (
         <>
-            <AlphaTabPlayer file="/files/Bach_Prelude_BWV999.gp">
+            <PlayerProvider file="/files/Bach_Prelude_BWV999.gp">
                 <AudioExportControls />
-                <AlphaTabCanvas />
-            </AlphaTabPlayer>
+                <PlayerHost />
+            </PlayerProvider>
             <CodeBlock language="typescript">
                 {[
                     "async function generateWav() {",

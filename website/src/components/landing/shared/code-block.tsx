@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { IconCopy } from './icons';
+import { IconCopy } from '@coderline/alphatab-ui';
 import styles from './code-block.module.scss';
 
 interface CodeBlockProps {

@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import type { model } from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import styles from "./styles.module.scss";
 
 export interface DirectImporterDemoProps {
@@ -80,7 +77,7 @@ const Inner: React.FC<InnerProps> = ({ setInfo }) => {
     };
   }, [api, module, setInfo]);
 
-  return <AlphaTabCanvas />;
+  return <PlayerHost />;
 };
 
 export const DirectImporterDemo: React.FC<DirectImporterDemoProps> = ({
@@ -107,9 +104,9 @@ api.renderScore(score, [0]);`;
     <div className={styles.demo}>
       <div className={styles.split}>
         <div className={styles.render}>
-          <AlphaTabPlayer player={true}>
+          <PlayerProvider player={true}>
             <Inner info={info} setInfo={setInfo} />
-          </AlphaTabPlayer>
+          </PlayerProvider>
         </div>
         <aside className={styles.inspection} aria-label="Score inspection">
           <h4>Score model (pre-render)</h4>

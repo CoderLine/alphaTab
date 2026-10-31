@@ -1,12 +1,8 @@
 import React, { useEffect } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabModule,
-  type AlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule, type AlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
 
 const tex = `
@@ -121,10 +117,10 @@ export const FormattingTemplateSample: React.FC = () => {
 
   return (
     <div>
-      <AlphaTabPlayer player={true}>
+      <PlayerProvider player={true}>
         <FormattingTemplateInner />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       <CodeBlock language="js">{trimmed}</CodeBlock>
     </div>
   );

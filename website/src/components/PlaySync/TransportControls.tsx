@@ -5,12 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solid from '@fortawesome/free-solid-svg-icons';
 import CodeBlock from '@theme/CodeBlock';
 import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabState,
-  type AlphaTabPlayerProps,
-} from '@site/src/alphatab-react';
+  PlayerProvider,
+  PlayerHost,
+  usePlayerControls,
+  usePlayerState,
+  type PlayerProviderProps,
+} from '@coderline/alphatab-ui';
 import styles from './styles.module.scss';
 
 export interface TransportControlsProps {
@@ -18,8 +18,8 @@ export interface TransportControlsProps {
   file?: string;
   /** Inline alphaTex source to load. Mutually exclusive with `file`. */
   tex?: string;
-  settings?: AlphaTabPlayerProps['settings'];
-  tracks?: AlphaTabPlayerProps['tracks'];
+  settings?: PlayerProviderProps['settings'];
+  tracks?: PlayerProviderProps['tracks'];
   /** Render a copy-pasteable code block below the demo. Defaults to `true`. */
   showCode?: boolean;
   /** Optional custom TypeScript snippet shown when `showCode` is true. */
@@ -41,12 +41,12 @@ const formatDuration = (ms: number) => {
 
 /**
  * Standalone transport strip — Play/Pause, Stop, time readout, progress bar.
- * Must be rendered inside an `<AlphaTabPlayer>`. Exposed so demos that layer
+ * Must be rendered inside an `<PlayerProvider>`. Exposed so demos that layer
  * their own chrome on top of the transport can compose it as a sibling.
  */
 export const TransportBar: React.FC = () => {
-  const controls = useAlphaTabControls();
-  const { isPlaying, currentTime, endTime } = useAlphaTabState();
+  const controls = usePlayerControls();
+  const { isPlaying, currentTime, endTime } = usePlayerState();
   const safeEnd = endTime > 0 ? endTime : 1;
   const progress = (currentTime / safeEnd) * 100;
 
@@ -83,7 +83,7 @@ export const TransportBar: React.FC = () => {
 };
 
 /**
- * Thin `AlphaTabPlayer` wrapper that lays down the standard demo chrome:
+ * Thin `PlayerProvider` wrapper that lays down the standard demo chrome:
  * transport bar on top, the score below, an optional code block at the
  * bottom. Additional consumer components can be composed via `children` —
  * they render between the transport bar and the score.
@@ -103,11 +103,11 @@ export const TransportControls: React.FC<TransportControlsProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <AlphaTabPlayer file={file} tex={tex} tracks={tracks} settings={settings}>
+      <PlayerProvider file={file} tex={tex} tracks={tracks} settings={settings}>
         <TransportBar />
         {children}
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode && codeSample && (
         <CodeBlock language="typescript" title="TypeScript Code for this sample">
           {codeSample}

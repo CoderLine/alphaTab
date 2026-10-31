@@ -1,12 +1,8 @@
 import React, { useEffect } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabModule,
-  type AlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule, type AlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
 
 export interface ProgrammaticScoreExampleProps {
@@ -141,10 +137,10 @@ export const ProgrammaticScoreExample: React.FC<ProgrammaticScoreExampleProps> =
 }) => {
   return (
     <div>
-      <AlphaTabPlayer player={true}>
+      <PlayerProvider player={true}>
         <RenderBuiltScore />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

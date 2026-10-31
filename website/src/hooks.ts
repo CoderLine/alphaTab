@@ -1,7 +1,7 @@
 import React, { type DependencyList, type EffectCallback, useEffect, useRef, useState } from "react";
 import * as alphaTab from "@coderline/alphatab";
 import environment from "./environment";
-import { PlaybackController } from "./alphatab-react/playback/playback-controller";
+import { PlaybackController } from "@coderline/alphatab-ui";
 import {useColorMode} from '@docusaurus/theme-common';
 
 export function useAlphaTab(

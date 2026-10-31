@@ -1,12 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabState,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerState } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -24,7 +20,7 @@ export interface TrackMixerDemoProps {
 
 const TrackMixer: React.FC = () => {
   const api = useAlphaTabApi();
-  const { tracks } = useAlphaTabState();
+  const { tracks } = usePlayerState();
   const [state, setState] = useState<Map<number, TrackState>>(new Map());
 
   // Seed the mixer strip state whenever a new score is loaded.
@@ -128,10 +124,10 @@ export const TrackMixerDemo: React.FC<TrackMixerDemoProps> = ({
   showCode = true,
 }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file}>
+    <PlayerProvider file={file}>
       <TransportBar />
       <TrackMixer />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

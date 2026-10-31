@@ -1,11 +1,8 @@
 import React from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabEvent } from "@coderline/alphatab-react";
+import { useAlphaTabModule } from "@site/src/alphatab-react";
 import * as Riffs from "@site/src/tex-riffs";
 import CodeBlock from "@theme/CodeBlock";
 
@@ -166,10 +163,10 @@ export const ColoringExample: React.FC<ColoringExampleProps> = ({
 
   return (
     <div>
-      <AlphaTabPlayer tex={TEX} player={true}>
+      <PlayerProvider tex={TEX} player={true}>
         <ApplyColors />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{trimmed}</CodeBlock> : null}
     </div>
   );

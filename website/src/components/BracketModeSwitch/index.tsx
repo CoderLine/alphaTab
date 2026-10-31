@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { useAlphaTabModule } from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 type ModeName = "NoBrackets" | "GroupStaves" | "GroupSimilarInstruments";
@@ -72,10 +68,10 @@ export const BracketModeSwitch: React.FC<BracketModeSwitchProps> = ({
           </li>
         ))}
       </ul>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
+      <PlayerProvider tex={DEMO_TEX} tracks="all" player={true}>
         <ApplyBracketMode mode={mode} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

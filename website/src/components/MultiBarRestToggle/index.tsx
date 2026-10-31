@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 
 export interface MultiBarRestToggleProps {
@@ -74,10 +70,10 @@ export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
           Collapse consecutive empty bars into a multi-bar rest
         </label>
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} tracks="all" player={true}>
+      <PlayerProvider tex={DEMO_TEX} tracks="all" player={true}>
         <ApplyMultiBarRest enabled={enabled} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

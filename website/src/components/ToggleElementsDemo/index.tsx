@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabControls,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
 
 type ElementKey =
@@ -55,7 +51,7 @@ function ApplyElementVisibility({
   visibility: Record<ElementKey, boolean>;
 }) {
   const api = useAlphaTabApi();
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const module = useAlphaTabModule();
   useEffect(() => {
     if (!api || !controls || !module) { return; }
@@ -131,10 +127,10 @@ ${disabledEntries || "      // every element visible"}
           </label>
         ))}
       </div>
-      <AlphaTabPlayer tex={DEMO_TEX} player={true}>
+      <PlayerProvider tex={DEMO_TEX} player={true}>
         <ApplyElementVisibility visibility={visibility} />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

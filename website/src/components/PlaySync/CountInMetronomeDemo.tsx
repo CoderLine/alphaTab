@@ -1,14 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -21,7 +16,7 @@ export interface CountInMetronomeDemoProps {
 type PlaybackPhase = 'Stopped' | 'Count-in bar' | 'Playing' | 'Paused';
 
 const CountInControls: React.FC = () => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const api = useAlphaTabApi();
   const module = useAlphaTabModule();
   const [countIn, setCountIn] = useState(true);
@@ -101,10 +96,10 @@ export const CountInMetronomeDemo: React.FC<CountInMetronomeDemoProps> = ({
   showCode = true,
 }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <PlayerProvider file={file} tex={tex}>
       <TransportBar />
       <CountInControls />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

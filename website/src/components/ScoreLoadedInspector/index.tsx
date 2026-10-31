@@ -1,11 +1,6 @@
 import React from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
 import styles from "./styles.module.scss";
 
 export interface ScoreLoadedInspectorProps {
@@ -15,8 +10,8 @@ export interface ScoreLoadedInspectorProps {
 const SOURCE_URL = "/files/Bach_Prelude_BWV999.gp";
 
 const Inner: React.FC = () => {
-  const state = useAlphaTabState();
-  const controls = useAlphaTabControls();
+  const state = usePlayerState();
+  const controls = usePlayerControls();
   const score = state.currentScore;
   const info = score
     ? {
@@ -86,7 +81,7 @@ const Inner: React.FC = () => {
           </p>
         )}
       </div>
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -107,9 +102,9 @@ api.scoreLoaded.on((score) => {
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={SOURCE_URL} player={true}>
+      <PlayerProvider file={SOURCE_URL} player={true}>
         <Inner />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

@@ -1,10 +1,6 @@
 import React, { useEffect } from "react";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabControls,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
 
 export interface AlphaTabPetalumaProps {
   children: string | React.ReactElement;
@@ -12,7 +8,7 @@ export interface AlphaTabPetalumaProps {
 
 function ApplyPetalumaMetadata() {
   const api = useAlphaTabApi();
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   useEffect(() => {
     if (!api || !controls) { return; }
     const request = new XMLHttpRequest();
@@ -37,7 +33,7 @@ export const AlphaTabPetaluma: React.FC<AlphaTabPetalumaProps> = ({
 }) => {
   const tex = typeof children === "string" ? children : undefined;
   return (
-    <AlphaTabPlayer
+    <PlayerProvider
       tex={tex}
       player={true}
       settings={{
@@ -51,7 +47,7 @@ export const AlphaTabPetaluma: React.FC<AlphaTabPetalumaProps> = ({
       }}
     >
       <ApplyPetalumaMetadata />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   );
 };

@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-    useAlphaTabControls,
-    useAlphaTabSelector,
+    usePlayerControls,
+    usePlayerSelector,
     type BackingTrackSource,
     type ScoreSource,
     type TexLoadResult,
-} from '@site/src/alphatab-react';
+} from '@coderline/alphatab-ui';
 import { DEFAULT_SAMPLE_ID, findSample, type PlaygroundSample } from './sources';
 import { buildPlaygroundUrl, parsePlaygroundUrl, type PlaygroundLinkTarget, type TrackSelection } from './url-state';
 
@@ -110,9 +110,9 @@ function documentForTarget(target: PlaygroundLinkTarget | null): PlaygroundDocum
 
 /** Opens, loads and links the Playground's score. Must be used inside `<AlphaTabPlayer>`. */
 export function usePlaygroundDocument(): PlaygroundDocumentState {
-    const controls = useAlphaTabControls();
-    const renderedTracks = useAlphaTabSelector((s) => s.renderedTracks);
-    const trackCount = useAlphaTabSelector((s) => s.tracks.length);
+    const controls = usePlayerControls();
+    const renderedTracks = usePlayerSelector((s) => s.renderedTracks);
+    const trackCount = usePlayerSelector((s) => s.tracks.length);
     const [document, setDocument] = useState<PlaygroundDocument | null>(null);
     const [text, setText] = useState('');
     const [texResult, setTexResult] = useState<PlaygroundDocumentState['texResult']>(null);

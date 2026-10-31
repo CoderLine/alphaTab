@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -22,7 +18,7 @@ const OPTIONS = [
 ];
 
 const BufferSizeControls: React.FC = () => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const [buffer, setBuffer] = useState(500);
 
   useEffect(() => {
@@ -53,10 +49,10 @@ const BufferSizeControls: React.FC = () => {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const BufferSizeDemo: React.FC<BufferSizeDemoProps> = ({ file, tex, showCode = true }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file} tex={tex}>
+    <PlayerProvider file={file} tex={tex}>
       <TransportBar />
       <BufferSizeControls />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

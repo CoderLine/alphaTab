@@ -1,4 +1,4 @@
-import type { ScoreSource } from '@site/src/alphatab-react';
+import type { ScoreSource } from '@coderline/alphatab-ui';
 import { DEMO_FILES } from '@site/src/components/landing/LandingPlayerStage/demo-files';
 import { PRESETS } from '@site/src/components/landing/LandingPlayground/presets';
 

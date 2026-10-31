@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-  useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { useAlphaTabModule } from "@site/src/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface LoadErrorDemoProps {
@@ -72,7 +67,7 @@ const Inner: React.FC<InnerProps> = ({
 }) => {
   const api = useAlphaTabApi();
   const module = useAlphaTabModule();
-  const state = useAlphaTabState();
+  const state = usePlayerState();
   const AlphaTabErrorType = module?.AlphaTabErrorType ?? null;
 
   useAlphaTabEvent(
@@ -174,7 +169,7 @@ const Inner: React.FC<InnerProps> = ({
           </span>
         )}
       </div>
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -199,14 +194,14 @@ export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={VALID_URL} player={true}>
+      <PlayerProvider file={VALID_URL} player={true}>
         <Inner
           record={record}
           setRecord={setRecord}
           success={success}
           setSuccess={setSuccess}
         />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

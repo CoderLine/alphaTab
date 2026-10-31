@@ -1,11 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';
 
@@ -62,7 +58,7 @@ const ToggleControls: React.FC<{
   file,
   tex,
 }) => {
-  const controls = useAlphaTabControls();
+  const controls = usePlayerControls();
   const [on, setOn] = useState(defaultOn);
   const isInitialRender = React.useRef(true);
 
@@ -113,7 +109,7 @@ export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
 
   return (
     <div className={styles.wrapper}>
-      <AlphaTabPlayer file={file} tex={tex} settings={initialSetting}>
+      <PlayerProvider file={file} tex={tex} settings={initialSetting}>
         <TransportBar />
         <ToggleControls
           settingPath={settingPath}
@@ -126,8 +122,8 @@ export const ToggleSettingDemo: React.FC<ToggleSettingDemoProps> = ({
           file={file}
           tex={tex}
         />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
     </div>
   );
 };

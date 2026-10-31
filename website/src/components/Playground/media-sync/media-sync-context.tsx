@@ -1,13 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { model, synth } from '@coderline/alphatab';
-import {
-    useAlphaTabApi,
-    useAlphaTabControls,
-    useAlphaTabEvent,
-    useAlphaTabModule,
-    useAlphaTabSelector,
-    type MediaElementLike,
-} from '@site/src/alphatab-react';
+import { usePlayerControls, usePlayerSelector, type MediaElementLike } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import { analyseAudio, type AudioAnalysis } from './model/audio';
 import { applySyncPoints, readTimelineInput, scoreHasSyncPoints, toFlatSyncPoints } from './model/apply';
 import { autoSync, markersFromScore } from './model/edit';
@@ -93,11 +88,11 @@ function audioElementOf(output: synth.ISynthOutput | undefined): HTMLAudioElemen
 /** Owns playback source, media and sync points of the Playground. Must be inside `<AlphaTabPlayer>`. */
 export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const api = useAlphaTabApi();
-    const store = useAlphaTabControls();
+    const store = usePlayerControls();
     const module = useAlphaTabModule();
-    const score = useAlphaTabSelector((s) => s.currentScore);
-    const effective = useAlphaTabSelector((s) => s.playback.effective);
-    const hasAudio = useAlphaTabSelector((s) => s.playback.hasBackingTrack);
+    const score = usePlayerSelector((s) => s.currentScore);
+    const effective = usePlayerSelector((s) => s.playback.effective);
+    const hasAudio = usePlayerSelector((s) => s.playback.hasBackingTrack);
 
     const [chosenKind, setChosenKind] = useState<MediaKind | null>(null);
     const kind: MediaKind =

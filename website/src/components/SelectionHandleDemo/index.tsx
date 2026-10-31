@@ -2,11 +2,8 @@
 
 import React, { useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabEvent,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabEvent } from "@coderline/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface SelectionHandleDemoProps {
@@ -63,7 +60,7 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({
 
     return (
         <div className={styles.wrapper}>
-            <AlphaTabPlayer
+            <PlayerProvider
                 tex={tex}
                 settings={{
                     player: {
@@ -73,8 +70,8 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({
                 }}
             >
                 {showEventLog && <HighlightPayloadTap onPayload={setPayload} />}
-                <AlphaTabCanvas withSelectionHandles />
-            </AlphaTabPlayer>
+                <PlayerHost withSelectionHandles />
+            </PlayerProvider>
             {showEventLog && (
                 <pre className={styles.eventLog}>
 {payload

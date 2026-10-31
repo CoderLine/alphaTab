@@ -1,12 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import styles from "./styles.module.scss";
 
 enum GuideType {
@@ -46,7 +42,7 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
     const scroller = api.settings.player.scrollElement;
     if (!(scroller instanceof HTMLElement)) { return null; }
     // alphaTab's mount sits inside `<div style="position: relative">` inside
-    // the scroll wrapper (see AlphaTabCanvas).
+    // the scroll wrapper (see PlayerHost).
     const relative = scroller.querySelector<HTMLDivElement>(
       ':scope > div[style*="position: relative"]'
     );
@@ -276,7 +272,7 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
           </li>
         </ul>
       </div>
-      <AlphaTabPlayer
+      <PlayerProvider
         tex={tex}
         tracks="all"
         player={true}
@@ -286,8 +282,8 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
           selectedType={selectedType}
           selectedElements={selectedElements}
         />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
     </>
   );
 };

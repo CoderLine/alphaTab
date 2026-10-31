@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
 import styles from "./styles.module.scss";
 
 export interface GpVersionSwitcherProps {
@@ -48,8 +43,8 @@ interface InnerProps {
 }
 
 const Inner: React.FC<InnerProps> = ({ active, setActive }) => {
-  const controls = useAlphaTabControls();
-  const state = useAlphaTabState();
+  const controls = usePlayerControls();
+  const state = usePlayerState();
   const loadedTitle = state.currentScore
     ? state.currentScore.title || "(untitled)"
     : null;
@@ -86,7 +81,7 @@ const Inner: React.FC<InnerProps> = ({ active, setActive }) => {
           </span>
         )}
       </div>
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -107,9 +102,9 @@ api.load('/scores/newer.gp');    // GP7/8 ZIP`;
 
   return (
     <div className={styles.demo}>
-      <AlphaTabPlayer file={INITIAL_VARIANT.file} player={true}>
+      <PlayerProvider file={INITIAL_VARIANT.file} player={true}>
         <Inner active={active} setActive={setActive} />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

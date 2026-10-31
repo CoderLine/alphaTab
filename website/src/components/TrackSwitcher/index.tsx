@@ -1,12 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabControls,
-  useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
+import { useAlphaTabApi } from "@coderline/alphatab-react";
 import styles from "./styles.module.scss";
 
 export interface TrackSwitcherProps {
@@ -20,8 +15,8 @@ interface TrackInfo {
 
 const Inner: React.FC = () => {
   const api = useAlphaTabApi();
-  const controls = useAlphaTabControls();
-  const state = useAlphaTabState();
+  const controls = usePlayerControls();
+  const state = usePlayerState();
 
   const tracks: TrackInfo[] = React.useMemo(
     () =>
@@ -118,7 +113,7 @@ const Inner: React.FC = () => {
           </>
         )}
       </div>
-      <AlphaTabCanvas />
+      <PlayerHost />
     </>
   );
 };
@@ -143,13 +138,13 @@ api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);`;
   return (
     <div className={styles.demo}>
       {/* Bach Prelude BWV 999 — PD single/multi-staff piece already shipped in the repo. */}
-      <AlphaTabPlayer
+      <PlayerProvider
         file="/files/Bach_Prelude_BWV999.gp"
         tracks={[0]}
         player={true}
       >
         <Inner />
-      </AlphaTabPlayer>
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

@@ -1,10 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
 
 export interface ResponsiveResizeDemoProps {
   showCode?: boolean;
@@ -108,13 +105,13 @@ api.resize.on((args) => {
           userSelect: dragging ? "none" : "auto",
         }}
       >
-        <AlphaTabPlayer file={file} player={true}>
+        <PlayerProvider file={file} player={true}>
           <TrackContainerWidth
             containerRef={containerRef}
             onWidthChange={setDisplayWidth}
           />
-          <AlphaTabCanvas />
-        </AlphaTabPlayer>
+          <PlayerHost />
+        </PlayerProvider>
         <div
           onMouseDown={(e) => {
             e.preventDefault();

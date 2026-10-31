@@ -1,6 +1,6 @@
 import React from 'react';
 import type * as alphaTab from '@coderline/alphatab';
-import { AlphaTabScore } from '@site/src/alphatab-react';
+import { PlayerScore } from '@coderline/alphatab-ui';
 
 export interface AlphaTabProps {
   file?: string;
@@ -12,10 +12,10 @@ export interface AlphaTabProps {
 }
 
 /**
- * Backwards-compatible shim over `<AlphaTabScore>`. MDX pages import
+ * Backwards-compatible shim over `<PlayerScore>`. MDX pages import
  * `<AlphaTab>` and pass alphaTex either as a string via `tex="..."` or
  * flagged as `tex={true}` with the source as children. Both forms are
- * normalized into the modern `AlphaTabScore` `tex` prop.
+ * normalized into the modern `PlayerScore` `tex` prop.
  */
 export const AlphaTab: React.FC<AlphaTabProps> = ({
   file,
@@ -33,7 +33,7 @@ export const AlphaTab: React.FC<AlphaTabProps> = ({
         : undefined;
 
   return (
-    <AlphaTabScore
+    <PlayerScore
       file={file}
       tex={texContent}
       tracks={tracks}

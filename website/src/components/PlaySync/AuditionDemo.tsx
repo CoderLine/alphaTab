@@ -1,12 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
+import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 import styles from './styles.module.scss';
 
 export interface AuditionDemoProps {
@@ -51,9 +47,9 @@ export const AuditionDemo: React.FC<AuditionDemoProps> = ({
   showCode = true,
 }) => (
   <div className={styles.wrapper}>
-    <AlphaTabPlayer file={file}>
+    <PlayerProvider file={file}>
       <AuditionControls />
-      <AlphaTabCanvas />
-    </AlphaTabPlayer>
+      <PlayerHost />
+    </PlayerProvider>
   </div>
 );

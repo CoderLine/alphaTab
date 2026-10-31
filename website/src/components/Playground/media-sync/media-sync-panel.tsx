@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useAlphaTabApi, useAlphaTabModule } from '@site/src/alphatab-react';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import {
     IconCheck,
     IconCopy,
@@ -16,15 +17,18 @@ import {
     IconZoomOut,
     IconChevronDown,
     IconCode,
-} from '@site/src/components/landing/shared/icons';
-import { Segmented } from '@site/src/components/landing/shared/segmented';
-import { PHONE_QUERY, useMediaQuery } from '@site/src/components/landing/shared/use-media-query';
-import { downloadBytes, withExtension } from '../download';
+    Segmented,
+    PHONE_QUERY,
+    useMediaQuery,
+    downloadBytes,
+    withExtension,
+    Dialog,
+    IconButton,
+    Menu,
+    MenuItem,
+    Panel,
+} from '@coderline/alphatab-ui';
 import type { PlaygroundDocumentState } from '../use-playground-document';
-import { Dialog } from '../ui/dialog';
-import { IconButton } from '../ui/icon-button';
-import { Menu, MenuItem } from '../ui/menu';
-import { Panel } from '../ui/panel';
 import { extractYouTubeVideoId } from './media/youtube-media';
 import { useMediaSync, type MediaKind } from './media-sync-context';
 import { generateSyncCode } from './model/codegen';

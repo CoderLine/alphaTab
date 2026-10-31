@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { IconArrow } from '../shared/icons';
+import { IconArrow } from '@coderline/alphatab-ui';
 import styles from './styles.module.scss';
 
 // NOTE: The design places this banner ABOVE the navbar. Docusaurus's <Layout>

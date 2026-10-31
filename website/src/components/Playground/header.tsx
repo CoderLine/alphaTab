@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useAlphaTabApi, useAlphaTabControls, useAlphaTabModule, useAlphaTabSelector } from '@site/src/alphatab-react';
 import {
+    usePlayerControls,
+    usePlayerSelector,
     IconCheck,
     IconClose,
     IconChevronDown,
@@ -13,14 +14,19 @@ import {
     IconTracks,
     IconUpload,
     IconWaveform,
-} from '@site/src/components/landing/shared/icons';
+    exportWav,
+    downloadBytes,
+    withExtension,
+    IconButton,
+    Menu,
+    MenuItem,
+    MenuLabel,
+} from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import { isIOS } from '@site/src/utils';
-import { exportWav } from './audio-export';
-import { downloadBytes, withExtension } from './download';
 import { PLAYGROUND_SAMPLES, type PlaygroundSample } from './sources';
 import type { PlaygroundDocument } from './use-playground-document';
-import { IconButton } from './ui/icon-button';
-import { Menu, MenuItem, MenuLabel } from './ui/menu';
 import styles from './playground.module.scss';
 
 export type PanelId = 'editor' | 'tracks' | 'settings' | 'sync';
@@ -48,7 +54,7 @@ export const PlaygroundHeader: React.FC<PlaygroundHeaderProps> = ({
     onOpenFile,
     buildShareUrl,
 }) => {
-    const score = useAlphaTabSelector((s) => s.currentScore);
+    const score = usePlayerSelector((s) => s.currentScore);
     const title = score?.title?.trim();
     const artist = score?.artist?.trim();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -196,8 +202,8 @@ const ShareButton: React.FC<{ document: PlaygroundDocument | null; buildShareUrl
 const ExportMenu: React.FC<{ document: PlaygroundDocument | null }> = ({ document }) => {
     const api = useAlphaTabApi();
     const module = useAlphaTabModule();
-    const store = useAlphaTabControls();
-    const currentScore = useAlphaTabSelector((s) => s.currentScore);
+    const store = usePlayerControls();
+    const currentScore = usePlayerSelector((s) => s.currentScore);
     const fileName = document?.fileName ?? 'score';
     const disabled = !api || !module || !currentScore;
     const [audioProgress, setAudioProgress] = useState<number | null>(null);

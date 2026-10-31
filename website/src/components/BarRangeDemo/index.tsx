@@ -1,11 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabControls,
-  useAlphaTabState,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
 import { BACH_PRELUDE_C_LONG } from "@site/src/tex-riffs";
 
 // Default sample: Bach, WTC I Prelude in C major BWV 846 bars 1–12 —
@@ -30,8 +25,8 @@ function ApplyRange({
   barCount: number;
   onTotalBarsChange: (n: number) => void;
 }) {
-  const controls = useAlphaTabControls();
-  const state = useAlphaTabState();
+  const controls = usePlayerControls();
+  const state = usePlayerState();
   useEffect(() => {
     if (controls) {
       controls.updateSettings({ display: { startBar, barCount } });
@@ -121,7 +116,7 @@ document.getElementById('next-page').addEventListener('click', () => {
           {totalBars > 0 ? ` of ${totalBars}` : ""}
         </span>
       </div>
-      <AlphaTabPlayer
+      <PlayerProvider
         file={file}
         tex={texContent}
         player={true}
@@ -132,8 +127,8 @@ document.getElementById('next-page').addEventListener('click', () => {
           barCount={barCount}
           onTotalBarsChange={setTotalBars}
         />
-        <AlphaTabCanvas />
-      </AlphaTabPlayer>
+        <PlayerHost />
+      </PlayerProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Btn } from '../shared/btn';
-import { IconArrow } from '../shared/icons';
+import { IconArrow } from '@coderline/alphatab-ui';
 import { LandingPlayerStage } from '../LandingPlayerStage';
 import styles from './styles.module.scss';
 

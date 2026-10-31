@@ -1,12 +1,8 @@
 import React, { FC, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import {
-  AlphaTabPlayer,
-  AlphaTabCanvas,
-  useAlphaTabApi,
-  useAlphaTabEvent,
-  useAlphaTabModule,
-} from "@site/src/alphatab-react";
+import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
+import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { useAlphaTabModule } from "@site/src/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
 import { openFile, openInputFile } from "@site/src/utils";
 
@@ -51,7 +47,7 @@ const AlphaTexExporterInner: FC = () => {
             style={{ cursor: 'pointer', overflow: 'auto', maxHeight: "50vh" }}
             onDoubleClick={() => api && openInputFile(api)}
         >
-            <AlphaTabCanvas />
+            <PlayerHost />
             <CodeBlock>{alphaTex}</CodeBlock>
         </div>
     );
@@ -59,8 +55,8 @@ const AlphaTexExporterInner: FC = () => {
 
 export const AlphaTexExporterSample: FC = () => {
     return (
-        <AlphaTabPlayer file="/files/Bach_Prelude_BWV999.gp">
+        <PlayerProvider file="/files/Bach_Prelude_BWV999.gp">
             <AlphaTexExporterInner />
-        </AlphaTabPlayer>
+        </PlayerProvider>
     );
 };

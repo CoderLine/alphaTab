@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
-import {
-    AlphaTabPlayer,
-    AlphaTabCanvas,
-    useAlphaTabApi,
-    useAlphaTabModule,
-    useAlphaTabState,
-} from '@site/src/alphatab-react';
+import { PlayerProvider, PlayerHost, usePlayerState } from '@coderline/alphatab-ui';
+import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { useAlphaTabModule } from '@site/src/alphatab-react';
 import styles from './styles.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solid from '@fortawesome/free-solid-svg-icons';
@@ -17,7 +13,7 @@ const tex = Riffs.BACH_PRELUDE_BWV999_SYNCED;
 const SyncPointInner: React.FC = () => {
     const api = useAlphaTabApi();
     const module = useAlphaTabModule();
-    const { isPlaying } = useAlphaTabState();
+    const { isPlaying } = usePlayerState();
 
     useEffect(() => {
         if (!api || !module) { return; }
@@ -42,7 +38,7 @@ const SyncPointInner: React.FC = () => {
             <button type="button" className="button button--primary" onClick={() => api?.playPause()}>
                 <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
             </button>
-            <AlphaTabCanvas />
+            <PlayerHost />
         </div>
     );
 };
@@ -50,14 +46,14 @@ const SyncPointInner: React.FC = () => {
 export const AlphaTexSyncPointSample: React.FC = () => {
     return (
         <>
-            <AlphaTabPlayer
+            <PlayerProvider
                 settings={{
                     core: { tex: true },
                     player: { playerMode: 'EnabledBackingTrack' },
                 }}
             >
                 <SyncPointInner />
-            </AlphaTabPlayer>
+            </PlayerProvider>
             <CodeBlock>{tex}</CodeBlock>
         </>
     );
