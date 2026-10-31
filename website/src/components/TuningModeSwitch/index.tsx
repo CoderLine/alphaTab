@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from '@coderline/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 type ModeName = "Score" | "Staff";
 
@@ -19,12 +23,10 @@ function ApplyTuning({
   hidden: boolean;
 }) {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
   const apply = (score: alphaTab.model.Score) => {
-    if (!module) { return; }
     const s = score.stylesheet;
     s.globalDisplayTuning = !hidden;
-    s.tuningDisplayMode = module.model.TuningDisplayMode[mode];
+    s.tuningDisplayMode = alphaTab.model.TuningDisplayMode[mode];
   };
   useAlphaTabEvent(
     "scoreLoaded",
@@ -37,7 +39,7 @@ function ApplyTuning({
       apply(api.score);
       api.render();
     }
-  }, [mode, hidden, api, module]);
+  }, [mode, hidden, api]);
   return null;
 }
 
@@ -46,6 +48,10 @@ export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
 }) => {
   const [mode, setMode] = useState<ModeName>("Score");
   const [hidden, setHidden] = useState(false);
+  const site = useSiteAlphaTabSettings({
+    player: true,
+    settings: { display: { barCount: 12 } },
+  });
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.globalDisplayTuning = ${!hidden};
@@ -93,14 +99,14 @@ export const TuningModeSwitch: React.FC<TuningModeSwitchProps> = ({
           Hide tuning globally
         </label>
       </div>
-      <PlayerProvider
+      <AlphaTabProvider
         file="/files/features/Tuning.gp5"
-        player={true}
-        settings={{ display: { barCount: 12 } }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
         <ApplyTuning mode={mode} hidden={hidden} />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

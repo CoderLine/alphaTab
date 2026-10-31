@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 export interface MidiExporterDemoProps {
   showCode?: boolean;
@@ -16,15 +15,14 @@ function formatBytes(n: number): string {
 }
 
 function buildMidiBytes(
-  module: typeof import("@coderline/alphatab"),
   api: alphaTab.AlphaTabApi,
   format: alphaTab.midi.MidiFileFormat,
 ): Uint8Array {
-  const midiFile = new module.midi.MidiFile();
+  const midiFile = new alphaTab.midi.MidiFile();
   midiFile.format = format;
 
-  const handler = new module.midi.AlphaSynthMidiFileHandler(midiFile, true);
-  const generator = new module.midi.MidiFileGenerator(
+  const handler = new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile, true);
+  const generator = new alphaTab.midi.MidiFileGenerator(
     api.score!,
     api.settings,
     handler,
@@ -51,15 +49,14 @@ api.scoreLoaded.on(() => {
 
 const MidiExporterControls: React.FC = () => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
   const [captions, setCaptions] = useState<CaptionMap>({});
 
   function download(format: alphaTab.midi.MidiFileFormat) {
-    if (!api || !api.score || !module) {
+    if (!api || !api.score) {
       return;
     }
     try {
-      const bytes = buildMidiBytes(module, api, format);
+      const bytes = buildMidiBytes(api, format);
       const fileName = api.score.title
         ? `${api.score.title}.mid`
         : "File.mid";
@@ -78,8 +75,8 @@ const MidiExporterControls: React.FC = () => {
     }
   }
 
-  const type0 = module?.midi.MidiFileFormat.SingleTrackMultiChannel;
-  const type1 = module?.midi.MidiFileFormat.MultiTrack;
+  const type0 = alphaTab.midi.MidiFileFormat.SingleTrackMultiChannel;
+  const type1 = alphaTab.midi.MidiFileFormat.MultiTrack;
 
   const columnStyle: React.CSSProperties = {
     flex: 1,
@@ -108,27 +105,25 @@ const MidiExporterControls: React.FC = () => {
       <div style={columnStyle}>
         <button
           className="button button--primary"
-          onClick={() => type0 !== undefined && download(type0)}
+          onClick={() => download(type0)}
           type="button"
-          disabled={type0 === undefined}
         >
           Download (SMF Type 0)
         </button>
         <span style={captionStyle}>
-          {(type0 !== undefined && captions[type0]) || "Single track, multi channel"}
+          {captions[type0] || "Single track, multi channel"}
         </span>
       </div>
       <div style={columnStyle}>
         <button
           className="button button--primary"
-          onClick={() => type1 !== undefined && download(type1)}
+          onClick={() => download(type1)}
           type="button"
-          disabled={type1 === undefined}
         >
           Download (SMF Type 1)
         </button>
         <span style={captionStyle}>
-          {(type1 !== undefined && captions[type1]) || "One MIDI track per alphaTab track"}
+          {captions[type1] || "One MIDI track per alphaTab track"}
         </span>
       </div>
     </div>
@@ -138,12 +133,17 @@ const MidiExporterControls: React.FC = () => {
 export const MidiExporterDemo: React.FC<MidiExporterDemoProps> = ({
   showCode = true,
 }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
   return (
     <div>
-      <PlayerProvider file="/files/features/Chords.gp5">
+      <AlphaTabProvider
+        file="/files/features/Chords.gp5"
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <MidiExporterControls />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

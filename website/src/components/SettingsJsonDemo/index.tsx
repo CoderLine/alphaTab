@@ -1,9 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from '@coderline/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 export interface SettingsJsonDemoProps {
   showCode?: boolean;
@@ -39,41 +43,29 @@ document.querySelector('#reset').addEventListener('click', () => {
   api.render();
 });`;
 
+const layoutModeOptions: { label: string; value: alphaTab.LayoutMode }[] = [
+  { label: "Page", value: alphaTab.LayoutMode.Page },
+  { label: "Horizontal", value: alphaTab.LayoutMode.Horizontal },
+  { label: "Parchment", value: alphaTab.LayoutMode.Parchment },
+];
+
 const SettingsJsonInner: React.FC = () => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
 
-  const layoutModeOptions = React.useMemo(() => {
-    if (!module) { return [] as { label: string; value: alphaTab.LayoutMode }[]; }
-    return [
-      { label: "Page", value: module.LayoutMode.Page },
-      { label: "Horizontal", value: module.LayoutMode.Horizontal },
-      { label: "Parchment", value: module.LayoutMode.Parchment },
-    ];
-  }, [module]);
-
-  const [layoutMode, setLayoutMode] = useState<alphaTab.LayoutMode | null>(null);
+  const [layoutMode, setLayoutMode] = useState<alphaTab.LayoutMode>(alphaTab.LayoutMode.Page);
   const [scale, setScale] = useState<number>(1.0);
   const [json, setJson] = useState<string>("");
   const [copyStatus, setCopyStatus] = useState<string>();
 
-  // Initialize layoutMode default once the module is loaded.
-  useEffect(() => {
-    if (module && layoutMode === null) {
-      setLayoutMode(module.LayoutMode.Page);
-    }
-  }, [module, layoutMode]);
-
   const refreshJson = useCallback(
     (current: alphaTab.AlphaTabApi) => {
-      if (!module) { return; }
       try {
-        setJson(module.model.JsonConverter.settingsToJson(current.settings));
+        setJson(alphaTab.model.JsonConverter.settingsToJson(current.settings));
       } catch (e) {
         console.error("Could not serialize settings", e);
       }
     },
-    [module],
+    [],
   );
 
   // Initial render of the JSON blob once the api is ready.
@@ -84,7 +76,7 @@ const SettingsJsonInner: React.FC = () => {
   });
 
   useEffect(() => {
-    if (!api || layoutMode === null) {
+    if (!api) {
       return;
     }
     api.settings.display.layoutMode = layoutMode;
@@ -95,11 +87,11 @@ const SettingsJsonInner: React.FC = () => {
   }, [api, layoutMode, scale, refreshJson]);
 
   function resetFromJson() {
-    if (!api || !module) {
+    if (!api) {
       return;
     }
     try {
-      const restored = module.model.JsonConverter.jsonToSettings(json);
+      const restored = alphaTab.model.JsonConverter.jsonToSettings(json);
       api.settings = restored;
       api.updateSettings();
       api.render();
@@ -156,9 +148,8 @@ const SettingsJsonInner: React.FC = () => {
           </label>
           <select
             id="settings-json-layout-mode"
-            value={layoutMode ?? ""}
+            value={layoutMode}
             onChange={(e) => setLayoutMode(Number(e.target.value))}
-            disabled={!module}
           >
             {layoutModeOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -192,7 +183,7 @@ const SettingsJsonInner: React.FC = () => {
           </span>
         </div>
       </div>
-      <PlayerHost />
+      <AlphaTabHost />
       <div
         style={{
           display: "flex",
@@ -253,15 +244,19 @@ const SettingsJsonInner: React.FC = () => {
 export const SettingsJsonDemo: React.FC<SettingsJsonDemoProps> = ({
   showCode = true,
 }) => {
+  const site = useSiteAlphaTabSettings({
+    player: true,
+    settings: { display: { scale: 1.0 } },
+  });
   return (
     <div>
-      <PlayerProvider
+      <AlphaTabProvider
         file="/files/features/Chords.gp5"
-        player={true}
-        settings={{ display: { scale: 1.0 } }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
         <SettingsJsonInner />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

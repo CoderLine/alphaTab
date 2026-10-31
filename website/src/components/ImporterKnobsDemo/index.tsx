@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
-import { useAlphaTabApi } from "@coderline/alphatab-react";
+import type * as alphaTab from "@coderline/alphatab";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface ImporterKnobsDemoProps {
@@ -11,6 +12,8 @@ export interface ImporterKnobsDemoProps {
 const SOURCE_URL = "/files/features/Text.gp5";
 const ENCODINGS = ["utf-8", "windows-1252"] as const;
 type Encoding = (typeof ENCODINGS)[number];
+
+const IMPORTER_SETTINGS: alphaTab.json.SettingsJson = { importer: { beatTextAsLyrics: false } };
 
 interface InnerProps {
   beatTextAsLyrics: boolean;
@@ -110,7 +113,7 @@ const Inner: React.FC<InnerProps> = ({
           </span>
         </div>
       </div>
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
@@ -120,6 +123,7 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
 }) => {
   const [beatTextAsLyrics, setBeatTextAsLyrics] = useState(false);
   const [encoding, setEncoding] = useState<Encoding>("windows-1252");
+  const site = useSiteAlphaTabSettings({ player: true, settings: IMPORTER_SETTINGS });
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/oldfile.gp5' },
@@ -133,9 +137,9 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
 
   return (
     <div className={styles.demo}>
-      <PlayerProvider
-        player={true}
-        settings={{ importer: { beatTextAsLyrics: false } }}
+      <AlphaTabProvider
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
         <Inner
           beatTextAsLyrics={beatTextAsLyrics}
@@ -143,7 +147,7 @@ export const ImporterKnobsDemo: React.FC<ImporterKnobsDemoProps> = ({
           encoding={encoding}
           setEncoding={setEncoding}
         />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

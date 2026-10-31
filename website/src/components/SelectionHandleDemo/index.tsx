@@ -2,8 +2,15 @@
 
 import React, { useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
-import { useAlphaTabEvent } from "@coderline/alphatab-react";
+import {
+    AlphaTabHost,
+    AlphaTabProvider,
+    useAlphaTabApi,
+    useAlphaTabElements,
+    useAlphaTabEvent,
+} from "@coderline/alphatab-react";
+import { SelectionHandles } from "@coderline/alphatab-ui";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface SelectionHandleDemoProps {
@@ -47,11 +54,26 @@ function HighlightPayloadTap({
     return null;
 }
 
+function SelectionHandlesOverlay() {
+    const api = useAlphaTabApi();
+    const { mountElement } = useAlphaTabElements();
+    return <SelectionHandles api={api ?? undefined} mountElement={mountElement} />;
+}
+
 export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({
     children,
     showEventLog = false,
 }) => {
     const [payload, setPayload] = useState<HighlightPayload | null>(null);
+    const site = useSiteAlphaTabSettings({
+        player: true,
+        settings: {
+            player: {
+                scrollMode: "Off",
+                scrollOffsetY: -50,
+            },
+        },
+    });
 
     const tex = typeof children === "string" ? children : undefined;
 
@@ -60,18 +82,14 @@ export const SelectionHandleDemo: React.FC<SelectionHandleDemoProps> = ({
 
     return (
         <div className={styles.wrapper}>
-            <PlayerProvider
+            <AlphaTabProvider
                 tex={tex}
-                settings={{
-                    player: {
-                        scrollMode: "Off",
-                        scrollOffsetY: -50,
-                    },
-                }}
+                configureSettings={site.configureSettings}
+                settings={site.settings}
             >
                 {showEventLog && <HighlightPayloadTap onPayload={setPayload} />}
-                <PlayerHost withSelectionHandles />
-            </PlayerProvider>
+                <AlphaTabHost overlay={<SelectionHandlesOverlay />} />
+            </AlphaTabProvider>
             {showEventLog && (
                 <pre className={styles.eventLog}>
 {payload

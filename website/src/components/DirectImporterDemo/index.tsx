@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import type { model } from "@coderline/alphatab";
+import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import styles from "./styles.module.scss";
 
 export interface DirectImporterDemoProps {
@@ -18,10 +17,7 @@ interface InspectedScore {
   tracks: Array<{ name: string; bars: number; tuning: string }>;
 }
 
-function inspect(
-  score: model.Score,
-  Tuning: typeof import("@coderline/alphatab").model.Tuning,
-): InspectedScore {
+function inspect(score: alphaTab.model.Score): InspectedScore {
   return {
     title: score.title || "(untitled)",
     artist: score.artist || "(unknown)",
@@ -32,7 +28,7 @@ function inspect(
       const stringTunings = track.staves[0]?.stringTuning?.tunings ?? [];
       const tuningNames = [...stringTunings]
         .reverse()
-        .map((midi) => Tuning.getTextForTuning(midi, false))
+        .map((midi) => alphaTab.model.Tuning.getTextForTuning(midi, false))
         .join(" ");
       return {
         name: track.name || "(unnamed)",
@@ -50,10 +46,9 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ setInfo }) => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
 
   useEffect(() => {
-    if (!api || !module) {
+    if (!api) {
       return;
     }
     let cancelled = false;
@@ -65,25 +60,26 @@ const Inner: React.FC<InnerProps> = ({ setInfo }) => {
         return;
       }
       const bytes = new Uint8Array(buffer);
-      const score = module.importer.ScoreLoader.loadScoreFromBytes(
+      const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
         bytes,
         api.settings,
       );
-      setInfo(inspect(score, module.model.Tuning));
+      setInfo(inspect(score));
       api.renderScore(score, [0]);
     })();
     return () => {
       cancelled = true;
     };
-  }, [api, module, setInfo]);
+  }, [api, setInfo]);
 
-  return <PlayerHost />;
+  return <AlphaTabHost />;
 };
 
 export const DirectImporterDemo: React.FC<DirectImporterDemoProps> = ({
   showCode = true,
 }) => {
   const [info, setInfo] = useState<InspectedScore | null>(null);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const code = `import * as alphaTab from '@coderline/alphatab';
 
@@ -104,9 +100,12 @@ api.renderScore(score, [0]);`;
     <div className={styles.demo}>
       <div className={styles.split}>
         <div className={styles.render}>
-          <PlayerProvider player={true}>
+          <AlphaTabProvider
+            configureSettings={site.configureSettings}
+            settings={site.settings}
+          >
             <Inner info={info} setInfo={setInfo} />
-          </PlayerProvider>
+          </AlphaTabProvider>
         </div>
         <aside className={styles.inspection} aria-label="Score inspection">
           <h4>Score model (pre-render)</h4>

@@ -1,12 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
-import { useAlphaTabApi } from "@coderline/alphatab-react";
-import { useAlphaTabModule } from "@site/src/alphatab-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as solid from "@fortawesome/free-solid-svg-icons";
+import * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabHost,
+    AlphaTabProvider,
+    useAlphaTabApi,
+    useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { IconPause, IconPlay } from "@coderline/alphatab-ui";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 type BuiltInMode = "Continuous" | "OffScreen" | "Smooth" | "Off";
@@ -29,11 +32,10 @@ export interface ScrollModeSwitchProps {
  */
 function ApplyScrollMode({ mode }: { mode: Mode }) {
     const api = useAlphaTabApi();
-    const module = useAlphaTabModule();
     useEffect(() => {
-        if (!api || !module) { return; }
+        if (!api) { return; }
         if (mode === "Center bar") {
-            api.settings.player.scrollMode = module.ScrollMode.Continuous;
+            api.settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
             api.updateSettings();
             const scroller = api.settings.player.scrollElement as HTMLElement | undefined;
             if (!(scroller instanceof HTMLElement)) { return; }
@@ -67,9 +69,9 @@ function ApplyScrollMode({ mode }: { mode: Mode }) {
             };
         }
         api.customScrollHandler = undefined;
-        api.settings.player.scrollMode = module.ScrollMode[mode];
+        api.settings.player.scrollMode = alphaTab.ScrollMode[mode];
         api.updateSettings();
-    }, [api, module, mode]);
+    }, [api, mode]);
     return null;
 }
 
@@ -105,7 +107,11 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ modes, showOffsetSliders, customHandler }) => {
     const api = useAlphaTabApi();
-    const state = usePlayerState();
+    const isPlaying =
+        useAlphaTabEventValue(
+            "playerStateChanged",
+            (e) => e.state === alphaTab.synth.PlayerState.Playing,
+        ) ?? false;
 
     const pillModes: Mode[] =
         customHandler === "center-bar" ? [...modes, "Center bar"] : modes;
@@ -121,9 +127,9 @@ const Inner: React.FC<InnerProps> = ({ modes, showOffsetSliders, customHandler }
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={state.isPlaying ? "Pause" : "Play"}
+                    aria-label={isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
+                    {isPlaying ? <IconPause aria-hidden="true" /> : <IconPlay aria-hidden="true" />}
                 </button>
                 <button
                     className="button button--secondary"
@@ -197,7 +203,7 @@ const Inner: React.FC<InnerProps> = ({ modes, showOffsetSliders, customHandler }
                     nativeSmooth={nativeSmooth}
                 />
             )}
-            <PlayerHost className={styles.scroller} />
+            <AlphaTabHost className={styles.scroller} />
         </div>
     );
 };
@@ -215,14 +221,20 @@ export const ScrollModeSwitch: React.FC<ScrollModeSwitchProps> = ({
             scrollOffsetY: -40,
         },
     };
+    const site = useSiteAlphaTabSettings({ player: true, settings });
 
     return (
-        <PlayerProvider file={file} tex={tex} settings={settings}>
+        <AlphaTabProvider
+            file={file}
+            tex={tex}
+            configureSettings={site.configureSettings}
+            settings={site.settings}
+        >
             <Inner
                 modes={modes}
                 showOffsetSliders={showOffsetSliders}
                 customHandler={customHandler}
             />
-        </PlayerProvider>
+        </AlphaTabProvider>
     );
 };

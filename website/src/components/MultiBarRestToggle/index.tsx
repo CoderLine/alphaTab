@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
-import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from "@coderline/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 
 export interface MultiBarRestToggleProps {
   showCode?: boolean;
@@ -51,6 +56,7 @@ export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
   showCode = true,
 }) => {
   const [enabled, setEnabled] = useState(true);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.multiTrackMultiBarRest = ${enabled};
@@ -70,10 +76,15 @@ export const MultiBarRestToggle: React.FC<MultiBarRestToggleProps> = ({
           Collapse consecutive empty bars into a multi-bar rest
         </label>
       </div>
-      <PlayerProvider tex={DEMO_TEX} tracks="all" player={true}>
+      <AlphaTabProvider
+        tex={DEMO_TEX}
+        tracks="all"
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <ApplyMultiBarRest enabled={enabled} />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

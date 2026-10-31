@@ -1,7 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
+import type * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
-import { useAlphaTabApi } from "@coderline/alphatab-react";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+  useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface TrackSwitcherProps {
@@ -13,32 +20,33 @@ interface TrackInfo {
   name: string;
 }
 
+const NO_TRACKS: alphaTab.model.Track[] = [];
+
 const Inner: React.FC = () => {
   const api = useAlphaTabApi();
-  const controls = usePlayerControls();
-  const state = usePlayerState();
+  const scoreTracks =
+    useAlphaTabEventValue("scoreLoaded", (score) => score.tracks) ?? NO_TRACKS;
 
   const tracks: TrackInfo[] = React.useMemo(
     () =>
-      state.tracks.map((t) => ({
+      scoreTracks.map((t) => ({
         index: t.index,
         name: t.name || `Track ${t.index + 1}`,
       })),
-    [state.tracks],
+    [scoreTracks],
   );
 
   const [selected, setSelected] = useState<Set<number>>(new Set([0]));
 
-  // When a new score is loaded, reflect the currently-rendered tracks.
-  useEffect(() => {
-    if (state.renderedTracks.length === 0) { return; }
-    setSelected(new Set(state.renderedTracks.map((t) => t.index)));
-  }, [state.renderedTracks]);
+  useAlphaTabEvent("renderStarted", () => {
+    if (!api || api.tracks.length === 0) { return; }
+    setSelected(new Set(api.tracks.map((t) => t.index)));
+  });
 
   const applySelection = useCallback(
     (nextIndices: number[]) => {
       const score = api?.score;
-      if (!controls || !score) {
+      if (!api || !score) {
         return;
       }
       const cleaned = Array.from(new Set(nextIndices)).sort((a, b) => a - b);
@@ -47,9 +55,9 @@ const Inner: React.FC = () => {
       }
       const trackObjs = cleaned.map((i) => score.tracks[i]).filter(Boolean);
       setSelected(new Set(cleaned));
-      controls.renderTracks(trackObjs);
+      api.renderTracks(trackObjs);
     },
-    [api, controls],
+    [api],
   );
 
   const toggle = (i: number) => {
@@ -113,7 +121,7 @@ const Inner: React.FC = () => {
           </>
         )}
       </div>
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
@@ -121,6 +129,7 @@ const Inner: React.FC = () => {
 export const TrackSwitcher: React.FC<TrackSwitcherProps> = ({
   showCode = true,
 }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: {
     file: '/scores/song.gp5',
@@ -138,13 +147,14 @@ api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);`;
   return (
     <div className={styles.demo}>
       {/* Bach Prelude BWV 999 — PD single/multi-staff piece already shipped in the repo. */}
-      <PlayerProvider
+      <AlphaTabProvider
         file="/files/Bach_Prelude_BWV999.gp"
         tracks={[0]}
-        player={true}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
         <Inner />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

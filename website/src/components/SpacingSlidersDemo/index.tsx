@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls } from "@coderline/alphatab-ui";
+import { AlphaTabHost, AlphaTabProvider } from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import { BACH_PRELUDE_C_LONG } from "@site/src/tex-riffs";
 
 export interface SpacingSlidersDemoProps {
@@ -13,30 +14,6 @@ export interface SpacingSlidersDemoProps {
 // enough content for spacing/stretch slider changes to have visible effect.
 const DEFAULT_TEX = BACH_PRELUDE_C_LONG;
 
-function ApplySpacing({
-  stretchForce,
-  spacingRatio,
-  lastSystemFillThreshold,
-}: {
-  stretchForce: number;
-  spacingRatio: number;
-  lastSystemFillThreshold: number;
-}) {
-  const controls = usePlayerControls();
-  useEffect(() => {
-    if (controls) {
-      controls.updateSettings({
-        display: {
-          stretchForce,
-          spacingRatio,
-          lastSystemFillThreshold,
-        },
-      });
-    }
-  }, [controls, stretchForce, spacingRatio, lastSystemFillThreshold]);
-  return null;
-}
-
 export const SpacingSlidersDemo: React.FC<SpacingSlidersDemoProps> = ({
   showCode = true,
   file,
@@ -46,6 +23,16 @@ export const SpacingSlidersDemo: React.FC<SpacingSlidersDemoProps> = ({
   const [stretchForce, setStretchForce] = useState(1.2);
   const [spacingRatio, setSpacingRatio] = useState(1.5);
   const [lastSystemFillThreshold, setLastSystemFillThreshold] = useState(0.5);
+  const site = useSiteAlphaTabSettings({
+    player: true,
+    settings: {
+      display: {
+        stretchForce,
+        spacingRatio,
+        lastSystemFillThreshold,
+      },
+    },
+  });
 
   const code = `import * as alphaTab from '@coderline/alphatab';
 
@@ -132,25 +119,14 @@ const api = new alphaTab.AlphaTabApi(container, {
           </span>
         </div>
       </div>
-      <PlayerProvider
+      <AlphaTabProvider
         file={file}
         tex={texContent}
-        player={true}
-        settings={{
-          display: {
-            stretchForce: 1.2,
-            spacingRatio: 1.5,
-            lastSystemFillThreshold: 0.5,
-          },
-        }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
-        <ApplySpacing
-          stretchForce={stretchForce}
-          spacingRatio={spacingRatio}
-          lastSystemFillThreshold={lastSystemFillThreshold}
-        />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

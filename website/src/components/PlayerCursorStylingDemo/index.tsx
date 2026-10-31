@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
-import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
-import { useAlphaTabModule } from "@site/src/alphatab-react";
+import * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { IconPause, IconPlay } from "@coderline/alphatab-ui";
 import CodeBlock from "@theme/CodeBlock";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as solid from "@fortawesome/free-solid-svg-icons";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 
 type ThemeKey = "default" | "blue" | "orange" | "dark";
 
@@ -77,32 +80,24 @@ export interface PlayerCursorStylingDemoProps {
   showCode?: boolean;
 }
 
-function PlayerStateWatcher({
-  onPlayingChange,
-}: {
-  onPlayingChange: (playing: boolean) => void;
-}) {
-  const module = useAlphaTabModule();
-  useAlphaTabEvent(
-    "playerStateChanged",
-    (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
-      if (module) {
-        onPlayingChange(args.state === module.synth.PlayerState.Playing);
-      }
-    }
-  );
-  return null;
-}
-
-function PlayPauseButton({ isPlaying }: { isPlaying: boolean }) {
+function PlayPauseButton() {
   const api = useAlphaTabApi();
+  const isPlaying =
+    useAlphaTabEventValue(
+      "playerStateChanged",
+      (e) => e.state === alphaTab.synth.PlayerState.Playing
+    ) ?? false;
   return (
     <button
       className="button button--primary"
       onClick={() => api?.playPause()}
       disabled={!api}
     >
-      <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+      {isPlaying ? (
+        <IconPause aria-hidden="true" />
+      ) : (
+        <IconPlay aria-hidden="true" />
+      )}
       <span style={{ marginLeft: "0.4rem" }}>
         {isPlaying ? "Pause" : "Play"}
       </span>
@@ -114,15 +109,18 @@ export const PlayerCursorStylingDemo: React.FC<
   PlayerCursorStylingDemoProps
 > = ({ showCode = true }) => {
   const [themeKey, setThemeKey] = useState<ThemeKey>("default");
-  const [isPlaying, setPlaying] = useState(false);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const activeCss = themes[themeKey].css;
 
   return (
     <div className="player-cursor-demo">
       <style>{activeCss}</style>
-      <PlayerProvider file="/files/features/Chords.gp5" player={true}>
-        <PlayerStateWatcher onPlayingChange={setPlaying} />
+      <AlphaTabProvider
+        file="/files/features/Chords.gp5"
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <div
           style={{
             display: "flex",
@@ -132,7 +130,7 @@ export const PlayerCursorStylingDemo: React.FC<
             marginBottom: "0.75rem",
           }}
         >
-          <PlayPauseButton isPlaying={isPlaying} />
+          <PlayPauseButton />
           <ul className="pills" style={{ margin: 0 }}>
             {(Object.keys(themes) as ThemeKey[]).map((k) => (
               <li
@@ -147,8 +145,8 @@ export const PlayerCursorStylingDemo: React.FC<
             ))}
           </ul>
         </div>
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="css">{activeCss}</CodeBlock> : null}
     </div>
   );

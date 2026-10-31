@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
-import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 
 export interface HideDynamicsToggleProps {
   showCode?: boolean;
 }
+
+const BAR_COUNT_SETTINGS: alphaTab.json.SettingsJson = { display: { barCount: 12 } };
 
 function ApplyHideDynamics({ hidden }: { hidden: boolean }) {
   const api = useAlphaTabApi();
@@ -29,6 +31,7 @@ export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
   showCode = true,
 }) => {
   const [hidden, setHidden] = useState(false);
+  const site = useSiteAlphaTabSettings({ player: true, settings: BAR_COUNT_SETTINGS });
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.hideDynamics = ${hidden};
@@ -48,14 +51,14 @@ export const HideDynamicsToggle: React.FC<HideDynamicsToggleProps> = ({
           Hide dynamics
         </label>
       </div>
-      <PlayerProvider
+      <AlphaTabProvider
         file="/files/features/Dynamics.gp5"
-        player={true}
-        settings={{ display: { barCount: 12 } }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
         <ApplyHideDynamics hidden={hidden} />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

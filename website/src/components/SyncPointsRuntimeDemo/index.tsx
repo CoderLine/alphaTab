@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type * as alphaTab from '@coderline/alphatab';
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import styles from './styles.module.scss';
 
 /**
@@ -142,6 +142,10 @@ const InnerBridge: React.FC<{
 export const SyncPointsRuntimeDemo: React.FC = () => {
     const audioRef = useRef<HTMLAudioElement>(null);
     const [shape, setShape] = useState<Shape>('linear');
+    const site = useSiteAlphaTabSettings({
+        player: true,
+        settings: { player: { playerMode: 'EnabledExternalMedia' } },
+    });
     return (
         <div className={styles.wrapper}>
             <audio ref={audioRef} src={AUDIO_URL} controls />
@@ -168,13 +172,14 @@ export const SyncPointsRuntimeDemo: React.FC = () => {
                     Playing: <code>{shape}</code> — flip while paused or during playback; the cursor re-aligns immediately.
                 </span>
             </div>
-            <PlayerProvider
+            <AlphaTabProvider
                 file={SCORE_URL}
-                settings={{ player: { playerMode: 'EnabledExternalMedia' } }}
+                configureSettings={site.configureSettings}
+                settings={site.settings}
             >
                 <InnerBridge audio={audioRef} shape={shape} />
-                <PlayerHost />
-            </PlayerProvider>
+                <AlphaTabHost />
+            </AlphaTabProvider>
         </div>
     );
 };

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 export interface ScoreJsonDemoProps {
   showCode?: boolean;
@@ -32,18 +32,17 @@ api.scoreLoaded.on(() => {
 
 const ScoreJsonControls: React.FC = () => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
 
   const [json, setJson] = useState<string>("");
   const [caption, setCaption] = useState<string>();
   const [copyStatus, setCopyStatus] = useState<string>();
 
   function serialize() {
-    if (!api || !api.score || !module) {
+    if (!api || !api.score) {
       return;
     }
     try {
-      const text = module.model.JsonConverter.scoreToJson(api.score);
+      const text = alphaTab.model.JsonConverter.scoreToJson(api.score);
       setJson(text);
       const bytes = new TextEncoder().encode(text).length;
       const lines = text.split("\n").length;
@@ -56,11 +55,11 @@ const ScoreJsonControls: React.FC = () => {
   }
 
   function roundTrip() {
-    if (!api || !json || !module) {
+    if (!api || !json) {
       return;
     }
     try {
-      const restored = module.model.JsonConverter.jsonToScore(json);
+      const restored = alphaTab.model.JsonConverter.jsonToScore(json);
       api.renderScore(restored);
     } catch (e) {
       console.error("Round-trip failed", e);
@@ -163,12 +162,17 @@ const ScoreJsonControls: React.FC = () => {
 export const ScoreJsonDemo: React.FC<ScoreJsonDemoProps> = ({
   showCode = true,
 }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
   return (
     <div>
-      <PlayerProvider file="/files/features/Chords.gp5" player={true}>
-        <PlayerHost />
+      <AlphaTabProvider
+        file="/files/features/Chords.gp5"
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <AlphaTabHost />
         <ScoreJsonControls />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

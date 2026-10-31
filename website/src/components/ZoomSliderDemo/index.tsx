@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls } from "@coderline/alphatab-ui";
+import { AlphaTabHost, AlphaTabProvider } from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import { FOLK_ARPEGGIO } from "@site/src/tex-riffs";
 
 export interface ZoomSliderDemoProps {
@@ -14,16 +15,6 @@ export interface ZoomSliderDemoProps {
 // See src/tex-riffs.ts for pitch verification.
 const DEFAULT_TEX = FOLK_ARPEGGIO;
 
-function ApplyScale({ scale }: { scale: number }) {
-  const controls = usePlayerControls();
-  useEffect(() => {
-    if (controls) {
-      controls.setScale(scale);
-    }
-  }, [controls, scale]);
-  return null;
-}
-
 export const ZoomSliderDemo: React.FC<ZoomSliderDemoProps> = ({
   showCode = true,
   file,
@@ -31,6 +22,10 @@ export const ZoomSliderDemo: React.FC<ZoomSliderDemoProps> = ({
 }) => {
   const [scale, setScale] = useState(1.3);
   const [pendingScale, setPendingScale] = useState(1.3);
+  const site = useSiteAlphaTabSettings({
+    player: true,
+    settings: { display: { scale } },
+  });
 
   // Debounce: only apply zoom after the user pauses moving the slider.
   useEffect(() => {
@@ -98,15 +93,14 @@ slider.addEventListener('change', (event) => {
           opacity: pendingScale === scale ? 1 : 0.6,
         }}
       >
-        <PlayerProvider
+        <AlphaTabProvider
           file={file}
           tex={texContent}
-          player={true}
-          settings={{ display: { scale: 1.3 } }}
+          configureSettings={site.configureSettings}
+          settings={site.settings}
         >
-          <ApplyScale scale={scale} />
-          <PlayerHost />
-        </PlayerProvider>
+          <AlphaTabHost />
+        </AlphaTabProvider>
       </div>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>

@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
-import { PlayerProvider, PlayerHost, usePlayerState } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from '@coderline/alphatab';
+import {
+    AlphaTabHost,
+    AlphaTabProvider,
+    useAlphaTabApi,
+    useAlphaTabEventValue
+} from '@coderline/alphatab-react';
+import { IconPause, IconPlay } from '@coderline/alphatab-ui';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import styles from './styles.module.scss';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import * as solid from '@fortawesome/free-solid-svg-icons';
 import CodeBlock from '@theme/CodeBlock';
 import * as Riffs from '@site/src/tex-riffs';
 
@@ -12,17 +16,17 @@ const tex = Riffs.BACH_PRELUDE_BWV999_SYNCED;
 
 const SyncPointInner: React.FC = () => {
     const api = useAlphaTabApi();
-    const module = useAlphaTabModule();
-    const { isPlaying } = usePlayerState();
+    const isPlaying =
+        useAlphaTabEventValue('playerStateChanged', e => e.state === alphaTab.synth.PlayerState.Playing) ?? false;
 
     useEffect(() => {
-        if (!api || !module) { return; }
+        if (!api) { return; }
         const request = new XMLHttpRequest();
         request.open('GET', '/files/Bach_Prelude_BWV999.ogg', true);
         request.responseType = 'arraybuffer';
         request.onload = () => {
-            const score = module.importer.ScoreLoader.loadAlphaTex(tex, api.settings);
-            score.backingTrack = new module.model.BackingTrack();
+            const score = alphaTab.importer.ScoreLoader.loadAlphaTex(tex, api.settings);
+            score.backingTrack = new alphaTab.model.BackingTrack();
             score.backingTrack.rawAudioFile = new Uint8Array(request.response);
             api.renderScore(score);
         };
@@ -31,29 +35,31 @@ const SyncPointInner: React.FC = () => {
         return () => {
             request.abort();
         };
-    }, [api, module]);
+    }, [api]);
 
     return (
         <div className={styles.wrapper}>
             <button type="button" className="button button--primary" onClick={() => api?.playPause()}>
-                <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+                {isPlaying ? <IconPause aria-hidden="true" /> : <IconPlay aria-hidden="true" />}
             </button>
-            <PlayerHost />
+            <AlphaTabHost />
         </div>
     );
 };
 
 export const AlphaTexSyncPointSample: React.FC = () => {
+    const site = useSiteAlphaTabSettings({
+        player: true,
+        settings: {
+            core: { tex: true },
+            player: { playerMode: 'EnabledBackingTrack' },
+        },
+    });
     return (
         <>
-            <PlayerProvider
-                settings={{
-                    core: { tex: true },
-                    player: { playerMode: 'EnabledBackingTrack' },
-                }}
-            >
+            <AlphaTabProvider configureSettings={site.configureSettings} settings={site.settings}>
                 <SyncPointInner />
-            </PlayerProvider>
+            </AlphaTabProvider>
             <CodeBlock>{tex}</CodeBlock>
         </>
     );

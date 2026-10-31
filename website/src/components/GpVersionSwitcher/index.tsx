@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabEventValue } from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface GpVersionSwitcherProps {
@@ -43,18 +44,14 @@ interface InnerProps {
 }
 
 const Inner: React.FC<InnerProps> = ({ active, setActive }) => {
-  const controls = usePlayerControls();
-  const state = usePlayerState();
-  const loadedTitle = state.currentScore
-    ? state.currentScore.title || "(untitled)"
-    : null;
+  const loadedTitle =
+    useAlphaTabEventValue("scoreLoaded", (score) => score.title || "(untitled)") ?? null;
 
   const pick = (v: Variant) => {
-    if (!controls || v.key === active.key) {
+    if (v.key === active.key) {
       return;
     }
     setActive(v);
-    void controls.loadScoreFromUrl(v.file);
   };
 
   return (
@@ -81,7 +78,7 @@ const Inner: React.FC<InnerProps> = ({ active, setActive }) => {
           </span>
         )}
       </div>
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
@@ -90,6 +87,7 @@ export const GpVersionSwitcher: React.FC<GpVersionSwitcherProps> = ({
   showCode = true,
 }) => {
   const [active, setActive] = useState<Variant>(INITIAL_VARIANT);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/song.gp' }, // GP7/8 ZIP archive
@@ -102,9 +100,13 @@ api.load('/scores/newer.gp');    // GP7/8 ZIP`;
 
   return (
     <div className={styles.demo}>
-      <PlayerProvider file={INITIAL_VARIANT.file} player={true}>
+      <AlphaTabProvider
+        file={active.file}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <Inner active={active} setActive={setActive} />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
+import * as alphaTab from "@coderline/alphatab";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
-import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
-import { useAlphaTabModule } from "@site/src/alphatab-react";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface LoadErrorDemoProps {
@@ -21,26 +25,17 @@ const WRONG_URL = "/files/does-not-exist.gp";
 const WRONG_FORMAT_URL = "/files/sonivox_musescore.sf2";
 const BAD_TEX = '\\title unterminated :garbage';
 
-function classifyErrorType(
-  err: unknown,
-  AlphaTabErrorType: typeof alphaTab.AlphaTabErrorType | null,
-): string {
+function classifyErrorType(err: unknown): string {
   const type = (err as { type?: unknown } | null)?.type;
   if (typeof type !== "number") {
     return "unknown";
   }
-  if (!AlphaTabErrorType) {
-    return String(type);
-  }
   const name =
-    AlphaTabErrorType[type as alphaTab.AlphaTabErrorType];
+    alphaTab.AlphaTabErrorType[type as alphaTab.AlphaTabErrorType];
   return typeof name === "string" ? name : String(type);
 }
 
-function classifyError(
-  err: unknown,
-  AlphaTabErrorType: typeof alphaTab.AlphaTabErrorType | null,
-): ErrorRecord {
+function classifyError(err: unknown): ErrorRecord {
   const asError = err as {
     constructor?: { name?: string };
     message?: string;
@@ -48,7 +43,7 @@ function classifyError(
   return {
     className: asError?.constructor?.name ?? "Error",
     message: asError?.message ?? String(err),
-    typeName: classifyErrorType(err, AlphaTabErrorType),
+    typeName: classifyErrorType(err),
   };
 }
 
@@ -66,36 +61,26 @@ const Inner: React.FC<InnerProps> = ({
   setSuccess,
 }) => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
-  const state = usePlayerState();
-  const AlphaTabErrorType = module?.AlphaTabErrorType ?? null;
 
   useAlphaTabEvent(
     "error",
     (err: Error) => {
       setSuccess(null);
-      setRecord(classifyError(err, AlphaTabErrorType));
+      setRecord(classifyError(err));
     },
   );
 
-  // Track successful loads via state.currentScore. Reset error when a
-  // fresh score arrives; the score identity from the store changes on
-  // every scoreLoaded emit.
-  const lastScoreRef = React.useRef(state.currentScore);
-  React.useEffect(() => {
-    if (state.currentScore && state.currentScore !== lastScoreRef.current) {
-      lastScoreRef.current = state.currentScore;
-      setRecord(null);
-      setSuccess(`Loaded "${state.currentScore.title || "(untitled)"}"`);
-    }
-  }, [state.currentScore, setRecord, setSuccess]);
+  useAlphaTabEvent("scoreLoaded", (score) => {
+    setRecord(null);
+    setSuccess(`Loaded "${score.title || "(untitled)"}"`);
+  });
 
   const safeCall = (fn: () => void) => {
     try {
       fn();
     } catch (err) {
       setSuccess(null);
-      setRecord(classifyError(err, AlphaTabErrorType));
+      setRecord(classifyError(err));
     }
   };
 
@@ -169,7 +154,7 @@ const Inner: React.FC<InnerProps> = ({
           </span>
         )}
       </div>
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
@@ -179,6 +164,7 @@ export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
 }) => {
   const [record, setRecord] = useState<ErrorRecord | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const code = `api.error.on((error) => {
   if (error instanceof alphaTab.importer.UnsupportedFormatError) {
@@ -194,14 +180,18 @@ export const LoadErrorDemo: React.FC<LoadErrorDemoProps> = ({
 
   return (
     <div className={styles.demo}>
-      <PlayerProvider file={VALID_URL} player={true}>
+      <AlphaTabProvider
+        file={VALID_URL}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <Inner
           record={record}
           setRecord={setRecord}
           success={success}
           setSuccess={setSuccess}
         />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

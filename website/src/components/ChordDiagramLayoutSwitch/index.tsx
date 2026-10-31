@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from "@coderline/alphatab-ui";
-import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 
 type Placement = "Top" | "Inline";
 
 export interface ChordDiagramLayoutSwitchProps {
   showCode?: boolean;
 }
+
+const BAR_COUNT_SETTINGS: alphaTab.json.SettingsJson = { display: { barCount: 12 } };
 
 function ApplyPlacement({ placement }: { placement: Placement }) {
   const api = useAlphaTabApi();
@@ -35,6 +37,7 @@ export const ChordDiagramLayoutSwitch: React.FC<
   ChordDiagramLayoutSwitchProps
 > = ({ showCode = true }) => {
   const [placement, setPlacement] = useState<Placement>("Top");
+  const site = useSiteAlphaTabSettings({ player: true, settings: BAR_COUNT_SETTINGS });
 
   const code = `api.scoreLoaded.on((score) => {
   score.stylesheet.globalDisplayChordDiagramsOnTop = ${placement === "Top"};
@@ -62,14 +65,14 @@ export const ChordDiagramLayoutSwitch: React.FC<
           </li>
         ))}
       </ul>
-      <PlayerProvider
+      <AlphaTabProvider
         file="/files/features/Chords.gp5"
-        player={true}
-        settings={{ display: { barCount: 12 } }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
         <ApplyPlacement placement={placement} />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

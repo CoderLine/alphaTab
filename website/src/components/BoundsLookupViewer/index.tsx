@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import * as alphaTab from "@coderline/alphatab";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import styles from "./styles.module.scss";
 
 enum GuideType {
@@ -30,52 +29,22 @@ interface InnerProps {
 
 /**
  * Draws the bounds-lookup overlay on top of the rendered score after every
- * layout pass. Uses the alphaTab mount element as the overlay parent so the
- * absolute-positioned rectangles line up with the SVG chunks.
+ * layout pass. Rendered as the host's overlay, so the absolute-positioned
+ * rectangles share the coordinate space of the SVG chunks.
  */
 const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
-
-  const getMountElement = useCallback((): HTMLElement | null => {
-    if (!api) { return null; }
-    const scroller = api.settings.player.scrollElement;
-    if (!(scroller instanceof HTMLElement)) { return null; }
-    // alphaTab's mount sits inside `<div style="position: relative">` inside
-    // the scroll wrapper (see PlayerHost).
-    const relative = scroller.querySelector<HTMLDivElement>(
-      ':scope > div[style*="position: relative"]'
-    );
-    return relative ?? scroller;
-  }, [api]);
+  const guidesRef = useRef<HTMLDivElement>(null);
 
   const updateVisualGuides = useCallback(() => {
-    if (!api || !module) { return; }
-    const container = getMountElement();
-    if (!container) { return; }
-
-    let guidesWrapper = container.querySelector<HTMLDivElement>(".at-guides");
-    if (!guidesWrapper) {
-      container.style.position = "relative";
-      guidesWrapper = document.createElement("div");
-      guidesWrapper.classList.add("at-guides");
-      guidesWrapper.style.position = "absolute";
-      guidesWrapper.style.zIndex = "1000";
-      guidesWrapper.style.display = "inline";
-      guidesWrapper.style.pointerEvents = "none";
-      guidesWrapper.style.top = "0";
-      guidesWrapper.style.left = "0";
-      guidesWrapper.style.right = "0";
-      guidesWrapper.style.bottom = "0";
-      container.insertBefore(guidesWrapper, container.firstChild);
-    } else {
-      guidesWrapper.innerHTML = "";
-    }
+    const guidesWrapper = guidesRef.current;
+    if (!api || !guidesWrapper) { return; }
+    guidesWrapper.innerHTML = "";
 
     if (api.renderer.boundsLookup) {
       createStaveGroupGuides(guidesWrapper, api.renderer.boundsLookup);
     }
-  }, [api, module, getMountElement, selectedType, selectedElements]);
+  }, [api, selectedType, selectedElements]);
 
   useAlphaTabEvent("postRenderFinished", () => {
     updateVisualGuides();
@@ -128,10 +97,9 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
     wrapper: HTMLDivElement,
     bar: alphaTab.rendering.BarBounds
   ) => {
-    if (!module) { return; }
     for (const beat of bar.beats) {
       if (selectedElements === GuideElements.BeatTime) {
-        const bounds = new module.rendering.Bounds();
+        const bounds = new alphaTab.rendering.Bounds();
         bounds.x = beat.onNotesX;
         bounds.y = beat.realBounds.y;
         bounds.w = 2;
@@ -192,8 +160,25 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
     return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255},${alpha})`;
   };
 
-  return null;
+  return (
+    <div
+      ref={guidesRef}
+      className="at-guides"
+      style={{
+        position: "absolute",
+        zIndex: 1000,
+        display: "inline",
+        pointerEvents: "none",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      }}
+    />
+  );
 };
+
+const NOTE_BOUNDS_SETTINGS: alphaTab.json.SettingsJson = { core: { includeNoteBounds: true } };
 
 export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
   children,
@@ -212,6 +197,7 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
   };
 
   const tex = typeof children === "string" ? children : undefined;
+  const site = useSiteAlphaTabSettings({ player: true, settings: NOTE_BOUNDS_SETTINGS });
 
   return (
     <>
@@ -272,18 +258,21 @@ export const BoundsLookupViewer: React.FC<BoundsLookupViewerProps> = ({
           </li>
         </ul>
       </div>
-      <PlayerProvider
+      <AlphaTabProvider
         tex={tex}
         tracks="all"
-        player={true}
-        settings={{ core: { includeNoteBounds: true } }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
-        <Overlay
-          selectedType={selectedType}
-          selectedElements={selectedElements}
+        <AlphaTabHost
+          overlay={
+            <Overlay
+              selectedType={selectedType}
+              selectedElements={selectedElements}
+            />
+          }
         />
-        <PlayerHost />
-      </PlayerProvider>
+      </AlphaTabProvider>
     </>
   );
 };

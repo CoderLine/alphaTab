@@ -1,11 +1,15 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
-import { useAlphaTabApi } from "@coderline/alphatab-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as solid from "@fortawesome/free-solid-svg-icons";
+import * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabHost,
+    AlphaTabProvider,
+    useAlphaTabApi,
+    useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { IconPause, IconPlay } from "@coderline/alphatab-ui";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface LazyLoadingDemoProps {
@@ -32,7 +36,11 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ renderCountVisible }) => {
     const api = useAlphaTabApi();
-    const state = usePlayerState();
+    const isPlaying =
+        useAlphaTabEventValue(
+            "playerStateChanged",
+            (e) => e.state === alphaTab.synth.PlayerState.Playing,
+        ) ?? false;
     const canvasWrapRef = useRef<HTMLDivElement>(null);
     const [lazy, setLazy] = useState(true);
     const [chunkCount, setChunkCount] = useState(0);
@@ -56,9 +64,9 @@ const Inner: React.FC<InnerProps> = ({ renderCountVisible }) => {
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={state.isPlaying ? "Pause" : "Play"}
+                    aria-label={isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
+                    {isPlaying ? <IconPause aria-hidden="true" /> : <IconPlay aria-hidden="true" />}
                 </button>
                 <ul className={`pills ${styles.pills}`}>
                     <li
@@ -86,7 +94,7 @@ const Inner: React.FC<InnerProps> = ({ renderCountVisible }) => {
             </div>
             <ApplyLazyLoading lazy={lazy} />
             <div ref={canvasWrapRef}>
-                <PlayerHost className={styles.scroller} />
+                <AlphaTabHost className={styles.scroller} />
             </div>
         </div>
     );
@@ -101,10 +109,16 @@ export const LazyLoadingDemo: React.FC<LazyLoadingDemoProps> = ({
         core: { enableLazyLoading: true },
         player: { scrollMode: "Off" },
     };
+    const site = useSiteAlphaTabSettings({ player: true, settings });
 
     return (
-        <PlayerProvider file={file} tex={tex} settings={settings}>
+        <AlphaTabProvider
+            file={file}
+            tex={tex}
+            configureSettings={site.configureSettings}
+            settings={site.settings}
+        >
             <Inner renderCountVisible={renderCountVisible} />
-        </PlayerProvider>
+        </AlphaTabProvider>
     );
 };

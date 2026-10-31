@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls } from "@coderline/alphatab-ui";
+import { AlphaTabHost, AlphaTabProvider } from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import * as Riffs from "@site/src/tex-riffs";
 import styles from "./styles.module.scss";
 
@@ -10,29 +11,20 @@ export interface AlphaTexLivePreviewProps {
 
 const INITIAL_TEX = Riffs.STEADY_PULSE;
 
-interface InnerProps {
-  text: string;
-  setText: (value: string) => void;
-}
-
-const Inner: React.FC<InnerProps> = ({ text, setText }) => {
-  const controls = usePlayerControls();
+export const AlphaTexLivePreview: React.FC<AlphaTexLivePreviewProps> = ({
+  showCode = true,
+}) => {
+  const [text, setText] = useState(INITIAL_TEX);
+  const [renderedTex, setRenderedTex] = useState(INITIAL_TEX);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const onChange = (value: string) => {
     setText(value);
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-    debounceRef.current = setTimeout(() => {
-      if (controls) {
-        try {
-          controls.loadScoreFromTex(value);
-        } catch {
-          // parse errors surface through the api.error event
-        }
-      }
-    }, 200);
+    debounceRef.current = setTimeout(() => setRenderedTex(value), 200);
   };
 
   useEffect(() => {
@@ -42,25 +34,6 @@ const Inner: React.FC<InnerProps> = ({ text, setText }) => {
       }
     };
   }, []);
-
-  return (
-    <>
-      <textarea
-        className={styles.editor}
-        value={text}
-        rows={8}
-        spellCheck={false}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      <PlayerHost />
-    </>
-  );
-};
-
-export const AlphaTexLivePreview: React.FC<AlphaTexLivePreviewProps> = ({
-  showCode = true,
-}) => {
-  const [text, setText] = useState(INITIAL_TEX);
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {});
 api.tex(\`
@@ -76,9 +49,20 @@ document.getElementById('tex-input').addEventListener('input', (e) => {
 
   return (
     <div className={styles.demo}>
-      <PlayerProvider tex={INITIAL_TEX} player={true}>
-        <Inner text={text} setText={setText} />
-      </PlayerProvider>
+      <AlphaTabProvider
+        tex={renderedTex}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
+        <textarea
+          className={styles.editor}
+          value={text}
+          rows={8}
+          spellCheck={false}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

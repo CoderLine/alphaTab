@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabEventValue } from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface UrlLoadSwitcherProps {
@@ -16,23 +17,13 @@ interface InnerProps {
 }
 
 const Inner: React.FC<InnerProps> = ({ currentUrl, setCurrentUrl }) => {
-  const controls = usePlayerControls();
-  const state = usePlayerState();
-  const score = state.currentScore;
+  const score = useAlphaTabEventValue("scoreLoaded", (s) => s) ?? null;
   const meta = score
     ? {
         title: score.title || "(untitled)",
         artist: score.artist || "(unknown)",
       }
     : null;
-
-  const loadUrl = (url: string) => {
-    if (!controls) {
-      return;
-    }
-    setCurrentUrl(url);
-    void controls.loadScoreFromUrl(url);
-  };
 
   return (
     <>
@@ -42,7 +33,7 @@ const Inner: React.FC<InnerProps> = ({ currentUrl, setCurrentUrl }) => {
           className={`button button--sm ${
             currentUrl === CHORDS_URL ? "button--primary" : "button--secondary"
           }`}
-          onClick={() => loadUrl(CHORDS_URL)}
+          onClick={() => setCurrentUrl(CHORDS_URL)}
         >
           Chord progression
         </button>
@@ -51,7 +42,7 @@ const Inner: React.FC<InnerProps> = ({ currentUrl, setCurrentUrl }) => {
           className={`button button--sm ${
             currentUrl === RHYTHM_URL ? "button--primary" : "button--secondary"
           }`}
-          onClick={() => loadUrl(RHYTHM_URL)}
+          onClick={() => setCurrentUrl(RHYTHM_URL)}
         >
           Rhythm groove
         </button>
@@ -65,7 +56,7 @@ const Inner: React.FC<InnerProps> = ({ currentUrl, setCurrentUrl }) => {
           <span> — {meta.artist}</span>
         </div>
       )}
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
@@ -74,6 +65,7 @@ export const UrlLoadSwitcher: React.FC<UrlLoadSwitcherProps> = ({
   showCode = true,
 }) => {
   const [currentUrl, setCurrentUrl] = useState(CHORDS_URL);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/chords.gp5' },
@@ -88,9 +80,13 @@ document.getElementById('load-rhythm').addEventListener('click', () => {
 
   return (
     <div className={styles.demo}>
-      <PlayerProvider file={CHORDS_URL} player={true}>
+      <AlphaTabProvider
+        file={currentUrl}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <Inner currentUrl={currentUrl} setCurrentUrl={setCurrentUrl} />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

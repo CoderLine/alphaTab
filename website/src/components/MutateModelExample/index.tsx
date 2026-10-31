@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEvent,
+} from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 const SCORE_URL = "/files/features/Chords.gp5";
 
@@ -44,7 +48,6 @@ function walkBeats(
 
 const MutateModelInner: React.FC = () => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
   const [ready, setReady] = useState(false);
 
   useAlphaTabEvent("scoreLoaded", () => {
@@ -78,11 +81,11 @@ const MutateModelInner: React.FC = () => {
   };
 
   const boostVelocities = () => {
-    if (!api?.score || !module) { return; }
+    if (!api?.score) { return; }
     walkBeats(api.score, (beat) => {
       const next = Math.min(
-        module.model.DynamicValue.FFF,
-        (beat.dynamics ?? module.model.DynamicValue.MF) + 1,
+        alphaTab.model.DynamicValue.FFF,
+        (beat.dynamics ?? alphaTab.model.DynamicValue.MF) + 1,
       );
       beat.dynamics = next;
     });
@@ -122,7 +125,7 @@ const MutateModelInner: React.FC = () => {
         <button
           className="button button--primary"
           onClick={boostVelocities}
-          disabled={!ready || !module}
+          disabled={!ready}
         >
           Boost velocities
         </button>
@@ -143,17 +146,22 @@ const MutateModelInner: React.FC = () => {
       >
         Each button walks the six-level tree, mutates one field, and re-renders.
       </p>
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
 
 export const MutateModelExample: React.FC = () => {
+  const site = useSiteAlphaTabSettings({ player: true });
   return (
     <div>
-      <PlayerProvider file={SCORE_URL}>
+      <AlphaTabProvider
+        file={SCORE_URL}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <MutateModelInner />
-      </PlayerProvider>
+      </AlphaTabProvider>
     </div>
   );
 };

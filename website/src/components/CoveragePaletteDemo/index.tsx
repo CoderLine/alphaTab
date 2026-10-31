@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import React, { useMemo, useState } from "react";
+import { AlphaTabHost, AlphaTabProvider } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import CodeBlock from "@theme/CodeBlock";
 
 type Field =
@@ -31,29 +30,15 @@ export interface CoveragePaletteDemoProps {
   showCode?: boolean;
 }
 
-function ApplyPalette({ palette }: { palette: PaletteState }) {
-  const api = useAlphaTabApi();
-  const controls = usePlayerControls();
-  const module = useAlphaTabModule();
-  useEffect(() => {
-    if (!api || !controls || !module) { return; }
-    const r = api.settings.display.resources;
-    r.mainGlyphColor = module.model.Color.fromJson(palette.mainGlyphColor)!;
-    r.staffLineColor = module.model.Color.fromJson(palette.staffLineColor)!;
-    r.barSeparatorColor = module.model.Color.fromJson(
-      palette.barSeparatorColor
-    )!;
-    r.barNumberColor = module.model.Color.fromJson(palette.barNumberColor)!;
-    r.scoreInfoColor = module.model.Color.fromJson(palette.scoreInfoColor)!;
-    controls.updateSettings();
-  }, [api, controls, module, palette]);
-  return null;
-}
-
 export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
   showCode = true,
 }) => {
   const [palette, setPalette] = useState<PaletteState>(initial);
+  const paletteSettings = useMemo(
+    () => ({ display: { resources: palette } }),
+    [palette],
+  );
+  const site = useSiteAlphaTabSettings({ player: true, settings: paletteSettings });
 
   const set = (key: Field, value: string) => {
     setPalette((p) => ({ ...p, [key]: value }));
@@ -118,24 +103,13 @@ export const CoveragePaletteDemo: React.FC<CoveragePaletteDemoProps> = ({
           </label>
         ))}
       </div>
-      <PlayerProvider
+      <AlphaTabProvider
         file="/files/features/Chords.gp5"
-        player={true}
-        settings={{
-          display: {
-            resources: {
-              mainGlyphColor: initial.mainGlyphColor,
-              staffLineColor: initial.staffLineColor,
-              barSeparatorColor: initial.barSeparatorColor,
-              barNumberColor: initial.barNumberColor,
-              scoreInfoColor: initial.scoreInfoColor,
-            },
-          },
-        }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
-        <ApplyPalette palette={palette} />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

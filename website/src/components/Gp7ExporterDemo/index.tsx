@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 export interface Gp7ExporterDemoProps {
   showCode?: boolean;
@@ -39,15 +39,14 @@ api.scoreLoaded.on(() => {
 
 const Gp7ExporterControls: React.FC = () => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
   const [status, setStatus] = useState<string>();
 
   function downloadGp() {
-    if (!api || !api.score || !module) {
+    if (!api || !api.score) {
       return;
     }
     try {
-      const exporter = new module.exporter.Gp7Exporter();
+      const exporter = new alphaTab.exporter.Gp7Exporter();
       const data = exporter.export(api.score, api.settings);
 
       const fileName = (api.score.title || "Untitled") + ".gp";
@@ -106,12 +105,17 @@ const Gp7ExporterControls: React.FC = () => {
 export const Gp7ExporterDemo: React.FC<Gp7ExporterDemoProps> = ({
   showCode = true,
 }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
   return (
     <div>
-      <PlayerProvider file="/files/features/Chords.gp5" player={true}>
+      <AlphaTabProvider
+        file="/files/features/Chords.gp5"
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <Gp7ExporterControls />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

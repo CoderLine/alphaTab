@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from '@coderline/alphatab';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
 import CodeBlock from '@theme/CodeBlock';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import './styles.module.scss';
 
 const AudioExportControls: React.FC = () => {
     const api = useAlphaTabApi();
-    const module = useAlphaTabModule();
 
     const [wavUrl, setWavUrl] = useState<string>();
 
@@ -21,35 +20,34 @@ const AudioExportControls: React.FC = () => {
     }, [wavUrl]);
 
     function createWavSampleUrl(chunks: Float32Array[], sampleRate: number): string {
-        if (!module) { throw new Error('alphaTab module not loaded'); }
         const samples = chunks.reduce((p, c) => p + c.length, 0);
         const wavHeaderSize = 44;
         const fileSize = wavHeaderSize + samples * 4;
-        const buffer = module.io.ByteBuffer.withCapacity(fileSize);
+        const buffer = alphaTab.io.ByteBuffer.withCapacity(fileSize);
 
         //
         // wav header
 
         // RIFF chunk
         buffer.write(new Uint8Array([0x52, 0x49, 0x46, 0x46]), 0, 4); // RIFF
-        module.io.IOHelper.writeInt32LE(buffer, fileSize - 8); // file size
+        alphaTab.io.IOHelper.writeInt32LE(buffer, fileSize - 8); // file size
         buffer.write(new Uint8Array([0x57, 0x41, 0x56, 0x45]), 0, 4); // WAVE
 
         // format chunk
         buffer.write(new Uint8Array([0x66, 0x6D, 0x74, 0x20]), 0, 4); // fmt␣
-        module.io.IOHelper.writeInt32LE(buffer, 16); // block size
-        module.io.IOHelper.writeInt16LE(buffer, 3); // audio format (1=WAVE_FORMAT_IEEE_FLOAT)
+        alphaTab.io.IOHelper.writeInt32LE(buffer, 16); // block size
+        alphaTab.io.IOHelper.writeInt16LE(buffer, 3); // audio format (1=WAVE_FORMAT_IEEE_FLOAT)
         const channels = 2;
-        module.io.IOHelper.writeInt16LE(buffer, channels); // number of channels
-        module.io.IOHelper.writeInt32LE(buffer, sampleRate); // sample rate
-        module.io.IOHelper.writeInt32LE(buffer, Float32Array.BYTES_PER_ELEMENT * channels * sampleRate); // bytes/second
+        alphaTab.io.IOHelper.writeInt16LE(buffer, channels); // number of channels
+        alphaTab.io.IOHelper.writeInt32LE(buffer, sampleRate); // sample rate
+        alphaTab.io.IOHelper.writeInt32LE(buffer, Float32Array.BYTES_PER_ELEMENT * channels * sampleRate); // bytes/second
         const bitsPerSample = Float32Array.BYTES_PER_ELEMENT * 8;
-        module.io.IOHelper.writeInt16LE(buffer, channels * Math.floor((bitsPerSample + 7) / 8)); // block align
-        module.io.IOHelper.writeInt16LE(buffer, bitsPerSample); // bits per sample
+        alphaTab.io.IOHelper.writeInt16LE(buffer, channels * Math.floor((bitsPerSample + 7) / 8)); // block align
+        alphaTab.io.IOHelper.writeInt16LE(buffer, bitsPerSample); // bits per sample
 
         // data chunk
         buffer.write(new Uint8Array([0x64, 0x61, 0x74, 0x61]), 0, 4); // data
-        module.io.IOHelper.writeInt32LE(buffer, samples * 4);
+        alphaTab.io.IOHelper.writeInt32LE(buffer, samples * 4);
         for (const c of chunks) {
             const bytes = new Uint8Array(c.buffer, c.byteOffset, c.byteLength);
             buffer.write(bytes, 0, bytes.length);
@@ -64,10 +62,10 @@ const AudioExportControls: React.FC = () => {
     }
 
     async function downloadFile() {
-        if (!api || !module) { return; }
+        if (!api) { return; }
         try {
             // setup options
-            const options = new module.synth.AudioExportOptions();
+            const options = new alphaTab.synth.AudioExportOptions();
             options.masterVolume = 0.8;
             options.metronomeVolume = 1;
             options.trackVolume.set(0, 0.5);
@@ -110,7 +108,7 @@ const AudioExportControls: React.FC = () => {
                 className="button button--primary"
                 onClick={() => downloadFile()}
                 type="button"
-                disabled={!api || !module}
+                disabled={!api}
             >
                 Generate WAV
             </button>
@@ -120,12 +118,17 @@ const AudioExportControls: React.FC = () => {
 };
 
 export const AudioExportSample: React.FC = () => {
+    const site = useSiteAlphaTabSettings({ player: true });
     return (
         <>
-            <PlayerProvider file="/files/Bach_Prelude_BWV999.gp">
+            <AlphaTabProvider
+                file="/files/Bach_Prelude_BWV999.gp"
+                configureSettings={site.configureSettings}
+                settings={site.settings}
+            >
                 <AudioExportControls />
-                <PlayerHost />
-            </PlayerProvider>
+                <AlphaTabHost />
+            </AlphaTabProvider>
             <CodeBlock language="typescript">
                 {[
                     "async function generateWav() {",

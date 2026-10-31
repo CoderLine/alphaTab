@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabEvent } from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import { BACH_PRELUDE_C_LONG } from "@site/src/tex-riffs";
 
 // Default sample: Bach, WTC I Prelude in C major BWV 846 bars 1–12 —
@@ -16,25 +17,12 @@ export interface BarRangeDemoProps {
   step?: number;
 }
 
-function ApplyRange({
-  startBar,
-  barCount,
+function TotalBars({
   onTotalBarsChange,
 }: {
-  startBar: number;
-  barCount: number;
   onTotalBarsChange: (n: number) => void;
 }) {
-  const controls = usePlayerControls();
-  const state = usePlayerState();
-  useEffect(() => {
-    if (controls) {
-      controls.updateSettings({ display: { startBar, barCount } });
-    }
-  }, [controls, startBar, barCount]);
-  useEffect(() => {
-    onTotalBarsChange(state.totalBars);
-  }, [state.totalBars, onTotalBarsChange]);
+  useAlphaTabEvent("scoreLoaded", (score) => onTotalBarsChange(score.masterBars.length));
   return null;
 }
 
@@ -47,6 +35,12 @@ export const BarRangeDemo: React.FC<BarRangeDemoProps> = ({
   const [startBar, setStartBar] = useState(1);
   const [totalBars, setTotalBars] = useState(0);
   const barCount = step;
+
+  const rangeSettings = useMemo(
+    () => ({ display: { startBar, barCount } }),
+    [startBar, barCount],
+  );
+  const site = useSiteAlphaTabSettings({ player: true, settings: rangeSettings });
 
   const useTex = !file;
   const texContent = useTex ? tex ?? DEFAULT_TEX : undefined;
@@ -116,19 +110,15 @@ document.getElementById('next-page').addEventListener('click', () => {
           {totalBars > 0 ? ` of ${totalBars}` : ""}
         </span>
       </div>
-      <PlayerProvider
+      <AlphaTabProvider
         file={file}
         tex={texContent}
-        player={true}
-        settings={{ display: { startBar: 1, barCount: step } }}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
       >
-        <ApplyRange
-          startBar={startBar}
-          barCount={barCount}
-          onTotalBarsChange={setTotalBars}
-        />
-        <PlayerHost />
-      </PlayerProvider>
+        <TotalBars onTotalBarsChange={setTotalBars} />
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

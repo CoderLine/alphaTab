@@ -1,60 +1,56 @@
 import React, { useEffect } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule, type AlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
 import CodeBlock from "@theme/CodeBlock";
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 export interface ProgrammaticScoreExampleProps {
   showCode?: boolean;
 }
 
-function buildScore(
-  module: AlphaTabModule,
-  settings: alphaTab.Settings,
-): alphaTab.model.Score {
-  const score = new module.model.Score();
+function buildScore(settings: alphaTab.Settings): alphaTab.model.Score {
+  const score = new alphaTab.model.Score();
   score.title = "Built in code";
 
   // Two shared master bars in 4/4. The initial tempo lives on the first
   // master bar as a tempo automation — Score.tempo itself is derived.
   for (let i = 0; i < 2; i++) {
-    const masterBar = new module.model.MasterBar();
+    const masterBar = new alphaTab.model.MasterBar();
     masterBar.timeSignatureNumerator = 4;
     masterBar.timeSignatureDenominator = 4;
     score.addMasterBar(masterBar);
   }
   score.masterBars[0].tempoAutomations.push(
-    module.model.Automation.buildTempoAutomation(false, 0, 120, 2),
+    alphaTab.model.Automation.buildTempoAutomation(false, 0, 120, 2),
   );
 
   // One guitar track, one staff, standard six-string tuning (high E → low E).
-  const track = new module.model.Track();
+  const track = new alphaTab.model.Track();
   track.name = "Guitar";
   track.shortName = "Gtr";
   score.addTrack(track);
 
-  const staff = new module.model.Staff();
+  const staff = new alphaTab.model.Staff();
   staff.stringTuning.tunings = [64, 59, 55, 50, 45, 40];
   track.addStaff(staff);
 
   // One bar per master bar, one voice per bar.
   for (let i = 0; i < score.masterBars.length; i++) {
-    const bar = new module.model.Bar();
+    const bar = new alphaTab.model.Bar();
     staff.addBar(bar);
 
-    const voice = new module.model.Voice();
+    const voice = new alphaTab.model.Voice();
     bar.addVoice(voice);
 
     // Four quarter-note beats per bar, ascending then descending the third string.
     // Note.string is 1-based counted from the lowest string.
     const frets = i === 0 ? [3, 5, 7, 8] : [8, 7, 5, 3];
     for (const fret of frets) {
-      const beat = new module.model.Beat();
-      beat.duration = module.model.Duration.Quarter;
+      const beat = new alphaTab.model.Beat();
+      beat.duration = alphaTab.model.Duration.Quarter;
       voice.addBeat(beat);
 
-      const note = new module.model.Note();
+      const note = new alphaTab.model.Note();
       note.string = 4;
       note.fret = fret;
       beat.addNote(note);
@@ -122,12 +118,11 @@ api.renderScore(score);
 
 const RenderBuiltScore: React.FC = () => {
   const api = useAlphaTabApi();
-  const module = useAlphaTabModule();
 
   useEffect(() => {
-    if (!api || !module) { return; }
-    api.renderScore(buildScore(module, api.settings));
-  }, [api, module]);
+    if (!api) { return; }
+    api.renderScore(buildScore(api.settings));
+  }, [api]);
 
   return null;
 };
@@ -135,12 +130,16 @@ const RenderBuiltScore: React.FC = () => {
 export const ProgrammaticScoreExample: React.FC<ProgrammaticScoreExampleProps> = ({
   showCode = true,
 }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
   return (
     <div>
-      <PlayerProvider player={true}>
+      <AlphaTabProvider
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <RenderBuiltScore />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{codeSample}</CodeBlock> : null}
     </div>
   );

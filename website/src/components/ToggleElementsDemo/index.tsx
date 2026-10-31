@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost, usePlayerControls } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
+import * as alphaTab from "@coderline/alphatab";
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import CodeBlock from "@theme/CodeBlock";
 
 type ElementKey =
@@ -51,19 +50,17 @@ function ApplyElementVisibility({
   visibility: Record<ElementKey, boolean>;
 }) {
   const api = useAlphaTabApi();
-  const controls = usePlayerControls();
-  const module = useAlphaTabModule();
   useEffect(() => {
-    if (!api || !controls || !module) { return; }
+    if (!api) { return; }
     const map = api.settings.notation.elements;
     for (const t of toggles) {
-      map.set(
-        module.NotationElement[t.key] as alphaTab.NotationElement,
-        visibility[t.key]
-      );
+      map.set(alphaTab.NotationElement[t.key], visibility[t.key]);
     }
-    controls.updateSettings();
-  }, [api, controls, module, visibility]);
+    api.updateSettings();
+    if (api.score) {
+      api.render();
+    }
+  }, [api, visibility]);
   return null;
 }
 
@@ -78,6 +75,8 @@ export const ToggleElementsDemo: React.FC<ToggleElementsDemoProps> = ({
     EffectDynamics: true,
     EffectPalmMute: true,
   });
+
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const flip = (key: ElementKey) => {
     setVisibility((v) => ({ ...v, [key]: !v[key] }));
@@ -127,10 +126,14 @@ ${disabledEntries || "      // every element visible"}
           </label>
         ))}
       </div>
-      <PlayerProvider tex={DEMO_TEX} player={true}>
+      <AlphaTabProvider
+        tex={DEMO_TEX}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <ApplyElementVisibility visibility={visibility} />
-        <PlayerHost />
-      </PlayerProvider>
+        <AlphaTabHost />
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

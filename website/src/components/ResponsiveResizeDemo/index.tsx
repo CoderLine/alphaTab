@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi } from '@coderline/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi } from '@coderline/alphatab-react';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 
 export interface ResponsiveResizeDemoProps {
   showCode?: boolean;
@@ -47,6 +47,7 @@ export const ResponsiveResizeDemo: React.FC<ResponsiveResizeDemoProps> = ({
   const [width, setWidth] = useState<number | null>(null);
   const [dragging, setDragging] = useState(false);
   const [displayWidth, setDisplayWidth] = useState(0);
+  const site = useSiteAlphaTabSettings({ player: true });
 
   useEffect(() => {
     if (!dragging) { return; }
@@ -105,13 +106,17 @@ api.resize.on((args) => {
           userSelect: dragging ? "none" : "auto",
         }}
       >
-        <PlayerProvider file={file} player={true}>
+        <AlphaTabProvider
+          file={file}
+          configureSettings={site.configureSettings}
+          settings={site.settings}
+        >
           <TrackContainerWidth
             containerRef={containerRef}
             onWidthChange={setDisplayWidth}
           />
-          <PlayerHost />
-        </PlayerProvider>
+          <AlphaTabHost />
+        </AlphaTabProvider>
         <div
           onMouseDown={(e) => {
             e.preventDefault();

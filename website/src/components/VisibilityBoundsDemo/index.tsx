@@ -1,11 +1,16 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
-import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as solid from "@fortawesome/free-solid-svg-icons";
+import * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabHost,
+    AlphaTabProvider,
+    useAlphaTabApi,
+    useAlphaTabEvent,
+    useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { IconPause, IconPlay } from "@coderline/alphatab-ui";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface VisibilityBoundsDemoProps {
@@ -32,12 +37,16 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
     const api = useAlphaTabApi();
-    const state = usePlayerState();
+    const isPlaying =
+        useAlphaTabEventValue(
+            "playerStateChanged",
+            (e) => e.state === alphaTab.synth.PlayerState.Playing,
+        ) ?? false;
     const [includeNotes, setIncludeNotes] = useState(true);
     const [currentBeat, setCurrentBeat] = useState<alphaTab.model.Beat | null>(null);
     const [isVisible, setIsVisible] = useState<boolean | null>(null);
 
-    // The bounded scroll wrapper is the PlayerHost's outer div — alphaTab
+    // The bounded scroll wrapper is the AlphaTabHost's scroll element — alphaTab
     // assigns it to `settings.player.scrollElement` during API construction.
     const getScroller = useCallback((): HTMLElement | null => {
         if (!api) { return null; }
@@ -168,9 +177,9 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={state.isPlaying ? "Pause" : "Play"}
+                    aria-label={isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
+                    {isPlaying ? <IconPause aria-hidden="true" /> : <IconPlay aria-hidden="true" />}
                 </button>
                 <button
                     className="button button--secondary"
@@ -206,7 +215,7 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
                 </strong>
             </div>
             <ApplyIncludeNoteBounds includeNotes={includeNotes} />
-            <PlayerHost className={styles.scroller} />
+            <AlphaTabHost className={styles.scroller} />
         </div>
     );
 };
@@ -223,10 +232,16 @@ export const VisibilityBoundsDemo: React.FC<VisibilityBoundsDemoProps> = ({
             scrollOffsetY: -40,
         },
     };
+    const site = useSiteAlphaTabSettings({ player: true, settings });
 
     return (
-        <PlayerProvider file={file} tex={tex} settings={settings}>
+        <AlphaTabProvider
+            file={file}
+            tex={tex}
+            configureSettings={site.configureSettings}
+            settings={site.settings}
+        >
             <Inner showNoteHeadOverlay={showNoteHeadOverlay} />
-        </PlayerProvider>
+        </AlphaTabProvider>
     );
 };

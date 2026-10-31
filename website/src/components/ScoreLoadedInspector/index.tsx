@@ -1,6 +1,12 @@
 import React from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerControls, usePlayerState } from "@coderline/alphatab-ui";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface ScoreLoadedInspectorProps {
@@ -10,9 +16,8 @@ export interface ScoreLoadedInspectorProps {
 const SOURCE_URL = "/files/Bach_Prelude_BWV999.gp";
 
 const Inner: React.FC = () => {
-  const state = usePlayerState();
-  const controls = usePlayerControls();
-  const score = state.currentScore;
+  const api = useAlphaTabApi();
+  const score = useAlphaTabEventValue("scoreLoaded", (s) => s) ?? null;
   const info = score
     ? {
         title: score.title || "(untitled)",
@@ -26,10 +31,10 @@ const Inner: React.FC = () => {
     : null;
 
   const reload = () => {
-    if (!controls) {
+    if (!api) {
       return;
     }
-    void controls.loadScoreFromUrl(SOURCE_URL);
+    api.load(SOURCE_URL);
   };
 
   return (
@@ -41,7 +46,7 @@ const Inner: React.FC = () => {
             type="button"
             className="button button--sm button--secondary"
             onClick={reload}
-            disabled={!controls}
+            disabled={!api}
           >
             Reload
           </button>
@@ -81,7 +86,7 @@ const Inner: React.FC = () => {
           </p>
         )}
       </div>
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
@@ -89,6 +94,7 @@ const Inner: React.FC = () => {
 export const ScoreLoadedInspector: React.FC<ScoreLoadedInspectorProps> = ({
   showCode = true,
 }) => {
+  const site = useSiteAlphaTabSettings({ player: true });
   const code = `const api = new alphaTab.AlphaTabApi(container, {
   core: { file: '/scores/song.gp5' },
 });
@@ -102,9 +108,13 @@ api.scoreLoaded.on((score) => {
 
   return (
     <div className={styles.demo}>
-      <PlayerProvider file={SOURCE_URL} player={true}>
+      <AlphaTabProvider
+        file={SOURCE_URL}
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <Inner />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );

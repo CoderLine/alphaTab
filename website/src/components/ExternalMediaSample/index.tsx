@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost } from '@coderline/alphatab-ui';
-import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
+import { AlphaTabHost, AlphaTabProvider, useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 import CodeBlock from '@theme/CodeBlock';
+import { useSiteAlphaTabSettings } from '@site/src/alphatab-settings';
 import styles from './styles.module.scss';
 
 /**
@@ -183,6 +183,8 @@ const ExternalMediaBridge: React.FC<{
     return null;
 };
 
+const EXTERNAL_MEDIA_SETTINGS: alphaTab.json.SettingsJson = { player: { playerMode: 'EnabledExternalMedia' } };
+
 const DEFAULT_SCORE = '/files/Bach_Prelude_BWV999.gp';
 const DEFAULT_AUDIO = '/files/Bach_Prelude_BWV999_original.ogg';
 const DEFAULT_VIDEO = '/files/features/Bach_Prelude_BWV999.mp4';
@@ -197,6 +199,7 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({
     const videoRef = useRef<HTMLVideoElement>(null);
     const src = mediaSrc ?? (mediaType === 'video' ? DEFAULT_VIDEO : DEFAULT_AUDIO);
     const mediaRef = mediaType === 'video' ? videoRef : audioRef;
+    const site = useSiteAlphaTabSettings({ player: true, settings: EXTERNAL_MEDIA_SETTINGS });
 
     return (
         <div className={styles.wrapper}>
@@ -205,13 +208,14 @@ export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({
             ) : (
                 <audio ref={audioRef} src={src} controls autoPlay={false} />
             )}
-            <PlayerProvider
+            <AlphaTabProvider
                 file={scoreFile}
-                settings={{ player: { playerMode: 'EnabledExternalMedia' } }}
+                configureSettings={site.configureSettings}
+                settings={site.settings}
             >
                 <ExternalMediaBridge media={mediaRef} />
-                <PlayerHost />
-            </PlayerProvider>
+                <AlphaTabHost />
+            </AlphaTabProvider>
             {showCode && <CodeBlock language="typescript" title="TypeScript Code for this sample">
                 {[
                     `const media = document.querySelector('#${mediaType}-element');`,

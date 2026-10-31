@@ -1,11 +1,16 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from "react";
-import type * as alphaTab from "@coderline/alphatab";
-import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
-import { useAlphaTabApi, useAlphaTabEvent } from "@coderline/alphatab-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import * as solid from "@fortawesome/free-solid-svg-icons";
+import * as alphaTab from "@coderline/alphatab";
+import {
+    AlphaTabHost,
+    AlphaTabProvider,
+    useAlphaTabApi,
+    useAlphaTabEvent,
+    useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { IconPause, IconPlay } from "@coderline/alphatab-ui";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface ClickLogDemoProps {
@@ -71,7 +76,11 @@ interface InnerProps {
 
 const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
     const api = useAlphaTabApi();
-    const state = usePlayerState();
+    const isPlaying =
+        useAlphaTabEventValue(
+            "playerStateChanged",
+            (e) => e.state === alphaTab.synth.PlayerState.Playing,
+        ) ?? false;
     const [entries, setEntries] = useState<LogEntry[]>([]);
     const [seekToClick, setSeekToClick] = useState(true);
     const [playbackRangeSelection, setPlaybackRangeSelection] = useState(true);
@@ -151,9 +160,9 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
                 <button
                     className="button button--primary"
                     onClick={() => api?.playPause()}
-                    aria-label={state.isPlaying ? "Pause" : "Play"}
+                    aria-label={isPlaying ? "Pause" : "Play"}
                 >
-                    <FontAwesomeIcon icon={state.isPlaying ? solid.faPause : solid.faPlay} />
+                    {isPlaying ? <IconPause aria-hidden="true" /> : <IconPlay aria-hidden="true" />}
                 </button>
                 {showInteractionToggle && (
                     <>
@@ -202,7 +211,7 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
                 />
             )}
             <div className={styles.grid}>
-                <PlayerHost className={styles.score} />
+                <AlphaTabHost className={styles.score} />
                 <div className={styles.log}>
                     <div className={styles.logHeader}>Event log</div>
                     <pre className={styles.logBody}>
@@ -240,10 +249,16 @@ export const ClickLogDemo: React.FC<ClickLogDemoProps> = ({
             resetPlaybackRangeOnClick: true,
         },
     };
+    const site = useSiteAlphaTabSettings({ player: true, settings });
 
     return (
-        <PlayerProvider file={file} tex={tex} settings={settings}>
+        <AlphaTabProvider
+            file={file}
+            tex={tex}
+            configureSettings={site.configureSettings}
+            settings={site.settings}
+        >
             <Inner showInteractionToggle={showInteractionToggle} />
-        </PlayerProvider>
+        </AlphaTabProvider>
     );
 };

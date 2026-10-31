@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import CodeBlock from "@theme/CodeBlock";
-import { PlayerProvider, PlayerHost, usePlayerState } from "@coderline/alphatab-ui";
-import { useAlphaTabApi } from "@coderline/alphatab-react";
+import {
+  AlphaTabHost,
+  AlphaTabProvider,
+  useAlphaTabApi,
+  useAlphaTabEventValue,
+} from "@coderline/alphatab-react";
+import { useSiteAlphaTabSettings } from "@site/src/alphatab-settings";
 import styles from "./styles.module.scss";
 
 export interface BytesLoadDemoProps {
@@ -49,8 +54,7 @@ const Inner: React.FC<InnerProps> = ({
   setFormat,
 }) => {
   const api = useAlphaTabApi();
-  const state = usePlayerState();
-  const score = state.currentScore;
+  const score = useAlphaTabEventValue("scoreLoaded", (s) => s) ?? null;
   const scoreInfo = score
     ? {
         title: score.title || "(untitled)",
@@ -111,7 +115,7 @@ const Inner: React.FC<InnerProps> = ({
           Reload from bytes
         </button>
       </div>
-      <PlayerHost />
+      <AlphaTabHost />
     </>
   );
 };
@@ -121,6 +125,7 @@ export const BytesLoadDemo: React.FC<BytesLoadDemoProps> = ({
 }) => {
   const [byteCount, setByteCount] = useState<number | null>(null);
   const [format, setFormat] = useState<string>("");
+  const site = useSiteAlphaTabSettings({ player: true });
 
   const code = `const bytes = new Uint8Array(
   await fetch('/scores/song.gp').then((r) => r.arrayBuffer())
@@ -134,14 +139,17 @@ api.scoreLoaded.on((score) => {
 
   return (
     <div className={styles.demo}>
-      <PlayerProvider player={true}>
+      <AlphaTabProvider
+        configureSettings={site.configureSettings}
+        settings={site.settings}
+      >
         <Inner
           byteCount={byteCount}
           setByteCount={setByteCount}
           format={format}
           setFormat={setFormat}
         />
-      </PlayerProvider>
+      </AlphaTabProvider>
       {showCode ? <CodeBlock language="js">{code}</CodeBlock> : null}
     </div>
   );
