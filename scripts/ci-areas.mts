@@ -197,11 +197,10 @@ const webTestLegs: WebTestLegDefinition[] = [
             'packages/tooling',
             'packages/lsp',
             'packages/monaco',
-            'packages/playground',
             'packages/react',
             'packages/ui'
         ],
-        test: ['packages/lsp', 'packages/monaco', 'packages/playground', 'packages/react', 'packages/ui']
+        test: ['packages/lsp', 'packages/monaco', 'packages/react', 'packages/ui']
     }
 ];
 

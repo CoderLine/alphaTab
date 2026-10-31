@@ -265,9 +265,9 @@ describe('webJobs', () => {
         assert.equal(
             editor.install,
             '-w packages/alphatab -w packages/alphatex -w packages/transpiler -w packages/tooling ' +
-                '-w packages/lsp -w packages/monaco -w packages/playground'
+                '-w packages/lsp -w packages/monaco'
         );
-        assert.equal(editor.test, '-w packages/lsp -w packages/monaco -w packages/playground');
+        assert.equal(editor.test, '-w packages/lsp -w packages/monaco');
     });
 });
 
