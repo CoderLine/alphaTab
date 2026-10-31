@@ -38,6 +38,8 @@ export interface PlayerViewProps {
     notationDimmed?: boolean;
     /** Placed over the notation, e.g. a docked video. */
     notationOverlay?: React.ReactNode;
+    /** Placed over the rendered score in its coordinates and scrolled with it, see `PlayerHostProps.overlay`. */
+    scoreOverlay?: React.ReactNode;
     /** Shows a busy indicator over the notation while it renders. */
     renderingIndicator?: boolean;
     /** Resizable area between the notation and the transport, e.g. a media sync editor. */
@@ -67,6 +69,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
     notationMessage,
     notationDimmed = false,
     notationOverlay,
+    scoreOverlay,
     renderingIndicator = false,
     drawer,
     waveform = false,
@@ -104,7 +107,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
                 <main className={styles.main}>
                     <div className={clsx(styles.notation, notationDimmed && styles.notationDimmed)}>
-                        <PlayerHost className={styles.canvas} withSelectionHandles />
+                        <PlayerHost className={styles.canvas} withSelectionHandles overlay={scoreOverlay} />
                         {notationMessage && <div className={styles.notationMessage}>{notationMessage}</div>}
                         {renderingIndicator && <RenderingOverlay />}
                         {notationOverlay}

@@ -221,14 +221,23 @@ export interface PlayerHostProps {
     className?: string;
     /** Draggable start and end handles on the selected playback range. */
     withSelectionHandles?: boolean;
+    /** Content positioned in score coordinates, scrolling with the score, e.g. markers drawn from the bounds lookup. */
+    overlay?: ReactNode;
 }
 
 /** The element the score of the surrounding {@link PlayerProvider} renders into. */
-export function PlayerHost({ className, withSelectionHandles = false }: PlayerHostProps) {
+export function PlayerHost({ className, withSelectionHandles = false, overlay }: PlayerHostProps) {
     return (
         <AlphaTabHost
             className={className}
-            overlay={withSelectionHandles ? <SelectionHandlesOverlay /> : undefined}
+            overlay={
+                withSelectionHandles || overlay ? (
+                    <>
+                        {overlay}
+                        {withSelectionHandles && <SelectionHandlesOverlay />}
+                    </>
+                ) : undefined
+            }
         />
     );
 }
