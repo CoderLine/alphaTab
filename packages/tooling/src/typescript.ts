@@ -194,6 +194,32 @@ function findTypeReferences(file: ts.SourceFile, names: string[]): Set<string> {
     return found;
 }
 
+const declarationTargets = ['', '.d.ts', '.d.mts', '/index.d.ts'];
+
+/**
+ * The relative module specifiers and reference paths of the declaration file `file` that do not resolve to a
+ * declaration file inside `rootDir`.
+ */
+export function unresolvedRelativeImports(file: string, content: string, rootDir: string): string[] {
+    const info = ts.preProcessFile(content, true, true);
+    const unresolved: string[] = [];
+    for (const { fileName } of [...info.importedFiles, ...info.referencedFiles]) {
+        if (!fileName.startsWith('.')) {
+            continue;
+        }
+        const target = path.resolve(path.dirname(file), fileName).replace(/\.[cm]?js$/, '');
+        const relative = path.relative(rootDir, target);
+        const inside = !relative.startsWith('..') && !path.isAbsolute(relative);
+        const resolves = declarationTargets.some(
+            ext => /\.d\.[cm]?ts$/.test(target + ext) && fs.existsSync(target + ext)
+        );
+        if (!inside || !resolves) {
+            unresolved.push(fileName);
+        }
+    }
+    return unresolved;
+}
+
 export async function createApiDtsFiles(
     dtsBaseDir: string,
     dtsFiles: string[],
@@ -273,6 +299,7 @@ export async function createApiDtsFiles(
         noEmitHelpers: true
     });
 
+    const written: [file: string, content: string][] = [];
     for (const s of sourceFiles) {
         const result = printer.printFile(s);
         const relativePath = path.relative(dtsBaseDir, s.fileName);
@@ -280,5 +307,12 @@ export async function createApiDtsFiles(
         const parent = path.dirname(outputFile);
         await fs.promises.mkdir(parent, { recursive: true });
         await fs.promises.writeFile(outputFile, result);
+        written.push([outputFile, result]);
+    }
+
+    for (const [file, content] of written) {
+        for (const specifier of unresolvedRelativeImports(file, content, outDir)) {
+            logger.error(`${file}: '${specifier}' does not resolve to a declaration file of the package`);
+        }
     }
 }
