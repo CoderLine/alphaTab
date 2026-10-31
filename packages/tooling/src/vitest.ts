@@ -35,7 +35,7 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
         },
         test: {
             include: ['test/**/*.test.{ts,tsx}'],
-            environment: options.environment,
+            environment: options.environment ?? 'node',
             isolate: false,
             testTimeout: options.testTimeout ?? 30000,
             setupFiles: options.setupFiles,
