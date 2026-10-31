@@ -14,7 +14,7 @@ function ApplyPetalumaMetadata() {
   const api = useAlphaTabApi();
   const controls = useAlphaTabControls();
   useEffect(() => {
-    if (!api || !controls) return;
+    if (!api || !controls) { return; }
     const request = new XMLHttpRequest();
     request.open("GET", "/files/petaluma/petaluma_metadata.json", true);
     request.responseType = "json";

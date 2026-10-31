@@ -33,7 +33,7 @@ const firstBeatOfBar = (
   for (const track of score.tracks) {
     const bar = track.staves[0]?.bars[barIndex];
     const beat = bar?.voices[0]?.beats[0];
-    if (beat) return beat;
+    if (beat) { return beat; }
   }
   return null;
 };
@@ -45,7 +45,7 @@ const lastBeatOfBar = (
   for (const track of score.tracks) {
     const bar = track.staves[0]?.bars[barIndex];
     const beats = bar?.voices[0]?.beats;
-    if (beats && beats.length > 0) return beats[beats.length - 1];
+    if (beats && beats.length > 0) { return beats[beats.length - 1]; }
   }
   return null;
 };
@@ -76,7 +76,7 @@ const LoopControls: React.FC = () => {
   // Apply the range from the bar dropdowns AND paint the highlight overlay so
   // the pre-configured loop is visible on the score from the first render.
   useEffect(() => {
-    if (!api || !api.score || barCount === 0 || !playerReady) return;
+    if (!api || !api.score || barCount === 0 || !playerReady) { return; }
     const s = Math.max(0, Math.min(startBar, barCount - 1));
     const e = Math.max(s, Math.min(endBar, barCount - 1));
     const startTick = api.score.masterBars[s].start;
@@ -101,7 +101,7 @@ const LoopControls: React.FC = () => {
   }, [api, startBar, endBar, barCount, playerReady]);
 
   useEffect(() => {
-    if (!controls || !playerReady) return;
+    if (!controls || !playerReady) { return; }
     controls.setLoopPlayback(isLooping);
   }, [controls, isLooping, playerReady]);
 
@@ -109,7 +109,7 @@ const LoopControls: React.FC = () => {
   useAlphaTabEvent('playbackRangeHighlightChanged', (e) => {
     const startBeat = e.startBeat;
     const endBeat = e.endBeat;
-    if (!startBeat || !endBeat || !api?.tickCache) return;
+    if (!startBeat || !endBeat || !api?.tickCache) { return; }
     const startTick = api.tickCache.getBeatStart(startBeat);
     const endTick = api.tickCache.getBeatStart(endBeat);
     const startBarIndex = startBeat.voice.bar.index;

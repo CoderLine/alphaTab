@@ -5,13 +5,13 @@ export const MIN_SYNC_POINT_GAP_MS = 20;
 
 function previousSyncPointIndex(markers: SyncMarker[], index: number): number {
     let i = index - 1;
-    while (i > 0 && !isSyncPoint(markers[i])) i--;
+    while (i > 0 && !isSyncPoint(markers[i])) { i--; }
     return Math.max(0, i);
 }
 
 function nextSyncPointIndex(markers: SyncMarker[], index: number): number {
     let i = index + 1;
-    while (i < markers.length - 1 && !isSyncPoint(markers[i])) i++;
+    while (i < markers.length - 1 && !isSyncPoint(markers[i])) { i++; }
     return Math.min(markers.length - 1, i);
 }
 
@@ -32,7 +32,7 @@ function relayout(markers: SyncMarker[], index: number, removed: boolean): void 
     const modified = markers[index];
 
     if (removed) {
-        if (next <= index) return;
+        if (next <= index) { return; }
         const previous = markers[start];
         let bpm = modified.synthBpm;
         if (isSyncPoint(markers[next])) {
@@ -92,7 +92,7 @@ function cloneAll(markers: SyncMarker[]): SyncMarker[] {
 
 /** Moves marker `index` to `timeMs` on the media (clamped between its neighbouring sync points) and makes it a sync point. */
 export function moveMarker(markers: SyncMarker[], index: number, timeMs: number): SyncMarker[] {
-    if (index < 0 || index >= markers.length) return markers;
+    if (index < 0 || index >= markers.length) { return markers; }
     const [lower, upper] = moveRange(markers, index);
     const next = cloneAll(markers);
     next[index].syncTime = Math.min(upper, Math.max(lower, timeMs));
@@ -108,7 +108,7 @@ export function canToggle(markers: SyncMarker[], index: number): boolean {
 
 /** Turns marker `index` into a sync point at its current position, or back into a regular marker. */
 export function toggleMarker(markers: SyncMarker[], index: number): SyncMarker[] {
-    if (!canToggle(markers, index)) return markers;
+    if (!canToggle(markers, index)) { return markers; }
     const next = cloneAll(markers);
     if (isSyncPoint(next[index])) {
         next[index].syncBpm = undefined;
@@ -126,10 +126,10 @@ export function toggleMarker(markers: SyncMarker[], index: number): SyncMarker[]
  */
 export function autoSync(input: TimelineInput, range: [number, number] | null): SyncMarker[] {
     const markers = buildMarkers(input);
-    if (markers.length === 0) return markers;
+    if (markers.length === 0) { return markers; }
     markers[0].syncBpm ??= markers[0].synthBpm;
     markers[markers.length - 1].syncBpm ??= markers[markers.length - 1].synthBpm;
-    if (!range) return markers;
+    if (!range) { return markers; }
 
     const [songStart, songEnd] = range;
     const synthTotal = markers[markers.length - 1].synthTime;
@@ -151,7 +151,7 @@ export function autoSync(input: TimelineInput, range: [number, number] | null): 
     let bpm = points[0].syncBpm!;
     for (let i = 0; i < markers.length; i++) {
         markers[i].syncTime = time;
-        if (markers[i].syncBpm) bpm = markers[i].syncBpm!;
+        if (markers[i].syncBpm) { bpm = markers[i].syncBpm!; }
         if (i < markers.length - 1) {
             time += ticksToMilliseconds(markers[i + 1].synthTick - markers[i].synthTick, bpm);
         }

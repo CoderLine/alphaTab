@@ -132,8 +132,8 @@ export async function writeReferenceTable(
         const at = a.title;
         const bt = b.title;
 
-        if (at < bt) return -1;
-        if (at > bt) return 1;
+        if (at < bt) { return -1; }
+        if (at > bt) { return 1; }
 
         return 0;
       });
@@ -2056,7 +2056,7 @@ export class TypeReferencedCodeBuilder {
 
 
 export function escapeHtmlEntities(input: string): string {
-  if (input === null || input === undefined) return "";
+  if (input === null || input === undefined) { return ""; }
   const map: Record<string, string> = {
     "&": "&amp;",
     "<": "&lt;",

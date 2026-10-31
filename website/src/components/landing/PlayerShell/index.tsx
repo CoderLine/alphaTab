@@ -88,34 +88,34 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
     });
 
     React.useEffect(() => {
-        if (!maximize.isMaximized || settingsOpen) return;
+        if (!maximize.isMaximized || settingsOpen) { return; }
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') maximize.collapse();
+            if (e.key === 'Escape') { maximize.collapse(); }
         };
         document.addEventListener('keydown', onKey);
         return () => document.removeEventListener('keydown', onKey);
     }, [maximize.isMaximized, maximize.collapse, settingsOpen]);
 
     React.useEffect(() => {
-        if (!controls) return;
+        if (!controls) { return; }
         controls.setMasterVolume(DEFAULT_VOLUME_PCT / 100);
     }, [controls]);
 
     const { playback, view } = state;
 
     React.useEffect(() => {
-        if (!settingsOpen) return;
+        if (!settingsOpen) { return; }
         // The flyout opens upward from the transport bar and can start above the viewport.
         const frame = requestAnimationFrame(() => {
             flyoutRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         });
         const onDown = (e: MouseEvent) => {
             const t = e.target as Node;
-            if (flyoutRef.current?.contains(t) || gearRef.current?.contains(t)) return;
+            if (flyoutRef.current?.contains(t) || gearRef.current?.contains(t)) { return; }
             setSettingsOpen(false);
         };
         const onKey = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setSettingsOpen(false);
+            if (e.key === 'Escape') { setSettingsOpen(false); }
         };
         document.addEventListener('mousedown', onDown);
         document.addEventListener('keydown', onKey);
@@ -155,7 +155,7 @@ export const PlayerShell: React.FC<PlayerShellProps> = ({
         // The range itself comes from drag-selecting on the score, not from this toggle.
         setLoop: (b) => controls?.setLoopPlayback(b),
         onReset: () => {
-            if (!controls) return;
+            if (!controls) { return; }
             controls.resetSettings();
             controls.setMasterVolume(DEFAULT_VOLUME_PCT / 100);
         },

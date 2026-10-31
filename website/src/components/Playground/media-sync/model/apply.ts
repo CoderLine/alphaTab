@@ -10,7 +10,7 @@ import { isSyncPoint, type SyncMarker, type TimelineInput } from './timeline';
 export function readTimelineInput(module: AlphaTabModule, api: AlphaTabApi, createSyncPoints: boolean): TimelineInput | null {
     const score = api.score;
     const cache = api.tickCache;
-    if (!score || !cache || cache.masterBars.length === 0) return null;
+    if (!score || !cache || cache.masterBars.length === 0) { return null; }
     return {
         tempo: score.tempo,
         bars: cache.masterBars.map((bar) => ({
@@ -48,9 +48,9 @@ export function toFlatSyncPoints(markers: SyncMarker[]): model.FlatSyncPoint[] {
 /** Replaces the score's sync points and updates the player, keeping the cursor where it is in the notation. */
 export function applySyncPoints(api: AlphaTabApi, points: model.FlatSyncPoint[]): void {
     const score = api.score;
-    if (!score) return;
+    if (!score) { return; }
     const tick = api.tickPosition;
-    for (const mb of score.masterBars) mb.syncPoints = undefined;
+    for (const mb of score.masterBars) { mb.syncPoints = undefined; }
     score.applyFlatSyncPoints(points);
     api.updateSyncPoints();
     api.tickPosition = tick;

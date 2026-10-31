@@ -68,14 +68,14 @@ const ToggleControls: React.FC<{
   const isInitialRender = React.useRef(true);
 
   useEffect(() => {
-    if (!controls) return;
+    if (!controls) { return; }
     const patch = patchFromPath(settingPath, on ? onValue : offValue);
     controls.updateSettings(patch);
     // On the first mount the score is loaded fresh with the seed settings, so
     // we only need to reload for subsequent toggles.
     if (reload && !isInitialRender.current) {
-      if (tex) controls.loadScoreFromTex(tex);
-      else if (file) void controls.loadScoreFromUrl(file);
+      if (tex) { controls.loadScoreFromTex(tex); }
+      else if (file) { void controls.loadScoreFromUrl(file); }
     }
     isInitialRender.current = false;
   }, [controls, on, settingPath, onValue, offValue, reload, tex, file]);

@@ -26,7 +26,7 @@ function applyPlaygroundBase(settings: Settings, module: AlphaTabModule, smuflMe
     settings.player.scrollMode = module.ScrollMode.Continuous;
     // Keeps a bit of the system above the cursor in view instead of scrolling it flush to the top edge.
     settings.player.scrollOffsetY = -24;
-    if (smuflMetadata) settings.display.resources.engravingSettings.fillFromSmufl(smuflMetadata as never);
+    if (smuflMetadata) { settings.display.resources.engravingSettings.fillFromSmufl(smuflMetadata as never); }
 }
 
 export interface PlaygroundSettings {
@@ -71,11 +71,11 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
 
     const defaults = useMemo(() => {
         const result: Overrides = {};
-        if (!store || !module) return result;
+        if (!store || !module) { return result; }
         const settings = store.createDefaultSettings();
         applyPlaygroundBase(settings, module, smuflMetadata);
         for (const entry of entries.values()) {
-            if (entry.effect !== 'stylesheet') result[entry.id] = entry.read(settings);
+            if (entry.effect !== 'stylesheet') { result[entry.id] = entry.read(settings); }
         }
         return result;
         // Theme colors are part of the defaults.
@@ -84,13 +84,13 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
 
     // Re-applied by the store after it rebuilds base settings (theme switch, reset).
     useEffect(() => {
-        if (!store || !module) return;
+        if (!store || !module) { return; }
         store.setScrollDuringPlayback(false);
         return store.addSettingsLayer((settings) => {
             applyPlaygroundBase(settings, module, smuflMetadata);
             for (const [id, value] of Object.entries(overridesRef.current)) {
                 const entry = entries.get(id);
-                if (entry && entry.effect !== 'stylesheet') entry.write(settings, value, module);
+                if (entry && entry.effect !== 'stylesheet') { entry.write(settings, value, module); }
             }
         });
     }, [store, module, entries, smuflMetadata]);
@@ -98,9 +98,9 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
     const [savedView, setSavedView] = usePersistedState<PersistedView | null>('alphatab.playground-view.v1', null);
     const viewRestored = useRef(false);
     useEffect(() => {
-        if (!store || viewRestored.current) return;
+        if (!store || viewRestored.current) { return; }
         viewRestored.current = true;
-        if (!savedView) return;
+        if (!savedView) { return; }
         store.setScale(savedView.scale);
         store.setPlaybackSpeed(savedView.playbackSpeed);
         store.setMasterVolume(savedView.masterVolume);
@@ -109,7 +109,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [store]);
     useEffect(() => {
-        if (!store || !viewRestored.current) return;
+        if (!store || !viewRestored.current) { return; }
         const { scale, playbackSpeed, masterVolume, highlight } = view;
         setSavedView({ scale, playbackSpeed, masterVolume, highlight });
     }, [store, view, setSavedView]);
@@ -119,7 +119,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
 
     const applyEntry = useCallback(
         (entry: SchemaEntry, value: SettingValue) => {
-            if (!store || !api || !module) return;
+            if (!store || !api || !module) { return; }
             if (entry.effect === 'stylesheet') {
                 store.mutateScore((s) => entry.write(s, value));
                 return;
@@ -132,7 +132,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
                     window.clearTimeout(renderTimer.current);
                     renderTimer.current = window.setTimeout(() => {
                         store.updateSettings();
-                        if (entry.effect === 'renderMidi') store.regenerateMidi();
+                        if (entry.effect === 'renderMidi') { store.regenerateMidi(); }
                     }, RENDER_DEBOUNCE_MS);
                     break;
                 case 'apply':
@@ -158,11 +158,11 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
     const setValue = useCallback(
         (entry: SchemaEntry, value: SettingValue) => {
             applyEntry(entry, value);
-            if (entry.effect === 'stylesheet') return;
+            if (entry.effect === 'stylesheet') { return; }
             setOverrides((prev) => {
                 const next = { ...prev };
-                if (value === defaults[entry.id]) delete next[entry.id];
-                else next[entry.id] = value;
+                if (value === defaults[entry.id]) { delete next[entry.id]; }
+                else { next[entry.id] = value; }
                 return next;
             });
         },
@@ -171,33 +171,33 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
 
     const resetValue = useCallback(
         (entry: SchemaEntry) => {
-            if (entry.effect === 'stylesheet') return;
+            if (entry.effect === 'stylesheet') { return; }
             const fallback = defaults[entry.id];
-            if (fallback !== undefined) setValue(entry, fallback);
+            if (fallback !== undefined) { setValue(entry, fallback); }
         },
         [defaults, setValue],
     );
 
     const resetAll = useCallback(() => {
-        if (!store || !api || !module) return;
+        if (!store || !api || !module) { return; }
         const effects = new Set<string>();
         for (const id of Object.keys(overridesRef.current)) {
             const entry = entries.get(id);
-            if (!entry || entry.effect === 'stylesheet' || defaults[id] === undefined) continue;
+            if (!entry || entry.effect === 'stylesheet' || defaults[id] === undefined) { continue; }
             entry.write(api.settings, defaults[id], module);
             effects.add(entry.effect);
         }
         overridesRef.current = {};
         setOverrides({});
         store.resetSettings();
-        if (effects.has('midi') || effects.has('renderMidi')) store.regenerateMidi();
-        if (effects.has('player')) store.rebuildPlayer();
-        if (effects.has('reload')) onReloadRef.current();
+        if (effects.has('midi') || effects.has('renderMidi')) { store.regenerateMidi(); }
+        if (effects.has('player')) { store.rebuildPlayer(); }
+        if (effects.has('reload')) { onReloadRef.current(); }
     }, [store, api, module, entries, defaults, setOverrides]);
 
     const valueOf = useCallback(
         (entry: SchemaEntry): SettingValue | undefined => {
-            if (entry.effect === 'stylesheet') return score ? entry.read(score) : undefined;
+            if (entry.effect === 'stylesheet') { return score ? entry.read(score) : undefined; }
             return overrides[entry.id] ?? defaults[entry.id];
         },
         // `scoreRevision` invalidates reads from the mutable score model.

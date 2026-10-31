@@ -10,14 +10,14 @@ export function useNearViewport<T extends Element>(rootMargin = '600px'): [(node
     const ref = useCallback((n: T | null) => setNode(n), []);
 
     useEffect(() => {
-        if (near || !node) return;
+        if (near || !node) { return; }
         if (typeof IntersectionObserver === 'undefined') {
             setNear(true);
             return;
         }
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries.some((e) => e.isIntersecting)) setNear(true);
+                if (entries.some((e) => e.isIntersecting)) { setNear(true); }
             },
             { rootMargin },
         );

@@ -36,7 +36,7 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({ axis, value, min, ma
                 start.current = { pos: axis === 'x' ? e.clientX : e.clientY, value };
             }}
             onPointerMove={(e) => {
-                if (!start.current) return;
+                if (!start.current) { return; }
                 const delta = (axis === 'x' ? e.clientX : e.clientY) - start.current.pos;
                 onChange(clamp(start.current.value + delta * direction));
             }}
@@ -50,9 +50,9 @@ export const ResizeHandle: React.FC<ResizeHandleProps> = ({ axis, value, min, ma
                 const grow = axis === 'x' ? 'ArrowRight' : 'ArrowDown';
                 const shrink = axis === 'x' ? 'ArrowLeft' : 'ArrowUp';
                 const step = e.shiftKey ? 64 : 16;
-                if (e.key === grow) onChange(clamp(value + step * direction));
-                else if (e.key === shrink) onChange(clamp(value - step * direction));
-                else return;
+                if (e.key === grow) { onChange(clamp(value + step * direction)); }
+                else if (e.key === shrink) { onChange(clamp(value - step * direction)); }
+                else { return; }
                 e.preventDefault();
             }}
         />

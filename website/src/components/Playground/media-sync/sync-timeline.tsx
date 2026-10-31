@@ -77,7 +77,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     const zoomAround = useCallback(
         (next: number, offset?: number) => {
             const scroller = scrollerRef.current;
-            if (!scroller) return;
+            if (!scroller) { return; }
             const anchorOffset = offset ?? scroller.clientWidth / 2;
             zoomAnchor.current = { time: (scroller.scrollLeft + anchorOffset - PAD) / pxPerMs, offset: anchorOffset };
             onZoomChange(clampZoom(next));
@@ -88,7 +88,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     useLayoutEffect(() => {
         const scroller = scrollerRef.current;
         const anchor = zoomAnchor.current;
-        if (!scroller || !anchor) return;
+        if (!scroller || !anchor) { return; }
         zoomAnchor.current = null;
         scroller.scrollLeft = PAD + anchor.time * pxPerMs - anchor.offset;
     }, [pxPerMs]);
@@ -99,7 +99,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
             zoomBy: (factor) => zoomAround(zoom * factor),
             fit: () => {
                 const scroller = scrollerRef.current;
-                if (!scroller || durationMs <= 0) return;
+                if (!scroller || durationMs <= 0) { return; }
                 onZoomChange(clampZoom(((scroller.clientWidth - PAD * 2) / durationMs) * 1000));
                 scroller.scrollLeft = 0;
             },
@@ -109,10 +109,10 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
 
     useEffect(() => {
         const scroller = scrollerRef.current;
-        if (!scroller) return;
+        if (!scroller) { return; }
         // Ctrl/⌘ + wheel zooms around the pointer; React's wheel listener is passive and cannot prevent the page zoom.
         const onWheel = (e: WheelEvent) => {
-            if (!e.ctrlKey && !e.metaKey) return;
+            if (!e.ctrlKey && !e.metaKey) { return; }
             e.preventDefault();
             const rect = scroller.getBoundingClientRect();
             zoomAround(zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX - rect.left);
@@ -131,7 +131,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     const draw = useCallback(() => {
         const scroller = scrollerRef.current;
         const canvas = canvasRef.current;
-        if (!scroller || !canvas) return;
+        if (!scroller || !canvas) { return; }
         const width = scroller.clientWidth;
         const height = scroller.clientHeight;
         const dpr = window.devicePixelRatio || 1;
@@ -142,7 +142,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
             canvas.style.height = `${height}px`;
         }
         const ctx = canvas.getContext('2d');
-        if (!ctx) return;
+        if (!ctx) { return; }
         colors.current ??= readColors(canvas);
         const c = colors.current;
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -170,7 +170,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
         ctx.stroke();
 
         // Waveform
-        if (!analysis) return;
+        if (!analysis) { return; }
         const samplesPerPx = analysis.sampleRate / zoom;
         const level = Math.min(analysis.peaks.length - 1, Math.max(0, Math.floor(Math.log2(samplesPerPx / PEAK_BUCKET))));
         const peaks = analysis.peaks[level];
@@ -183,9 +183,9 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
         for (let x = 0; x < width; x++) {
             const from = Math.floor(toBucket(timeAt(x)));
             const to = Math.max(from + 1, Math.floor(toBucket(timeAt(x + 1))));
-            if (to <= 0 || from >= peaks.length) continue;
+            if (to <= 0 || from >= peaks.length) { continue; }
             let peak = 0;
-            for (let b = Math.max(0, from); b < Math.min(peaks.length, to); b++) if (peaks[b] > peak) peak = peaks[b];
+            for (let b = Math.max(0, from); b < Math.min(peaks.length, to); b++) { if (peaks[b] > peak) { peak = peaks[b]; } }
             const h = Math.max(1, peak * half);
             ctx.fillRect(x, mid - h, 1, h * 2);
         }
@@ -193,7 +193,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     }, [analysis, durationMs, pxPerMs, zoom]);
 
     const scheduleDraw = useCallback(() => {
-        if (frame.current) return;
+        if (frame.current) { return; }
         frame.current = requestAnimationFrame(() => {
             frame.current = 0;
             draw();
@@ -206,7 +206,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
 
     useEffect(() => {
         const scroller = scrollerRef.current;
-        if (!scroller) return;
+        if (!scroller) { return; }
         const observer = new ResizeObserver(scheduleDraw);
         observer.observe(scroller);
         return () => {
@@ -221,10 +221,10 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
         (follow: boolean) => {
             const head = playheadRef.current;
             const scroller = scrollerRef.current;
-            if (!head || !scroller || !media) return;
+            if (!head || !scroller || !media) { return; }
             const x = PAD + media.currentTime * 1000 * pxPerMs;
             head.style.transform = `translateX(${x}px)`;
-            if (!follow || performance.now() - lastUserScroll.current < USER_SCROLL_GRACE_MS) return;
+            if (!follow || performance.now() - lastUserScroll.current < USER_SCROLL_GRACE_MS) { return; }
             const view = scroller.clientWidth;
             if (x < scroller.scrollLeft + view * 0.05 || x > scroller.scrollLeft + view * 0.85) {
                 scroller.scrollLeft = x - view * 0.2;
@@ -234,7 +234,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     );
 
     useEffect(() => {
-        if (!media) return;
+        if (!media) { return; }
         let raf = 0;
         const loop = () => {
             placePlayhead(true);
@@ -254,8 +254,8 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
         media.addEventListener('ended', stop);
         media.addEventListener('seeked', update);
         media.addEventListener('timeupdate', update);
-        if (media.paused) update();
-        else start();
+        if (media.paused) { update(); }
+        else { start(); }
         return () => {
             cancelAnimationFrame(raf);
             media.removeEventListener('play', start);
@@ -267,7 +267,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     }, [media, placePlayhead]);
 
     const seek = (ms: number) => {
-        if (media) media.currentTime = Math.max(0, ms) / 1000;
+        if (media) { media.currentTime = Math.max(0, ms) / 1000; }
     };
 
     // ─── Marker interaction ──────────────────────────────────────
@@ -275,7 +275,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     const markerEls = useRef(new Map<number, HTMLButtonElement>());
 
     const beatSpacing = useMemo(() => {
-        if (markers.length < 2) return Infinity;
+        if (markers.length < 2) { return Infinity; }
         return ((markers[markers.length - 1].syncTime - markers[0].syncTime) / (markers.length - 1)) * pxPerMs;
     }, [markers, pxPerMs]);
     const showBeats = beatSpacing >= 8;
@@ -290,7 +290,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     };
 
     const onMarkerPointerDown = (e: React.PointerEvent, index: number) => {
-        if (e.button !== 0) return;
+        if (e.button !== 0) { return; }
         e.preventDefault();
         e.stopPropagation();
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -301,9 +301,9 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
 
     const onMarkerPointerMove = (e: React.PointerEvent) => {
         const d = drag.current;
-        if (!d) return;
+        if (!d) { return; }
         const dx = e.clientX - d.startX;
-        if (!d.moved && Math.abs(dx) < DRAG_THRESHOLD_PX) return;
+        if (!d.moved && Math.abs(dx) < DRAG_THRESHOLD_PX) { return; }
         d.moved = true;
         setPreview(moveMarker(markers, d.index, d.startTime + dx / pxPerMs));
     };
@@ -311,9 +311,9 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
     const onMarkerPointerUp = () => {
         const d = drag.current;
         drag.current = null;
-        if (!d) return;
-        if (d.moved && preview) onCommit(preview);
-        else seek(markers[d.index].syncTime);
+        if (!d) { return; }
+        if (d.moved && preview) { onCommit(preview); }
+        else { seek(markers[d.index].syncTime); }
         setPreview(null);
     };
 
@@ -352,7 +352,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
         }
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            if (canToggle(markers, index)) onCommit(toggleMarker(markers, index));
+            if (canToggle(markers, index)) { onCommit(toggleMarker(markers, index)); }
         }
     };
 
@@ -375,7 +375,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
                 <div
                     className={styles.lane}
                     onPointerDown={(e) => {
-                        if (e.target !== e.currentTarget || e.button !== 0) return;
+                        if (e.target !== e.currentTarget || e.button !== 0) { return; }
                         const rect = e.currentTarget.getBoundingClientRect();
                         seek((e.clientX - rect.left - PAD) / pxPerMs);
                     }}
@@ -384,7 +384,7 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
                 >
                     {shown.map((marker, index) => {
                         const active = isSyncPoint(marker);
-                        if (!active && marker.kind === 'beat' && !showBeats) return null;
+                        if (!active && marker.kind === 'beat' && !showBeats) { return null; }
                         const x = PAD + marker.syncTime * pxPerMs;
                         const bar = marker.masterBarIndex + 1;
                         const repeat = marker.occurence > 0 ? `, repeat ${marker.occurence + 1}` : '';
@@ -397,8 +397,8 @@ export const SyncTimeline: React.FC<SyncTimelineProps> = ({
                             <button
                                 key={marker.id}
                                 ref={(el) => {
-                                    if (el) markerEls.current.set(index, el);
-                                    else markerEls.current.delete(index);
+                                    if (el) { markerEls.current.set(index, el); }
+                                    else { markerEls.current.delete(index); }
                                 }}
                                 type="button"
                                 tabIndex={index === selected ? 0 : -1}

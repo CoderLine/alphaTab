@@ -19,7 +19,7 @@ export const PLAYGROUND_PATH = '/playground';
 
 /** Builds a Playground link; `basePath` is the (base-URL-resolved) Playground route. */
 export async function buildPlaygroundUrl(target: PlaygroundLinkTarget, basePath = PLAYGROUND_PATH): Promise<string> {
-    if (!('tex' in target)) return buildFileLink(target, basePath);
+    if (!('tex' in target)) { return buildFileLink(target, basePath); }
     const query = target.tracks ? `?tracks=${formatTracks(target.tracks)}` : '';
     return `${basePath}${query}#tex=${await encodeTex(target.tex)}`;
 }
@@ -27,9 +27,9 @@ export async function buildPlaygroundUrl(target: PlaygroundLinkTarget, basePath 
 /** Synchronous variant of `buildPlaygroundUrl` for targets that need no compression. */
 export function buildFileLink(target: Exclude<PlaygroundLinkTarget, { tex: string }>, basePath = PLAYGROUND_PATH): string {
     const params = new URLSearchParams();
-    if ('sample' in target) params.set('file', target.sample);
-    else params.set('url', target.url);
-    if (target.tracks) params.set('tracks', formatTracks(target.tracks));
+    if ('sample' in target) { params.set('file', target.sample); }
+    else { params.set('url', target.url); }
+    if (target.tracks) { params.set('tracks', formatTracks(target.tracks)); }
     return `${basePath}?${params.toString()}`;
 }
 
@@ -47,15 +47,15 @@ export async function parsePlaygroundUrl(location: { search: string; hash: strin
         }
     }
     const sample = params.get('file');
-    if (sample) return { sample, tracks };
+    if (sample) { return { sample, tracks }; }
     const url = params.get('url');
-    if (url && isSameOriginPath(url, location.origin)) return { url, tracks };
+    if (url && isSameOriginPath(url, location.origin)) { return { url, tracks }; }
     return null;
 }
 
 /** Only site-relative paths: a link must not make the Playground fetch from arbitrary hosts. */
 export function isSameOriginPath(url: string, origin: string): boolean {
-    if (!url.startsWith('/') || url.startsWith('//')) return false;
+    if (!url.startsWith('/') || url.startsWith('//')) { return false; }
     try {
         return new URL(url, origin).origin === origin;
     } catch {
@@ -68,8 +68,8 @@ function formatTracks(tracks: TrackSelection): string {
 }
 
 function parseTracks(value: string | null): TrackSelection | undefined {
-    if (!value) return undefined;
-    if (value === 'all') return 'all';
+    if (!value) { return undefined; }
+    if (value === 'all') { return 'all'; }
     const indexes = value
         .split(',')
         .map((v) => Number.parseInt(v, 10))
@@ -80,7 +80,7 @@ function parseTracks(value: string | null): TrackSelection | undefined {
 export async function encodeTex(tex: string): Promise<string> {
     const compressed = await pipe(new TextEncoder().encode(tex), new CompressionStream('deflate-raw'));
     let binary = '';
-    for (const byte of compressed) binary += String.fromCharCode(byte);
+    for (const byte of compressed) { binary += String.fromCharCode(byte); }
     return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 

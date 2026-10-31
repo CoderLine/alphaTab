@@ -17,7 +17,7 @@ export const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({ videoId, onMedia, on
 
     useEffect(() => {
         const host = hostRef.current;
-        if (!host) return;
+        if (!host) { return; }
         const target = document.createElement('div');
         host.appendChild(target);
         let media: YouTubeMedia | null = null;
@@ -32,7 +32,7 @@ export const YouTubeEmbed: React.FC<YouTubeEmbedProps> = ({ videoId, onMedia, on
                 callbacks.current.onMedia(created);
             },
             (e: unknown) => {
-                if (!cancelled) callbacks.current.onError(e instanceof Error ? e.message : String(e));
+                if (!cancelled) { callbacks.current.onError(e instanceof Error ? e.message : String(e)); }
             },
         );
         return () => {

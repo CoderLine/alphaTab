@@ -78,7 +78,7 @@ export function connectAlphaTexLsp(
     editor: Monaco.editor.IStandaloneCodeEditor,
 ): Monaco.IDisposable {
     const model = editor.getModel();
-    if (!model) throw new Error('[AlphaTexEditor] Editor has no model');
+    if (!model) { throw new Error('[AlphaTexEditor] Editor has no model'); }
     const uri = model.uri.toString();
     const isOwnModel = (m: Monaco.editor.ITextModel) => m.uri.toString() === uri;
 
@@ -91,7 +91,7 @@ export function connectAlphaTexLsp(
     const pullDiagnostics = async () => {
         const version = model.getVersionId();
         const result = await connection.sendRequest(DocumentDiagnosticRequest.type, { textDocument: { uri } });
-        if (disposed || model.isDisposed() || model.getVersionId() !== version || result.kind !== 'full') return;
+        if (disposed || model.isDisposed() || model.getVersionId() !== version || result.kind !== 'full') { return; }
         monaco.editor.setModelMarkers(model, MARKER_OWNER, result.items.map(lspToMonacoMarker));
     };
     const scheduleDiagnostics = () => {
@@ -102,7 +102,7 @@ export function connectAlphaTexLsp(
     const start = async () => {
         connection.listen();
         const init = await connection.sendRequest(InitializeRequest.type, initializeParams);
-        if (disposed) return;
+        if (disposed) { return; }
         void connection.sendNotification(InitializedNotification.type, {});
 
         // The snapshot and the change subscription must happen in the same tick so no edit slips between them.
@@ -132,7 +132,7 @@ export function connectAlphaTexLsp(
                 monaco.languages.registerCompletionItemProvider(ALPHATEX_LANGUAGE_ID, {
                     triggerCharacters: capabilities.completionProvider.triggerCharacters,
                     async provideCompletionItems(m, position, context, t) {
-                        if (!isOwnModel(m)) return null;
+                        if (!isOwnModel(m)) { return null; }
                         const response = await connection.sendRequest(
                             CompletionRequest.type,
                             {
@@ -145,7 +145,7 @@ export function connectAlphaTexLsp(
                             },
                             token(t),
                         );
-                        if (!response) return null;
+                        if (!response) { return null; }
                         const range = typedTokenRange(monaco, m, position);
                         const items = Array.isArray(response) ? response : response.items;
                         return {
@@ -169,7 +169,7 @@ export function connectAlphaTexLsp(
             disposables.push(
                 monaco.languages.registerHoverProvider(ALPHATEX_LANGUAGE_ID, {
                     async provideHover(m, position, t) {
-                        if (!isOwnModel(m)) return null;
+                        if (!isOwnModel(m)) { return null; }
                         const response = await connection.sendRequest(
                             HoverRequest.type,
                             { textDocument: { uri }, position: toLspPosition(position) },
@@ -188,7 +188,7 @@ export function connectAlphaTexLsp(
                     signatureHelpTriggerCharacters: triggerCharacters,
                     signatureHelpRetriggerCharacters: retriggerCharacters,
                     async provideSignatureHelp(m, position, t, context) {
-                        if (!isOwnModel(m)) return null;
+                        if (!isOwnModel(m)) { return null; }
                         const response = await connection.sendRequest(
                             SignatureHelpRequest.type,
                             {
@@ -213,18 +213,18 @@ export function connectAlphaTexLsp(
     };
 
     function reportError(e: unknown) {
-        if (!disposed) console.error('[AlphaTexEditor] Language server request failed', e);
+        if (!disposed) { console.error('[AlphaTexEditor] Language server request failed', e); }
     }
 
     void start().catch(reportError);
 
     return {
         dispose() {
-            if (disposed) return;
+            if (disposed) { return; }
             disposed = true;
             clearTimeout(diagnosticsTimer);
-            for (const d of disposables) d.dispose();
-            if (!model.isDisposed()) monaco.editor.setModelMarkers(model, MARKER_OWNER, []);
+            for (const d of disposables) { d.dispose(); }
+            if (!model.isDisposed()) { monaco.editor.setModelMarkers(model, MARKER_OWNER, []); }
             connection.dispose();
             worker.terminate();
         },

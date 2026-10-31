@@ -34,7 +34,7 @@ const MidiLog: React.FC<{ maxEntries: number }> = ({ maxEntries }) => {
   const [entries, setEntries] = useState<LogEntry[]>([]);
 
   useEffect(() => {
-    if (!api || !module) return;
+    if (!api || !module) { return; }
     api.midiEventsPlayedFilter = [
       module.midi.MidiEventType.NoteOn,
       module.midi.MidiEventType.AlphaTabMetronome,
@@ -43,13 +43,13 @@ const MidiLog: React.FC<{ maxEntries: number }> = ({ maxEntries }) => {
   }, [api, module]);
 
   const typeName = (t: alphaTab.midi.MidiEventType): string => {
-    if (!module) return String(t);
+    if (!module) { return String(t); }
     const map = module.midi.MidiEventType as unknown as Record<number, string>;
     return map[t] ?? String(t);
   };
 
   const describe = (evt: alphaTab.midi.MidiEvent): string => {
-    if (!module) return '';
+    if (!module) { return ''; }
     const anyEvt = evt as unknown as {
       channel?: number;
       noteKey?: number;

@@ -66,7 +66,7 @@ const MediaSyncContext = createContext<MediaSyncState | null>(null);
 
 export function useMediaSync(): MediaSyncState {
     const ctx = useContext(MediaSyncContext);
-    if (!ctx) throw new Error('useMediaSync must be used inside <MediaSyncProvider>');
+    if (!ctx) { throw new Error('useMediaSync must be used inside <MediaSyncProvider>'); }
     return ctx;
 }
 
@@ -129,8 +129,8 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     // User audio lives on the score model, which every alphaTex re-parse replaces.
     useEffect(() => {
-        if (!score || !userAudio || !store) return;
-        if (score.backingTrack?.rawAudioFile !== userAudio.bytes) store.attachBackingTrackAudio(userAudio.bytes);
+        if (!score || !userAudio || !store) { return; }
+        if (score.backingTrack?.rawAudioFile !== userAudio.bytes) { store.attachBackingTrackAudio(userAudio.bytes); }
     }, [score, userAudio, store]);
 
     const loadAudioFile = useCallback(
@@ -156,17 +156,17 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const audioBytes = kind === 'audio' && effective === 'backingTrack' ? (score?.backingTrack?.rawAudioFile ?? null) : null;
     const analysis = analysed && analysed.bytes === audioBytes ? analysed.result : null;
     useEffect(() => {
-        if (!audioBytes) return;
+        if (!audioBytes) { return; }
         let cancelled = false;
         setAnalysing(true);
         analyseCached(audioBytes).then(
             (result) => {
-                if (cancelled) return;
+                if (cancelled) { return; }
                 setAnalysed({ bytes: audioBytes, result });
                 setAnalysing(false);
             },
             (e: unknown) => {
-                if (cancelled) return;
+                if (cancelled) { return; }
                 setAnalysing(false);
                 setError(`The audio could not be decoded: ${e instanceof Error ? e.message : String(e)}`);
             },
@@ -178,14 +178,14 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     // `api.player.output` is a different object after every player rebuild.
     const media = useMemo<MediaElementLike | null>(() => {
-        if (kind === 'youtube') return youtubeMedia;
-        if (kind === 'audio' && effective === 'backingTrack') return audioElementOf(api?.player?.output);
+        if (kind === 'youtube') { return youtubeMedia; }
+        if (kind === 'audio' && effective === 'backingTrack') { return audioElementOf(api?.player?.output); }
         return null;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [kind, effective, youtubeMedia, api, playerRevision]);
 
     useEffect(() => {
-        if (!youtubeMedia || !store || kind !== 'youtube') return;
+        if (!youtubeMedia || !store || kind !== 'youtube') { return; }
         const onDuration = () => setYoutubeDuration(Number.isFinite(youtubeMedia.duration) ? youtubeMedia.duration * 1000 : 0);
         onDuration();
         youtubeMedia.addEventListener('durationchange', onDuration);
@@ -205,9 +205,9 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const syncing = kind !== 'synth';
 
     useEffect(() => {
-        if (!api || !module || !score || !syncing) return;
+        if (!api || !module || !score || !syncing) { return; }
         const input = readTimelineInput(module, api, false);
-        if (!input) return;
+        if (!input) { return; }
         const signature = timelineSignature(input);
         if (timeline.current?.signature === signature && history.present) {
             // Same bars (e.g. an edited alphaTex): carry the sync points over to the new score model.
@@ -221,7 +221,7 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (scoreHasSyncPoints(score)) {
             markers = markersFromScore(input);
         } else if (kind === 'audio') {
-            if (!analysis) return;
+            if (!analysis) { return; }
             markers = autoSync(readTimelineInput(module, api, true)!, analysis.songRange);
         } else {
             markers = autoSync(readTimelineInput(module, api, true)!, null);
@@ -235,7 +235,7 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const appliedRef = useRef<SyncMarker[] | null>(null);
     useEffect(() => {
         const present = history.present;
-        if (!api || !present || appliedRef.current === present) return;
+        if (!api || !present || appliedRef.current === present) { return; }
         appliedRef.current = present;
         applySyncPoints(api, toFlatSyncPoints(present));
     }, [api, history.present]);
@@ -245,16 +245,16 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const redo = useCallback(() => dispatch({ type: 'redo' }), []);
 
     const autoSyncNow = useCallback(() => {
-        if (!api || !module) return;
+        if (!api || !module) { return; }
         const input = readTimelineInput(module, api, true);
-        if (!input) return;
+        if (!input) { return; }
         commit(autoSync(input, kind === 'audio' ? (analysis?.songRange ?? null) : null));
     }, [api, module, kind, analysis, commit]);
 
     const clearSyncPoints = useCallback(() => {
-        if (!api || !module) return;
+        if (!api || !module) { return; }
         const input = readTimelineInput(module, api, false);
-        if (!input) return;
+        if (!input) { return; }
         const markers = buildMarkers({ ...input, syncPoints: [] });
         markers[0].syncBpm = markers[0].synthBpm;
         markers[markers.length - 1].syncBpm = markers[markers.length - 1].synthBpm;

@@ -22,19 +22,19 @@ export function createHistory<T>(value: T): History<T> {
 export function historyReducer<T>(state: History<T>, action: HistoryAction<T>): History<T> {
     switch (action.type) {
         case 'commit':
-            if (action.value === state.present) return state;
+            if (action.value === state.present) { return state; }
             return { past: [...state.past, state.present].slice(-LIMIT), present: action.value, future: [] };
         case 'reset':
             return createHistory(action.value);
         case 'undo':
-            if (state.past.length === 0) return state;
+            if (state.past.length === 0) { return state; }
             return {
                 past: state.past.slice(0, -1),
                 present: state.past[state.past.length - 1],
                 future: [state.present, ...state.future],
             };
         case 'redo':
-            if (state.future.length === 0) return state;
+            if (state.future.length === 0) { return state; }
             return { past: [...state.past, state.present], present: state.future[0], future: state.future.slice(1) };
     }
 }

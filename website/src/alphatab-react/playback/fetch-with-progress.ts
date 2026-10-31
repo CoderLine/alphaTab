@@ -34,7 +34,7 @@ export async function fetchWithProgress(
     onProgress?.({ loaded, total });
     for (;;) {
         const { done, value } = await reader.read();
-        if (done) break;
+        if (done) { break; }
         chunks.push(value);
         loaded += value.length;
         onProgress?.({ loaded, total: Math.max(total, loaded) });

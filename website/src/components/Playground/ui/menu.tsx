@@ -18,10 +18,10 @@ export const Menu: React.FC<MenuProps> = ({ trigger, align = 'start', children, 
     const popoverRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (!open) return;
+        if (!open) { return; }
         const onDown = (e: PointerEvent) => {
             const t = e.target as Node;
-            if (popoverRef.current?.contains(t) || triggerRef.current?.contains(t)) return;
+            if (popoverRef.current?.contains(t) || triggerRef.current?.contains(t)) { return; }
             setOpen(false);
         };
         const onKey = (e: KeyboardEvent) => {
@@ -40,7 +40,7 @@ export const Menu: React.FC<MenuProps> = ({ trigger, align = 'start', children, 
     }, [open]);
 
     const onPopoverKey = (e: React.KeyboardEvent) => {
-        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+        if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') { return; }
         e.preventDefault();
         const items = Array.from(popoverRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]:not([disabled])') ?? []);
         const index = items.indexOf(document.activeElement as HTMLElement);

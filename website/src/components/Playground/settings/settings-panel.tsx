@@ -30,8 +30,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({ settings, onClose 
     const toggleGroup = (id: string) =>
         setOpenGroups((prev) => {
             const next = new Set(prev);
-            if (next.has(id)) next.delete(id);
-            else next.add(id);
+            if (next.has(id)) { next.delete(id); }
+            else { next.add(id); }
             return next;
         });
 
@@ -172,7 +172,7 @@ const OutputDeviceSelect: React.FC = () => {
     const [loading, setLoading] = useState(false);
 
     const load = React.useCallback(async () => {
-        if (!api) return;
+        if (!api) { return; }
         setLoading(true);
         try {
             const [list, current] = await Promise.all([api.enumerateOutputDevices(), api.getOutputDevice()]);
@@ -186,13 +186,13 @@ const OutputDeviceSelect: React.FC = () => {
     }, [api]);
 
     useEffect(() => {
-        if (devices === null) return;
+        if (devices === null) { return; }
         const onChange = () => void load();
         navigator.mediaDevices?.addEventListener('devicechange', onChange);
         return () => navigator.mediaDevices?.removeEventListener('devicechange', onChange);
     }, [devices, load]);
 
-    if (!canSwitchOutput) return null;
+    if (!canSwitchOutput) { return null; }
     return (
         <>
             <span className={styles.label}>Output</span>
@@ -225,7 +225,7 @@ const SettingRow: React.FC<{ entry: SchemaEntry; settings: PlaygroundSettings; q
     const module = useAlphaTabModule();
     const value = settings.valueOf(entry);
     const overridden = settings.isOverridden(entry);
-    if (value === undefined) return null;
+    if (value === undefined) { return null; }
     const set = (v: SettingValue) => settings.setValue(entry, v);
     const { control } = entry;
 

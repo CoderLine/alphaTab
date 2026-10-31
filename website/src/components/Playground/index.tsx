@@ -72,13 +72,13 @@ const PlaygroundApp: React.FC = () => {
         [isPhone, setLayout],
     );
     const closePanel = (panel: PanelId) => {
-        if (isPhone && SIDE_PANELS.includes(panel)) setPhoneSheet(null);
-        else setLayout((l) => ({ ...l, panels: { ...l.panels, [panel]: false } }));
+        if (isPhone && SIDE_PANELS.includes(panel)) { setPhoneSheet(null); }
+        else { setLayout((l) => ({ ...l, panels: { ...l.panels, [panel]: false } })); }
     };
 
     const documentId = doc.document?.id;
     useEffect(() => {
-        if (documentId !== undefined) resetDocument();
+        if (documentId !== undefined) { resetDocument(); }
     }, [documentId, resetDocument]);
 
     const { openFile } = doc;

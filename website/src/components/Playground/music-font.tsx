@@ -34,7 +34,7 @@ const MusicFontContext = createContext<MusicFontState | null>(null);
 
 export function useMusicFont(): MusicFontState {
     const ctx = useContext(MusicFontContext);
-    if (!ctx) throw new Error('useMusicFont must be used inside <MusicFontProvider>');
+    if (!ctx) { throw new Error('useMusicFont must be used inside <MusicFontProvider>'); }
     return ctx;
 }
 
@@ -52,13 +52,13 @@ export const MusicFontProvider: React.FC<{ children: (font: { key: MusicFontId; 
 
     useEffect(() => {
         setMetadata(null);
-        if (!font.metadataUrl) return;
+        if (!font.metadataUrl) { return; }
         const controller = new AbortController();
         fetch(font.metadataUrl, { signal: controller.signal })
             .then((r) => r.json())
             .then(setMetadata)
             .catch((e: unknown) => {
-                if (!controller.signal.aborted) console.error('[Playground] Music font metadata could not be loaded', e);
+                if (!controller.signal.aborted) { console.error('[Playground] Music font metadata could not be loaded', e); }
             });
         return () => controller.abort();
     }, [font.metadataUrl]);

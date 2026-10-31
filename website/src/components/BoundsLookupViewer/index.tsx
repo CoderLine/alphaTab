@@ -42,9 +42,9 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
   const module = useAlphaTabModule();
 
   const getMountElement = useCallback((): HTMLElement | null => {
-    if (!api) return null;
+    if (!api) { return null; }
     const scroller = api.settings.player.scrollElement;
-    if (!(scroller instanceof HTMLElement)) return null;
+    if (!(scroller instanceof HTMLElement)) { return null; }
     // alphaTab's mount sits inside `<div style="position: relative">` inside
     // the scroll wrapper (see AlphaTabCanvas).
     const relative = scroller.querySelector<HTMLDivElement>(
@@ -54,9 +54,9 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
   }, [api]);
 
   const updateVisualGuides = useCallback(() => {
-    if (!api || !module) return;
+    if (!api || !module) { return; }
     const container = getMountElement();
-    if (!container) return;
+    if (!container) { return; }
 
     let guidesWrapper = container.querySelector<HTMLDivElement>(".at-guides");
     if (!guidesWrapper) {
@@ -132,7 +132,7 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
     wrapper: HTMLDivElement,
     bar: alphaTab.rendering.BarBounds
   ) => {
-    if (!module) return;
+    if (!module) { return; }
     for (const beat of bar.beats) {
       if (selectedElements === GuideElements.BeatTime) {
         const bounds = new module.rendering.Bounds();

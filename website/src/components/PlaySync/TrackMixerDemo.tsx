@@ -29,7 +29,7 @@ const TrackMixer: React.FC = () => {
 
   // Seed the mixer strip state whenever a new score is loaded.
   useEffect(() => {
-    if (tracks.length === 0) return;
+    if (tracks.length === 0) { return; }
     setState((prev) => {
       const next = new Map<number, TrackState>();
       for (const t of tracks) {
@@ -50,9 +50,9 @@ const TrackMixer: React.FC = () => {
       next.set(idx, merged);
       const track = tracks.find((t) => t.index === idx);
       if (track && api) {
-        if (patch.volume !== undefined) api.changeTrackVolume([track], patch.volume);
-        if (patch.solo !== undefined) api.changeTrackSolo([track], patch.solo);
-        if (patch.mute !== undefined) api.changeTrackMute([track], patch.mute);
+        if (patch.volume !== undefined) { api.changeTrackVolume([track], patch.volume); }
+        if (patch.solo !== undefined) { api.changeTrackSolo([track], patch.solo); }
+        if (patch.mute !== undefined) { api.changeTrackMute([track], patch.mute); }
         if (patch.transpose !== undefined) {
           api.changeTrackTranspositionPitch([track], patch.transpose);
         }

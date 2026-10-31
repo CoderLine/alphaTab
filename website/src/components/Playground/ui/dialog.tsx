@@ -19,7 +19,7 @@ export const Dialog: React.FC<DialogProps> = ({ title, onClose, footer, wide, ch
 
     useEffect(() => {
         const dialog = ref.current;
-        if (!dialog) return;
+        if (!dialog) { return; }
         dialog.showModal();
         const onCancel = (e: Event) => {
             e.preventDefault();
@@ -38,7 +38,7 @@ export const Dialog: React.FC<DialogProps> = ({ title, onClose, footer, wide, ch
             className={clsx(styles.dialog, wide && styles.wide)}
             aria-label={title}
             onClick={(e) => {
-                if (e.target === e.currentTarget) onClose();
+                if (e.target === e.currentTarget) { onClose(); }
             }}
         >
             <div className={styles.content}>

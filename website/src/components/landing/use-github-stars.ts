@@ -31,14 +31,14 @@ export function useGithubStars(): string {
   const [stars, setStars] = useState(initial);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!slug) { return; }
     let cancelled = false;
     fetch(jsonUrlFor(slug))
       .then((r) => (r.ok ? (r.json() as Promise<ShieldsResponse>) : null))
       .then((data) => {
-        if (cancelled || !data) return;
+        if (cancelled || !data) { return; }
         const next = data.message ?? data.value;
-        if (next) setStars(next);
+        if (next) { setStars(next); }
       })
       .catch(() => {
         /* keep the build-time initial value */

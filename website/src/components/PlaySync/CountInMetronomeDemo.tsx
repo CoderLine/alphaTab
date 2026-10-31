@@ -40,7 +40,7 @@ const CountInControls: React.FC = () => {
   useAlphaTabEvent(
     'playerStateChanged',
     (e) => {
-      if (!module) return;
+      if (!module) { return; }
       const isPlaying = e.state === module.synth.PlayerState.Playing;
       setPlaying(isPlaying);
       if (e.stopped) {
@@ -64,7 +64,7 @@ const CountInControls: React.FC = () => {
   );
 
   const restart = () => {
-    if (!controls) return;
+    if (!controls) { return; }
     controls.stop();
     // Give the player a beat to reset before pressing play again.
     window.setTimeout(() => controls.playPause(), 50);

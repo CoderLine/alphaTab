@@ -10,32 +10,32 @@ export function useFileDrop(target: RefObject<HTMLElement | null>, onDrop: (file
 
     useEffect(() => {
         const el = target.current;
-        if (!el) return;
+        if (!el) { return; }
         // dragenter/dragleave fire for every child crossed; only the outermost pair matters.
         let depth = 0;
         const enter = (e: DragEvent) => {
-            if (!hasFiles(e)) return;
+            if (!hasFiles(e)) { return; }
             e.preventDefault();
             depth++;
             setDragging(true);
         };
         const over = (e: DragEvent) => {
-            if (!hasFiles(e)) return;
+            if (!hasFiles(e)) { return; }
             e.preventDefault();
             e.dataTransfer!.dropEffect = 'copy';
         };
         const leave = (e: DragEvent) => {
-            if (!hasFiles(e)) return;
+            if (!hasFiles(e)) { return; }
             depth = Math.max(0, depth - 1);
-            if (depth === 0) setDragging(false);
+            if (depth === 0) { setDragging(false); }
         };
         const drop = (e: DragEvent) => {
-            if (!hasFiles(e)) return;
+            if (!hasFiles(e)) { return; }
             e.preventDefault();
             depth = 0;
             setDragging(false);
             const file = e.dataTransfer!.files[0];
-            if (file) onDrop(file);
+            if (file) { onDrop(file); }
         };
         el.addEventListener('dragenter', enter);
         el.addEventListener('dragover', over);

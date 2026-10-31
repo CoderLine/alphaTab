@@ -25,7 +25,7 @@ function ApplyTuning({
   const api = useAlphaTabApi();
   const module = useAlphaTabModule();
   const apply = (score: alphaTab.model.Score) => {
-    if (!module) return;
+    if (!module) { return; }
     const s = score.stylesheet;
     s.globalDisplayTuning = !hidden;
     s.tuningDisplayMode = module.model.TuningDisplayMode[mode];

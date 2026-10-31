@@ -48,7 +48,7 @@ const SettingsJsonInner: React.FC = () => {
   const module = useAlphaTabModule();
 
   const layoutModeOptions = React.useMemo(() => {
-    if (!module) return [] as { label: string; value: alphaTab.LayoutMode }[];
+    if (!module) { return [] as { label: string; value: alphaTab.LayoutMode }[]; }
     return [
       { label: "Page", value: module.LayoutMode.Page },
       { label: "Horizontal", value: module.LayoutMode.Horizontal },
@@ -70,7 +70,7 @@ const SettingsJsonInner: React.FC = () => {
 
   const refreshJson = useCallback(
     (current: alphaTab.AlphaTabApi) => {
-      if (!module) return;
+      if (!module) { return; }
       try {
         setJson(module.model.JsonConverter.settingsToJson(current.settings));
       } catch (e) {

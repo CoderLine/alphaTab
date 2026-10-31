@@ -133,7 +133,7 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
     useEffect(() => {
         let cancelled = false;
         void parsePlaygroundUrl(window.location).then((target) => {
-            if (cancelled) return;
+            if (cancelled) { return; }
             // A link always wins; a plain /playground continues with the last document of this visit.
             if (!target && remembered) {
                 setDocument(remembered.document);
@@ -148,13 +148,13 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
     }, [open]);
 
     useEffect(() => {
-        if (!document) return;
+        if (!document) { return; }
         remembered = { document, text };
     }, [document, text]);
 
     // Binary documents load once per open.
     useEffect(() => {
-        if (!controls || document?.kind !== 'binary') return;
+        if (!controls || document?.kind !== 'binary') { return; }
         controls.loadSource(document.source, { tracks: document.initialTracks }).catch((e: unknown) => {
             setLoadError(e instanceof Error ? e.message : String(e));
         });
@@ -163,7 +163,7 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
     // alphaTex documents re-render on every edit; the first render of a document is immediate.
     const lastTexDocumentId = useRef(0);
     useEffect(() => {
-        if (!controls || document?.kind !== 'tex') return;
+        if (!controls || document?.kind !== 'tex') { return; }
         const first = lastTexDocumentId.current !== document.id;
         const render = () => {
             lastTexDocumentId.current = document.id;
@@ -211,7 +211,7 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
     const textRef = useRef(text);
     textRef.current = text;
     const reload = useCallback(() => {
-        if (!controls || !document) return;
+        if (!controls || !document) { return; }
         const rendered = renderedRef.current.map((t) => t.index);
         const tracks = rendered.length > 0 && rendered.length < trackCountRef.current ? rendered : 'all';
         if (document.kind === 'binary') {
@@ -225,28 +225,28 @@ export function usePlaygroundDocument(): PlaygroundDocumentState {
 
     const currentTracks = useCallback((): TrackSelection | undefined => {
         const rendered = renderedRef.current.map((t) => t.index);
-        if (rendered.length === 0 || rendered.length === trackCountRef.current) return undefined;
+        if (rendered.length === 0 || rendered.length === trackCountRef.current) { return undefined; }
         return rendered;
     }, []);
 
     const linkTarget = useCallback((): PlaygroundLinkTarget | null => {
-        if (!document) return null;
+        if (!document) { return null; }
         const tracks = currentTracks();
-        if (document.kind === 'binary') return document.link ? { ...document.link, tracks } : null;
-        if (document.sampleId && text === document.originalText) return { sample: document.sampleId, tracks };
+        if (document.kind === 'binary') { return document.link ? { ...document.link, tracks } : null; }
+        if (document.sampleId && text === document.originalText) { return { sample: document.sampleId, tracks }; }
         return { tex: text, tracks };
     }, [document, text, currentTracks]);
 
     const buildShareUrl = useCallback(async () => {
         const target = linkTarget();
-        if (!target) return null;
+        if (!target) { return null; }
         return new URL(await buildPlaygroundUrl(target, window.location.pathname), window.location.origin).toString();
     }, [linkTarget]);
 
     // Mirror the document into the address bar so a reload reopens it (local binary files cannot be).
     const renderedKey = renderedTracks.map((t) => t.index).join(',');
     useEffect(() => {
-        if (!document) return;
+        if (!document) { return; }
         let cancelled = false;
         const timer = setTimeout(() => {
             const target = linkTarget();

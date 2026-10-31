@@ -111,7 +111,7 @@ function color(path: string, label: string): SettingsEntry {
         read: (s) => (getPath(s, path) as model.Color).rgba,
         write: (s, v, module) => {
             const parsed = module.model.Color.fromJson(v);
-            if (parsed) setPath(s, path, parsed);
+            if (parsed) { setPath(s, path, parsed); }
         },
     };
 }
@@ -125,7 +125,7 @@ function font(path: string, label: string): SettingsEntry {
         read: (s) => (getPath(s, path) as model.Font).toCssString(),
         write: (s, v, module) => {
             const parsed = module.model.Font.fromJson(v);
-            if (parsed) setPath(s, path, parsed);
+            if (parsed) { setPath(s, path, parsed); }
         },
     };
 }
@@ -170,8 +170,8 @@ function elementDisplay(config: StaffConfigKey, key: ElementDisplayKey, label: s
         effect: 'stylesheet',
         read: (score) => {
             const display = (score.stylesheet[config] as Record<string, model.ElementDisplay | undefined>)[key];
-            if (!display) return AUTO;
-            if (display.isVisible === false) return 0;
+            if (!display) { return AUTO; }
+            if (display.isVisible === false) { return 0; }
             const primary = display.staffPlacement === StaffPlacement.Primary;
             const first = display.systemDisplay === SystemDisplay.FirstSystemOnly;
             return 1 + (primary ? 2 : 0) + (first ? 1 : 0);
@@ -179,14 +179,15 @@ function elementDisplay(config: StaffConfigKey, key: ElementDisplayKey, label: s
         write: (score, v) => {
             const target = score.stylesheet[config] as Record<string, model.ElementDisplay | undefined>;
             const code = v as number;
-            if (code === AUTO) delete target[key];
-            else if (code === 0) target[key] = { isVisible: false };
-            else
+            if (code === AUTO) { delete target[key]; }
+            else if (code === 0) { target[key] = { isVisible: false }; }
+            else {
                 target[key] = {
                     isVisible: true,
                     staffPlacement: code >= 3 ? StaffPlacement.Primary : StaffPlacement.AllStaves,
                     systemDisplay: code % 2 === 0 ? SystemDisplay.FirstSystemOnly : SystemDisplay.AllSystems,
                 };
+            }
         },
     };
 }
@@ -200,8 +201,8 @@ function staffEnum(config: StaffConfigKey, key: 'barNumber' | 'rhythm', label: s
         read: (score) => ((score.stylesheet[config] as Record<string, number | undefined>)[key] ?? AUTO),
         write: (score, v) => {
             const target = score.stylesheet[config] as Record<string, number | undefined>;
-            if (v === AUTO) delete target[key];
-            else target[key] = v as number;
+            if (v === AUTO) { delete target[key]; }
+            else { target[key] = v as number; }
         },
     };
 }
@@ -323,7 +324,7 @@ export function buildSchema(module: AlphaTabModule): SchemaGroup[] {
                     read: (s) => (s.display.resources.elementFonts.get(element) ?? defaultFonts.get(element)!).toCssString(),
                     write: (s, v, mod) => {
                         const parsed = mod.model.Font.fromJson(v);
-                        if (parsed) s.display.resources.elementFonts.set(element, parsed);
+                        if (parsed) { s.display.resources.elementFonts.set(element, parsed); }
                     },
                 })),
                 font('display.resources.tablatureFont', 'Tablature numbers'),

@@ -20,7 +20,7 @@ const SyncPointInner: React.FC = () => {
     const { isPlaying } = useAlphaTabState();
 
     useEffect(() => {
-        if (!api || !module) return;
+        if (!api || !module) { return; }
         const request = new XMLHttpRequest();
         request.open('GET', '/files/Bach_Prelude_BWV999.ogg', true);
         request.responseType = 'arraybuffer';

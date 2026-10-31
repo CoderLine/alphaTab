@@ -52,7 +52,7 @@ const FormattingTemplateInner: React.FC = () => {
   const module = useAlphaTabModule();
 
   useEffect(() => {
-    if (!api || !module) return;
+    if (!api || !module) { return; }
     const score = module.importer.ScoreLoader.loadScoreFromBytes(
       new TextEncoder().encode(tex),
     );

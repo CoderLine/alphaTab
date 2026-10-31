@@ -22,7 +22,7 @@ const PROJECTS: Project[] = SHOWCASE_STORIES.filter((s): s is Project => s.cardT
 );
 
 const TAG_COUNTS = PROJECTS.reduce((counts, p) => {
-  for (const t of p.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+  for (const t of p.tags) { counts.set(t, (counts.get(t) ?? 0) + 1); }
   return counts;
 }, new Map<ShowcaseTag, number>());
 
@@ -89,7 +89,7 @@ export default function Showcase(): React.ReactElement {
   const toggle = (tag: ShowcaseTag) =>
     setSelected((prev) => {
       const next = new Set(prev);
-      if (!next.delete(tag)) next.add(tag);
+      if (!next.delete(tag)) { next.add(tag); }
       return next;
     });
 

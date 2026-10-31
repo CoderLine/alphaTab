@@ -20,7 +20,7 @@ function ApplyColors() {
   useAlphaTabEvent(
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
-      if (!module) return;
+      if (!module) { return; }
       // create custom style on score level
       score.style = new module.model.ScoreStyle();
       score.style.colors.set(

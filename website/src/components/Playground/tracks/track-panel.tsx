@@ -290,12 +290,12 @@ const StaffNotations: React.FC<{ staff: model.Staff; label: string }> = ({ staff
 function describeTrack(track: model.Track, mix: TrackMix): string {
     const parts: string[] = [];
     const staff = track.staves[0];
-    if (staff?.isPercussion) parts.push('drums');
-    else if (staff?.isStringed) parts.push(`${staff.tuning.length}-string`);
-    if (track.staves.length > 1) parts.push(`${track.staves.length} staves`);
-    if (mix.volume !== 1) parts.push(`${Math.round(mix.volume * 100)}%`);
-    if (mix.transpose !== 0) parts.push(`pitch ${mix.transpose > 0 ? '+' : ''}${mix.transpose}`);
-    if (mix.notationTranspose !== 0) parts.push(`transp. ${mix.notationTranspose > 0 ? '+' : ''}${mix.notationTranspose}`);
-    if (mix.displayTranspose !== 0) parts.push(`written ${mix.displayTranspose > 0 ? '+' : ''}${mix.displayTranspose}`);
+    if (staff?.isPercussion) { parts.push('drums'); }
+    else if (staff?.isStringed) { parts.push(`${staff.tuning.length}-string`); }
+    if (track.staves.length > 1) { parts.push(`${track.staves.length} staves`); }
+    if (mix.volume !== 1) { parts.push(`${Math.round(mix.volume * 100)}%`); }
+    if (mix.transpose !== 0) { parts.push(`pitch ${mix.transpose > 0 ? '+' : ''}${mix.transpose}`); }
+    if (mix.notationTranspose !== 0) { parts.push(`transp. ${mix.notationTranspose > 0 ? '+' : ''}${mix.notationTranspose}`); }
+    if (mix.displayTranspose !== 0) { parts.push(`written ${mix.displayTranspose > 0 ? '+' : ''}${mix.displayTranspose}`); }
     return parts.join(' · ');
 }

@@ -41,7 +41,7 @@ export const AlphaTexEditor = React.forwardRef<AlphaTexEditorHandle, AlphaTexEdi
         useImperativeHandle(ref, () => ({
             revealPosition(line, col) {
                 const editor = editorRef.current;
-                if (!editor) return;
+                if (!editor) { return; }
                 const position = { lineNumber: line, column: col };
                 editor.setPosition(position);
                 editor.revealPositionInCenterIfOutsideViewport(position);
@@ -51,14 +51,14 @@ export const AlphaTexEditor = React.forwardRef<AlphaTexEditorHandle, AlphaTexEdi
 
         useEffect(() => {
             const host = hostRef.current;
-            if (!host) return;
+            if (!host) { return; }
             let cancelled = false;
             let cleanup: (() => void) | undefined;
 
             void Promise.all([import('./monaco-env'), import('./lsp-bridge')])
                 .then(async ([env, bridge]) => {
                     const monaco = await env.loadMonaco();
-                    if (cancelled) return;
+                    if (cancelled) { return; }
                     cleanup = mountEditor(monaco, env, bridge.connectAlphaTexLsp, host);
                 })
                 .catch((e) => console.error('[AlphaTexEditor] Monaco failed to load; using the plain editor', e));
@@ -104,7 +104,7 @@ export const AlphaTexEditor = React.forwardRef<AlphaTexEditorHandle, AlphaTexEdi
                 const lsp = connect(monaco, editor);
                 const changes = model.onDidChangeContent(() => {
                     const next = model.getValue();
-                    if (next !== valueRef.current) onChangeRef.current(next);
+                    if (next !== valueRef.current) { onChangeRef.current(next); }
                 });
                 editorRef.current = editor;
                 setReady(true);
@@ -130,7 +130,7 @@ export const AlphaTexEditor = React.forwardRef<AlphaTexEditorHandle, AlphaTexEdi
         useEffect(() => {
             const editor = editorRef.current;
             const model = editor?.getModel();
-            if (!editor || !model || model.getValue() === value) return;
+            if (!editor || !model || model.getValue() === value) { return; }
             editor.pushUndoStop();
             editor.executeEdits('external', [{ range: model.getFullModelRange(), text: value }]);
             editor.pushUndoStop();

@@ -107,7 +107,7 @@ export function AlphaTabPlayer({
     initialSettingsRef.current = settings;
 
     useEffect(() => {
-        if (!module || !mountNode || !scrollNode) return;
+        if (!module || !mountNode || !scrollNode) { return; }
 
         const constructed = new module.Settings();
         applyAlphaTabSettings(module, constructed, {
@@ -117,8 +117,8 @@ export function AlphaTabPlayer({
         constructed.player.scrollElement = scrollNode;
         applyPlayerDefaults(module, constructed);
 
-        if (file) constructed.core.file = file;
-        if (tex) constructed.core.tex = true;
+        if (file) { constructed.core.file = file; }
+        if (tex) { constructed.core.tex = true; }
         if (tracks !== undefined) {
             constructed.core.tracks = tracks === 'all' ? [-1] : tracks;
         }
@@ -138,7 +138,7 @@ export function AlphaTabPlayer({
             fixedSource: !player || playerSettings?.playerMode !== undefined,
             ownSoundFont: ownSoundFont || !!playerSettings?.soundFont,
         });
-        if (playerSettings?.scrollMode !== undefined) s.setScrollDuringPlayback(false);
+        if (playerSettings?.scrollMode !== undefined) { s.setScrollDuringPlayback(false); }
         setStore(s);
         setApi(created);
 
@@ -152,14 +152,14 @@ export function AlphaTabPlayer({
 
     // Color mode sync.
     useEffect(() => {
-        if (store) store.applyColorMode(colorMode);
+        if (store) { store.applyColorMode(colorMode); }
     }, [store, colorMode]);
 
     // Temporary: register with the global spacebar-playPause coordinator so
     // authors can audibly step through demos without one focus target per
     // player. Uses the scroll node as the "container" for visibility scoring.
     useEffect(() => {
-        if (!api || !scrollNode) return;
+        if (!api || !scrollNode) { return; }
         return registerForSpacebar(scrollNode, api);
     }, [api, scrollNode]);
 
@@ -167,7 +167,7 @@ export function AlphaTabPlayer({
     const initialFile = useRef(file);
     const initialTex = useRef(tex);
     useEffect(() => {
-        if (!store) return;
+        if (!store) { return; }
         if (file !== initialFile.current) {
             initialFile.current = file;
             if (file) {
@@ -176,7 +176,7 @@ export function AlphaTabPlayer({
         }
     }, [store, file]);
     useEffect(() => {
-        if (!store) return;
+        if (!store) { return; }
         if (tex !== initialTex.current) {
             initialTex.current = tex;
             if (tex) {
@@ -188,11 +188,11 @@ export function AlphaTabPlayer({
     // Runtime settings patch after mount.
     const initialSettingsJson = useRef(JSON.stringify(settings ?? null));
     useEffect(() => {
-        if (!store) return;
+        if (!store) { return; }
         const nextJson = JSON.stringify(settings ?? null);
         if (nextJson !== initialSettingsJson.current) {
             initialSettingsJson.current = nextJson;
-            if (settings) store.updateSettings(settings);
+            if (settings) { store.updateSettings(settings); }
         }
     }, [store, settings]);
 
@@ -318,7 +318,7 @@ export function useAlphaTabEvent<E extends ApiEventKeys & keyof alphaTab.AlphaTa
 ): void {
     const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         const emitter = api[event] as unknown as alphaTab.IEventEmitterOfT<unknown>;
         emitter.on(handler as never);
         return () => {

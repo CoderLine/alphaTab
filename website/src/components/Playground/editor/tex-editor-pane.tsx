@@ -82,7 +82,7 @@ const ConvertPlaceholder: React.FC<{ doc: PlaygroundDocumentState }> = ({ doc })
     const fileName = doc.document?.fileName ?? 'score';
 
     const convert = () => {
-        if (!api?.score || !module) return;
+        if (!api?.score || !module) { return; }
         const tex = new module.exporter.AlphaTexExporter().exportToString(api.score, api.settings);
         doc.openTex(withExtension(fileName, 'alphatex'), tex);
     };

@@ -17,7 +17,7 @@ export interface OutputDeviceDemoProps {
 }
 
 const isSupported = () => {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') { return false; }
   return 'AudioContext' in window && 'setSinkId' in (AudioContext.prototype as object);
 };
 
@@ -33,12 +33,12 @@ const OutputDeviceControls: React.FC = () => {
   }, []);
 
   const refresh = useCallback(async () => {
-    if (!api) return;
+    if (!api) { return; }
     try {
       const list = await api.enumerateOutputDevices();
       setDevices(list);
       const def = list.find((d) => d.isDefault) ?? list[0];
-      if (def) setSelectedId(def.deviceId);
+      if (def) { setSelectedId(def.deviceId); }
       setStatus(`${list.length} device(s)`);
     } catch (err) {
       setStatus(`enumerate failed: ${(err as Error).message}`);
@@ -47,7 +47,7 @@ const OutputDeviceControls: React.FC = () => {
 
   const onSelect = async (id: string) => {
     setSelectedId(id);
-    if (!api) return;
+    if (!api) { return; }
     const dev = devices.find((d) => d.deviceId === id) ?? null;
     try {
       await api.setOutputDevice(dev);

@@ -63,7 +63,7 @@ async function fetchInitialGithubStars(
       { signal: ctrl.signal },
     );
     clearTimeout(timeout);
-    if (!res.ok) return fallback;
+    if (!res.ok) { return fallback; }
     const data = (await res.json()) as { message?: string; value?: string };
     return data.message ?? data.value ?? fallback;
   } catch {
@@ -82,7 +82,7 @@ function findLatestReleaseNotesPath(): string {
   const ranked = files
     .map((f) => {
       const m = f.match(/^release(\d+)_(\d+)\.(mdx?|md)$/);
-      if (!m) return null;
+      if (!m) { return null; }
       const major = parseInt(m[1], 10);
       const minor = parseInt(m[2], 10);
       const base = f.replace(/\.(mdx?|md)$/, "");
@@ -293,10 +293,10 @@ async function createConfig(): Promise<Config> {
               const match =
                 docChild &&
                 /^features\/([^/]+)\//.exec((docChild as any).id);
-              if (!match) return item;
+              if (!match) { return item; }
               const groupName = match[1];
               const chapters = parseChapters(groupName);
-              if (chapters.length === 0) return item;
+              if (chapters.length === 0) { return item; }
 
               const indexId = `features/${groupName}/index`;
               const indexItem = item.items.find(
@@ -306,7 +306,7 @@ async function createConfig(): Promise<Config> {
               chapters.forEach((c) => buckets.set(c.id, []));
               const rest: any[] = [];
               for (const child of item.items) {
-                if (child === indexItem) continue;
+                if (child === indexItem) { continue; }
                 if (child.type !== "doc") {
                   rest.push(child);
                   continue;
@@ -325,10 +325,10 @@ async function createConfig(): Promise<Config> {
                 );
               }
               const newItems: any[] = [];
-              if (indexItem) newItems.push(indexItem);
+              if (indexItem) { newItems.push(indexItem); }
               for (const chapter of chapters) {
                 const arr = buckets.get(chapter.id) || [];
-                if (arr.length === 0) continue;
+                if (arr.length === 0) { continue; }
                 newItems.push({
                   type: "category",
                   label: chapter.label,

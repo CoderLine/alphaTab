@@ -48,17 +48,17 @@ function ApplyCursorSettings({
 }) {
     const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         api.settings.player.enableCursor = enableCursor;
         api.updateSettings();
     }, [api, enableCursor]);
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         api.settings.player.enableElementHighlighting = enableHighlight;
         api.updateSettings();
     }, [api, enableHighlight]);
     useEffect(() => {
-        if (!api || !manageAnimation) return;
+        if (!api || !manageAnimation) { return; }
         api.settings.player.enableAnimatedBeatCursor = enableAnimation;
         api.updateSettings();
         // WORKAROUND (upstream library bug — remove once alphaTab 1.9.0 lands):
@@ -104,7 +104,7 @@ function ApplyCursorSettings({
 function AttachCustomCursor({ attached }: { attached: boolean }) {
     const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         if (!attached) {
             api.customCursorHandler = undefined;
             return;

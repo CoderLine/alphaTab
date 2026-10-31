@@ -89,7 +89,7 @@ const PlaygroundPlayer: React.FC<PlaygroundPlayerProps> = ({ active, preset, onS
   const [loaded, setLoaded] = useState<LoadedTex | null>(null);
 
   useEffect(() => {
-    if (!controls) return;
+    if (!controls) { return; }
     const timer = setTimeout(() => setLoaded({ tex: text, ...controls.loadTex(text) }), RENDER_DELAY_MS);
     return () => clearTimeout(timer);
   }, [controls, text]);
@@ -99,7 +99,7 @@ const PlaygroundPlayer: React.FC<PlaygroundPlayerProps> = ({ active, preset, onS
   const warnings = diagnostics.filter((d) => d.severity === 'warning');
   const isUpdating = !loaded || loaded.tex !== text || state.isRendering;
   const reveal = (d: TexDiagnostic | undefined) => {
-    if (d?.start) editorRef.current?.revealPosition(d.start.line, d.start.col);
+    if (d?.start) { editorRef.current?.revealPosition(d.start.line, d.start.col); }
   };
 
   const tabs = PRESETS.map((p) => (

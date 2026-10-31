@@ -16,7 +16,7 @@ const AlphaTexExporterInner: FC = () => {
     const [alphaTex, setAlphaTex] = useState('');
 
     useAlphaTabEvent('scoreLoaded', (score: alphaTab.model.Score) => {
-        if (!module) return;
+        if (!module) { return; }
         const exporter = new module.exporter.AlphaTexExporter();
         const exportSettings = new module.Settings();
         exportSettings.exporter.comments = true;

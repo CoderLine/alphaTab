@@ -58,7 +58,7 @@ function ApplyElementVisibility({
   const controls = useAlphaTabControls();
   const module = useAlphaTabModule();
   useEffect(() => {
-    if (!api || !controls || !module) return;
+    if (!api || !controls || !module) { return; }
     const map = api.settings.notation.elements;
     for (const t of toggles) {
       map.set(

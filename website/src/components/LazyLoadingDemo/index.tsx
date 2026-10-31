@@ -22,7 +22,7 @@ export interface LazyLoadingDemoProps {
 function ApplyLazyLoading({ lazy }: { lazy: boolean }) {
     const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         api.settings.core.enableLazyLoading = lazy;
         api.updateSettings();
         api.render();
@@ -44,7 +44,7 @@ const Inner: React.FC<InnerProps> = ({ renderCountVisible }) => {
     // Count SVG chunks currently in the DOM.
     useEffect(() => {
         const wrap = canvasWrapRef.current;
-        if (!wrap) return;
+        if (!wrap) { return; }
         const update = () => {
             setChunkCount(wrap.querySelectorAll("svg").length);
         };

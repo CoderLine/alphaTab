@@ -34,7 +34,7 @@ export const SourceSwitch: React.FC<SourceSwitchProps> = ({ playback, compact = 
     const [flash, setFlash] = React.useState(false);
     const previous = React.useRef(onBackingTrack);
     React.useEffect(() => {
-        if (previous.current === onBackingTrack) return;
+        if (previous.current === onBackingTrack) { return; }
         previous.current = onBackingTrack;
         if (picked.current) {
             picked.current = false;
@@ -43,13 +43,13 @@ export const SourceSwitch: React.FC<SourceSwitchProps> = ({ playback, compact = 
         setFlash(true);
     }, [onBackingTrack]);
     React.useEffect(() => {
-        if (!flash) return;
+        if (!flash) { return; }
         const timer = window.setTimeout(() => setFlash(false), 1600);
         return () => window.clearTimeout(timer);
     }, [flash]);
 
     const pick = (v: PlaybackSourcePreference) => {
-        if (v === preferences.source) return;
+        if (v === preferences.source) { return; }
         picked.current = true;
         playbackPreferences.setSource(v);
     };

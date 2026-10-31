@@ -35,7 +35,7 @@ const LandingPlayerStageInner: React.FC = () => {
 
     const activeFile = DEMO_FILES[activeFileIndex];
     React.useEffect(() => {
-        if (!controls) return;
+        if (!controls) { return; }
         controls.loadSource(activeFile.source).catch((err) => {
             console.error('[LandingPlayerStage] Failed to load score', err);
         });
@@ -59,7 +59,7 @@ const LandingPlayerStageInner: React.FC = () => {
     );
     const onTrackClick = (track: model.Track) => controls?.renderTracks([track]);
     const onFileTabClick = (i: number) => {
-        if (i !== activeFileIndex) setActiveFileIndex(i);
+        if (i !== activeFileIndex) { setActiveFileIndex(i); }
     };
 
     const tabs = (

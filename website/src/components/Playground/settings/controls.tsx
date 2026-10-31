@@ -45,7 +45,7 @@ function useDraft<T>(value: T, format: (v: T) => string, parse: (text: string) =
         setInvalid(false);
     }, [value]);
     const commit = () => {
-        if (draft === null) return;
+        if (draft === null) { return; }
         const parsed = parse(draft);
         if (parsed === null) {
             setInvalid(true);
@@ -53,7 +53,7 @@ function useDraft<T>(value: T, format: (v: T) => string, parse: (text: string) =
         }
         setDraft(null);
         setInvalid(false);
-        if (parsed !== value) onCommit(parsed);
+        if (parsed !== value) { onCommit(parsed); }
     };
     return {
         text: draft ?? format(value),
@@ -65,7 +65,7 @@ function useDraft<T>(value: T, format: (v: T) => string, parse: (text: string) =
             },
             onBlur: commit,
             onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === 'Enter') commit();
+                if (e.key === 'Enter') { commit(); }
                 if (e.key === 'Escape') {
                     setDraft(null);
                     setInvalid(false);
@@ -85,16 +85,16 @@ export const NumberField: React.FC<{
 }> = ({ value, onChange, min, max, step = 1, label }) => {
     const parse = (text: string) => {
         const n = Number(text.replace(',', '.'));
-        if (text.trim() === '' || !Number.isFinite(n)) return null;
-        if ((min !== undefined && n < min) || (max !== undefined && n > max)) return null;
+        if (text.trim() === '' || !Number.isFinite(n)) { return null; }
+        if ((min !== undefined && n < min) || (max !== undefined && n > max)) { return null; }
         return n;
     };
     const draft = useDraft(value, String, parse, onChange);
     const nudge = (direction: 1 | -1) => {
         const decimals = (String(step).split('.')[1] ?? '').length;
         let next = Number((value + direction * step).toFixed(decimals));
-        if (min !== undefined) next = Math.max(min, next);
-        if (max !== undefined) next = Math.min(max, next);
+        if (min !== undefined) { next = Math.max(min, next); }
+        if (max !== undefined) { next = Math.min(max, next); }
         onChange(next);
     };
     return (

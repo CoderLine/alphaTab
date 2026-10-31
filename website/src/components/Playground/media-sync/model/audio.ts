@@ -34,18 +34,18 @@ export function buildPeaks(left: Float32Array, right: Float32Array): Float32Arra
         const end = Math.min(left.length, (b + 1) * PEAK_BUCKET);
         for (let i = b * PEAK_BUCKET; i < end; i++) {
             const v = Math.max(Math.abs(left[i]), Math.abs(right[i]));
-            if (v > peak) peak = v;
+            if (v > peak) { peak = v; }
         }
         base[b] = peak;
-        if (peak > loudest) loudest = peak;
+        if (peak > loudest) { loudest = peak; }
     }
-    if (loudest > 0) for (let b = 0; b < count; b++) base[b] /= loudest;
+    if (loudest > 0) { for (let b = 0; b < count; b++) { base[b] /= loudest; } }
 
     const levels = [base];
     while (levels[levels.length - 1].length > 1) {
         const prev = levels[levels.length - 1];
         const next = new Float32Array(Math.ceil(prev.length / 2));
-        for (let i = 0; i < next.length; i++) next[i] = Math.max(prev[2 * i], prev[2 * i + 1] ?? 0);
+        for (let i = 0; i < next.length; i++) { next[i] = Math.max(prev[2 * i], prev[2 * i + 1] ?? 0); }
         levels.push(next);
     }
     return levels;
@@ -68,7 +68,7 @@ export function findSongRange(left: Float32Array, right: Float32Array, sampleRat
         let silence = 0;
         for (let i = from; step > 0 ? i < to : i >= to; i += step) {
             if (loud(i)) {
-                if (sound === 0) sectionStart = i;
+                if (sound === 0) { sectionStart = i; }
                 sound++;
                 silence = 0;
             } else {

@@ -35,12 +35,12 @@ function ApplyScrollMode({ mode }: { mode: Mode }) {
     const api = useAlphaTabApi();
     const module = useAlphaTabModule();
     useEffect(() => {
-        if (!api || !module) return;
+        if (!api || !module) { return; }
         if (mode === "Center bar") {
             api.settings.player.scrollMode = module.ScrollMode.Continuous;
             api.updateSettings();
             const scroller = api.settings.player.scrollElement as HTMLElement | undefined;
-            if (!(scroller instanceof HTMLElement)) return;
+            if (!(scroller instanceof HTMLElement)) { return; }
             const centerBar = (
                 bounds: alphaTab.rendering.BeatBounds,
                 behavior: ScrollBehavior
@@ -88,13 +88,13 @@ function ApplyOffsets({
 }) {
     const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         api.settings.player.scrollOffsetX = offsetX;
         api.settings.player.scrollOffsetY = offsetY;
         api.updateSettings();
     }, [api, offsetX, offsetY]);
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         api.settings.player.nativeBrowserSmoothScroll = nativeSmooth;
         api.updateSettings();
     }, [api, nativeSmooth]);

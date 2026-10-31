@@ -26,7 +26,7 @@ const VIEWPORT_MARGIN = 8;
 function parseCssColor(value: string): Rgba {
     const text = value.trim();
     const fn = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)$/i.exec(text);
-    if (fn) return { r: Number(fn[1]), g: Number(fn[2]), b: Number(fn[3]), a: fn[4] === undefined ? 1 : Number(fn[4]) };
+    if (fn) { return { r: Number(fn[1]), g: Number(fn[2]), b: Number(fn[3]), a: fn[4] === undefined ? 1 : Number(fn[4]) }; }
     const hex = parseHex(text);
     return hex ?? { r: 0, g: 0, b: 0, a: 1 };
 }
@@ -34,8 +34,8 @@ function parseCssColor(value: string): Rgba {
 /** `#rgb`, `#rgba`, `#rrggbb` or `#rrggbbaa`. */
 function parseHex(text: string): Rgba | null {
     let m = /^#?([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(text.trim())?.[1];
-    if (!m) return null;
-    if (m.length <= 4) m = [...m].map((c) => c + c).join('');
+    if (!m) { return null; }
+    if (m.length <= 4) { m = [...m].map((c) => c + c).join(''); }
     const byte = (i: number) => parseInt(m!.slice(i, i + 2), 16);
     return { r: byte(0), g: byte(2), b: byte(4), a: m.length === 8 ? byte(6) / 255 : 1 };
 }
@@ -46,7 +46,7 @@ function toHex({ r, g, b }: Rgba): string {
 
 /** The formats alphaTab's `Color.fromJson` accepts. */
 function toCssColor(c: Rgba): string {
-    if (c.a >= 1) return toHex(c);
+    if (c.a >= 1) { return toHex(c); }
     return `rgba(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)},${Number(c.a.toFixed(2))})`;
 }
 
@@ -56,9 +56,9 @@ function rgbToHsv({ r, g, b }: Rgba): Hsv {
     const d = max - Math.min(rn, gn, bn);
     let h = 0;
     if (d > 0) {
-        if (max === rn) h = ((gn - bn) / d) % 6;
-        else if (max === gn) h = (bn - rn) / d + 2;
-        else h = (rn - gn) / d + 4;
+        if (max === rn) { h = ((gn - bn) / d) % 6; }
+        else if (max === gn) { h = (bn - rn) / d + 2; }
+        else { h = (rn - gn) / d + 4; }
     }
     return { h: (h * 60 + 360) % 360, s: max === 0 ? 0 : d / max, v: max };
 }
@@ -143,7 +143,7 @@ const ColorPopover: React.FC<ColorPopoverProps> = ({ anchor, label, value, onCha
     const place = useCallback(() => {
         const trigger = anchor.current?.getBoundingClientRect();
         const popover = popoverRef.current;
-        if (!trigger || !popover) return;
+        if (!trigger || !popover) { return; }
         const height = popover.offsetHeight;
         // Right-aligned to the swatch, flipped above it when there is no room below, always inside the viewport.
         const left = Math.min(
@@ -164,7 +164,7 @@ const ColorPopover: React.FC<ColorPopoverProps> = ({ anchor, label, value, onCha
     useEffect(() => {
         const onDown = (e: PointerEvent) => {
             const t = e.target as Node;
-            if (popoverRef.current?.contains(t) || anchor.current?.contains(t)) return;
+            if (popoverRef.current?.contains(t) || anchor.current?.contains(t)) { return; }
             onClose();
         };
         const onKey = (e: KeyboardEvent) => {
@@ -210,7 +210,7 @@ const ColorPopover: React.FC<ColorPopoverProps> = ({ anchor, label, value, onCha
             ArrowDown: [0, -step],
         };
         const move = moves[e.key];
-        if (!move) return;
+        if (!move) { return; }
         e.preventDefault();
         commit({ ...hsv, s: clamp01(hsv.s + move[0]), v: clamp01(hsv.v + move[1]) });
     };
@@ -243,7 +243,7 @@ const ColorPopover: React.FC<ColorPopoverProps> = ({ anchor, label, value, onCha
                     pickFromArea(e.clientX, e.clientY);
                 }}
                 onPointerMove={(e) => {
-                    if (e.currentTarget.hasPointerCapture(e.pointerId)) pickFromArea(e.clientX, e.clientY);
+                    if (e.currentTarget.hasPointerCapture(e.pointerId)) { pickFromArea(e.clientX, e.clientY); }
                 }}
             >
                 <span className={styles.areaThumb} style={{ left: `${hsv.s * 100}%`, top: `${(1 - hsv.v) * 100}%`, background: opaque }} />
@@ -289,7 +289,7 @@ const ColorPopover: React.FC<ColorPopoverProps> = ({ anchor, label, value, onCha
                     }}
                     onBlur={() => setHexDraft(null)}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter') onClose();
+                        if (e.key === 'Enter') { onClose(); }
                     }}
                 />
                 {eyeDropper && (
@@ -302,7 +302,7 @@ const ColorPopover: React.FC<ColorPopoverProps> = ({ anchor, label, value, onCha
                             try {
                                 const result = await new (window as unknown as { EyeDropper: new () => { open(): Promise<{ sRGBHex: string }> } }).EyeDropper().open();
                                 const picked = parseHex(result.sRGBHex);
-                                if (picked) commit(rgbToHsv(picked));
+                                if (picked) { commit(rgbToHsv(picked)); }
                             } catch {
                                 // Cancelled by the user.
                             }

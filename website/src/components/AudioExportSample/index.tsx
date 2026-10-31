@@ -24,7 +24,7 @@ const AudioExportControls: React.FC = () => {
     }, [wavUrl]);
 
     function createWavSampleUrl(chunks: Float32Array[], sampleRate: number): string {
-        if (!module) throw new Error('alphaTab module not loaded');
+        if (!module) { throw new Error('alphaTab module not loaded'); }
         const samples = chunks.reduce((p, c) => p + c.length, 0);
         const wavHeaderSize = 44;
         const fileSize = wavHeaderSize + samples * 4;
@@ -67,7 +67,7 @@ const AudioExportControls: React.FC = () => {
     }
 
     async function downloadFile() {
-        if (!api || !module) return;
+        if (!api || !module) { return; }
         try {
             // setup options
             const options = new module.synth.AudioExportOptions();

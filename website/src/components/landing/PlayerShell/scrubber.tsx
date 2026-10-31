@@ -35,9 +35,9 @@ export const Scrubber: React.FC<ScrubberProps> = ({
     if (tempoMarkers) {
         let lastX = -Infinity;
         for (const t of tempoMarkers) {
-            if (t.atBar >= safeTotal) continue;
+            if (t.atBar >= safeTotal) { continue; }
             const x = xOf(t.atBar);
-            if (x - lastX < MIN_TEMPO_LABEL_GAP) continue;
+            if (x - lastX < MIN_TEMPO_LABEL_GAP) { continue; }
             tempos.push(t);
             lastX = x;
         }
@@ -49,7 +49,7 @@ export const Scrubber: React.FC<ScrubberProps> = ({
     const seekAtClientX = React.useCallback(
         (clientX: number) => {
             const node = wrapperRef.current;
-            if (!node || !onSeek) return;
+            if (!node || !onSeek) { return; }
             const r = node.getBoundingClientRect();
             const f = Math.min(Math.max((clientX - r.left) / r.width, 0), 1);
             onSeek(f);
@@ -58,7 +58,7 @@ export const Scrubber: React.FC<ScrubberProps> = ({
     );
 
     React.useEffect(() => {
-        if (!drag) return;
+        if (!drag) { return; }
         const move = (e: PointerEvent) => seekAtClientX(e.clientX);
         const up = () => setDrag(false);
         window.addEventListener('pointermove', move);
@@ -80,7 +80,7 @@ export const Scrubber: React.FC<ScrubberProps> = ({
             tabIndex={onSeek ? 0 : undefined}
             style={{ width: '100%', cursor: onSeek ? 'pointer' : undefined, touchAction: 'none' }}
             onPointerDown={(e) => {
-                if (!onSeek) return;
+                if (!onSeek) { return; }
                 setDrag(true);
                 seekAtClientX(e.clientX);
             }}

@@ -40,7 +40,7 @@ function ApplyPalette({ palette }: { palette: PaletteState }) {
   const controls = useAlphaTabControls();
   const module = useAlphaTabModule();
   useEffect(() => {
-    if (!api || !controls || !module) return;
+    if (!api || !controls || !module) { return; }
     const r = api.settings.display.resources;
     r.mainGlyphColor = module.model.Color.fromJson(palette.mainGlyphColor)!;
     r.staffLineColor = module.model.Color.fromJson(palette.staffLineColor)!;

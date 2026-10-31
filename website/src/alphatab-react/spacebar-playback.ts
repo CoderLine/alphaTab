@@ -28,12 +28,12 @@ const registry = new Set<Entry>();
 let listenerInstalled = false;
 
 function isTypingContext(target: EventTarget | null): boolean {
-    if (!(target instanceof HTMLElement)) return false;
+    if (!(target instanceof HTMLElement)) { return false; }
     const tag = target.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
-    if (target.isContentEditable) return true;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') { return true; }
+    if (target.isContentEditable) { return true; }
     // Editors built on the EditContext API (e.g. Monaco) receive text input on a plain element.
-    if ((target as HTMLElement & { editContext?: unknown }).editContext) return true;
+    if ((target as HTMLElement & { editContext?: unknown }).editContext) { return true; }
     return false;
 }
 
@@ -60,19 +60,19 @@ function findMostVisible(): Entry | null {
 }
 
 function onKeyDown(e: KeyboardEvent): void {
-    if (e.code !== 'Space') return;
-    if (isTypingContext(e.target)) return;
+    if (e.code !== 'Space') { return; }
+    if (isTypingContext(e.target)) { return; }
     // Also skip when a modifier is held so browser shortcuts still work.
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) { return; }
     const target = findMostVisible();
-    if (!target) return;
+    if (!target) { return; }
     e.preventDefault();
     target.api.playPause();
 }
 
 function ensureListener(): void {
-    if (listenerInstalled) return;
-    if (typeof document === 'undefined') return;
+    if (listenerInstalled) { return; }
+    if (typeof document === 'undefined') { return; }
     document.addEventListener('keydown', onKeyDown, true);
     listenerInstalled = true;
 }

@@ -192,7 +192,7 @@ export class AlphaTabStore {
 
     play(): void { this.api.play(); }
     pause(): void {
-        if (this.playback.cancelResume()) this.update({ isPlaying: false });
+        if (this.playback.cancelResume()) { this.update({ isPlaying: false }); }
         this.api.pause();
     }
     playPause(): void {
@@ -204,7 +204,7 @@ export class AlphaTabStore {
         this.api.playPause();
     }
     stop(): void {
-        if (this.playback.cancelResume()) this.update({ isPlaying: false });
+        if (this.playback.cancelResume()) { this.update({ isPlaying: false }); }
         this.playback.seekWhileSwitching(0);
         this.api.stop();
     }
@@ -287,16 +287,16 @@ export class AlphaTabStore {
      */
     mutateScore(mutate: (score: model.Score) => void, options: { render?: boolean; regenerateMidi?: boolean } = {}): void {
         const score = this.api.score;
-        if (!score) return;
+        if (!score) { return; }
         mutate(score);
         this.update({ scoreRevision: this.snapshot.scoreRevision + 1 });
-        if (options.regenerateMidi) this.api.loadMidiForScore();
-        if (options.render ?? true) this.api.render();
+        if (options.regenerateMidi) { this.api.loadMidiForScore(); }
+        if (options.render ?? true) { this.api.render(); }
     }
 
     /** Regenerates the playback MIDI after changing settings that only affect audio generation. */
     regenerateMidi(): void {
-        if (this.api.score) this.api.loadMidiForScore();
+        if (this.api.score) { this.api.loadMidiForScore(); }
     }
 
     private midiTimer = 0;
@@ -383,10 +383,10 @@ export class AlphaTabStore {
     }
 
     applyColorMode(colorMode: ColorMode): void {
-        if (this.colorMode === colorMode) return;
+        if (this.colorMode === colorMode) { return; }
         this.colorMode = colorMode;
         applyTheme(this.module, this.api.settings, colorMode);
-        for (const layer of this.settingsLayers) layer(this.api.settings);
+        for (const layer of this.settingsLayers) { layer(this.api.settings); }
         this.scheduleApply();
     }
 
@@ -403,7 +403,7 @@ export class AlphaTabStore {
         this.api.settings.display.staveProfile = defaults.display.staveProfile;
         this.api.settings.player.playerMode = playerMode;
         this.api.settings.player.soundFont = soundFont;
-        for (const layer of this.settingsLayers) layer(this.api.settings);
+        for (const layer of this.settingsLayers) { layer(this.api.settings); }
         this.scheduleApply();
         this.setMasterVolume(1);
         this.setPlaybackSpeed(1);
@@ -424,13 +424,13 @@ export class AlphaTabStore {
 
     /** Renders `tracks` in score order; ignored if that would leave nothing to render. */
     renderTracks(tracks: model.Track[]): void {
-        if (tracks.length === 0) return;
+        if (tracks.length === 0) { return; }
         tracks = [...tracks].sort((a, b) => a.index - b.index);
         this.api.renderTracks(tracks);
     }
 
     seekToTick(tick: number): void {
-        if (this.playback.seekWhileSwitching(tick)) return;
+        if (this.playback.seekWhileSwitching(tick)) { return; }
         this.api.tickPosition = tick;
     }
 
@@ -440,14 +440,14 @@ export class AlphaTabStore {
 
     seekToBar(bar: number): void {
         const ticks = this.snapshot.barStartTicks;
-        if (ticks.length === 0) return;
+        if (ticks.length === 0) { return; }
         const clamped = Math.max(0, Math.min(bar, ticks.length - 1));
         this.seekToTick(ticks[clamped]);
     }
 
     seekToFraction(f: number): void {
         const ticks = this.snapshot.barStartTicks;
-        if (ticks.length < 2) return;
+        if (ticks.length < 2) { return; }
         const totalTicks = ticks[ticks.length - 1];
         this.seekToTick(Math.max(0, Math.min(f, 1)) * totalTicks);
     }
@@ -483,7 +483,7 @@ export class AlphaTabStore {
      */
     async loadSource(source: ScoreSource, options: LoadSourceOptions = {}): Promise<void> {
         const token = ++this.loadToken;
-        if (this.snapshot.isPlaying) this.api.stop();
+        if (this.snapshot.isPlaying) { this.api.stop(); }
         if (source.url || source.bytes) {
             let buffer = source.bytes;
             if (!buffer) {
@@ -493,7 +493,7 @@ export class AlphaTabStore {
                 }
                 buffer = new Uint8Array(await response.arrayBuffer());
             }
-            if (token !== this.loadToken) return;
+            if (token !== this.loadToken) { return; }
             const score = this.module.importer.ScoreLoader.loadScoreFromBytes(buffer, this.api.settings);
             this.playback.setSource(source);
             this.api.renderScore(score, resolveTrackIndexes(score, options.tracks));
@@ -538,7 +538,7 @@ export class AlphaTabStore {
             return { rendered: false, diagnostics };
         }
 
-        if (this.snapshot.isPlaying) this.api.stop();
+        if (this.snapshot.isPlaying) { this.api.stop(); }
         this.playback.setSource({ tex, backingTrack: options.backingTrack });
         this.api.renderScore(score, resolveTrackIndexes(score, options.tracks));
         return { rendered: true, diagnostics };
@@ -551,7 +551,7 @@ export class AlphaTabStore {
 
     getApi(): AlphaTabApi { return this.api; }
     destroy(): void {
-        if (this.rafHandle) cancelAnimationFrame(this.rafHandle);
+        if (this.rafHandle) { cancelAnimationFrame(this.rafHandle); }
         clearTimeout(this.midiTimer);
         this.playback.destroy();
         this.api.destroy();
@@ -595,7 +595,7 @@ export class AlphaTabStore {
 
     /** Channel state lives in the synthesizer and is lost whenever alphaTab rebuilds the player or reloads the MIDI. */
     private applyTrackMix(tracks: model.Track[] = this.api.score?.tracks ?? []): void {
-        if (!this.api.player || !this.api.score) return;
+        if (!this.api.player || !this.api.score) { return; }
         const { trackMix, view } = this.snapshot;
         for (const track of tracks) {
             const mix = trackMix[track.index] ?? defaultTrackMix;
@@ -608,17 +608,17 @@ export class AlphaTabStore {
 
     private update(partial: Partial<AlphaTabState>): void {
         this.snapshot = { ...this.snapshot, ...partial };
-        for (const sub of this.subscribers) sub();
+        for (const sub of this.subscribers) { sub(); }
     }
 
     private scheduleApply(): void {
-        if (this.pendingRender) return;
+        if (this.pendingRender) { return; }
         this.pendingRender = true;
         this.rafHandle = requestAnimationFrame(() => {
             this.pendingRender = false;
             this.rafHandle = 0;
             this.api.updateSettings();
-            if (this.api.score) this.api.render();
+            if (this.api.score) { this.api.render(); }
         });
     }
 
@@ -626,14 +626,14 @@ export class AlphaTabStore {
         const player = this.api.settings.player;
         const { ScrollMode } = this.module;
         if (this.scrollDuringPlayback && this.snapshot.isPlaying) {
-            if (player.scrollMode !== ScrollMode.Off) return;
+            if (player.scrollMode !== ScrollMode.Off) { return; }
             player.scrollMode = ScrollMode.Continuous;
             this.scrollingForPlayback = true;
         } else {
-            if (!this.scrollingForPlayback) return;
+            if (!this.scrollingForPlayback) { return; }
             this.scrollingForPlayback = false;
             // Someone picked a different mode during playback; keep theirs.
-            if (player.scrollMode !== ScrollMode.Continuous) return;
+            if (player.scrollMode !== ScrollMode.Continuous) { return; }
             player.scrollMode = ScrollMode.Off;
         }
         this.api.updateSettings();
@@ -680,7 +680,7 @@ export class AlphaTabStore {
             this.syncPlaybackScroll();
         });
         this.api.playerPositionChanged.on((e) => {
-            if (!this.playback.acceptPosition(e.currentTick)) return;
+            if (!this.playback.acceptPosition(e.currentTick)) { return; }
             const currentBar = this.findBarForTick(e.currentTick);
             this.update({
                 currentTime: e.currentTime,
@@ -760,31 +760,31 @@ export class AlphaTabStore {
 
     private findBarForTick(tick: number): number {
         const ticks = this.snapshot.barStartTicks;
-        if (ticks.length === 0) return 0;
+        if (ticks.length === 0) { return 0; }
         let lo = 0;
         let hi = ticks.length - 1;
         while (lo < hi) {
             const mid = (lo + hi + 1) >>> 1;
-            if (ticks[mid] <= tick) lo = mid;
-            else hi = mid - 1;
+            if (ticks[mid] <= tick) { lo = mid; }
+            else { hi = mid - 1; }
         }
         return lo;
     }
 }
 
 function setTrackPitch(pitches: number[], index: number, semitones: number): void {
-    while (pitches.length <= index) pitches.push(0);
+    while (pitches.length <= index) { pitches.push(0); }
     pitches[index] = semitones;
 }
 
 function resolveTrackIndexes(score: model.Score, tracks: number[] | 'all' | undefined): number[] | undefined {
-    if (tracks === 'all') return [-1];
+    if (tracks === 'all') { return [-1]; }
     const valid = tracks?.filter((i) => i >= 0 && i < score.tracks.length);
     return valid && valid.length > 0 ? valid : undefined;
 }
 
 function sameTrackLayout(previous: model.Score | null, next: model.Score): boolean {
-    if (!previous || previous.tracks.length !== next.tracks.length) return false;
+    if (!previous || previous.tracks.length !== next.tracks.length) { return false; }
     return previous.tracks.every((t, i) => t.name === next.tracks[i].name);
 }
 

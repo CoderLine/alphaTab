@@ -66,7 +66,7 @@ export const MediaSyncPanel: React.FC<MediaSyncPanelProps> = ({ doc, onClose }) 
     };
 
     const downloadGp = () => {
-        if (!api?.score || !module) return;
+        if (!api?.score || !module) { return; }
         const bytes = new module.exporter.Gp7Exporter().export(api.score, api.settings);
         downloadBytes(withExtension(doc.document?.fileName ?? 'score', 'gp'), bytes);
     };
@@ -79,11 +79,11 @@ export const MediaSyncPanel: React.FC<MediaSyncPanelProps> = ({ doc, onClose }) 
 
     // Undo/redo while focus is anywhere in the editor.
     const onKeyDown = (e: React.KeyboardEvent) => {
-        if (!(e.ctrlKey || e.metaKey) || (e.target as HTMLElement).closest('input, textarea, select')) return;
+        if (!(e.ctrlKey || e.metaKey) || (e.target as HTMLElement).closest('input, textarea, select')) { return; }
         const key = e.key.toLowerCase();
-        if (key === 'z' && !e.shiftKey) sync.undo();
-        else if ((key === 'z' && e.shiftKey) || key === 'y') sync.redo();
-        else return;
+        if (key === 'z' && !e.shiftKey) { sync.undo(); }
+        else if ((key === 'z' && e.shiftKey) || key === 'y') { sync.redo(); }
+        else { return; }
         e.preventDefault();
     };
 
@@ -200,7 +200,7 @@ export const MediaSyncPanel: React.FC<MediaSyncPanelProps> = ({ doc, onClose }) 
                 onChange={(e) => {
                     const file = e.target.files?.[0];
                     e.target.value = '';
-                    if (file) void sync.loadAudioFile(file);
+                    if (file) { void sync.loadAudioFile(file); }
                 }}
             />
         </div>
@@ -304,7 +304,7 @@ const YouTubeDialog: React.FC<{ onClose: () => void; onOpen: (videoId: string) =
     const videoId = extractYouTubeVideoId(url);
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!videoId) return;
+        if (!videoId) { return; }
         onOpen(videoId);
         onClose();
     };
@@ -365,7 +365,7 @@ const CodeDialog: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const CodeBlock: React.FC<{ title: string; code: string }> = ({ title, code }) => {
     const [copied, setCopied] = useState(false);
     useEffect(() => {
-        if (!copied) return;
+        if (!copied) { return; }
         const timer = setTimeout(() => setCopied(false), 1500);
         return () => clearTimeout(timer);
     }, [copied]);

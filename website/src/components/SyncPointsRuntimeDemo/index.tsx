@@ -70,7 +70,7 @@ const InnerBridge: React.FC<{
     const durationMsRef = useRef(0);
 
     const applyShape = () => {
-        if (!api || !api.score || durationMsRef.current <= 0 || !scoreLoadedRef.current) return;
+        if (!api || !api.score || durationMsRef.current <= 0 || !scoreLoadedRef.current) { return; }
         const points = buildPoints(shape, api.score.masterBars.length, durationMsRef.current);
         api.score.applyFlatSyncPoints(points);
         api.updateSyncPoints();
@@ -86,7 +86,7 @@ const InnerBridge: React.FC<{
 
     // Wire the HTML5-audio ↔ alphaTab bridge (same shape as ExternalMediaSample).
     useEffect(() => {
-        if (!api || !audio.current) return;
+        if (!api || !audio.current) { return; }
         const el = audio.current;
         const handler: alphaTab.synth.IExternalMediaHandler = {
             get backingTrackDuration() {

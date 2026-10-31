@@ -48,7 +48,7 @@ export function useAlphaTabModule(): AlphaTabModule | null {
     useEffect(() => {
         let cancelled = false;
         initAlphaTab().then((m) => {
-            if (!cancelled) setModule(m);
+            if (!cancelled) { setModule(m); }
         });
         return () => {
             cancelled = true;

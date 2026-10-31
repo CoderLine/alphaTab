@@ -27,13 +27,13 @@ export function SelectionHandles({ api, mountElement }: SelectionHandlesProps) {
     const currentHighlightRef = useRef<alphaTab.PlaybackHighlightChangeEventArgs | undefined>(undefined);
 
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
 
         const handler = (e: alphaTab.PlaybackHighlightChangeEventArgs) => {
             currentHighlightRef.current = e;
             const start = startHandleRef.current;
             const end = endHandleRef.current;
-            if (!start || !end) return;
+            if (!start || !end) { return; }
 
             const blocks = e.highlightBlocks;
             if (!blocks || blocks.length === 0) {
@@ -62,30 +62,30 @@ export function SelectionHandles({ api, mountElement }: SelectionHandlesProps) {
     }, [api]);
 
     useEffect(() => {
-        if (!api || !mountElement || !dragging) return;
+        if (!api || !mountElement || !dragging) { return; }
 
         const beatFromEvent = (e: MouseEvent): alphaTab.model.Beat | undefined => {
             const rect = mountElement.getBoundingClientRect();
             const relX = e.clientX - rect.left;
             const relY = e.clientY - rect.top;
             const beat = api.boundsLookup?.getBeatAtPos(relX, relY);
-            if (!beat) return undefined;
+            if (!beat) { return undefined; }
             const bounds = api.boundsLookup!.findBeat(beat);
-            if (!bounds) return undefined;
+            if (!bounds) { return undefined; }
             const visualEnd = bounds.visualBounds.x + bounds.visualBounds.w;
             const realEnd = bounds.realBounds.x + bounds.realBounds.w;
             // Only snap to a beat when the cursor is in the whitespace after
             // it — matches the playground's behaviour for stable selection.
-            if (relX < visualEnd || relX > realEnd) return undefined;
+            if (relX < visualEnd || relX > realEnd) { return undefined; }
             return beat;
         };
 
         const onMove = (e: MouseEvent) => {
             e.preventDefault();
             const highlight = currentHighlightRef.current;
-            if (!highlight?.startBeat || !highlight?.endBeat) return;
+            if (!highlight?.startBeat || !highlight?.endBeat) { return; }
             const beat = beatFromEvent(e);
-            if (!beat) return;
+            if (!beat) { return; }
             if (dragging === 'start') {
                 api.highlightPlaybackRange(beat, highlight.endBeat);
             } else {
@@ -110,7 +110,7 @@ export function SelectionHandles({ api, mountElement }: SelectionHandlesProps) {
     }, [api, mountElement, dragging]);
 
     const beginDrag = (side: DragSide) => (e: React.MouseEvent<HTMLDivElement>) => {
-        if (e.button !== 0) return;
+        if (e.button !== 0) { return; }
         e.preventDefault();
         setDragging(side);
     };

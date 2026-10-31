@@ -36,7 +36,7 @@ const Inner: React.FC = () => {
 
   // When a new score is loaded, reflect the currently-rendered tracks.
   useEffect(() => {
-    if (state.renderedTracks.length === 0) return;
+    if (state.renderedTracks.length === 0) { return; }
     setSelected(new Set(state.renderedTracks.map((t) => t.index)));
   }, [state.renderedTracks]);
 

@@ -75,7 +75,7 @@ function markerId(barIndex: number, occurence: number, tick: number): string {
 /** Builds the markers for `input`; sync points present in `input.syncPoints` become active markers. */
 export function buildMarkers(input: TimelineInput): SyncMarker[] {
     const markers: SyncMarker[] = [];
-    if (input.bars.length === 0) return markers;
+    if (input.bars.length === 0) { return markers; }
     const occurences = new Map<number, number>();
     const syncPoints = input.syncPoints;
     let nextSyncPoint = 0;

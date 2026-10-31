@@ -21,18 +21,18 @@ const PITCH_CLASSES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#
 
 export function formatKey(score: model.Score | null): string {
     const mb = score?.masterBars[0];
-    if (!mb) return '—';
+    if (!mb) { return '—'; }
     const k = mb.keySignature as unknown as number;
     const type = mb.keySignatureType as unknown as number;
     const isMinor = type === 1;
     const name = (isMinor ? MINOR_KEY_NAMES : MAJOR_KEY_NAMES)[k];
-    if (!name) return '—';
+    if (!name) { return '—'; }
     return `${name} ${isMinor ? 'minor' : 'major'}`;
 }
 
 export function formatTuning(track: model.Track | undefined): string {
     const tuning = track?.staves[0]?.tuning;
-    if (!tuning || tuning.length === 0) return '—';
+    if (!tuning || tuning.length === 0) { return '—'; }
     return tuning.slice().reverse().map((p) => PITCH_CLASSES[((p % 12) + 12) % 12]).join(' ');
 }
 

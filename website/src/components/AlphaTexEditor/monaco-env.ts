@@ -28,7 +28,7 @@ async function initialize(): Promise<MonacoApi> {
         import('monaco-editor'),
         import('@coderline/alphatab-monaco'),
         fetch(new URL('vscode-oniguruma/release/onig.wasm', import.meta.url)).then((r) => {
-            if (!r.ok) throw new Error(`[AlphaTexEditor] Failed to fetch onig.wasm: ${r.status}`);
+            if (!r.ok) { throw new Error(`[AlphaTexEditor] Failed to fetch onig.wasm: ${r.status}`); }
             return r.arrayBuffer();
         }),
     ]);

@@ -25,7 +25,7 @@ function TrackContainerWidth({
   const api = useAlphaTabApi();
   useEffect(() => {
     const node = containerRef.current;
-    if (!node) return;
+    if (!node) { return; }
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         onWidthChange(Math.round(entry.contentRect.width));
@@ -52,9 +52,9 @@ export const ResponsiveResizeDemo: React.FC<ResponsiveResizeDemoProps> = ({
   const [displayWidth, setDisplayWidth] = useState(0);
 
   useEffect(() => {
-    if (!dragging) return;
+    if (!dragging) { return; }
     const onMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
+      if (!containerRef.current) { return; }
       const rect = containerRef.current.getBoundingClientRect();
       const next = Math.max(minWidth, e.clientX - rect.left);
       setWidth(next);

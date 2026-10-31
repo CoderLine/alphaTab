@@ -17,16 +17,16 @@ function AttributionInfo({ entry }: { entry: SoundFontEntry }): React.ReactEleme
     const popoverId = React.useId();
 
     React.useEffect(() => {
-        if (!open) return;
+        if (!open) { return; }
         const onDown = (e: MouseEvent) => {
-            if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+            if (!rootRef.current?.contains(e.target as Node)) { setOpen(false); }
         };
         document.addEventListener('mousedown', onDown);
         return () => document.removeEventListener('mousedown', onDown);
     }, [open]);
 
     const attribution = entry.attribution;
-    if (!attribution) return null;
+    if (!attribution) { return null; }
 
     return (
         <div

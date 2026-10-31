@@ -182,7 +182,7 @@ describe('audio analysis', () => {
     it('finds the music between leading and trailing silence', () => {
         const rate = 100;
         const samples = new Float32Array(60 * rate);
-        for (let i = 2 * rate; i < 57 * rate; i++) samples[i] = 0.5 * Math.sin(i);
+        for (let i = 2 * rate; i < 57 * rate; i++) { samples[i] = 0.5 * Math.sin(i); }
         const [start, end] = findSongRange(samples, samples, rate);
         assert.ok(Math.abs(start - 2000) <= 20, `start ${start}`);
         assert.ok(Math.abs(end - 57000) <= 20, `end ${end}`);

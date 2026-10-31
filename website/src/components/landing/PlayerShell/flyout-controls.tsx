@@ -77,7 +77,7 @@ export const Slider: React.FC<SliderProps> = ({
   const seek = React.useCallback(
     (clientX: number) => {
       const node = trackRef.current;
-      if (!node) return;
+      if (!node) { return; }
       const r = node.getBoundingClientRect();
       const x = Math.min(Math.max(clientX - r.left, 0), r.width);
       commit(min + (x / r.width) * range);
@@ -86,7 +86,7 @@ export const Slider: React.FC<SliderProps> = ({
   );
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (disabled) return;
+    if (disabled) { return; }
     const big = Math.max(step, range / 10);
     const next =
       e.key === 'ArrowRight' || e.key === 'ArrowUp' ? value + step :
@@ -96,13 +96,13 @@ export const Slider: React.FC<SliderProps> = ({
       e.key === 'Home' ? min :
       e.key === 'End' ? max :
       null;
-    if (next === null) return;
+    if (next === null) { return; }
     e.preventDefault();
     commit(next);
   };
 
   React.useEffect(() => {
-    if (!drag || disabled) return;
+    if (!drag || disabled) { return; }
     const move = (e: PointerEvent) => seek(e.clientX);
     const up = () => setDrag(false);
     window.addEventListener('pointermove', move);
@@ -131,7 +131,7 @@ export const Slider: React.FC<SliderProps> = ({
         className={styles.sliderTrack}
         onKeyDown={onKeyDown}
         onPointerDown={(e) => {
-          if (disabled) return;
+          if (disabled) { return; }
           e.preventDefault();
           (e.currentTarget as HTMLElement).focus();
           setDrag(true);

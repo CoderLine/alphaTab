@@ -10,7 +10,7 @@ import styles from './media-sync.module.scss';
 export const YouTubeDock: React.FC = () => {
     const sync = useMediaSync();
     const [collapsed, setCollapsed] = useState(false);
-    if (sync.kind !== 'youtube' || !sync.youtubeVideoId) return null;
+    if (sync.kind !== 'youtube' || !sync.youtubeVideoId) { return null; }
 
     return (
         <div className={clsx(styles.videoDock, collapsed && styles.videoDockCollapsed)}>

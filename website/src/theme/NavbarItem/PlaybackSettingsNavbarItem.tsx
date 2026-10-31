@@ -17,12 +17,12 @@ export default function PlaybackSettingsNavbarItem({ mobile, className }: Props)
   const rootRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    if (!open) return;
+    if (!open) { return; }
     const onDown = (e: MouseEvent) => {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+      if (!rootRef.current?.contains(e.target as Node)) { setOpen(false); }
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') { setOpen(false); }
     };
     document.addEventListener('mousedown', onDown);
     document.addEventListener('keydown', onKey);

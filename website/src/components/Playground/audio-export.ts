@@ -26,7 +26,7 @@ export async function exportWav(
     options.useSyncPoints = false;
     options.masterVolume = state.view.masterVolume;
     options.metronomeVolume = state.view.metronome ? 1 : 0;
-    if (api.playbackRange) options.playbackRange = api.playbackRange;
+    if (api.playbackRange) { options.playbackRange = api.playbackRange; }
     // The site loads SoundFonts itself, so the synthesizer settings carry none the exporter could use.
     options.soundFonts = [await soundFontLibrary.load(playbackPreferences.getSnapshot().soundFontId)];
 
@@ -43,14 +43,14 @@ export async function exportWav(
     try {
         while (!signal.aborted) {
             const chunk = await exporter.render(CHUNK_MS);
-            if (!chunk) break;
+            if (!chunk) { break; }
             chunks.push(chunk.samples);
-            if (chunk.endTime > 0) onProgress(Math.min(1, chunk.currentTime / chunk.endTime));
+            if (chunk.endTime > 0) { onProgress(Math.min(1, chunk.currentTime / chunk.endTime)); }
         }
     } finally {
         exporter.destroy();
     }
-    if (signal.aborted) throw new DOMException('Export cancelled', 'AbortError');
+    if (signal.aborted) { throw new DOMException('Export cancelled', 'AbortError'); }
     return encodeWav(chunks, SAMPLE_RATE);
 }
 
@@ -63,7 +63,7 @@ function encodeWav(chunks: Float32Array[], sampleRate: number): Uint8Array {
     const bytes = new Uint8Array(44 + dataSize);
     const view = new DataView(bytes.buffer);
     const ascii = (offset: number, text: string) => {
-        for (let i = 0; i < text.length; i++) bytes[offset + i] = text.charCodeAt(i);
+        for (let i = 0; i < text.length; i++) { bytes[offset + i] = text.charCodeAt(i); }
     };
     ascii(0, 'RIFF');
     view.setUint32(4, 36 + dataSize, true);

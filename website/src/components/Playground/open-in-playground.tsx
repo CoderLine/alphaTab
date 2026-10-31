@@ -17,7 +17,7 @@ export function usePlaygroundLink(target: PlaygroundLinkTarget, fallback?: FileT
     const isTex = 'tex' in target;
     const href = !isTex ? buildFileLink(target, base) : fallback ? buildFileLink(fallback, base) : base;
     const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        if (!isTex || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        if (!isTex || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) { return; }
         e.preventDefault();
         void buildPlaygroundUrl(target, base).then((url) => history.push(url));
     };

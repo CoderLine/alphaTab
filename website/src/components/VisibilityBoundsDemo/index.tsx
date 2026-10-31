@@ -23,7 +23,7 @@ export interface VisibilityBoundsDemoProps {
 function ApplyIncludeNoteBounds({ includeNotes }: { includeNotes: boolean }) {
     const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         api.settings.core.includeNoteBounds = includeNotes;
         api.updateSettings();
         api.render();
@@ -45,20 +45,20 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
     // The bounded scroll wrapper is the AlphaTabCanvas's outer div — alphaTab
     // assigns it to `settings.player.scrollElement` during API construction.
     const getScroller = useCallback((): HTMLElement | null => {
-        if (!api) return null;
+        if (!api) { return null; }
         const el = api.settings.player.scrollElement;
         return el instanceof HTMLElement ? el : null;
     }, [api]);
 
     const checkVisible = useCallback(
         (beat: alphaTab.model.Beat): boolean => {
-            if (!api) return false;
+            if (!api) { return false; }
             const scroller = getScroller();
-            if (!scroller) return false;
+            if (!scroller) { return false; }
             const lookup = api.renderer.boundsLookup;
-            if (!lookup) return false;
+            if (!lookup) { return false; }
             const bounds = lookup.findBeat(beat);
-            if (!bounds) return false;
+            if (!bounds) { return false; }
             const top = scroller.scrollTop;
             const bottom = top + scroller.clientHeight;
             const beatTop = bounds.realBounds.y;
@@ -76,7 +76,7 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
     // Recompute visibility on scroll so the readout stays fresh.
     useEffect(() => {
         const scroller = getScroller();
-        if (!scroller) return;
+        if (!scroller) { return; }
         const onScroll = () => {
             if (currentBeat) {
                 setIsVisible(checkVisible(currentBeat));
@@ -87,9 +87,9 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
     }, [api, currentBeat, checkVisible, getScroller]);
 
     const drawOverlay = useCallback(() => {
-        if (!api) return;
+        if (!api) { return; }
         const scroller = getScroller();
-        if (!scroller) return;
+        if (!scroller) { return; }
         // alphaTab's mount lives inside `<div style="position: relative">`
         // inside the scroll element. Use it as the overlay parent so the
         // absolute-positioned rectangles line up with the SVG chunks.
@@ -113,7 +113,7 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
         }
         overlay.innerHTML = "";
         const lookup = api.renderer.boundsLookup;
-        if (!lookup) return;
+        if (!lookup) { return; }
 
         for (const staff of lookup.staffSystems) {
             for (const master of staff.bars) {
@@ -151,11 +151,11 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
     }, [api, includeNotes, getScroller]);
 
     useAlphaTabEvent("postRenderFinished", () => {
-        if (showNoteHeadOverlay) drawOverlay();
+        if (showNoteHeadOverlay) { drawOverlay(); }
     }, [showNoteHeadOverlay, drawOverlay]);
 
     useEffect(() => {
-        if (showNoteHeadOverlay) drawOverlay();
+        if (showNoteHeadOverlay) { drawOverlay(); }
     }, [showNoteHeadOverlay, includeNotes, drawOverlay]);
 
     const barLabel =

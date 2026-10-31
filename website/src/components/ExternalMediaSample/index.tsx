@@ -22,9 +22,9 @@ const applyLinearSyncPoints = (
     mediaDurationMs: number,
 ) => {
     const score = api.score;
-    if (!score || !mediaDurationMs || !Number.isFinite(mediaDurationMs)) return;
+    if (!score || !mediaDurationMs || !Number.isFinite(mediaDurationMs)) { return; }
     const barCount = score.masterBars.length;
-    if (barCount === 0) return;
+    if (barCount === 0) { return; }
     const points: alphaTab.model.FlatSyncPoint[] = [];
     for (let i = 0; i < barCount; i++) {
         points.push({
@@ -70,8 +70,8 @@ const ExternalMediaBridge: React.FC<{
     const durationMsRef = useRef(0);
     const syncAppliedRef = useRef(false);
     const tryApplySync = () => {
-        if (!api || syncAppliedRef.current) return;
-        if (!scoreLoadedRef.current || durationMsRef.current <= 0) return;
+        if (!api || syncAppliedRef.current) { return; }
+        if (!scoreLoadedRef.current || durationMsRef.current <= 0) { return; }
         applyLinearSyncPoints(api, durationMsRef.current);
         syncAppliedRef.current = true;
     };
@@ -81,7 +81,7 @@ const ExternalMediaBridge: React.FC<{
     });
     useEffect(() => {
         const el = media.current;
-        if (!el) return;
+        if (!el) { return; }
         const onLoadedMeta = () => {
             const d = el.duration;
             if (Number.isFinite(d) && d > 0) {
@@ -100,7 +100,7 @@ const ExternalMediaBridge: React.FC<{
     }, [api, media]);
 
     useEffect(() => {
-        if (!api || !media.current) return;
+        if (!api || !media.current) { return; }
         const el = media.current;
 
         // alphaTab works in milliseconds while HTML5 media elements work in seconds

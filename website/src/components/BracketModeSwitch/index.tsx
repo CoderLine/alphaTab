@@ -26,7 +26,7 @@ function ApplyBracketMode({ mode }: { mode: ModeName }) {
   useAlphaTabEvent(
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
-      if (!module) return;
+      if (!module) { return; }
       score.stylesheet.bracketExtendMode = module.model.BracketExtendMode[mode];
     },
     [mode, module]

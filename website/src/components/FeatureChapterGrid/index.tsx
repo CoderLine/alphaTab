@@ -88,7 +88,7 @@ function normalizeAccent(v: unknown): CardAccent | undefined {
 }
 
 function normalizePlatforms(v: unknown): Platform[] | undefined {
-  if (!Array.isArray(v)) return undefined;
+  if (!Array.isArray(v)) { return undefined; }
   const out = v.filter((x): x is Platform =>
     typeof x === 'string' && (KNOWN_PLATFORMS as readonly string[]).includes(x),
   );
@@ -126,7 +126,7 @@ function buildFeatureItem(
   const cp = (link.customProps ?? {}) as Record<string, unknown>;
 
   const featureChapter = cp['feature_chapter'];
-  if (featureChapter !== chapter) return null;
+  if (featureChapter !== chapter) { return null; }
 
   // Confirm the doc actually lives under the requested group directory.
   const docId = link.docId ?? '';
@@ -185,16 +185,16 @@ export const FeatureChapterGrid: React.FC<FeatureChapterGridProps> = ({
   const version = useDocsVersion();
 
   const items = useMemo(() => {
-    if (!sidebar) return [];
+    if (!sidebar) { return []; }
     const links = collectLinks(sidebar.items);
     const collected: FeatureItem[] = [];
     for (const link of links) {
       const item = buildFeatureItem(link, group, chapter, version.docs);
-      if (!item) continue;
+      if (!item) { continue; }
       collected.push(item);
     }
     collected.sort((a, b) => {
-      if (a.order !== b.order) return a.order - b.order;
+      if (a.order !== b.order) { return a.order - b.order; }
       return a.title.localeCompare(b.title);
     });
     return collected;

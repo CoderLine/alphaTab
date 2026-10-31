@@ -42,10 +42,10 @@ class PlaybackPreferencesStore {
     private readonly listeners = new Set<() => void>();
 
     constructor() {
-        if (typeof window === 'undefined') return;
+        if (typeof window === 'undefined') { return; }
         this.snapshot = readStored();
         window.addEventListener('storage', (e) => {
-            if (e.key !== STORAGE_KEY) return;
+            if (e.key !== STORAGE_KEY) { return; }
             this.replace(readStored(), false);
         });
     }
@@ -69,7 +69,7 @@ class PlaybackPreferencesStore {
     }
 
     private replace(next: PlaybackPreferences, persist: boolean): void {
-        if (next.source === this.snapshot.source && next.soundFontId === this.snapshot.soundFontId) return;
+        if (next.source === this.snapshot.source && next.soundFontId === this.snapshot.soundFontId) { return; }
         this.snapshot = next;
         if (persist) {
             try {
@@ -78,7 +78,7 @@ class PlaybackPreferencesStore {
                 // Preference still applies for this session.
             }
         }
-        for (const listener of this.listeners) listener();
+        for (const listener of this.listeners) { listener(); }
     }
 }
 

@@ -129,7 +129,7 @@ const RenderBuiltScore: React.FC = () => {
   const module = useAlphaTabModule();
 
   useEffect(() => {
-    if (!api || !module) return;
+    if (!api || !module) { return; }
     api.renderScore(buildScore(module, api.settings));
   }, [api, module]);
 

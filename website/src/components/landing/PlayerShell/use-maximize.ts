@@ -27,12 +27,12 @@ function animationDuration(): number {
 // alphaTab re-lays out the score on every container width change, so the canvas width is
 // pinned while the stage geometry animates and alphaTab only sees the start and end widths.
 function freezeWidth(el: HTMLElement | null, width: number) {
-    if (!el) return;
+    if (!el) { return; }
     el.style.width = `${width}px`;
 }
 
 function unfreezeWidth(el: HTMLElement | null) {
-    if (!el) return;
+    if (!el) { return; }
     el.style.width = '';
 }
 
@@ -78,7 +78,7 @@ export function useMaximize({ slotRef, stageRef, getCanvas }: MaximizeOptions): 
     const expand = React.useCallback(() => {
         const stage = stageRef.current;
         const slot = slotRef.current;
-        if (!stage || !slot || animationRef.current || isMaximized) return;
+        if (!stage || !slot || animationRef.current || isMaximized) { return; }
         const from = measure(stage);
         slot.style.height = `${from.height}px`;
         inPageCanvasWidthRef.current = getCanvasRef.current()?.offsetWidth ?? 0;
@@ -90,7 +90,7 @@ export function useMaximize({ slotRef, stageRef, getCanvas }: MaximizeOptions): 
     const collapse = React.useCallback(() => {
         const stage = stageRef.current;
         const slot = slotRef.current;
-        if (!stage || !slot || animationRef.current || !isMaximized) return;
+        if (!stage || !slot || animationRef.current || !isMaximized) { return; }
         const from = measure(stage);
         const to = measure(slot);
         freezeWidth(getCanvasRef.current(), inPageCanvasWidthRef.current);
@@ -105,11 +105,11 @@ export function useMaximize({ slotRef, stageRef, getCanvas }: MaximizeOptions): 
 
     React.useLayoutEffect(() => {
         const stage = stageRef.current;
-        if (!stage) return;
+        if (!stage) { return; }
 
         if (isMaximized) {
             const from = expandFromRef.current;
-            if (!from) return;
+            if (!from) { return; }
             expandFromRef.current = null;
             const to = measure(stage);
             const canvas = getCanvasRef.current();
@@ -127,7 +127,7 @@ export function useMaximize({ slotRef, stageRef, getCanvas }: MaximizeOptions): 
             animationRef.current.cancel();
             animationRef.current = null;
             unfreezeWidth(getCanvasRef.current());
-            if (slotRef.current) slotRef.current.style.height = '';
+            if (slotRef.current) { slotRef.current.style.height = ''; }
             unlockScrollRef.current?.();
             unlockScrollRef.current = null;
         }

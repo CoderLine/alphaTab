@@ -27,7 +27,7 @@ function absoluteUrl(url: string): string {
 }
 
 async function openCache(): Promise<Cache | null> {
-    if (typeof caches === 'undefined') return null;
+    if (typeof caches === 'undefined') { return null; }
     try {
         return await caches.open(CACHE_NAME);
     } catch {
@@ -188,11 +188,11 @@ class SoundFontLibrary {
 
     /** First client subscription: mark persisted SoundFonts and prune entries no longer registered. */
     private probe(): void {
-        if (this.probed || typeof window === 'undefined') return;
+        if (this.probed || typeof window === 'undefined') { return; }
         this.probed = true;
         void (async () => {
             const cache = await openCache();
-            if (!cache) return;
+            if (!cache) { return; }
             try {
                 const registered = new Map(SOUNDFONTS.map((s) => [absoluteUrl(s.url), s]));
                 for (const request of await cache.keys()) {
@@ -215,7 +215,7 @@ class SoundFontLibrary {
     }
 
     private emit(): void {
-        for (const listener of this.listeners) listener();
+        for (const listener of this.listeners) { listener(); }
     }
 }
 

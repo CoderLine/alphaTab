@@ -34,17 +34,17 @@ function tokenize(src: string): Token[] {
   let m: RegExpExecArray | null;
   TOKEN_RE.lastIndex = 0;
   while ((m = TOKEN_RE.exec(src)) !== null) {
-    if (m.index > last) out.push({ t: src.slice(last, m.index), c: 'plain' });
-    if (m[1]) out.push({ t: m[1], c: 'comment' });
-    else if (m[2]) out.push({ t: m[2], c: 'string' });
-    else if (m[3]) out.push({ t: m[3], c: 'kw' });
-    else if (m[4]) out.push({ t: m[4], c: 'num' });
-    else if (m[5]) out.push({ t: m[5], c: 'cls' });
-    else if (m[6]) out.push({ t: m[6], c: 'fn' });
-    else if (m[7]) out.push({ t: m[7], c: 'punc' });
+    if (m.index > last) { out.push({ t: src.slice(last, m.index), c: 'plain' }); }
+    if (m[1]) { out.push({ t: m[1], c: 'comment' }); }
+    else if (m[2]) { out.push({ t: m[2], c: 'string' }); }
+    else if (m[3]) { out.push({ t: m[3], c: 'kw' }); }
+    else if (m[4]) { out.push({ t: m[4], c: 'num' }); }
+    else if (m[5]) { out.push({ t: m[5], c: 'cls' }); }
+    else if (m[6]) { out.push({ t: m[6], c: 'fn' }); }
+    else if (m[7]) { out.push({ t: m[7], c: 'punc' }); }
     last = TOKEN_RE.lastIndex;
   }
-  if (last < src.length) out.push({ t: src.slice(last), c: 'plain' });
+  if (last < src.length) { out.push({ t: src.slice(last), c: 'plain' }); }
   return out;
 }
 

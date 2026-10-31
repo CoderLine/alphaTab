@@ -47,7 +47,7 @@ export function useRotation(length: number, intervalMs: number, paused: boolean)
   };
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') { return; }
     if (paused) {
       // Pause: capture how much of the current slide has already elapsed,
       // then cancel the pending advance.
@@ -73,7 +73,7 @@ export function useRotation(length: number, intervalMs: number, paused: boolean)
 
   // Pause when the tab is hidden — match the discipline used elsewhere.
   useEffect(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined') { return; }
     const onVis = () => {
       if (document.hidden && runStartRef.current !== 0) {
         elapsedRef.current += performance.now() - runStartRef.current;

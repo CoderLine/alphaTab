@@ -86,7 +86,7 @@ export function bindExternalMedia(
 
     const install = () => {
         const current = output();
-        if (current && current.handler !== handler) current.handler = handler;
+        if (current && current.handler !== handler) { current.handler = handler; }
     };
 
     let frame = 0;
@@ -104,7 +104,7 @@ export function bindExternalMedia(
 
     const onPlay = () => {
         target.play();
-        if (!frame) frame = requestAnimationFrame(tick);
+        if (!frame) { frame = requestAnimationFrame(tick); }
     };
     const onPause = () => {
         stopTicking();
@@ -124,7 +124,7 @@ export function bindExternalMedia(
     const offReady = api.playerReady.on(install);
     const offMidiLoad = api.midiLoad.on(install);
     install();
-    if (!media.paused) onPlay();
+    if (!media.paused) { onPlay(); }
 
     return () => {
         stopTicking();
@@ -138,6 +138,6 @@ export function bindExternalMedia(
         offReady();
         offMidiLoad();
         const current = output();
-        if (current?.handler === handler) current.handler = undefined;
+        if (current?.handler === handler) { current.handler = undefined; }
     };
 }

@@ -52,7 +52,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 export default function Footer(): React.ReactElement | null {
   const { footer } = useThemeConfig();
   const { siteConfig } = useDocusaurusContext();
-  if (!footer) return null;
+  if (!footer) { return null; }
 
   const { links, copyright } = footer;
   const columns: FooterColumn[] = isMultiColumn(links) ? links : [];

@@ -84,7 +84,7 @@ class FrozenCursorHandler implements ICursorHandler {
 
     private place(): void {
         const bounds = this.bounds;
-        if (!bounds) return;
+        if (!bounds) { return; }
         const bar = bounds.barBounds.masterBarBounds.visualBounds;
         this.barCursor?.setBounds(bar.x, bar.y, bar.w, bar.h);
         this.beatCursor?.transitionToX(0, bounds.onNotesX);
@@ -125,7 +125,7 @@ async function resolveSyncPoints(source: SyncPointSource): Promise<model.FlatSyn
         case 'url':
             return loadShared(syncPointCache, source.url, async () => {
                 const response = await fetch(source.url);
-                if (!response.ok) throw new Error(`${source.url}: HTTP ${response.status}`);
+                if (!response.ok) { throw new Error(`${source.url}: HTTP ${response.status}`); }
                 return (await response.json()) as model.FlatSyncPoint[];
             });
     }
@@ -210,7 +210,7 @@ export class PlaybackController {
      * `'backingTrack'` falls back to the synthesizer while the score has no backing track.
      */
     setSourceOverride(kind: PlaybackSourceKind | null): void {
-        if (this.sourceOverride === kind) return;
+        if (this.sourceOverride === kind) { return; }
         this.sourceOverride = kind;
         this.backingTrackFailed = false;
         this.patch({ notice: null });
@@ -223,7 +223,7 @@ export class PlaybackController {
      */
     attachBackingTrack(audio: Uint8Array): void {
         const score = this.score;
-        if (!score) return;
+        if (!score) { return; }
         score.backingTrack = new this.module.model.BackingTrack();
         score.backingTrack.rawAudioFile = audio;
         this.backingTrackFailed = false;
@@ -238,7 +238,7 @@ export class PlaybackController {
     rebuildPlayer(): void {
         const { PlayerMode } = this.module;
         const mode = this.api.actualPlayerMode;
-        if (mode === PlayerMode.Disabled) return;
+        if (mode === PlayerMode.Disabled) { return; }
         this.holdPosition();
         this.api.pause();
         this.api.settings.player.playerMode = PlayerMode.Disabled;
@@ -286,8 +286,8 @@ export class PlaybackController {
      */
     acceptPosition(tick: number): boolean {
         const hold = this.hold;
-        if (!hold) return true;
-        if (!hold.restored || Math.abs(tick - hold.tick) > HOLD_TOLERANCE_TICKS) return false;
+        if (!hold) { return true; }
+        if (!hold.restored || Math.abs(tick - hold.tick) > HOLD_TOLERANCE_TICKS) { return false; }
         this.releaseHold();
         return true;
     }
@@ -304,7 +304,7 @@ export class PlaybackController {
         this.generation++;
         clearTimeout(this.restoreTimer);
         this.releaseHold();
-        for (const unsubscribe of this.unsubscribers) unsubscribe();
+        for (const unsubscribe of this.unsubscribers) { unsubscribe(); }
         this.listeners.clear();
     }
 
@@ -313,7 +313,7 @@ export class PlaybackController {
      * returns is stable afterwards and re-fires `ready` for every rebuilt instance.
      */
     private ensurePlayerSubscription(): void {
-        if (this.playerSubscribed || !this.api.player) return;
+        if (this.playerSubscribed || !this.api.player) { return; }
         this.playerSubscribed = true;
         this.unsubscribers.push(this.api.player.ready.on(this.onPlayerInstanceReady));
     }
@@ -347,7 +347,7 @@ export class PlaybackController {
 
     private readonly onReadyForPlayback = (): void => {
         this.refresh();
-        if (this.pendingTick === null && !this.resumeAfterReady) return;
+        if (this.pendingTick === null && !this.resumeAfterReady) { return; }
         // alphaTab reports ready from within its MIDI load and only then attaches the backing-track
         // audio and sync points, which resets the position and interrupts a play() made right now.
         clearTimeout(this.restoreTimer);
@@ -355,7 +355,7 @@ export class PlaybackController {
     };
 
     private readonly restorePosition = (): void => {
-        if (this.destroyed || !this.api.isReadyForPlayback) return;
+        if (this.destroyed || !this.api.isReadyForPlayback) { return; }
         if (this.pendingTick !== null) {
             if (this.hold) {
                 this.hold.restored = true;
@@ -377,7 +377,7 @@ export class PlaybackController {
      * restore is already pending the current player has not reached that position yet, so it is kept.
      */
     private holdPosition(): void {
-        if (this.pendingTick !== null) return;
+        if (this.pendingTick !== null) { return; }
         this.pendingTick = this.api.tickPosition;
         this.resumeAfterReady = this.isPlaying();
         const bounds = this.beatBoundsAt(this.pendingTick);
@@ -412,7 +412,7 @@ export class PlaybackController {
 
     private releaseHold(): void {
         const hold = this.hold;
-        if (!hold) return;
+        if (!hold) { return; }
         this.hold = null;
         clearTimeout(hold.timer);
         // alphaTab draws cursor updates in the next animation frame and reads the handler only then,
@@ -425,7 +425,7 @@ export class PlaybackController {
     }
 
     private readonly onLibraryChanged = (): void => {
-        if (this.state.preparing?.kind !== 'soundFont') return;
+        if (this.state.preparing?.kind !== 'soundFont') { return; }
         const progress = soundFontLibrary.getSnapshot()[playbackPreferences.getSnapshot().soundFontId];
         if (progress) {
             this.patch({ preparing: { kind: 'soundFont', loaded: progress.loaded, total: progress.total } });
@@ -437,8 +437,8 @@ export class PlaybackController {
     }
 
     private resolveTarget(): PlaybackSourceKind | null {
-        if (this.options.fixedSource) return this.effectiveSource();
-        if (!this.score) return null;
+        if (this.options.fixedSource) { return this.effectiveSource(); }
+        if (!this.score) { return null; }
         if (this.sourceOverride === 'externalMedia' || this.sourceOverride === 'synthesizer') {
             return this.sourceOverride;
         }
@@ -490,7 +490,7 @@ export class PlaybackController {
     }
 
     private reconcile(): void {
-        if (this.destroyed) return;
+        if (this.destroyed) { return; }
         const generation = ++this.generation;
         const target = this.resolveTarget();
         this.patch({ target });
@@ -520,11 +520,11 @@ export class PlaybackController {
                 try {
                     bytes = await soundFontLibrary.load(id);
                 } catch (e) {
-                    if (generation !== this.generation) return;
+                    if (generation !== this.generation) { return; }
                     this.patch({ preparing: null, notice: `SoundFont could not be loaded: ${errorMessage(e)}` });
                     return;
                 }
-                if (generation !== this.generation) return;
+                if (generation !== this.generation) { return; }
                 this.fontId = id;
                 this.fontBytes = bytes;
             }
@@ -546,7 +546,7 @@ export class PlaybackController {
                 await this.attachExternalBackingTrack(score);
                 attachedNow = true;
             } catch (e) {
-                if (score !== this.score) return;
+                if (score !== this.score) { return; }
                 this.backingTrackFailed = true;
                 this.patch({
                     preparing: null,
@@ -556,7 +556,7 @@ export class PlaybackController {
                 return;
             }
         }
-        if (generation !== this.generation) return;
+        if (generation !== this.generation) { return; }
         this.patch({ preparing: null });
         // A new player picks up audio and sync points via alphaTab's own loadMidiForScore on ready.
         if (!this.switchMode('backingTrack') && attachedNow) {
@@ -591,7 +591,7 @@ export class PlaybackController {
             loadShared(audioCache, backingTrack.audioUrl, () => fetchWithProgress(backingTrack.audioUrl, onProgress)),
             resolveSyncPoints(backingTrack.syncPoints),
         ]);
-        if (score !== this.score) throw new Error('score changed');
+        if (score !== this.score) { throw new Error('score changed'); }
 
         if (syncPoints) {
             score.applyFlatSyncPoints(syncPoints);
@@ -625,9 +625,9 @@ export class PlaybackController {
     }
 
     private feedSoundFont(): void {
-        if (this.options.ownSoundFont || !this.fontBytes || this.loadedFontId === this.fontId) return;
-        if (this.api.actualPlayerMode !== this.module.PlayerMode.EnabledSynthesizer) return;
-        if (!this.api.player?.isReady) return;
+        if (this.options.ownSoundFont || !this.fontBytes || this.loadedFontId === this.fontId) { return; }
+        if (this.api.actualPlayerMode !== this.module.PlayerMode.EnabledSynthesizer) { return; }
+        if (!this.api.player?.isReady) { return; }
         // The synthesizer pauses itself to swap SoundFonts and reports ready again once the presets are loaded.
         this.resumeAfterReady ||= this.isPlaying();
         this.api.loadSoundFont(this.fontBytes, false);
@@ -647,7 +647,7 @@ export class PlaybackController {
     }
 
     private patch(partial: Partial<PlaybackState>): void {
-        if (this.destroyed) return;
+        if (this.destroyed) { return; }
         let changed = false;
         for (const key of Object.keys(partial) as (keyof PlaybackState)[]) {
             if (this.state[key] !== partial[key]) {
@@ -655,8 +655,8 @@ export class PlaybackController {
                 break;
             }
         }
-        if (!changed) return;
+        if (!changed) { return; }
         this.state = { ...this.state, ...partial };
-        for (const listener of this.listeners) listener();
+        for (const listener of this.listeners) { listener(); }
     }
 }

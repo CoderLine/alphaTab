@@ -56,7 +56,7 @@ const MutateModelInner: React.FC = () => {
   });
 
   const uppercaseLyrics = () => {
-    if (!api?.score) return;
+    if (!api?.score) { return; }
     walkBeats(api.score, (beat) => {
       if (beat.lyrics && beat.lyrics.length > 0) {
         beat.lyrics = beat.lyrics.map((l) => (l ?? "").toUpperCase());
@@ -69,7 +69,7 @@ const MutateModelInner: React.FC = () => {
   };
 
   const transposeDown = () => {
-    if (!api?.score) return;
+    if (!api?.score) { return; }
     walkNotes(api.score, (note) => {
       if (!Number.isNaN(note.octave)) {
         note.octave -= 1;
@@ -82,7 +82,7 @@ const MutateModelInner: React.FC = () => {
   };
 
   const boostVelocities = () => {
-    if (!api?.score || !module) return;
+    if (!api?.score || !module) { return; }
     walkBeats(api.score, (beat) => {
       const next = Math.min(
         module.model.DynamicValue.FFF,
@@ -95,7 +95,7 @@ const MutateModelInner: React.FC = () => {
   };
 
   const reset = () => {
-    if (!api) return;
+    if (!api) { return; }
     api.load(SCORE_URL);
   };
 

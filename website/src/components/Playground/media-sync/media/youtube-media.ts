@@ -44,7 +44,7 @@ const SEEK_SETTLE_MS = 600;
 let apiPromise: Promise<YouTubeNamespace> | null = null;
 
 function loadYouTubeApi(): Promise<YouTubeNamespace> {
-    if (window.YT?.Player) return Promise.resolve(window.YT);
+    if (window.YT?.Player) { return Promise.resolve(window.YT); }
     apiPromise ??= new Promise<YouTubeNamespace>((resolve, reject) => {
         const previous = window.onYouTubeIframeAPIReady;
         window.onYouTubeIframeAPIReady = () => {
@@ -66,14 +66,14 @@ function loadYouTubeApi(): Promise<YouTubeNamespace> {
 /** Accepts youtube.com/watch, youtu.be, /embed/, /shorts/ and youtube-nocookie links, or a bare 11-character id. */
 export function extractYouTubeVideoId(input: string): string | null {
     const text = input.trim();
-    if (/^[\w-]{11}$/.test(text)) return text;
+    if (/^[\w-]{11}$/.test(text)) { return text; }
     try {
         const url = new URL(text);
         const host = url.hostname.replace(/^www\.|^m\./, '').toLowerCase();
-        if (host === 'youtu.be') return url.pathname.split('/')[1] || null;
+        if (host === 'youtu.be') { return url.pathname.split('/')[1] || null; }
         if (host === 'youtube.com' || host === 'youtube-nocookie.com' || host === 'music.youtube.com') {
             const v = url.searchParams.get('v');
-            if (v) return v;
+            if (v) { return v; }
             const match = /^\/(embed|shorts|live|v)\/([\w-]{11})/.exec(url.pathname);
             return match?.[2] ?? null;
         }
@@ -125,13 +125,13 @@ export class YouTubeMedia extends EventTarget implements MediaElementLike {
     }
 
     get currentTime(): number {
-        if (this.pendingSeek !== null) return this.pendingSeek;
-        if (this.seekTarget && performance.now() < this.seekTarget.until) return this.seekTarget.time;
+        if (this.pendingSeek !== null) { return this.pendingSeek; }
+        if (this.seekTarget && performance.now() < this.seekTarget.until) { return this.seekTarget.time; }
         return this.player?.getCurrentTime() ?? 0;
     }
 
     set currentTime(value: number) {
-        if (!this.player) return;
+        if (!this.player) { return; }
         if (!this.started) {
             // Seeking an unstarted video starts playback; apply it on the first play instead.
             this.pendingSeek = value;
@@ -158,9 +158,9 @@ export class YouTubeMedia extends EventTarget implements MediaElementLike {
 
     set volume(value: number) {
         const v = Math.min(1, Math.max(0, value));
-        if (Math.abs(v - this.volumeValue) < 0.005) return;
+        if (Math.abs(v - this.volumeValue) < 0.005) { return; }
         this.volumeValue = v;
-        if (v > 0 && this.player?.isMuted()) this.player.unMute();
+        if (v > 0 && this.player?.isMuted()) { this.player.unMute(); }
         this.player?.setVolume(Math.round(v * 100));
         this.emit('volumechange');
     }
@@ -170,7 +170,7 @@ export class YouTubeMedia extends EventTarget implements MediaElementLike {
     }
 
     set playbackRate(value: number) {
-        if (Math.abs(value - this.rateValue) < 0.001) return;
+        if (Math.abs(value - this.rateValue) < 0.001) { return; }
         this.rateValue = value;
         // YouTube offers a fixed set of rates and reports the one it picked via onPlaybackRateChange.
         this.player?.setPlaybackRate(value);
@@ -186,7 +186,7 @@ export class YouTubeMedia extends EventTarget implements MediaElementLike {
     }
 
     destroy(): void {
-        if (this.destroyed) return;
+        if (this.destroyed) { return; }
         this.destroyed = true;
         window.clearInterval(this.timer);
         this.player?.destroy();
@@ -194,7 +194,7 @@ export class YouTubeMedia extends EventTarget implements MediaElementLike {
     }
 
     private emit(type: MediaElementLikeEvent): void {
-        if (!this.destroyed) this.dispatchEvent(new Event(type));
+        if (!this.destroyed) { this.dispatchEvent(new Event(type)); }
     }
 
     private onStateChange(state: number): void {
@@ -231,7 +231,7 @@ export class YouTubeMedia extends EventTarget implements MediaElementLike {
     }
 
     private onRateChange(rate: number): void {
-        if (Math.abs(rate - this.rateValue) < 0.001) return;
+        if (Math.abs(rate - this.rateValue) < 0.001) { return; }
         this.rateValue = rate;
         this.emit('ratechange');
     }

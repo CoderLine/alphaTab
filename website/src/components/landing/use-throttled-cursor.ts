@@ -16,13 +16,13 @@ export function useThrottledCursor(
   const [cursor, setCursor] = useState(initial);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') { return; }
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let last = performance.now();
 
     const tick = () => {
-      if (cancelled) return;
+      if (cancelled) { return; }
       const now = performance.now();
       const dt = (now - last) / 1000;
       last = now;
@@ -38,7 +38,7 @@ export function useThrottledCursor(
     timer = setTimeout(tick, intervalMs);
     return () => {
       cancelled = true;
-      if (timer !== undefined) clearTimeout(timer);
+      if (timer !== undefined) { clearTimeout(timer); }
     };
   }, [step, intervalMs, loopStart, loopEnd]);
 

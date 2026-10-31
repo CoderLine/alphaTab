@@ -35,7 +35,7 @@ function formatBeat(beat: alphaTab.model.Beat | null | undefined): {
     bar: number | null;
     beat: number | null;
 } {
-    if (!beat) return { bar: null, beat: null };
+    if (!beat) { return { bar: null, beat: null }; }
     return {
         bar: beat.voice.bar.index,
         beat: beat.index,
@@ -43,7 +43,7 @@ function formatBeat(beat: alphaTab.model.Beat | null | undefined): {
 }
 
 function formatNote(note: alphaTab.model.Note | null | undefined): string {
-    if (!note) return "";
+    if (!note) { return ""; }
     if (note.string > 0) {
         return `string ${note.string}, fret ${note.fret}`;
     }
@@ -61,7 +61,7 @@ function ApplyInteractionSettings({
 }) {
     const api = useAlphaTabApi();
     useEffect(() => {
-        if (!api) return;
+        if (!api) { return; }
         api.settings.player.enableSeekToClick = seekToClick;
         api.settings.player.enablePlaybackRangeSelection = playbackRangeSelection;
         api.settings.player.resetPlaybackRangeOnClick = resetPlaybackRangeOnClick;
@@ -109,7 +109,7 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
     useAlphaTabEvent("beatMouseMove", (beat: alphaTab.model.Beat) => {
         const { bar, beat: b } = formatBeat(beat);
         const key = `${bar}-${b}`;
-        if (lastMoveBeatKeyRef.current === key) return;
+        if (lastMoveBeatKeyRef.current === key) { return; }
         lastMoveBeatKeyRef.current = key;
         pushEntry({ event: "beatMouseMove", bar, beat: b });
     });
@@ -134,7 +134,7 @@ const Inner: React.FC<InnerProps> = ({ showInteractionToggle }) => {
         const { bar, beat: b } = formatBeat(note.beat);
         const detail = formatNote(note);
         const key = `${bar}-${b}-${detail}`;
-        if (lastMoveNoteKeyRef.current === key) return;
+        if (lastMoveNoteKeyRef.current === key) { return; }
         lastMoveNoteKeyRef.current = key;
         pushEntry({ event: "noteMouseMove", bar, beat: b, detail });
     });

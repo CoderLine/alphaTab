@@ -63,13 +63,13 @@ function plural(count: number, noun: string): string {
 
 /** `♩=120 · 16 bars · 2 tracks · standard + tab` */
 export function describeScore(score: model.Score | null, totalBars: number): string {
-  if (!score) return '';
+  if (!score) { return ''; }
   const staves = score.tracks.flatMap((t) => t.staves);
   const standard = staves.some((s) => s.showStandardNotation);
   const tab = staves.some((s) => s.showTablature);
   const notation = standard && tab ? 'standard + tab' : tab ? 'tab' : 'standard';
   const parts = [`♩=${score.tempo}`, plural(totalBars, 'bar')];
-  if (score.tracks.length > 1) parts.push(plural(score.tracks.length, 'track'));
+  if (score.tracks.length > 1) { parts.push(plural(score.tracks.length, 'track')); }
   parts.push(notation);
   return parts.join(' · ');
 }

@@ -64,7 +64,7 @@ const SoundFontControls: React.FC<{
   );
 
   const loadFromUrl = async (url: string, label: string) => {
-    if (!api) return;
+    if (!api) { return; }
     setLoading(true);
     setStatus(`loading ${label}…`);
     try {
@@ -78,7 +78,7 @@ const SoundFontControls: React.FC<{
   const chooseOption = (index: number) => {
     setSelected(index);
     const opt = options[index];
-    if (!api) return;
+    if (!api) { return; }
     if (!opt.url) {
       setLoading(true);
       setStatus('loading bundled Sonivox…');

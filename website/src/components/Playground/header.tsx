@@ -119,7 +119,7 @@ export const PlaygroundHeader: React.FC<PlaygroundHeaderProps> = ({
                 onChange={(e) => {
                     const file = e.target.files?.[0];
                     e.target.value = '';
-                    if (file) onOpenFile(file);
+                    if (file) { onOpenFile(file); }
                 }}
             />
 
@@ -159,7 +159,7 @@ const ShareButton: React.FC<{ document: PlaygroundDocument | null; buildShareUrl
 }) => {
     const [copied, setCopied] = useState(false);
     useEffect(() => {
-        if (!copied) return;
+        if (!copied) { return; }
         const timer = setTimeout(() => setCopied(false), 1800);
         return () => clearTimeout(timer);
     }, [copied]);
@@ -179,7 +179,7 @@ const ShareButton: React.FC<{ document: PlaygroundDocument | null; buildShareUrl
             disabled={!shareable}
             onClick={async () => {
                 const url = await buildShareUrl();
-                if (!url) return;
+                if (!url) { return; }
                 try {
                     await navigator.clipboard.writeText(url);
                     setCopied(true);
@@ -205,7 +205,7 @@ const ExportMenu: React.FC<{ document: PlaygroundDocument | null }> = ({ documen
     useEffect(() => () => abortRef.current?.abort(), []);
 
     const exportAudio = async () => {
-        if (!api || !module || !store) return;
+        if (!api || !module || !store) { return; }
         const abort = new AbortController();
         abortRef.current = abort;
         setAudioProgress(0);
@@ -213,9 +213,9 @@ const ExportMenu: React.FC<{ document: PlaygroundDocument | null }> = ({ documen
             const wav = await exportWav(api, module, store.getSnapshot(), setAudioProgress, abort.signal);
             downloadBytes(withExtension(fileName, 'wav'), wav, 'audio/wav');
         } catch (e) {
-            if (!abort.signal.aborted) console.error('[Playground] Audio export failed', e);
+            if (!abort.signal.aborted) { console.error('[Playground] Audio export failed', e); }
         } finally {
-            if (abortRef.current === abort) abortRef.current = null;
+            if (abortRef.current === abort) { abortRef.current = null; }
             setAudioProgress(null);
         }
     };
