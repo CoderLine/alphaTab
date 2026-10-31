@@ -17,7 +17,7 @@ import { BoundsLookupWire } from '@coderline/alphatab/rendering/utils/BoundsLook
 import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
 import { Settings } from '@coderline/alphatab/Settings';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { LayoutCorpus } from '../layoutFlow/LayoutCorpus';
+import { ScoreCorpus } from '../ScoreCorpus';
 
 // The web worker writes the bounds directly in wire format; that must equal the encoded lookup a
 // renderer builds without a worker, after every kind of render.
@@ -116,7 +116,7 @@ describe('BoundsLookupWireWriter', () => {
     for (const c of configurations) {
         it(`corpus-${LayoutMode[c.layoutMode]}-notes-${c.includeNoteBounds}-scale-${c.scale}`, () => {
             let checked = 0;
-            for (const file of LayoutCorpus.files(process.cwd())) {
+            for (const file of ScoreCorpus.files(process.cwd())) {
                 if (check(file, c.layoutMode, c.includeNoteBounds, c.scale)) {
                     checked++;
                 }
@@ -128,7 +128,7 @@ describe('BoundsLookupWireWriter', () => {
     it('partial-update-keeps-systems', () => {
         const settings = createSettings(LayoutMode.Page, true, 1);
         const score = ScoreLoader.loadScoreFromBytes(
-            new Uint8Array(fs.readFileSync(path.join(process.cwd(), LayoutCorpus.referenceScores[0].file))),
+            new Uint8Array(fs.readFileSync(path.join(process.cwd(), ScoreCorpus.referenceScores[0].file))),
             settings
         );
         const renderer = new ScoreRenderer(settings);
@@ -159,7 +159,7 @@ describe('BoundsLookupWireWriter', () => {
     it('partial-update-falling-back-to-full-layout', () => {
         const settings = createSettings(LayoutMode.Horizontal, true, 1);
         const score = ScoreLoader.loadScoreFromBytes(
-            new Uint8Array(fs.readFileSync(path.join(process.cwd(), LayoutCorpus.referenceScores[0].file))),
+            new Uint8Array(fs.readFileSync(path.join(process.cwd(), ScoreCorpus.referenceScores[0].file))),
             settings
         );
         const renderer = new ScoreRenderer(settings);
@@ -178,7 +178,7 @@ describe('BoundsLookupWireWriter', () => {
     it('web-worker-posts-wire', () => {
         const settings = createSettings(LayoutMode.Page, true, 1);
         const score = ScoreLoader.loadScoreFromBytes(
-            new Uint8Array(fs.readFileSync(path.join(process.cwd(), LayoutCorpus.referenceScores[1].file))),
+            new Uint8Array(fs.readFileSync(path.join(process.cwd(), ScoreCorpus.referenceScores[1].file))),
             settings
         );
         const tracks = score.tracks.map(t => t.index);

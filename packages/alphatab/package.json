@@ -77,8 +77,7 @@
         "build": "npm run generate-typescript && vite build --mode esm && vite build --mode umd",
         "test": "vitest run",
         "test-web": "npm run test",
-        "test-accept-reference": "tsx scripts/accept-new-reference-files.ts",
-        "test-layout-flow": "vitest run --config vitest.layoutflow.config.ts"
+        "test-accept-reference": "tsx scripts/accept-new-reference-files.ts"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.5.14",

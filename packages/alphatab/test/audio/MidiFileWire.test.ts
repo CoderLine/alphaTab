@@ -37,7 +37,7 @@ import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
 import type { PositionChangedEventArgs } from '@coderline/alphatab/synth/PositionChangedEventArgs';
 import { TestOutput } from 'test/audio/TestOutput';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { LayoutCorpus } from '../layoutFlow/LayoutCorpus';
+import { ScoreCorpus } from '../ScoreCorpus';
 
 /**
  * Connects an {@link AlphaSynthWebWorkerApi} and an {@link AlphaSynthWebWorker} in-process; structured clone
@@ -175,7 +175,7 @@ describe('MidiFileWire', () => {
     it('corpus', () => {
         let compared = 0;
         let events = 0;
-        for (const file of LayoutCorpus.files(process.cwd())) {
+        for (const file of ScoreCorpus.files(process.cwd())) {
             const settings = new Settings();
             settings.core.logLevel = LogLevel.None;
             let score: Score;

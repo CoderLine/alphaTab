@@ -19,7 +19,7 @@ import { WorkerScoreEncoding } from '@coderline/alphatab/platform/worker/WorkerS
 import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
 import { Settings } from '@coderline/alphatab/Settings';
 import { describe, expect, it } from 'vitest';
-import { LayoutCorpus } from '../layoutFlow/LayoutCorpus';
+import { ScoreCorpus } from '../ScoreCorpus';
 
 /**
  * The score hand-off to the rendering worker as one transferred binary buffer.
@@ -96,7 +96,7 @@ describe('WorkerBinaryScoreTests', () => {
         settings.core.engine = 'svg';
         settings.core.logLevel = LogLevel.None;
         const score = ScoreLoader.loadScoreFromBytes(
-            new Uint8Array(fs.readFileSync(path.join(process.cwd(), LayoutCorpus.referenceScores[0].file))),
+            new Uint8Array(fs.readFileSync(path.join(process.cwd(), ScoreCorpus.referenceScores[0].file))),
             settings
         );
 
@@ -136,7 +136,7 @@ describe('WorkerBinaryScoreTests', () => {
 
     function loadReferenceScore(settings: Settings): Score {
         return ScoreLoader.loadScoreFromBytes(
-            new Uint8Array(fs.readFileSync(path.join(process.cwd(), LayoutCorpus.referenceScores[0].file))),
+            new Uint8Array(fs.readFileSync(path.join(process.cwd(), ScoreCorpus.referenceScores[0].file))),
             settings
         );
     }
