@@ -5,7 +5,8 @@
     "private": true,
     "type": "module",
     "workspaces": [
-        "packages/*"
+        "packages/*",
+        "website"
     ],
     "scripts": {
         "clean": "npm run clean --workspaces --if-present",
@@ -41,6 +42,9 @@
         "test-webpack": "npm run test --workspace=packages/webpack",
 
         "build-monaco": "npm run build --workspace=packages/monaco",
+
+        "build-website": "npm run build --workspace=website",
+        "dev-website": "npm run start --workspace=website",
 
         "nightly-check": "node ./scripts/nightly.mts --mode check",
         "nightly-pack": "node ./scripts/nightly.mts --mode pack",

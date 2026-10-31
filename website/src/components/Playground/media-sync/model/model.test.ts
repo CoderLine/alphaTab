@@ -1,4 +1,4 @@
-import { describe, it } from 'node:test';
+import { describe, it } from 'vitest';
 import assert from 'node:assert/strict';
 import { buildMarkers, isSyncPoint, type TimelineBar, type TimelineInput } from './timeline';
 import { autoSync, canToggle, moveMarker, moveRange, toggleMarker, MIN_SYNC_POINT_GAP_MS } from './edit';

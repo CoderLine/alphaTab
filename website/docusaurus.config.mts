@@ -171,6 +171,7 @@ async function createConfig(): Promise<Config> {
     [
       "classic",
       {
+        blog: false,
         docs: {
           sidebarPath: "./sidebars.ts",
           editUrl: "https://github.com/CoderLine/alphaTabWebsite/tree/main/",
