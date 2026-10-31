@@ -10,7 +10,7 @@ import {
     useAlphaTabEventValue
 } from '@coderline/alphatab-react';
 import { act, cleanup, render } from '@testing-library/react';
-import { createRef, StrictMode } from 'react';
+import { Activity, Component, createRef, type ReactNode, StrictMode, useEffect } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -159,6 +159,11 @@ function nextFrame() {
     return act(() => new Promise<void>(resolve => requestAnimationFrame(() => resolve())));
 }
 
+/** Lets deferred destruction run. */
+function settle() {
+    return act(async () => {});
+}
+
 function asFake(api: AlphaTabApi | null): FakeApi | null {
     return api as unknown as FakeApi | null;
 }
@@ -206,7 +211,7 @@ describe('AlphaTabProvider', () => {
         expect(live.element.closest('.scroll')).not.toBeNull();
     });
 
-    it('runs the onApi cleanup before destroying the API', () => {
+    it('runs the onApi cleanup before destroying the API', async () => {
         const onApi = vi.fn((api: AlphaTabApi) => {
             const id = asFake(api)!.id;
             fake.log.push(`onApi ${id}`);
@@ -217,6 +222,7 @@ describe('AlphaTabProvider', () => {
         const { unmount } = render(<Player onApi={onApi} />);
         const live = liveApis()[0];
         unmount();
+        await settle();
 
         expect(liveApis()).toHaveLength(0);
         expect(fake.log.slice(-3)).toEqual([
@@ -229,6 +235,159 @@ describe('AlphaTabProvider', () => {
             expect(cleanupAt).toBeGreaterThan(fake.log.indexOf(`onApi ${api.id}`));
             expect(cleanupAt).toBeLessThan(fake.log.indexOf(`destroy ${api.id}`));
         }
+    });
+
+    describe('destroys an instance after the effect cleanups that use it', () => {
+        function User({ name }: { name: string }) {
+            const api = useAlphaTabApi();
+            useEffect(() => {
+                if (!api) {
+                    return;
+                }
+                const used = asFake(api)!;
+                fake.log.push(`${name} uses ${used.id}`);
+                return () => {
+                    fake.log.push(`${name} cleanup ${used.id} destroyed=${used.destroyed}`);
+                };
+            }, [api, name]);
+            return null;
+        }
+
+        function expectCleanupBeforeDestroy(id: number) {
+            const destroyAt = fake.log.indexOf(`destroy ${id}`);
+            expect(destroyAt).toBeGreaterThan(-1);
+            for (const name of ['child', 'grandchild']) {
+                const cleanupAt = fake.log.indexOf(`${name} cleanup ${id} destroyed=false`);
+                expect(cleanupAt).toBeGreaterThan(-1);
+                expect(cleanupAt).toBeLessThan(destroyAt);
+            }
+        }
+
+        function Tree(props: { hostKey?: string; withHost?: boolean }) {
+            const { hostKey, withHost = true } = props;
+            return (
+                <StrictMode>
+                    <AlphaTabProvider>
+                        {withHost && <AlphaTabHost key={hostKey} />}
+                        <User name="child" />
+                        <section>
+                            <User name="grandchild" />
+                        </section>
+                    </AlphaTabProvider>
+                </StrictMode>
+            );
+        }
+
+        it('when the provider unmounts', async () => {
+            const { unmount } = render(<Tree />);
+            const live = liveApis()[0];
+            unmount();
+            expect(live.destroyed).toBe(false);
+            await settle();
+            expectCleanupBeforeDestroy(live.id);
+        });
+
+        it('when the host unmounts', async () => {
+            const ref = createRef<AlphaTabProviderHandle>();
+            const { rerender } = render(
+                <AlphaTabProvider ref={ref}>
+                    <AlphaTabHost />
+                    <User name="child" />
+                    <User name="grandchild" />
+                </AlphaTabProvider>
+            );
+            const live = liveApis()[0];
+            const handle = ref.current;
+            expect(asFake(handle!.api)).toBe(live);
+
+            rerender(
+                <AlphaTabProvider ref={ref}>
+                    <User name="child" />
+                    <User name="grandchild" />
+                </AlphaTabProvider>
+            );
+            await settle();
+
+            expectCleanupBeforeDestroy(live.id);
+            expect(ref.current).toBe(handle);
+            expect(handle!.api).toBeNull();
+            expect(liveApis()).toHaveLength(0);
+        });
+
+        it('when the host is replaced', async () => {
+            const { rerender } = render(<Tree hostKey="a" />);
+            const first = liveApis()[0];
+            rerender(<Tree hostKey="b" />);
+            await settle();
+
+            expectCleanupBeforeDestroy(first.id);
+            const second = liveApis()[0];
+            expect(second).not.toBe(first);
+            expect(fake.log).toContain(`child uses ${second.id}`);
+        });
+
+        it('before a successor is created on the same mount element', async () => {
+            function Hideable({ mode }: { mode: 'visible' | 'hidden' }) {
+                return (
+                    <Activity mode={mode}>
+                        <Tree />
+                    </Activity>
+                );
+            }
+            const { rerender } = render(<Hideable mode="visible" />);
+            const first = liveApis()[0];
+            rerender(<Hideable mode="hidden" />);
+            rerender(<Hideable mode="visible" />);
+            await settle();
+
+            const second = fake.apis[fake.apis.length - 1];
+            expect(second).not.toBe(first);
+            expect(second.element).toBe(first.element);
+            expect(fake.log.indexOf(`destroy ${first.id}`)).toBeLessThan(fake.log.indexOf(`construct ${second.id}`));
+            expect(liveApis()).toEqual([second]);
+        });
+    });
+
+    it('destroys the instance and rethrows when onApi throws', async () => {
+        const errors: unknown[] = [];
+        class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+            public override state = { failed: false };
+            public static getDerivedStateFromError() {
+                return { failed: true };
+            }
+            public override componentDidCatch(error: unknown) {
+                errors.push(error);
+            }
+            public override render() {
+                return this.state.failed ? null : this.props.children;
+            }
+        }
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+        render(
+            <Boundary>
+                <Player
+                    onApi={() => {
+                        throw new Error('onApi failed');
+                    }}
+                />
+            </Boundary>
+        );
+        await settle();
+        vi.mocked(console.error).mockRestore();
+
+        expect(errors).toEqual([new Error('onApi failed')]);
+        expect(fake.apis.length).toBeGreaterThan(0);
+        expect(liveApis()).toHaveLength(0);
+    });
+
+    it('drops a pending settings frame when the API goes away', async () => {
+        const { rerender, unmount } = render(<Player settings={{ display: { scale: 1 } }} />);
+        const live = liveApis()[0];
+        rerender(<Player settings={{ display: { scale: 2 } }} />);
+        unmount();
+        await nextFrame();
+        expect(live.updateSettings).not.toHaveBeenCalled();
+        expect(live.destroyed).toBe(true);
     });
 
     it('applies creation-time sources, configureSettings and settings in order', () => {
@@ -357,7 +516,7 @@ describe('AlphaTabProvider', () => {
         expect(first.element.isConnected).toBe(false);
     });
 
-    it('destroys the API on unmount and exposes it through the ref until then', () => {
+    it('destroys the API on unmount and exposes it through the ref until then', async () => {
         const ref = createRef<AlphaTabProviderHandle>();
         const { unmount } = render(
             <StrictMode>
@@ -370,6 +529,8 @@ describe('AlphaTabProvider', () => {
         expect(asFake(ref.current!.api)).toBe(live);
 
         unmount();
+        expect(ref.current).toBeNull();
+        await settle();
 
         expect(live.destroyed).toBe(true);
         expect(liveApis()).toHaveLength(0);

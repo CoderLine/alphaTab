@@ -10,6 +10,7 @@ import {
     useState
 } from 'react';
 import { AlphaTabContext, type AlphaTabContextValue } from './context';
+import { ApiLifecycle } from './lifecycle';
 import { diffSettings, settingsEqual, snapshotSettings } from './settings';
 
 /**
@@ -50,8 +51,9 @@ export interface AlphaTabProviderProps {
     tracks?: number | number[] | 'all';
     /**
      * Called with every new API instance, right after construction. A returned function is called
-     * synchronously before that instance is destroyed.
-     * Only the function passed in the render that precedes the construction is used.
+     * right before that instance is destroyed, after the effect cleanups of the provider's descendants.
+     * When `onApi` throws, the instance is destroyed and the error propagates to the nearest error
+     * boundary. Only the function passed in the render that precedes the construction is used.
      */
     // biome-ignore lint/suspicious/noConfusingVoidType: same contract as React's EffectCallback
     onApi?: (api: AlphaTabApi) => void | (() => void);
@@ -59,7 +61,8 @@ export interface AlphaTabProviderProps {
 }
 
 /**
- * The value an {@link AlphaTabProvider} ref resolves to.
+ * The value an {@link AlphaTabProvider} ref resolves to. The object stays the same for the lifetime
+ * of the provider.
  */
 export interface AlphaTabProviderHandle {
     /** The live API instance, `null` while no {@link AlphaTabHost} is mounted. */
@@ -69,17 +72,26 @@ export interface AlphaTabProviderHandle {
 /**
  * Owns one alphaTab API instance and provides it to its subtree.
  *
- * The API is created once an {@link AlphaTabHost} inside the provider has mounted and is destroyed when
- * the host or the provider unmounts. It is recreated only when the host's elements change; to recreate it
- * for other reasons, change the provider's React `key`. At most one API instance per provider is alive
- * at any time, also under `<StrictMode>`. Nothing touches the DOM during rendering, so the provider can
- * be rendered on the server.
+ * The API is created once an {@link AlphaTabHost} inside the provider has mounted and is recreated only
+ * when the host's elements change; to recreate it for other reasons, change the provider's React `key`.
+ * Nothing touches the DOM during rendering, so the provider can be rendered on the server.
+ *
+ * An instance that is replaced, or whose host or provider unmounts, is no longer provided right away
+ * and is destroyed once the effects of the subtree that used it have been cleaned up, so these cleanups
+ * may still call it. A new instance on the same mount element is only created after its predecessor is
+ * destroyed, which keeps one instance per element alive, also under `<StrictMode>`.
  */
 export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProviderProps>(
     function AlphaTabProvider(props, ref) {
         const [scrollElement, setScrollElement] = useState<HTMLElement | null>(null);
         const [mountElement, setMountElement] = useState<HTMLElement | null>(null);
         const [api, setApi] = useState<AlphaTabApi | null>(null);
+        const [lifecycle] = useState(() => new ApiLifecycle());
+        const [handle] = useState<AlphaTabProviderHandle>(() => ({
+            get api() {
+                return lifecycle.live;
+            }
+        }));
 
         const latestProps = useRef(props);
         useLayoutEffect(() => {
@@ -87,12 +99,14 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
         });
 
         const appliedSettings = useRef<json.SettingsJson | undefined>(undefined);
-        const pendingFrame = useRef(0);
 
         useEffect(() => {
             if (!scrollElement || !mountElement) {
                 return;
             }
+            // destroying clears the mount element, so it must not hit the successor's content
+            lifecycle.destroyRetired((_, element) => element === mountElement);
+
             const { configureSettings, settings, file, tex, tracks, onApi } = latestProps.current;
 
             const initial = new Settings();
@@ -113,25 +127,40 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
             appliedSettings.current = snapshotSettings(settings);
 
             const created = new AlphaTabApi(mountElement, initial);
-            const detach = onApi?.(created);
+            // biome-ignore lint/suspicious/noConfusingVoidType: the return type of onApi
+            let detach: void | (() => void);
+            try {
+                detach = onApi?.(created);
+            } catch (error) {
+                created.destroy();
+                throw error;
+            }
+            lifecycle.activate(created);
             setApi(created);
 
             return () => {
-                if (pendingFrame.current) {
-                    cancelAnimationFrame(pendingFrame.current);
-                    pendingFrame.current = 0;
-                }
                 setApi(null);
-                if (typeof detach === 'function') {
-                    detach();
-                }
-                created.destroy();
+                lifecycle.retire(created, mountElement, typeof detach === 'function' ? detach : undefined);
             };
-        }, [scrollElement, mountElement]);
+        }, [lifecycle, scrollElement, mountElement]);
+
+        // A replaced instance is destroyed in the first commit that no longer provides it, after the
+        // descendants' effect cleanups for it.
+        useEffect(() => {
+            lifecycle.destroyRetired(retired => retired !== api);
+        }, [lifecycle, api]);
+
+        // Unmounting cleans up the provider before its descendants, so destruction waits for them.
+        useEffect(
+            () => () => {
+                queueMicrotask(() => lifecycle.destroyRetired());
+            },
+            [lifecycle]
+        );
 
         const settings = props.settings;
         useEffect(() => {
-            if (!api || settingsEqual(appliedSettings.current, settings)) {
+            if (!api || api !== lifecycle.live || settingsEqual(appliedSettings.current, settings)) {
                 return;
             }
             const patch = diffSettings(appliedSettings.current, settings);
@@ -140,18 +169,15 @@ export const AlphaTabProvider = forwardRef<AlphaTabProviderHandle, AlphaTabProvi
                 return;
             }
             api.settings.fillFromJson(patch);
-            if (!pendingFrame.current) {
-                pendingFrame.current = requestAnimationFrame(() => {
-                    pendingFrame.current = 0;
-                    api.updateSettings();
-                    if (api.score) {
-                        api.render();
-                    }
-                });
-            }
+            lifecycle.requestFrame(() => {
+                api.updateSettings();
+                if (api.score) {
+                    api.render();
+                }
+            });
         });
 
-        useImperativeHandle(ref, () => ({ api }), [api]);
+        useImperativeHandle(ref, () => handle, [handle]);
 
         const context = useMemo<AlphaTabContextValue>(
             () => ({
