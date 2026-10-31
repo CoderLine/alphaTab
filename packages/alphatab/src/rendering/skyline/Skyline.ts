@@ -1,4 +1,4 @@
-import type { SkylineSegment, SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 
 /**
  * Piecewise-constant step-function skyline used as a placement oracle.
@@ -6,26 +6,38 @@ import type { SkylineSegment, SkylineSegmentPool } from '@coderline/alphatab/ren
  * @internal
  */
 export class Skyline {
-    public readonly xMin: number;
-    public readonly xMax: number;
+    // The initializers keep V8 from tracking the fields as tagged, which would box every double
+    // mixed with them in the union/insert loops.
+    public readonly xMin: number = 0;
+    public readonly xMax: number = 0;
 
-    private readonly _pool: SkylineSegmentPool;
-    private readonly _segments: SkylineSegment[] = [];
+    private readonly _scratch: SkylineScratch;
 
-    public constructor(xMin: number, xMax: number, pool: SkylineSegmentPool) {
+    /**
+     * Segment `k` covers `[_xStarts[k], _xStarts[k + 1])` with height
+     * `_heights[k]`; entry `_count - 1` is a sentinel at `xMax` with height 0.
+     * Entries at and beyond `_count` are unused capacity.
+     */
+    private _xStarts: number[];
+    private _heights: number[];
+    private _count: number = 0;
+
+    public constructor(xMin: number, xMax: number, scratch: SkylineScratch) {
         this.xMin = xMin;
         this.xMax = xMax;
-        this._pool = pool;
+        this._scratch = scratch;
+        this._xStarts = new Array<number>(SkylineScratch.initialCapacity);
+        this._heights = new Array<number>(SkylineScratch.initialCapacity);
         this._initBaseline();
     }
 
     public get segmentCount(): number {
-        return this._segments.length - 1;
+        return this._count - 1;
     }
 
     public forEachSegment(cb: (xStart: number, xEnd: number, height: number) => void): void {
-        for (let k: number = 0; k < this._segments.length - 1; k = k + 1) {
-            cb(this._segments[k].xStart, this._segments[k + 1].xStart, this._segments[k].height);
+        for (let k: number = 0; k < this._count - 1; k = k + 1) {
+            cb(this._xStarts[k], this._xStarts[k + 1], this._heights[k]);
         }
     }
 
@@ -38,15 +50,15 @@ export class Skyline {
      * exposed.
      */
     public segmentXStart(i: number): number {
-        return this._segments[i].xStart;
+        return this._xStarts[i];
     }
 
     public segmentXEnd(i: number): number {
-        return this._segments[i + 1].xStart;
+        return this._xStarts[i + 1];
     }
 
     public segmentHeight(i: number): number {
-        return this._segments[i].height;
+        return this._heights[i];
     }
 
     public placeAbove(xStart: number, xEnd: number, _intrinsicHeight: number, pad: number): number {
@@ -62,11 +74,10 @@ export class Skyline {
     }
 
     public union(other: Skyline): void {
-        const o: SkylineSegment[] = other._segments;
-        for (let k: number = 0; k < o.length - 1; k = k + 1) {
-            const segStart: number = o[k].xStart;
-            const segEnd: number = o[k + 1].xStart;
-            const h: number = o[k].height;
+        for (let k: number = 0; k < other._count - 1; k = k + 1) {
+            const segStart: number = other._xStarts[k];
+            const segEnd: number = other._xStarts[k + 1];
+            const h: number = other._heights[k];
             if (h > 0) {
                 this._raiseRange(segStart, segEnd, h);
             }
@@ -78,131 +89,127 @@ export class Skyline {
      * x-axis (i.e. each other-segment `[xs, xe)` contributes height `h` to
      * the range `[xs + dx, xe + dx)`). Clamps to `[xMin, xMax]`.
      *
-     * Pair-merge implementation: walks `this._segments` and `other._segments`
-     * in lockstep and emits a fresh segment list in O(s_this + s_other) time.
-     * Each emitted segment's height is `max(thisH, otherH)` for that span;
-     * adjacent equal-height pieces are coalesced inline so the result stays
-     * in canonical form (no two consecutive segments with equal height). The
-     * sentinel structure is preserved by appending a fresh sentinel at
-     * `xMax` after the sweep. Old segments are returned to the pool.
-     *
-     * This replaces the previous "iterate other + raise per segment" path,
-     * which was O(s_other * s_this) due to repeated split+raise on `this`.
+     * Pair-merge implementation: walks both segment lists in lockstep over the
+     * range where `other` has positive heights and emits the result into the
+     * scratch buffers in O(window + segments of `this` after it) time before
+     * splicing it back. Each emitted segment's height is `max(thisH, otherH)`
+     * for that span; adjacent equal-height pieces are coalesced so the result
+     * stays in canonical form (no two consecutive segments with equal height).
      */
     public unionShifted(other: Skyline, dx: number): void {
-        const o: SkylineSegment[] = other._segments;
-        const oLast: number = o.length - 1; // sentinel index in other
+        const oXs: number[] = other._xStarts;
+        const oHs: number[] = other._heights;
+        const oLast: number = other._count - 1; // sentinel index in other
         const xMin: number = this.xMin;
         const xMax: number = this.xMax;
 
-        // Short-circuit: other entirely out of [xMin, xMax] after shifting.
-        if (o[oLast].xStart + dx <= xMin || o[0].xStart + dx >= xMax) {
+        // The window covered by positive-height segments of other.
+        let first: number = 0;
+        while (first < oLast && oHs[first] <= 0) {
+            first = first + 1;
+        }
+        if (first === oLast) {
             return;
         }
-        // Short-circuit: other has no positive-height segments at all.
-        let hasContent: boolean = false;
-        for (let k: number = 0; k < oLast; k = k + 1) {
-            if (o[k].height > 0) {
-                hasContent = true;
-                break;
-            }
+        let last: number = oLast - 1;
+        while (oHs[last] <= 0) {
+            last = last - 1;
         }
-        if (!hasContent) {
+        let lo: number = oXs[first] + dx;
+        let hi: number = oXs[last + 1] + dx;
+        if (lo < xMin) {
+            lo = xMin;
+        }
+        if (hi > xMax) {
+            hi = xMax;
+        }
+        if (lo >= hi) {
             return;
         }
 
-        const t: SkylineSegment[] = this._segments;
-        const tLast: number = t.length - 1; // sentinel index in this
+        const tXs: number[] = this._xStarts;
+        const tHs: number[] = this._heights;
+        const tLast: number = this._count - 1; // sentinel index in this
 
-        const newSegs: SkylineSegment[] = [];
+        // Every emitted segment starts at lo, hi or at a breakpoint of one of the inputs.
+        const capacity: number = this._count + other._count + 3;
+        const scratch: SkylineScratch = this._scratch;
+        const nXs: number[] = SkylineScratch.ensureCapacity(scratch.xStarts, 0, capacity);
+        const nHs: number[] = SkylineScratch.ensureCapacity(scratch.heights, 0, capacity);
+        scratch.xStarts = nXs;
+        scratch.heights = nHs;
+        let n: number = 0;
 
-        let i: number = 0; // current segment index in this (active over [t[i].xStart, t[i+1].xStart))
-        let j: number = 0; // current segment index in other
+        const firstKept: number = this._segmentIndexAt(lo);
+        let i: number = firstKept; // current segment index in this (active over [tXs[i], tXs[i+1]))
+        let j: number = first; // current segment index in other
 
-        // Skip other's segments that end at or before xMin.
-        while (j < oLast && o[j + 1].xStart + dx <= xMin) {
+        // Skip other's segments that end at or before lo.
+        while (j < oLast && oXs[j + 1] + dx <= lo) {
             j = j + 1;
         }
 
-        let x: number = xMin;
-        while (x < xMax) {
-            const thisH: number = i < tLast ? t[i].height : 0;
+        let x: number = lo;
+        while (x < hi) {
+            const thisH: number = i < tLast ? tHs[i] : 0;
             let otherH: number = 0;
             if (j < oLast) {
-                const oStart: number = o[j].xStart + dx;
+                const oStart: number = oXs[j] + dx;
                 if (x >= oStart) {
-                    otherH = o[j].height;
+                    otherH = oHs[j];
                 }
             }
             const h: number = thisH > otherH ? thisH : otherH;
 
             // Find next breakpoint.
-            let nextX: number = xMax;
+            let nextX: number = hi;
             if (i < tLast) {
-                const tNext: number = t[i + 1].xStart;
+                const tNext: number = tXs[i + 1];
                 if (tNext < nextX) {
                     nextX = tNext;
                 }
             }
             if (j < oLast) {
-                const oStart: number = o[j].xStart + dx;
+                const oStart: number = oXs[j] + dx;
                 if (x < oStart) {
                     if (oStart < nextX) {
                         nextX = oStart;
                     }
                 } else {
-                    const oExit: number = o[j + 1].xStart + dx;
+                    const oExit: number = oXs[j + 1] + dx;
                     if (oExit < nextX) {
                         nextX = oExit;
                     }
                 }
             }
-            if (nextX > xMax) {
-                nextX = xMax;
-            }
             // Safety: guarantee forward progress. Should not trigger for
-            // valid sorted inputs, but avoid an infinite loop on degenerate
-            // (zero-width) inputs.
+            // valid sorted inputs; on degenerate (zero-width) inputs the
+            // current height extends to xMax.
             if (nextX <= x) {
                 nextX = xMax;
+                hi = xMax;
             }
 
             // Emit, coalescing adjacent equal-height pieces.
-            if (newSegs.length > 0 && newSegs[newSegs.length - 1].height === h) {
-                // skip — previous segment already covers up to nextX implicitly
-            } else {
-                const ns: SkylineSegment = this._pool.acquire();
-                ns.xStart = x;
-                ns.height = h;
-                newSegs.push(ns);
+            if (n === 0 || nHs[n - 1] !== h) {
+                nXs[n] = x;
+                nHs[n] = h;
+                n = n + 1;
             }
 
             x = nextX;
 
             // Advance i while its right edge is at or before x.
-            while (i < tLast && t[i + 1].xStart <= x) {
+            while (i < tLast && tXs[i + 1] <= x) {
                 i = i + 1;
             }
             // Advance j similarly (shifted).
-            while (j < oLast && o[j + 1].xStart + dx <= x) {
+            while (j < oLast && oXs[j + 1] + dx <= x) {
                 j = j + 1;
             }
         }
 
-        // Append sentinel at xMax.
-        const sentinel: SkylineSegment = this._pool.acquire();
-        sentinel.xStart = xMax;
-        sentinel.height = 0;
-        newSegs.push(sentinel);
-
-        // Release old segments and swap in the new list.
-        while (this._segments.length > 0) {
-            const s: SkylineSegment = this._segments.pop()!;
-            this._pool.release(s);
-        }
-        for (let k: number = 0; k < newSegs.length; k = k + 1) {
-            this._segments.push(newSegs[k]);
-        }
+        this._spliceFromScratch(firstKept, lo, hi, i, n);
     }
 
     /**
@@ -211,107 +218,156 @@ export class Skyline {
      * three.
      */
     public unionShifted3(o1: Skyline, dx1: number, o2: Skyline, dx2: number, o3: Skyline, dx3: number): void {
-        const a: SkylineSegment[] = o1._segments;
-        const b: SkylineSegment[] = o2._segments;
-        const c: SkylineSegment[] = o3._segments;
-        const aLast: number = a.length - 1;
-        const bLast: number = b.length - 1;
-        const cLast: number = c.length - 1;
+        const aXs: number[] = o1._xStarts;
+        const aHs: number[] = o1._heights;
+        const bXs: number[] = o2._xStarts;
+        const bHs: number[] = o2._heights;
+        const cXs: number[] = o3._xStarts;
+        const cHs: number[] = o3._heights;
+        const aLast: number = o1._count - 1;
+        const bLast: number = o2._count - 1;
+        const cLast: number = o3._count - 1;
         const xMin: number = this.xMin;
         const xMax: number = this.xMax;
 
-        // Treat streams that are out-of-range or have no positive height as absent.
-        let aActive: boolean = !(a[aLast].xStart + dx1 <= xMin || a[0].xStart + dx1 >= xMax);
-        if (aActive) {
-            let any: boolean = false;
-            for (let k: number = 0; k < aLast; k = k + 1) {
-                if (a[k].height > 0) {
-                    any = true;
-                    break;
+        // The window covered by positive-height segments of the inputs; streams
+        // without positive heights inside [xMin, xMax) are treated as absent.
+        let lo: number = xMax;
+        let hi: number = xMin;
+
+        let ja: number = 0;
+        while (ja < aLast && aHs[ja] <= 0) {
+            ja = ja + 1;
+        }
+        let aActive: boolean = false;
+        if (ja < aLast) {
+            let last: number = aLast - 1;
+            while (aHs[last] <= 0) {
+                last = last - 1;
+            }
+            const start: number = aXs[ja] + dx1 > xMin ? aXs[ja] + dx1 : xMin;
+            const end: number = aXs[last + 1] + dx1 < xMax ? aXs[last + 1] + dx1 : xMax;
+            if (start < end) {
+                aActive = true;
+                if (start < lo) {
+                    lo = start;
+                }
+                if (end > hi) {
+                    hi = end;
                 }
             }
-            aActive = any;
         }
-        let bActive: boolean = !(b[bLast].xStart + dx2 <= xMin || b[0].xStart + dx2 >= xMax);
-        if (bActive) {
-            let any: boolean = false;
-            for (let k: number = 0; k < bLast; k = k + 1) {
-                if (b[k].height > 0) {
-                    any = true;
-                    break;
+
+        let jb: number = 0;
+        while (jb < bLast && bHs[jb] <= 0) {
+            jb = jb + 1;
+        }
+        let bActive: boolean = false;
+        if (jb < bLast) {
+            let last: number = bLast - 1;
+            while (bHs[last] <= 0) {
+                last = last - 1;
+            }
+            const start: number = bXs[jb] + dx2 > xMin ? bXs[jb] + dx2 : xMin;
+            const end: number = bXs[last + 1] + dx2 < xMax ? bXs[last + 1] + dx2 : xMax;
+            if (start < end) {
+                bActive = true;
+                if (start < lo) {
+                    lo = start;
+                }
+                if (end > hi) {
+                    hi = end;
                 }
             }
-            bActive = any;
         }
-        let cActive: boolean = !(c[cLast].xStart + dx3 <= xMin || c[0].xStart + dx3 >= xMax);
-        if (cActive) {
-            let any: boolean = false;
-            for (let k: number = 0; k < cLast; k = k + 1) {
-                if (c[k].height > 0) {
-                    any = true;
-                    break;
+
+        let jc: number = 0;
+        while (jc < cLast && cHs[jc] <= 0) {
+            jc = jc + 1;
+        }
+        let cActive: boolean = false;
+        if (jc < cLast) {
+            let last: number = cLast - 1;
+            while (cHs[last] <= 0) {
+                last = last - 1;
+            }
+            const start: number = cXs[jc] + dx3 > xMin ? cXs[jc] + dx3 : xMin;
+            const end: number = cXs[last + 1] + dx3 < xMax ? cXs[last + 1] + dx3 : xMax;
+            if (start < end) {
+                cActive = true;
+                if (start < lo) {
+                    lo = start;
+                }
+                if (end > hi) {
+                    hi = end;
                 }
             }
-            cActive = any;
         }
+
         if (!aActive && !bActive && !cActive) {
             return;
         }
 
-        const t: SkylineSegment[] = this._segments;
-        const tLast: number = t.length - 1;
+        const tXs: number[] = this._xStarts;
+        const tHs: number[] = this._heights;
+        const tLast: number = this._count - 1;
 
-        const newSegs: SkylineSegment[] = [];
+        // Every emitted segment starts at lo, hi or at a breakpoint of one of the inputs.
+        const capacity: number = this._count + o1._count + o2._count + o3._count + 3;
+        const scratch: SkylineScratch = this._scratch;
+        const nXs: number[] = SkylineScratch.ensureCapacity(scratch.xStarts, 0, capacity);
+        const nHs: number[] = SkylineScratch.ensureCapacity(scratch.heights, 0, capacity);
+        scratch.xStarts = nXs;
+        scratch.heights = nHs;
+        let n: number = 0;
 
-        let i: number = 0;
-        let ja: number = 0;
-        let jb: number = 0;
-        let jc: number = 0;
+        const firstKept: number = this._segmentIndexAt(lo);
+        let i: number = firstKept;
 
-        // Skip leading segments that end at or before xMin.
+        // Skip leading segments that end at or before lo.
         if (aActive) {
-            while (ja < aLast && a[ja + 1].xStart + dx1 <= xMin) {
+            while (ja < aLast && aXs[ja + 1] + dx1 <= lo) {
                 ja = ja + 1;
             }
         }
         if (bActive) {
-            while (jb < bLast && b[jb + 1].xStart + dx2 <= xMin) {
+            while (jb < bLast && bXs[jb + 1] + dx2 <= lo) {
                 jb = jb + 1;
             }
         }
         if (cActive) {
-            while (jc < cLast && c[jc + 1].xStart + dx3 <= xMin) {
+            while (jc < cLast && cXs[jc + 1] + dx3 <= lo) {
                 jc = jc + 1;
             }
         }
 
-        let x: number = xMin;
-        while (x < xMax) {
-            const thisH: number = i < tLast ? t[i].height : 0;
+        let x: number = lo;
+        while (x < hi) {
+            const thisH: number = i < tLast ? tHs[i] : 0;
             let h: number = thisH;
 
             if (aActive && ja < aLast) {
-                const oStart: number = a[ja].xStart + dx1;
+                const oStart: number = aXs[ja] + dx1;
                 if (x >= oStart) {
-                    const ah: number = a[ja].height;
+                    const ah: number = aHs[ja];
                     if (ah > h) {
                         h = ah;
                     }
                 }
             }
             if (bActive && jb < bLast) {
-                const oStart: number = b[jb].xStart + dx2;
+                const oStart: number = bXs[jb] + dx2;
                 if (x >= oStart) {
-                    const bh: number = b[jb].height;
+                    const bh: number = bHs[jb];
                     if (bh > h) {
                         h = bh;
                     }
                 }
             }
             if (cActive && jc < cLast) {
-                const oStart: number = c[jc].xStart + dx3;
+                const oStart: number = cXs[jc] + dx3;
                 if (x >= oStart) {
-                    const ch: number = c[jc].height;
+                    const ch: number = cHs[jc];
                     if (ch > h) {
                         h = ch;
                     }
@@ -319,102 +375,106 @@ export class Skyline {
             }
 
             // Find next breakpoint across all 4 streams.
-            let nextX: number = xMax;
+            let nextX: number = hi;
             if (i < tLast) {
-                const tNext: number = t[i + 1].xStart;
+                const tNext: number = tXs[i + 1];
                 if (tNext < nextX) {
                     nextX = tNext;
                 }
             }
             if (aActive && ja < aLast) {
-                const oStart: number = a[ja].xStart + dx1;
+                const oStart: number = aXs[ja] + dx1;
                 if (x < oStart) {
                     if (oStart < nextX) {
                         nextX = oStart;
                     }
                 } else {
-                    const oExit: number = a[ja + 1].xStart + dx1;
+                    const oExit: number = aXs[ja + 1] + dx1;
                     if (oExit < nextX) {
                         nextX = oExit;
                     }
                 }
             }
             if (bActive && jb < bLast) {
-                const oStart: number = b[jb].xStart + dx2;
+                const oStart: number = bXs[jb] + dx2;
                 if (x < oStart) {
                     if (oStart < nextX) {
                         nextX = oStart;
                     }
                 } else {
-                    const oExit: number = b[jb + 1].xStart + dx2;
+                    const oExit: number = bXs[jb + 1] + dx2;
                     if (oExit < nextX) {
                         nextX = oExit;
                     }
                 }
             }
             if (cActive && jc < cLast) {
-                const oStart: number = c[jc].xStart + dx3;
+                const oStart: number = cXs[jc] + dx3;
                 if (x < oStart) {
                     if (oStart < nextX) {
                         nextX = oStart;
                     }
                 } else {
-                    const oExit: number = c[jc + 1].xStart + dx3;
+                    const oExit: number = cXs[jc + 1] + dx3;
                     if (oExit < nextX) {
                         nextX = oExit;
                     }
                 }
             }
-            if (nextX > xMax) {
-                nextX = xMax;
-            }
             if (nextX <= x) {
                 nextX = xMax;
+                hi = xMax;
             }
 
-            if (newSegs.length > 0 && newSegs[newSegs.length - 1].height === h) {
-                // coalesce equal-height neighbours
-            } else {
-                const ns: SkylineSegment = this._pool.acquire();
-                ns.xStart = x;
-                ns.height = h;
-                newSegs.push(ns);
+            // Emit, coalescing equal-height neighbours.
+            if (n === 0 || nHs[n - 1] !== h) {
+                nXs[n] = x;
+                nHs[n] = h;
+                n = n + 1;
             }
 
             x = nextX;
 
-            while (i < tLast && t[i + 1].xStart <= x) {
+            while (i < tLast && tXs[i + 1] <= x) {
                 i = i + 1;
             }
             if (aActive) {
-                while (ja < aLast && a[ja + 1].xStart + dx1 <= x) {
+                while (ja < aLast && aXs[ja + 1] + dx1 <= x) {
                     ja = ja + 1;
                 }
             }
             if (bActive) {
-                while (jb < bLast && b[jb + 1].xStart + dx2 <= x) {
+                while (jb < bLast && bXs[jb + 1] + dx2 <= x) {
                     jb = jb + 1;
                 }
             }
             if (cActive) {
-                while (jc < cLast && c[jc + 1].xStart + dx3 <= x) {
+                while (jc < cLast && cXs[jc + 1] + dx3 <= x) {
                     jc = jc + 1;
                 }
             }
         }
 
-        const sentinel: SkylineSegment = this._pool.acquire();
-        sentinel.xStart = xMax;
-        sentinel.height = 0;
-        newSegs.push(sentinel);
+        this._spliceFromScratch(firstKept, lo, hi, i, n);
+    }
 
-        while (this._segments.length > 0) {
-            const s: SkylineSegment = this._segments.pop()!;
-            this._pool.release(s);
+    /**
+     * Replaces the segments of `this` with the same segments as `other`.
+     * Both skylines must cover the same range.
+     */
+    public copyFrom(other: Skyline): void {
+        const count: number = other._count;
+        const xs: number[] = SkylineScratch.ensureCapacity(this._xStarts, 0, count);
+        const hs: number[] = SkylineScratch.ensureCapacity(this._heights, 0, count);
+        const oXs: number[] = other._xStarts;
+        const oHs: number[] = other._heights;
+        for (let k: number = 0; k < count; k = k + 1) {
+            xs[k] = oXs[k];
+            hs[k] = oHs[k];
         }
-        for (let k: number = 0; k < newSegs.length; k = k + 1) {
-            this._segments.push(newSegs[k]);
-        }
+        this._xStarts = xs;
+        this._heights = hs;
+        this._count = count;
     }
 
     public maxHeightInRange(xStart: number, xEnd: number): number {
@@ -423,8 +483,8 @@ export class Skyline {
 
     public maxHeight(): number {
         let best: number = 0;
-        for (let k: number = 0; k < this._segments.length - 1; k = k + 1) {
-            const h: number = this._segments[k].height;
+        for (let k: number = 0; k < this._count - 1; k = k + 1) {
+            const h: number = this._heights[k];
             if (h > best) {
                 best = h;
             }
@@ -433,22 +493,88 @@ export class Skyline {
     }
 
     public reset(): void {
-        while (this._segments.length > 0) {
-            const s: SkylineSegment = this._segments.pop()!;
-            this._pool.release(s);
-        }
         this._initBaseline();
     }
 
     private _initBaseline(): void {
-        const first: SkylineSegment = this._pool.acquire();
-        first.xStart = this.xMin;
-        first.height = 0;
-        this._segments.push(first);
-        const sentinel: SkylineSegment = this._pool.acquire();
-        sentinel.xStart = this.xMax;
-        sentinel.height = 0;
-        this._segments.push(sentinel);
+        this._xStarts[0] = this.xMin;
+        this._heights[0] = 0;
+        this._xStarts[1] = this.xMax;
+        this._heights[1] = 0;
+        this._count = 2;
+    }
+
+    /** The index of the non-sentinel segment containing `x` (`xMin <= x < xMax`). */
+    private _segmentIndexAt(x: number): number {
+        const xs: number[] = this._xStarts;
+        let lo: number = 0;
+        let hi: number = this._count - 2;
+        while (lo < hi) {
+            const mid: number = Math.floor((lo + hi + 1) / 2);
+            if (xs[mid] <= x) {
+                lo = mid;
+            } else {
+                hi = mid - 1;
+            }
+        }
+        return lo;
+    }
+
+    /**
+     * Replaces the segments over `[lo, hi)` with the `windowCount` merged pieces in the scratch
+     * buffers (the first one starting at `lo`) and keeps the segments outside the window.
+     * @param firstIndex The index of the segment containing `lo`.
+     * @param lastIndex The index of the segment containing `hi` (the sentinel when `hi` is `xMax`).
+     */
+    private _spliceFromScratch(
+        firstIndex: number,
+        lo: number,
+        hi: number,
+        lastIndex: number,
+        windowCount: number
+    ): void {
+        const scratch: SkylineScratch = this._scratch;
+        const nXs: number[] = scratch.xStarts;
+        const nHs: number[] = scratch.heights;
+        const tXs: number[] = this._xStarts;
+        const tHs: number[] = this._heights;
+        const tLast: number = this._count - 1;
+        let n: number = windowCount;
+
+        // the segments from hi on, coalesced with the last merged piece
+        let k: number = lastIndex;
+        if (k < tLast && tXs[k] < hi) {
+            if (nHs[n - 1] !== tHs[k]) {
+                nXs[n] = hi;
+                nHs[n] = tHs[k];
+                n = n + 1;
+            }
+            k = k + 1;
+        }
+        for (; k < tLast; k = k + 1) {
+            if (nHs[n - 1] !== tHs[k]) {
+                nXs[n] = tXs[k];
+                nHs[n] = tHs[k];
+                n = n + 1;
+            }
+        }
+        nXs[n] = this.xMax;
+        nHs[n] = 0;
+        n = n + 1;
+
+        // the segments starting before lo stay, coalesced with the first merged piece
+        const kept: number = tXs[firstIndex] < lo ? firstIndex + 1 : firstIndex;
+        const from: number = kept > 0 && nHs[0] === tHs[kept - 1] ? 1 : 0;
+        const count: number = kept + n - from;
+        const xs: number[] = SkylineScratch.ensureCapacity(tXs, kept, count);
+        const hs: number[] = SkylineScratch.ensureCapacity(tHs, kept, count);
+        for (let s: number = from; s < n; s = s + 1) {
+            xs[kept + s - from] = nXs[s];
+            hs[kept + s - from] = nHs[s];
+        }
+        this._xStarts = xs;
+        this._heights = hs;
+        this._count = count;
     }
 
     private _maxHeightInRange(xStart: number, xEnd: number): number {
@@ -457,17 +583,27 @@ export class Skyline {
         if (lo >= hi) {
             return 0;
         }
-        let best: number = 0;
-        for (let k: number = 0; k < this._segments.length - 1; k = k + 1) {
-            const segStart: number = this._segments[k].xStart;
-            const segEnd: number = this._segments[k + 1].xStart;
-            if (segEnd <= lo) {
-                continue;
+        const xs: number[] = this._xStarts;
+        const hs: number[] = this._heights;
+        const last: number = this._count - 1;
+        // Binary search for the last non-sentinel segment with xStart <= lo,
+        // which is the first segment ending beyond lo.
+        let first: number = 0;
+        let upper: number = last - 1;
+        while (first < upper) {
+            const mid: number = Math.floor((first + upper + 1) / 2);
+            if (xs[mid] <= lo) {
+                first = mid;
+            } else {
+                upper = mid - 1;
             }
-            if (segStart >= hi) {
+        }
+        let best: number = 0;
+        for (let k: number = first; k < last; k = k + 1) {
+            if (xs[k] >= hi) {
                 break;
             }
-            const h: number = this._segments[k].height;
+            const h: number = hs[k];
             if (h > best) {
                 best = h;
             }
@@ -486,41 +622,40 @@ export class Skyline {
         // never the `lo` index, so it is safe to keep `loIdx` afterwards.
         const loIdx: number = this._splitAt(lo);
         const hiIdx: number = this._splitAt(hi);
+        const xs: number[] = this._xStarts;
+        const hs: number[] = this._heights;
+        const count: number = this._count;
         // Raise heights over the half-open index range [loIdx, hiIdx).
         for (let i: number = loIdx; i < hiIdx; i = i + 1) {
-            if (this._segments[i].height < newHeight) {
-                this._segments[i].height = newHeight;
+            if (hs[i] < newHeight) {
+                hs[i] = newHeight;
             }
         }
-        // Merge only inside the touched window: any new same-height
-        // adjacency can only appear at the boundary with the left
-        // neighbour (loIdx-1 / loIdx), inside the raised range itself
-        // (segments that were already >= newHeight stay distinct from
-        // those that were raised to newHeight), or at the boundary with
-        // the right neighbour (hiIdx-1 / hiIdx). Segments outside this
-        // window are untouched and were already in canonical form.
+        // Merge equal-height neighbours inside the touched window only: new
+        // adjacencies can only appear at the boundary with the left neighbour
+        // (loIdx-1 / loIdx), inside the raised range, or at the boundary with
+        // the right neighbour (hiIdx-1 / hiIdx). Segments outside this window
+        // were already in canonical form. The sentinel is never merged away.
         const mergeLo: number = loIdx > 0 ? loIdx - 1 : 0;
-        // hiIdx is the index of the first segment AFTER the raised range.
-        // We must consider the adjacency between hiIdx-1 and hiIdx, so
-        // iterate up to and including hiIdx-1.
-        let mergeIdx: number = mergeLo;
-        let mergeEnd: number = hiIdx; // upper bound (inclusive) on left-of-pair index
-        // Cap `mergeEnd` so we never look past the last non-sentinel segment.
-        if (mergeEnd > this._segments.length - 2) {
-            mergeEnd = this._segments.length - 2;
+        let mergeHi: number = hiIdx + 1;
+        if (mergeHi > count - 2) {
+            mergeHi = count - 2;
         }
-        while (mergeIdx <= mergeEnd) {
-            if (
-                mergeIdx < this._segments.length - 2 &&
-                this._segments[mergeIdx].height === this._segments[mergeIdx + 1].height
-            ) {
-                const removed: SkylineSegment = this._segments.splice(mergeIdx + 1, 1)[0];
-                this._pool.release(removed);
-                mergeEnd = mergeEnd - 1;
-                // do not advance mergeIdx: re-check current index against the new neighbour
-            } else {
-                mergeIdx = mergeIdx + 1;
+        let kept: number = mergeLo;
+        for (let k: number = mergeLo + 1; k <= mergeHi; k = k + 1) {
+            if (hs[k] !== hs[kept]) {
+                kept = kept + 1;
+                xs[kept] = xs[k];
+                hs[kept] = hs[k];
             }
+        }
+        const removed: number = mergeHi - kept;
+        if (removed > 0) {
+            for (let k: number = mergeHi + 1; k < count; k = k + 1) {
+                xs[k - removed] = xs[k];
+                hs[k - removed] = hs[k];
+            }
+            this._count = count - removed;
         }
     }
 
@@ -528,35 +663,43 @@ export class Skyline {
      * Splits the skyline at `x` so that some segment afterwards has
      * `xStart === x`. Returns the index of that segment. If `x <= xMin`
      * the baseline (index 0) is returned. If `x >= xMax` the sentinel
-     * index (`_segments.length - 1`) is returned.
+     * index (`_count - 1`) is returned.
      */
     private _splitAt(x: number): number {
         if (x <= this.xMin) {
             return 0;
         }
+        const count: number = this._count;
         if (x >= this.xMax) {
-            return this._segments.length - 1;
+            return count - 1;
         }
-        // Binary search for the largest index k with segments[k].xStart <= x.
+        // Binary search for the largest index k with xStarts[k] <= x.
         // Segments are sorted strictly increasing by xStart.
         let lo: number = 0;
-        let hi: number = this._segments.length - 1;
+        let hi: number = count - 1;
         while (lo < hi) {
             const mid: number = Math.floor((lo + hi + 1) / 2);
-            if (this._segments[mid].xStart <= x) {
+            if (this._xStarts[mid] <= x) {
                 lo = mid;
             } else {
                 hi = mid - 1;
             }
         }
-        // Now segments[lo].xStart <= x < segments[lo+1].xStart.
-        if (this._segments[lo].xStart === x) {
+        // Now xStarts[lo] <= x < xStarts[lo+1].
+        if (this._xStarts[lo] === x) {
             return lo;
         }
-        const newSeg: SkylineSegment = this._pool.acquire();
-        newSeg.xStart = x;
-        newSeg.height = this._segments[lo].height;
-        this._segments.splice(lo + 1, 0, newSeg);
+        const xs: number[] = SkylineScratch.ensureCapacity(this._xStarts, count, count + 1);
+        const hs: number[] = SkylineScratch.ensureCapacity(this._heights, count, count + 1);
+        this._xStarts = xs;
+        this._heights = hs;
+        for (let k: number = count; k > lo + 1; k = k - 1) {
+            xs[k] = xs[k - 1];
+            hs[k] = hs[k - 1];
+        }
+        xs[lo + 1] = x;
+        hs[lo + 1] = hs[lo];
+        this._count = count + 1;
         return lo + 1;
     }
 }

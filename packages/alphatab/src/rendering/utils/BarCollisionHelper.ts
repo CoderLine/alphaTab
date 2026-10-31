@@ -4,30 +4,47 @@ import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper
 /**
  * @internal
  */
-export class ReservedLayoutAreaSlot {
-    public topY: number = 0;
-    public bottomY: number = 0;
-    public constructor(topY: number, bottomY: number) {
-        this.topY = topY;
-        this.bottomY = bottomY;
-    }
-}
-
-/**
- * @internal
- */
 export class ReservedLayoutArea {
     public beat: Beat;
     public topY: number = -1000;
     public bottomY: number = -1000;
-    public slots: ReservedLayoutAreaSlot[] = [];
+    /**
+     * The reserved slots in insertion order as interleaved pairs: `[top0, bottom0, top1, bottom1, ...]`.
+     */
+    public slots: number[] = [];
 
     public constructor(beat: Beat) {
         this.beat = beat;
     }
 
+    /**
+     * A copy of {@link slots} sorted by the top of the slots, keeping the insertion order of equal tops.
+     */
+    public getSlotsSortedByTop(): number[] {
+        const slots = this.slots;
+        const sorted = new Array<number>(slots.length);
+        for (let i = 0; i < slots.length; i += 2) {
+            const topY = slots[i];
+            const bottomY = slots[i + 1];
+            let j = i;
+            while (j > 0 && sorted[j - 2] > topY) {
+                sorted[j] = sorted[j - 2];
+                sorted[j + 1] = sorted[j - 1];
+                j -= 2;
+            }
+            sorted[j] = topY;
+            sorted[j + 1] = bottomY;
+        }
+        return sorted;
+    }
+
     public addSlot(topY: number, bottomY: number) {
-        this.slots.push(new ReservedLayoutAreaSlot(topY, bottomY));
+        if (this.slots.length === 0) {
+            this.slots = [topY, bottomY];
+        } else {
+            this.slots.push(topY);
+            this.slots.push(bottomY);
+        }
         if (this.topY === -1000) {
             this.topY = topY;
             this.bottomY = bottomY;
@@ -48,22 +65,26 @@ export class ReservedLayoutArea {
  * @internal
  */
 export class BarCollisionHelper {
-    public reservedLayoutAreasByDisplayTime: Map<number, ReservedLayoutArea> = new Map();
-    public restDurationsByDisplayTime: Map<number /*start*/, Map<number /*duration*/, number /*beat id*/>> = new Map();
+    public reservedLayoutAreasByDisplayTime: Map<number, ReservedLayoutArea> | null = null;
+    public restDurationsByDisplayTime: Map<number /*start*/, Map<number /*duration*/, number /*beat id*/>> | null =
+        null;
 
     public getBeatMinMaxY(): number[] {
         let minY = -1000;
         let maxY = -1000;
-        for (const v of this.reservedLayoutAreasByDisplayTime.values()) {
-            if (minY === -1000) {
-                minY = v.topY;
-                maxY = v.bottomY;
-            } else {
-                if (minY > v.topY) {
+        const reservedAreas = this.reservedLayoutAreasByDisplayTime;
+        if (reservedAreas) {
+            for (const v of reservedAreas.values()) {
+                if (minY === -1000) {
                     minY = v.topY;
-                }
-                if (maxY < v.bottomY) {
                     maxY = v.bottomY;
+                } else {
+                    if (minY > v.topY) {
+                        minY = v.topY;
+                    }
+                    if (maxY < v.bottomY) {
+                        maxY = v.bottomY;
+                    }
                 }
             }
         }
@@ -78,21 +99,31 @@ export class BarCollisionHelper {
         if (topY === bottomY) {
             return;
         }
-        if (!this.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
-            this.reservedLayoutAreasByDisplayTime.set(beat.displayStart, new ReservedLayoutArea(beat));
+        let reservedAreas = this.reservedLayoutAreasByDisplayTime;
+        if (!reservedAreas) {
+            reservedAreas = new Map<number, ReservedLayoutArea>();
+            this.reservedLayoutAreasByDisplayTime = reservedAreas;
         }
-        this.reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.addSlot(topY, bottomY);
+        if (!reservedAreas.has(beat.displayStart)) {
+            reservedAreas.set(beat.displayStart, new ReservedLayoutArea(beat));
+        }
+        reservedAreas.get(beat.displayStart)!.addSlot(topY, bottomY);
         if (beat.isRest) {
             this.registerRest(beat);
         }
     }
 
     public registerRest(beat: Beat) {
-        if (!this.restDurationsByDisplayTime.has(beat.displayStart)) {
-            this.restDurationsByDisplayTime.set(beat.displayStart, new Map<number, number>());
+        let restDurations = this.restDurationsByDisplayTime;
+        if (!restDurations) {
+            restDurations = new Map<number, Map<number, number>>();
+            this.restDurationsByDisplayTime = restDurations;
         }
-        if (!this.restDurationsByDisplayTime.get(beat.displayStart)!.has(beat.playbackDuration)) {
-            this.restDurationsByDisplayTime.get(beat.displayStart)!.set(beat.playbackDuration, beat.id);
+        if (!restDurations.has(beat.displayStart)) {
+            restDurations.set(beat.displayStart, new Map<number, number>());
+        }
+        if (!restDurations.get(beat.displayStart)!.has(beat.playbackDuration)) {
+            restDurations.get(beat.displayStart)!.set(beat.playbackDuration, beat.id);
         }
     }
 
@@ -105,7 +136,8 @@ export class BarCollisionHelper {
             // on the horizontal axis. So we only need to check for collisions
             // of elements at the current time position
             // if there are none, we can just use the line
-            if (this.reservedLayoutAreasByDisplayTime.has(beat.playbackStart)) {
+            const reservedAreas = this.reservedLayoutAreasByDisplayTime;
+            if (reservedAreas !== null && reservedAreas.has(beat.playbackStart)) {
                 // do check for collisions we need to obtain the range on which the
                 // restglyph is placed
                 // rest glyphs have their ancor
@@ -114,12 +146,15 @@ export class BarCollisionHelper {
                 const oldRestBottomY = currentY + restSizes[1];
                 let newRestTopY = oldRestTopY;
 
-                const reservedSlots = this.reservedLayoutAreasByDisplayTime.get(beat.playbackStart)!;
+                const reservedSlots = reservedAreas.get(beat.playbackStart)!;
+                const slots = reservedSlots.slots;
                 let hasCollision = false;
-                for (const slot of reservedSlots.slots) {
+                for (let i = 0; i < slots.length; i += 2) {
+                    const slotTopY = slots[i];
+                    const slotBottomY = slots[i + 1];
                     if (
-                        (oldRestTopY >= slot.topY && oldRestTopY <= slot.bottomY) ||
-                        (oldRestBottomY >= slot.topY && oldRestBottomY <= slot.bottomY)
+                        (oldRestTopY >= slotTopY && oldRestTopY <= slotBottomY) ||
+                        (oldRestBottomY >= slotTopY && oldRestBottomY <= slotBottomY)
                     ) {
                         hasCollision = true;
                         break;

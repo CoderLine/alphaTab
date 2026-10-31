@@ -96,10 +96,8 @@ function createEffectSlurLabelEffectInfo(
         // all bars of the system have their final positions here, labels can be centered
         // towards beats in later bars before the band is placed vertically.
         finalizeBand: (band: EffectBand): void => {
-            for (const voiceGlyphs of band.glyphsByVoice) {
-                for (const g of voiceGlyphs) {
-                    (g as EffectSlurLabelGlyph).resolveOffset();
-                }
+            for (const g of band.glyphs) {
+                (g as EffectSlurLabelGlyph).resolveOffset();
             }
             band.invalidateXRange();
         }

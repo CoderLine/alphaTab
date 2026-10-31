@@ -25,7 +25,8 @@ import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { ElementStyle } from '@coderline/alphatab/model/ElementStyle';
-import { JsonHelper } from '@coderline/alphatab/io/JsonHelper';
+import type { IObjectReader } from '@coderline/alphatab/io/IObjectReader';
+import type { IObjectWriter } from '@coderline/alphatab/io/IObjectWriter';
 import type { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 
 /**
@@ -992,7 +993,7 @@ export class Note {
                         }
                     }
                 } else {
-                    Logger.warning('Model', 'Unsupported bend type detected, fallback to custom', null);
+                    Logger.warning('Model', 'Unsupported bend type detected, fallback to custom');
                 }
             } else if (points!.length === 3) {
                 const origin: BendPoint = points[0];
@@ -1160,8 +1161,6 @@ export class Note {
 
     private static _noteIdLookupKey = 'NoteIdLookup';
 
-    private static readonly _legacyUnsetKeys = ['fret', 'string', 'octave', 'tone', 'percussionarticulation'];
-
     private _noteIdBag: NoteIdBag | null = null;
     public chain(sharedDataBag: Map<string, unknown> | null = null) {
         // mainly for backwards compat in case we reach this code from somewhere outside.
@@ -1238,45 +1237,56 @@ export class Note {
     /**
      * @internal
      */
-    public toJson(o: Map<string, unknown>) {
+    public toJson(w: IObjectWriter) {
         // inject linked note ids into JSON
         if (this.tieDestination !== null) {
-            o.set('tiedestinationnoteid', this.tieDestination.id);
+            w.prop('tiedestinationnoteid');
+            w.writeNumber(this.tieDestination.id);
         }
         if (this.tieOrigin !== null) {
-            o.set('tieoriginnoteid', this.tieOrigin.id);
+            w.prop('tieoriginnoteid');
+            w.writeNumber(this.tieOrigin.id);
         }
         if (this.slurDestination !== null) {
-            o.set('slurdestinationnoteid', this.slurDestination.id);
+            w.prop('slurdestinationnoteid');
+            w.writeNumber(this.slurDestination.id);
         }
         if (this.slurOrigin !== null) {
-            o.set('sluroriginnoteid', this.slurOrigin.id);
+            w.prop('sluroriginnoteid');
+            w.writeNumber(this.slurOrigin.id);
         }
         if (this.hammerPullOrigin !== null) {
-            o.set('hammerpulloriginnoteid', this.hammerPullOrigin.id);
+            w.prop('hammerpulloriginnoteid');
+            w.writeNumber(this.hammerPullOrigin.id);
         }
         if (this.hammerPullDestination !== null) {
-            o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
+            w.prop('hammerpulldestinationnoteid');
+            w.writeNumber(this.hammerPullDestination.id);
         }
-
         if (this.slideTarget !== null) {
-            o.set('slidetargetnoteid', this.slideTarget.id);
+            w.prop('slidetargetnoteid');
+            w.writeNumber(this.slideTarget.id);
         }
         if (this.slideOrigin !== null) {
-            o.set('slideoriginnoteid', this.slideOrigin.id);
+            w.prop('slideoriginnoteid');
+            w.writeNumber(this.slideOrigin.id);
         }
     }
 
     /**
      * @internal
      */
-    public afterFromJson(m: unknown) {
-        // 1.8 and earlier write all of these keys with -1 for unset values, later versions omit unset values
-        for (const key of Note._legacyUnsetKeys) {
-            const v = JsonHelper.getValue(m, key);
-            if (v === null || v === undefined) {
-                return;
-            }
+    public afterFromJson() {
+        // 1.8 and earlier write all of these with -1 for unset values, later versions omit unset values,
+        // which are read as NaN
+        if (
+            Number.isNaN(this.fret) ||
+            Number.isNaN(this.string) ||
+            Number.isNaN(this.octave) ||
+            Number.isNaN(this.tone) ||
+            Number.isNaN(this.percussionArticulation)
+        ) {
+            return;
         }
 
         if (this.string === -1) {
@@ -1299,57 +1309,57 @@ export class Note {
     /**
      * @internal
      */
-    public setProperty(property: string, v: unknown): boolean {
+    public setProperty(property: string, r: IObjectReader): boolean {
         switch (property) {
             case 'tiedestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.tieDestinationNoteId = v as number;
+                this._noteIdBag.tieDestinationNoteId = r.readNumber();
                 return true;
             case 'tieoriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.tieOriginNoteId = v as number;
+                this._noteIdBag.tieOriginNoteId = r.readNumber();
                 return true;
 
             case 'slurdestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slurDestinationNoteId = v as number;
+                this._noteIdBag.slurDestinationNoteId = r.readNumber();
                 return true;
             case 'sluroriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slurOriginNoteId = v as number;
+                this._noteIdBag.slurOriginNoteId = r.readNumber();
                 return true;
 
             case 'hammerpulloriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.hammerPullOriginNoteId = v as number;
+                this._noteIdBag.hammerPullOriginNoteId = r.readNumber();
                 return true;
             case 'hammerpulldestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.hammerPullDestinationNoteId = v as number;
+                this._noteIdBag.hammerPullDestinationNoteId = r.readNumber();
                 return true;
             case 'slidetargetnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slideTargetNoteId = v as number;
+                this._noteIdBag.slideTargetNoteId = r.readNumber();
                 return true;
             case 'slideoriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
-                this._noteIdBag.slideOriginNoteId = v as number;
+                this._noteIdBag.slideOriginNoteId = r.readNumber();
                 return true;
         }
         return false;

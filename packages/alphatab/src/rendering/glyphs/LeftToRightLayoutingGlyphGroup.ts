@@ -1,6 +1,6 @@
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
-import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 
 /**
  * @internal
@@ -10,7 +10,6 @@ export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
 
     public constructor() {
         super(0, 0);
-        this.glyphs = [];
     }
 
     public override doLayout(): void {
@@ -25,7 +24,7 @@ export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
         super.addGlyph(g);
     }
 
-    public override registerHeaderRod(info: BarLayoutingInfo): void {
+    public override registerHeaderRod(info: IHeaderRodSink): void {
         const glyphs = this.glyphs;
         if (glyphs) {
             for (const g of glyphs) {
@@ -34,7 +33,7 @@ export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
         }
     }
 
-    public override applyHeaderRod(info: BarLayoutingInfo): void {
+    public override applyHeaderRod(info: IHeaderRodSink): void {
         const glyphs = this.glyphs;
         if (glyphs) {
             for (const g of glyphs) {

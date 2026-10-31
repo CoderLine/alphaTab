@@ -219,6 +219,7 @@ export class ScoreStyle extends ElementStyle<ScoreSubElement> {
  * model. It stores the basic information of
  * a song and stores the sub components.
  * @json
+ * @json_root
  * @json_strict
  * @public
  */

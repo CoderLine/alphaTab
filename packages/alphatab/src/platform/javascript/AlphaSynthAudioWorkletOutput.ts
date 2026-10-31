@@ -9,6 +9,7 @@ import type {
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { SynthConstants } from '@coderline/alphatab/synth/SynthConstants';
 import { CircularSampleBuffer } from '@coderline/alphatab/synth/ds/CircularSampleBuffer';
+import { PlayedFramesAccumulator } from '@coderline/alphatab/synth/ds/PlayedFramesAccumulator';
 
 /**
  * @target web
@@ -79,6 +80,7 @@ export class AlphaSynthWebWorklet {
                 private _bufferCount: number = 0;
                 private _requestedBufferCount: number = 0;
                 private _isStopped = false;
+                private _playedFrames: PlayedFramesAccumulator;
 
                 constructor(options: AudioWorkletNodeOptions) {
                     super(options);
@@ -92,6 +94,11 @@ export class AlphaSynthWebWorklet {
                     );
                     this._circularBuffer = new CircularSampleBuffer(
                         AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
+                    );
+                    this._playedFrames = new PlayedFramesAccumulator(
+                        Math.round(
+                            ((options.processorOptions.positionUpdateIntervalInMilliseconds ?? 0) * sampleRate) / 1000
+                        )
                     );
 
                     this.port.addEventListener('message', e => this._handleMessage(e));
@@ -108,11 +115,21 @@ export class AlphaSynthWebWorklet {
                             this._requestedBufferCount--;
                             break;
                         case 'alphaSynth.output.resetSamples':
+                            this._reportPlayedFrames(this._playedFrames.flush());
                             this._circularBuffer.clear();
                             break;
                         case 'alphaSynth.output.stop':
                             this._isStopped = true;
                             break;
+                    }
+                }
+
+                private _reportPlayedFrames(frames: number) {
+                    if (frames > 0) {
+                        this.port.postMessage({
+                            cmd: 'alphaSynth.output.samplesPlayed',
+                            samples: frames
+                        });
                     }
                 }
 
@@ -157,10 +174,16 @@ export class AlphaSynthWebWorklet {
                         }
                     }
 
-                    this.port.postMessage({
-                        cmd: 'alphaSynth.output.samplesPlayed',
-                        samples: samplesFromBuffer / SynthConstants.AudioChannels
-                    });
+                    const playedFrames = this._playedFrames.add(
+                        left.length,
+                        samplesFromBuffer / SynthConstants.AudioChannels
+                    );
+                    if (playedFrames !== PlayedFramesAccumulator.NothingToReport) {
+                        this.port.postMessage({
+                            cmd: 'alphaSynth.output.samplesPlayed',
+                            samples: playedFrames
+                        });
+                    }
                     this._requestBuffers();
 
                     return this._circularBuffer.count > 0 || !this._isStopped;
@@ -291,7 +314,8 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
             numberOfOutputs: 1,
             outputChannelCount: [2],
             processorOptions: {
-                bufferTimeInMilliseconds: this._bufferTimeInMilliseconds
+                bufferTimeInMilliseconds: this._bufferTimeInMilliseconds,
+                positionUpdateIntervalInMilliseconds: this._settings.player.positionUpdateIntervalInMilliseconds
             }
         }) as AudioWorkletNode<IAlphaSynthWorkerMessage>;
         this._worklet = worklet;

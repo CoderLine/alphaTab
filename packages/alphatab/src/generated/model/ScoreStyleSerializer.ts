@@ -4,59 +4,66 @@
 // the code is regenerated.
 // </auto-generated>
 import { ScoreStyle } from "@coderline/alphatab/model/Score";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { HeaderFooterStyleSerializer } from "@coderline/alphatab/generated/model/HeaderFooterStyleSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ScoreSubElement } from "@coderline/alphatab/model/Score";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { HeaderFooterStyle } from "@coderline/alphatab/model/Score";
+import { HeaderFooterStyleSerializer } from "@coderline/alphatab/generated/model/HeaderFooterStyleSerializer";
 import { Color } from "@coderline/alphatab/model/Color";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class ScoreStyleSerializer {
-    public static fromJson(obj: ScoreStyle, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["headerandfooter", "colors"]);
+    public static read(obj: ScoreStyle, reader: IObjectReader): void {
+        reader.readRecord(ScoreStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    ScoreStyleSerializer._readHeaderAndFooter(obj, r);
+                    return true;
+                case 1:
+                    ScoreStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
+    }
+    private static _readHeaderAndFooter(obj: ScoreStyle, r: IObjectReader): void {
+        obj.headerAndFooter = new Map<ScoreSubElement, HeaderFooterStyle>();
+        r.readObject((k, rr) => {
+            const i = new HeaderFooterStyle();
+            HeaderFooterStyleSerializer.read(i, rr);
+            obj.headerAndFooter.set(JsonHelper.parseEnum<ScoreSubElement>(k, ScoreSubElement)!, i);
+            return true;
+        });
+    }
+    private static _readColors(obj: ScoreStyle, r: IObjectReader): void {
+        obj.colors = new Map<ScoreSubElement, Color | null>();
+        r.readObject((k, rr) => {
+            obj.colors.set(JsonHelper.parseEnum<ScoreSubElement>(k, ScoreSubElement)!, Color.fromJson(rr.readValue()));
+            return true;
+        });
+    }
+    public static write(obj: ScoreStyle | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => ScoreStyleSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: ScoreStyle | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
+        w.startObject(ScoreStyleSerializer._fields);
+        w.mapField(0);
+        for (const [k, v] of obj.headerAndFooter!) {
+            w.prop(k.toString());
+            HeaderFooterStyleSerializer.write(v, w);
         }
-        const o = new Map<string, unknown>();
-        {
-            const m = new Map<string, unknown>();
-            o.set("headerandfooter", m);
-            for (const [k, v] of obj.headerAndFooter!) {
-                m.set(k.toString(), HeaderFooterStyleSerializer.toJson(v));
-            }
+        w.endMap();
+        w.mapField(1);
+        for (const [k, v] of obj.colors!) {
+            w.prop(k.toString());
+            w.writeValue(Color.toJson(v));
         }
-        {
-            const m = new Map<string, unknown>();
-            o.set("colors", m);
-            for (const [k, v] of obj.colors!) {
-                m.set(k.toString(), Color.toJson(v));
-            }
-        }
-        return o;
-    }
-    public static setProperty(obj: ScoreStyle, property: string, v: unknown): boolean {
-        switch (property) {
-            case "headerandfooter":
-                obj.headerAndFooter = new Map<ScoreSubElement, HeaderFooterStyle>();
-                JsonHelper.forEach(v, (v, k) => {
-                    const i = new HeaderFooterStyle();
-                    HeaderFooterStyleSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.headerAndFooter.set(JsonHelper.parseEnum<ScoreSubElement>(k, ScoreSubElement)!, i);
-                });
-                return true;
-            case "colors":
-                obj.colors = new Map<ScoreSubElement, Color | null>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.colors.set(JsonHelper.parseEnum<ScoreSubElement>(k, ScoreSubElement)!, Color.fromJson(v));
-                });
-                return true;
-        }
-        return false;
+        w.endMap();
+        w.endObject();
     }
 }

@@ -4,59 +4,94 @@
 // the code is regenerated.
 // </auto-generated>
 import { SlashBarOverride } from "@coderline/alphatab/model/BarOverrides";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ElementDisplaySerializer } from "@coderline/alphatab/generated/model/ElementDisplaySerializer";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class SlashBarOverrideSerializer {
-    public static fromJson(obj: SlashBarOverride, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => SlashBarOverrideSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["keysignature", "timesignature", "barnumber"]);
+    public static read(obj: SlashBarOverride, reader: IObjectReader): void {
+        reader.readRecord(SlashBarOverrideSerializer._fields, (id, k, rr) => SlashBarOverrideSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: SlashBarOverride | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        if (obj.keySignature) {
-            o.set("keysignature", ElementDisplaySerializer.toJson(obj.keySignature));
-        }
-        if (obj.timeSignature) {
-            o.set("timesignature", ElementDisplaySerializer.toJson(obj.timeSignature));
-        }
-        o.set("barnumber", obj.barNumber as number | undefined);
-        return o;
+    public static readProperty(obj: SlashBarOverride, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = SlashBarOverrideSerializer._fields.idOf(property);
+        return id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: SlashBarOverride, property: string, v: unknown): boolean {
-        switch (property) {
-            case "barnumber":
-                obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay);
+    private static _readField(obj: SlashBarOverride, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                if (r.isNullish()) {
+                    obj.keySignature = undefined;
+                }
+                else {
+                    obj.keySignature = {};
+                    ElementDisplaySerializer.read(obj.keySignature, r);
+                }
+                return true;
+            case 1:
+                if (r.isNullish()) {
+                    obj.timeSignature = undefined;
+                }
+                else {
+                    obj.timeSignature = {};
+                    ElementDisplaySerializer.read(obj.timeSignature, r);
+                }
+                return true;
+            case 2:
+                obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
         }
+        return false;
+    }
+    public static readFlexible(obj: SlashBarOverride, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? SlashBarOverrideSerializer._readField(obj, id, rr, false) : SlashBarOverrideSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: SlashBarOverride, property: string, r: IObjectReader): boolean {
+        if (["keysignature", "timesignature"].indexOf(property) < 0 && SlashBarOverrideSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
         if (["keysignature"].indexOf(property) >= 0) {
-            if (v) {
-                obj.keySignature = {};
-                ElementDisplaySerializer.fromJson(obj.keySignature, v as Map<string, unknown>);
+            if (r.isNullish()) {
+                obj.keySignature = undefined;
             }
             else {
-                obj.keySignature = undefined;
+                obj.keySignature = {};
+                ElementDisplaySerializer.readFlexible(obj.keySignature, r);
             }
             return true;
         }
         if (["timesignature"].indexOf(property) >= 0) {
-            if (v) {
-                obj.timeSignature = {};
-                ElementDisplaySerializer.fromJson(obj.timeSignature, v as Map<string, unknown>);
+            if (r.isNullish()) {
+                obj.timeSignature = undefined;
             }
             else {
-                obj.timeSignature = undefined;
+                obj.timeSignature = {};
+                ElementDisplaySerializer.readFlexible(obj.timeSignature, r);
             }
             return true;
         }
         return false;
+    }
+    public static write(obj: SlashBarOverride | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(SlashBarOverrideSerializer._fields);
+        if (obj.keySignature) {
+            w.field(0);
+            ElementDisplaySerializer.write(obj.keySignature, w);
+        }
+        if (obj.timeSignature) {
+            w.field(1);
+            ElementDisplaySerializer.write(obj.timeSignature, w);
+        }
+        w.valueField(2, obj.barNumber as number | undefined);
+        w.endObject();
     }
 }

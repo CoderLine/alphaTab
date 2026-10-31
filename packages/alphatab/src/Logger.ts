@@ -48,6 +48,29 @@ export class Logger {
         return Logger.logLevel !== LogLevel.None && level >= Logger.logLevel;
     }
 
+    /**
+     * Whether trace messages are currently written.
+     * @remarks
+     * The library build removes `if (Logger.isTraceEnabled) { ... }` statements together with all
+     * {@link Logger.trace} calls, so the guarded code must only serve the trace output.
+     * @internal
+     */
+    public static get isTraceEnabled(): boolean {
+        return Logger._shouldLog(LogLevel.Trace);
+    }
+
+    /**
+     * Writes a trace message through {@link ILogger.debug}.
+     * @remarks
+     * The published JavaScript files do not contain the calls made by alphaTab itself.
+     * @since 1.9.0
+     */
+    public static trace(category: string, msg: string, ...details: unknown[]): void {
+        if (Logger._shouldLog(LogLevel.Trace)) {
+            Logger.log.debug(category, msg, ...details);
+        }
+    }
+
     public static debug(category: string, msg: string, ...details: unknown[]): void {
         if (Logger._shouldLog(LogLevel.Debug)) {
             Logger.log.debug(category, msg, ...details);

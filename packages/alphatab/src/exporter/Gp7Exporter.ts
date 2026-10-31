@@ -24,14 +24,14 @@ export class Gp7Exporter extends ScoreExporter {
         // during export. We work on a copy to keep the input score untouched.
         score = Gp7Exporter._cloneScore(score, this.settings);
 
-        Logger.debug(this.name, 'Writing data entries');
+        Logger.trace(this.name, 'Writing data entries');
         const gpifWriter: GpifWriter = new GpifWriter();
         const gpifXml = gpifWriter.writeXml(score);
         const binaryStylesheet = BinaryStylesheet.writeForScore(score);
         const partConfiguration = PartConfiguration.writeForScore(score);
         const layoutConfiguration = LayoutConfiguration.writeForScore(score);
 
-        Logger.debug(this.name, 'Writing ZIP entries');
+        Logger.trace(this.name, 'Writing ZIP entries');
         const fileSystem: ZipWriter = new ZipWriter(this.data);
         fileSystem.writeEntry(new ZipEntry('VERSION', IOHelper.stringToBytes('7.0')));
         fileSystem.writeEntry(new ZipEntry('Content/', new Uint8Array(0)));

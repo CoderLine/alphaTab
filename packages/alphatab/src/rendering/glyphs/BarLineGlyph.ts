@@ -5,7 +5,7 @@ import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/gl
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 
 /**
  * @internal
@@ -193,6 +193,15 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
     private _isRight: boolean;
     private _extendToNextStaff: boolean;
 
+    /**
+     * Whether the barline is a single regular light line painted by this glyph itself instead of a child glyph,
+     * placed at {@link _lineX}/{@link _lineY} with {@link _lineHeight}.
+     */
+    private _isSingleLightLine = false;
+    private _lineX = 0;
+    private _lineY = 0;
+    private _lineHeight = 0;
+
     public constructor(isRight: boolean, extendToNextStaff: boolean) {
         super();
         this._isRight = isRight;
@@ -286,7 +295,11 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             case BarLineStyle.Regular:
                 // use previous light bar
                 if (previousLineType !== BarLineStyle.HeavyLight && previousLineType !== BarLineStyle.LightLight) {
-                    this.addGlyph(new BarLineLightGlyph(0, 0, isRepeatHeavy));
+                    if (this.isEmpty && !(!this._isRight && masterBar.isRepeatStart)) {
+                        this._addSingleLightLine(isRepeatHeavy);
+                    } else {
+                        this.addGlyph(new BarLineLightGlyph(0, 0, isRepeatHeavy));
+                    }
                 }
                 break;
             case BarLineStyle.Short:
@@ -333,20 +346,51 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             this.width = fullWidth;
         }
 
-        for (const g of this.glyphs!) {
-            g.y = top;
-            g.x += xShift;
-            g.height = h;
+        if (this._isSingleLightLine) {
+            this._lineY = top;
+            this._lineX += xShift;
+            this._lineHeight = h;
+        }
+        const glyphs = this.glyphs;
+        if (glyphs) {
+            for (const g of glyphs) {
+                g.y = top;
+                g.x += xShift;
+                g.height = h;
+            }
         }
     }
 
-    public override registerHeaderRod(info: BarLayoutingInfo): void {
+    /**
+     * Lays out the line like {@link addGlyph} would lay out a {@link BarLineLightGlyph}.
+     */
+    private _addSingleLightLine(isRepeat: boolean) {
+        const metrics = this.renderer.smuflMetrics;
+        this._isSingleLightLine = true;
+        this._lineX = this.width;
+        const lineWidth = isRepeat ? metrics.repeatEndingLineThickness : metrics.thinBarlineThickness;
+        this.width = this._lineX + lineWidth + this.gap;
+    }
+
+    public override get isEmpty(): boolean {
+        return !this._isSingleLightLine && super.isEmpty;
+    }
+
+    public override getBoundingBoxTop(): number {
+        return this._isSingleLightLine ? this._lineY : super.getBoundingBoxTop();
+    }
+
+    public override getBoundingBoxBottom(): number {
+        return this._isSingleLightLine ? this._lineY + this._lineHeight : super.getBoundingBoxBottom();
+    }
+
+    public override registerHeaderRod(info: IHeaderRodSink): void {
         if (!this._isRight) {
-            info.addHeaderRod(BarLineGlyph.HeaderRank, 0, this.width);
+            info.addHeaderRod(BarLineGlyph.HeaderRank, 0, this.width, 0);
         }
     }
 
-    public override applyHeaderRod(info: BarLayoutingInfo): void {
+    public override applyHeaderRod(info: IHeaderRodSink): void {
         if (!this._isRight) {
             this.x = info.getHeaderRodX(BarLineGlyph.HeaderRank, 0);
         }
@@ -354,33 +398,50 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const lines = this.glyphs;
-        if (!lines) {
+        if (!lines && !this._isSingleLightLine) {
             return;
         }
 
         const renderer = this.renderer as LineBarRenderer;
-        using _ = ElementStyleHelper.bar(canvas, renderer.barLineBarSubElement, this.renderer.bar, true);
-
-        // extending across systems needs some more dynamic lookup, we do that during drawing
-        // as during layout things are still moving
-        let actualLineHeight = this.height;
-        const thisStaff = renderer.staff!;
-        const allStaves = thisStaff.system.allStaves;
-        let isExtended = false;
-        if (this._extendToNextStaff && thisStaff.index < allStaves.length - 1) {
-            const nextStaff = allStaves[thisStaff.index + 1];
-            const lineTop = thisStaff.y + renderer.y;
-            const lineBottom = nextStaff.y + nextStaff.topOverflow + renderer.smuflMetrics.staffLineThickness;
-            actualLineHeight = lineBottom - lineTop;
-            isExtended = true;
-        }
-
-        for (const line of lines) {
-            if (isExtended) {
-                (line as BarLineGlyphBase).paintExtended(cx, cy, canvas, actualLineHeight);
-            } else {
-                (line as BarLineGlyphBase).paint(cx, cy, canvas);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            renderer.barLineBarSubElement,
+            this.renderer.bar,
+            true
+        );
+        try {
+            // extending across systems needs some more dynamic lookup, we do that during drawing
+            // as during layout things are still moving
+            let actualLineHeight = this.height;
+            const thisStaff = renderer.staff!;
+            const allStaves = thisStaff.system.allStaves;
+            let isExtended = false;
+            if (this._extendToNextStaff && thisStaff.index < allStaves.length - 1) {
+                const nextStaff = allStaves[thisStaff.index + 1];
+                const lineTop = thisStaff.y + renderer.y;
+                const lineBottom = nextStaff.y + nextStaff.topOverflow + renderer.smuflMetrics.staffLineThickness;
+                actualLineHeight = lineBottom - lineTop;
+                isExtended = true;
             }
+
+            if (this._isSingleLightLine) {
+                canvas.fillRect(
+                    cx + this._lineX,
+                    cy + this._lineY,
+                    renderer.smuflMetrics.thinBarlineThickness,
+                    isExtended ? actualLineHeight : this._lineHeight
+                );
+            } else {
+                for (const line of lines!) {
+                    if (isExtended) {
+                        (line as BarLineGlyphBase).paintExtended(cx, cy, canvas, actualLineHeight);
+                    } else {
+                        (line as BarLineGlyphBase).paint(cx, cy, canvas);
+                    }
+                }
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 }

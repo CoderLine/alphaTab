@@ -18,11 +18,10 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
 import java.text.DecimalFormat
-import java.text.NumberFormat
-import java.util.Locale
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.truncate
 
 @ExperimentalUnsignedTypes
 internal inline fun UByteArray.decodeToFloatArray(): FloatArray {
@@ -228,34 +227,25 @@ internal inline fun Int?.toDouble(): Double? {
     return this?.toDouble()
 }
 
+/**
+ * Parses a decimal number with optional sign, fraction and exponent, locale-independent, with optional
+ * surrounding whitespace. Unlike ECMAScript, text with trailing characters is NaN.
+ */
 internal inline fun String.toDoubleOrNaN(): Double {
-    try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
-        if (number != null) {
-            return number.toDouble()
-        }
-    } catch (e: Throwable) {
-    }
-    return Double.NaN
+    return this.toDoubleOrNull() ?: Double.NaN
 }
 
-internal fun String.toIntOrNaN(): Double {
-    try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
-        if (number != null) {
-            return number.toInt().toDouble()
-        }
-    } catch (e: Throwable) {
-    }
-    return Double.NaN
-}
-
+/**
+ * Parses an integer in radix 10 (also for radix 0) or 16, locale-independent, with optional surrounding
+ * whitespace. In radix 10 the text is read like [toDoubleOrNaN] and truncated towards zero
+ * (`"3.5"` gives 3, `"-0.5"` gives -0). Unlike ECMAScript, text with trailing characters is NaN.
+ */
 internal fun String.toIntOrNaN(radix: Double): Double {
-    try {
-        return Integer.parseInt(this.trim(), radix.toInt()).toDouble();
-    } catch (e: Throwable) {
+    return when (radix) {
+        0.0, 10.0 -> truncate(this.toDoubleOrNaN())
+        16.0 -> this.trim().toULongOrNull(16)?.toDouble() ?: Double.NaN
+        else -> throw IllegalArgumentException("Radix $radix is not supported")
     }
-    return Double.NaN
 }
 
 

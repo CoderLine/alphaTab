@@ -122,4 +122,28 @@ describe('SpecialTracksTests', () => {
             }
         );
     })
+
+    it('numbered-whole-rests', async () => {
+        const rests =
+            '\\ts (4 4) r.1 | \\ts (8 4) r.1 r.1 | \\ts (6 4) r.1 C4.2 | C4.2 r.1 | \\ts (8 4) r.1 {tu 3} * 3';
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\track "Num"
+            \\staff {numbered}
+                ${rests}
+
+            \\track "Std & Num"
+            \\staff {score numbered}
+                \\voice
+                    ${rests}
+                \\voice
+                    C5.4 D5 E5 F5 | C5.2 D5 E5 F5
+            `,
+            'test-data/visual-tests/special-tracks/numbered-whole-rests.png',
+            undefined,
+            o => {
+                o.tracks = o.score.tracks.map(t => t.index);
+            }
+        );
+    });
 });

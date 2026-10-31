@@ -13,12 +13,13 @@ import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
  *
  * Two axes of behaviour are covered:
  *
- *  - **System-wide minimum-duration reference.** The Gourlay stretch formula uses the
- *    shortest note of the entire system (not of each bar) so that rhythmically-equivalent
- *    beats across bars of the same system receive spring constants derived from the same
- *    reference. The `shared-min-duration-*` tests exercise this end-to-end: the core fix,
- *    both positions of the shorter note during system assembly, multiple successive
- *    shortenings, per-system isolation, mode-specific variants and the resize path.
+ *  - **Shared minimum-duration reference.** In page and parchment layouts the Gourlay
+ *    stretch formula uses the shortest note of all rendered bars (not of each bar) so that
+ *    rhythmically-equivalent beats receive spring constants derived from the same
+ *    reference. The `shared-min-duration-*` tests exercise this end-to-end: the shorter
+ *    note before and after the other bars, several short durations, systems without short
+ *    notes, mode-specific variants and the resize path. Horizontal layout keeps a
+ *    reference per bar.
  *
  *  - **Stretch-formula duration scaling.** The Gourlay log-scale formula produces spacing
  *    that grows with note duration. `stretch-formula-*` tests pin the current coefficient
@@ -62,8 +63,8 @@ describe('SystemSpacingTests', () => {
 
     it('shared-min-duration-reconciles-on-resize', async () => {
         // Same score content as the alignment test, rendered at a narrower width so that
-        // the reconcile path runs under a tighter fit (distributable share smaller, force
-        // differs from the wider case). Guards the reconcile-on-fit path when a system is
+        // the shared reference is applied under a tighter fit (distributable share smaller, force
+        // differs from the wider case). Guards the shared reference when a system is
         // re-sized after layout.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
@@ -85,13 +86,9 @@ describe('SystemSpacingTests', () => {
     });
 
     it('shared-min-duration-shorter-note-first', async () => {
-        // Bar 1 already carries the system's shortest note (128th triplet). Bars 2 and 3
-        // hold only quarters, so their bar-local minimum falls back to the default. When
-        // each subsequent bar is added, the system's existing minimum is already lower
-        // than the bar's local one, so the system minimum does not move and no reconcile
-        // is flagged; instead, each newly-added bar has its spring constants recomputed
-        // immediately so it references the system minimum. This exercises the
-        // "eager-recompute-on-add" branch of `_trackSystemMinDuration`.
+        // Bar 1 carries the shortest note (128th triplet). Bars 2 and 3 hold only quarters;
+        // they are spaced against the same reference as bar 1, so the quarters of all three
+        // bars line up.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
@@ -108,11 +105,9 @@ describe('SystemSpacingTests', () => {
     });
 
     it('shared-min-duration-multiple-short-arrivals', async () => {
-        // Successive shortenings of the system minimum: bar 2 introduces a 128th triplet
-        // rest (20 ticks per rest), bar 4 introduces 256th rests (15 ticks each). When
-        // bar 2 is added the reconcile flag is set for bar 1; when bar 4 is added the
-        // flag is re-asserted for bars 1-3. A single reconcile pass at fit time must
-        // re-derive all stale bars in one iteration, not once per shortening event.
+        // Several short durations: bar 2 has a 128th triplet rest (20 ticks per rest), bar 4
+        // has 256th rests (15 ticks each). All bars are spaced against the shortest one
+        // (15 ticks).
         //
         // Bar 4's padding uses an extra `:128 r` (30 ticks) compared to bar 2, because
         // bar 4's short slot is only 30 ticks (two 256th rests) whereas bar 2's is 60
@@ -147,12 +142,10 @@ describe('SystemSpacingTests', () => {
     });
 
     it('shared-min-duration-per-system-isolation', async () => {
-        // Four bars laid out as two systems of two bars each. System 1 holds pure quarters
-        // (local minimum falls back to the default). System 2 holds quarters plus a 128th
-        // triplet (minimum drops to 20 ticks). Because the shared-minimum reference lives
-        // on `StaffSystem` rather than being score-wide, system 1's spacing must not be
-        // influenced by system 2's shorter notes - each system's bars use only their own
-        // system's minimum.
+        // Four bars laid out as two systems of two bars each. System 1 holds pure quarters,
+        // system 2 quarters plus a 128th triplet (20 ticks). Both systems use the 20-tick
+        // reference; system 1 is justified and its springs all scale alike, so its spacing
+        // matches a quarters-only score.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;
         await VisualTestHelper.runVisualTestTex(
@@ -173,7 +166,7 @@ describe('SystemSpacingTests', () => {
         // Same two-bar score as the core alignment test, but rendered in Page layout with
         // the Automatic systems mode (the default). In this mode the system distributes
         // the distributable staff width across bars by their natural content width, not
-        // by authored `displayScale`. The system-wide minimum fix applies equally here:
+        // by authored `displayScale`. The shared reference applies equally here:
         // bar 1 and bar 2 share a reference so their quarter-note spring constants match,
         // and each bar's natural content width reflects the shared spacing.
         const settings = new Settings();
@@ -193,11 +186,10 @@ describe('SystemSpacingTests', () => {
     it('shared-min-duration-horizontal-preserves-local', async () => {
         // Horizontal layout sizes each bar independently (by `bar.displayWidth` or the
         // bar's intrinsic width) - there is no shared staff width to distribute across
-        // bars. The `StaffSystem.shareMinDurationAcrossBars` flag is set to `false` for
-        // this layout so each bar's spring constants stay referenced against its local
-        // minimum, preserving the historical per-bar rendering. This test guards the
-        // opt-out: under shared-minimum bar 1 would have its quarters widened to match
-        // bar 2's reference, which must NOT happen in Horizontal.
+        // bars. `ScoreLayout.sharesMinDurationAcrossBars` is `false` for this layout so each
+        // bar's spring constants stay referenced against its own shortest note. This test
+        // guards the opt-out: with a shared reference bar 1 would have its quarters widened
+        // to match bar 2's reference, which must NOT happen in Horizontal.
         const settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         await VisualTestHelper.runVisualTestTex(
@@ -381,9 +373,9 @@ describe('SystemSpacingTests', () => {
     });
 
     /**
-     * Visual coverage for Phase 2 (A2) of the spacing spike: the system-wide minimum-duration
-     * reference (`StaffSystem.minDuration`) must aggregate across tracks and must NOT be
-     * inflated by grace-note durations.
+     * Visual coverage for the shared minimum-duration reference
+     * (`BarLayoutingInfo.referenceMinDuration`): it must aggregate across tracks and must NOT be
+     * lowered by grace-note durations.
      *
      * The pre-existing `shared-min-duration-*` tests cover the core cross-bar behaviour for
      * single-track scores; these two tests cover the cases the spike plan explicitly calls out
@@ -391,15 +383,12 @@ describe('SystemSpacingTests', () => {
      */
     it('system-min-duration-grace-notes-excluded', async () => {
         // Two-bar system. Bar 1 has a 32nd-note grace flourish (60 ticks per grace) before its
-        // first quarter; bar 2 has only quarters with no graces. Grace-note durations are routed
-        // through `addBeatSpring`'s grace branch which never calls `addSpring`, so they cannot
-        // update `BarLayoutingInfo._minDuration`. The system-wide minimum therefore falls back
-        // to the default reference (30 ticks) - identical to the no-graces case - and the
-        // quarter-note positions in bar 1 and bar 2 align column-by-column.
+        // first quarter; bar 2 has only quarters with no graces. Grace beats are not part of the
+        // reference, so it stays at the default (30 ticks) - identical to the no-graces case -
+        // and the quarter-note positions in bar 1 and bar 2 align column-by-column.
         //
-        // If a regression introduced grace durations into `_minDuration`, bar 1's reference
-        // would drop below bar 2's, the system would reconcile against the smaller value, and
-        // the quarters would shift visibly between the two bars.
+        // If a regression introduced grace durations into the reference, the spacing of both
+        // bars would change visibly.
         //
         // Expected baseline: quarter notes in both bars align under the same x-coordinates.
         // Bar 1 has a small grace cluster anchored to the first quarter; bar 2 is plain quarters.

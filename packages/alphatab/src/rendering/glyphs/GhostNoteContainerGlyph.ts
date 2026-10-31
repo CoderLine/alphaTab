@@ -2,6 +2,7 @@ import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { GhostParenthesisGlyph } from '@coderline/alphatab/rendering/glyphs/GhostParenthesisGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
+import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { Color } from '@coderline/alphatab/model/Color';
@@ -36,13 +37,30 @@ export class GhostNoteContainerGlyph extends Glyph {
         this._isOpen = isOpen;
     }
 
+    /**
+     * Whether any visible note of the given ones is shown with parentheses.
+     */
+    public static hasAnyParenthesis(renderer: BarRendererBase, notes: Note[]): boolean {
+        for (const n of notes) {
+            if (n.isVisible && GhostNoteContainerGlyph._hasParenthesis(renderer, n)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static _hasParenthesis(renderer: BarRendererBase, n: Note): boolean {
+        return (
+            n.isGhost ||
+            (GhostNoteContainerGlyph._isTiedBend(n) &&
+                renderer.settings.notation.isNotationElementVisible(NotationElement.ParenthesisOnTiedBends))
+        );
+    }
+
     public addParenthesis(n: Note): void {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const steps: number = sr.getNoteSteps(n);
-        const hasParenthesis: boolean =
-            n.isGhost ||
-            (this._isTiedBend(n) &&
-                sr.settings.notation.isNotationElementVisible(NotationElement.ParenthesisOnTiedBends));
+        const hasParenthesis: boolean = GhostNoteContainerGlyph._hasParenthesis(sr, n);
 
         const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.Effects, n);
 
@@ -61,12 +79,12 @@ export class GhostNoteContainerGlyph extends Glyph {
         }
     }
 
-    private _isTiedBend(note: Note): boolean {
+    private static _isTiedBend(note: Note): boolean {
         if (note.isTieDestination) {
             if (note.tieOrigin!.hasBend) {
                 return true;
             }
-            return this._isTiedBend(note.tieOrigin!);
+            return GhostNoteContainerGlyph._isTiedBend(note.tieOrigin!);
         }
         return false;
     }

@@ -37,6 +37,7 @@ import type { IAudioExporterWorker } from '@coderline/alphatab/synth/IAudioExpor
 import { AlphaSynthAudioExporterWorkerApi } from '@coderline/alphatab/platform/worker/AlphaSynthAudioExporterWorkerApi';
 import type { IAlphaTabRenderingWorker, IAlphaSynthWorker } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import { DetachedPartialCache } from '@coderline/alphatab/platform/javascript/DetachedPartialCache';
 
 /**
  * @target web
@@ -58,6 +59,8 @@ interface ResultPlaceholder extends HTMLElement {
     resultState: ResultState;
     renderedResult?: Element[];
     renderedResultId?: string;
+    layoutArea: number;
+    isOnScreen?: boolean;
 }
 
 /**
@@ -94,6 +97,18 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
     private _resultIdToElementLookup: Map<string, ResultPlaceholder> = new Map<string, ResultPlaceholder>();
     private _webFont!: RegisteredWebFont;
+
+    /**
+     * Detached partials are kept for fast scroll-back up to this many viewport areas; older ones are
+     * released and rendered again when they become visible.
+     */
+    private static readonly _detachedViewportBudget = 2;
+    private static readonly _detachedMinKept = 2;
+    private _detachedPartials: DetachedPartialCache<ResultPlaceholder> = new DetachedPartialCache<ResultPlaceholder>(
+        BrowserUiFacade._detachedViewportBudget * 1920 * 1080,
+        BrowserUiFacade._detachedMinKept,
+        BrowserUiFacade._releaseDetachedPartial
+    );
 
     public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
     public canRenderChanged: IEventEmitter = new EventEmitter();
@@ -159,6 +174,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 }
             } else if ('layoutResultId' in htmlElement && this._api.settings.core.enableLazyLoading) {
                 const placeholder = htmlElement as ResultPlaceholder;
+                placeholder.isOnScreen = e.isIntersecting;
+                const rootBounds = e.rootBounds;
+                if (rootBounds && rootBounds.width > 0 && rootBounds.height > 0) {
+                    this._detachedPartials.budget =
+                        BrowserUiFacade._detachedViewportBudget * rootBounds.width * rootBounds.height;
+                }
                 if (e.isIntersecting) {
                     // missing result or result not matching layout -> request render
                     if (placeholder.renderedResultId !== placeholder.layoutResultId) {
@@ -175,14 +196,29 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     }
                     // detached and became visible
                     else if (placeholder.resultState === ResultState.Detached) {
+                        this._detachedPartials.remove(placeholder);
                         htmlElement.replaceChildren(...placeholder.renderedResult!);
                         placeholder.resultState = ResultState.RenderDone;
+                        this._reapplyHighlights(placeholder);
                     }
                 } else if (placeholder.resultState === ResultState.RenderDone) {
-                    placeholder.resultState = ResultState.Detached;
-                    placeholder.replaceChildren();
+                    this._detachPartial(placeholder);
                 }
             }
+        }
+    }
+
+    private _detachPartial(placeholder: ResultPlaceholder) {
+        placeholder.resultState = ResultState.Detached;
+        placeholder.replaceChildren();
+        this._detachedPartials.add(placeholder, placeholder.layoutArea);
+    }
+
+    private static _releaseDetachedPartial(placeholder: ResultPlaceholder) {
+        if (placeholder.resultState === ResultState.Detached) {
+            placeholder.resultState = ResultState.LayoutDone;
+            placeholder.renderedResult = undefined;
+            placeholder.renderedResultId = undefined;
         }
     }
 
@@ -253,6 +289,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public destroy(): void {
         const element = (this.rootContainer as HtmlElementContainer).element;
         element.innerHTML = '';
+        this._detachedPartials.clear();
         const webFont = this._webFont;
 
         const styleElement = webFont.elements.get(element.ownerDocument);
@@ -368,6 +405,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             this._totalResultCount = 0;
             this._resultIdToElementLookup.clear();
             this._barToElementLookup.clear();
+            this._detachedPartials.clear();
         });
 
         const initialRender = () => {
@@ -658,6 +696,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         placeholder.resultState = ResultState.RenderDone;
         placeholder.renderedResultId = renderResult.id;
         placeholder.renderedResult = Array.from(placeholder.children);
+        this._reapplyHighlights(placeholder);
+        // scrolled out of view while the render was requested: no visibility change will detach it later
+        if (placeholder.isOnScreen === false && this._api.settings.core.enableLazyLoading) {
+            this._detachPartial(placeholder);
+        }
     }
 
     public beginAppendRenderResults(renderResult: RenderFinishedEventArgs | null): void {
@@ -690,6 +733,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             placeholder.resultState = ResultState.LayoutDone;
             placeholder.renderedResultId = undefined;
             placeholder.renderedResult = undefined;
+            placeholder.layoutArea = renderResult.width * renderResult.height;
 
             if (!renderResult.reuseViewport) {
                 placeholder.textContent = '';
@@ -756,7 +800,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
 
         if (!player) {
-            Logger.error('Player', 'Player requires webworkers and web audio api, browser unsupported', null);
+            Logger.error('Player', 'Player requires webworkers and web audio api, browser unsupported');
         } else {
             player.ready.on(() => {
                 if (this._api.settings.player.soundFont) {
@@ -784,20 +828,46 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private _highlightedElements: HTMLElement[] = [];
+    /**
+     * The active highlights as parallel group id / master bar index lists, re-applied to partials
+     * whose rendered result is inserted while they are active.
+     */
+    private _highlightedGroupIds: string[] = [];
+    private _highlightedMasterBarIndexes: number[] = [];
+
     public highlightElements(groupId: string, masterBarIndex: number): void {
+        this._highlightedGroupIds.push(groupId);
+        this._highlightedMasterBarIndexes.push(masterBarIndex);
         const element = this._barToElementLookup.get(masterBarIndex);
         if (element) {
-            const elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
-            for (let i: number = 0; i < elementsToHighlight.length; i++) {
-                elementsToHighlight.item(i)!.classList.add('at-highlight');
-                this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+            this._highlightGroup(element, groupId);
+        }
+    }
+
+    private _highlightGroup(element: HTMLElement, groupId: string) {
+        const elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
+        for (let i: number = 0; i < elementsToHighlight.length; i++) {
+            elementsToHighlight.item(i)!.classList.add('at-highlight');
+            this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
+        }
+    }
+
+    private _reapplyHighlights(placeholder: ResultPlaceholder) {
+        const masterBarIndexes = this._highlightedMasterBarIndexes;
+        for (let i = 0; i < masterBarIndexes.length; i++) {
+            if (this._barToElementLookup.get(masterBarIndexes[i]) === placeholder) {
+                this._highlightGroup(placeholder, this._highlightedGroupIds[i]);
             }
         }
     }
 
     public removeHighlights(): void {
+        if (this._highlightedGroupIds.length > 0) {
+            this._highlightedGroupIds = [];
+            this._highlightedMasterBarIndexes = [];
+        }
         const highlightedElements = this._highlightedElements;
-        if (!highlightedElements) {
+        if (highlightedElements.length === 0) {
             return;
         }
         for (const element of highlightedElements) {

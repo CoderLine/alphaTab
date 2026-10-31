@@ -14,7 +14,7 @@ import { TabRestGlyph } from '@coderline/alphatab/rendering/glyphs/TabRestGlyph'
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -23,6 +23,16 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public slash: SlashNoteHeadGlyph | null = null;
     public noteNumbers: TabNoteChordGlyph | null = null;
     public restGlyph: TabRestGlyph | null = null;
+
+    protected override get mainGlyph(): Glyph | null {
+        if (this.slash) {
+            return this.slash;
+        }
+        if (this.noteNumbers) {
+            return this.noteNumbers;
+        }
+        return this.restGlyph;
+    }
 
     protected override get effectElement() {
         return BeatSubElement.GuitarTabEffects;
@@ -108,23 +118,21 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         return this.noteNumbers ? this.noteNumbers.getHighestNoteY(requestedPosition) : 0;
     }
 
-    public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public override buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         if (this.noteNumbers) {
-            this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
+            this.noteNumbers.buildBoundingsLookup(writer, cx + this.x, cy + this.y);
         }
     }
 
     public override doLayout(): void {
         const tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
 
-        const centeredEffectGlyphs: Glyph[] = [];
+        let tremoloGlyph: Glyph | null = null;
         if (!this.container.beat.isRest) {
             //
             // Note numbers
             const isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
-
-            let beatEffects: Map<string, Glyph>;
 
             if (this.container.beat.slashed) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
@@ -134,8 +142,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 slashNoteHead.effectElement = BeatSubElement.GuitarTabEffects;
                 this.slash = slashNoteHead;
                 slashNoteHead.beat = this.container.beat;
-                this.addNormal(slashNoteHead);
-                beatEffects = slashNoteHead.beatEffects;
+                slashNoteHead.renderer = this.renderer;
             } else {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 this.noteNumbers = tabNoteNumbers;
@@ -146,17 +153,21 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                         this._createNoteGlyph(note);
                     }
                 }
-                this.addNormal(tabNoteNumbers);
-                beatEffects = tabNoteNumbers.beatEffects;
+                tabNoteNumbers.renderer = this.renderer;
             }
 
             //
             // Tremolo Picking
-            if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
-                const glyph = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloPicking!);
-                glyph.offsetY = this.renderer.smuflMetrics.glyphTop.get(glyph.symbol)!;
-                beatEffects.set('tremolo', glyph);
-                centeredEffectGlyphs.push(glyph);
+            if (this.container.beat.isTremolo) {
+                const beatEffects = this.container.beat.slashed
+                    ? this.slash!.beatEffects
+                    : this.noteNumbers!.beatEffects;
+                if (!beatEffects.has('tremolo')) {
+                    const glyph = new TremoloPickingGlyph(0, 0, this.container.beat.tremoloPicking!);
+                    glyph.offsetY = this.renderer.smuflMetrics.glyphTop.get(glyph.symbol)!;
+                    beatEffects.set('tremolo', glyph);
+                    tremoloGlyph = glyph;
+                }
             }
 
             //
@@ -175,7 +186,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph = restGlyph;
             restGlyph.beat = this.container.beat;
-            this.addNormal(restGlyph);
+            restGlyph.renderer = this.renderer;
             //
             // Note dots
             //
@@ -189,16 +200,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         if (this.isEmpty) {
             return;
         }
-        let w: number = 0;
-        for (let i: number = 0, j: number = this.glyphs!.length; i < j; i++) {
-            const g: Glyph = this.glyphs![i];
-            g.x = w;
-            g.renderer = this.renderer;
-            g.doLayout();
-            w += g.width;
-        }
-        this.width = w;
-        this.computedWidth = w;
+        super.doLayout();
         if (this.container.beat.isEmpty) {
             this.onTimeX = this.width / 2;
         } else if (this.restGlyph) {
@@ -212,7 +214,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         // slashes attach the stem like regular note heads (SMuFL stem anchor)
         this.stemX = this.slash ? this.slash.x + this.slash.stemX : this.middleX;
 
-        if (this.slash) {
+        if (this.slash && this.renderer.drawsRhythm) {
             // reserve the slash area so stems are not painted through it
             this.renderer.collisionHelper.reserveBeatSlot(
                 this.container.beat,
@@ -223,8 +225,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
 
         // effects like tremolos sit on the (potentially hidden) stem
         const effectX = BeamingHelper.beatHasStem(this.container.beat) ? this.stemX : this.onTimeX;
-        for (const g of centeredEffectGlyphs) {
-            g.x = effectX;
+        if (tremoloGlyph) {
+            tremoloGlyph.x = effectX;
         }
     }
 
@@ -236,10 +238,13 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
-        const topY = noteNumberGlyph.getBoundingBoxTop();
-        const bottomY = noteNumberGlyph.getBoundingBoxBottom();
-
-        this.renderer.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
+        if (tr.drawsRhythm) {
+            tr.collisionHelper.reserveBeatSlot(
+                this.container.beat,
+                noteNumberGlyph.getBoundingBoxTop(),
+                noteNumberGlyph.getBoundingBoxBottom()
+            );
+        }
 
         // minString/maxString track the topmost/bottommost used line (not the string number)
         const minString = tr.minString;

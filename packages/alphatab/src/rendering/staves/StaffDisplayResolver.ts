@@ -33,6 +33,7 @@ export class StaffDisplayResolver {
     /**
      * Per-axis fall-through: first defined value walking
      * per-bar → per-staff → score-wide → {@link _fallback}.
+     * The result may be one of the inputs or a shared instance and must not be modified.
      */
     public static merge(
         perBar: ElementDisplay | undefined,
@@ -40,20 +41,38 @@ export class StaffDisplayResolver {
         stylesheet: ElementDisplay | undefined
     ): ElementDisplay {
         const fallback = StaffDisplayResolver._fallback;
+        const isVisible = perBar?.isVisible ?? perStaff?.isVisible ?? stylesheet?.isVisible ?? fallback.isVisible;
+        const staffPlacement =
+            perBar?.staffPlacement ?? perStaff?.staffPlacement ?? stylesheet?.staffPlacement ?? fallback.staffPlacement;
+        const systemDisplay =
+            perBar?.systemDisplay ?? perStaff?.systemDisplay ?? stylesheet?.systemDisplay ?? fallback.systemDisplay;
+        if (StaffDisplayResolver._equals(fallback, isVisible, staffPlacement, systemDisplay)) {
+            return fallback;
+        }
+        if (
+            stylesheet !== undefined &&
+            StaffDisplayResolver._equals(stylesheet, isVisible, staffPlacement, systemDisplay)
+        ) {
+            return stylesheet;
+        }
         return {
-            isVisible:
-                perBar?.isVisible ?? perStaff?.isVisible ?? stylesheet?.isVisible ?? fallback.isVisible,
-            staffPlacement:
-                perBar?.staffPlacement ??
-                perStaff?.staffPlacement ??
-                stylesheet?.staffPlacement ??
-                fallback.staffPlacement,
-            systemDisplay:
-                perBar?.systemDisplay ??
-                perStaff?.systemDisplay ??
-                stylesheet?.systemDisplay ??
-                fallback.systemDisplay
+            isVisible,
+            staffPlacement,
+            systemDisplay
         };
+    }
+
+    private static _equals(
+        display: ElementDisplay,
+        isVisible: boolean | undefined,
+        staffPlacement: StaffPlacement | undefined,
+        systemDisplay: SystemDisplay | undefined
+    ): boolean {
+        return (
+            display.isVisible === isVisible &&
+            display.staffPlacement === staffPlacement &&
+            display.systemDisplay === systemDisplay
+        );
     }
 
     public static isPrimaryForElement(staff: IStaffDisplayContext, display: ElementDisplay): boolean {

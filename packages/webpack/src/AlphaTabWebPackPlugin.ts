@@ -298,6 +298,7 @@ export class AlphaTabWebPackPlugin {
                             'Could not find alphaTab, please ensure it is installed into node_modules or configure alphaTabSourceDir'
                         )
                     );
+                    callback();
                     return;
                 }
 
@@ -308,6 +309,7 @@ export class AlphaTabWebPackPlugin {
                             'Need output.path configured in application to store asset files.'
                         )
                     );
+                    callback();
                     return;
                 }
 
@@ -349,7 +351,12 @@ export class AlphaTabWebPackPlugin {
                     );
                 }
 
-                await Promise.all([copyFiles('font'), copyFiles('soundfont')]);
+                try {
+                    await Promise.all([copyFiles('font'), copyFiles('soundfont')]);
+                } catch (e) {
+                    callback(e as Error);
+                    return;
+                }
 
                 callback();
             }

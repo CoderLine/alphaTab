@@ -4,39 +4,39 @@
 // the code is regenerated.
 // </auto-generated>
 import { Tuning } from "@coderline/alphatab/model/Tuning";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class TuningSerializer {
-    public static fromJson(obj: Tuning, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["isstandard", "name", "tunings"]);
+    public static read(obj: Tuning, reader: IObjectReader): void {
+        reader.readRecord(TuningSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.isStandard = r.readBoolean();
+                    return true;
+                case 1:
+                    obj.name = r.readString();
+                    return true;
+                case 2:
+                    obj.tunings = r.readValue()! as number[];
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: Tuning | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => TuningSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: Tuning | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("isstandard", obj.isStandard);
-        o.set("name", obj.name);
-        o.set("tunings", obj.tunings);
-        return o;
-    }
-    public static setProperty(obj: Tuning, property: string, v: unknown): boolean {
-        switch (property) {
-            case "isstandard":
-                obj.isStandard = v! as boolean;
-                return true;
-            case "name":
-                obj.name = v! as string;
-                return true;
-            case "tunings":
-                obj.tunings = v! as number[];
-                return true;
-        }
-        return false;
+        w.startObject(TuningSerializer._fields);
+        w.booleanField(0, obj.isStandard);
+        w.stringField(1, obj.name);
+        w.valueField(2, obj.tunings);
+        w.endObject();
     }
 }

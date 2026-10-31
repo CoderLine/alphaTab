@@ -13,7 +13,7 @@ import type { NumberedBeatPreNotesGlyph } from '@coderline/alphatab/rendering/gl
 import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
-import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -40,8 +40,9 @@ export class NumberedNoteBeatContainerGlyphBase extends NumberedBeatContainerGly
     }
 
     private static _ticksToBarCount(displayDuration: number): number {
-        // we know that displayDuration < MidiUtils.QuarterTime, otherwise this glyph is not created
-        if (displayDuration >= MidiUtils.toTicks(Duration.Eighth)) {
+        if (displayDuration >= MidiUtils.QuarterTime) {
+            return 0;
+        } else if (displayDuration >= MidiUtils.toTicks(Duration.Eighth)) {
             return 1;
         } else if (displayDuration >= MidiUtils.toTicks(Duration.Sixteenth)) {
             return 2;
@@ -95,7 +96,7 @@ export class NumberedNoteBeatContainerGlyphBase extends NumberedBeatContainerGly
         return false;
     }
 
-    public override buildBoundingsLookup(_barBounds: BarBounds, _cx: number, _cy: number): void {}
+    public override buildBoundingsLookup(_writer: IBoundsLookupWriter, _cx: number, _cy: number): void {}
 }
 
 /**
@@ -178,7 +179,7 @@ export class NumberedDashBeatContainerGlyph extends BeatContainerGlyphBase imple
         layoutings.addBeatSpring(this, width / 2, width / 2);
     }
     public override applyLayoutingInfo(_info: BarLayoutingInfo): void {}
-    public override buildBoundingsLookup(_barBounds: BarBounds, _cx: number, _cy: number): void {}
+    public override buildBoundingsLookup(_writer: IBoundsLookupWriter, _cx: number, _cy: number): void {}
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const renderer = this.renderer as NumberedBarRenderer;

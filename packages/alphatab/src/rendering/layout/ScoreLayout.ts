@@ -2,6 +2,7 @@ import { Environment } from '@coderline/alphatab/Environment';
 import type { EventEmitterOfT } from '@coderline/alphatab/EventEmitter';
 import { Logger } from '@coderline/alphatab/Logger';
 import type { Bar } from '@coderline/alphatab/model/Bar';
+import type { Duration } from '@coderline/alphatab/model/Duration';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
@@ -13,19 +14,27 @@ import { Profiler } from '@coderline/alphatab/profiling/Profiler';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { type EffectBandInfo, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
+import type { EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
+import type { ActiveEffectBand } from '@coderline/alphatab/rendering/EffectBandContainer';
+import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSystemPlacement';
 import { ChordDiagramContainerGlyph } from '@coderline/alphatab/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
+import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { TuningContainerGlyph } from '@coderline/alphatab/rendering/glyphs/TuningContainerGlyph';
 import { TuningGlyph } from '@coderline/alphatab/rendering/glyphs/TuningGlyph';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
+import type { BeamingBounds } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
+import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import { HeaderKey, type HeaderProfile } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
 import type { BeamingRuleLookup } from '@coderline/alphatab/rendering/utils/BeamingRuleLookup';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { TextMeasureCache } from '@coderline/alphatab/rendering/utils/TextMeasureCache';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { Lazy } from '@coderline/alphatab/util/Lazy';
 
@@ -55,7 +64,22 @@ export abstract class ScoreLayout {
     public width: number = 0;
     public height: number = 0;
 
-    public readonly skylinePool: SkylineSegmentPool = new SkylineSegmentPool();
+    public readonly skylineScratch: SkylineScratch = new SkylineScratch();
+    /**
+     * Scratch result of the beaming bounds computation of the bar renderers.
+     */
+    public readonly beamingBoundsScratch: BeamingBounds = { topY: 0, bottomY: 0 };
+    /**
+     * Scratch range of the effect band placement.
+     */
+    public readonly effectBandRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
+
+    /** Scratch for the geometry of the tie being laid out, see {@link TieGlyph.newControlPoints}. */
+    public readonly tieControlPoints: number[] = TieGlyph.newControlPoints();
+    /** Scratch for the geometry of the tie being painted, see {@link TieGlyph.paintTie}. */
+    public readonly tiePaintControlPoints: number[] = TieGlyph.newControlPoints();
+
+    public readonly effectPlacement: EffectSystemPlacement;
 
     private _showAttribution: boolean = true;
 
@@ -96,6 +120,7 @@ export abstract class ScoreLayout {
 
     public constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
+        this.effectPlacement = new EffectSystemPlacement(this.skylineScratch);
     }
 
     public abstract get firstBarX(): number;
@@ -106,7 +131,10 @@ export abstract class ScoreLayout {
     public abstract get systems(): StaffSystem[];
 
     public slurRegistry = new SlurRegistry();
-    public beamingRuleLookups = new Map<string, BeamingRuleLookup>();
+    /**
+     * The beaming rule lookups by beaming rules id and rule duration.
+     */
+    public beamingRuleLookups = new Map<string, Map<Duration, BeamingRuleLookup>>();
 
     /**
      * The master bars which had to be compressed below their minimum width in the current layout pass,
@@ -160,6 +188,44 @@ export abstract class ScoreLayout {
         compressedBars.clear();
     }
 
+    /**
+     * The duration reference of the spacing formula for all bars of this layout
+     * (see {@link BarLayoutingInfo.referenceMinDuration}).
+     */
+    public referenceMinDuration: number = BarLayoutingInfo.defaultMinDuration;
+
+    /**
+     * The header profiles of this layout by {@link HeaderKey.high} and {@link HeaderKey.low}.
+     */
+    public readonly headerProfiles: Map<number, Map<number, HeaderProfile>> = new Map<
+        number,
+        Map<number, HeaderProfile>
+    >();
+
+    /**
+     * Text measurements of this layout's canvas, reset with every full layout.
+     */
+    public readonly textMeasures: TextMeasureCache = new TextMeasureCache();
+
+    /**
+     * The effects that can create glyphs, by `2 * RenderStaff.index` (top) and `2 * RenderStaff.index + 1`
+     * (bottom): every staff system of a layout has the same staves.
+     */
+    public readonly activeEffects: Map<number, ActiveEffectBand[]> = new Map<number, ActiveEffectBand[]>();
+
+    /**
+     * Reused while building the header key of a bar renderer.
+     */
+    public readonly headerKey: HeaderKey = new HeaderKey();
+
+    /**
+     * Whether all bars are spaced against {@link referenceMinDuration}. Layouts that size every bar
+     * on its own keep a reference per bar instead.
+     */
+    public get sharesMinDurationAcrossBars(): boolean {
+        return true;
+    }
+
     public resize(): void {
         this._showAttribution = this._resolveShowAttribution();
         this._lazyPartials.clear();
@@ -189,16 +255,30 @@ export abstract class ScoreLayout {
             this.lastBarIndex
         );
 
+        // bars laid out against another reference would be spaced inconsistently
+        const previousReferenceMinDuration = this.referenceMinDuration;
+        this.referenceMinDuration = BarLayoutingInfo.referenceMinDuration(
+            this.renderer.tracks!,
+            this.firstBarIndex,
+            this.lastBarIndex
+        );
+
         const firstChangedMasterBar = renderHints?.firstChangedMasterBar;
         if (firstChangedMasterBar !== undefined) {
-            if (this.doUpdateForBars(renderHints!)) {
+            if (previousReferenceMinDuration === this.referenceMinDuration && this.doUpdateForBars(renderHints!)) {
                 this._logCompressedBars();
                 return;
             }
+            // the renderer kept the bounds of the previous render for a partial update
+            this.renderer.boundsWriter.begin(false);
         }
 
         this._lazyPartials.clear();
         this.beamingRuleLookups.clear();
+        this.headerProfiles.clear();
+        this.textMeasures.clear();
+        this.activeEffects.clear();
+        this._staffEffectInfos = [];
         this._barRendererLookup.clear();
 
         this.profile = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
@@ -224,6 +304,10 @@ export abstract class ScoreLayout {
 
     protected getExistingPartialArgs(id: string): RenderFinishedEventArgs | undefined {
         return this._lazyPartials.has(id) ? this._lazyPartials.get(id)!.args : undefined;
+    }
+
+    protected unregisterPartial(id: string): void {
+        this._lazyPartials.delete(id);
     }
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
@@ -258,8 +342,20 @@ export abstract class ScoreLayout {
         const canvas = this.renderer.canvas!;
         canvas.beginRender(args.width, args.height);
         callback(canvas);
-        args.renderResult = canvas.endRender();
-        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
+        // the registered args outlive the event: storing the result on them would keep every painted partial alive
+        const rendered = new RenderFinishedEventArgs();
+        rendered.id = args.id;
+        rendered.reuseViewport = args.reuseViewport;
+        rendered.x = args.x;
+        rendered.y = args.y;
+        rendered.width = args.width;
+        rendered.height = args.height;
+        rendered.totalWidth = args.totalWidth;
+        rendered.totalHeight = args.totalHeight;
+        rendered.firstMasterBarIndex = args.firstMasterBarIndex;
+        rendered.lastMasterBarIndex = args.lastMasterBarIndex;
+        rendered.renderResult = canvas.endRender();
+        (this.renderer.partialRenderFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(rendered);
     }
 
     public renderLazyPartial(resultId: string) {
@@ -353,7 +449,7 @@ export abstract class ScoreLayout {
     }
 
     private _createScoreInfoGlyphs(): void {
-        Logger.debug('ScoreLayout', 'Creating score info glyphs');
+        Logger.trace('ScoreLayout', 'Creating score info glyphs');
         const settings = this.renderer.settings;
         const score: Score = this.renderer.score!;
         this.headerGlyphs = new Map<ScoreSubElement, TextGlyph>();
@@ -414,9 +510,9 @@ export abstract class ScoreLayout {
                         const trackLabel = stavesWithTuning.length > 1 ? staff.track.name : '';
                         const item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
                         item.colorOverride = ElementStyleHelper.trackColor(
-                            res,
                             TrackSubElement.StringTuning,
-                            staff.track
+                            staff.track,
+                            res.scoreInfoColor
                         );
                         item.renderer = fakeBarRenderer;
                         item.doLayout();
@@ -471,12 +567,21 @@ export abstract class ScoreLayout {
 
     public lastBarIndex: number = 0;
 
+    /**
+     * The top and bottom effect infos of the staves of the first staff system (two entries per staff),
+     * shared by all staff systems of the layout.
+     */
+    private _staffEffectInfos: EffectBandInfo[][] = [];
+
     protected createEmptyStaffSystem(index: number): StaffSystem {
         const system: StaffSystem = new StaffSystem(this);
         system.index = index;
         const allFactories = Environment.defaultRenderers;
 
         const renderStaves: RenderStaff[] = [];
+        // every staff system has the same staves
+        const staffEffectInfos = this._staffEffectInfos;
+        const reuseEffectInfos = staffEffectInfos.length > 0;
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
             const track: Track = this.renderer.tracks![trackIndex];
 
@@ -491,9 +596,15 @@ export abstract class ScoreLayout {
                 for (const factory of allFactories) {
                     if (this.profile.has(factory.staffId) && factory.canCreate(track, staff)) {
                         const renderStaff = new RenderStaff(system, trackIndex, staff, factory);
-                        // insert shared effect bands at front
-                        renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
-                        renderStaff.bottomEffectInfos.push(...sharedBottomEffects);
+                        if (reuseEffectInfos) {
+                            renderStaff.topEffectInfos = staffEffectInfos[renderStaves.length * 2];
+                            renderStaff.bottomEffectInfos = staffEffectInfos[renderStaves.length * 2 + 1];
+                        } else {
+                            renderStaff.createEffectInfos();
+                            // insert shared effect bands at front
+                            renderStaff.topEffectInfos.splice(0, 0, ...sharedTopEffects);
+                            renderStaff.bottomEffectInfos.push(...sharedBottomEffects);
+                        }
                         previousStaff = renderStaff;
                         // just remember staff, adding to system comes later when we have all effects collected
                         renderStaves.push(renderStaff);
@@ -514,7 +625,7 @@ export abstract class ScoreLayout {
                 }
 
                 // don't forget any left-over shared effects.
-                if (previousStaff) {
+                if (previousStaff && !reuseEffectInfos) {
                     if (sharedTopEffects.length > 0) {
                         previousStaff.bottomEffectInfos.push(...sharedTopEffects);
                     }
@@ -527,6 +638,10 @@ export abstract class ScoreLayout {
 
         for (const staff of renderStaves) {
             system.addStaff(staff);
+            if (!reuseEffectInfos) {
+                staffEffectInfos.push(staff.topEffectInfos);
+                staffEffectInfos.push(staff.bottomEffectInfos);
+            }
         }
 
         return system;

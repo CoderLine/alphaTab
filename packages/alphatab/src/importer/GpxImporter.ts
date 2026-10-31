@@ -21,7 +21,7 @@ export class GpxImporter extends ScoreImporter {
     public readScore(): Score {
         // at first we need to load the binary file system
         // from the GPX container
-        Logger.debug(this.name, 'Loading GPX filesystem');
+        Logger.trace(this.name, 'Loading GPX filesystem');
         const fileSystem: GpxFileSystem = new GpxFileSystem(this.settings.importer.maxDecodingBufferSize);
         fileSystem.fileFilter = s => {
             return (
@@ -32,7 +32,7 @@ export class GpxImporter extends ScoreImporter {
             );
         };
         fileSystem.load(this.data);
-        Logger.debug(this.name, 'GPX filesystem loaded');
+        Logger.trace(this.name, 'GPX filesystem loaded');
 
         let xml: string | null = null;
         let binaryStylesheetData: Uint8Array | null = null;
@@ -61,36 +61,36 @@ export class GpxImporter extends ScoreImporter {
 
         // the score.gpif file within this filesystem stores
         // the score information as XML we need to parse.
-        Logger.debug(this.name, 'Start Parsing score.gpif');
+        Logger.trace(this.name, 'Start Parsing score.gpif');
         const gpifParser: GpifParser = new GpifParser();
         gpifParser.isGp6 = true;
         gpifParser.parseXml(xml, this.settings);
-        Logger.debug(this.name, 'score.gpif parsed');
+        Logger.trace(this.name, 'score.gpif parsed');
         const score: Score = gpifParser.score;
 
         if (binaryStylesheetData) {
-            Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
+            Logger.trace(this.name, 'Start Parsing BinaryStylesheet');
             const binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData, this.settings.importer.maxDecodingBufferSize);
             binaryStylesheet.apply(score);
-            Logger.debug(this.name, 'BinaryStylesheet parsed');
+            Logger.trace(this.name, 'BinaryStylesheet parsed');
         }
 
         let partConfigurationParser: PartConfiguration | null = null;
         if (partConfigurationData) {
-            Logger.debug(this.name, 'Start Parsing Part Configuration');
+            Logger.trace(this.name, 'Start Parsing Part Configuration');
             partConfigurationParser = new PartConfiguration(partConfigurationData);
             partConfigurationParser.apply(score);
-            Logger.debug(this.name, 'Part Configuration parsed');
+            Logger.trace(this.name, 'Part Configuration parsed');
         }
 
         if (layoutConfigurationData && partConfigurationParser != null) {
-            Logger.debug(this.name, 'Start Parsing Layout Configuration');
+            Logger.trace(this.name, 'Start Parsing Layout Configuration');
             const layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
                 partConfigurationParser,
                 layoutConfigurationData
             );
             layoutConfigurationParser.apply(score);
-            Logger.debug(this.name, 'Layout Configuration parsed');
+            Logger.trace(this.name, 'Layout Configuration parsed');
         }
 
         return score;

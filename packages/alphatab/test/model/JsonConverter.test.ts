@@ -1,14 +1,21 @@
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
 import { describe, expect, it } from 'vitest';
 import { NoteSerializer } from '@coderline/alphatab/generated/model/NoteSerializer';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { LogLevel } from '@coderline/alphatab/LogLevel';
+import { BarStyle, BarSubElement } from '@coderline/alphatab/model/Bar';
+import { BeatStyle, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import { Color } from '@coderline/alphatab/model/Color';
-import { Font, FontStyle } from '@coderline/alphatab/model/Font';
+import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
-import { Note } from '@coderline/alphatab/model/Note';
-import type { Score } from '@coderline/alphatab/model/Score';
+import { Note, NoteStyle, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { TrackStyle, TrackSubElement } from '@coderline/alphatab/model/Track';
+import { VoiceStyle, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
@@ -223,6 +230,104 @@ describe('JsonConverterTest', () => {
         expect(settings.display.resources.mainGlyphColor.b).toBe(0);
     });
 
+    function createScoreWithNullStyleColors(): Score {
+        const importer = new AlphaTexImporter();
+        importer.init(ByteBuffer.fromString('3.3 3.3 | 3.3'), new Settings());
+        const score = importer.readScore();
+        const red = new Color(255, 0, 0, 255);
+
+        score.style = new ScoreStyle();
+        score.style.colors.set(ScoreSubElement.Title, null);
+        score.style.colors.set(ScoreSubElement.SubTitle, red);
+
+        const track = score.tracks[0];
+        track.style = new TrackStyle();
+        track.style.colors.set(TrackSubElement.TrackName, null);
+        track.style.colors.set(TrackSubElement.StringTuning, red);
+
+        const bar = track.staves[0].bars[0];
+        bar.style = new BarStyle();
+        bar.style.colors.set(BarSubElement.StandardNotationStaffLine, null);
+        bar.style.colors.set(BarSubElement.GuitarTabsStaffLine, red);
+
+        const voice = bar.voices[0];
+        voice.style = new VoiceStyle();
+        voice.style.colors.set(VoiceSubElement.Glyphs, null);
+
+        const beat = voice.beats[0];
+        beat.style = new BeatStyle();
+        beat.style.colors.set(BeatSubElement.Effects, null);
+        beat.style.colors.set(BeatSubElement.StandardNotationStem, red);
+
+        const note = beat.notes[0];
+        note.style = new NoteStyle();
+        note.style.colors.set(NoteSubElement.Effects, null);
+        note.style.colors.set(NoteSubElement.GuitarTabFretNumber, red);
+
+        return score;
+    }
+
+    function expectNullStyleColors(score: Score): void {
+        const scoreColors = score.style!.colors;
+        expect(scoreColors.has(ScoreSubElement.Title)).toBe(true);
+        expect(scoreColors.get(ScoreSubElement.Title)).toBe(null);
+        expect(scoreColors.get(ScoreSubElement.SubTitle)!.rgba).toBe('#FF0000');
+        expect(scoreColors.has(ScoreSubElement.Artist)).toBe(false);
+
+        const track = score.tracks[0];
+        const trackColors = track.style!.colors;
+        expect(trackColors.has(TrackSubElement.TrackName)).toBe(true);
+        expect(trackColors.get(TrackSubElement.TrackName)).toBe(null);
+        expect(trackColors.get(TrackSubElement.StringTuning)!.rgba).toBe('#FF0000');
+        expect(trackColors.has(TrackSubElement.BracesAndBrackets)).toBe(false);
+
+        const bar = track.staves[0].bars[0];
+        const barColors = bar.style!.colors;
+        expect(barColors.has(BarSubElement.StandardNotationStaffLine)).toBe(true);
+        expect(barColors.get(BarSubElement.StandardNotationStaffLine)).toBe(null);
+        expect(barColors.get(BarSubElement.GuitarTabsStaffLine)!.rgba).toBe('#FF0000');
+        expect(barColors.has(BarSubElement.SlashStaffLine)).toBe(false);
+
+        const voice = bar.voices[0];
+        const voiceColors = voice.style!.colors;
+        expect(voiceColors.has(VoiceSubElement.Glyphs)).toBe(true);
+        expect(voiceColors.get(VoiceSubElement.Glyphs)).toBe(null);
+
+        const beat = voice.beats[0];
+        const beatColors = beat.style!.colors;
+        expect(beatColors.has(BeatSubElement.Effects)).toBe(true);
+        expect(beatColors.get(BeatSubElement.Effects)).toBe(null);
+        expect(beatColors.get(BeatSubElement.StandardNotationStem)!.rgba).toBe('#FF0000');
+        expect(beatColors.has(BeatSubElement.StandardNotationFlags)).toBe(false);
+
+        const note = beat.notes[0];
+        const noteColors = note.style!.colors;
+        expect(noteColors.has(NoteSubElement.Effects)).toBe(true);
+        expect(noteColors.get(NoteSubElement.Effects)).toBe(null);
+        expect(noteColors.get(NoteSubElement.GuitarTabFretNumber)!.rgba).toBe('#FF0000');
+        expect(noteColors.has(NoteSubElement.StandardNotationNoteHead)).toBe(false);
+    }
+
+    it('style-null-colors-js-object', () => {
+        const expected = createScoreWithNullStyleColors();
+        expectNullStyleColors(expected);
+
+        const actual = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(expected));
+        expectNullStyleColors(actual);
+    });
+
+    /*@target web*/
+    it('style-null-colors-json', () => {
+        const json = JsonConverter.scoreToJson(createScoreWithNullStyleColors());
+        expectNullStyleColors(JsonConverter.jsonToScore(json));
+    });
+
+    /*@target web*/
+    it('style-null-colors-structured-clone', () => {
+        const jsObject = JsonConverter.scoreToJsObject(createScoreWithNullStyleColors());
+        expectNullStyleColors(JsonConverter.jsObjectToScore(structuredClone(jsObject)));
+    });
+
     it('settings-deprecated-font-keys-are-read-only', () => {
         const raw = new Map<string, unknown>();
         raw.set('displayResourcesEffectFont', 'italic 13px Arial');
@@ -259,6 +364,41 @@ describe('JsonConverterTest', () => {
         expect(settings.display.resources.effectFont.size).toBe(13);
     });
 
+    /*@target web*/
+    it('settings-fonts-via-json', () => {
+        const expected = new Settings();
+        expected.display.resources.elementFonts.set(
+            NotationElement.ScoreTitle,
+            Font.withFamilyList(['Title'], 33, FontStyle.Italic, FontWeight.Bold)
+        );
+        expected.display.resources.tablatureFont = Font.withFamilyList(['Tab'], 21, FontStyle.Italic, FontWeight.Bold);
+
+        const actual = JsonConverter.jsonToSettings(JsonConverter.settingsToJson(expected));
+
+        expect(actual.display.resources.titleFont.toCssString()).toBe('bold italic 33px Title');
+        expect(actual.display.resources.tablatureFont.toCssString()).toBe('bold italic 21px Tab');
+        ComparisonHelpers.expectJsonEqual(
+            JsonConverter.settingsToJsObject(expected),
+            JsonConverter.settingsToJsObject(actual),
+            '',
+            null
+        );
+    });
+
+    /*@target web*/
+    it('settings-font-from-object', () => {
+        const json: SettingsJson = {
+            display: {
+                resources: {
+                    titleFont: { families: ['Title'], size: 40, style: 'Italic', weight: FontWeight.Bold }
+                }
+            }
+        };
+        const settings = new Settings();
+        settings.fillFromJson(json);
+        expect(settings.display.resources.titleFont.toCssString()).toBe('bold italic 40px Title');
+    });
+
     const unsetNoteTex = '\\track "P" \\staff {score} C4.4 D4 r r | \\track "G" 3.3.4 5.2 r r';
 
     function expectUnsetNoteValuesKept(score: Score) {
@@ -279,7 +419,7 @@ describe('JsonConverterTest', () => {
     }
 
     it('unset-note-values-are-not-written', () => {
-        const json = NoteSerializer.toJson(new Note())!;
+        const json = TestPlatform.toJson(w => NoteSerializer.write(new Note(), w));
         expect(json.has('fret')).toBe(false);
         expect(json.has('string')).toBe(false);
         expect(json.has('octave')).toBe(false);
@@ -289,7 +429,7 @@ describe('JsonConverterTest', () => {
 
     function noteFromJson(raw: Map<string, unknown>): Note {
         const note = new Note();
-        NoteSerializer.fromJson(note, raw);
+        NoteSerializer.read(note, new MapObjectReader(raw));
         return note;
     }
 

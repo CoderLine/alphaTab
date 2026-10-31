@@ -14,9 +14,13 @@ import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
  * @internal
  */
 export class BarHelpers {
+    private static readonly _noHelpers: BeamingHelper[][] = [];
     private _renderer: BarRendererBase;
-    private _beamHelperLookup = new Map<number, BeamingHelper>();
-    public beamHelpers: BeamingHelper[][] = [];
+    /**
+     * The beaming helper per voice index and beat index.
+     */
+    private _beamHelperLookup: BeamingHelper[][] = BarHelpers._noHelpers;
+    public beamHelpers: BeamingHelper[][] = BarHelpers._noHelpers;
     public collisionHelper: BarCollisionHelper;
     public preferredBeamDirection: BeamDirection | null = null;
 
@@ -28,27 +32,41 @@ export class BarHelpers {
     public initialize() {
         const barRenderer = this._renderer;
         const bar = this._renderer.bar;
+        if (!barRenderer.drawsRhythm) {
+            this._beamHelperLookup = BarHelpers._noHelpers;
+            this.beamHelpers = BarHelpers._noHelpers;
+            return;
+        }
 
         const masterBar = bar.masterBar;
         const beamingRules = masterBar.actualBeamingRules ?? BarHelpers._findOrBuildDefaultBeamingRules(masterBar);
         const rule = beamingRules.findRule(bar.shortestDuration);
-        // NOTE: moste rules have only one group definition, so its better to reuse the unique id
-        // than compute a potentially shorter id here.
-        const key = `beaming_${beamingRules.uniqueId}_${rule[0]}`;
+        const ruleDuration = rule[0];
 
-        let beamingRuleLookup = this._renderer.scoreRenderer.layout!.beamingRuleLookups.has(key)
-            ? this._renderer.scoreRenderer.layout!.beamingRuleLookups.get(key)!
+        const beamingRuleLookups = this._renderer.scoreRenderer.layout!.beamingRuleLookups;
+        let lookupsByDuration = beamingRuleLookups.has(beamingRules.uniqueId)
+            ? beamingRuleLookups.get(beamingRules.uniqueId)!
             : undefined;
+        if (!lookupsByDuration) {
+            lookupsByDuration = new Map<Duration, BeamingRuleLookup>();
+            beamingRuleLookups.set(beamingRules.uniqueId, lookupsByDuration);
+        }
+        let beamingRuleLookup = lookupsByDuration.has(ruleDuration) ? lookupsByDuration.get(ruleDuration)! : undefined;
         if (!beamingRuleLookup) {
-            beamingRuleLookup = BeamingRuleLookup.build(masterBar, rule[0], rule[1]);
-            this._renderer.scoreRenderer.layout!.beamingRuleLookups.set(key, beamingRuleLookup);
+            beamingRuleLookup = BeamingRuleLookup.build(masterBar, ruleDuration, rule[1]);
+            lookupsByDuration.set(ruleDuration, beamingRuleLookup);
         }
 
         let currentBeamHelper: BeamingHelper | null = null;
         let currentGraceBeamHelper: BeamingHelper | null = null;
+        const beamHelperLookup = new Array<BeamingHelper[]>(bar.voices.length);
+        this._beamHelperLookup = beamHelperLookup;
+        const beamHelpers = new Array<BeamingHelper[]>(bar.voices.length);
         for (let i: number = 0, j: number = bar.voices.length; i < j; i++) {
             const v: Voice = bar.voices[i];
-            this.beamHelpers.push([]);
+            let voiceHelpers: BeamingHelper[] | null = null;
+            const helperByBeat = new Array<BeamingHelper>(v.beats.length);
+            beamHelperLookup[i] = helperByBeat;
             for (let k: number = 0, l: number = v.beats.length; k < l; k++) {
                 const b: Beat = v.beats[k];
                 let helperForBeat: BeamingHelper | null;
@@ -76,9 +94,13 @@ export class BarHelpers {
                     } else {
                         currentBeamHelper = helperForBeat;
                     }
-                    this.beamHelpers[v.index].push(helperForBeat);
+                    if (voiceHelpers) {
+                        voiceHelpers.push(helperForBeat);
+                    } else {
+                        voiceHelpers = [helperForBeat];
+                    }
                 }
-                this._beamHelperLookup.set(b.id, helperForBeat!);
+                helperByBeat[k] = helperForBeat!;
             }
             if (currentBeamHelper) {
                 currentBeamHelper.finish();
@@ -88,7 +110,9 @@ export class BarHelpers {
             }
             currentBeamHelper = null;
             currentGraceBeamHelper = null;
+            beamHelpers[i] = voiceHelpers ? voiceHelpers : [];
         }
+        this.beamHelpers = beamHelpers;
     }
 
     private static _defaultBeamingRules: Map<string, BeamingRules> | undefined;
@@ -181,6 +205,12 @@ export class BarHelpers {
     }
 
     public getBeamingHelperForBeat(beat: Beat): BeamingHelper | undefined {
-        return this._beamHelperLookup.has(beat.id) ? this._beamHelperLookup.get(beat.id)! : undefined;
+        const voice = beat.voice;
+        const lookup = this._beamHelperLookup;
+        if (voice.bar !== this._renderer.bar || voice.index >= lookup.length) {
+            return undefined;
+        }
+        const helperByBeat = lookup[voice.index];
+        return beat.index < helperByBeat.length ? helperByBeat[beat.index] : undefined;
     }
 }

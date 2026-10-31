@@ -8,8 +8,10 @@ import {
     type EffectBandInfo,
     EffectBandMode
 } from '@coderline/alphatab/rendering/BarRendererFactory';
-import { EffectSystemPlacement } from '@coderline/alphatab/rendering/EffectSystemPlacement';
+import { ActiveEffectBand } from '@coderline/alphatab/rendering/EffectBandContainer';
 import { AttributionGlyph } from '@coderline/alphatab/rendering/glyphs/AttributionGlyph';
+import { SlurRegistry } from '@coderline/alphatab/rendering/layout/SlurRegistry';
+import { BarLocalSkyline } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
 import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import {
@@ -44,8 +46,59 @@ export class RenderStaff implements IStaffDisplayContext {
         return this.system.firstVisibleStaff === this;
     }
 
+    /**
+     * The effect bands above the staff. The list is shared with the staves at the same position in
+     * the other staff systems of the layout and must not be changed once the first system is built.
+     */
     public topEffectInfos: EffectBandInfo[] = [];
+    /**
+     * The effect bands below the staff, shared like {@link topEffectInfos}.
+     */
     public bottomEffectInfos: EffectBandInfo[] = [];
+    private _activeTopEffects: ActiveEffectBand[] | null = null;
+    private _activeBottomEffects: ActiveEffectBand[] | null = null;
+
+    /** The effects of {@link topEffectInfos} that can create glyphs on this staff. */
+    public get activeTopEffects(): ActiveEffectBand[] {
+        let active = this._activeTopEffects;
+        if (active === null) {
+            active = this._activeEffects(this.topEffectInfos, this.index * 2);
+            this._activeTopEffects = active;
+        }
+        return active;
+    }
+
+    /** The effects of {@link bottomEffectInfos} that can create glyphs on this staff. */
+    public get activeBottomEffects(): ActiveEffectBand[] {
+        let active = this._activeBottomEffects;
+        if (active === null) {
+            active = this._activeEffects(this.bottomEffectInfos, this.index * 2 + 1);
+            this._activeBottomEffects = active;
+        }
+        return active;
+    }
+
+    private _activeEffects(infos: EffectBandInfo[], key: number): ActiveEffectBand[] {
+        const shared = this.system.layout.activeEffects;
+        const existing = shared.get(key);
+        if (existing !== undefined) {
+            return existing;
+        }
+        const notation = this.system.layout.renderer.settings.notation;
+        const active: ActiveEffectBand[] = [];
+        for (let i = 0; i < infos.length; i++) {
+            const effect = infos[i].effect;
+            if (
+                notation.isNotationElementVisible(effect.notationElement) &&
+                (!effect.hideOnMultiTrack || this.trackIndex === 0)
+            ) {
+                // fallback order: the declaration index in the staff's infos
+                active.push(new ActiveEffectBand(effect, infos[i].order ?? i));
+            }
+        }
+        shared.set(key, active);
+        return active;
+    }
 
     /**
      * This is the index of the track being rendered. This is not the index of the track within the model,
@@ -58,6 +111,19 @@ export class RenderStaff implements IStaffDisplayContext {
 
     public get staffId(): string {
         return this._factory.staffId;
+    }
+
+    private _slurRegistryKey: string | null = null;
+
+    /** The key of this staff in the {@link SlurRegistry}. */
+    public get slurRegistryKey(): string {
+        let key = this._slurRegistryKey;
+        if (key === null) {
+            // built outside: `System.*` in generated C# would resolve to this class's `system` member
+            key = SlurRegistry.staffKey(this);
+            this._slurRegistryKey = key;
+        }
+        return key;
     }
 
     public get cascadePriority(): number {
@@ -112,7 +178,16 @@ export class RenderStaff implements IStaffDisplayContext {
         this.trackIndex = trackIndex;
         this.modelStaff = staff;
         this.system = system;
-        for (const b of factory.effectBands) {
+        this._updateVisibility();
+    }
+
+    /**
+     * Fills {@link topEffectInfos} and {@link bottomEffectInfos} with the effect bands of the factory
+     * that apply to this staff.
+     */
+    public createEffectInfos(): void {
+        const staff = this.modelStaff;
+        for (const b of this._factory.effectBands) {
             if (b.shouldCreate && !b.shouldCreate!(staff)) {
                 continue;
             }
@@ -129,7 +204,29 @@ export class RenderStaff implements IStaffDisplayContext {
                     break;
             }
         }
+    }
 
+    /**
+     * Prepares the staff to be filled with bars again; the effect band setup is kept.
+     */
+    public reset(): void {
+        this.resetSharedLayoutData();
+        while (this.barRenderers.length > 0) {
+            this.barRenderers.pop();
+        }
+        this.x = 0;
+        this.y = 0;
+        this.height = 0;
+        this.staffTop = 0;
+        this.staffBottom = 0;
+        this.topPadding = 0;
+        this.bottomPadding = 0;
+        this.topOverflow = 0;
+        this.bottomOverflow = 0;
+        this._emptyBarCount = 0;
+        if (this._systemSkyline) {
+            this._systemSkyline.reset();
+        }
         this._updateVisibility();
     }
 
@@ -179,11 +276,34 @@ export class RenderStaff implements IStaffDisplayContext {
         }
     }
 
+    /**
+     * Creates and lays out the renderer of the bar as if it were the next bar of this staff,
+     * without adding it.
+     */
+    public createBarRenderer(
+        bar: Bar,
+        layoutingInfo: BarLayoutingInfo,
+        additionalMultiBarsRestBars: Bar[] | null
+    ): BarRendererBase {
+        const renderer = this._factory.create(this.system.layout.renderer, bar);
+
+        renderer.topEffects.infos = this.activeTopEffects;
+        renderer.bottomEffects.infos = this.activeBottomEffects;
+
+        renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
+        renderer.staff = this;
+        renderer.index = this.barRenderers.length;
+        renderer.layoutingInfo = layoutingInfo;
+        renderer.doLayout();
+        this.system.layout.registerBarRenderer(this.staffId, renderer);
+        return renderer;
+    }
+
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
         const renderer = this._factory.create(this.system.layout.renderer, bar);
 
-        renderer.topEffects.infos = this.topEffectInfos;
-        renderer.bottomEffects.infos = this.bottomEffectInfos;
+        renderer.topEffects.infos = this.activeTopEffects;
+        renderer.bottomEffects.infos = this.activeBottomEffects;
 
         renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
         renderer.staff = this;
@@ -219,7 +339,15 @@ export class RenderStaff implements IStaffDisplayContext {
     }
 
     public resetSharedLayoutData() {
-        this._sharedLayoutData.clear();
+        // Map.clear() allocates a fresh hash table in V8 even when the map is empty.
+        if (this._sharedLayoutData.size > 0) {
+            this._sharedLayoutData.clear();
+        }
+    }
+
+    public resetOverflows() {
+        this.topOverflow = 0;
+        this.bottomOverflow = 0;
     }
 
     public topOverflow = 0;
@@ -237,59 +365,31 @@ export class RenderStaff implements IStaffDisplayContext {
     }
 
     private _systemSkyline: StaffSystemSkyline | null = null;
-    private _contentSkyline: StaffSystemSkyline | null = null;
-    private _effectPlacement: EffectSystemPlacement | null = null;
-
-    public get effectPlacement(): EffectSystemPlacement {
-        if (!this._effectPlacement) {
-            this._effectPlacement = new EffectSystemPlacement(this);
-        }
-        return this._effectPlacement;
-    }
 
     /**
-     * Full placement surface: content (notes/beams/ties) + the structural bar
-     * header (clef/key/time via each renderer's pre/post-beat skylines). Almost
-     * every effect band is placed against this.
+     * Full placement surface of the finalized staff: content (notes/beams/ties) + the structural bar
+     * header (clef/key/time via each renderer's pre/post-beat skylines) + the placed effect bands.
      */
     public get systemSkyline(): StaffSystemSkyline {
         if (!this._systemSkyline) {
-            const pool = this.system.layout.renderer.layout!.skylinePool;
+            const scratch = this.system.layout.renderer.layout!.skylineScratch;
             this._systemSkyline = new StaffSystemSkyline(
                 this.staffIndex,
                 this.system.index,
                 0,
                 Number.MAX_SAFE_INTEGER,
-                pool
+                scratch
             );
         }
         return this._systemSkyline;
     }
 
-    /**
-     * Content-only placement surface: the same as {@link systemSkyline} minus the
-     * structural bar header. Bands with {@link EffectInfo.ignoresStructuralHeader}
-     * (bar numbers) are placed against this so the clef/key/time — a fixed fixture
-     * already priced into the staff via scalar overflow — never shoves them up.
-     * Only built when such a band exists on the staff ({@link placesAgainstContentOnly}).
-     */
-    public get contentSkyline(): StaffSystemSkyline {
-        if (!this._contentSkyline) {
-            const pool = this.system.layout.renderer.layout!.skylinePool;
-            this._contentSkyline = new StaffSystemSkyline(
-                this.staffIndex,
-                this.system.index,
-                0,
-                Number.MAX_SAFE_INTEGER,
-                pool
-            );
-        }
-        return this._contentSkyline;
-    }
-
     private _placesAgainstContentOnly: boolean | null = null;
 
-    /** True if any effect band on this staff ignores the structural header (needs {@link contentSkyline}). */
+    /**
+     * True if any effect band on this staff ignores the structural header (needs
+     * {@link import('@coderline/alphatab/rendering/EffectSystemPlacement').EffectSystemPlacement.contentSkyline}).
+     */
     public get placesAgainstContentOnly(): boolean {
         if (this._placesAgainstContentOnly === null) {
             let found = false;
@@ -313,23 +413,32 @@ export class RenderStaff implements IStaffDisplayContext {
         return this._placesAgainstContentOnly === true;
     }
 
-    private _unionBarLocalIntoStaffSkyline(renderer: BarRendererBase): void {
-        const sky = this.systemSkyline;
+    private static _unionBarLocalIntoStaffSkyline(
+        renderer: BarRendererBase,
+        sky: StaffSystemSkyline,
+        content: StaffSystemSkyline | null
+    ): void {
+        const bar = renderer.barLocalSkylineOrNull;
+        const pre = renderer.preBeatLocalSkylineOrNull;
+        const post = renderer.postBeatLocalSkylineOrNull;
+        if (!bar && !pre && !post) {
+            return;
+        }
         const baseX = renderer.x;
-        const bar = renderer.barLocalSkyline;
-        const pre = renderer.preBeatLocalSkyline;
-        const post = renderer.postBeatLocalSkyline;
+        const empty = BarLocalSkyline.empty;
+        const barSky = bar ?? empty;
+        const preSky = pre ?? empty;
+        const postSky = post ?? empty;
         // Post-beat segments live in post-beat-group-local coords; shift by the
         // group's final x (settled by scaleToWidth) before unioning.
         const postBaseX = baseX + renderer.postBeatGroupOffset;
 
         // Full surface = content (bar) + structural header (pre/post).
-        sky.upSky.unionShifted3(bar.upSky, baseX, pre.upSky, baseX, post.upSky, postBaseX);
-        sky.downSky.unionShifted3(bar.downSky, baseX, pre.downSky, baseX, post.downSky, postBaseX);
+        sky.upSky.unionShifted3(barSky.upSky, baseX, preSky.upSky, baseX, postSky.upSky, postBaseX);
+        sky.downSky.unionShifted3(barSky.downSky, baseX, preSky.downSky, baseX, postSky.downSky, postBaseX);
 
         // Content-only surface = bar content, header excluded by construction.
-        if (this.placesAgainstContentOnly) {
-            const content = this.contentSkyline;
+        if (bar && content !== null) {
             content.upSky.unionShifted(bar.upSky, baseX);
             content.downSky.unionShifted(bar.downSky, baseX);
         }
@@ -362,7 +471,7 @@ export class RenderStaff implements IStaffDisplayContext {
      * Rests the attribution above everything placed on the top staff, ending at the barline of the bar chosen by
      * the layout. Runs after effect band placement so that it never displaces notation.
      */
-    private _placeAttribution(): void {
+    private _placeAttribution(sky: StaffSystemSkyline): void {
         const index = this.isFirstInSystem ? this.system.layout.attributionRendererIndex(this.system) : -1;
         let last: BarRendererBase | null = null;
         for (let i = 0; i < this.barRenderers.length; i++) {
@@ -383,7 +492,7 @@ export class RenderStaff implements IStaffDisplayContext {
         const xEnd = last.x + last.width;
         const xStart = xEnd - glyph.width;
         const gap = last.smuflMetrics.oneStaffSpace * 0.5;
-        const upSky = this.systemSkyline.upSky;
+        const upSky = sky.upSky;
         let bottom = Math.max(upSky.maxHeightInRange(xStart, xEnd), last.staffTopClearance) + gap;
         // marks beside it which reach up next to it keep the same gap horizontally
         const beside = Math.max(upSky.maxHeightInRange(xStart - gap, xStart), upSky.maxHeightInRange(xEnd, xEnd + gap));
@@ -394,7 +503,7 @@ export class RenderStaff implements IStaffDisplayContext {
         glyph.x = xStart - last.x;
         glyph.y = -top;
 
-        this.systemSkyline.upSky.insert(xStart, xEnd, top, 0);
+        upSky.insert(xStart, xEnd, top, 0);
         this.registerOverflowTop(Math.ceil(top));
     }
 
@@ -404,9 +513,12 @@ export class RenderStaff implements IStaffDisplayContext {
 
         this.height = 0;
 
-        this.systemSkyline.reset();
-        if (this.placesAgainstContentOnly) {
-            this.contentSkyline.reset();
+        const placement = this.system.layout.effectPlacement;
+        const sky = placement.systemSkyline;
+        sky.reset();
+        const content = this.placesAgainstContentOnly ? placement.contentSkyline : null;
+        if (content !== null) {
+            content.reset();
         }
 
         // Only renderer 0 ever yields continuations; hoist out of the per-renderer loop.
@@ -420,19 +532,16 @@ export class RenderStaff implements IStaffDisplayContext {
             renderer.finalizeOwnedTies();
             renderer.finalizeEffectBandSpans();
 
-            if (renderer.tiesDirty) {
-                renderer.registerStaffOverflows();
-                renderer.clearTiesDirty();
-            }
             if (renderer.height > this.height) {
                 this.height = renderer.height;
             }
-            this._unionBarLocalIntoStaffSkyline(renderer);
+            RenderStaff._unionBarLocalIntoStaffSkyline(renderer, sky, content);
         }
 
-        this.effectPlacement.place();
-        this._placeAttribution();
-        this.effectPlacement.apply();
+        placement.place(this);
+        this._placeAttribution(sky);
+        placement.apply(this);
+        this.systemSkyline.copyFrom(sky);
 
         if (this.height > 0) {
             this.height += this.topPadding + this.topOverflow + this.bottomOverflow + this.bottomPadding;
@@ -452,14 +561,19 @@ export class RenderStaff implements IStaffDisplayContext {
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.system.width - this.x, this.height);
 
-        const endIndex: number = Math.min(startIndex + count, this.barRenderers.length);
-        for (let i: number = startIndex; i < endIndex; i++) {
-            this.barRenderers[i].paint(cx + this.x, cy + this.y, canvas);
+        const end = Math.min(startIndex + count, this.barRenderers.length);
+        const x = cx + this.x;
+        const y = cy + this.y;
+        if (startIndex < end) {
+            this.barRenderers[startIndex].paintStaffLines(x, y, canvas, this.barRenderers, startIndex, end);
+            for (let i: number = startIndex; i < end; i++) {
+                this.barRenderers[i].paint(x, y, canvas);
+            }
         }
 
         // partial rendering: the bar after the range can reach into it (e.g. a bar number centred on its barline)
-        if (endIndex < this.barRenderers.length) {
-            this.barRenderers[endIndex].paintLeftOverhang(cx + this.x, cy + this.y, canvas);
+        if (end < this.barRenderers.length) {
+            this.barRenderers[end].paintLeftOverhang(x, y, canvas);
         }
     }
 }

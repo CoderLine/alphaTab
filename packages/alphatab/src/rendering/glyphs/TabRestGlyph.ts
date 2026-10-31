@@ -22,8 +22,12 @@ export class TabRestGlyph extends MusicFontGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._isVisibleRest) {
-            using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabRests, this.beat!);
-            super.paint(cx, cy, canvas);
+            const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.GuitarTabRests, this.beat!);
+            try {
+                super.paint(cx, cy, canvas);
+            } finally {
+                ElementStyleHelper.restore(canvas, previousColor);
+            }
         }
     }
 }

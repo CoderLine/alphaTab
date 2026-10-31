@@ -1,5 +1,5 @@
 import { BarLocalSkyline, StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
-import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -7,10 +7,10 @@ import { describe, expect, it } from 'vitest';
  */
 class Wrapper {
     public readonly bar: BarLocalSkyline;
-    public readonly pool: SkylineSegmentPool;
+    public readonly scratch: SkylineScratch;
     public constructor(xMin: number = 0, xMax: number = 100) {
-        this.pool = new SkylineSegmentPool();
-        this.bar = new BarLocalSkyline(xMin, xMax, this.pool);
+        this.scratch = new SkylineScratch();
+        this.bar = new BarLocalSkyline(xMin, xMax, this.scratch);
     }
 }
 
@@ -60,16 +60,14 @@ describe('BarLocalSkyline — side-aware routing', () => {
 });
 
 describe('BarLocalSkyline — reset', () => {
-    it('returns child Skylines to baseline + reuses pool segments', () => {
+    it('returns child Skylines to baseline', () => {
         const w: Wrapper = BarLocalSkylineFixtures.newWrapper();
         w.bar.insertPlaced(StaffSide.Top, 10, 30, 4, 0);
         w.bar.insertPlaced(StaffSide.Bottom, 50, 70, 3, 0);
-        const grownBefore: number = w.pool.grownCount;
         w.bar.reset();
         expect(w.bar.upSky.maxHeight()).toBe(0);
         expect(w.bar.downSky.maxHeight()).toBe(0);
         w.bar.insertPlaced(StaffSide.Top, 20, 80, 6, 0);
         expect(w.bar.upSky.placeAbove(40, 60, 1, 0)).toBe(6);
-        expect(w.pool.grownCount).toBe(grownBefore);
     });
 });

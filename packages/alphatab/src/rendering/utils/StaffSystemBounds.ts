@@ -34,9 +34,9 @@ export class StaffSystemBounds {
     public boundsLookup!: BoundsLookup;
 
     /**
-     * Whether this system's bounds have already been scaled via `finish`. Prevents double-scaling
-     * when the parent `BoundsLookup` is preserved across partial renders and `finish` is invoked
-     * again on a mix of already-scaled (preserved) and newly-registered (natural-coordinate) systems.
+     * Whether this system's bounds are already scaled and sorted, either via `finish` or because the
+     * renderer built them that way. Prevents double-scaling when the parent `BoundsLookup` is preserved
+     * across partial renders and `finish` is invoked again on a mix of systems.
      */
     public isFinished: boolean = false;
 

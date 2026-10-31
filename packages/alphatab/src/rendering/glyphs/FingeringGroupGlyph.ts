@@ -39,12 +39,29 @@ export class FingeringGroupGlyph extends GlyphGroup {
         return this._infos.size === 0;
     }
 
+    /**
+     * Whether {@link addFingers} adds any finger for the given note.
+     */
+    public static hasFingers(settings: Settings, note: Note): boolean {
+        return (
+            FingeringGroupGlyph._isScoreFingering(settings) &&
+            (FingeringGroupGlyph.fingerToMusicFontSymbol(settings, note.beat, note.leftHandFinger, true) !==
+                MusicFontSymbol.None ||
+                FingeringGroupGlyph.fingerToMusicFontSymbol(settings, note.beat, note.rightHandFinger, false) !==
+                    MusicFontSymbol.None)
+        );
+    }
+
+    private static _isScoreFingering(settings: Settings): boolean {
+        return (
+            settings.notation.fingeringMode === FingeringMode.ScoreDefault ||
+            settings.notation.fingeringMode === FingeringMode.ScoreForcePiano
+        );
+    }
+
     public addFingers(note: Note) {
         const settings = this.renderer.settings;
-        if (
-            settings.notation.fingeringMode !== FingeringMode.ScoreDefault &&
-            settings.notation.fingeringMode !== FingeringMode.ScoreForcePiano
-        ) {
+        if (!FingeringGroupGlyph._isScoreFingering(settings)) {
             return;
         }
 

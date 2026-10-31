@@ -4,103 +4,156 @@
 // the code is regenerated.
 // </auto-generated>
 import { Settings } from "@coderline/alphatab/Settings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { CoreSettingsSerializer } from "@coderline/alphatab/generated/CoreSettingsSerializer";
 import { DisplaySettingsSerializer } from "@coderline/alphatab/generated/DisplaySettingsSerializer";
 import { NotationSettingsSerializer } from "@coderline/alphatab/generated/NotationSettingsSerializer";
 import { ImporterSettingsSerializer } from "@coderline/alphatab/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@coderline/alphatab/generated/PlayerSettingsSerializer";
 import { ExporterSettingsSerializer } from "@coderline/alphatab/generated/ExporterSettingsSerializer";
+import { MapObjectReader } from "@coderline/alphatab/io/MapObjectReader";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
+import { MapObjectWriter } from "@coderline/alphatab/io/MapObjectWriter";
 /**
  * @internal
  */
 export class SettingsSerializer {
+    private static readonly _fields: RecordFields = new RecordFields(["core", "display", "notation", "importer", "player", "exporter"]);
     public static fromJson(obj: Settings, m: unknown): void {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+        SettingsSerializer.readFlexible(obj, new MapObjectReader(m));
     }
-    public static toJson(obj: Settings | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
+    public static read(obj: Settings, reader: IObjectReader): void {
+        reader.readRecord(SettingsSerializer._fields, (id, k, rr) => SettingsSerializer._readField(obj, id, rr, false));
+    }
+    public static readProperty(obj: Settings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = SettingsSerializer._fields.idOf(property);
+        return id >= 0 ? SettingsSerializer._readField(obj, id, r, flexible) : false;
+    }
+    private static _readField(obj: Settings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                CoreSettingsSerializer.read(obj.core, r);
+                return true;
+            case 1:
+                DisplaySettingsSerializer.read(obj.display, r);
+                return true;
+            case 2:
+                NotationSettingsSerializer.read(obj.notation, r);
+                return true;
+            case 3:
+                ImporterSettingsSerializer.read(obj.importer, r);
+                return true;
+            case 4:
+                PlayerSettingsSerializer.read(obj.player, r);
+                return true;
+            case 5:
+                ExporterSettingsSerializer.read(obj.exporter, r);
+                return true;
         }
-        const o = new Map<string, unknown>();
-        o.set("core", CoreSettingsSerializer.toJson(obj.core));
-        o.set("display", DisplaySettingsSerializer.toJson(obj.display));
-        o.set("notation", NotationSettingsSerializer.toJson(obj.notation));
-        o.set("importer", ImporterSettingsSerializer.toJson(obj.importer));
-        o.set("player", PlayerSettingsSerializer.toJson(obj.player));
-        o.set("exporter", ExporterSettingsSerializer.toJson(obj.exporter));
-        return o;
+        return false;
     }
-    public static setProperty(obj: Settings, property: string, v: unknown): boolean {
+    public static readFlexible(obj: Settings, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? SettingsSerializer._readField(obj, id, rr, false) : SettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: Settings, property: string, r: IObjectReader): boolean {
+        if (["core", "display", "notation", "importer", "player", "exporter"].indexOf(property) < 0 && SettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
         if (["core", ""].indexOf(property) >= 0) {
-            CoreSettingsSerializer.fromJson(obj.core, v as Map<string, unknown>);
+            CoreSettingsSerializer.readFlexible(obj.core, r);
             return true;
         }
         for (const c of ["core", ""]) {
             if (property.indexOf(c) === 0) {
-                if (CoreSettingsSerializer.setProperty(obj.core, property.substring(c.length), v)) {
+                if (CoreSettingsSerializer.readFlexibleProperty(obj.core, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         if (["display", ""].indexOf(property) >= 0) {
-            DisplaySettingsSerializer.fromJson(obj.display, v as Map<string, unknown>);
+            DisplaySettingsSerializer.readFlexible(obj.display, r);
             return true;
         }
         for (const c of ["display", ""]) {
             if (property.indexOf(c) === 0) {
-                if (DisplaySettingsSerializer.setProperty(obj.display, property.substring(c.length), v)) {
+                if (DisplaySettingsSerializer.readFlexibleProperty(obj.display, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         if (["notation"].indexOf(property) >= 0) {
-            NotationSettingsSerializer.fromJson(obj.notation, v as Map<string, unknown>);
+            NotationSettingsSerializer.readFlexible(obj.notation, r);
             return true;
         }
         for (const c of ["notation"]) {
             if (property.indexOf(c) === 0) {
-                if (NotationSettingsSerializer.setProperty(obj.notation, property.substring(c.length), v)) {
+                if (NotationSettingsSerializer.readFlexibleProperty(obj.notation, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         if (["importer"].indexOf(property) >= 0) {
-            ImporterSettingsSerializer.fromJson(obj.importer, v as Map<string, unknown>);
+            ImporterSettingsSerializer.readFlexible(obj.importer, r);
             return true;
         }
         for (const c of ["importer"]) {
             if (property.indexOf(c) === 0) {
-                if (ImporterSettingsSerializer.setProperty(obj.importer, property.substring(c.length), v)) {
+                if (ImporterSettingsSerializer.readFlexibleProperty(obj.importer, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         if (["player"].indexOf(property) >= 0) {
-            PlayerSettingsSerializer.fromJson(obj.player, v as Map<string, unknown>);
+            PlayerSettingsSerializer.readFlexible(obj.player, r);
             return true;
         }
         for (const c of ["player"]) {
             if (property.indexOf(c) === 0) {
-                if (PlayerSettingsSerializer.setProperty(obj.player, property.substring(c.length), v)) {
+                if (PlayerSettingsSerializer.readFlexibleProperty(obj.player, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         if (["exporter"].indexOf(property) >= 0) {
-            ExporterSettingsSerializer.fromJson(obj.exporter, v as Map<string, unknown>);
+            ExporterSettingsSerializer.readFlexible(obj.exporter, r);
             return true;
         }
         for (const c of ["exporter"]) {
             if (property.indexOf(c) === 0) {
-                if (ExporterSettingsSerializer.setProperty(obj.exporter, property.substring(c.length), v)) {
+                if (ExporterSettingsSerializer.readFlexibleProperty(obj.exporter, property.substring(c.length), r)) {
                     return true;
                 }
             }
         }
         return false;
+    }
+    public static toJson(obj: Settings | null | undefined): Map<string, unknown> | null {
+        const w = new MapObjectWriter();
+        SettingsSerializer.write(obj, w);
+        return w.result as Map<string, unknown> | null;
+    }
+    public static write(obj: Settings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(SettingsSerializer._fields);
+        w.field(0);
+        CoreSettingsSerializer.write(obj.core, w);
+        w.field(1);
+        DisplaySettingsSerializer.write(obj.display, w);
+        w.field(2);
+        NotationSettingsSerializer.write(obj.notation, w);
+        w.field(3);
+        ImporterSettingsSerializer.write(obj.importer, w);
+        w.field(4);
+        PlayerSettingsSerializer.write(obj.player, w);
+        w.field(5);
+        ExporterSettingsSerializer.write(obj.exporter, w);
+        w.endObject();
     }
 }

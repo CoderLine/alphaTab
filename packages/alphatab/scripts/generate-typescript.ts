@@ -6,6 +6,8 @@ import cloneEmit from './CloneEmitter';
 import { GENERATED_FILE_HEADER } from './EmitterBase';
 import jsonDeclarationEmit from './JsonDeclarationEmitter';
 import serializerEmit from './SerializerEmitter';
+import serializerFillEmit from './SerializerFillEmitter';
+import serializerSchemaEmit from './SerializerSchemaEmitter';
 
 transpiler(
     [
@@ -16,6 +18,14 @@ transpiler(
         {
             name: 'Serializer',
             emit: serializerEmit
+        },
+        {
+            name: 'Serializer Schema',
+            emit: serializerSchemaEmit
+        },
+        {
+            name: 'Serializer Test Data',
+            emit: serializerFillEmit
         },
         {
             name: 'JSON Declarations',

@@ -5,6 +5,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 import type { RenderingResources } from '@coderline/alphatab/RenderingResources';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { EffectBandContainer } from '@coderline/alphatab/rendering/EffectBandContainer';
@@ -17,6 +18,7 @@ import {
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import { type HeaderKey, HeaderProfile } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { MultiVoiceContainerGlyph } from '@coderline/alphatab/rendering/glyphs/MultiVoiceContainerGlyph';
 import { ContinuationTieGlyph, type ITieGlyph, type TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import { MultiBarRestBeatContainerGlyph } from '@coderline/alphatab/rendering/MultiBarRestBeatContainerGlyph';
@@ -26,12 +28,9 @@ import { BarLocalSkyline, StaffSide } from '@coderline/alphatab/rendering/skylin
 import { SkylineShape } from '@coderline/alphatab/rendering/skyline/SkylineShape';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
-import { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
 import { BarHelpers } from '@coderline/alphatab/rendering/utils/BarHelpers';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import type { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
 import type { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -94,32 +93,26 @@ export enum NoteXPosition {
  */
 export class BarRendererBase {
     private static readonly _compressionTolerance: number = 1;
+    // the layout works on _headerProfile; the header glyphs are only created once they are needed
+    // for painting and kept as long as the header of the bar does not change
     private _preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
+    private _headerProfile: HeaderProfile | null = null;
+    private _headerInFirstSystem: boolean = false;
     protected readonly voiceContainer = new MultiVoiceContainerGlyph();
     private readonly _postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
 
-    private _ties: ITieGlyph[] = [];
+    private _ties: ITieGlyph[] | null = null;
 
     private _multiSystemSlurs?: ContinuationTieGlyph[];
 
-    /** Set by {@link RenderStaff._finalizeRendererTies} when a tie write grew this renderer's overflow. */
-    private _tiesDirty: boolean = false;
-
     /** Ties whose start beat lives on this renderer. */
     public get ties(): ITieGlyph[] {
-        return this._ties;
-    }
-
-    public markTiesDirty(): void {
-        this._tiesDirty = true;
-    }
-
-    public get tiesDirty(): boolean {
-        return this._tiesDirty;
-    }
-
-    public clearTiesDirty(): void {
-        this._tiesDirty = false;
+        let ties = this._ties;
+        if (!ties) {
+            ties = [];
+            this._ties = ties;
+        }
+        return ties;
     }
 
     /** Multi-system slur continuations attached to this renderer. Only populated on renderer 0 of a staff. */
@@ -170,6 +163,16 @@ export class BarRendererBase {
     private _contentTopOverflow: number = 0;
     private _contentBottomOverflow: number = 0;
 
+    // Content overflows are max-only within a pass. These snapshots let every later pass start
+    // from the measured content ({@link doLayout}) and the positioned content
+    // ({@link applyLayoutingInfo}) instead of from the maximum of all previous positions.
+    private _hasMeasuredOverflow: boolean = false;
+    private _measuredTopOverflow: number = 0;
+    private _measuredBottomOverflow: number = 0;
+    private _hasPositionedOverflow: boolean = false;
+    private _positionedTopOverflow: number = 0;
+    private _positionedBottomOverflow: number = 0;
+
     public beatEffectsMinY = Number.NaN;
     public beatEffectsMaxY = Number.NaN;
 
@@ -204,7 +207,7 @@ export class BarRendererBase {
             this._barLocalSkyline = new BarLocalSkyline(
                 0,
                 Number.MAX_SAFE_INTEGER,
-                this.scoreRenderer.layout!.skylinePool
+                this.scoreRenderer.layout!.skylineScratch
             );
         }
         return this._barLocalSkyline;
@@ -221,7 +224,7 @@ export class BarRendererBase {
             this._preBeatLocalSkyline = new BarLocalSkyline(
                 0,
                 Number.MAX_SAFE_INTEGER,
-                this.scoreRenderer.layout!.skylinePool
+                this.scoreRenderer.layout!.skylineScratch
             );
         }
         return this._preBeatLocalSkyline;
@@ -233,9 +236,24 @@ export class BarRendererBase {
             this._postBeatLocalSkyline = new BarLocalSkyline(
                 0,
                 Number.MAX_SAFE_INTEGER,
-                this.scoreRenderer.layout!.skylinePool
+                this.scoreRenderer.layout!.skylineScratch
             );
         }
+        return this._postBeatLocalSkyline;
+    }
+
+    /** {@link barLocalSkyline}, or `null` if it was never created because nothing was inserted. */
+    public get barLocalSkylineOrNull(): BarLocalSkyline | null {
+        return this._barLocalSkyline;
+    }
+
+    /** {@link preBeatLocalSkyline}, or `null` if it was never created because nothing was inserted. */
+    public get preBeatLocalSkylineOrNull(): BarLocalSkyline | null {
+        return this._preBeatLocalSkyline;
+    }
+
+    /** {@link postBeatLocalSkyline}, or `null` if it was never created because nothing was inserted. */
+    public get postBeatLocalSkylineOrNull(): BarLocalSkyline | null {
         return this._postBeatLocalSkyline;
     }
 
@@ -248,7 +266,7 @@ export class BarRendererBase {
         this._barLocalSkyline?.reset();
         this._preBeatLocalSkyline?.reset();
         this._postBeatLocalSkyline?.reset();
-        this._ties = [];
+        this._ties = null;
         this.beatEffectsMinY = Number.NaN;
         this.beatEffectsMaxY = Number.NaN;
     }
@@ -304,6 +322,14 @@ export class BarRendererBase {
         return true;
     }
 
+    /**
+     * Whether this renderer paints the rhythm (stems, flags, beams, tuplets) of its beats.
+     * When false, no beaming helpers or stem collision slots exist for the bar.
+     */
+    public get drawsRhythm(): boolean {
+        return true;
+    }
+
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         this.scoreRenderer = renderer;
         this.bar = bar;
@@ -313,7 +339,7 @@ export class BarRendererBase {
     }
 
     public registerTie(tie: ITieGlyph) {
-        this._ties.push(tie);
+        this.ties.push(tie);
     }
 
     public get middleYPosition(): number {
@@ -417,12 +443,24 @@ export class BarRendererBase {
     }
 
     public scaleToWidth(width: number): void {
+        if (this._hasPositionedOverflow) {
+            this._contentTopOverflow = this._positionedTopOverflow;
+            this._contentBottomOverflow = this._positionedBottomOverflow;
+        } else {
+            this._positionedTopOverflow = this._contentTopOverflow;
+            this._positionedBottomOverflow = this._contentBottomOverflow;
+            this._hasPositionedOverflow = true;
+        }
+        // effect band heights are the result of the placement in finalizeStaff
+        this.topEffects.height = 0;
+        this.bottomEffects.height = 0;
+
         // preBeat and postBeat glyphs do not get resized
         const containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;
 
         // Re-emit scale-dependent segments. pre/postBeatLocalSkyline are
         // owned by calculateOverflows and untouched here.
-        this.barLocalSkyline.reset();
+        this._barLocalSkyline?.reset();
 
         // Spring-X about to be re-laid-out, so cached BeamingHelperDrawInfo is stale.
         for (const v of this.helpers.beamHelpers) {
@@ -449,16 +487,12 @@ export class BarRendererBase {
         this.topEffects.alignGlyphs();
         this.bottomEffects.alignGlyphs();
 
-        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
-        if (preBeatGlyphs) {
-            for (const g of preBeatGlyphs) {
-                g.populateSkyline();
-            }
-        }
         this.topEffects.populateSkyline();
         this.bottomEffects.populateSkyline();
 
         this.emitSubclassBarLocalSkyline();
+
+        this._registerStaffOverflow();
 
         // Geometry is now settled; cross-renderer chain walks during
         // finalizeStaff can rely on this flag. Reset by {@link afterReverted}.
@@ -509,7 +543,7 @@ export class BarRendererBase {
         const info: BarLayoutingInfo = this.layoutingInfo;
         // header glyphs (clef, key signature, time signature...) register their
         // columns to be aligned across all staves.
-        this._preBeatGlyphs.registerHeaderRod(info);
+        this._headerProfile!.registerHeaderRods(info);
         if (!this._voiceWalkDone) {
             const container = this.voiceContainer;
             container.registerLayoutingInfo(info);
@@ -525,40 +559,49 @@ export class BarRendererBase {
         }
     }
 
-    public _registerOverlayRods(): void {
+    private _registerOverlayRods(): void {
         const info: BarLayoutingInfo = this.layoutingInfo;
-        // all staves of a master bar share the layouting info; bands of different staves never share a row
-        const staffKey = `${this.bar.staff.track.index}/${this.bar.staff.index}/${this.staff!.staffId}`;
-        this._collectOverlayRods(this.topEffects, info, `${staffKey}/top`);
-        this._collectOverlayRods(this.bottomEffects, info, `${staffKey}/bottom`);
+        // all staves of a master bar share the layouting info; bands of different staves never share a row.
+        // A row is one side of one staff of the system, a band key one notation element in a row.
+        const staff = this.staff!;
+        const rowCount = staff.system.allStaves.length * 2;
+        this._collectOverlayRods(this.topEffects, info, staff.index * 2, rowCount);
+        this._collectOverlayRods(this.bottomEffects, info, staff.index * 2 + 1, rowCount);
     }
 
-    private _collectOverlayRods(container: EffectBandContainer, info: BarLayoutingInfo, rowKey: string): void {
-        for (const band of container.bands) {
+    private _collectOverlayRods(
+        container: EffectBandContainer,
+        info: BarLayoutingInfo,
+        row: number,
+        rowCount: number
+    ): void {
+        const bands = container.bands;
+        for (let i = 0; i < bands.length; i++) {
+            const band = bands[i];
             const policy = band.info.overlayRodPolicy;
             if (policy === undefined) {
                 continue;
             }
-            const bandKey = `${rowKey}/${band.info.notationElement}`;
-            for (const voiceGlyphs of band.glyphsByVoice) {
-                for (const glyph of voiceGlyphs) {
-                    if (!glyph.beat || glyph.width <= 0) {
-                        continue;
-                    }
-                    const w = glyph.width;
-                    const t = glyph.beat.absoluteDisplayStart;
-                    switch (policy) {
-                        case OverlayRodPolicy.Left:
-                            info.addOverlayRod(bandKey, t, 0, w);
-                            break;
-                        case OverlayRodPolicy.Right:
-                            info.addOverlayRod(bandKey, t, w, 0);
-                            break;
-                        default: {
-                            const half = w * 0.5;
-                            info.addOverlayRod(bandKey, t, half, half);
-                            break;
-                        }
+            const bandKey = band.info.notationElement * rowCount + row;
+            const glyphs = band.glyphs;
+            for (let j = 0; j < glyphs.length; j++) {
+                const glyph = glyphs[j];
+                if (!glyph.beat || glyph.width <= 0) {
+                    continue;
+                }
+                const w = glyph.width;
+                const t = glyph.beat.absoluteDisplayStart;
+                switch (policy) {
+                    case OverlayRodPolicy.Left:
+                        info.addOverlayRod(bandKey, t, 0, w);
+                        break;
+                    case OverlayRodPolicy.Right:
+                        info.addOverlayRod(bandKey, t, w, 0);
+                        break;
+                    default: {
+                        const half = w * 0.5;
+                        info.addOverlayRod(bandKey, t, half, half);
+                        break;
                     }
                 }
             }
@@ -567,11 +610,8 @@ export class BarRendererBase {
 
     public afterReverted() {
         this.staff = undefined;
-        this.registerMultiSystemSlurs(undefined);
+        this.registerMultiSystemSlurs(null);
         this.isFinalized = false;
-        // `_layoutInvariantCached` and `_voiceWalkDone` deliberately survive:
-        // they cache bar-local invariant state and `afterReverted` fires every
-        // resize cycle — invalidating here would defeat the optimisation.
     }
 
     public afterStaffBarReverted() {
@@ -588,8 +628,17 @@ export class BarRendererBase {
      * must gate themselves to skip unchanged bars.
      */
     public applyLayoutingInfo(): void {
+        if (this._hasMeasuredOverflow) {
+            this._contentTopOverflow = this._measuredTopOverflow;
+            this._contentBottomOverflow = this._measuredBottomOverflow;
+        } else {
+            this._measuredTopOverflow = this._contentTopOverflow;
+            this._measuredBottomOverflow = this._contentBottomOverflow;
+            this._hasMeasuredOverflow = true;
+        }
+        this._hasPositionedOverflow = false;
+
         // align the header glyphs with the shared columns of all staves
-        this._preBeatGlyphs.applyHeaderRod(this.layoutingInfo);
         this._preBeatGlyphs.width = this.layoutingInfo.preBeatSize;
         // header glyphs moved: re-emit their skyline spans (overflow magnitudes are x-independent)
         this._emitPreBeatOverflows(this.height);
@@ -611,20 +660,8 @@ export class BarRendererBase {
 
     public isFinalized: boolean = false;
 
-    /**
-     * Set once {@link doLayout} has populated the bar-local invariant state
-     * (`_preBeatGlyphs.width`, `_postBeatGlyphs.width`, broker per-beat sizes,
-     * local pre/post-beat skylines). Lets {@link reLayout} skip the bar-local
-     * re-walk on width-only changes.
-     */
-    private _layoutInvariantCached: boolean = false;
-
-    public invalidateLayoutCache(): void {
-        this._layoutInvariantCached = false;
-    }
-
-    public registerMultiSystemSlurs(startedTies: Generator<TieGlyph> | undefined) {
-        if (!startedTies) {
+    public registerMultiSystemSlurs(startedTies: TieGlyph[] | null) {
+        if (startedTies === null) {
             this._multiSystemSlurs = undefined;
             return;
         }
@@ -636,9 +673,10 @@ export class BarRendererBase {
             continuation.tieDirection = g.tieDirection;
 
             if (!ties) {
-                ties = [];
+                ties = [continuation];
+            } else {
+                ties.push(continuation);
             }
-            ties.push(continuation);
         }
 
         this._multiSystemSlurs = ties;
@@ -651,7 +689,9 @@ export class BarRendererBase {
     }
 
     public finalizeOwnedTies(): void {
-        this._emitTies(this._ties);
+        if (this._ties) {
+            this._emitTies(this._ties);
+        }
         if (this._multiSystemSlurs) {
             this._emitTies(this._multiSystemSlurs);
         }
@@ -685,35 +725,36 @@ export class BarRendererBase {
                 continue;
             }
             const tieBottomOverflow = tieBottom - this.height;
-            if (tieTopOverflow > 0 && this.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow)) {
-                this.markTiesDirty();
+            if (tieTopOverflow > 0) {
+                this.registerOverflowRangeTop(xStart, xEnd, tieTopOverflow);
             }
-            if (tieBottomOverflow > 0 && this.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow)) {
-                this.markTiesDirty();
+            if (tieBottomOverflow > 0) {
+                this.registerOverflowRangeBottom(xStart, xEnd, tieBottomOverflow);
             }
         }
     }
 
-    private readonly _tieShape: SkylineShape = new SkylineShape();
+    private _tieShape: SkylineShape | null = null;
 
     /**
      * The overflow of the tie is registered as a whole on this renderer, the skyline gets the drawn shape
      * in every renderer of the staff it reaches into.
      */
     private _emitTieShape(t: ITieGlyph, topOverflow: number, bottomOverflow: number): void {
-        let changed = false;
-        if (topOverflow > 0 && this.registerOverflowTop(topOverflow)) {
-            changed = true;
+        if (topOverflow > 0) {
+            this.registerOverflowTop(topOverflow);
         }
-        if (bottomOverflow > 0 && this.registerOverflowBottom(bottomOverflow)) {
-            changed = true;
-        }
-        if (changed) {
-            this.markTiesDirty();
+        if (bottomOverflow > 0) {
+            this.registerOverflowBottom(bottomOverflow);
         }
 
-        const shape = this._tieShape;
-        shape.clear();
+        let shape = this._tieShape;
+        if (shape === null) {
+            shape = new SkylineShape();
+            this._tieShape = shape;
+        } else {
+            shape.clear();
+        }
         t.collectSkylineShape(shape);
         for (let k = 0; k < shape.count; k++) {
             this._insertTieSkyline(this.index, shape.xStart(k), shape.top(k), shape.xEnd(k), shape.bottom(k));
@@ -755,15 +796,6 @@ export class BarRendererBase {
         this._registerStaffOverflow();
     }
 
-    /**
-     * Public wrapper for `updateSizes`. Cannot widen `updateSizes` directly
-     * because `LineBarRenderer.updateSizes` is `protected override` and the
-     * transpiler does not consistently widen visibility across overrides.
-     */
-    public refreshSizes(): void {
-        this.updateSizes();
-    }
-
     public doLayout(): void {
         if (!this.bar) {
             return;
@@ -775,8 +807,12 @@ export class BarRendererBase {
         this.topEffects.doLayout();
         this.bottomEffects.doLayout();
         this.resetCycleState();
+        this._contentTopOverflow = 0;
+        this._contentBottomOverflow = 0;
+        this._hasMeasuredOverflow = false;
+        this._hasPositionedOverflow = false;
 
-        this.createPreBeatGlyphs();
+        this._updateHeaderProfile();
         this.createBeatGlyphs();
         this.createPostBeatGlyphs();
 
@@ -785,32 +821,20 @@ export class BarRendererBase {
 
         this.updateSizes();
 
-        // finish up all helpers
-        for (const v of this.helpers.beamHelpers) {
-            for (const h of v) {
-                h.finish();
-            }
-        }
-
         this.computedWidth = this.width;
 
         this.calculateOverflows(0, this.height);
-
-        this._layoutInvariantCached = true;
     }
 
     protected calculateOverflows(_rendererTop: number, rendererBottom: number) {
-        // Re-emit pre/post-beat (structural header) skylines from scratch each
-        // pass. Pre-beat group x = 0 so its local x equals bar-local x; post-beat
-        // x is not final until scaleToWidth, so the staff-skyline union shifts it
-        // later. These are kept separate from barLocalSkyline (the content
-        // surface) so a band can be placed against content-only.
-        this._emitPreBeatOverflows(rendererBottom);
-
-        this.postBeatLocalSkyline.reset();
+        // The pre-beat (header) skyline and overflow depend on the position of the bar and are
+        // emitted by applyLayoutingInfo. Post-beat x is not final until scaleToWidth, so the
+        // staff-skyline union shifts it later. Both are kept separate from barLocalSkyline (the
+        // content surface) so a band can be placed against content-only.
+        this._postBeatLocalSkyline?.reset();
         const postBeatGlyphs = this._postBeatGlyphs.glyphs;
         if (postBeatGlyphs) {
-            this._emitGroupOverflows(postBeatGlyphs, this.postBeatLocalSkyline, rendererBottom);
+            this._emitPostBeatOverflows(postBeatGlyphs, rendererBottom);
         }
 
         const v = this.voiceContainer;
@@ -836,15 +860,119 @@ export class BarRendererBase {
     }
 
     private _emitPreBeatOverflows(rendererBottom: number): void {
-        this.preBeatLocalSkyline.reset();
-        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
-        if (preBeatGlyphs) {
-            this._emitGroupOverflows(preBeatGlyphs, this.preBeatLocalSkyline, rendererBottom);
+        this._preBeatLocalSkyline?.reset();
+        const profile = this._headerProfile;
+        if (!profile) {
+            return;
+        }
+        const info = this.layoutingInfo;
+        for (const g of profile.glyphs) {
+            const topOver = g.top < 0;
+            const bottomOver = g.bottom > rendererBottom;
+            if (!topOver && !bottomOver) {
+                continue;
+            }
+            const x = profile.glyphX(g, info);
+            if (topOver) {
+                this.registerOverflowTop(g.top * -1);
+            }
+            if (bottomOver) {
+                this.registerOverflowBottom(g.bottom - rendererBottom);
+            }
+            const boxes = g.skylineBoxes;
+            if (boxes === null) {
+                this._insertPreBeatSkyline(x + g.left, x + g.right, g.top, g.bottom, rendererBottom);
+            } else {
+                for (let k = 0; k < boxes.length; k += 4) {
+                    this._insertPreBeatSkyline(
+                        x + boxes[k],
+                        x + boxes[k + 1],
+                        boxes[k + 2],
+                        boxes[k + 3],
+                        rendererBottom
+                    );
+                }
+            }
         }
     }
 
-    /** Emit per-glyph overflow into the given group skyline. Shared by pre- and post-beat groups. */
-    private _emitGroupOverflows(glyphs: Glyph[], skyline: BarLocalSkyline, rendererBottom: number): void {
+    private _insertPreBeatSkyline(xL: number, xR: number, top: number, bottom: number, rendererBottom: number): void {
+        if (!(xR > xL)) {
+            return;
+        }
+        if (top < 0) {
+            this.preBeatLocalSkyline.insertPlaced(StaffSide.Top, xL, xR, top * -1, 0);
+        }
+        if (bottom > rendererBottom) {
+            this.preBeatLocalSkyline.insertPlaced(StaffSide.Bottom, xL, xR, bottom - rendererBottom, 0);
+        }
+    }
+
+    /**
+     * Adds the inputs the bar header (start barline, clef, key signature, time signature ...) is
+     * created from for the current position: bars with equal keys have the same header geometry.
+     * Keys hold inputs rather than the decisions derived from them so that they cannot diverge from
+     * {@link createPreBeatGlyphs}. Headers with an invalid key are not shared.
+     */
+    protected buildHeaderKey(key: HeaderKey): void {
+        key.invalidate();
+    }
+
+    private _updateHeaderProfile(): void {
+        const layout = this.scoreRenderer.layout!;
+        const key = layout.headerKey;
+        key.reset();
+        this.buildHeaderKey(key);
+        const profiles = layout.headerProfiles;
+        let byLow: Map<number, HeaderProfile> | null = null;
+        let profile: HeaderProfile | null = null;
+        if (key.isValid && profiles.has(key.high)) {
+            byLow = profiles.get(key.high)!;
+            if (byLow.has(key.low)) {
+                profile = byLow.get(key.low)!;
+            }
+        }
+        const group = this._preBeatGlyphs;
+        if (profile) {
+            this.wasFirstOfStaff = this.isFirstOfStaff;
+            if (profile !== this._headerProfile) {
+                group.glyphs = null;
+            }
+        } else {
+            const high = key.high;
+            const low = key.low;
+            const isValid = key.isValid;
+            group.width = 0;
+            group.glyphs = null;
+            this.createPreBeatGlyphs();
+            profile = HeaderProfile.measure(group);
+            if (isValid) {
+                if (!byLow) {
+                    byLow = new Map<number, HeaderProfile>();
+                    profiles.set(high, byLow);
+                }
+                byLow.set(low, profile);
+            }
+        }
+        group.width = profile.naturalWidth;
+        this._headerProfile = profile;
+        this._headerInFirstSystem = this.staff!.system.index === 0;
+    }
+
+    private _paintHeader(cx: number, cy: number, canvas: ICanvas): void {
+        const group = this._preBeatGlyphs;
+        if (!group.glyphs) {
+            const width = group.width;
+            group.width = 0;
+            this.createPreBeatGlyphs();
+            group.width = width;
+        }
+        group.applyHeaderRod(this.layoutingInfo);
+        group.paint(cx, cy, canvas);
+    }
+
+    /** Emit per-glyph overflow into {@link postBeatLocalSkyline}. */
+    private _emitPostBeatOverflows(glyphs: Glyph[], rendererBottom: number): void {
         for (const g of glyphs) {
             const topY = g.getBoundingBoxTop();
             const bottomY = g.getBoundingBoxBottom();
@@ -859,7 +987,7 @@ export class BarRendererBase {
             if (bottomOver) {
                 this.registerOverflowBottom(bottomY - rendererBottom);
             }
-            BarRendererBase._insertGlyphSkyline(g, 0, skyline, rendererBottom);
+            BarRendererBase._insertGlyphSkyline(g, 0, this.postBeatLocalSkyline, rendererBottom);
         }
     }
 
@@ -921,6 +1049,21 @@ export class BarRendererBase {
         return this.voiceContainer.getBeatContainer(beat);
     }
 
+    /**
+     * Paints the staff lines of `renderers[from..to)`, the bars of this renderer's staff painted next.
+     * Called on the first of them, before any of them paints its content.
+     */
+    public paintStaffLines(
+        _cx: number,
+        _cy: number,
+        _canvas: ICanvas,
+        _renderers: BarRendererBase[],
+        _from: number,
+        _to: number
+    ): void {
+        // no staff lines
+    }
+
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
@@ -949,7 +1092,7 @@ export class BarRendererBase {
         this.paintBackground(cx, cy, canvas);
 
         canvas.color = this.resources.mainGlyphColor;
-        this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
+        this._paintHeader(cx + this.x, cy + this.y, canvas);
         this.voiceContainer.paint(cx + this.x, cy + this.y, canvas);
         canvas.color = this.resources.mainGlyphColor;
         this._postBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
@@ -964,7 +1107,12 @@ export class BarRendererBase {
         }
 
         for (const slur of multiSystemSlurs) {
-            slur.paint(cx, cy, canvas);
+            const previousColor = ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, slur.voice, true);
+            try {
+                slur.paint(cx, cy, canvas);
+            } finally {
+                ElementStyleHelper.restore(canvas, previousColor);
+            }
         }
     }
 
@@ -979,23 +1127,13 @@ export class BarRendererBase {
         // canvas.strokeRect(cx + this.x, cy + this.y - this.topOverflow, this.width, this.height + this.topOverflow + this.bottomOverflow);
     }
 
-    public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
-        const barBounds: BarBounds = new BarBounds();
-        barBounds.bar = this.bar;
-        barBounds.visualBounds = new Bounds();
-        barBounds.visualBounds.x = cx + this.x;
-        barBounds.visualBounds.y = cy + this.y;
-        barBounds.visualBounds.w = this.width;
-        barBounds.visualBounds.h = this.height;
-
-        barBounds.realBounds = new Bounds();
-        barBounds.realBounds.x = cx + this.x;
-        barBounds.realBounds.y = cy + this.y;
-        barBounds.realBounds.w = this.width;
-        barBounds.realBounds.h = this.height;
-
-        masterBarBounds.addBar(barBounds);
-        this.voiceContainer.buildBoundingsLookup(barBounds, cx + this.x, cy + this.y);
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number): void {
+        const scale = this.settings.display.scale;
+        const x = cx + this.x;
+        const y = cy + this.y;
+        writer.addBar(this.bar, x * scale, y * scale, this.width * scale, this.height * scale);
+        this.voiceContainer.buildBoundingsLookup(writer, x, y);
+        writer.endBar();
     }
 
     protected addPostBeatGlyph(g: Glyph): void {
@@ -1076,62 +1214,74 @@ export class BarRendererBase {
         this.bottomEffects.height = 0;
         this.updateSizes();
 
-        // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
-        // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
-        if ((this.wasFirstOfStaff && !this.isFirstOfStaff) || (!this.wasFirstOfStaff && this.isFirstOfStaff)) {
-            this.recreatePreBeatGlyphs();
-        }
+        this._refreshHeaderForPosition();
 
         // Must always re-register: the broker resets its header rods at the head of every resize cycle.
+        // Overlay rods and content overflows are bar-local: they only feed the broker's `finish` and
+        // the measured overflow snapshot, both taken after doLayout.
         this._registerLayoutingInfo();
-        this._registerOverlayRods();
-        if (!this._layoutInvariantCached) {
-            this.calculateOverflows(0, this.height);
-            this._layoutInvariantCached = true;
+    }
+
+    // the header depends on the position: first in the staff and, for first-system-only
+    // elements, the first system
+    private _refreshHeaderForPosition(): void {
+        if (
+            this.wasFirstOfStaff !== this.isFirstOfStaff ||
+            this._headerInFirstSystem !== (this.staff!.system.index === 0)
+        ) {
+            this.recreatePreBeatGlyphs();
         }
+    }
+
+    /**
+     * Registers the header columns of the bar for its current {@link staff} and {@link index}
+     * without laying it out again.
+     */
+    public registerHeaderForPosition(): void {
+        this._refreshHeaderForPosition();
+        this._headerProfile!.registerHeaderRods(this.layoutingInfo);
     }
 
     protected recreatePreBeatGlyphs() {
-        // Pre-beat composition is changing — invalidate cached bar-local state.
-        this._layoutInvariantCached = false;
-        this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
-        this._preBeatGlyphs.renderer = this;
-        this.createPreBeatGlyphs();
+        this._updateHeaderProfile();
     }
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, this.bar.voices[0], true);
+        const previousColor = ElementStyleHelper.applyVoice(canvas, VoiceSubElement.Glyphs, this.bar.voices[0], true);
+        try {
+            switch (this.bar.simileMark) {
+                case SimileMark.Simple:
+                    canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
+                        cx + this.x + this.width / 2,
+                        cy + this.y + this.height / 2,
+                        1,
+                        MusicFontSymbol.Repeat1Bar,
+                        true
+                    );
+                    canvas.endGroup();
+                    break;
+                case SimileMark.SecondOfDouble:
+                    canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
+                    canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
 
-        switch (this.bar.simileMark) {
-            case SimileMark.Simple:
-                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
-                CanvasHelper.fillMusicFontSymbolSafe(
-                    canvas,
-                    cx + this.x + this.width / 2,
-                    cy + this.y + this.height / 2,
-                    1,
-                    MusicFontSymbol.Repeat1Bar,
-                    true
-                );
-                canvas.endGroup();
-                break;
-            case SimileMark.SecondOfDouble:
-                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
-                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
+                    CanvasHelper.fillMusicFontSymbolSafe(
+                        canvas,
+                        cx + this.x,
+                        cy + this.y + this.height / 2,
+                        1,
+                        MusicFontSymbol.Repeat2Bars,
+                        true
+                    );
 
-                CanvasHelper.fillMusicFontSymbolSafe(
-                    canvas,
-                    cx + this.x,
-                    cy + this.y + this.height / 2,
-                    1,
-                    MusicFontSymbol.Repeat2Bars,
-                    true
-                );
+                    canvas.endGroup();
+                    canvas.endGroup();
 
-                canvas.endGroup();
-                canvas.endGroup();
-
-                break;
+                    break;
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 

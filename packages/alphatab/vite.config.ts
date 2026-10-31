@@ -7,6 +7,7 @@ import type { OutputOptions } from 'rollup';
 import { defineConfig, type LibraryOptions, type Plugin } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { addDts, defaultBuildUserConfig, esm, umd } from '../tooling/src/vite';
+import { stripTracePlugin } from '../tooling/src/vite.plugin.strip-trace';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -82,8 +83,16 @@ const preserveClassDeclarationsPlugin = (): Plugin => ({
     }
 });
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
     const config = defaultBuildUserConfig(__dirname);
+    if (command === 'build') {
+        // Rolldown's own TypeScript transform replaces enum member reads with their values across modules
+        // and drops enums nothing else references; Vite's per-file oxc transform cannot see other modules.
+        // The dev server does not bundle and needs Vite's transform.
+        config.oxc = false;
+    }
+    // Trace output exists only when running from the TypeScript sources (dev server, tests).
+    config.plugins!.push(stripTracePlugin());
     config.plugins!.push(
         viteStaticCopy({
             // `stripBase` flattens so files land directly under `font/` and

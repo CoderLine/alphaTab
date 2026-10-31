@@ -45,32 +45,35 @@ export class NumberedNoteHeadGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = this._beat.isRest
-            ? ElementStyleHelper.beat(canvas, BeatSubElement.NumberedRests, this._beat)
+        const previousColor = this._beat.isRest
+            ? ElementStyleHelper.applyBeat(canvas, BeatSubElement.NumberedRests, this._beat)
             : this._beat.notes.length > 0
-              ? ElementStyleHelper.note(canvas, NoteSubElement.NumberedNumber, this._beat.notes[0])
+              ? ElementStyleHelper.applyNote(canvas, NoteSubElement.NumberedNumber, this._beat.notes[0])
               : undefined;
+        try {
+            const res = this.renderer.resources;
+            canvas.font = this._isGrace ? res.numberedNotationGraceFont : res.numberedNotationFont;
+            const baseline = canvas.textBaseline;
+            canvas.textBaseline = TextBaseline.Middle;
+            canvas.textAlign = TextAlign.Left;
+            canvas.fillText(this._number.toString(), cx + this.x, cy + this.y);
+            canvas.textBaseline = baseline;
 
-        const res = this.renderer.resources;
-        canvas.font = this._isGrace ? res.numberedNotationGraceFont : res.numberedNotationFont;
-        const baseline = canvas.textBaseline;
-        canvas.textBaseline = TextBaseline.Middle;
-        canvas.textAlign = TextAlign.Left;
-        canvas.fillText(this._number.toString(), cx + this.x, cy + this.y);
-        canvas.textBaseline = baseline;
-
-        const dotCount = Math.abs(this._octaveDots);
-        let dotsY = this._octaveDotsY + res.engravingSettings.glyphTop.get(MusicFontSymbol.AugmentationDot)!;
-        for (let d = 0; d < dotCount; d++) {
-            CanvasHelper.fillMusicFontSymbolSafe(
-                canvas,
-                cx + this.x + this.width / 2,
-                cy + this.y + dotsY,
-                1,
-                MusicFontSymbol.AugmentationDot,
-                true
-            );
-            dotsY += this._octaveDotHeight * 2;
+            const dotCount = Math.abs(this._octaveDots);
+            let dotsY = this._octaveDotsY + res.engravingSettings.glyphTop.get(MusicFontSymbol.AugmentationDot)!;
+            for (let d = 0; d < dotCount; d++) {
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
+                    cx + this.x + this.width / 2,
+                    cy + this.y + dotsY,
+                    1,
+                    MusicFontSymbol.AugmentationDot,
+                    true
+                );
+                dotsY += this._octaveDotHeight * 2;
+            }
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
         }
     }
 

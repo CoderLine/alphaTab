@@ -16,10 +16,12 @@ import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/Accidental
 import { ClefGlyph } from '@coderline/alphatab/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import { KeySignatureGlyph } from '@coderline/alphatab/rendering/glyphs/KeySignatureGlyph';
+import { ScoreChordNoteHeadInfo } from '@coderline/alphatab/rendering/glyphs/ScoreNoteChordGlyphBase';
 import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { ScoreBeatContainerGlyph } from '@coderline/alphatab/rendering/ScoreBeatContainerGlyph';
 import type { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
+import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 import { StaffDisplayResolver } from '@coderline/alphatab/rendering/staves/StaffDisplayResolver';
 import { AccidentalHelper } from '@coderline/alphatab/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
@@ -162,7 +164,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override getBeamDirection(helper: BeamingHelper): BeamDirection {
-        return this._beamDirections.has(helper) ? this._beamDirections.get(helper)! : BeamDirection.Up;
+        return helper.beamDirection;
     }
 
     public centerStaffStemY(direction: BeamDirection) {
@@ -204,6 +206,23 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     protected override getMaxLineOfBeat(beat: Beat): number {
         return this.accidentalHelper.getMaxSteps(beat) / 2;
+    }
+
+    protected override buildLineHeaderKey(key: HeaderKey): void {
+        const bar = this.bar;
+        const previous = bar.previousBar;
+        key.addHighFlag(StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveClefDisplay()));
+        key.addHigh(bar.clef as number, 3);
+        key.addHigh(bar.clefOttava as number, 3);
+        key.addHighFlag(StaffDisplayResolver.isPrimaryForElement(this.staff!, this.resolveKeySignatureDisplay()));
+        key.addHigh((bar.keySignature as number) + 7, 4);
+        key.addHighFlag(previous !== null);
+        if (previous) {
+            key.addHigh(previous.clef as number, 3);
+            key.addHigh(previous.clefOttava as number, 3);
+            key.addHigh((previous.keySignature as number) + 7, 4);
+        }
+        this.buildTimeSignatureHeaderKey(key);
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -364,6 +383,40 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
     }
 
+    private _chordNoteHeadInfoStarts: number[] | null = null;
+    private _chordNoteHeadInfos: ScoreChordNoteHeadInfo[] | null = null;
+
+    protected override createBeatGlyphs(): void {
+        super.createBeatGlyphs();
+        this._chordNoteHeadInfoStarts = null;
+        this._chordNoteHeadInfos = null;
+    }
+
+    /**
+     * The note head info shared by the chords of all voices starting at the given display start in this bar,
+     * created with the given main voice direction on the first request. Only available while the beat glyphs
+     * are created.
+     */
+    public getChordNoteHeadInfo(displayStart: number, mainVoiceDirection: BeamDirection): ScoreChordNoteHeadInfo {
+        const starts = this._chordNoteHeadInfoStarts;
+        const infos = this._chordNoteHeadInfos;
+        if (starts === null || infos === null) {
+            const first = new ScoreChordNoteHeadInfo(mainVoiceDirection);
+            this._chordNoteHeadInfoStarts = [displayStart];
+            this._chordNoteHeadInfos = [first];
+            return first;
+        }
+        for (let i = 0, j = starts.length; i < j; i++) {
+            if (starts[i] === displayStart) {
+                return infos[i];
+            }
+        }
+        const info = new ScoreChordNoteHeadInfo(mainVoiceDirection);
+        starts.push(displayStart);
+        infos.push(info);
+        return info;
+    }
+
     public override getNoteLine(note: Note): number {
         return this.accidentalHelper.getNoteSteps(note) / 2;
     }
@@ -372,11 +425,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return this.accidentalHelper.getNoteSteps(n);
     }
 
-    private readonly _beamDirections = new Map<BeamingHelper, BeamDirection>();
-
     public override completeBeamingHelper(helper: BeamingHelper) {
-        const direction = this._calculateBeamDirection(helper);
-        this._beamDirections.set(helper, direction);
+        helper.beamDirection = this._calculateBeamDirection(helper);
     }
 
     private _calculateBeamDirection(helper: BeamingHelper): BeamDirection {
@@ -449,7 +499,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
-        canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.StandardNotationStem, beat);
+        try {
+            canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 }

@@ -4,46 +4,71 @@
 // the code is regenerated.
 // </auto-generated>
 import { NumberedBarOverride } from "@coderline/alphatab/model/BarOverrides";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ElementDisplaySerializer } from "@coderline/alphatab/generated/model/ElementDisplaySerializer";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class NumberedBarOverrideSerializer {
-    public static fromJson(obj: NumberedBarOverride, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => NumberedBarOverrideSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["timesignature", "barnumber"]);
+    public static read(obj: NumberedBarOverride, reader: IObjectReader): void {
+        reader.readRecord(NumberedBarOverrideSerializer._fields, (id, k, rr) => NumberedBarOverrideSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: NumberedBarOverride | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        if (obj.timeSignature) {
-            o.set("timesignature", ElementDisplaySerializer.toJson(obj.timeSignature));
-        }
-        o.set("barnumber", obj.barNumber as number | undefined);
-        return o;
+    public static readProperty(obj: NumberedBarOverride, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = NumberedBarOverrideSerializer._fields.idOf(property);
+        return id >= 0 ? NumberedBarOverrideSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: NumberedBarOverride, property: string, v: unknown): boolean {
-        switch (property) {
-            case "barnumber":
-                obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(v, BarNumberDisplay);
+    private static _readField(obj: NumberedBarOverride, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                if (r.isNullish()) {
+                    obj.timeSignature = undefined;
+                }
+                else {
+                    obj.timeSignature = {};
+                    ElementDisplaySerializer.read(obj.timeSignature, r);
+                }
+                return true;
+            case 1:
+                obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
                 return true;
         }
+        return false;
+    }
+    public static readFlexible(obj: NumberedBarOverride, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? NumberedBarOverrideSerializer._readField(obj, id, rr, false) : NumberedBarOverrideSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: NumberedBarOverride, property: string, r: IObjectReader): boolean {
+        if (["timesignature"].indexOf(property) < 0 && NumberedBarOverrideSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
         if (["timesignature"].indexOf(property) >= 0) {
-            if (v) {
-                obj.timeSignature = {};
-                ElementDisplaySerializer.fromJson(obj.timeSignature, v as Map<string, unknown>);
+            if (r.isNullish()) {
+                obj.timeSignature = undefined;
             }
             else {
-                obj.timeSignature = undefined;
+                obj.timeSignature = {};
+                ElementDisplaySerializer.readFlexible(obj.timeSignature, r);
             }
             return true;
         }
         return false;
+    }
+    public static write(obj: NumberedBarOverride | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(NumberedBarOverrideSerializer._fields);
+        if (obj.timeSignature) {
+            w.field(0);
+            ElementDisplaySerializer.write(obj.timeSignature, w);
+        }
+        w.valueField(1, obj.barNumber as number | undefined);
+        w.endObject();
     }
 }

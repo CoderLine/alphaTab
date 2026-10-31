@@ -1,5 +1,6 @@
 import { Environment } from '@coderline/alphatab/Environment';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
 import { Logger } from '@coderline/alphatab/Logger';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -8,9 +9,11 @@ import type {
     IAlphaTabWorkerGlobalScope,
     IAlphaTabWorkerMessage
 } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import { WorkerScoreEncoding } from '@coderline/alphatab/platform/worker/WorkerScoreEncoding';
 import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
-import type { Settings } from '@coderline/alphatab/Settings';
+import { BoundsLookupWireWriter } from '@coderline/alphatab/rendering/utils/BoundsLookupWireWriter';
+import { Settings } from '@coderline/alphatab/Settings';
 
 /**
  * @internal
@@ -18,6 +21,10 @@ import type { Settings } from '@coderline/alphatab/Settings';
  */
 export class AlphaTabWebWorker {
     private _renderer!: ScoreRenderer;
+    /**
+     * @target web
+     */
+    private _boundsWire: BoundsLookupWireWriter | null = null;
     private _scoreId = 0;
     private _main: IAlphaTabWorkerGlobalScope<IAlphaTabWorkerMessage>;
 
@@ -37,9 +44,12 @@ export class AlphaTabWebWorker {
         }
         switch (data.cmd) {
             case 'alphaTab.initialize':
-                const settings: Settings = JsonConverter.jsObjectToSettings(data.settings);
+                const settings = new Settings();
+                SettingsSerializer.read(settings, new MapObjectReader(data.settings));
                 Logger.logLevel = settings.core.logLevel;
                 this._renderer = new ScoreRenderer(settings);
+                /*@target web*/
+                this._installBoundsWire();
                 this._renderer.partialRenderFinished.on(result => {
                     this._main.postMessage({
                         cmd: 'alphaTab.partialRenderFinished',
@@ -58,13 +68,7 @@ export class AlphaTabWebWorker {
                         result: result
                     });
                 });
-                this._renderer.postRenderFinished.on(() => {
-                    this._main.postMessage({
-                        cmd: 'alphaTab.postRenderFinished',
-                        scoreId: this._scoreId,
-                        boundsLookup: this._renderer.boundsLookup?.toJson() ?? null
-                    });
-                });
+                this._renderer.postRenderFinished.on(() => this._postRenderFinished());
                 this._renderer.preRender.on(resize => {
                     this._main.postMessage({
                         cmd: 'alphaTab.preRender',
@@ -77,7 +81,11 @@ export class AlphaTabWebWorker {
                 this._renderer.render(data.renderHints);
                 break;
             case 'alphaTab.resizeRender':
-                this._renderer.resizeRender();
+                try {
+                    this._renderer.resizeRender();
+                } finally {
+                    this._main.postMessage({ cmd: 'alphaTab.resizeRenderFinished' });
+                }
                 break;
             case 'alphaTab.renderResult':
                 this._renderer.renderResult(data.resultId);
@@ -88,15 +96,57 @@ export class AlphaTabWebWorker {
             case 'alphaTab.renderScore':
                 this._scoreId = data.scoreId;
                 this._updateFontSizes(data.fontSizes);
-                const renderHints = data.renderHints;
-                const score =
-                    data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
-                this._renderMultiple(score, data.trackIndexes, renderHints);
+                this._renderScore(data.score, data.trackIndexes, data.renderHints);
                 break;
             case 'alphaTab.updateSettings':
                 this._updateSettings(data.settings);
                 break;
         }
+    }
+
+    private _deserializeScore(data: unknown): Score {
+        /*@target web*/
+        if (data instanceof Uint8Array) {
+            return WorkerScoreEncoding.decode(data, this._renderer.settings);
+        }
+        return JsonConverter.jsObjectToScore(data, this._renderer.settings);
+    }
+
+    private _postRenderFinished(): void {
+        /*@target web*/
+        if (this._postBoundsLookupWire()) {
+            return;
+        }
+        this._main.postMessage({
+            cmd: 'alphaTab.postRenderFinished',
+            scoreId: this._scoreId,
+            boundsLookup: this._renderer.boundsLookup?.toJson() ?? null
+        });
+    }
+
+    /**
+     * The main thread is the only consumer of the bounds, so the renderer writes them in wire format
+     * and its `boundsLookup` stays null.
+     * @target web
+     */
+    private _installBoundsWire(): void {
+        this._boundsWire = new BoundsLookupWireWriter();
+        this._renderer.boundsWriter = this._boundsWire;
+    }
+
+    /**
+     * @target web
+     */
+    private _postBoundsLookupWire(): boolean {
+        const data = this._boundsWire?.encode() ?? null;
+        if (!data) {
+            return false;
+        }
+        (this._main as unknown as DedicatedWorkerGlobalScope).postMessage(
+            { cmd: 'alphaTab.postRenderFinishedWire', scoreId: this._scoreId, boundsLookup: data },
+            [data.buffer]
+        );
+        return true;
     }
 
     private _updateFontSizes(fontSizes: Map<string, FontSizeDefinition>): void {
@@ -106,11 +156,12 @@ export class AlphaTabWebWorker {
     }
 
     private _updateSettings(json: unknown): void {
-        SettingsSerializer.fromJson(this._renderer.settings, json);
+        SettingsSerializer.read(this._renderer.settings, new MapObjectReader(json));
     }
 
-    private _renderMultiple(score: Score | null, trackIndexes: number[] | null, renderHints?: RenderHints): void {
+    private _renderScore(data: unknown, trackIndexes: number[] | null, renderHints?: RenderHints): void {
         try {
+            const score = data == null ? null : this._deserializeScore(data);
             this._renderer.renderScore(score, trackIndexes, renderHints);
         } catch (e) {
             this._error(e as Error);

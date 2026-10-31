@@ -2742,6 +2742,38 @@ export class GpifParser {
                 this._attachNoteToBeat(beat, noteId, staff);
             }
         }
+        if (staff.isPercussion) {
+            GpifParser._fitPercussionStrings(beat, staff.tuning.length);
+        }
+    }
+
+    /**
+     * Moves percussion notes with a string outside of the staff onto a string of the staff:
+     * the nearest one if no other note of the beat uses it, otherwise the highest unused one.
+     */
+    private static _fitPercussionStrings(beat: Beat, stringCount: number): void {
+        if (stringCount === 0) {
+            return;
+        }
+        for (const note of beat.notes) {
+            if (Number.isNaN(note.string) || (note.string >= 1 && note.string <= stringCount)) {
+                continue;
+            }
+            if (beat.noteStringLookup.has(note.string) && beat.noteStringLookup.get(note.string) === note) {
+                beat.noteStringLookup.delete(note.string);
+            }
+            let fitted = Math.max(1, Math.min(stringCount, note.string));
+            if (beat.noteStringLookup.has(fitted)) {
+                for (let s = stringCount; s >= 1; s--) {
+                    if (!beat.noteStringLookup.has(s)) {
+                        fitted = s;
+                        break;
+                    }
+                }
+            }
+            note.string = fitted;
+            beat.noteStringLookup.set(fitted, note);
+        }
     }
 
     private _attachNoteToBeat(beat: Beat, noteId: string, staff: Staff): void {

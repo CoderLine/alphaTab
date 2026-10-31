@@ -18,8 +18,8 @@ import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingH
  */
 export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;
-    private _effectSlurStarts: Set<BeamDirection> = new Set<BeamDirection>();
-    private _effectSlurEnds: Set<BeamDirection> = new Set<BeamDirection>();
+    private _effectSlurStarts: Set<BeamDirection> | null = null;
+    private _effectSlurEnds: Set<BeamDirection> | null = null;
 
     public constructor(beat: Beat) {
         super(beat);
@@ -32,8 +32,8 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public override doLayout(): void {
-        this._effectSlurStarts.clear();
-        this._effectSlurEnds.clear();
+        this._effectSlurStarts?.clear();
+        this._effectSlurEnds?.clear();
         super.doLayout();
         if (this._bend) {
             this._bend.renderer = this.renderer;
@@ -63,11 +63,17 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
             const direction = TabTieGlyph.getBeamDirectionForNote(n);
-            const group = this._effectSlurStarts.has(direction)
-                ? null
-                : TabSlurGlyph.getEffectSlurGroup(this.beat, direction);
+            let slurStarts = this._effectSlurStarts;
+            const group =
+                slurStarts !== null && slurStarts.has(direction)
+                    ? null
+                    : TabSlurGlyph.getEffectSlurGroup(this.beat, direction);
             if (group) {
-                this._effectSlurStarts.add(direction);
+                if (!slurStarts) {
+                    slurStarts = new Set<BeamDirection>();
+                    this._effectSlurStarts = slurStarts;
+                }
+                slurStarts.add(direction);
                 this.addTie(
                     new TabSlurGlyph(`tab.slur.effect.${group.startNote.id}`, group.startNote, group.endNote, false)
                 );
@@ -76,11 +82,17 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         // end effect slur on last beat
         if (n.isEffectSlurDestination && n.effectSlurOrigin) {
             const direction = TabTieGlyph.getBeamDirectionForNote(n.effectSlurOrigin);
-            const group = this._effectSlurEnds.has(direction)
-                ? null
-                : TabSlurGlyph.getEffectSlurGroup(n.effectSlurOrigin.beat, direction);
+            let slurEnds = this._effectSlurEnds;
+            const group =
+                slurEnds !== null && slurEnds.has(direction)
+                    ? null
+                    : TabSlurGlyph.getEffectSlurGroup(n.effectSlurOrigin.beat, direction);
             if (group && group.endNote === n) {
-                this._effectSlurEnds.add(direction);
+                if (!slurEnds) {
+                    slurEnds = new Set<BeamDirection>();
+                    this._effectSlurEnds = slurEnds;
+                }
+                slurEnds.add(direction);
                 this.addTie(
                     new TabSlurGlyph(`tab.slur.effect.${group.startNote.id}`, group.startNote, group.endNote, true)
                 );

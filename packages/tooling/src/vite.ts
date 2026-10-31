@@ -20,7 +20,9 @@ import { elementStyleUsingPlugin } from './vite.plugin.transform';
 const terserOptions: MinifyOptions = {
     mangle: {
         properties: {
-            regex: /^_/
+            regex: /^_/,
+            // Quoted keys, as emitted for enum members like the public `Ottavia._8va`, keep their names everywhere.
+            keep_quoted: true
         }
     }
 };

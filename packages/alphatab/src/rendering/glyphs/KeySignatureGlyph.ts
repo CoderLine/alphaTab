@@ -2,7 +2,7 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { LeftToRightLayoutingGlyphGroup } from '@coderline/alphatab/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
-import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
+import type { IHeaderRodSink } from '@coderline/alphatab/rendering/staves/HeaderProfile';
 
 /**
  * @internal
@@ -13,7 +13,7 @@ export class KeySignatureGlyph extends LeftToRightLayoutingGlyphGroup {
      */
     public static readonly HeaderRank: number = 300;
 
-    public override registerHeaderRod(info: BarLayoutingInfo): void {
+    public override registerHeaderRod(info: IHeaderRodSink): void {
         if (this.isEmpty) {
             return;
         }
@@ -22,7 +22,7 @@ export class KeySignatureGlyph extends LeftToRightLayoutingGlyphGroup {
         info.addHeaderRod(KeySignatureGlyph.HeaderRank, 0, this.width + spacing, spacing);
     }
 
-    public override applyHeaderRod(info: BarLayoutingInfo): void {
+    public override applyHeaderRod(info: IHeaderRodSink): void {
         if (this.isEmpty) {
             return;
         }
@@ -30,7 +30,15 @@ export class KeySignatureGlyph extends LeftToRightLayoutingGlyphGroup {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationKeySignature, this.renderer.bar);
-        super.paint(cx, cy, canvas);
+        const previousColor = ElementStyleHelper.applyBar(
+            canvas,
+            BarSubElement.StandardNotationKeySignature,
+            this.renderer.bar
+        );
+        try {
+            super.paint(cx, cy, canvas);
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 }

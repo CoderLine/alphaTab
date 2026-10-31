@@ -4,25 +4,25 @@
 // the code is regenerated.
 // </auto-generated>
 import { BackingTrack } from "@coderline/alphatab/model/BackingTrack";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class BackingTrackSerializer {
-    public static fromJson(obj: BackingTrack, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields([]);
+    public static read(obj: BackingTrack, reader: IObjectReader): void {
+        reader.readRecord(BackingTrackSerializer._fields, (id, k, r) => {
+            return false;
+        });
+    }
+    public static write(obj: BackingTrack | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BackingTrackSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: BackingTrack | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        return o;
-    }
-    public static setProperty(obj: BackingTrack, property: string, v: unknown): boolean {
-        return false;
+        w.startObject(BackingTrackSerializer._fields);
+        w.endObject();
     }
 }

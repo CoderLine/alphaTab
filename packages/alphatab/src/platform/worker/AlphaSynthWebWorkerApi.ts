@@ -9,6 +9,7 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { LogLevel } from '@coderline/alphatab/LogLevel';
 import type { MidiEventType } from '@coderline/alphatab/midi/MidiEvent';
 import type { MidiFile } from '@coderline/alphatab/midi/MidiFile';
+import { MidiFileWire } from '@coderline/alphatab/midi/MidiFileWire';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Score } from '@coderline/alphatab/model/Score';
@@ -293,6 +294,10 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public playOneTimeMidiFile(midi: MidiFile): void {
+        /*@target web*/
+        if (MidiFileWire.post(this._synth, { cmd: 'alphaSynth.playOneTimeMidiFile', midi: null }, midi)) {
+            return;
+        }
         this._synth.postMessage({
             cmd: 'alphaSynth.playOneTimeMidiFile',
             midi: JsonConverter.midiFileToJsObject(Environment.prepareForPostMessage(midi))
@@ -314,6 +319,10 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public loadMidiFile(midi: MidiFile): void {
+        /*@target web*/
+        if (MidiFileWire.post(this._synth, { cmd: 'alphaSynth.loadMidi', midi: null }, midi)) {
+            return;
+        }
         this._synth.postMessage({
             cmd: 'alphaSynth.loadMidi',
             midi: JsonConverter.midiFileToJsObject(Environment.prepareForPostMessage(midi))

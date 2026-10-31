@@ -4,6 +4,30 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { describe, expect, it } from 'vitest';
 import webpack from 'webpack';
 import { AlphaTabWebPackPlugin } from '../src/alphaTab.webpack';
+import type { AlphaTabWebPackPluginOptions } from '../src/AlphaTabWebPackPluginOptions';
+
+/**
+ * Runs webpack on a minimal project and returns the messages of the errors the build finished with.
+ */
+async function bundleMisconfigured(pluginOptions: AlphaTabWebPackPluginOptions): Promise<string[]> {
+    const project = path.resolve('./test-data/misconfigured');
+    return new Promise<string[]>(resolve => {
+        webpack(
+            {
+                mode: 'development',
+                context: project,
+                entry: './src/app.mjs',
+                output: {
+                    path: path.resolve('./test-data/project/out/misconfigured')
+                },
+                plugins: [new AlphaTabWebPackPlugin(pluginOptions)]
+            },
+            (err, stats) => {
+                resolve(err ? [err.message] : stats!.compilation.errors.map(e => e.message));
+            }
+        );
+    });
+}
 
 describe('WebPack', () => {
     it('bundle-correctly', { timeout: 30000 }, async () => {
@@ -133,5 +157,30 @@ describe('WebPack', () => {
         expect(coreFileValidated, 'Missing core file validation').toBe(true);
         expect(workerValidated, 'Missing worker validation').toBe(true);
         expect(workletValidated, 'Missing worklet validation').toBe(true);
+    });
+
+    it('reports-missing-alphatab', { timeout: 10000 }, async () => {
+        const errors = await bundleMisconfigured({
+            alphaTabSourceDir: path.resolve('./test-data/misconfigured/does-not-exist')
+        });
+        expect(errors).toEqual([
+            'Could not find alphaTab, please ensure it is installed into node_modules or configure alphaTabSourceDir'
+        ]);
+    });
+
+    it('reports-missing-output-path', { timeout: 10000 }, async () => {
+        const errors = await bundleMisconfigured({
+            alphaTabSourceDir: path.resolve('./test-data/misconfigured/alphatab'),
+            assetOutputDir: ''
+        });
+        expect(errors).toEqual(['Need output.path configured in application to store asset files.']);
+    });
+
+    it('reports-failed-asset-copy', { timeout: 10000 }, async () => {
+        const errors = await bundleMisconfigured({
+            alphaTabSourceDir: path.resolve('./test-data/misconfigured/alphatab')
+        });
+        expect(errors.length).toBe(1);
+        expect(errors[0]).toContain('ENOENT');
     });
 });

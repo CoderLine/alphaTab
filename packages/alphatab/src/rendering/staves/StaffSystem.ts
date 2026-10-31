@@ -24,10 +24,7 @@ import { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayout
 import { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 import { StaffTrackGroup } from '@coderline/alphatab/rendering/staves/StaffTrackGroup';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { MasterBarBounds } from '@coderline/alphatab/rendering/utils/MasterBarBounds';
-import { StaffSystemBounds } from '@coderline/alphatab/rendering/utils/StaffSystemBounds';
 
 /**
  * @internal
@@ -57,6 +54,19 @@ export abstract class SystemBracket {
     }
 
     public abstract includesStaff(s: RenderStaff): boolean;
+
+    /**
+     * Clears the state derived from the bars of the system; the staves in the bracket are kept.
+     */
+    public reset(): void {
+        this.firstVisibleStaffInBracket = undefined;
+        this.lastVisibleStaffInBracket = undefined;
+        this.braceScale = 1;
+        this.width = 0;
+        this.canPaint = false;
+        this._initialPaintabilityCaptured = false;
+        this.reservesAccoladeSpace = false;
+    }
 
     public updateCanPaint() {
         let firstVisibleStaff: RenderStaff | undefined = undefined;
@@ -246,36 +256,6 @@ export class StaffSystem {
      */
     public totalContentWidth: number = 0;
 
-    /**
-     * Shortest note duration (in ticks) across every bar that has been added to this system, used
-     * as the common reference in the Gourlay stretch formula so that rhythmically-equivalent beats
-     * in different bars of the same system align column-wise.
-     *
-     * `-1` means "no bar added yet". The value only moves downward during system assembly; when a
-     * new bar introduces a shorter minimum, {@link isMinDurationDirty} is set so that
-     * {@link reconcileMinDurationIfDirty} can re-derive spring constants on the previously-added
-     * bars before layout distribution runs.
-     */
-    public minDuration: number = -1;
-
-    /**
-     * Set when a bar added to this system introduced a shorter {@link minDuration} than previously
-     * seen, leaving earlier bars' spring constants stale. Consumed by
-     * {@link reconcileMinDurationIfDirty} which is called from `VerticalLayoutBase._fitSystem`
-     * once the system is fully assembled.
-     */
-    public isMinDurationDirty: boolean = false;
-
-    /**
-     * Whether this system coordinates a shared minimum-duration reference across its bars for the
-     * Gourlay stretch formula. Defaults to `true` for page-style and parchment layouts where bars
-     * of a system fight for a common staff width. Set to `false` for horizontal layouts where each
-     * bar is sized independently (by `bar.displayWidth` or its intrinsic width) and there is no
-     * column-alignment concern - each bar keeps its local minimum so pre-existing rendering is
-     * preserved.
-     */
-    public shareMinDurationAcrossBars: boolean = true;
-
     public isLast: boolean = false;
     public masterBarsRenderers: MasterBarsRenderers[] = [];
     public staves: StaffTrackGroup[] = [];
@@ -290,6 +270,128 @@ export class StaffSystem {
         this.layout = layout;
         this.topPadding = layout.renderer.settings.display.systemPaddingTop;
         this.bottomPadding = layout.renderer.settings.display.systemPaddingBottom;
+    }
+
+    /**
+     * Prepares the system to be filled with bars again: the staves, track groups and brackets are
+     * kept, everything derived from the bars is cleared.
+     */
+    public reset(): void {
+        const display = this.layout.renderer.settings.display;
+        this._accoladeVisibilityFingerprint = -1;
+        this._contentHeight = 0;
+        this._hasSystemSeparator = false;
+        this.x = 0;
+        this.y = 0;
+        this.accoladeWidth = 0;
+        this.isFull = false;
+        this.width = 0;
+        this.computedWidth = 0;
+        this.totalBarDisplayScale = 0;
+        this.totalFixedOverhead = 0;
+        this.totalContentWidth = 0;
+        this.isLast = false;
+        while (this.masterBarsRenderers.length > 0) {
+            this.masterBarsRenderers.pop();
+        }
+        this.topPadding = display.systemPaddingTop;
+        this.bottomPadding = display.systemPaddingBottom;
+        this.firstVisibleStaff = undefined;
+        for (let i = 0; i < this.staves.length; i++) {
+            const g = this.staves[i];
+            g.firstVisibleStaff = undefined;
+            g.lastVisibleStaff = undefined;
+        }
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
+            s.reset();
+        }
+        for (let i = 0; i < this._brackets.length; i++) {
+            const b = this._brackets[i];
+            b.reset();
+        }
+    }
+
+    /**
+     * Restores the bars of {@link masterBarsRenderers} on the staves holding them, after other systems
+     * measured some of them as their next bar (which detaches them again). Fails without changes when
+     * a staff does not hold the renderers anymore or one is attached elsewhere.
+     * @returns Whether every staff holds its renderers at the positions they were added at.
+     */
+    public reattachBars(): boolean {
+        const count = this.masterBarsRenderers.length;
+        if (count === 0) {
+            return false;
+        }
+        const allStaves = this.allStaves;
+        for (let i = 0; i < allStaves.length; i++) {
+            if (allStaves[i].barRenderers.length !== count) {
+                return false;
+            }
+        }
+        let anyDetached = false;
+        for (let i = 0; i < count; i++) {
+            const renderers = this.masterBarsRenderers[i].renderers;
+            let attached = 0;
+            for (let j = 0; j < allStaves.length; j++) {
+                const staff = allStaves[j];
+                const r = renderers[j];
+                if (staff.barRenderers[i] !== r) {
+                    return false;
+                }
+                if (r.staff === staff && r.index === i) {
+                    attached++;
+                } else if (r.staff !== undefined) {
+                    return false;
+                }
+            }
+            if (attached === 0) {
+                anyDetached = true;
+            } else if (attached !== allStaves.length) {
+                return false;
+            }
+        }
+        if (!anyDetached) {
+            return true;
+        }
+        for (let i = 0; i < count; i++) {
+            const bars = this.masterBarsRenderers[i];
+            const renderers = bars.renderers;
+            if (renderers[0].staff !== undefined) {
+                continue;
+            }
+            bars.layoutingInfo.resetHeaderRods();
+            for (let j = 0; j < allStaves.length; j++) {
+                const r = renderers[j];
+                r.staff = allStaves[j];
+                r.index = i;
+                r.reLayout();
+            }
+            for (let j = 0; j < allStaves.length; j++) {
+                renderers[j].applyLayoutingInfo();
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Prepares a system holding its assembled bars (see {@link reattachBars}) to be fitted and
+     * finalized again: the state is the one after the last bar was added.
+     */
+    public prepareRefit(): void {
+        const display = this.layout.renderer.settings.display;
+        this.width = this.computedWidth;
+        this.topPadding = display.systemPaddingTop;
+        this.bottomPadding = display.systemPaddingBottom;
+        this._hasSystemSeparator = false;
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const renderers = this.allStaves[i].barRenderers;
+            for (let j = 0; j < renderers.length; j++) {
+                const r = renderers[j];
+                r.registerMultiSystemSlurs(null);
+                r.isFinalized = false;
+            }
+        }
     }
 
     public get firstBarIndex(): number {
@@ -311,11 +413,13 @@ export class StaffSystem {
         let firstVisibleStaff: RenderStaff | undefined = undefined;
         let anyStaffVisible = false;
 
-        for (const g of this.staves) {
+        for (let i = 0; i < this.staves.length; i++) {
+            const g = this.staves[i];
             let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
             let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
 
-            for (const s of g.staves) {
+            for (let j = 0; j < g.staves.length; j++) {
+                const s = g.staves[j];
                 const renderer: BarRendererBase = renderers.renderers[src++];
                 s.addBarRenderer(renderer);
 
@@ -351,12 +455,73 @@ export class StaffSystem {
         this.firstVisibleStaff = firstVisibleStaff;
         this._calculateAccoladeSpacing(tracks);
 
-        // On the resize path the layoutingInfo was finalized in a previous layout pass, so we
-        // only need to check whether its min-duration reference still matches the new system's.
-        this._trackSystemMinDuration(renderers.layoutingInfo);
-
         this._applyLayoutAndUpdateWidth();
         return renderers;
+    }
+
+    /**
+     * Creates and lays out the renderers of the master bar as if it were the next bar of this
+     * system, without adding them (see {@link addMasterBarRenderers}).
+     */
+    public measureBars(
+        tracks: Track[],
+        barIndex: number,
+        additionalMultiBarRestIndexes: number[] | null
+    ): MasterBarsRenderers {
+        const result: MasterBarsRenderers = new MasterBarsRenderers();
+        result.additionalMultiBarRestIndexes = additionalMultiBarRestIndexes;
+        const display = this.layout.renderer.settings.display;
+        const sharesMinDuration = this.layout.sharesMinDurationAcrossBars;
+        result.layoutingInfo = new BarLayoutingInfo(
+            display.spacingRatio,
+            display.resources.engravingSettings.beatContentPadding,
+            display.resources.engravingSettings.barlineContentPadding,
+            sharesMinDuration ? this.layout.referenceMinDuration : BarLayoutingInfo.defaultMinDuration,
+            !sharesMinDuration
+        );
+        result.masterBar = tracks[0].score.masterBars[barIndex];
+
+        for (const g of this.staves) {
+            for (const s of g.staves) {
+                const bar: Bar = g.track.staves[s.modelStaff.index].bars[barIndex];
+                const additionalMultiBarsRestBars: Bar[] | null =
+                    additionalMultiBarRestIndexes == null
+                        ? null
+                        : additionalMultiBarRestIndexes.map(b => g.track.staves[s.modelStaff.index].bars[b]);
+                const renderer = s.createBarRenderer(bar, result.layoutingInfo, additionalMultiBarsRestBars);
+                result.renderers.push(renderer);
+                if (renderer.isLinkedToPrevious) {
+                    result.isLinkedToPrevious = true;
+                }
+                if (bar.simileMark === SimileMark.SecondOfDouble) {
+                    result.canWrap = false;
+                }
+            }
+        }
+
+        result.layoutingInfo.finish();
+        return result;
+    }
+
+    /**
+     * The width the master bar would have as the next bar of this system, or as the bar after
+     * `pending` more bars. Positions the renderers on the staves of this system without adding them.
+     */
+    public measureWidth(renderers: MasterBarsRenderers, pending: number = 0): number {
+        const info = renderers.layoutingInfo;
+        info.resetHeaderRods();
+        let src: number = 0;
+        for (let i = 0; i < this.staves.length; i++) {
+            const g = this.staves[i];
+            for (let j = 0; j < g.staves.length; j++) {
+                const s = g.staves[j];
+                const renderer: BarRendererBase = renderers.renderers[src++];
+                renderer.staff = s;
+                renderer.index = s.barRenderers.length + pending;
+                renderer.registerHeaderForPosition();
+            }
+        }
+        return info.naturalBarWidth(this.layout.renderer.settings.display.stretchForce);
     }
 
     public addBars(
@@ -367,10 +532,13 @@ export class StaffSystem {
         const result: MasterBarsRenderers = new MasterBarsRenderers();
         result.additionalMultiBarRestIndexes = additionalMultiBarRestIndexes;
         const display = this.layout.renderer.settings.display;
+        const sharesMinDuration = this.layout.sharesMinDurationAcrossBars;
         result.layoutingInfo = new BarLayoutingInfo(
             display.spacingRatio,
             display.resources.engravingSettings.beatContentPadding,
-            display.resources.engravingSettings.barlineContentPadding
+            display.resources.engravingSettings.barlineContentPadding,
+            sharesMinDuration ? this.layout.referenceMinDuration : BarLayoutingInfo.defaultMinDuration,
+            !sharesMinDuration
         );
         result.masterBar = tracks[0].score.masterBars[barIndex];
         this.masterBarsRenderers.push(result);
@@ -431,103 +599,11 @@ export class StaffSystem {
         this._calculateAccoladeSpacing(tracks);
 
         barLayoutingInfo.finish();
-        // Reconcile against the system-wide minimum-duration reference now that springs are
-        // finalized. If this bar introduced a shorter note, earlier bars become stale (flagged
-        // for bulk reconcile at fit time). If the system already had a shorter min than this
-        // bar's local one, this bar's spring constants are recomputed immediately so the width
-        // we return below reflects the shared reference.
-        this._trackSystemMinDuration(barLayoutingInfo);
 
         // ensure same widths of new renderer
         result.width = this._applyLayoutAndUpdateWidth();
 
         return result;
-    }
-
-    /**
-     * Updates {@link minDuration} and {@link isMinDurationDirty} when a bar is added, and brings
-     * the just-added bar's {@link BarLayoutingInfo} in line with the current system minimum if the
-     * system already saw a shorter reference. The bulk reconcile over previously-added bars is
-     * deferred to {@link reconcileMinDurationIfDirty} (called from `_fitSystem`) to avoid
-     * re-iterating the system every time a bar is appended.
-     */
-    private _trackSystemMinDuration(info: BarLayoutingInfo): void {
-        if (!this.shareMinDurationAcrossBars) {
-            return;
-        }
-        const localMin = info.localMinDuration;
-        if (this.minDuration === -1 || localMin < this.minDuration) {
-            // this bar shortens the system minimum; earlier bars (if any) are now stale
-            if (this.masterBarsRenderers.length > 1 && localMin !== this.minDuration) {
-                this.isMinDurationDirty = true;
-            }
-            this.minDuration = localMin;
-        }
-        if (info.computedWithMinDuration > this.minDuration) {
-            // this bar was initialized against a larger (local) min than the system carries; pull
-            // it down to the system reference so its computedWidth reflects the shared spacing.
-            info.recomputeSpringConstants(this.minDuration);
-        }
-    }
-
-    /**
-     * Re-derives spring constants on bars whose {@link BarLayoutingInfo.computedWithMinDuration}
-     * is out of sync with the current {@link minDuration}, and rebuilds the cached system totals
-     * (widths, {@link totalFixedOverhead}, {@link totalContentWidth}) from the refreshed bar
-     * widths. Called from `VerticalLayoutBase._fitSystem` after the system is fully assembled and
-     * before distribution runs. No-op when {@link isMinDurationDirty} is false.
-     */
-    public reconcileMinDurationIfDirty(): void {
-        if (!this.isMinDurationDirty) {
-            return;
-        }
-
-        let systemWidth = this.accoladeWidth;
-        let totalFixedOverhead = 0;
-        let totalContentWidth = 0;
-
-        for (const mb of this.masterBarsRenderers) {
-            // Only re-apply renderers whose layoutingInfo was actually
-            // recomputed in this loop. `applyLayoutingInfo` no longer
-            // short-circuits internally, so the caller gates it.
-            const wasRecomputed = mb.layoutingInfo.computedWithMinDuration > this.minDuration;
-            if (wasRecomputed) {
-                mb.layoutingInfo.recomputeSpringConstants(this.minDuration);
-            }
-
-            let maxPrefix = 0;
-            let maxContent = 0;
-            let realWidth = 0;
-            for (const r of mb.renderers) {
-                if (wasRecomputed) {
-                    r.applyLayoutingInfo();
-                }
-                if (r.computedWidth > realWidth) {
-                    realWidth = r.computedWidth;
-                }
-                const overhead = r.fixedOverhead;
-                if (overhead > maxPrefix) {
-                    maxPrefix = overhead;
-                }
-                const content = Math.max(0, r.computedWidth - overhead);
-                if (content > maxContent) {
-                    maxContent = content;
-                }
-            }
-
-            mb.maxFixedOverhead = maxPrefix;
-            mb.maxContentWidth = maxContent;
-            mb.width = realWidth;
-            systemWidth += realWidth;
-            totalFixedOverhead += maxPrefix;
-            totalContentWidth += maxContent;
-        }
-
-        this.width = systemWidth;
-        this.computedWidth = systemWidth;
-        this.totalFixedOverhead = totalFixedOverhead;
-        this.totalContentWidth = totalContentWidth;
-        this.isMinDurationDirty = false;
     }
 
     public getBarDisplayScale(renderer: BarRendererBase) {
@@ -542,11 +618,13 @@ export class StaffSystem {
             let barDisplayScale = 0;
 
             let firstVisibleStaff: RenderStaff | undefined = undefined;
-            for (const g of this.staves) {
+            for (let i = 0; i < this.staves.length; i++) {
+                const g = this.staves[i];
                 let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
                 let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
 
-                for (const s of g.staves) {
+                for (let j = 0; j < g.staves.length; j++) {
+                    const s = g.staves[j];
                     const lastBar: BarRendererBase = s.revertLastBar();
                     const computedWidth = lastBar.computedWidth;
                     if (computedWidth > width) {
@@ -594,7 +672,8 @@ export class StaffSystem {
         let maxContentWidth: number = 0;
 
         let barDisplayScale = 0;
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             const last = s.barRenderers[s.barRenderers.length - 1];
             last.applyLayoutingInfo();
 
@@ -639,7 +718,8 @@ export class StaffSystem {
         // `calculateHeightForAccolade` reads.
         const visibilityFingerprint = this._computeVisibilityFingerprint();
         if (this._accoladeVisibilityFingerprint === visibilityFingerprint) {
-            for (const b of this._brackets) {
+            for (let i = 0; i < this._brackets.length; i++) {
+                const b = this._brackets[i];
                 b.updateCanPaint();
                 b.finalizeBracket(settings.display.resources.engravingSettings);
             }
@@ -736,14 +816,16 @@ export class StaffSystem {
         this.accoladeWidth += this._inlineTuningWidth;
 
         let currentY: number = 0;
-        for (const staff of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const staff = this.allStaves[i];
             staff.y = currentY;
             staff.calculateHeightForAccolade();
             currentY += staff.height;
         }
 
         let braceWidth = 0;
-        for (const b of this._brackets) {
+        for (let i = 0; i < this._brackets.length; i++) {
+            const b = this._brackets[i];
             b.updateCanPaint();
             b.finalizeBracket(settings.display.resources.engravingSettings);
             if (b.reservesAccoladeSpace) {
@@ -766,8 +848,20 @@ export class StaffSystem {
      * Per-revert resets are handled separately by {@link RenderStaff.revertLastBar}.
      */
     public resetAllStavesSharedLayoutData(): void {
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             s.resetSharedLayoutData();
+        }
+    }
+
+    /**
+     * Clears the staff overflows before the bars of a fully assembled system are scaled; the bars
+     * register them again from their positioned content, the effect placement adds the bands.
+     */
+    public resetAllStavesOverflows(): void {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
+            s.resetOverflows();
         }
     }
 
@@ -776,7 +870,8 @@ export class StaffSystem {
         // we stay in JS double-precision safe-integer range; bitwise ops would
         // cap at 32 bits. See `_accoladeVisibilityFingerprint` for the limit.
         let fingerprint = 0;
-        for (const s of this.allStaves) {
+        for (let i = 0; i < this.allStaves.length; i++) {
+            const s = this.allStaves[i];
             fingerprint = fingerprint * 2 + (s.isVisible ? 1 : 0);
         }
         return fingerprint;
@@ -912,7 +1007,8 @@ export class StaffSystem {
             using _ = ElementStyleHelper.track(
                 canvas,
                 TrackSubElement.SystemSeparator,
-                this.allStaves[0].modelStaff.track
+                this.allStaves[0].modelStaff.track,
+                true
             );
 
             // NOTE: the divider is currently not "nicely" centered between the systems as this would lead to cropping
@@ -1192,7 +1288,8 @@ export class StaffSystem {
             this._finalizeTrackGroups(true);
         }
 
-        for (const b of this._brackets!) {
+        for (let i = 0; i < this._brackets.length; i++) {
+            const b = this._brackets[i];
             b.finalizeBracket(settings.display.resources.engravingSettings);
         }
         Profiler.end('layout.finalizeSystem');
@@ -1268,10 +1365,12 @@ export class StaffSystem {
 
         let endSpikeOverflow = 0;
         let anyStaffVisible = false;
-        for (const group of this.staves) {
+        for (let i = 0; i < this.staves.length; i++) {
+            const group = this.staves[i];
             let firstVisibleStaffInGroup: RenderStaff | undefined = undefined;
             let lastVisibleStaffInGroup: RenderStaff | undefined = undefined;
-            for (const staff of group.staves) {
+            for (let j = 0; j < group.staves.length; j++) {
+                const staff = group.staves[j];
                 // check if we need "in-between padding"
                 if (previousStaff !== undefined && previousStaff!.trackIndex !== staff.trackIndex) {
                     currentY += settings.display.trackStaffPaddingBetween;
@@ -1405,7 +1504,8 @@ export class StaffSystem {
     }
 
     public buildBoundingsLookup(cx: number, cy: number): void {
-        if (this.layout.renderer.boundsLookup!.isFinished) {
+        const writer = this.layout.renderer.boundsWriter;
+        if (writer.isFinished) {
             return;
         }
         const firstStaff = this.allStaves[0];
@@ -1427,57 +1527,55 @@ export class StaffSystem {
         const lineHeight = lineBottom - lineTop;
 
         const x: number = this.x + firstStaff.x;
-        const staffSystemBounds = new StaffSystemBounds();
-        staffSystemBounds.visualBounds = new Bounds();
-        staffSystemBounds.visualBounds.x = cx + this.x;
-        staffSystemBounds.visualBounds.y = cy + this.y;
-        staffSystemBounds.visualBounds.w = this.width;
-        staffSystemBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
-        staffSystemBounds.realBounds = new Bounds();
-        staffSystemBounds.realBounds.x = cx + this.x;
-        staffSystemBounds.realBounds.y = cy + this.y;
-        staffSystemBounds.realBounds.w = this.width;
-        staffSystemBounds.realBounds.h = this.height;
+        const scale = this.layout.renderer.settings.display.scale;
+        writer.beginStaffSystem(
+            (cx + this.x) * scale,
+            (cy + this.y) * scale,
+            this.width * scale,
+            (this.height - this.topPadding - this.bottomPadding) * scale,
+            this.height * scale
+        );
 
-        this.layout.renderer.boundsLookup!.addStaffSystem(staffSystemBounds);
-        const masterBarBoundsLookup: Map<number, MasterBarBounds> = new Map<number, MasterBarBounds>();
+        const scaledRealTop = realTop * scale;
+        const scaledRealHeight = realHeight * scale;
+        const scaledVisualTop = visualTop * scale;
+        const scaledVisualHeight = visualHeight * scale;
+        const scaledLineTop = lineTop * scale;
+        const scaledLineHeight = lineHeight * scale;
         for (let i: number = 0; i < this.staves.length; i++) {
-            for (const staff of this.staves[i].staves) {
+            const staves = this.staves[i].staves;
+            for (let s = 0; s < staves.length; s++) {
+                const staff = staves[s];
                 if (!staff.isVisible) {
                     continue;
                 }
-                for (const renderer of staff.barRenderers) {
-                    let masterBarBounds: MasterBarBounds;
-                    if (!masterBarBoundsLookup.has(renderer.bar.masterBar.index)) {
-                        masterBarBounds = new MasterBarBounds();
-                        masterBarBounds.index = renderer.bar.masterBar.index;
-                        masterBarBounds.isFirstOfLine = renderer.isFirstOfStaff;
-                        masterBarBounds.realBounds = new Bounds();
-                        masterBarBounds.realBounds.x = x + renderer.x;
-                        masterBarBounds.realBounds.y = realTop;
-                        masterBarBounds.realBounds.w = renderer.width;
-                        masterBarBounds.realBounds.h = realHeight;
-
-                        masterBarBounds.visualBounds = new Bounds();
-                        masterBarBounds.visualBounds.x = x + renderer.x;
-                        masterBarBounds.visualBounds.y = visualTop;
-                        masterBarBounds.visualBounds.w = renderer.width;
-                        masterBarBounds.visualBounds.h = visualHeight;
-
-                        masterBarBounds.lineAlignedBounds = new Bounds();
-                        masterBarBounds.lineAlignedBounds.x = x + renderer.x;
-                        masterBarBounds.lineAlignedBounds.y = lineTop;
-                        masterBarBounds.lineAlignedBounds.w = renderer.width;
-                        masterBarBounds.lineAlignedBounds.h = lineHeight;
-                        this.layout.renderer.boundsLookup!.addMasterBar(masterBarBounds);
-                        masterBarBoundsLookup.set(masterBarBounds.index, masterBarBounds);
-                    } else {
-                        masterBarBounds = masterBarBoundsLookup.get(renderer.bar.masterBar.index)!;
+                const renderers = staff.barRenderers;
+                for (let j = 0; j < renderers.length; j++) {
+                    const renderer = renderers[j];
+                    const masterBarIndex = renderer.bar.masterBar.index;
+                    // staves usually hold one renderer per master bar of the system, in the same order
+                    if (!writer.openMasterBar(masterBarIndex, j)) {
+                        const barX = (x + renderer.x) * scale;
+                        const barW = renderer.width * scale;
+                        writer.addMasterBar(
+                            masterBarIndex,
+                            renderer.isFirstOfStaff,
+                            barX,
+                            barW,
+                            scaledRealTop,
+                            scaledRealHeight,
+                            scaledVisualTop,
+                            scaledVisualHeight,
+                            scaledLineTop,
+                            scaledLineHeight
+                        );
                     }
-                    renderer.buildBoundingsLookup(masterBarBounds, x, cy + this.y + staff.y);
+                    renderer.buildBoundingsLookup(writer, x, cy + this.y + staff.y);
                 }
             }
         }
+
+        writer.endStaffSystem();
     }
 
     public getBarX(index: number): number {

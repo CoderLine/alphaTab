@@ -4,42 +4,46 @@
 // the code is regenerated.
 // </auto-generated>
 import { BeatStyle } from "@coderline/alphatab/model/Beat";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { BeatSubElement } from "@coderline/alphatab/model/Beat";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Color } from "@coderline/alphatab/model/Color";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class BeatStyleSerializer {
-    public static fromJson(obj: BeatStyle, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["colors"]);
+    public static read(obj: BeatStyle, reader: IObjectReader): void {
+        reader.readRecord(BeatStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    BeatStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
+    }
+    private static _readColors(obj: BeatStyle, r: IObjectReader): void {
+        obj.colors = new Map<BeatSubElement, Color | null>();
+        r.readObject((k, rr) => {
+            obj.colors.set(JsonHelper.parseEnum<BeatSubElement>(k, BeatSubElement)!, Color.fromJson(rr.readValue()));
+            return true;
+        });
+    }
+    public static write(obj: BeatStyle | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => BeatStyleSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: BeatStyle | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
+        w.startObject(BeatStyleSerializer._fields);
+        w.mapField(0);
+        for (const [k, v] of obj.colors!) {
+            w.prop(k.toString());
+            w.writeValue(Color.toJson(v));
         }
-        const o = new Map<string, unknown>();
-        {
-            const m = new Map<string, unknown>();
-            o.set("colors", m);
-            for (const [k, v] of obj.colors!) {
-                m.set(k.toString(), Color.toJson(v));
-            }
-        }
-        return o;
-    }
-    public static setProperty(obj: BeatStyle, property: string, v: unknown): boolean {
-        switch (property) {
-            case "colors":
-                obj.colors = new Map<BeatSubElement, Color | null>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.colors.set(JsonHelper.parseEnum<BeatSubElement>(k, BeatSubElement)!, Color.fromJson(v));
-                });
-                return true;
-        }
-        return false;
+        w.endMap();
+        w.endObject();
     }
 }

@@ -27,6 +27,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _endNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
     private _container: ScoreBeatContainerGlyph;
+    /** Height of the gradual bend label; the label font is fixed for the lifetime of this glyph. */
+    private _gradualLabelHeight = Number.NaN;
 
     public constructor(container: ScoreBeatContainerGlyph) {
         super(0, 0);
@@ -88,16 +90,16 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
             switch (note.bendType) {
                 case BendType.Bend:
                 case BendType.PrebendBend:
-                    endY = this._endNoteGlyph!.minStepsNote!.glyph.getBoundingBoxTop();
+                    endY = this._endNoteGlyph!.minStepsNote!.getBoundingBoxTop();
                     endX = width;
                     break;
                 case BendType.BendRelease:
-                    endY = this._middleNoteGlyph!.minStepsNote!.glyph.getBoundingBoxTop();
+                    endY = this._middleNoteGlyph!.minStepsNote!.getBoundingBoxTop();
                     endX = width / 2;
                     break;
                 case BendType.Release:
                 case BendType.PrebendRelease:
-                    endY = this._endNoteGlyph!.maxStepsNote!.glyph.getBoundingBoxTop();
+                    endY = this._endNoteGlyph!.maxStepsNote!.getBoundingBoxTop();
                     endX = width;
                     break;
             }
@@ -117,8 +119,12 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
             if (note.bendStyle === BendStyle.Gradual) {
                 const res = this.renderer.resources;
                 const c = this.renderer.scoreRenderer.canvas!;
+                // the font is set on every call so the canvas state does not depend on the cache
                 c.font = res.elementFonts.get(NotationElement.ScoreBendSlur)!;
-                slurHeight += c.measureText('grad.').height;
+                if (Number.isNaN(this._gradualLabelHeight)) {
+                    this._gradualLabelHeight = c.measureText('grad.').height;
+                }
+                slurHeight += this._gradualLabelHeight;
             }
 
             if (slurHeight > maxSlurHeight) {
@@ -147,7 +153,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 {
                     let endGlyphs = this._endNoteGlyph;
                     if (!endGlyphs) {
-                        endGlyphs = new BendNoteHeadGroupGlyph('postbend', note.beat, false);
+                        endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                         endGlyphs.renderer = this.renderer;
                         this._endNoteGlyph = endGlyphs;
                         this.addGlyph(endGlyphs);
@@ -165,7 +171,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     if (!note.isTieOrigin) {
                         let endGlyphs = this._endNoteGlyph;
                         if (!endGlyphs) {
-                            endGlyphs = new BendNoteHeadGroupGlyph('postbend', note.beat, false);
+                            endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                             endGlyphs.renderer = this.renderer;
                             this._endNoteGlyph = endGlyphs;
                             this.addGlyph(endGlyphs);
@@ -183,7 +189,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 {
                     let middleGlyphs = this._middleNoteGlyph;
                     if (!middleGlyphs) {
-                        middleGlyphs = new BendNoteHeadGroupGlyph('middlebend', note.beat, false);
+                        middleGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                         this._middleNoteGlyph = middleGlyphs;
                         middleGlyphs.renderer = this.renderer;
                         this.addGlyph(middleGlyphs);
@@ -196,7 +202,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     );
                     let endGlyphs = this._endNoteGlyph;
                     if (!endGlyphs) {
-                        endGlyphs = new BendNoteHeadGroupGlyph('postbend', note.beat, false);
+                        endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                         endGlyphs.renderer = this.renderer;
                         this._endNoteGlyph = endGlyphs;
                         this.addGlyph(endGlyphs);

@@ -4,55 +4,55 @@
 // the code is regenerated.
 // </auto-generated>
 import { Chord } from "@coderline/alphatab/model/Chord";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class ChordSerializer {
-    public static fromJson(obj: Chord, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["name", "firstfret", "strings", "barrefrets", "showname", "showdiagram", "showfingering"]);
+    public static read(obj: Chord, reader: IObjectReader): void {
+        reader.readRecord(ChordSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.name = r.readString();
+                    return true;
+                case 1:
+                    obj.firstFret = r.readNumber();
+                    return true;
+                case 2:
+                    obj.strings = r.readValue()! as number[];
+                    return true;
+                case 3:
+                    obj.barreFrets = r.readValue()! as number[];
+                    return true;
+                case 4:
+                    obj.showName = r.readBoolean();
+                    return true;
+                case 5:
+                    obj.showDiagram = r.readBoolean();
+                    return true;
+                case 6:
+                    obj.showFingering = r.readBoolean();
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: Chord | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => ChordSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: Chord | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("name", obj.name);
-        o.set("firstfret", obj.firstFret);
-        o.set("strings", obj.strings);
-        o.set("barrefrets", obj.barreFrets);
-        o.set("showname", obj.showName);
-        o.set("showdiagram", obj.showDiagram);
-        o.set("showfingering", obj.showFingering);
-        return o;
-    }
-    public static setProperty(obj: Chord, property: string, v: unknown): boolean {
-        switch (property) {
-            case "name":
-                obj.name = v! as string;
-                return true;
-            case "firstfret":
-                obj.firstFret = v! as number;
-                return true;
-            case "strings":
-                obj.strings = v! as number[];
-                return true;
-            case "barrefrets":
-                obj.barreFrets = v! as number[];
-                return true;
-            case "showname":
-                obj.showName = v! as boolean;
-                return true;
-            case "showdiagram":
-                obj.showDiagram = v! as boolean;
-                return true;
-            case "showfingering":
-                obj.showFingering = v! as boolean;
-                return true;
-        }
-        return false;
+        w.startObject(ChordSerializer._fields);
+        w.stringField(0, obj.name);
+        w.numberField(1, obj.firstFret);
+        w.valueField(2, obj.strings);
+        w.valueField(3, obj.barreFrets);
+        w.booleanField(4, obj.showName);
+        w.booleanField(5, obj.showDiagram);
+        w.booleanField(6, obj.showFingering);
+        w.endObject();
     }
 }

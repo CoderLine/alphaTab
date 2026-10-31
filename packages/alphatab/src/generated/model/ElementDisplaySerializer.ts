@@ -4,41 +4,56 @@
 // the code is regenerated.
 // </auto-generated>
 import { ElementDisplay } from "@coderline/alphatab/model/ElementDisplay";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { StaffPlacement } from "@coderline/alphatab/model/ElementDisplay";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { SystemDisplay } from "@coderline/alphatab/model/ElementDisplay";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class ElementDisplaySerializer {
-    public static fromJson(obj: ElementDisplay, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => ElementDisplaySerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["isvisible", "staffplacement", "systemdisplay"]);
+    public static read(obj: ElementDisplay, reader: IObjectReader): void {
+        reader.readRecord(ElementDisplaySerializer._fields, (id, k, rr) => ElementDisplaySerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: ElementDisplay | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("isvisible", obj.isVisible);
-        o.set("staffplacement", obj.staffPlacement as number | undefined);
-        o.set("systemdisplay", obj.systemDisplay as number | undefined);
-        return o;
+    public static readProperty(obj: ElementDisplay, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = ElementDisplaySerializer._fields.idOf(property);
+        return id >= 0 ? ElementDisplaySerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: ElementDisplay, property: string, v: unknown): boolean {
-        switch (property) {
-            case "isvisible":
-                obj.isVisible = v as boolean | undefined;
+    private static _readField(obj: ElementDisplay, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                obj.isVisible = r.readValue() as boolean | undefined;
                 return true;
-            case "staffplacement":
-                obj.staffPlacement = JsonHelper.parseEnum<StaffPlacement>(v, StaffPlacement);
+            case 1:
+                obj.staffPlacement = JsonHelper.parseEnum<StaffPlacement>(r.readValue(), StaffPlacement);
                 return true;
-            case "systemdisplay":
-                obj.systemDisplay = JsonHelper.parseEnum<SystemDisplay>(v, SystemDisplay);
+            case 2:
+                obj.systemDisplay = JsonHelper.parseEnum<SystemDisplay>(r.readValue(), SystemDisplay);
                 return true;
         }
         return false;
+    }
+    public static readFlexible(obj: ElementDisplay, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? ElementDisplaySerializer._readField(obj, id, rr, false) : ElementDisplaySerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: ElementDisplay, property: string, r: IObjectReader): boolean {
+        if (ElementDisplaySerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static write(obj: ElementDisplay | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(ElementDisplaySerializer._fields);
+        w.valueField(0, obj.isVisible);
+        w.valueField(1, obj.staffPlacement as number | undefined);
+        w.valueField(2, obj.systemDisplay as number | undefined);
+        w.endObject();
     }
 }

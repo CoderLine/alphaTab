@@ -1,4 +1,5 @@
 import type { Note } from '@coderline/alphatab/model/Note';
+import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -52,7 +53,11 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     private _endX: number = 0;
     private _endY: number = 0;
     private _tieHeight: number = 0;
-    private _boundingBox?: Bounds;
+    private _hasBoundingBox: boolean = false;
+    private _boundingBoxX: number = 0;
+    private _boundingBoxY: number = 0;
+    private _boundingBoxW: number = 0;
+    private _boundingBoxH: number = 0;
     private _shouldPaint: boolean = false;
 
     public collectSkylineShape(_shape: SkylineShape): void {
@@ -60,35 +65,35 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     }
 
     public get checkForOverflow() {
-        return this._shouldPaint && this._boundingBox !== undefined;
+        return this._shouldPaint && this._hasBoundingBox;
     }
 
     /** Renderer-local Y. Staff finalize may shift `renderer.y` after tie layout, so geometry stays renderer-relative. */
     public override getBoundingBoxTop(): number {
-        if (this._boundingBox) {
-            return this._boundingBox!.y;
+        if (this._hasBoundingBox) {
+            return this._boundingBoxY;
         }
         return this._startY;
     }
 
     public override getBoundingBoxBottom(): number {
-        if (this._boundingBox) {
-            return this._boundingBox.y + this._boundingBox.h;
+        if (this._hasBoundingBox) {
+            return this._boundingBoxY + this._boundingBoxH;
         }
         return this._startY;
     }
 
     /** Staff-absolute X — `_startX`/`_endX` bake in their renderers' `.x` for cross-bar ties. */
     public override getBoundingBoxLeft(): number {
-        if (this._boundingBox) {
-            return this._boundingBox.x;
+        if (this._hasBoundingBox) {
+            return this._boundingBoxX;
         }
         return this._startX;
     }
 
     public override getBoundingBoxRight(): number {
-        if (this._boundingBox) {
-            return this._boundingBox.x + this._boundingBox.w;
+        if (this._hasBoundingBox) {
+            return this._boundingBoxX + this._boundingBoxW;
         }
         return this._endX;
     }
@@ -162,13 +167,12 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             this._shouldPaint = startNoteRenderer.staff !== endNoteRenderer!.staff;
         }
 
-        this._boundingBox = undefined;
+        this._hasBoundingBox = false;
         this.y = Math.min(this._startY, this._endY);
         const down = this.tieDirection === BeamDirection.Down;
-        let tieBoundingBox: Bounds;
         if (this.shouldDrawBendSlur()) {
             this._tieHeight = 0;
-            tieBoundingBox = TieGlyph.calculateBendSlurHeight(
+            const bendBoundingBox = TieGlyph.calculateBendSlurHeight(
                 this._startX,
                 this._startY,
                 this._endX,
@@ -176,38 +180,44 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
                 down,
                 this.renderer.smuflMetrics.tieHeight
             );
+            this._boundingBoxX = bendBoundingBox.x;
+            this._boundingBoxY = bendBoundingBox.y;
+            this._boundingBoxW = bendBoundingBox.w;
+            this._boundingBoxH = bendBoundingBox.h;
         } else {
             this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
             const tieThickness = this.renderer.smuflMetrics.tieMidpointThickness;
-            const cps = TieGlyph._computeBezierControlPoints(
-                1,
-                this._startX,
-                this._startY,
-                this._endX,
-                this._endY,
-                down,
-                this._tieHeight,
-                tieThickness
-            );
-            tieBoundingBox = TieGlyph._calculateActualTieHeightFromCps(
-                cps,
-                this._startX,
-                this._startY,
-                this._endX,
-                this._endY,
-                down,
-                tieThickness
-            );
+            const cps = this.renderer.scoreRenderer.layout!.tieControlPoints;
+            if (
+                TieGlyph._computeBezierControlPoints(
+                    cps,
+                    1,
+                    this._startX,
+                    this._startY,
+                    this._endX,
+                    this._endY,
+                    down,
+                    this._tieHeight,
+                    tieThickness
+                )
+            ) {
+                this._setBoundingBoxFromCps(cps, down, tieThickness);
+            } else {
+                this._boundingBoxX = this._startX;
+                this._boundingBoxY = this._startY;
+                this._boundingBoxW = this._endX - this._startX;
+                this._boundingBoxH = this._endY - this._startY;
+            }
         }
 
-        this._boundingBox = tieBoundingBox;
-        this.height = tieBoundingBox.h;
+        this._hasBoundingBox = true;
+        this.height = this._boundingBoxH;
 
         if (this.tieDirection === BeamDirection.Up) {
             // the tie might go above `this.y` due to its shape
             // here we calculate how much this is so we can consider the
             // respective overflow
-            const overlap = this.y - tieBoundingBox.y;
+            const overlap = this.y - this._boundingBoxY;
             if (overlap > 0) {
                 this.y -= overlap;
             }
@@ -251,6 +261,7 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         } else {
             TieGlyph.paintTie(
                 canvas,
+                this.renderer.scoreRenderer.layout!.tiePaintControlPoints,
                 1,
                 cx + this._startX,
                 cy + rendererY + this._startY,
@@ -264,6 +275,12 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
     }
 
     protected abstract shouldDrawBendSlur(): boolean;
+
+    /**
+     * The voice the tie or slur starts in. Its voice colour applies to every piece of the tie, including the
+     * continuations on later systems.
+     */
+    public abstract get voice(): Voice;
 
     public getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
         return this.renderer.smuflMetrics.tieHeight;
@@ -305,28 +322,43 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         offset: number,
         size: number
     ): Bounds {
-        const cp = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
-        return TieGlyph._calculateActualTieHeightFromCps(cp, x1, y1, x2, y2, down, size);
+        const cp = TieGlyph.newControlPoints();
+        if (!TieGlyph._computeBezierControlPoints(cp, scale, x1, y1, x2, y2, down, offset, size)) {
+            return new Bounds(x1, y1, x2 - x1, y2 - y1);
+        }
+        TieGlyph._calculateBoundingBoxFromCps(cp, down, size);
+        return new Bounds(cp[14], cp[15], cp[16], cp[17]);
     }
 
     /**
-     * Derives the bounding box for a tie from already-computed control
-     * points. Splits the bbox math from cps generation so callers that
-     * need BOTH cps and bbox (e.g. multi-label slur layout) avoid a
-     * second call to `_computeBezierControlPoints`.
+     * Creates the scratch array the tie geometry is computed in: 14 control point coordinates followed
+     * by the bounding box (x, y, w, h).
      */
-    private static _calculateActualTieHeightFromCps(
-        cp: number[],
-        x1: number,
-        y1: number,
-        x2: number,
-        y2: number,
-        down: boolean,
-        size: number
-    ): Bounds {
-        if (cp.length === 0) {
-            return new Bounds(x1, y1, x2 - x1, y2 - y1);
+    public static newControlPoints(): number[] {
+        // the fractional literal makes JS engines store the list as doubles from the start, so the
+        // fractional coordinates written into it do not reallocate it (`fill` would make it an integer list again)
+        const cps: number[] = [
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
+        ];
+        for (let i = 0; i < cps.length; i++) {
+            cps[i] = 0;
         }
+        return cps;
+    }
+
+    private _setBoundingBoxFromCps(cp: number[], down: boolean, size: number): void {
+        TieGlyph._calculateBoundingBoxFromCps(cp, down, size);
+        this._boundingBoxX = cp[14];
+        this._boundingBoxY = cp[15];
+        this._boundingBoxW = cp[16];
+        this._boundingBoxH = cp[17];
+    }
+
+    /**
+     * Derives the bounding box of a tie from the control points in `cp[0..13]` and stores it in
+     * `cp[14..17]` as x, y, w, h.
+     */
+    private static _calculateBoundingBoxFromCps(cp: number[], down: boolean, size: number): void {
         const p0x = cp[0];
         const p0y = cp[1];
         const c1x = cp[2];
@@ -350,15 +382,18 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
             yMin -= size;
         }
 
-        const b = new Bounds();
-        b.x = xMin;
-        b.y = yMin;
-        b.w = xMax - xMin;
-        b.h = yMax - yMin;
-        return b;
+        cp[14] = xMin;
+        cp[15] = yMin;
+        cp[16] = xMax - xMin;
+        cp[17] = yMax - yMin;
     }
 
+    /**
+     * Writes the control points of the tie outline into `cps[0..13]`.
+     * @returns false (and leaves `cps` untouched) when start and end coincide.
+     */
     private static _computeBezierControlPoints(
+        cps: number[],
         scale: number,
         x1: number,
         y1: number,
@@ -367,9 +402,9 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         down: boolean,
         offset: number,
         size: number
-    ): number[] {
+    ): boolean {
         if (x1 === x2 && y1 === y2) {
-            return [];
+            return false;
         }
 
         // ensure endX > startX
@@ -425,25 +460,52 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         let cp4y = y1 - offset - size;
 
         const angle = Math.atan2(dY, dX);
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
 
-        [cp1x, cp1y] = TieGlyph._rotate(cp1x, cp1y, x1, y1, angle);
-        [cp2x, cp2y] = TieGlyph._rotate(cp2x, cp2y, x1, y1, angle);
-        [cp3x, cp3y] = TieGlyph._rotate(cp3x, cp3y, x1, y1, angle);
-        [cp4x, cp4y] = TieGlyph._rotate(cp4x, cp4y, x1, y1, angle);
+        let dx = cp1x - x1;
+        let dy = cp1y - y1;
+        cp1x = x1 + (dx * cos - dy * sin);
+        cp1y = y1 + (dx * sin + dy * cos);
 
-        return [x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, cp3x, cp3y, cp4x, cp4y, x1, y1];
+        dx = cp2x - x1;
+        dy = cp2y - y1;
+        cp2x = x1 + (dx * cos - dy * sin);
+        cp2y = y1 + (dx * sin + dy * cos);
+
+        dx = cp3x - x1;
+        dy = cp3y - y1;
+        cp3x = x1 + (dx * cos - dy * sin);
+        cp3y = y1 + (dx * sin + dy * cos);
+
+        dx = cp4x - x1;
+        dy = cp4y - y1;
+        cp4x = x1 + (dx * cos - dy * sin);
+        cp4y = y1 + (dx * sin + dy * cos);
+
+        cps[0] = x1;
+        cps[1] = y1;
+        cps[2] = cp1x;
+        cps[3] = cp1y;
+        cps[4] = cp2x;
+        cps[5] = cp2y;
+        cps[6] = x2;
+        cps[7] = y2;
+        cps[8] = cp3x;
+        cps[9] = cp3y;
+        cps[10] = cp4x;
+        cps[11] = cp4y;
+        cps[12] = x1;
+        cps[13] = y1;
+        return true;
     }
 
-    private static _rotate(x: number, y: number, rotateX: number, rotateY: number, angle: number): [number, number] {
-        const dx = x - rotateX;
-        const dy = y - rotateY;
-        const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
-        const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
-        return [rotateX + rx, rotateY + ry];
-    }
-
+    /**
+     * @param cps scratch for the tie geometry, see {@link newControlPoints}.
+     */
     public static paintTie(
         canvas: ICanvas,
+        cps: number[],
         scale: number,
         x1: number,
         y1: number,
@@ -453,7 +515,9 @@ export abstract class TieGlyph extends Glyph implements ITieGlyph {
         offset: number /*= 22*/,
         size: number /*= 4*/
     ): void {
-        const cps = TieGlyph._computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
+        if (!TieGlyph._computeBezierControlPoints(cps, scale, x1, y1, x2, y2, down, offset, size)) {
+            cps = [];
+        }
 
         canvas.beginPath();
         canvas.moveTo(cps[0], cps[1]);
@@ -576,6 +640,10 @@ export abstract class NoteTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
+    public override get voice(): Voice {
+        return this.startNote.beat.voice;
+    }
+
     protected get isLeftHandTap() {
         return this.startNote === this.endNote;
     }
@@ -691,6 +759,10 @@ export class ContinuationTieGlyph extends TieGlyph {
     public constructor(startTie: TieGlyph) {
         super(startTie.slurEffectId, false);
         this._startTie = startTie;
+    }
+
+    public override get voice(): Voice {
+        return this._startTie.voice;
     }
 
     protected override lookupStartBeatRenderer() {

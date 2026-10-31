@@ -4,35 +4,35 @@
 // the code is regenerated.
 // </auto-generated>
 import { Section } from "@coderline/alphatab/model/Section";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class SectionSerializer {
-    public static fromJson(obj: Section, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["marker", "text"]);
+    public static read(obj: Section, reader: IObjectReader): void {
+        reader.readRecord(SectionSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.marker = r.readString();
+                    return true;
+                case 1:
+                    obj.text = r.readString();
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: Section | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SectionSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: Section | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("marker", obj.marker);
-        o.set("text", obj.text);
-        return o;
-    }
-    public static setProperty(obj: Section, property: string, v: unknown): boolean {
-        switch (property) {
-            case "marker":
-                obj.marker = v! as string;
-                return true;
-            case "text":
-                obj.text = v! as string;
-                return true;
-        }
-        return false;
+        w.startObject(SectionSerializer._fields);
+        w.stringField(0, obj.marker);
+        w.stringField(1, obj.text);
+        w.endObject();
     }
 }

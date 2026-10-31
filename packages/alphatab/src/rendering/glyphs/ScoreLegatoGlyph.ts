@@ -1,6 +1,7 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
+import type { Voice } from '@coderline/alphatab/model/Voice';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
@@ -20,6 +21,10 @@ export class ScoreLegatoGlyph extends TieGlyph {
         super(slurEffectId, forEnd);
         this.startBeat = startBeat;
         this.endBeat = endBeat;
+    }
+
+    public override get voice(): Voice {
+        return this.startBeat.voice;
     }
 
     public override doLayout(): void {

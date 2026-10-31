@@ -157,7 +157,18 @@ export abstract class ScoreHelperNotesBaseGlyph extends GlyphGroup implements IT
         size: number
     ): void {
         if (!this._isMeasuring) {
-            TieGlyph.paintTie(canvas, 1, x1, y1, x2, y2, down, offset, size);
+            TieGlyph.paintTie(
+                canvas,
+                this.renderer.scoreRenderer.layout!.tiePaintControlPoints,
+                1,
+                x1,
+                y1,
+                x2,
+                y2,
+                down,
+                offset,
+                size
+            );
             return;
         }
         const b = TieGlyph.calculateActualTieHeight(1, x1, y1, x2, y2, down, offset, size);

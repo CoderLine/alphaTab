@@ -36,11 +36,12 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public get prebendNoteHeadOffset() {
-        return (this.preNotes as ScoreBeatPreNotesGlyph).prebendNoteHeadOffset;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
+        return preNotes ? preNotes.prebendNoteHeadOffset : 0;
     }
 
     public get accidentalsWidth() {
-        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
         if (preNotes && preNotes.accidentals) {
             return preNotes.accidentals.width;
         }
@@ -48,10 +49,16 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     }
 
     public override doMultiVoiceLayout(): void {
-        this.preNotes.x = 0;
-        (this.preNotes as ScoreBeatPreNotesGlyph).doMultiVoiceLayout();
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        const preNotes = this.preNotes as ScoreBeatPreNotesGlyph | null;
+        if (preNotes) {
+            preNotes.x = 0;
+            preNotes.doMultiVoiceLayout();
+            this.onNotes.x = preNotes.x + preNotes.width;
+        } else {
+            this.onNotes.x = 0;
+        }
         (this.onNotes as ScoreBeatGlyph).doMultiVoiceLayout();
+        this.invalidateNoteExtent();
 
         this._bend?.doMultiVoiceLayout();
     }
@@ -95,7 +102,7 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
 
     public override getBoundingBoxBottom(): number {
         if (this._bend !== null) {
-            return ModelUtils.maxBoundingBox(this._bend.getEstimatedBoundingBoxBottom(), super.getBoundingBoxTop());
+            return ModelUtils.maxBoundingBox(this._bend.getEstimatedBoundingBoxBottom(), super.getBoundingBoxBottom());
         } else {
             return super.getBoundingBoxBottom();
         }
@@ -215,12 +222,10 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
 
         if (own) {
-            own.topLedgerLineTrimRight = sharesTop ? ownTrim : 0;
-            own.bottomLedgerLineTrimRight = sharesBottom ? ownTrim : 0;
+            own.setLedgerLineTrimsRight(sharesTop ? ownTrim : 0, sharesBottom ? ownTrim : 0);
         }
         if (other) {
-            other.topLedgerLineTrimLeft = sharesTop ? otherTrim : 0;
-            other.bottomLedgerLineTrimLeft = sharesBottom ? otherTrim : 0;
+            other.setLedgerLineTrimsLeft(sharesTop ? otherTrim : 0, sharesBottom ? otherTrim : 0);
         }
     }
 

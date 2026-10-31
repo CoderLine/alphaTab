@@ -25,7 +25,7 @@ export class Gp7To8Importer extends ScoreImporter {
     public readScore(): Score {
         // at first we need to load the binary file system
         // from the GPX container
-        Logger.debug(this.name, 'Loading ZIP entries');
+        Logger.trace(this.name, 'Loading ZIP entries');
         const fileSystem: ZipReader = new ZipReader(this.data, this.settings.importer.maxDecodingBufferSize);
         let entries: ZipEntry[];
         try {
@@ -34,7 +34,7 @@ export class Gp7To8Importer extends ScoreImporter {
             throw new UnsupportedFormatError('No Zip archive', e as Error);
         }
 
-        Logger.debug(this.name, 'Zip entries loaded');
+        Logger.trace(this.name, 'Zip entries loaded');
         let xml: string | null = null;
         let binaryStylesheetData: Uint8Array | null = null;
         let partConfigurationData: Uint8Array | null = null;
@@ -64,7 +64,7 @@ export class Gp7To8Importer extends ScoreImporter {
 
         // the score.gpif file within this filesystem stores
         // the score information as XML we need to parse.
-        Logger.debug(this.name, 'Start Parsing score.gpif');
+        Logger.trace(this.name, 'Start Parsing score.gpif');
         const gpifParser: GpifParser = new GpifParser();
         gpifParser.loadAsset = (fileName) => {
             if(entryLookup.has(fileName)) {
@@ -73,31 +73,31 @@ export class Gp7To8Importer extends ScoreImporter {
             return undefined;
         };
         gpifParser.parseXml(xml, this.settings);
-        Logger.debug(this.name, 'score.gpif parsed');
+        Logger.trace(this.name, 'score.gpif parsed');
         const score: Score = gpifParser.score;
 
         if (binaryStylesheetData) {
-            Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
+            Logger.trace(this.name, 'Start Parsing BinaryStylesheet');
             const stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData, this.settings.importer.maxDecodingBufferSize);
             stylesheet.apply(score);
-            Logger.debug(this.name, 'BinaryStylesheet parsed');
+            Logger.trace(this.name, 'BinaryStylesheet parsed');
         }
 
         let partConfigurationParser: PartConfiguration | null = null;
         if (partConfigurationData) {
-            Logger.debug(this.name, 'Start Parsing Part Configuration');
+            Logger.trace(this.name, 'Start Parsing Part Configuration');
             partConfigurationParser = new PartConfiguration(partConfigurationData);
             partConfigurationParser.apply(score);
-            Logger.debug(this.name, 'Part Configuration parsed');
+            Logger.trace(this.name, 'Part Configuration parsed');
         }
         if (layoutConfigurationData && partConfigurationParser != null) {
-            Logger.debug(this.name, 'Start Parsing Layout Configuration');
+            Logger.trace(this.name, 'Start Parsing Layout Configuration');
             const layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
                 partConfigurationParser,
                 layoutConfigurationData
             );
             layoutConfigurationParser.apply(score);
-            Logger.debug(this.name, 'Layout Configuration parsed');
+            Logger.trace(this.name, 'Layout Configuration parsed');
         }
         return score;
     }

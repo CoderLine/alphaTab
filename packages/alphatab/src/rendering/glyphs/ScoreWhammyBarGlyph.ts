@@ -41,7 +41,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     /** The top of the helper notes before the beats are positioned. */
     public getEstimatedBoundingBoxTop(): number {
         if (this._endGlyph?.minStepsNote) {
-            return this._endGlyph.minStepsNote.glyph.getBoundingBoxTop();
+            return this._endGlyph.minStepsNote.getBoundingBoxTop();
         }
         return this.getNoteHeadsBoundingBoxTop();
     }
@@ -49,7 +49,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     /** The bottom of the helper notes before the beats are positioned. */
     public getEstimatedBoundingBoxBottom(): number {
         if (this._endGlyph?.maxStepsNote) {
-            return this._endGlyph.maxStepsNote.glyph.getBoundingBoxBottom();
+            return this._endGlyph.maxStepsNote.getBoundingBoxBottom();
         }
         return this.getNoteHeadsBoundingBoxBottom();
     }
@@ -58,8 +58,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         this._endGlyph?.doMultiVoiceLayout();
     }
 
-    public override doLayout(): void {
-        this.isMeasured = false;
+    /**
+     * Creates the helper note heads; called once, before the first {@link doLayout}. {@link doLayout}
+     * runs again on every finalize pass and only lays out the existing note heads.
+     */
+    public createHelperNotes(): void {
         const sr = this.renderer as ScoreBarRenderer;
         const whammyMode: NotationMode = sr.settings.notation.notationMode;
         switch (this._beat.whammyBarType) {
@@ -70,11 +73,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             case WhammyType.Dive:
             case WhammyType.PrediveDive:
                 {
-                    const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
-                        'postwhammy',
-                        this._beat,
-                        false
-                    );
+                    const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                     this._endGlyph = endGlyphs;
                     endGlyphs.renderer = sr;
                     const lastWhammyPoint: BendPoint =
@@ -98,11 +97,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         // handled separately
                         return;
                     } else {
-                        const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
-                            'middlewhammy',
-                            this._beat,
-                            false
-                        );
+                        const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         middleGlyphs.renderer = sr;
                         if (sr.settings.notation.notationMode === NotationMode.GuitarPro) {
                             const middleBendPoint: BendPoint = this._beat.whammyBarPoints![1];
@@ -116,11 +111,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         }
                         middleGlyphs.doLayout();
                         this.addGlyph(middleGlyphs);
-                        const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(
-                            'postwhammy',
-                            this._beat,
-                            false
-                        );
+                        const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         endGlyphs.renderer = sr;
                         this._endGlyph = endGlyphs;
 
@@ -143,7 +134,10 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             case WhammyType.Predive:
                 break;
         }
+    }
 
+    public override doLayout(): void {
+        this.isMeasured = false;
         super.doLayout();
         this.width = this.width / 2;
     }

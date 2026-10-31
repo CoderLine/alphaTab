@@ -1,17 +1,33 @@
 import type { EffectBand, EffectBandXRange } from '@coderline/alphatab/rendering/EffectBand';
 import { EffectBandPlacementCategory } from '@coderline/alphatab/rendering/EffectInfo';
 import type { Skyline } from '@coderline/alphatab/rendering/skyline/Skyline';
+import type { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
+import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
 import type { RenderStaff } from '@coderline/alphatab/rendering/staves/RenderStaff';
 
 /**
  * Priority-ordered skyline oracle that positions every {@link EffectBand} on
- * a staff line. Fires from {@link RenderStaff.finalizeStaff}.
+ * a staff line. Fires from {@link RenderStaff.finalizeStaff}. One instance serves all staves of a
+ * layout: it only holds scratch storage that is rebuilt for every staff.
  * @internal
  */
 export class EffectSystemPlacement {
-    private readonly _staff: RenderStaff;
+    /**
+     * The full placement surface of the staff being finalized: content (notes/beams/ties) plus the
+     * structural bar header, assembled from the bar-local skylines. Almost every effect band is
+     * placed against this. The staff keeps a copy as {@link RenderStaff.systemSkyline}.
+     */
+    public readonly systemSkyline: StaffSystemSkyline;
 
-    // Reusable scratch buffers; rebuilt every finalize cycle.
+    /**
+     * The content-only placement surface of the staff being finalized: the same as
+     * {@link systemSkyline} minus the structural bar header. Bands with
+     * {@link EffectInfo.ignoresStructuralHeader} (bar numbers) are placed against this so the
+     * clef/key/time, a fixed fixture already priced into the staff via scalar overflow, never
+     * shoves them up. Only built for staves with such a band ({@link RenderStaff.placesAgainstContentOnly}).
+     */
+    public readonly contentSkyline: StaffSystemSkyline;
+
     private readonly _top: EffectBand[] = [];
     private readonly _bottom: EffectBand[] = [];
     private readonly _groupBands: EffectBand[] = [];
@@ -20,30 +36,38 @@ export class EffectSystemPlacement {
     private readonly _clearXStarts: number[] = [];
     private readonly _clearXEnds: number[] = [];
 
-    public constructor(staff: RenderStaff) {
-        this._staff = staff;
+    public constructor(scratch: SkylineScratch) {
+        this.systemSkyline = new StaffSystemSkyline(0, 0, 0, Number.MAX_SAFE_INTEGER, scratch);
+        this.contentSkyline = new StaffSystemSkyline(0, 0, 0, Number.MAX_SAFE_INTEGER, scratch);
     }
 
     /**
-     * Places all non-empty effect bands of the staff on its skyline and publishes them into it.
-     * Must be followed by {@link apply}.
+     * Places the non-empty effect bands of the staff against {@link systemSkyline} (and {@link contentSkyline}),
+     * which must hold the assembled skylines of the staff, and publishes them into it.
+     * Must be followed by {@link apply} for the same staff.
      */
-    public place(): void {
-        const staff = this._staff;
-        const sky = staff.systemSkyline;
+    public place(staff: RenderStaff): void {
+        const sky = this.systemSkyline;
         const pad = staff.system.layout.renderer.settings.display.effectBandPaddingBottom;
 
         const top = this._top;
         const bottom = this._bottom;
-        // splice() instead of `.length = 0`: transpile-safe array clear.
-        top.splice(0, top.length);
-        bottom.splice(0, bottom.length);
+        // pop() loops clear without reallocating the backing store (splice allocates a result
+        // array, `.length = 0` drops the store; C#/Kotlin splice copies lists).
+        while (top.length > 0) {
+            top.pop();
+        }
+        while (bottom.length > 0) {
+            bottom.pop();
+        }
 
         // Filter non-empty bands and run `finalizeBand` (settles dynamic-height
         // effects like TabWhammy) in one walk.
         for (let i = 0; i < staff.barRenderers.length; i++) {
             const r = staff.barRenderers[i];
-            for (const b of r.topEffects.bands) {
+            const topBands = r.topEffects.bands;
+            for (let j = 0, n = topBands.length; j < n; j++) {
+                const b = topBands[j];
                 if (!b.isEmpty) {
                     // Reset; `_placeSide` only writes it when computeLocalXRange succeeds,
                     // but the band-y loop reads it for every band.
@@ -52,7 +76,9 @@ export class EffectSystemPlacement {
                     top.push(b);
                 }
             }
-            for (const b of r.bottomEffects.bands) {
+            const bottomBands = r.bottomEffects.bands;
+            for (let j = 0, n = bottomBands.length; j < n; j++) {
+                const b = bottomBands[j];
                 if (!b.isEmpty) {
                     b.placedMagnitude = 0;
                     b.finalizeBand();
@@ -67,7 +93,7 @@ export class EffectSystemPlacement {
         // Content-only surface for bands that ignore the structural header (bar
         // numbers). Null when no such band exists, in which case every band is
         // placed against the full skyline exactly as before.
-        const contentSky = staff.placesAgainstContentOnly ? staff.contentSkyline : null;
+        const contentSky = staff.placesAgainstContentOnly ? this.contentSkyline : null;
         this._placeSide(top, sky.upSky, contentSky ? contentSky.upSky : null, pad, /* isTop */ true);
         this._placeSide(bottom, sky.downSky, contentSky ? contentSky.downSky : null, pad, /* isTop */ false);
     }
@@ -76,8 +102,7 @@ export class EffectSystemPlacement {
      * Reserves the placed bands in the renderer and staff overflows and positions them relative to the final
      * staff overflow. Overflow registered on the staff between {@link place} and this call is respected.
      */
-    public apply(): void {
-        const staff = this._staff;
+    public apply(staff: RenderStaff): void {
         const top = this._top;
         const bottom = this._bottom;
 
@@ -98,10 +123,12 @@ export class EffectSystemPlacement {
 
         const staffTopOverflow = staff.topOverflow;
         const staffBottomOverflow = staff.bottomOverflow;
-        for (const band of top) {
+        for (let i = 0, n = top.length; i < n; i++) {
+            const band = top[i];
             band.y = staffTopOverflow - (band.placedMagnitude + band.height);
         }
-        for (const band of bottom) {
+        for (let i = 0, n = bottom.length; i < n; i++) {
+            const band = bottom[i];
             band.y = band.placedMagnitude + band.renderer.bottomEffects.height - staffBottomOverflow;
         }
     }
@@ -123,9 +150,21 @@ export class EffectSystemPlacement {
         return Math.max(0, Math.ceil(max - contentOverflow));
     }
 
-    /** Sort by precomputed {@link EffectBand.sortKey} (placementCategory, order desc, voice, renderer). */
+    /**
+     * Stable sort by precomputed {@link EffectBand.sortKey} (placementCategory, order desc, voice, renderer).
+     * An in-place insertion sort: `sort` copies the list into a temporary store on every call.
+     */
     private static _sortByPriority(bands: EffectBand[]): void {
-        bands.sort((a, b) => a.sortKey - b.sortKey);
+        for (let i = 1, n = bands.length; i < n; i++) {
+            const band = bands[i];
+            const key = band.sortKey;
+            let j = i - 1;
+            while (j >= 0 && bands[j].sortKey > key) {
+                bands[j + 1] = bands[j];
+                j--;
+            }
+            bands[j + 1] = band;
+        }
     }
 
     private _placeSide(
@@ -173,17 +212,27 @@ export class EffectSystemPlacement {
             // clef/key/time never enters their magnitude.
             const querySky = contentSky !== null && band.info.ignoresStructuralHeader === true ? contentSky : sky;
 
-            groupBands.splice(0, groupBands.length);
-            groupXStarts.splice(0, groupXStarts.length);
-            groupXEnds.splice(0, groupXEnds.length);
+            while (groupBands.length > 0) {
+                groupBands.pop();
+            }
+            while (groupXStarts.length > 0) {
+                groupXStarts.pop();
+            }
+            while (groupXEnds.length > 0) {
+                groupXEnds.pop();
+            }
             let groupMagnitude = 0;
             for (let k = i; k < groupEnd; k++) {
                 const m = bands[k];
                 // one entry per occupied range (note-attached bands: one per glyph)
                 const clearStarts = this._clearXStarts;
                 const clearEnds = this._clearXEnds;
-                clearStarts.splice(0, clearStarts.length);
-                clearEnds.splice(0, clearEnds.length);
+                while (clearStarts.length > 0) {
+                    clearStarts.pop();
+                }
+                while (clearEnds.length > 0) {
+                    clearEnds.pop();
+                }
                 const firstRange = groupXStarts.length;
                 if (!m.collectPlacementRanges(clearStarts, clearEnds, groupXStarts, groupXEnds)) {
                     continue;

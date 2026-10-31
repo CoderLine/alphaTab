@@ -4,36 +4,37 @@
 // the code is regenerated.
 // </auto-generated>
 import { SustainPedalMarker } from "@coderline/alphatab/model/Bar";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { SustainPedalMarkerType } from "@coderline/alphatab/model/Bar";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class SustainPedalMarkerSerializer {
-    public static fromJson(obj: SustainPedalMarker, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["ratioposition", "pedaltype"]);
+    public static read(obj: SustainPedalMarker, reader: IObjectReader): void {
+        reader.readRecord(SustainPedalMarkerSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.ratioPosition = r.readNumber();
+                    return true;
+                case 1:
+                    obj.pedalType = JsonHelper.parseEnum<SustainPedalMarkerType>(r.readValue(), SustainPedalMarkerType)!;
+                    return true;
+            }
+            return false;
+        });
+    }
+    public static write(obj: SustainPedalMarker | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SustainPedalMarkerSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: SustainPedalMarker | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("ratioposition", obj.ratioPosition);
-        o.set("pedaltype", obj.pedalType as number);
-        return o;
-    }
-    public static setProperty(obj: SustainPedalMarker, property: string, v: unknown): boolean {
-        switch (property) {
-            case "ratioposition":
-                obj.ratioPosition = v! as number;
-                return true;
-            case "pedaltype":
-                obj.pedalType = JsonHelper.parseEnum<SustainPedalMarkerType>(v, SustainPedalMarkerType)!;
-                return true;
-        }
-        return false;
+        w.startObject(SustainPedalMarkerSerializer._fields);
+        w.numberField(0, obj.ratioPosition);
+        w.numberField(1, obj.pedalType as number);
+        w.endObject();
     }
 }

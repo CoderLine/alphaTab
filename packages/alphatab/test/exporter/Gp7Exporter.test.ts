@@ -54,6 +54,8 @@ describe('Gp7ExporterTest', () => {
 
         ComparisonHelpers.simplifyAccidentalModes(expected);
         ComparisonHelpers.simplifyAccidentalModes(actual);
+        ComparisonHelpers.removeRedundantPitches(expected);
+        ComparisonHelpers.removeRedundantPitches(actual);
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 

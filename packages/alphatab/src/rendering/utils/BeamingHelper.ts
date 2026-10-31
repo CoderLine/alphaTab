@@ -57,8 +57,8 @@ export class BeamingHelper {
      */
     public hasTuplet: boolean = false;
 
-    public slashBeats: Beat[] = [];
-    public restBeats: Beat[] = [];
+    public slashBeats: Beat[] | null = null;
+    public restBeats: Beat[] | null = null;
 
     public lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
@@ -68,6 +68,10 @@ export class BeamingHelper {
 
     public invertBeamDirection: boolean = false;
     public preferredBeamDirection: BeamDirection | null = null;
+    /**
+     * The stem direction the standard notation renderer computed when finishing this helper.
+     */
+    public beamDirection: BeamDirection = BeamDirection.Up;
     public graceType: GraceType = GraceType.None;
 
     public get isRestBeamHelper(): boolean {
@@ -101,7 +105,6 @@ export class BeamingHelper {
     public constructor(staff: Staff, renderer: BarRendererBase, beamingRuleLookup: BeamingRuleLookup) {
         this._staff = staff;
         this._renderer = renderer;
-        this.beats = [];
         this._beamingRuleLookup = beamingRuleLookup;
     }
 
@@ -188,22 +191,31 @@ export class BeamingHelper {
             }
 
             if (!beat.isRest) {
-                if (this.isRestBeamHelper) {
-                    this.beats = [];
+                if (this.beats.length === 0) {
+                    this.beats = [beat];
+                } else if (this.isRestBeamHelper) {
+                    this.beats[0] = beat;
+                } else {
+                    this.beats.push(beat);
                 }
-                this.beats.push(beat);
                 this._checkNote(beat.minNote);
                 this._checkNote(beat.maxNote);
                 if (this.shortestDuration < beat.duration) {
                     this.shortestDuration = beat.duration;
                 }
             } else if (this.beats.length === 0) {
-                this.beats.push(beat);
+                this.beats = [beat];
             } else {
+                if (!this.restBeats) {
+                    this.restBeats = [];
+                }
                 this.restBeats.push(beat);
             }
 
             if (beat.slashed) {
+                if (!this.slashBeats) {
+                    this.slashBeats = [];
+                }
                 this.slashBeats.push(beat);
             }
         }
@@ -308,23 +320,29 @@ export class BeamingHelper {
     }
 
     /**
-     * Per-direction beam drawing info cache. BeamDirection is a 2-value enum
-     * (Up=0, Down=1) so we use two pre-allocated `BeamingHelperDrawInfo`
-     * instances plus paired `*Valid: boolean` flags. The slot is reused
-     * across cycles; `*Valid=false` means callers must re-initialize before
-     * reading. This avoids the per-cycle Map allocation and lookup cost on
-     * the hot beam-paint path. The "paired Valid + non-null T" pattern
-     * follows {@link BarTempoGlyph} — `T | null` does not transpile cleanly
-     * to C# (nullable struct/class semantics diverge), but plain fields plus
-     * a boolean do.
+     * Per-direction beam drawing info, created on first use and reused across
+     * layout cycles; `*Valid=false` means callers must re-initialize before reading.
      */
-    private readonly _drawingInfoUp: BeamingHelperDrawInfo = new BeamingHelperDrawInfo();
-    private readonly _drawingInfoDown: BeamingHelperDrawInfo = new BeamingHelperDrawInfo();
+    private _drawingInfoUp: BeamingHelperDrawInfo | null = null;
+    private _drawingInfoDown: BeamingHelperDrawInfo | null = null;
     private _drawingInfoUpValid: boolean = false;
     private _drawingInfoDownValid: boolean = false;
 
     public getDrawingInfo(direction: BeamDirection): BeamingHelperDrawInfo {
-        return direction === BeamDirection.Up ? this._drawingInfoUp : this._drawingInfoDown;
+        if (direction === BeamDirection.Up) {
+            let up = this._drawingInfoUp;
+            if (!up) {
+                up = new BeamingHelperDrawInfo();
+                this._drawingInfoUp = up;
+            }
+            return up;
+        }
+        let down = this._drawingInfoDown;
+        if (!down) {
+            down = new BeamingHelperDrawInfo();
+            this._drawingInfoDown = down;
+        }
+        return down;
     }
 
     public hasDrawingInfo(direction: BeamDirection): boolean {

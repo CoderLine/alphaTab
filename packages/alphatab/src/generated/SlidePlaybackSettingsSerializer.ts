@@ -4,39 +4,53 @@
 // the code is regenerated.
 // </auto-generated>
 import { SlidePlaybackSettings } from "@coderline/alphatab/PlayerSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class SlidePlaybackSettingsSerializer {
-    public static fromJson(obj: SlidePlaybackSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => SlidePlaybackSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["simpleslidepitchoffset", "simpleslidedurationratio", "shiftslidedurationratio"]);
+    public static read(obj: SlidePlaybackSettings, reader: IObjectReader): void {
+        reader.readRecord(SlidePlaybackSettingsSerializer._fields, (id, k, rr) => SlidePlaybackSettingsSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: SlidePlaybackSettings | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("simpleslidepitchoffset", obj.simpleSlidePitchOffset);
-        o.set("simpleslidedurationratio", obj.simpleSlideDurationRatio);
-        o.set("shiftslidedurationratio", obj.shiftSlideDurationRatio);
-        return o;
+    public static readProperty(obj: SlidePlaybackSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = SlidePlaybackSettingsSerializer._fields.idOf(property);
+        return id >= 0 ? SlidePlaybackSettingsSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: SlidePlaybackSettings, property: string, v: unknown): boolean {
-        switch (property) {
-            case "simpleslidepitchoffset":
-                obj.simpleSlidePitchOffset = v! as number;
+    private static _readField(obj: SlidePlaybackSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                obj.simpleSlidePitchOffset = r.readNumber();
                 return true;
-            case "simpleslidedurationratio":
-                obj.simpleSlideDurationRatio = v! as number;
+            case 1:
+                obj.simpleSlideDurationRatio = r.readNumber();
                 return true;
-            case "shiftslidedurationratio":
-                obj.shiftSlideDurationRatio = v! as number;
+            case 2:
+                obj.shiftSlideDurationRatio = r.readNumber();
                 return true;
         }
         return false;
+    }
+    public static readFlexible(obj: SlidePlaybackSettings, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? SlidePlaybackSettingsSerializer._readField(obj, id, rr, false) : SlidePlaybackSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: SlidePlaybackSettings, property: string, r: IObjectReader): boolean {
+        if (SlidePlaybackSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static write(obj: SlidePlaybackSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(SlidePlaybackSettingsSerializer._fields);
+        w.numberField(0, obj.simpleSlidePitchOffset);
+        w.numberField(1, obj.simpleSlideDurationRatio);
+        w.numberField(2, obj.shiftSlideDurationRatio);
+        w.endObject();
     }
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
+import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
@@ -143,6 +144,150 @@ describe('GeneralTests', () => {
         await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
             enableColoring(o.score);
         });
+    });
+
+    it('colors-partial-staff-lines', async () => {
+        const bar = ':4 3.3 5.3 7.3 8.3';
+        await VisualTestHelper.runVisualTestTex(
+            `\\track \\staff {score tabs} ${[bar, bar, bar, bar, bar, bar].join(' | ')}`,
+            'test-data/visual-tests/general/colors-partial-staff-lines.png',
+            undefined,
+            o => {
+                const bars = o.score.tracks[0].staves[0].bars;
+
+                // a style without staff-line entries keeps the default staff-line colour
+                bars[1].style = new BarStyle();
+                bars[1].style.colors.set(BarSubElement.StandardNotationBarNumber, Color.fromJson('#00AA00')!);
+
+                // adjacent bars with the same colour
+                for (const b of [bars[2], bars[3]]) {
+                    b.style = new BarStyle();
+                    b.style.colors.set(BarSubElement.StandardNotationStaffLine, Color.fromJson('#DD0000')!);
+                    b.style.colors.set(BarSubElement.GuitarTabsStaffLine, Color.fromJson('#DD0000')!);
+                }
+
+                // standard notation coloured with equal colours of separate styles, tab lines default
+                for (const b of [bars[4], bars[5]]) {
+                    b.style = new BarStyle();
+                    b.style.colors.set(BarSubElement.StandardNotationStaffLine, Color.fromJson('#0000DD')!);
+                }
+            }
+        );
+    });
+
+    it('colors-partial-bar-style', async () => {
+        const voice1 = ':4 0.6 3.6 0.5 2.5';
+        const voice2 = ':2 0.1 3.1';
+        const settings = new Settings();
+        // a barline colour distinct from the glyph colour keeps the default barline colour recognisable
+        settings.display.resources.barSeparatorColor = Color.fromJson('#0080C0')!;
+        await VisualTestHelper.runVisualTestTex(
+            `\\defaultBarNumberDisplay allBars \\track \\staff {score tabs} \\voice ${[voice1, voice1, voice1, voice1].join(' | ')} \\voice ${[voice2, voice2, voice2, voice2].join(' | ')}`,
+            'test-data/visual-tests/general/colors-partial-bar-style.png',
+            settings,
+            o => {
+                const bars = o.score.tracks[0].staves[0].bars;
+
+                // only staff lines coloured: barlines and bar number keep their default colours
+                bars[1].style = new BarStyle();
+                bars[1].style.colors.set(BarSubElement.StandardNotationStaffLine, Color.fromJson('#DD0000')!);
+                bars[1].style.colors.set(BarSubElement.GuitarTabsStaffLine, Color.fromJson('#DD0000')!);
+
+                // only the bar number coloured: staff lines, ledger lines and barlines keep their default colours
+                bars[2].style = new BarStyle();
+                bars[2].style.colors.set(BarSubElement.StandardNotationBarNumber, Color.fromJson('#00AA00')!);
+
+                // only the tab barline coloured, and a voice style without entries: the standard notation
+                // barline and the second voice keep their default colours
+                bars[3].style = new BarStyle();
+                bars[3].style.colors.set(BarSubElement.GuitarTabsBarLines, Color.fromJson('#00AA00')!);
+                bars[3].voices[1].style = new VoiceStyle();
+            }
+        );
+    });
+
+    it('colors-voice-cascade', async () => {
+        const flagsAndBeams = ':8 0.6{dy f} 3.6 0.5 2.5 :16 0.6 3.6 0.5 2.5 :8 0.6 r';
+        const tuplet = ':8 0.6{tu 3 dy mf} 3.6{tu 3} 0.5{tu 3} :8 2.5 2.5 :4 0.6 3.6';
+        const overriddenTuplet = ':8 0.6{tu 3 dy ff} 3.6{tu 3} 0.5{tu 3} :8 2.5 2.5 :4 0.6 3.6';
+        const voice2 = ':2 0.1 3.1{dy p}';
+        const settings = new Settings();
+        settings.notation.rhythmMode = TabRhythmMode.ShowWithBars;
+        await VisualTestHelper.runVisualTestTex(
+            `\\track \\staff {score tabs slash numbered} \\voice ${flagsAndBeams} | ${tuplet} | ${overriddenTuplet} \\voice ${voice2} | ${voice2} | ${voice2}`,
+            'test-data/visual-tests/general/colors-voice-cascade.png',
+            settings,
+            o => {
+                const bars = o.score.tracks[0].staves[0].bars;
+
+                // stems, beams, flags, tuplets and effects follow the voice colour; bar elements such as the
+                // numbered key signature and the bar number keep their default colours
+                for (const b of bars) {
+                    b.voices[0].style = new VoiceStyle();
+                    b.voices[0].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#0000DD')!);
+                    b.voices[1].style = new VoiceStyle();
+                    b.voices[1].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#00AA00')!);
+                }
+
+                // the entries of a beat win over the voice colour
+                const overridden: BeatSubElement[] = [
+                    BeatSubElement.StandardNotationStem,
+                    BeatSubElement.StandardNotationBeams,
+                    BeatSubElement.StandardNotationTuplet,
+                    BeatSubElement.GuitarTabStem,
+                    BeatSubElement.GuitarTabBeams,
+                    BeatSubElement.GuitarTabTuplet,
+                    BeatSubElement.SlashStem,
+                    BeatSubElement.SlashBeams,
+                    BeatSubElement.SlashTuplet,
+                    BeatSubElement.NumberedDuration,
+                    BeatSubElement.NumberedTuplet,
+                    BeatSubElement.Effects
+                ];
+                const beat = bars[2].voices[0].beats[0];
+                beat.style = new BeatStyle();
+                for (const element of overridden) {
+                    beat.style.colors.set(element, Color.fromJson('#DD0000')!);
+                }
+            }
+        );
+    });
+
+    it('colors-multi-system-slur', async () => {
+        // every piece of a slur over several systems takes the colour of its voice: the first voice is
+        // styled blue, the second voice keeps its default colour
+        const settings = new Settings();
+        settings.display.barsPerRow = 1;
+        await VisualTestHelper.runVisualTestTex(
+            '\\track \\staff {score} \\voice :1 3.3{slur s1} | 3.3 | 3.3 | 3.3{slur s1} \\voice :1 5.1{slur s2} | 5.1 | 5.1 | 5.1{slur s2}',
+            'test-data/visual-tests/general/colors-multi-system-slur.png',
+            settings,
+            o => {
+                for (const b of o.score.tracks[0].staves[0].bars) {
+                    b.voices[0].style = new VoiceStyle();
+                    b.voices[0].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#0000DD')!);
+                }
+            }
+        );
+    });
+
+    it('colors-tab-bend', async () => {
+        // the bends of several notes on one beat take the voice colour like single bends: bar 1 shows the
+        // default colours of both voices, bar 2 a blue first voice and a green second voice
+        const voice1 = ':4 3.3{b (0 4)} (3.3{b (0 4)} 5.2{b (0 4)}) (3.3{b (0 4)} 5.2{b (0 4)} 5.1{b (0 4)}) r';
+        const voice2 = ':4 r r r (7.5{b (0 4)} 7.4{b (0 4)})';
+        await VisualTestHelper.runVisualTestTex(
+            `\\track \\staff {tabs} \\voice ${voice1} | ${voice1} \\voice ${voice2} | ${voice2}`,
+            'test-data/visual-tests/general/colors-tab-bend.png',
+            undefined,
+            o => {
+                const bar = o.score.tracks[0].staves[0].bars[1];
+                bar.voices[0].style = new VoiceStyle();
+                bar.voices[0].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#0000DD')!);
+                bar.voices[1].style = new VoiceStyle();
+                bar.voices[1].style.colors.set(VoiceSubElement.Glyphs, Color.fromJson('#00AA00')!);
+            }
+        );
     });
 
     it('color-performance', async () => {

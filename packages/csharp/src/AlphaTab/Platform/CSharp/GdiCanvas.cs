@@ -334,6 +334,11 @@ internal sealed class GdiCanvas : ICanvas
 
     public void FillRect(double x, double y, double w, double h)
     {
+        if (w <= 0)
+        {
+            return;
+        }
+
         x *= _scale;
         y *= _scale;
         w *= _scale;

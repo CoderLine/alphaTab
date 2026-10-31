@@ -4,35 +4,49 @@
 // the code is regenerated.
 // </auto-generated>
 import { ExporterSettings } from "@coderline/alphatab/ExporterSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class ExporterSettingsSerializer {
-    public static fromJson(obj: ExporterSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => ExporterSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["indent", "comments"]);
+    public static read(obj: ExporterSettings, reader: IObjectReader): void {
+        reader.readRecord(ExporterSettingsSerializer._fields, (id, k, rr) => ExporterSettingsSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: ExporterSettings | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("indent", obj.indent);
-        o.set("comments", obj.comments);
-        return o;
+    public static readProperty(obj: ExporterSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = ExporterSettingsSerializer._fields.idOf(property);
+        return id >= 0 ? ExporterSettingsSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: ExporterSettings, property: string, v: unknown): boolean {
-        switch (property) {
-            case "indent":
-                obj.indent = v! as number;
+    private static _readField(obj: ExporterSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                obj.indent = r.readNumber();
                 return true;
-            case "comments":
-                obj.comments = v! as boolean;
+            case 1:
+                obj.comments = r.readBoolean();
                 return true;
         }
         return false;
+    }
+    public static readFlexible(obj: ExporterSettings, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? ExporterSettingsSerializer._readField(obj, id, rr, false) : ExporterSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: ExporterSettings, property: string, r: IObjectReader): boolean {
+        if (ExporterSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static write(obj: ExporterSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(ExporterSettingsSerializer._fields);
+        w.numberField(0, obj.indent);
+        w.booleanField(1, obj.comments);
+        w.endObject();
     }
 }

@@ -24,6 +24,7 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const c = canvas.color;
+        const cps = this.renderer.scoreRenderer.layout!.tiePaintControlPoints;
         if (this.colorOverride) {
             canvas.color = this.colorOverride;
         }
@@ -31,6 +32,7 @@ export class GhostParenthesisGlyph extends Glyph {
         if (this._isOpen) {
             TieGlyph.paintTie(
                 canvas,
+                cps,
                 1,
                 cx + this.x + this.renderer.smuflMetrics.ghostParenthesisWidth,
                 cy + this.y + this.height,
@@ -43,6 +45,7 @@ export class GhostParenthesisGlyph extends Glyph {
         } else {
             TieGlyph.paintTie(
                 canvas,
+                cps,
                 1,
                 cx + this.x + this.renderer.smuflMetrics.ghostParenthesisPadding,
                 cy + this.y,

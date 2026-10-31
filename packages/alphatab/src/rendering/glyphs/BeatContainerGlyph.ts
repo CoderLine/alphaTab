@@ -13,10 +13,9 @@ import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { ITieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { BarLayoutingInfo } from '@coderline/alphatab/rendering/staves/BarLayoutingInfo';
-import type { BarBounds } from '@coderline/alphatab/rendering/utils/BarBounds';
+import type { Spring } from '@coderline/alphatab/rendering/staves/Spring';
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
-import { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * Per-beat effect-glyph overflow; consumed by the per-beat skyline emission
@@ -34,12 +33,32 @@ export interface BeatEffectOverflow {
  * @internal
  */
 export abstract class BeatContainerGlyphBase extends Glyph {
-    public pendingEffectOverflows: BeatEffectOverflow[] = [];
+    private _pendingEffectOverflows: BeatEffectOverflow[] | null = null;
+
+    /**
+     * The spring of the beat in the layouting info of its renderer, `null` for grace beats and
+     * beats which are not registered there.
+     */
+    public spring: Spring | null = null;
+
+    public get pendingEffectOverflows(): BeatEffectOverflow[] {
+        let pending = this._pendingEffectOverflows;
+        if (!pending) {
+            pending = [];
+            this._pendingEffectOverflows = pending;
+        }
+        return pending;
+    }
+
+    /** {@link pendingEffectOverflows} without creating the list; `null` when nothing was registered. */
+    public get pendingEffectOverflowsOrNull(): BeatEffectOverflow[] | null {
+        return this._pendingEffectOverflows;
+    }
 
     /** Drain pending overflows before the next producer pass; consumer may not run. */
     public prepareForOverflowPass(): void {
-        const pending = this.pendingEffectOverflows;
-        if (pending.length > 0) {
+        const pending = this._pendingEffectOverflows;
+        if (pending && pending.length > 0) {
             pending.splice(0, pending.length);
         }
     }
@@ -70,7 +89,7 @@ export abstract class BeatContainerGlyphBase extends Glyph {
     public abstract getHighestNoteY(requestedPosition: NoteYPosition): number;
     public abstract registerLayoutingInfo(layoutings: BarLayoutingInfo): void;
     public abstract applyLayoutingInfo(info: BarLayoutingInfo): void;
-    public abstract buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number): void;
+    public abstract buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number): void;
     public scaleToWidth(beatWidth: number) {
         this.width = beatWidth;
     }
@@ -108,10 +127,13 @@ export abstract class BeatContainerGlyphBase extends Glyph {
  * @internal
  */
 export class BeatContainerGlyph extends BeatContainerGlyphBase {
-    private _ties: ITieGlyph[] = [];
+    private _ties: ITieGlyph[] | null = null;
     private _tieWidth = 0;
     public beat: Beat;
-    public preNotes!: BeatGlyphBase;
+    /**
+     * The glyphs before the notes (accidentals, spacing, effects), `null` after the layout when there are none.
+     */
+    public preNotes: BeatGlyphBase | null = null;
     public onNotes!: BeatOnNoteGlyphBase;
 
     public override getLowestNoteY(requestedPosition: NoteYPosition): number {
@@ -173,7 +195,6 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     public constructor(beat: Beat) {
         super(0, 0);
         this.beat = beat;
-        this._ties = [];
     }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
@@ -191,27 +212,57 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     public addTie(tie: ITieGlyph) {
         const tg = tie as unknown as Glyph;
         tg.renderer = this.renderer;
+        if (!this._ties) {
+            this._ties = [];
+        }
         this._ties.push(tie);
         this.renderer.registerTie(tie);
     }
 
-    public override getBoundingBoxTop(): number {
-        let top = ModelUtils.minBoundingBox(this.preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop());
+    /**
+     * Vertical extent of {@link preNotes} and {@link onNotes}. Their glyphs only move vertically in
+     * {@link doLayout} and {@link doMultiVoiceLayout}, which invalidate the cache when done.
+     * Horizontal positioning (layouting info, scaling, centering) keeps it valid.
+     */
+    private _noteExtentValid = false;
+    private _noteExtentTop = 0;
+    private _noteExtentBottom = 0;
+
+    protected invalidateNoteExtent(): void {
+        this._noteExtentValid = false;
+    }
+
+    private _updateNoteExtent(): void {
+        const preNotes = this.preNotes;
+        let top = preNotes
+            ? ModelUtils.minBoundingBox(preNotes.getBoundingBoxTop(), this.onNotes.getBoundingBoxTop())
+            : this.onNotes.getBoundingBoxTop();
         if (Number.isNaN(top)) {
             top = (this.renderer as LineBarRenderer).middleYPosition;
         }
-        return top;
-    }
-
-    public override getBoundingBoxBottom(): number {
-        let bottom = ModelUtils.maxBoundingBox(
-            this.preNotes.getBoundingBoxBottom(),
-            this.onNotes.getBoundingBoxBottom()
-        );
+        let bottom = preNotes
+            ? ModelUtils.maxBoundingBox(preNotes.getBoundingBoxBottom(), this.onNotes.getBoundingBoxBottom())
+            : this.onNotes.getBoundingBoxBottom();
         if (Number.isNaN(bottom)) {
             bottom = (this.renderer as LineBarRenderer).middleYPosition;
         }
-        return bottom;
+        this._noteExtentTop = top;
+        this._noteExtentBottom = bottom;
+        this._noteExtentValid = true;
+    }
+
+    public override getBoundingBoxTop(): number {
+        if (!this._noteExtentValid) {
+            this._updateNoteExtent();
+        }
+        return this._noteExtentTop;
+    }
+
+    public override getBoundingBoxBottom(): number {
+        if (!this._noteExtentValid) {
+            this._updateNoteExtent();
+        }
+        return this._noteExtentBottom;
     }
 
     protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
@@ -223,13 +274,17 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
-        const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.onTimeX;
+        const preNotes = this.preNotes;
+        const preBeatStretch: number = preNotes ? preNotes.computedWidth + this.onNotes.onTimeX : this.onNotes.onTimeX;
 
         let postBeatStretch: number = this.postBeatStretch;
 
-        for (const tie of this._ties) {
-            const tg = tie as unknown as Glyph;
-            postBeatStretch += tg.width;
+        const ties = this._ties;
+        if (ties) {
+            for (const tie of ties) {
+                const tg = tie as unknown as Glyph;
+                postBeatStretch += tg.width;
+            }
         }
 
         layoutings.addBeatSpring(this, preBeatStretch, postBeatStretch);
@@ -237,10 +292,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         // store sizes for usages in effects
         // we might have empty content in the individual bar renderers, but need to know
         // the "shared" maximum widths
-        layoutings.setBeatSizes(this, {
-            preBeatSize: this.preNotes.width,
-            onBeatSize: this.onNotes.width
-        });
+        layoutings.setBeatSizes(this, preNotes ? preNotes.width : 0, this.onNotes.width);
     }
 
     public applyLayoutingInfo(_info: BarLayoutingInfo): void {
@@ -248,10 +300,16 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
     }
 
     public override doLayout(): void {
-        this.preNotes.x = 0;
-        this.preNotes.renderer = this.renderer;
-        this.preNotes.container = this;
-        this.preNotes.doLayout();
+        const preNotes = this.preNotes;
+        if (preNotes) {
+            preNotes.x = 0;
+            preNotes.renderer = this.renderer;
+            preNotes.container = this;
+            preNotes.doLayout();
+            if (preNotes.isEmpty) {
+                this.preNotes = null;
+            }
+        }
         // preNotes.width is only final once preNotes.doLayout() has run, so onNotes.x must be
         // derived here, not before.
         this._layoutOnsetX();
@@ -260,6 +318,7 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         this.onNotes.doLayout();
         this.createBeatTies();
         this.updateWidth();
+        this.invalidateNoteExtent();
     }
 
     /**
@@ -268,15 +327,25 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
      * repeatedly (once per `_scaleToForce` pass) without compounding a previous offset.
      */
     private _layoutOnsetX(): void {
-        this.preNotes.x = 0;
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        const preNotes = this.preNotes;
+        if (preNotes) {
+            preNotes.x = 0;
+            this.onNotes.x = preNotes.x + preNotes.width;
+        } else {
+            this.onNotes.x = 0;
+        }
     }
 
     public override applyCenterOffset(target: number): void {
         this._layoutOnsetX();
         const offset = target - this.onTimeX;
-        this.preNotes.x = offset;
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
+        const preNotes = this.preNotes;
+        if (preNotes) {
+            preNotes.x = offset;
+            this.onNotes.x = preNotes.x + preNotes.width;
+        } else {
+            this.onNotes.x = offset;
+        }
     }
 
     protected createBeatTies() {
@@ -286,17 +355,22 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         }
     }
 
+    /** Overrides that move note glyphs vertically must call {@link invalidateNoteExtent} when done. */
     public override doMultiVoiceLayout(): void {
         // do nothing by default, overridden when needed
     }
 
     protected updateWidth(): void {
-        let width = this.preNotes.width + this.onNotes.width;
+        const preNotes = this.preNotes;
+        let width = preNotes ? preNotes.width + this.onNotes.width : this.onNotes.width;
         let tieWidth: number = 0;
-        for (const tie of this._ties) {
-            const tg = tie as unknown as Glyph;
-            if (tg.width > tieWidth) {
-                tieWidth = tg.width;
+        const ties = this._ties;
+        if (ties) {
+            for (const tie of ties) {
+                const tg = tie as unknown as Glyph;
+                if (tg.width > tieWidth) {
+                    tieWidth = tg.width;
+                }
             }
         }
         this._tieWidth = tieWidth;
@@ -363,90 +437,94 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
         // }
         // canvas.color = c;
 
-        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this._ties.length === 0;
+        const ties = this._ties;
+        const preNotes = this.preNotes;
+        const isEmptyGlyph: boolean = !preNotes && this.onNotes.isEmpty && (!ties || ties.length === 0);
         if (isEmptyGlyph) {
             return;
         }
         canvas.beginGroup(BeatContainerGlyph.getGroupId(this.beat));
 
-        this.preNotes.paint(cx + this.x, cy + this.y, canvas);
-        this.onNotes.paint(cx + this.x, cy + this.y, canvas);
+        const x = cx + this.x;
+        const y = cy + this.y;
+        if (preNotes) {
+            preNotes.paint(x, y, canvas);
+        }
+        this.onNotes.paint(x, y, canvas);
 
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
         const staffX: number = cx - this.renderer.beatGlyphsStart - this.renderer.x;
         const staffY: number = cy - this.renderer.y;
-        for (let i: number = 0, j: number = this._ties.length; i < j; i++) {
-            const t = this._ties[i] as unknown as Glyph;
-            t.renderer = this.renderer;
-            t.paint(staffX, staffY, canvas);
+        if (ties) {
+            for (let i: number = 0, j: number = ties.length; i < j; i++) {
+                const t = ties[i] as unknown as Glyph;
+                t.renderer = this.renderer;
+                t.paint(staffX, staffY, canvas);
+            }
         }
         canvas.endGroup();
     }
 
-    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number) {
-        const beatBoundings: BeatBounds = new BeatBounds();
-        beatBoundings.beat = this.beat;
-
-        if (this.beat.isEmpty) {
-            beatBoundings.visualBounds = new Bounds();
-            beatBoundings.visualBounds.x = cx + this.x;
-            beatBoundings.visualBounds.y = barBounds.visualBounds.y;
-            beatBoundings.visualBounds.w = this.width;
-            beatBoundings.visualBounds.h = barBounds.visualBounds.h;
-
-            beatBoundings.realBounds = new Bounds();
-            beatBoundings.realBounds.x = cx + this.x;
-            beatBoundings.realBounds.y = barBounds.realBounds.y;
-            beatBoundings.realBounds.w = this.width;
-            beatBoundings.realBounds.h = barBounds.realBounds.h;
-
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX;
-        } else {
-            beatBoundings.visualBounds = new Bounds();
-            beatBoundings.visualBounds.x = cx + this.x;
-
-            if (!this.preNotes.isEmpty) {
-                beatBoundings.visualBounds.x = cx + this.x + this.preNotes.x;
+    public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
+        const scale = this.renderer.settings.display.scale;
+        const x = cx + this.x;
+        let visualX = x;
+        let visualW = this.width;
+        const preNotes = this.preNotes;
+        if (!this.beat.isEmpty) {
+            if (preNotes) {
+                visualX = x + preNotes.x;
             } else if (!this.onNotes.isEmpty) {
-                beatBoundings.visualBounds.x = cx + this.x + this.onNotes.x;
-            } else {
-                beatBoundings.visualBounds.x = cx + this.x;
+                visualX = x + this.onNotes.x;
             }
 
             let visualEndX = 0;
-
             if (!this.onNotes.isEmpty) {
-                visualEndX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX + this.postBeatStretch;
-            } else if (!this.preNotes.isEmpty) {
-                visualEndX = cx + this.x + this.preNotes.x + this.preNotes.width;
+                visualEndX = x + this.onNotes.x + this.onNotes.onTimeX + this.postBeatStretch;
+            } else if (preNotes) {
+                visualEndX = x + preNotes.x + preNotes.width;
             } else {
-                visualEndX = cx + this.x + this.width;
+                visualEndX = x + this.width;
             }
-
-            beatBoundings.visualBounds.w = visualEndX - beatBoundings.visualBounds.x;
-            beatBoundings.visualBounds.y = barBounds.visualBounds.y;
-            beatBoundings.visualBounds.h = barBounds.visualBounds.h;
-
-            beatBoundings.realBounds = new Bounds();
-            beatBoundings.realBounds.x = cx + this.x;
-            beatBoundings.realBounds.y = barBounds.realBounds.y;
-            beatBoundings.realBounds.w = this.width;
-            beatBoundings.realBounds.h = barBounds.realBounds.h;
-
-            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.onTimeX;
+            visualW = visualEndX - visualX;
         }
+        visualW = this.getBoundsVisualWidth(visualX, visualW);
+        const realW = this.getBoundsRealWidth(x, this.width);
 
-        barBounds.addBeat(beatBoundings);
+        writer.addBeat(
+            this.beat,
+            visualX * scale,
+            visualW * scale,
+            x * scale,
+            realW * scale,
+            (x + this.onNotes.x + this.onNotes.onTimeX) * scale
+        );
 
         if (this.renderer.settings.core.includeNoteBounds) {
-            this.onNotes.buildBoundingsLookup(beatBoundings, cx + this.x, cy + this.y);
+            this.onNotes.buildBoundingsLookup(writer, x, cy + this.y);
         }
+    }
+
+    /**
+     * The unscaled width of the visual beat bounds starting at `visualX`.
+     * @param width The width covered by the beat glyphs.
+     */
+    protected getBoundsVisualWidth(_visualX: number, width: number): number {
+        return width;
+    }
+
+    /**
+     * The unscaled width of the real beat bounds starting at `realX`.
+     * @param width The width of the beat container.
+     */
+    protected getBoundsRealWidth(_realX: number, width: number): number {
+        return width;
     }
 
     public getBeatX(requestedPosition: BeatXPosition, useSharedSizes: boolean = false) {
         switch (requestedPosition) {
             case BeatXPosition.PreNotes:
-                return this.preNotes.x;
+                return this.preNotes ? this.preNotes.x : this.onNotes.x;
             case BeatXPosition.OnNotes:
                 return this.onNotes.x;
             case BeatXPosition.MiddleNotes:
@@ -461,6 +539,6 @@ export class BeatContainerGlyph extends BeatContainerGlyphBase {
             case BeatXPosition.EndBeat:
                 return this.width;
         }
-        return this.preNotes.x;
+        return this.preNotes ? this.preNotes.x : this.onNotes.x;
     }
 }

@@ -2,21 +2,33 @@ import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
-import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
  * @internal
  */
-export class FlagGlyph extends MusicFontGlyph {
-    public constructor(x: number, y: number, duration: Duration, direction: BeamDirection, isGrace: boolean) {
-        super(x, y, isGrace ? EngravingSettings.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));
-    }
-
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const c = canvas.color;
-        super.paint(cx, cy, canvas);
-        canvas.color = c;
+export class FlagGlyph {
+    /**
+     * Paints the flag symbol of a beat with the given properties.
+     * @returns The width of the flag.
+     */
+    public static paintFlag(
+        canvas: ICanvas,
+        metrics: EngravingSettings,
+        x: number,
+        y: number,
+        duration: Duration,
+        direction: BeamDirection,
+        isGrace: boolean
+    ): number {
+        const symbol = FlagGlyph.getSymbol(duration, direction, isGrace);
+        const scale = isGrace ? EngravingSettings.GraceScale : 1;
+        const width = metrics.glyphWidths.get(symbol)! * scale;
+        const height = metrics.glyphHeights.get(symbol)! * scale;
+        if (width !== 0 || height !== 0) {
+            canvas.fillMusicFontSymbol(x, y, scale, symbol, false);
+        }
+        return width;
     }
 
     public static getSymbol(duration: Duration, direction: BeamDirection, isGrace: boolean): MusicFontSymbol {

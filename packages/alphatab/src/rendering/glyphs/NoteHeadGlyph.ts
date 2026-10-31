@@ -1,6 +1,7 @@
 import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
+import type { Note } from '@coderline/alphatab/model/Note';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
@@ -11,6 +12,14 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
  */
 export class NoteHeadGlyphBase extends MusicFontGlyph {
     public centerOnStem = false;
+    /**
+     * The staff steps this note head is placed on within its chord.
+     */
+    public steps = 0;
+    /**
+     * The note this is the main note head of within its chord, `null` for additional heads (e.g. harmonics).
+     */
+    public note: Note | null = null;
     public constructor(x: number, y: number, isGrace: boolean, symbol: MusicFontSymbol) {
         super(x, y, isGrace ? EngravingSettings.GraceScale : 1, symbol);
     }

@@ -4,6 +4,15 @@
  * @public
  */
 export enum LogLevel {
+    // Kotlin orders enum members by declaration, so the members must stay sorted by value.
+    /**
+     * Trace level (high-volume internal flow details, implies all other levels).
+     * @remarks
+     * The published JavaScript files do not contain trace messages; they are only written when running alphaTab
+     * from its TypeScript sources and on .NET and Android.
+     * @since 1.9.0
+     */
+    Trace = -1,
     /**
      * No logging
      */

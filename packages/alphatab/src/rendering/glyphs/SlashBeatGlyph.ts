@@ -12,9 +12,7 @@ import { SlashRestGlyph } from '@coderline/alphatab/rendering/glyphs/SlashRestGl
 import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/TremoloPickingGlyph';
 import type { SlashBarRenderer } from '@coderline/alphatab/rendering/SlashBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import type { BeatBounds } from '@coderline/alphatab/rendering/utils/BeatBounds';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
-import { NoteBounds } from '@coderline/alphatab/rendering/utils/NoteBounds';
+import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
  * @internal
@@ -57,16 +55,16 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         return 0;
     }
 
-    public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public override buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {
         if (this.noteHeads && this.container.beat.notes.length > 0) {
-            const noteBounds = new NoteBounds();
-            noteBounds.note = this.container.beat.notes[0];
-            noteBounds.noteHeadBounds = new Bounds();
-            noteBounds.noteHeadBounds.x = cx + this.x + this.noteHeads.x;
-            noteBounds.noteHeadBounds.y = cy + this.y + this.noteHeads.y - this.noteHeads.height / 2;
-            noteBounds.noteHeadBounds.w = this.width;
-            noteBounds.noteHeadBounds.h = this.height;
-            beatBounds.addNote(noteBounds);
+            const scale = this.renderer.settings.display.scale;
+            writer.addNote(
+                this.container.beat.notes[0],
+                (cx + this.x + this.noteHeads.x) * scale,
+                (cy + this.y + this.noteHeads.y - this.noteHeads.height / 2) * scale,
+                this.width * scale,
+                this.height * scale
+            );
         }
     }
 

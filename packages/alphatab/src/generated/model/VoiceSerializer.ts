@@ -4,56 +4,64 @@
 // the code is regenerated.
 // </auto-generated>
 import { Voice } from "@coderline/alphatab/model/Voice";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
-import { BeatSerializer } from "@coderline/alphatab/generated/model/BeatSerializer";
-import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { Beat } from "@coderline/alphatab/model/Beat";
+import { BeatSerializer } from "@coderline/alphatab/generated/model/BeatSerializer";
 import { VoiceStyle } from "@coderline/alphatab/model/Voice";
+import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class VoiceSerializer {
-    public static fromJson(obj: Voice, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["id", "beats", "style"]);
+    public static read(obj: Voice, reader: IObjectReader): void {
+        reader.readRecord(VoiceSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    obj.id = r.readNumber();
+                    return true;
+                case 1:
+                    VoiceSerializer._readBeats(obj, r);
+                    return true;
+                case 2:
+                    if (r.isNullish()) {
+                        obj.style = undefined;
+                    }
+                    else {
+                        obj.style = new VoiceStyle();
+                        VoiceStyleSerializer.read(obj.style, r);
+                    }
+                    return true;
+            }
+            return false;
+        });
+    }
+    private static _readBeats(obj: Voice, r: IObjectReader): void {
+        obj.beats = [];
+        r.readArray(rr => {
+            const i = new Beat();
+            BeatSerializer.read(i, rr);
+            obj.addBeat(i);
+        });
+    }
+    public static write(obj: Voice | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => VoiceSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: Voice | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
+        w.startObject(VoiceSerializer._fields);
+        w.numberField(0, obj.id);
+        w.arrayField(1, obj.beats!.length);
+        for (const i of obj.beats!) {
+            BeatSerializer.write(i, w);
         }
-        const o = new Map<string, unknown>();
-        o.set("id", obj.id);
-        o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i)));
+        w.endArray();
         if (obj.style) {
-            o.set("style", VoiceStyleSerializer.toJson(obj.style));
+            w.field(2);
+            VoiceStyleSerializer.write(obj.style, w);
         }
-        return o;
-    }
-    public static setProperty(obj: Voice, property: string, v: unknown): boolean {
-        switch (property) {
-            case "id":
-                obj.id = v! as number;
-                return true;
-            case "beats":
-                obj.beats = [];
-                for (const o of (v as (Map<string, unknown> | null)[])) {
-                    const i = new Beat();
-                    BeatSerializer.fromJson(i, o);
-                    obj.addBeat(i);
-                }
-                return true;
-            case "style":
-                if (v) {
-                    obj.style = new VoiceStyle();
-                    VoiceStyleSerializer.fromJson(obj.style, v);
-                }
-                else {
-                    obj.style = undefined;
-                }
-                return true;
-        }
-        return false;
+        w.endObject();
     }
 }

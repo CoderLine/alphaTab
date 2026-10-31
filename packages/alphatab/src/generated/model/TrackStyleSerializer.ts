@@ -4,42 +4,46 @@
 // the code is regenerated.
 // </auto-generated>
 import { TrackStyle } from "@coderline/alphatab/model/Track";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { TrackSubElement } from "@coderline/alphatab/model/Track";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { Color } from "@coderline/alphatab/model/Color";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class TrackStyleSerializer {
-    public static fromJson(obj: TrackStyle, m: unknown): void {
-        if (!m) {
+    private static readonly _fields: RecordFields = new RecordFields(["colors"]);
+    public static read(obj: TrackStyle, reader: IObjectReader): void {
+        reader.readRecord(TrackStyleSerializer._fields, (id, k, r) => {
+            switch (id) {
+                case 0:
+                    TrackStyleSerializer._readColors(obj, r);
+                    return true;
+            }
+            return false;
+        });
+    }
+    private static _readColors(obj: TrackStyle, r: IObjectReader): void {
+        obj.colors = new Map<TrackSubElement, Color | null>();
+        r.readObject((k, rr) => {
+            obj.colors.set(JsonHelper.parseEnum<TrackSubElement>(k, TrackSubElement)!, Color.fromJson(rr.readValue()));
+            return true;
+        });
+    }
+    public static write(obj: TrackStyle | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
             return;
         }
-        JsonHelper.forEach(m, (v, k) => TrackStyleSerializer.setProperty(obj, k, v));
-    }
-    public static toJson(obj: TrackStyle | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
+        w.startObject(TrackStyleSerializer._fields);
+        w.mapField(0);
+        for (const [k, v] of obj.colors!) {
+            w.prop(k.toString());
+            w.writeValue(Color.toJson(v));
         }
-        const o = new Map<string, unknown>();
-        {
-            const m = new Map<string, unknown>();
-            o.set("colors", m);
-            for (const [k, v] of obj.colors!) {
-                m.set(k.toString(), Color.toJson(v));
-            }
-        }
-        return o;
-    }
-    public static setProperty(obj: TrackStyle, property: string, v: unknown): boolean {
-        switch (property) {
-            case "colors":
-                obj.colors = new Map<TrackSubElement, Color | null>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.colors.set(JsonHelper.parseEnum<TrackSubElement>(k, TrackSubElement)!, Color.fromJson(v));
-                });
-                return true;
-        }
-        return false;
+        w.endMap();
+        w.endObject();
     }
 }

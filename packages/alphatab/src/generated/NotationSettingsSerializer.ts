@@ -4,84 +4,102 @@
 // the code is regenerated.
 // </auto-generated>
 import { NotationSettings } from "@coderline/alphatab/NotationSettings";
-import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
+import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { NotationMode } from "@coderline/alphatab/NotationSettings";
+import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
 import { FingeringMode } from "@coderline/alphatab/NotationSettings";
 import { NotationElement } from "@coderline/alphatab/NotationSettings";
 import { TabRhythmMode } from "@coderline/alphatab/NotationSettings";
+import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class NotationSettingsSerializer {
-    public static fromJson(obj: NotationSettings, m: unknown): void {
-        if (!m) {
-            return;
-        }
-        JsonHelper.forEach(m, (v, k) => NotationSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
+    private static readonly _fields: RecordFields = new RecordFields(["notationmode", "fingeringmode", "elements", "rhythmmode", "rhythmheight", "transpositionpitches", "displaytranspositionpitches", "smallgracetabnotes", "extendbendarrowsontiednotes", "extendlineeffectstobeatend", "slurheight"]);
+    public static read(obj: NotationSettings, reader: IObjectReader): void {
+        reader.readRecord(NotationSettingsSerializer._fields, (id, k, rr) => NotationSettingsSerializer._readField(obj, id, rr, false));
     }
-    public static toJson(obj: NotationSettings | null | undefined): Map<string, unknown> | null {
-        if (!obj) {
-            return null;
-        }
-        const o = new Map<string, unknown>();
-        o.set("notationmode", obj.notationMode as number);
-        o.set("fingeringmode", obj.fingeringMode as number);
-        {
-            const m = new Map<string, unknown>();
-            o.set("elements", m);
-            for (const [k, v] of obj.elements!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("rhythmmode", obj.rhythmMode as number);
-        o.set("rhythmheight", obj.rhythmHeight);
-        o.set("transpositionpitches", obj.transpositionPitches);
-        o.set("displaytranspositionpitches", obj.displayTranspositionPitches);
-        o.set("smallgracetabnotes", obj.smallGraceTabNotes);
-        o.set("extendbendarrowsontiednotes", obj.extendBendArrowsOnTiedNotes);
-        o.set("extendlineeffectstobeatend", obj.extendLineEffectsToBeatEnd);
-        o.set("slurheight", obj.slurHeight);
-        return o;
+    public static readProperty(obj: NotationSettings, property: string, r: IObjectReader, flexible: boolean): boolean {
+        const id = NotationSettingsSerializer._fields.idOf(property);
+        return id >= 0 ? NotationSettingsSerializer._readField(obj, id, r, flexible) : false;
     }
-    public static setProperty(obj: NotationSettings, property: string, v: unknown): boolean {
-        switch (property) {
-            case "notationmode":
-                obj.notationMode = JsonHelper.parseEnum<NotationMode>(v, NotationMode)!;
+    private static _readField(obj: NotationSettings, id: number, r: IObjectReader, flexible: boolean): boolean {
+        switch (id) {
+            case 0:
+                obj.notationMode = JsonHelper.parseEnum<NotationMode>(r.readValue(), NotationMode)!;
                 return true;
-            case "fingeringmode":
-                obj.fingeringMode = JsonHelper.parseEnum<FingeringMode>(v, FingeringMode)!;
+            case 1:
+                obj.fingeringMode = JsonHelper.parseEnum<FingeringMode>(r.readValue(), FingeringMode)!;
                 return true;
-            case "elements":
-                obj.elements = new Map<NotationElement, boolean>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.elements.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, v as boolean);
-                });
+            case 2:
+                NotationSettingsSerializer._readElements(obj, r, flexible);
                 return true;
-            case "rhythmmode":
-                obj.rhythmMode = JsonHelper.parseEnum<TabRhythmMode>(v, TabRhythmMode)!;
+            case 3:
+                obj.rhythmMode = JsonHelper.parseEnum<TabRhythmMode>(r.readValue(), TabRhythmMode)!;
                 return true;
-            case "rhythmheight":
-                obj.rhythmHeight = v! as number;
+            case 4:
+                obj.rhythmHeight = r.readNumber();
                 return true;
-            case "transpositionpitches":
-                obj.transpositionPitches = v! as number[];
+            case 5:
+                obj.transpositionPitches = r.readValue()! as number[];
                 return true;
-            case "displaytranspositionpitches":
-                obj.displayTranspositionPitches = v! as number[];
+            case 6:
+                obj.displayTranspositionPitches = r.readValue()! as number[];
                 return true;
-            case "smallgracetabnotes":
-                obj.smallGraceTabNotes = v! as boolean;
+            case 7:
+                obj.smallGraceTabNotes = r.readBoolean();
                 return true;
-            case "extendbendarrowsontiednotes":
-                obj.extendBendArrowsOnTiedNotes = v! as boolean;
+            case 8:
+                obj.extendBendArrowsOnTiedNotes = r.readBoolean();
                 return true;
-            case "extendlineeffectstobeatend":
-                obj.extendLineEffectsToBeatEnd = v! as boolean;
+            case 9:
+                obj.extendLineEffectsToBeatEnd = r.readBoolean();
                 return true;
-            case "slurheight":
-                obj.slurHeight = v! as number;
+            case 10:
+                obj.slurHeight = r.readNumber();
                 return true;
         }
         return false;
+    }
+    private static _readElements(obj: NotationSettings, r: IObjectReader, flexible: boolean): void {
+        obj.elements = new Map<NotationElement, boolean>();
+        r.readObject((k, rr) => {
+            obj.elements.set(JsonHelper.parseEnum<NotationElement>(k, NotationElement)!, rr.readBoolean());
+            return true;
+        });
+    }
+    public static readFlexible(obj: NotationSettings, r: IObjectReader): void {
+        r.readRecord(null, (id, k, rr) => id >= 0 ? NotationSettingsSerializer._readField(obj, id, rr, false) : NotationSettingsSerializer.readFlexibleProperty(obj, k.toLowerCase(), rr));
+    }
+    public static readFlexibleProperty(obj: NotationSettings, property: string, r: IObjectReader): boolean {
+        if (NotationSettingsSerializer.readProperty(obj, property, r, true)) {
+            return true;
+        }
+        return false;
+    }
+    public static write(obj: NotationSettings | null | undefined, w: IObjectWriter): void {
+        if (!obj) {
+            w.writeNull();
+            return;
+        }
+        w.startObject(NotationSettingsSerializer._fields);
+        w.numberField(0, obj.notationMode as number);
+        w.numberField(1, obj.fingeringMode as number);
+        w.mapField(2);
+        for (const [k, v] of obj.elements!) {
+            w.prop(k.toString());
+            w.writeBoolean(v);
+        }
+        w.endMap();
+        w.numberField(3, obj.rhythmMode as number);
+        w.numberField(4, obj.rhythmHeight);
+        w.valueField(5, obj.transpositionPitches);
+        w.valueField(6, obj.displayTranspositionPitches);
+        w.booleanField(7, obj.smallGraceTabNotes);
+        w.booleanField(8, obj.extendBendArrowsOnTiedNotes);
+        w.booleanField(9, obj.extendLineEffectsToBeatEnd);
+        w.numberField(10, obj.slurHeight);
+        w.endObject();
     }
 }

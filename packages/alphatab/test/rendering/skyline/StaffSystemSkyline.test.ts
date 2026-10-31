@@ -1,5 +1,5 @@
 import { StaffSide } from '@coderline/alphatab/rendering/skyline/BarLocalSkyline';
-import { SkylineSegmentPool } from '@coderline/alphatab/rendering/skyline/SkylineSegmentPool';
+import { SkylineScratch } from '@coderline/alphatab/rendering/skyline/SkylineScratch';
 import { StaffSystemSkyline } from '@coderline/alphatab/rendering/skyline/StaffSystemSkyline';
 import { describe, expect, it } from 'vitest';
 
@@ -8,10 +8,10 @@ import { describe, expect, it } from 'vitest';
  */
 class SysSkyHandle {
     public readonly sky: StaffSystemSkyline;
-    public readonly pool: SkylineSegmentPool;
-    public constructor(sky: StaffSystemSkyline, pool: SkylineSegmentPool) {
+    public readonly scratch: SkylineScratch;
+    public constructor(sky: StaffSystemSkyline, scratch: SkylineScratch) {
         this.sky = sky;
-        this.pool = pool;
+        this.scratch = scratch;
     }
 }
 
@@ -25,9 +25,9 @@ class StaffSystemSkylineFixtures {
         xMin: number = 0,
         xMax: number = 200
     ): SysSkyHandle {
-        const pool: SkylineSegmentPool = new SkylineSegmentPool();
-        const sky: StaffSystemSkyline = new StaffSystemSkyline(staffIndex, systemIndex, xMin, xMax, pool);
-        return new SysSkyHandle(sky, pool);
+        const scratch: SkylineScratch = new SkylineScratch();
+        const sky: StaffSystemSkyline = new StaffSystemSkyline(staffIndex, systemIndex, xMin, xMax, scratch);
+        return new SysSkyHandle(sky, scratch);
     }
 }
 

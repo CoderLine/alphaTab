@@ -28,8 +28,13 @@ export interface EffectBandXRange {
  * @internal
  */
 export class EffectBand extends Glyph {
-    private _uniqueEffectGlyphs: EffectGlyph[][] = [];
-    private _effectGlyphs: Map<number, EffectGlyph>[] = [];
+    private static readonly _noEffectGlyphs: EffectGlyph[] = [];
+    private static readonly _noChainHeads: GroupedEffectGlyph[] = [];
+    /** The glyphs of the band in insertion order; all belong to beats of {@link voice}. */
+    private _glyphs: EffectGlyph[] = EffectBand._noEffectGlyphs;
+    private static readonly _noGlyphs: (EffectGlyph | null)[] = [];
+    /** The glyph per beat index of {@link voice}, null for beats without one. */
+    private _glyphsByBeat: (EffectGlyph | null)[] = EffectBand._noGlyphs;
     private _container: EffectBandContainer;
     public isEmpty: boolean = true;
 
@@ -77,10 +82,14 @@ export class EffectBand extends Glyph {
     }
 
     /** Chain heads in this band, walked by {@link finalizeChainSpans}. */
-    private _chainHeads: GroupedEffectGlyph[] = [];
+    private _chainHeads: GroupedEffectGlyph[] = EffectBand._noChainHeads;
 
     public registerChainHead(head: GroupedEffectGlyph): void {
-        this._chainHeads.push(head);
+        if (this._chainHeads.length === 0) {
+            this._chainHeads = [head];
+        } else {
+            this._chainHeads.push(head);
+        }
     }
 
     /** Republishes each chain head's cross-renderer xEnd. Called once per band after the staff is finalized. */
@@ -93,11 +102,9 @@ export class EffectBand extends Glyph {
 
     /** Dispatches {@link Glyph.populateSkyline} on every glyph the band owns. */
     public override populateSkyline(): void {
-        for (let v = 0; v < this._uniqueEffectGlyphs.length; v++) {
-            const voiceGlyphs = this._uniqueEffectGlyphs[v];
-            for (let i = 0, n = voiceGlyphs.length; i < n; i++) {
-                voiceGlyphs[i].populateSkyline();
-            }
+        const glyphs = this._glyphs;
+        for (let i = 0, n = glyphs.length; i < n; i++) {
+            glyphs[i].populateSkyline();
         }
     }
 
@@ -149,25 +156,25 @@ export class EffectBand extends Glyph {
             max = this.renderer.width;
             found = true;
         }
-        for (const v of this._uniqueEffectGlyphs) {
-            for (const g of v) {
-                const left = g.getBoundingBoxLeft();
-                const right = g.getBoundingBoxRight();
-                if (Number.isNaN(left) || Number.isNaN(right)) {
-                    // glyph has no extent in the current layout (NaN convention, cf. ModelUtils.minBoundingBox)
-                    continue;
-                }
-                if (!found) {
+        const glyphs = this._glyphs;
+        for (let i = 0, n = glyphs.length; i < n; i++) {
+            const g = glyphs[i];
+            const left = g.getBoundingBoxLeft();
+            const right = g.getBoundingBoxRight();
+            if (Number.isNaN(left) || Number.isNaN(right)) {
+                // glyph has no extent in the current layout (NaN convention, cf. ModelUtils.minBoundingBox)
+                continue;
+            }
+            if (!found) {
+                min = left;
+                max = right;
+                found = true;
+            } else {
+                if (left < min) {
                     min = left;
+                }
+                if (right > max) {
                     max = right;
-                    found = true;
-                } else {
-                    if (left < min) {
-                        min = left;
-                    }
-                    if (right > max) {
-                        max = right;
-                    }
                 }
             }
         }
@@ -180,6 +187,8 @@ export class EffectBand extends Glyph {
         this._xRangeBaseDirty = false;
     }
 
+    private readonly _shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat) => boolean;
+
     public constructor(
         voice: Voice,
         info: EffectInfo,
@@ -190,6 +199,7 @@ export class EffectBand extends Glyph {
         super(0, 0);
         this.voice = voice;
         this.info = info;
+        this._shouldCreateGlyph = info.shouldCreateGlyph;
         this._container = container;
         this.renderer = renderer;
         const clampedOrder = order < 0 ? 0 : order > 0xffff ? 0xffff : order;
@@ -199,9 +209,9 @@ export class EffectBand extends Glyph {
             voice.index * 1048576; // 2^20
     }
 
-    /** Per-voice insertion-ordered view of every glyph the band owns. Read-only; band owns lifetime. */
-    public get glyphsByVoice(): EffectGlyph[][] {
-        return this._uniqueEffectGlyphs;
+    /** Insertion-ordered view of every glyph the band owns. Read-only; band owns lifetime. */
+    public get glyphs(): EffectGlyph[] {
+        return this._glyphs;
     }
 
     public finalizeBand() {
@@ -212,68 +222,68 @@ export class EffectBand extends Glyph {
         if (!this.info.contributesToBeatSpacing) {
             return;
         }
-        for (let v = 0; v < this._uniqueEffectGlyphs.length; v++) {
-            const voiceGlyphs = this._uniqueEffectGlyphs[v];
-            for (let i = 0, n = voiceGlyphs.length; i < n; i++) {
-                const glyph = voiceGlyphs[i];
-                const beat = glyph.beat;
-                if (!beat) {
-                    continue;
-                }
-                const container = this.renderer.getBeatContainer(beat);
-                if (!container) {
-                    continue;
-                }
-                // glyph.x is 0 here; set later by `_alignGlyph`.
-                const preBeat = Math.max(0, -glyph.getBoundingBoxLeft());
-                const postBeat = Math.max(0, glyph.getBoundingBoxRight());
-                if (preBeat > 0 || postBeat > 0) {
-                    layoutings.addBeatSpring(container, preBeat, postBeat);
-                }
+        const glyphs = this._glyphs;
+        for (let i = 0, n = glyphs.length; i < n; i++) {
+            const glyph = glyphs[i];
+            const beat = glyph.beat;
+            if (!beat) {
+                continue;
+            }
+            const container = this.renderer.getBeatContainer(beat);
+            if (!container) {
+                continue;
+            }
+            // glyph.x is 0 here; set later by `_alignGlyph`.
+            const preBeat = Math.max(0, -glyph.getBoundingBoxLeft());
+            const postBeat = Math.max(0, glyph.getBoundingBoxRight());
+            if (preBeat > 0 || postBeat > 0) {
+                layoutings.addBeatSpring(container, preBeat, postBeat);
             }
         }
     }
 
     public override doLayout(): void {
         super.doLayout();
-        for (let i: number = 0; i < this.renderer.bar.voices.length; i++) {
-            this._effectGlyphs.push(new Map<number, EffectGlyph>());
-            this._uniqueEffectGlyphs.push([]);
-        }
+        // fill() returns nothing on Kotlin
+        const glyphsByBeat = new Array<EffectGlyph | null>(this.voice.beats.length);
+        glyphsByBeat.fill(null);
+        this._glyphsByBeat = glyphsByBeat;
     }
 
-    public static shouldCreateGlyph(beat: Beat, info: EffectInfo, renderer: BarRendererBase) {
-        return info.shouldCreateGlyph(renderer, beat) && (!info.hideOnMultiTrack || renderer.staff!.trackIndex === 0);
+    private _glyphAt(beatIndex: number): EffectGlyph | null {
+        const glyphs = this._glyphsByBeat;
+        return beatIndex < glyphs.length ? glyphs[beatIndex] : null;
     }
 
+    /** Adds the glyph of the given beat of {@link voice} if the effect applies to it. */
     public createGlyph(beat: Beat): void {
-        if (beat.voice !== this.voice) {
-            return;
+        if (this._shouldCreateGlyph(this.renderer, beat)) {
+            this.addBeatGlyph(beat);
         }
-        // NOTE: the track order will never change. even if the staff behind the renderer changes, the trackIndex will not.
-        // so it's okay to access the staff here while creating the glyphs.
-        if (EffectBand.shouldCreateGlyph(beat, this.info, this.renderer)) {
-            this.isEmpty = false;
-            if (!this.firstBeat || beat.isBefore(this.firstBeat)) {
-                this.firstBeat = beat;
+    }
+
+    /** Adds the glyph of the given beat of {@link voice}; the effect must apply to it. */
+    public addBeatGlyph(beat: Beat): void {
+        this.isEmpty = false;
+        if (!this.firstBeat || beat.isBefore(this.firstBeat)) {
+            this.firstBeat = beat;
+        }
+        if (!this.lastBeat || beat.isAfter(this.lastBeat)) {
+            this.lastBeat = beat;
+            // for "toEnd" sizing occupy until next follow-up-beat
+            switch (this.info.sizingMode) {
+                case EffectBarGlyphSizing.SingleOnBeatToEnd:
+                case EffectBarGlyphSizing.GroupedOnBeatToEnd:
+                    if (this.lastBeat.nextBeat) {
+                        this.lastBeat = this.lastBeat.nextBeat;
+                    }
+                    break;
             }
-            if (!this.lastBeat || beat.isAfter(this.lastBeat)) {
-                this.lastBeat = beat;
-                // for "toEnd" sizing occupy until next follow-up-beat
-                switch (this.info.sizingMode) {
-                    case EffectBarGlyphSizing.SingleOnBeatToEnd:
-                    case EffectBarGlyphSizing.GroupedOnBeatToEnd:
-                        if (this.lastBeat.nextBeat) {
-                            this.lastBeat = this.lastBeat.nextBeat;
-                        }
-                        break;
-                }
-            }
-            const glyph: EffectGlyph = this._createOrResizeGlyph(this.info.sizingMode, beat);
-            if (glyph.height > this.height) {
-                this.height = glyph.height;
-                this.originalHeight = glyph.height;
-            }
+        }
+        const glyph: EffectGlyph = this._createOrResizeGlyph(this.info.sizingMode, beat);
+        if (glyph.height > this.height) {
+            this.height = glyph.height;
+            this.originalHeight = glyph.height;
         }
     }
 
@@ -291,8 +301,8 @@ export class EffectBand extends Glyph {
                 g.beat = b;
                 g.band = this;
                 g.doLayout();
-                this._effectGlyphs[b.voice.index].set(b.index, g);
-                this._uniqueEffectGlyphs[b.voice.index].push(g);
+                this._glyphsByBeat[b.index] = g;
+                this._addGlyph(g);
                 // FullBar chain link so continuation bars stay at one magnitude.
                 if (this.renderer.index > 0 && b.index === 0) {
                     const previousContainer = this._container.previousContainer;
@@ -318,8 +328,8 @@ export class EffectBand extends Glyph {
                 g.beat = b;
                 g.band = this;
                 g.doLayout();
-                this._effectGlyphs[b.voice.index].set(b.index, g);
-                this._uniqueEffectGlyphs[b.voice.index].push(g);
+                this._glyphsByBeat[b.index] = g;
+                this._addGlyph(g);
                 return g;
             case EffectBarGlyphSizing.GroupedOnBeat:
             case EffectBarGlyphSizing.GroupedOnBeatToEnd:
@@ -333,20 +343,16 @@ export class EffectBand extends Glyph {
                     if (this.info.shouldCreateGlyph(this.renderer, prevBeat)) {
                         // first load the effect bar renderer and glyph
                         let prevEffect: EffectGlyph | null = null;
-                        if (b.index > 0 && this._effectGlyphs[b.voice.index].has(prevBeat.index)) {
+                        if (b.index > 0 && this._glyphAt(prevBeat.index) !== null) {
                             // load effect from previous beat in the same renderer
-                            prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index)!;
+                            prevEffect = this._glyphAt(prevBeat.index);
                         } else if (this.renderer.index > 0) {
                             // load the effect from the previous renderer if possible.
                             const previousContainer = this._container.previousContainer!;
                             const previousBand = previousContainer.getBand(prevBeat.voice, this.info.effectId);
                             // it can happen that we have an empty voice and then we don't have an effect band
                             if (previousBand) {
-                                const voiceGlyphs: Map<number, EffectGlyph> =
-                                    previousBand._effectGlyphs[prevBeat.voice.index];
-                                if (voiceGlyphs.has(prevBeat.index)) {
-                                    prevEffect = voiceGlyphs.get(prevBeat.index)!;
-                                }
+                                prevEffect = previousBand._glyphAt(prevBeat.index);
                             }
                         }
                         // if the effect cannot be expanded, create a new glyph
@@ -380,15 +386,25 @@ export class EffectBand extends Glyph {
         }
     }
 
+    private _addGlyph(g: EffectGlyph): void {
+        if (this._glyphs.length === 0) {
+            this._glyphs = [g];
+        } else {
+            this._glyphs.push(g);
+        }
+    }
+
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
 
-        for (let i: number = 0, j: number = this._uniqueEffectGlyphs.length; i < j; i++) {
-            const v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
-            for (let k: number = 0, l: number = v.length; k < l; k++) {
-                const g: EffectGlyph = v[k];
-                using _ = ElementStyleHelper.beat(canvas, BeatSubElement.Effects, g.beat!, false);
+        const glyphs = this._glyphs;
+        for (let i: number = 0, j: number = glyphs.length; i < j; i++) {
+            const g: EffectGlyph = glyphs[i];
+            const previousColor = ElementStyleHelper.applyBeat(canvas, BeatSubElement.Effects, g.beat!, false);
+            try {
                 g.paint(cx + this.x, cy + this.y, canvas);
+            } finally {
+                ElementStyleHelper.restore(canvas, previousColor);
             }
         }
     }
@@ -400,11 +416,9 @@ export class EffectBand extends Glyph {
         this._xRangeMax = 0;
         this._xRangeFound = false;
 
-        for (let v: number = 0; v < this._uniqueEffectGlyphs.length; v++) {
-            const voiceGlyphs = this._uniqueEffectGlyphs[v];
-            for (let i = 0, n = voiceGlyphs.length; i < n; i++) {
-                this._alignGlyph(this.info.sizingMode, voiceGlyphs[i].beat!);
-            }
+        const glyphs = this._glyphs;
+        for (let i = 0, n = glyphs.length; i < n; i++) {
+            this._alignGlyph(this.info.sizingMode, glyphs[i].beat!);
         }
         this.info.onAlignGlyphs?.(this);
     }
@@ -431,8 +445,6 @@ export class EffectBand extends Glyph {
         out.xEnd = this._xRangeMax;
         return true;
     }
-
-    private readonly _placementRangeScratch: EffectBandXRange = { xStart: 0, xEnd: 0 };
 
     /**
      * Collects the renderer-local x-ranges of this band for the vertical placement: the ranges which must be
@@ -467,30 +479,30 @@ export class EffectBand extends Glyph {
                 sizing === EffectBarGlyphSizing.GroupedOnBeat ||
                 sizing === EffectBarGlyphSizing.GroupedOnBeatToEnd;
             let found = false;
-            for (const v of this._uniqueEffectGlyphs) {
-                for (const g of v) {
-                    const left = g.getBoundingBoxLeft();
-                    const right = g.getBoundingBoxRight();
-                    if (Number.isNaN(left) || Number.isNaN(right)) {
-                        continue;
-                    }
-                    let clearStart = Math.min(left, g.getPlacementClearanceLeft());
-                    let clearEnd = Math.max(right, g.getPlacementClearanceRight());
-                    if (beatAttached && g.beat) {
-                        clearStart = Math.min(clearStart, this.renderer.getBeatX(g.beat, BeatXPosition.OnNotes));
-                        clearEnd = Math.max(clearEnd, this.renderer.getBeatX(g.beat, BeatXPosition.PostNotes));
-                    }
-                    clearStarts.push(clearStart);
-                    clearEnds.push(clearEnd);
-                    xStarts.push(left);
-                    xEnds.push(right);
-                    found = true;
+            const glyphs = this._glyphs;
+            for (let i = 0, n = glyphs.length; i < n; i++) {
+                const g = glyphs[i];
+                const left = g.getBoundingBoxLeft();
+                const right = g.getBoundingBoxRight();
+                if (Number.isNaN(left) || Number.isNaN(right)) {
+                    continue;
                 }
+                let clearStart = Math.min(left, g.getPlacementClearanceLeft());
+                let clearEnd = Math.max(right, g.getPlacementClearanceRight());
+                if (beatAttached && g.beat) {
+                    clearStart = Math.min(clearStart, this.renderer.getBeatX(g.beat, BeatXPosition.OnNotes));
+                    clearEnd = Math.max(clearEnd, this.renderer.getBeatX(g.beat, BeatXPosition.PostNotes));
+                }
+                clearStarts.push(clearStart);
+                clearEnds.push(clearEnd);
+                xStarts.push(left);
+                xEnds.push(right);
+                found = true;
             }
             return found;
         }
 
-        const range = this._placementRangeScratch;
+        const range = this.renderer.scoreRenderer.layout!.effectBandRangeScratch;
         if (!this.computeLocalXRange(range)) {
             return false;
         }
@@ -502,7 +514,7 @@ export class EffectBand extends Glyph {
     }
 
     private _alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
-        const g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
+        const g: EffectGlyph = this._glyphsByBeat[beat.index]!;
         // bar-anchored glyphs also exist on renderers without beat glyphs (multi-bar rests)
         switch (sizing) {
             case EffectBarGlyphSizing.FullBar:

@@ -61,18 +61,21 @@ export class BarNumberGlyph extends EffectGlyph {
             return;
         }
 
-        using _ = ElementStyleHelper.bar(
+        const previousColor = ElementStyleHelper.applyBar(
             canvas,
             (this.renderer as LineBarRenderer).barNumberBarSubElement,
             this.renderer.bar,
             true
         );
-
-        const res: RenderingResources = this.renderer.resources;
-        const baseline = canvas.textBaseline;
-        canvas.font = res.elementFonts.get(NotationElement.BarNumber)!;
-        canvas.textBaseline = TextBaseline.Top;
-        canvas.fillText(this._barNumberText, cx + this.x, cy + this.y);
-        canvas.textBaseline = baseline;
+        try {
+            const res: RenderingResources = this.renderer.resources;
+            const baseline = canvas.textBaseline;
+            canvas.font = res.elementFonts.get(NotationElement.BarNumber)!;
+            canvas.textBaseline = TextBaseline.Top;
+            canvas.fillText(this._barNumberText, cx + this.x, cy + this.y);
+            canvas.textBaseline = baseline;
+        } finally {
+            ElementStyleHelper.restore(canvas, previousColor);
+        }
     }
 }
