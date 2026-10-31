@@ -15,6 +15,8 @@ class SummaryLabelReporter {
 
 export interface VitestPackageOptions {
     setupFiles?: string[];
+    /** The test environment, e.g. `jsdom` for packages that render DOM. Defaults to `node`. */
+    environment?: 'node' | 'jsdom';
     truncateThreshold?: number;
     testTimeout?: number;
 }
@@ -32,7 +34,8 @@ export function defineVitestConfig(options: VitestPackageOptions = {}) {
             alias: buildTsconfigAliases(process.cwd())
         },
         test: {
-            include: ['test/**/*.test.ts'],
+            include: ['test/**/*.test.{ts,tsx}'],
+            environment: options.environment,
             isolate: false,
             testTimeout: options.testTimeout ?? 30000,
             setupFiles: options.setupFiles,
