@@ -2,8 +2,7 @@
 import * as alphaTab from "@coderline/alphatab";
 import { useEffect, useRef } from "react";
 import styles from "./styles.module.scss";
-import environment from "@site/src/environment";
-import { useColorMode } from '@docusaurus/theme-common';
+import { applyThemeColors, useUiEnvironment } from "@coderline/alphatab-ui";
 
 type RasguadoItemMode = "down" | "up" | "head";
 type RasgueadoPatternItem = {
@@ -204,9 +203,9 @@ canvas.settings.display.scale = 1.5;
 
 export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
   const pattern = RasgueadoPatternDefinition.get(rasgueado)!;
-  const { colorMode } = useColorMode();
+  const { theme } = useUiEnvironment();
 
-  environment.setAlphaTabDefaults(canvas.settings, colorMode);
+  applyThemeColors(canvas.settings, theme);
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -385,7 +384,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
     }
 
     canvasRef.current!.innerHTML = canvas.endRender() as string;
-  }, [colorMode]);
+  }, [theme]);
 
   return (
     <div className={styles.rasgueado}>
