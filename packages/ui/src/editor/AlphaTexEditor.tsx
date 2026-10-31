@@ -55,18 +55,17 @@ export const AlphaTexEditor = React.forwardRef<AlphaTexEditorHandle, AlphaTexEdi
             let cancelled = false;
             let cleanup: (() => void) | undefined;
 
-            void Promise.all([import('./monaco-env'), import('./lsp-bridge')])
-                .then(async ([env, bridge]) => {
+            void import('./monaco-env')
+                .then(async (env) => {
                     const monaco = await env.loadMonaco();
                     if (cancelled) { return; }
-                    cleanup = mountEditor(monaco, env, bridge.connectAlphaTexLsp, host);
+                    cleanup = mountEditor(monaco, env, host);
                 })
                 .catch((e) => console.error('[AlphaTexEditor] Monaco failed to load; using the plain editor', e));
 
             function mountEditor(
                 monaco: MonacoApi,
                 env: typeof import('./monaco-env'),
-                connect: typeof import('./lsp-bridge').connectAlphaTexLsp,
                 container: HTMLDivElement,
             ): () => void {
                 const model = monaco.editor.createModel(
@@ -101,7 +100,7 @@ export const AlphaTexEditor = React.forwardRef<AlphaTexEditorHandle, AlphaTexEdi
                     contextmenu: false,
                     wordBasedSuggestions: 'off',
                 });
-                const lsp = connect(monaco, editor);
+                const lsp = env.connectLanguageServer(editor);
                 const changes = model.onDidChangeContent(() => {
                     const next = model.getValue();
                     if (next !== valueRef.current) { onChangeRef.current(next); }

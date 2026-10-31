@@ -21,7 +21,7 @@ export function loadMonaco(): Promise<MonacoApi> {
 
 async function initialize(): Promise<MonacoApi> {
     self.MonacoEnvironment = {
-        getWorker: () => new Worker(new URL('./editor.worker.ts', import.meta.url)),
+        getWorker: () => new Worker(new URL('./editor.worker.ts', import.meta.url), { type: 'module' }),
     };
 
     const [monaco, { addTextMateGrammarSupport, registerAlphaTexGrammar }, onigurumaWasm] = await Promise.all([
@@ -36,6 +36,62 @@ async function initialize(): Promise<MonacoApi> {
     await registerAlphaTexGrammar(addTextMateGrammarSupport(onigurumaWasm));
     defineTheme(monaco);
     return monaco;
+}
+
+const TYPED_TOKEN = /\\?[\w-]*$/;
+const DIAGNOSTICS_DELAY_MS = 150;
+
+/** The token being typed before the cursor, including a leading `\\` of a metadata tag. */
+function typedTokenRange(model: Monaco.editor.ITextModel, position: Monaco.Position): Monaco.IRange {
+    const before = model.getLineContent(position.lineNumber).slice(0, position.column - 1);
+    const typed = TYPED_TOKEN.exec(before)?.[0].length ?? 0;
+    return {
+        startLineNumber: position.lineNumber,
+        startColumn: position.column - typed,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+    };
+}
+
+/**
+ * Connects `editor` to its own alphaTex language server worker: diagnostics after a pause in typing,
+ * completion of the typed token, hover and signature help. Disposing stops the server, also while
+ * it still starts.
+ */
+export function connectLanguageServer(editor: Monaco.editor.IStandaloneCodeEditor): Monaco.IDisposable {
+    const worker = new Worker(new URL('./alphatex-lsp.worker.ts', import.meta.url), { type: 'module' });
+    let disposed = false;
+    let integration: Monaco.IDisposable | null = null;
+    import('@coderline/alphatab-monaco/lsp')
+        .then(({ basicEditorLspIntegration }) =>
+            basicEditorLspIntegration(editor, worker, {
+                languageId: ALPHATEX_LANGUAGE_ID,
+                clientInfo: { name: 'alphaTab UI' },
+                diagnosticsDelay: DIAGNOSTICS_DELAY_MS,
+                completionRange: typedTokenRange,
+                logger: {
+                    error: (m) => console.error('[AlphaTexEditor]', m),
+                    warn: (m) => console.warn('[AlphaTexEditor]', m),
+                    info: () => {},
+                    log: () => {},
+                },
+            }),
+        )
+        .then((connected) => {
+            if (disposed) { connected.dispose(); }
+            else { integration = connected; }
+        })
+        .catch((e: unknown) => {
+            if (!disposed) { console.error('[AlphaTexEditor] Language server failed to start', e); }
+        });
+    return {
+        dispose() {
+            if (disposed) { return; }
+            disposed = true;
+            integration?.dispose();
+            worker.terminate();
+        },
+    };
 }
 
 /**
