@@ -9,14 +9,8 @@ keywords:
 ---
 
 import { FeatureGrid, FeatureCard } from '@site/src/components/FeatureCard';
-import {
-  faFileImport,
-  faPaintbrush,
-  faPlay,
-  faHandPointer,
-  faFileExport,
-  faPuzzlePiece,
-} from '@fortawesome/free-solid-svg-icons';
+import { IconCode, IconDownload, IconFileMusic, IconPlay } from '@coderline/alphatab-ui';
+import { IconNotation, IconPointer } from '@site/src/components/FeatureCard/icons';
 
 alphaTab is a music-notation SDK that reads Guitar Pro, MusicXML, CapXML, and alphaTex files and produces engraved sheet music with playback. This section catalogs what alphaTab does, grouped by capability. Each entry links into the [API reference](/docs/reference/api/) or a deeper guide for the exact signatures.
 
@@ -31,42 +25,42 @@ Where a capability genuinely differs across platforms, the card names the affect
 <FeatureGrid columns={2}>
   <FeatureCard
     title="Import & load"
-    icon={faFileImport}
+    icon={IconFileMusic}
     accent="sky"
     hook="Every Guitar Pro version, MusicXML, CapXML, and alphaTex — from a URL, a byte buffer, or an inline string."
     link="/docs/features/import-load/"
   />
   <FeatureCard
     title="Render"
-    icon={faPaintbrush}
+    icon={IconNotation}
     accent="violet"
     hook="Layout modes, backends, notation types, styling, and every music-engraving detail alphaTab draws."
     link="/docs/features/render/"
   />
   <FeatureCard
     title="Play & sync"
-    icon={faPlay}
+    icon={IconPlay}
     accent="emerald"
     hook="Built-in synthesizer, playback controls, count-in, loop, per-track mixing, and external audio and video sync."
     link="/docs/features/play-sync/"
   />
   <FeatureCard
     title="Interact"
-    icon={faHandPointer}
+    icon={IconPointer}
     accent="amber"
     hook="Playback cursor, beat highlighting, mouse events, range selection, and custom cursor and scroll handlers."
     link="/docs/features/interact/"
   />
   <FeatureCard
     title="Export"
-    icon={faFileExport}
+    icon={IconDownload}
     accent="rose"
     hook="Write Guitar Pro 7, alphaTex, SMF 1.0 MIDI, or rendered PCM audio from any loaded score."
     link="/docs/features/export/"
   />
   <FeatureCard
     title="Extend"
-    icon={faPuzzlePiece}
+    icon={IconCode}
     accent="slate"
     hook="Custom SMuFL fonts, programmatic score construction, worker and worklet initialization, and hosting alphaTab on your platform."
     link="/docs/features/extend/"

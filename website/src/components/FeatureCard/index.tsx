@@ -1,8 +1,6 @@
 import React from 'react';
 import Link from '@docusaurus/Link';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import type { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { IconArrow } from '@coderline/alphatab-ui';
 import styles from './styles.module.scss';
 
 export type Platform = 'web' | 'net' | 'android';
@@ -27,7 +25,8 @@ export interface FeatureCardProps {
   link?: string;
   since?: string;
   platforms?: Platform[];
-  icon?: IconDefinition;
+  /** An icon component such as the icons of `@coderline/alphatab-ui`. */
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement> & { size?: number }>;
   accent?: CardAccent;
   visual?: React.ReactNode;
   children?: React.ReactNode;
@@ -39,17 +38,17 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
   link,
   since,
   platforms,
-  icon,
+  icon: Icon,
   accent = 'slate',
   visual,
   children,
 }) => {
   const media = visual ?? children;
-  const hasHeadRow = !!icon;
+  const hasHeadRow = !!Icon;
   const classes = [
     styles.card,
     styles[`accent_${accent}`],
-    icon ? styles.cardWithIcon : styles.cardNoIcon,
+    Icon ? styles.cardWithIcon : styles.cardNoIcon,
     media ? styles.cardWithVisual : '',
     link ? styles.cardLink : '',
   ]
@@ -62,7 +61,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
       <div className={styles.body}>
         {hasHeadRow ? (
           <div className={styles.iconBadge} aria-hidden="true">
-            <FontAwesomeIcon icon={icon!} />
+            {Icon && <Icon size={18} />}
           </div>
         ) : null}
         <div className={styles.head}>
@@ -85,7 +84,7 @@ export const FeatureCard: React.FC<FeatureCardProps> = ({
             )}
             {link ? (
               <span className={styles.arrow} aria-hidden="true">
-                <FontAwesomeIcon icon={faArrowRight} />
+                <IconArrow />
               </span>
             ) : null}
           </div>
