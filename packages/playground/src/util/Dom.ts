@@ -60,12 +60,3 @@ export function injectStyles(key: string, sheet: string): void {
     }
     el.textContent = sheet;
 }
-
-export function mount<T extends Mountable>(container: HTMLElement, selector: string, component: T): T {
-    const placeholder = container.querySelector(selector);
-    if (!placeholder) {
-        throw new Error(`mount: placeholder '${selector}' not found in container`);
-    }
-    placeholder.replaceWith(component.root);
-    return component;
-}
