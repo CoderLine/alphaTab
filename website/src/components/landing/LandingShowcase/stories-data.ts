@@ -1,9 +1,3 @@
-/**
- * `pending`: the author has not yet been asked whether we may feature their words.
- * `not-needed`: the entry cites the author's own public credit or announcement.
- */
-export type Outreach = 'pending' | 'not-needed';
-
 export interface ShowcaseLink {
   label: string;
   url: string;
@@ -71,7 +65,6 @@ export type ShowcaseStory =
        * top-left, so supply 920×448. Without it the preview shows decorative notation.
        */
       screenshot?: string;
-      outreach: Outreach;
     } & ProjectVoice)
   | {
       cardType: 'quote';
@@ -84,7 +77,6 @@ export type ShowcaseStory =
       handle?: string;
       role: string;
       source: ShowcaseLink;
-      outreach: Outreach;
     }
   | {
       cardType: 'press';
@@ -98,14 +90,10 @@ export type ShowcaseStory =
       quote: string;
       byline: string;
       url: string;
-      outreach: Outreach;
     };
 
 /** Pool the page draws from on load; the server render uses the first `SHOWCASE_SLOTS` entries of each type. */
 export const SHOWCASE_STORIES: ShowcaseStory[] = [
-  // TODO(outreach): ask Infinite Guitar for a testimonial to replace the summary, and confirm featuring them
-  // with the preview: the public "Pentatonic Pathways: Intro to the Scale" lesson page with its header kept,
-  // the video left out and the author's name and photo blurred.
   {
     cardType: 'project',
     id: 'infiniteguitar',
@@ -122,10 +110,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     tags: ['learning', 'web'],
     meta: 'Lessons with Guitar Pro tabs',
     screenshot: '/img/showcase/infiniteguitar.webp',
-    outreach: 'pending',
   },
-  // TODO(outreach): ask Fretello for a testimonial to replace the summary, and for consent to use their
-  // App Store screenshots (fretello.com/assets/images/screenshots/{listen,learn}.jpg) in the preview.
   {
     cardType: 'project',
     id: 'fretello',
@@ -142,9 +127,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     tags: ['learning', 'mobile'],
     meta: 'iOS · Android',
     screenshot: '/img/showcase/fretello.webp',
-    outreach: 'pending',
   },
-  // TODO(outreach): confirm in discussion #2930 that the app screenshot (our Iron Waltz demo file) may be used.
   {
     cardType: 'project',
     id: 'smart-beat',
@@ -163,9 +146,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     announcement: 'https://github.com/CoderLine/alphaTab/discussions/2930',
     meta: 'Tauri · React · desktop',
     screenshot: '/img/showcase/smart-beat.webp',
-    outreach: 'pending',
   },
-  // TODO(outreach): Reddit comment by u/louislamlam; confirm the quote and the use of his real name.
   {
     cardType: 'project',
     id: 'its-mytabs',
@@ -188,9 +169,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     sourceCode: 'https://github.com/louislam/its-mytabs',
     meta: 'Open source · audio & YouTube sync',
     screenshot: '/img/showcase/its-mytabs.webp',
-    outreach: 'pending',
   },
-  // TODO(outreach): Hacker News comment; reply on the thread before treating this as final.
   {
     cardType: 'quote',
     id: 'hn-webprofusion',
@@ -201,9 +180,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     person: 'webprofusion',
     role: 'Hacker News commenter',
     source: { label: 'news.ycombinator.com', url: 'https://news.ycombinator.com/item?id=40835858' },
-    outreach: 'pending',
   },
-  // TODO(outreach): courtesy ask on Show and tell #2315 for using the README screenshot of their UI.
   {
     cardType: 'project',
     id: 'tab-flow',
@@ -229,9 +206,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     // TODO(verify): download count as of 2026-10-17; refresh from the Obsidian plugin stats before release.
     stat: { k: '1,264', l: 'Obsidian downloads' },
     screenshot: '/img/showcase/tab-flow.webp',
-    outreach: 'pending',
   },
-  // TODO(outreach): courtesy note on Show and tell #2694.
   {
     cardType: 'project',
     id: 'drumforge',
@@ -252,7 +227,6 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     announcement: 'https://github.com/CoderLine/alphaTab/discussions/2694',
     meta: 'Exercises generated as alphaTex',
     screenshot: '/img/showcase/drumforge.webp',
-    outreach: 'pending',
   },
   {
     cardType: 'quote',
@@ -265,9 +239,7 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     handle: '@maxcomperatore',
     role: 'Developer',
     source: { label: 'GitHub Show and tell', url: 'https://github.com/CoderLine/alphaTab/discussions/2872' },
-    outreach: 'not-needed',
   },
-  // TODO(outreach): courtesy ask on Show and tell #1728 for using a screenshot of their UI.
   {
     cardType: 'project',
     id: 'gonb',
@@ -289,7 +261,6 @@ export const SHOWCASE_STORIES: ShowcaseStory[] = [
     announcement: 'https://github.com/CoderLine/alphaTab/discussions/1728',
     meta: 'Generated melodies with playback',
     screenshot: '/img/showcase/gonb.webp',
-    outreach: 'pending',
   },
 ];
 
