@@ -1,3 +1,4 @@
+/// <reference path="./monaco-internals.d.ts" />
 import type * as Monaco from 'monaco-editor';
 import { ResizableContentWidget } from 'monaco-editor/editor/contrib/hover/browser/resizableContentWidget';
 import { SuggestWidget } from 'monaco-editor/editor/contrib/suggest/browser/suggestWidget';
