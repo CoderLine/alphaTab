@@ -16,6 +16,7 @@ import { emitDtsPlugin } from './vite.plugin.emit-dts';
 import min from './vite.plugin.min';
 import { stripProfilingPlugin } from './vite.plugin.strip-profiling';
 import { elementStyleUsingPlugin } from './vite.plugin.transform';
+import { intermediateDeclarationDir, intermediateDeclarationPath } from './workspace';
 
 const terserOptions: MinifyOptions = {
     mangle: {
@@ -211,7 +212,6 @@ export interface DtsRegistration {
 export function addDts(config: UserConfig, projectDir: string, options: DtsRegistration = {}) {
     const tsconfigPath = options.tsconfigPath ?? path.resolve(projectDir, 'tsconfig.json');
     const declarationDir = path.resolve(projectDir, 'dist/types');
-    const srcDir = path.resolve(projectDir, 'src');
     const shouldEmitForChunk = options.shouldEmitForChunk ?? (() => true);
 
     config.plugins!.push(emitDtsPlugin({ projectDir, tsconfigPath, declarationDir: 'dist/types' }));
@@ -224,6 +224,7 @@ export function addDts(config: UserConfig, projectDir: string, options: DtsRegis
         (o.plugins as OutputPlugin[]).push({
             name: 'alphatab:bundle-dts',
             async writeBundle(opts, bundle) {
+                const matchedExternals = new Set<string | RegExp>();
                 for (const fileName of Object.keys(bundle)) {
                     const chunk = bundle[fileName];
                     if (
@@ -234,14 +235,21 @@ export function addDts(config: UserConfig, projectDir: string, options: DtsRegis
                     ) {
                         continue;
                     }
-                    // intermediates mirror the entry's path relative to src/ (rootDir).
-                    const relative = path.parse(path.relative(srcDir, chunk.facadeModuleId!));
-                    const intermediate = path.join(declarationDir, relative.dir, `${relative.name}.d.ts`);
+                    const intermediate = intermediateDeclarationPath(declarationDir, chunk.facadeModuleId!);
                     if (!fs.existsSync(intermediate)) {
                         this.error(`Could not find intermediate d.ts at ${intermediate}`);
                     }
                     const outFile = path.resolve(opts.dir!, fileName.replace(/\.mjs$/, '.d.ts'));
-                    generateDts(projectDir, intermediate, outFile, externalTypes);
+                    for (const matched of generateDts(projectDir, intermediate, outFile, externalTypes)) {
+                        matchedExternals.add(matched);
+                    }
+                }
+                const unmatched = externalTypes.filter(e => !matchedExternals.has(e));
+                if (unmatched.length > 0) {
+                    this.error(
+                        `externalTypes ${unmatched.join(', ')} never matched an import of the declarations; ` +
+                            'they may have been inlined'
+                    );
                 }
             }
         });
@@ -388,7 +396,7 @@ export function defineEsmLibConfig(setup?: (config: UserConfig) => void) {
                 {
                     name: 'alphatab:filter-per-file-dts',
                     async writeBundle(opts) {
-                        const dtsBaseDir = declarationDir;
+                        const dtsBaseDir = intermediateDeclarationDir(declarationDir, path.resolve(projectDir, 'src'));
                         if (!fs.existsSync(dtsBaseDir)) {
                             this.error(`Expected declaration directory ${dtsBaseDir} to exist`);
                         }

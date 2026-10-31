@@ -43,14 +43,16 @@ function toExternalTypeModule(declared: string | RegExp): ExternalTypeModule {
 /**
  * Bundles the declarations of `dtsPath` into `outputFile`.
  * @param externalTypes Modules kept as imports instead of inlined: exact module names, or patterns for
- * subpaths. Each must be imported by the bundled declarations, otherwise the build fails.
+ * subpaths.
+ * @returns The entries of `externalTypes` the declarations import. An entry that no entry point of a package
+ * imports is a misconfiguration or a sign that the declarations were inlined.
  */
 export default function generateDts(
     root: string,
     dtsPath: string,
     outputFile: string,
     externalTypes: (string | RegExp)[]
-) {
+): (string | RegExp)[] {
     externalTypeModules = externalTypes.map(toExternalTypeModule);
 
     const extractorConfig: ExtractorConfig = ExtractorConfig.prepare({
@@ -81,7 +83,6 @@ export default function generateDts(
     } finally {
         externalTypeModules = [];
     }
-    const unmatched = modules.filter(m => m.count === 0).map(m => String(m.declared));
 
     if (!extractorResult.succeeded) {
         throw new Error(
@@ -89,11 +90,6 @@ export default function generateDts(
                 ` and ${extractorResult.warningCount} warnings`
         );
     }
-    if (unmatched.length > 0) {
-        throw new Error(
-            `externalTypes ${unmatched.join(', ')} never matched an import of ${dtsPath}; ` +
-                'the declarations may have been inlined'
-        );
-    }
     console.log(`DTS bundled`, outputFile);
+    return modules.filter(m => m.count > 0).map(m => m.declared);
 }

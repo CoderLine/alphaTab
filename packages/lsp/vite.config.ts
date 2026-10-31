@@ -13,6 +13,6 @@ export default defineConfig(() => {
     esm(config, import.meta.dirname, 'server/node', 'src/server/node.ts', { withMin: false });
     addHashbang(config, ['index.node']);
     (config.build!.rollupOptions!.external as (RegExp | string)[]).push('@coderline/alphatab');
-    addDts(config, import.meta.dirname);
+    addDts(config, import.meta.dirname, { externalTypes: ['@coderline/alphatab'] });
     return config;
 });
