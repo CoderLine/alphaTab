@@ -308,9 +308,12 @@ type ApiEventKeys = {
  * (or until `deps` change). Handles the on/off symmetry so consumers
  * can pass a plain function.
  */
-export function useAlphaTabEvent<E extends ApiEventKeys>(
+type ApiEventHandler<E extends keyof alphaTab.AlphaTabApi> =
+    alphaTab.AlphaTabApi[E] extends alphaTab.IEventEmitterOfT<infer T> ? (arg: T) => void : () => void;
+
+export function useAlphaTabEvent<E extends ApiEventKeys & keyof alphaTab.AlphaTabApi>(
     event: E,
-    handler: Parameters<alphaTab.AlphaTabApi[E]['on']>[0],
+    handler: ApiEventHandler<E>,
     deps?: DependencyList,
 ): void {
     const api = useAlphaTabApi();

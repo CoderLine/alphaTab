@@ -76,7 +76,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
     const a = document.createElement("a");
     a.download =
       score.title.length > 0 ? score.title.trim() + ".gp" : "Untitled.gp";
-    a.href = URL.createObjectURL(new Blob([data], { type: "application/gp" }));
+    a.href = URL.createObjectURL(new Blob([data as Uint8Array<ArrayBuffer>], { type: "application/gp" }));
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

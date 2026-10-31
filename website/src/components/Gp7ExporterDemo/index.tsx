@@ -55,7 +55,7 @@ const Gp7ExporterControls: React.FC = () => {
 
       const fileName = (api.score.title || "Untitled") + ".gp";
 
-      const blob = new Blob([data], { type: "application/octet-stream" });
+      const blob = new Blob([data as Uint8Array<ArrayBuffer>], { type: "application/octet-stream" });
       const href = URL.createObjectURL(blob);
 
       const a = document.createElement("a");

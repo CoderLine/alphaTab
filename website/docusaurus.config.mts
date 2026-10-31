@@ -701,6 +701,23 @@ async function createConfig(): Promise<Config> {
           loader: "resolve-url-loader",
         });
 
+        const alias: Record<string, string | false> = isServer
+          ? {
+              // The alphaTex editor is loaded on demand in the browser only.
+              "monaco-editor": false,
+              "@coderline/alphatab-monaco": false,
+              "@coderline/alphatab-language-server/server/browser": false,
+              "vscode-languageserver-protocol/browser": false,
+              "vscode-languageserver/browser": false,
+            }
+          : {
+              // Monaco's root entry registers ~80 bundled languages; the site only needs alphaTex.
+              "monaco-editor$": path.resolve(
+                context.siteDir,
+                "src/components/AlphaTexEditor/monaco-slim.ts"
+              ),
+            };
+
         return {
           plugins: [
             // Copy the Font and SoundFont Files to the output
@@ -709,22 +726,7 @@ async function createConfig(): Promise<Config> {
             }),
           ],
           resolve: {
-            alias: isServer
-              ? {
-                  // The alphaTex editor is loaded on demand in the browser only.
-                  "monaco-editor": false,
-                  "@coderline/alphatab-monaco": false,
-                  "@coderline/alphatab-language-server/server/browser": false,
-                  "vscode-languageserver-protocol/browser": false,
-                  "vscode-languageserver/browser": false,
-                }
-              : {
-                  // Monaco's root entry registers ~80 bundled languages; the site only needs alphaTex.
-                  "monaco-editor$": path.resolve(
-                    context.siteDir,
-                    "src/components/AlphaTexEditor/monaco-slim.ts"
-                  ),
-                },
+            alias,
             fallback: {
               fs: false,
               buffer: false,

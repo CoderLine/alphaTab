@@ -92,8 +92,9 @@
             "${configDir}/node_modules/@types",
             "${configDir}/types",
         ],
-        // include all @types/* packages found in `typeRoots` as ambient.
-        "types": ["*"],
+        // The hoisted root node_modules/@types also holds the website's
+        // dependencies; only the listed ones become ambient.
+        "types": ["node"],
     },
     "include": [
         "${configDir}/*.ts",

@@ -59,7 +59,7 @@ const AudioExportControls: React.FC = () => {
         }
 
         const blob: Blob = new Blob([
-            buffer.toArray()
+            buffer.toArray() as Uint8Array<ArrayBuffer>
         ], {
             type: 'audio/wav'
         });

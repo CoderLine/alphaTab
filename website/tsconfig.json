@@ -1,19 +1,21 @@
 {
-  // This file is not used in compilation. It is here just for a nice editor experience.
-  "extends": "@docusaurus/tsconfig",
+  // Mirrors @docusaurus/tsconfig without its baseUrl, which TypeScript 6 rejects.
   "compilerOptions": {
-    "baseUrl": ".",
-    "downlevelIteration": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "ES2024.Promise", "ESNext.Disposable"],
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "noEmit": true,
+    "paths": {
+      "@site/*": ["./*"]
+    },
+    "skipLibCheck": true,
+    "strict": false,
     "strictNullChecks": true,
-    "lib": [
-      "ES2022",
-      "DOM",
-      "ES2024.Promise"
-    ]
+    "types": ["node", "@docusaurus/module-type-aliases"]
   },
-  "include": [
-    "*.ts",
-    "src/",
-    "scripts/",
-  ]
+  "include": ["*.ts", "*.mts", "src/", "scripts/", "docs/**/_chapters.ts"]
 }
