@@ -88,7 +88,6 @@ const MidiLog: React.FC<{ maxEntries: number }> = ({ maxEntries }) => {
         return next.slice(-maxEntries);
       });
     },
-    [module, maxEntries],
   );
 
   return (

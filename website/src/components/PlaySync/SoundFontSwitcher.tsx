@@ -60,7 +60,6 @@ const SoundFontControls: React.FC<{
       setLoading(false);
       setStatus((prev) => prev.replace('loading ', 'loaded: '));
     },
-    [],
   );
 
   const loadFromUrl = async (url: string, label: string) => {

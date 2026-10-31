@@ -25,8 +25,7 @@ function ApplySystemSeparator({ enabled }: { enabled: boolean }) {
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       score.stylesheet.useSystemSignSeparator = enabled;
-    },
-    [enabled]
+    }
   );
   useEffect(() => {
     if (api && api.score) {

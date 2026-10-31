@@ -40,8 +40,7 @@ function ApplyMultiBarRest({ enabled }: { enabled: boolean }) {
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       score.stylesheet.multiTrackMultiBarRest = enabled;
-    },
-    [enabled]
+    }
   );
   useEffect(() => {
     if (api && api.score) {

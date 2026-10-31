@@ -49,8 +49,7 @@ function ApplyTrackNames({
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       applyStylesheet(score);
-    },
-    [policy, mode, orientation, module]
+    }
   );
   useEffect(() => {
     if (api && api.score) {

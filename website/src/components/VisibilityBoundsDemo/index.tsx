@@ -71,7 +71,7 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
     useAlphaTabEvent("playedBeatChanged", (beat: alphaTab.model.Beat) => {
         setCurrentBeat(beat);
         setIsVisible(checkVisible(beat));
-    }, [checkVisible]);
+    });
 
     // Recompute visibility on scroll so the readout stays fresh.
     useEffect(() => {
@@ -152,7 +152,7 @@ const Inner: React.FC<InnerProps> = ({ showNoteHeadOverlay }) => {
 
     useAlphaTabEvent("postRenderFinished", () => {
         if (showNoteHeadOverlay) { drawOverlay(); }
-    }, [showNoteHeadOverlay, drawOverlay]);
+    });
 
     useEffect(() => {
         if (showNoteHeadOverlay) { drawOverlay(); }

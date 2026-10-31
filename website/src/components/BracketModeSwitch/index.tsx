@@ -28,8 +28,7 @@ function ApplyBracketMode({ mode }: { mode: ModeName }) {
     (score: alphaTab.model.Score) => {
       if (!module) { return; }
       score.stylesheet.bracketExtendMode = module.model.BracketExtendMode[mode];
-    },
-    [mode, module]
+    }
   );
   useEffect(() => {
     if (api && api.score && module) {

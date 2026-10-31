@@ -85,7 +85,7 @@ const SettingsJsonInner: React.FC = () => {
     if (api) {
       refreshJson(api);
     }
-  }, [api, refreshJson]);
+  });
 
   useEffect(() => {
     if (!api || layoutMode === null) {

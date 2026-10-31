@@ -45,8 +45,7 @@ function HighlightPayloadTap({
                 endBeat: e.endBeat ? e.endBeat.index : null,
                 blocks: e.highlightBlocks.length,
             });
-        },
-        [onPayload]
+        }
     );
     return null;
 }

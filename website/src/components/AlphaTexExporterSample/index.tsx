@@ -23,7 +23,7 @@ const AlphaTexExporterInner: FC = () => {
         exportSettings.exporter.indent = 2;
 
         setAlphaTex(exporter.exportToString(score, exportSettings));
-    }, [module]);
+    });
 
     const onDragOver = (e: React.DragEvent) => {
         e.stopPropagation();

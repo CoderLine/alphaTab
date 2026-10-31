@@ -93,8 +93,7 @@ function PlayerStateWatcher({
       if (module) {
         onPlayingChange(args.state === module.synth.PlayerState.Playing);
       }
-    },
-    [module, onPlayingChange]
+    }
   );
   return null;
 }

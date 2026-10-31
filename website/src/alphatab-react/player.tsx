@@ -3,38 +3,34 @@ import {
     useCallback,
     useContext,
     useEffect,
-    useMemo,
     useRef,
     useState,
     useSyncExternalStore,
-    type DependencyList,
     type ReactNode,
 } from 'react';
-import type * as alphaTab from '@coderline/alphatab';
+import * as alphaTab from '@coderline/alphatab';
+import {
+    AlphaTabHost,
+    AlphaTabProvider,
+    useAlphaTabApi,
+    useAlphaTabElements,
+} from '@coderline/alphatab-react';
 import { useColorMode } from '@docusaurus/theme-common';
-import { useAlphaTabModule } from './module';
 import { applyAlphaTabSettings, applyPlayerDefaults, type AlphaTabPreset } from './settings';
 import { AlphaTabStore, initialAlphaTabState, type AlphaTabState } from './store';
 import { SelectionHandles } from './selection-handles';
 import { registerForSpacebar } from './spacebar-playback';
 
-interface AlphaTabContextValue {
-    store: AlphaTabStore | null;
-    api: alphaTab.AlphaTabApi | null;
-    setMountElement: (node: HTMLDivElement | null) => void;
-    setScrollElement: (node: HTMLDivElement | null) => void;
-}
+// Split so that components using only the store do not re-render on every state change.
+const AlphaTabStoreContext = createContext<AlphaTabStore | null | undefined>(undefined);
+const AlphaTabStateContext = createContext<AlphaTabState>(initialAlphaTabState);
 
-// Split so that components using only the store or api do not re-render on every state change.
-const AlphaTabContext = createContext<AlphaTabContextValue | null>(null);
-const AlphaTabStateContext = createContext<AlphaTabState | null>(null);
-
-function useAlphaTabContext(): AlphaTabContextValue {
-    const ctx = useContext(AlphaTabContext);
-    if (!ctx) {
+function useAlphaTabStoreContext(): AlphaTabStore | null {
+    const store = useContext(AlphaTabStoreContext);
+    if (store === undefined) {
         throw new Error('useAlphaTab* hooks must be used inside <AlphaTabPlayer>');
     }
-    return ctx;
+    return store;
 }
 
 const noopSubscribe = () => () => {};
@@ -83,85 +79,39 @@ export function AlphaTabPlayer({
     ownSoundFont = false,
     children,
 }: AlphaTabPlayerProps) {
-    const module = useAlphaTabModule();
-    const [mountNode, setMountNode] = useState<HTMLDivElement | null>(null);
-    const [scrollNode, setScrollNode] = useState<HTMLDivElement | null>(null);
     const [store, setStore] = useState<AlphaTabStore | null>(null);
-    const [api, setApi] = useState<alphaTab.AlphaTabApi | null>(null);
     const { colorMode } = useColorMode();
-    const colorModeRef = useRef(colorMode);
-    colorModeRef.current = colorMode;
 
-    const setMountElement = useCallback((node: HTMLDivElement | null) => {
-        setMountNode(node);
+    // The provider calls these once per API instance with the props of the preceding render.
+    const latest = useRef({ colorMode, settings, player, settingsPreset, ownSoundFont });
+    latest.current = { colorMode, settings, player, settingsPreset, ownSoundFont };
+
+    const configureSettings = useCallback((s: alphaTab.Settings) => {
+        applyAlphaTabSettings(alphaTab, s, {
+            colorMode: latest.current.colorMode,
+            preset: latest.current.settingsPreset,
+        });
+        applyPlayerDefaults(alphaTab, s);
     }, []);
 
-    const setScrollElement = useCallback((node: HTMLDivElement | null) => {
-        setScrollNode(node);
-    }, []);
-
-    // Freeze the initial-mount props via refs so the effect below re-runs only
-    // when the DOM nodes change. Runtime changes to `file`/`tex`/`tracks`/
-    // `settings` are handled by dedicated effects further down.
-    const initialSettingsRef = useRef(settings);
-    initialSettingsRef.current = settings;
-
-    useEffect(() => {
-        if (!module || !mountNode || !scrollNode) { return; }
-
-        const constructed = new module.Settings();
-        applyAlphaTabSettings(module, constructed, {
-            colorMode: colorModeRef.current,
-            preset: settingsPreset,
+    const onApi = useCallback((api: alphaTab.AlphaTabApi) => {
+        const current = latest.current;
+        const playerSettings = current.settings?.player;
+        const created = new AlphaTabStore(api, alphaTab, current.colorMode, current.settingsPreset, {
+            fixedSource: !current.player || playerSettings?.playerMode !== undefined,
+            ownSoundFont: current.ownSoundFont || !!playerSettings?.soundFont,
         });
-        constructed.player.scrollElement = scrollNode;
-        applyPlayerDefaults(module, constructed);
-
-        if (file) { constructed.core.file = file; }
-        if (tex) { constructed.core.tex = true; }
-        if (tracks !== undefined) {
-            constructed.core.tracks = tracks === 'all' ? [-1] : tracks;
-        }
-        if (initialSettingsRef.current) {
-            constructed.fillFromJson(initialSettingsRef.current);
-        }
-
-        // Tex content needs to sit inside the mount element as textContent
-        // before construction — alphaTab reads it during startup.
-        if (tex && !file) {
-            mountNode.textContent = tex;
-        }
-
-        const playerSettings = initialSettingsRef.current?.player;
-        const created = new module.AlphaTabApi(mountNode, constructed);
-        const s = new AlphaTabStore(created, module, colorModeRef.current, settingsPreset, {
-            fixedSource: !player || playerSettings?.playerMode !== undefined,
-            ownSoundFont: ownSoundFont || !!playerSettings?.soundFont,
-        });
-        if (playerSettings?.scrollMode !== undefined) { s.setScrollDuringPlayback(false); }
-        setStore(s);
-        setApi(created);
-
+        if (playerSettings?.scrollMode !== undefined) { created.setScrollDuringPlayback(false); }
+        setStore(created);
         return () => {
-            s.destroy();
+            created.destroy();
             setStore(null);
-            setApi(null);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [module, mountNode, scrollNode, player, settingsPreset, ownSoundFont]);
+    }, []);
 
-    // Color mode sync.
     useEffect(() => {
         if (store) { store.applyColorMode(colorMode); }
     }, [store, colorMode]);
-
-    // Temporary: register with the global spacebar-playPause coordinator so
-    // authors can audibly step through demos without one focus target per
-    // player. Uses the scroll node as the "container" for visibility scoring.
-    useEffect(() => {
-        if (!api || !scrollNode) { return; }
-        return registerForSpacebar(scrollNode, api);
-    }, [api, scrollNode]);
 
     // Runtime file/tex switches after mount.
     const initialFile = useRef(file);
@@ -185,33 +135,50 @@ export function AlphaTabPlayer({
         }
     }, [store, tex]);
 
-    // Runtime settings patch after mount.
-    const initialSettingsJson = useRef(JSON.stringify(settings ?? null));
-    useEffect(() => {
-        if (!store) { return; }
-        const nextJson = JSON.stringify(settings ?? null);
-        if (nextJson !== initialSettingsJson.current) {
-            initialSettingsJson.current = nextJson;
-            if (settings) { store.updateSettings(settings); }
-        }
-    }, [store, settings]);
-
     const state = useSyncExternalStore(
         store ? store.subscribe : noopSubscribe,
         store ? store.getSnapshot : noopSnapshot,
         noopSnapshot,
     );
 
-    const contextValue = useMemo(
-        () => ({ store, api, setMountElement, setScrollElement }),
-        [store, api, setMountElement, setScrollElement],
-    );
-
     return (
-        <AlphaTabContext.Provider value={contextValue}>
-            <AlphaTabStateContext.Provider value={state}>{children}</AlphaTabStateContext.Provider>
-        </AlphaTabContext.Provider>
+        <AlphaTabProvider
+            // These props shape the store and the playback source, which are bound to one API instance.
+            key={`${player}:${settingsPreset}:${ownSoundFont}`}
+            configureSettings={configureSettings}
+            settings={settings}
+            file={file}
+            tex={file || !tex ? undefined : tex}
+            tracks={tracks}
+            onApi={onApi}
+        >
+            <AlphaTabStoreContext.Provider value={store}>
+                <AlphaTabStateContext.Provider value={state}>
+                    <SpacebarPlayback />
+                    {children}
+                </AlphaTabStateContext.Provider>
+            </AlphaTabStoreContext.Provider>
+        </AlphaTabProvider>
     );
+}
+
+// Temporary: register with the global spacebar-playPause coordinator so
+// authors can audibly step through demos without one focus target per
+// player. Uses the scroll element as the "container" for visibility scoring.
+function SpacebarPlayback() {
+    const api = useAlphaTabApi();
+    const { scrollElement } = useAlphaTabElements();
+    useEffect(() => {
+        if (!api || !scrollElement) { return; }
+        return registerForSpacebar(scrollElement, api);
+    }, [api, scrollElement]);
+    return null;
+}
+
+function SelectionHandlesOverlay() {
+    const api = useAlphaTabApi();
+    const { mountElement } = useAlphaTabElements();
+    return <SelectionHandles api={api ?? undefined} mountElement={mountElement} />;
 }
 
 interface AlphaTabCanvasProps {
@@ -221,22 +188,11 @@ interface AlphaTabCanvasProps {
 }
 
 export function AlphaTabCanvas({ className, withSelectionHandles = false }: AlphaTabCanvasProps) {
-    const { setMountElement, setScrollElement, api } = useAlphaTabContext();
-    const [mountNode, setLocalMountNode] = useState<HTMLDivElement | null>(null);
-    const combinedMountRef = useCallback((node: HTMLDivElement | null) => {
-        setLocalMountNode(node);
-        setMountElement(node);
-    }, [setMountElement]);
-
     return (
-        <div ref={setScrollElement} className={className}>
-            <div style={{ position: 'relative' }}>
-                <div ref={combinedMountRef} />
-                {withSelectionHandles && (
-                    <SelectionHandles api={api ?? undefined} mountElement={mountNode} />
-                )}
-            </div>
-        </div>
+        <AlphaTabHost
+            className={className}
+            overlay={withSelectionHandles ? <SelectionHandlesOverlay /> : undefined}
+        />
     );
 }
 
@@ -262,8 +218,8 @@ export function AlphaTabScore({ className, withSelectionHandles, ...playerProps 
 
 /** The full player state; the component re-renders on every change, including playback position updates. */
 export function useAlphaTabState(): AlphaTabState {
-    useAlphaTabContext();
-    return useContext(AlphaTabStateContext)!;
+    useAlphaTabStoreContext();
+    return useContext(AlphaTabStateContext);
 }
 
 /**
@@ -271,7 +227,7 @@ export function useAlphaTabState(): AlphaTabState {
  * (compared with `Object.is`). The selector must return stable references, e.g. `(s) => s.view`.
  */
 export function useAlphaTabSelector<T>(selector: (state: AlphaTabState) => T): T {
-    const { store } = useAlphaTabContext();
+    const store = useAlphaTabStoreContext();
     const selectorRef = useRef(selector);
     selectorRef.current = selector;
     const getSnapshot = useCallback(
@@ -282,48 +238,5 @@ export function useAlphaTabSelector<T>(selector: (state: AlphaTabState) => T): T
 }
 
 export function useAlphaTabControls(): AlphaTabStore | null {
-    return useAlphaTabContext().store;
-}
-
-/**
- * The raw `AlphaTabApi` instance for advanced integrations: attaching
- * custom cursor/scroll handlers, invoking exporter classes, subscribing
- * to bespoke events, mutating the loaded score model.
- * Returns `null` while the API is booting.
- */
-export function useAlphaTabApi(): alphaTab.AlphaTabApi | null {
-    return useAlphaTabContext().api;
-}
-
-type ApiEventKeys = {
-    [K in keyof alphaTab.AlphaTabApi]: alphaTab.AlphaTabApi[K] extends
-        | alphaTab.IEventEmitter
-        | alphaTab.IEventEmitterOfT<any>
-        ? K
-        : never;
-}[keyof alphaTab.AlphaTabApi];
-
-/**
- * Subscribe to an alphaTab API event for the lifetime of the component
- * (or until `deps` change). Handles the on/off symmetry so consumers
- * can pass a plain function.
- */
-type ApiEventHandler<E extends keyof alphaTab.AlphaTabApi> =
-    alphaTab.AlphaTabApi[E] extends alphaTab.IEventEmitterOfT<infer T> ? (arg: T) => void : () => void;
-
-export function useAlphaTabEvent<E extends ApiEventKeys & keyof alphaTab.AlphaTabApi>(
-    event: E,
-    handler: ApiEventHandler<E>,
-    deps?: DependencyList,
-): void {
-    const api = useAlphaTabApi();
-    useEffect(() => {
-        if (!api) { return; }
-        const emitter = api[event] as unknown as alphaTab.IEventEmitterOfT<unknown>;
-        emitter.on(handler as never);
-        return () => {
-            emitter.off(handler as never);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [api, event, ...(deps ?? [])]);
+    return useAlphaTabStoreContext();
 }

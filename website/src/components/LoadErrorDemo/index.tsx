@@ -81,7 +81,6 @@ const Inner: React.FC<InnerProps> = ({
       setSuccess(null);
       setRecord(classifyError(err, AlphaTabErrorType));
     },
-    [AlphaTabErrorType],
   );
 
   // Track successful loads via state.currentScore. Reset error when a

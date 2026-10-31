@@ -49,7 +49,6 @@ const CountInControls: React.FC = () => {
         setPhase('Paused');
       }
     },
-    [module],
   );
 
   // A negative currentTick means the count-in bar is currently playing.
@@ -60,7 +59,6 @@ const CountInControls: React.FC = () => {
         setPhase(e.currentTick < 0 ? 'Count-in bar' : 'Playing');
       }
     },
-    [playing],
   );
 
   const restart = () => {

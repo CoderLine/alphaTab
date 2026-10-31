@@ -83,7 +83,7 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
 
   useAlphaTabEvent("postRenderFinished", () => {
     updateVisualGuides();
-  }, [updateVisualGuides]);
+  });
 
   useEffect(() => {
     updateVisualGuides();

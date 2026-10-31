@@ -5,9 +5,8 @@ export {
     useAlphaTabState,
     useAlphaTabSelector,
     useAlphaTabControls,
-    useAlphaTabApi,
-    useAlphaTabEvent,
 } from './player';
+export { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
 export type { AlphaTabPlayerProps, AlphaTabScoreProps } from './player';
 export { AlphaTabStore, initialAlphaTabState, defaultPlayerView, defaultTrackMix } from './store';
 export type {
@@ -25,7 +24,7 @@ export type {
     TexLoadResult,
 } from './store';
 export type { AlphaTabPreset } from './settings';
-export { registerAlphaTabLoader, initAlphaTab, useAlphaTabModule } from './module';
+export { useAlphaTabModule } from './module';
 export type { AlphaTabModule } from './module';
 export * from './playback';
 export { bindExternalMedia } from './external-media';

@@ -34,8 +34,7 @@ function ApplyTuning({
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       apply(score);
-    },
-    [mode, hidden, module]
+    }
   );
   useEffect(() => {
     if (api && api.score) {

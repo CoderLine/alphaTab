@@ -18,8 +18,7 @@ function ApplyHideDynamics({ hidden }: { hidden: boolean }) {
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       score.stylesheet.hideDynamics = hidden;
-    },
-    [hidden]
+    }
   );
   useEffect(() => {
     if (api && api.score) {

@@ -157,6 +157,7 @@ export class AlphaTabStore {
     private readonly playback: PlaybackController;
     private loadToken = 0;
     private readonly settingsLayers = new Set<(settings: Settings) => void>();
+    private readonly unsubscribers: (() => void)[] = [];
     private scrollDuringPlayback = true;
     /** The store switched `scrollMode` from `Off` for the current playback and owes the switch back. */
     private scrollingForPlayback = false;
@@ -550,15 +551,27 @@ export class AlphaTabStore {
     }
 
     getApi(): AlphaTabApi { return this.api; }
+
+    /** Detaches the store from the API; the API itself stays alive and belongs to its owner. */
     destroy(): void {
         if (this.rafHandle) { cancelAnimationFrame(this.rafHandle); }
         clearTimeout(this.midiTimer);
         this.playback.destroy();
-        this.api.destroy();
+        for (const unsubscribe of this.unsubscribers) { unsubscribe(); }
+        this.unsubscribers.length = 0;
     }
 
     private updateView(partial: Partial<PlayerViewSettings>): void {
         this.update({ view: { ...this.snapshot.view, ...partial } });
+    }
+
+    /** Settings can change from outside the store, e.g. through the player's `settings` prop. */
+    private refreshView(): void {
+        const next = this.readView();
+        const view = this.snapshot.view;
+        if ((Object.keys(next) as (keyof typeof next)[]).some((key) => view[key] !== next[key])) {
+            this.updateView(next);
+        }
     }
 
     private readView(): Pick<PlayerViewSettings, 'layoutMode' | 'staveProfile' | 'scale' | 'highlight'> {
@@ -642,7 +655,9 @@ export class AlphaTabStore {
     private wireEvents(): void {
         const { synth } = this.module;
 
-        this.api.scoreLoaded.on((score) => {
+        this.unsubscribers.push(this.api.settingsUpdated.on(() => this.refreshView()));
+
+        this.unsubscribers.push(this.api.scoreLoaded.on((score) => {
             const tables = this.deriveBarTables(score);
             // A re-parse of the same piece (e.g. an edited alphaTex) keeps the mix; any other file starts fresh.
             const samePiece = sameTrackLayout(this.snapshot.currentScore, score);
@@ -661,25 +676,25 @@ export class AlphaTabStore {
                 loopRangeBars: null,
                 trackMix,
             });
-        });
-        this.api.midiLoaded.on(() => this.applyTrackMix());
-        this.api.playerReady.on(() => this.applyTrackMix());
-        this.api.renderStarted.on(() => {
+        }));
+        this.unsubscribers.push(this.api.midiLoaded.on(() => this.applyTrackMix()));
+        this.unsubscribers.push(this.api.playerReady.on(() => this.applyTrackMix()));
+        this.unsubscribers.push(this.api.renderStarted.on(() => {
             this.update({ isRendering: true });
-        });
-        this.api.postRenderFinished.on(() => {
+        }));
+        this.unsubscribers.push(this.api.postRenderFinished.on(() => {
             this.update({ isRendering: false, renderedTracks: [...this.api.tracks] });
-        });
-        this.api.playerStateChanged.on((e) => {
+        }));
+        this.unsubscribers.push(this.api.playerStateChanged.on((e) => {
             // A switch pauses the old player and resumes the new one; the UI keeps showing playback.
             this.update({ isPlaying: e.state === synth.PlayerState.Playing || this.playback.isResumePending });
             this.syncPlaybackScroll();
-        });
-        this.api.playerFinished.on(() => {
+        }));
+        this.unsubscribers.push(this.api.playerFinished.on(() => {
             this.update({ isPlaying: false, currentTime: 0, currentBar: 0 });
             this.syncPlaybackScroll();
-        });
-        this.api.playerPositionChanged.on((e) => {
+        }));
+        this.unsubscribers.push(this.api.playerPositionChanged.on((e) => {
             if (!this.playback.acceptPosition(e.currentTick)) { return; }
             const currentBar = this.findBarForTick(e.currentTick);
             this.update({
@@ -687,11 +702,11 @@ export class AlphaTabStore {
                 endTime: e.endTime,
                 currentBar,
             });
-        });
+        }));
         // alphaTab's built-in user interaction (drag-select on the score) sets
         // this. Convert ticks back to bar indices so the scrubber overlay and
         // flyout hint can reflect the user's actual selection.
-        this.api.playbackRangeChanged.on((e) => {
+        this.unsubscribers.push(this.api.playbackRangeChanged.on((e) => {
             if (!e.playbackRange) {
                 this.update({ loopRangeBars: null });
                 return;
@@ -699,14 +714,14 @@ export class AlphaTabStore {
             const from = this.findBarForTick(e.playbackRange.startTick);
             const to = this.findBarForTick(e.playbackRange.endTick);
             this.update({ loopRangeBars: { from, to } });
-        });
-        this.api.soundFontLoad.on((e) => {
+        }));
+        this.unsubscribers.push(this.api.soundFontLoad.on((e) => {
             const progress = e.total > 0 ? e.loaded / e.total : 0;
             this.update({ soundFontLoadProgress: progress });
-        });
-        this.api.soundFontLoaded.on(() => {
+        }));
+        this.unsubscribers.push(this.api.soundFontLoaded.on(() => {
             this.update({ isSoundFontLoaded: true, soundFontLoadProgress: 1 });
-        });
+        }));
     }
 
     private deriveBarTables(score: model.Score): {

@@ -13,6 +13,7 @@ npm install
 npm run build-web
 npm run build-language-server
 npm run build-monaco
+npm run build-react
 ```
 
 Then start the dev server on `http://localhost:3000`:

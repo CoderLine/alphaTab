@@ -83,8 +83,7 @@ function ApplyColors() {
           }
         }
       }
-    },
-    [module]
+    }
   );
   return null;
 }

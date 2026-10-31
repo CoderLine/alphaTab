@@ -24,8 +24,7 @@ function ApplyPlacement({ placement }: { placement: Placement }) {
     "scoreLoaded",
     (score: alphaTab.model.Score) => {
       apply(score, placement);
-    },
-    [placement]
+    }
   );
   useEffect(() => {
     if (api && api.score) {
