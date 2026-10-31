@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-ui",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "private": true,
     "description": "The alphaTab player and alphaTex editor shared by the website and the playground.",
     "author": "Daniel Kuschny",
@@ -30,10 +30,10 @@
         "react-dom": "^19.0.0"
     },
     "dependencies": {
-        "@coderline/alphatab": "^1.9.0",
-        "@coderline/alphatab-language-server": "^1.9.0",
-        "@coderline/alphatab-monaco": "^1.9.0",
-        "@coderline/alphatab-react": "^1.9.0",
+        "@coderline/alphatab": "^1.10.0",
+        "@coderline/alphatab-language-server": "^1.10.0",
+        "@coderline/alphatab-monaco": "^1.10.0",
+        "@coderline/alphatab-react": "^1.10.0",
         "clsx": "^2.1.1",
         "monaco-editor": "^0.57.0",
         "vscode-languageserver-protocol": "^3.18.4",

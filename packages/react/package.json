@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-react",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "private": true,
     "description": "React bindings for alphaTab: API lifecycle, host element and event hooks.",
     "keywords": [
@@ -33,7 +33,7 @@
         "test-web": "npm run test"
     },
     "peerDependencies": {
-        "@coderline/alphatab": "^1.9.0",
+        "@coderline/alphatab": "^1.10.0",
         "@types/react": "^19.0.0",
         "react": "^19.0.0"
     },

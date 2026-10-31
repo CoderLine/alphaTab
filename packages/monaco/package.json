@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab-monaco",
-    "version": "1.9.0",
+    "version": "1.10.0",
     "description": "A Monaco editor integration for alphaTab providing coding assistance for alphaTex.",
     "keywords": [
         "guitar",
@@ -32,8 +32,8 @@
         "test-web": "npm run test"
     },
     "dependencies": {
-        "@coderline/alphatab": "^1.9.0",
-        "@coderline/alphatab-language-server": "^1.9.0",
+        "@coderline/alphatab": "^1.10.0",
+        "@coderline/alphatab-language-server": "^1.10.0",
         "monaco-editor": "^0.57.0",
         "vscode-languageserver": "^11.0.0",
         "vscode-languageserver-protocol": "^3.18.4",
