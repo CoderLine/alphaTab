@@ -1,0 +1,30 @@
+---
+title: Interact
+description: Wire the score into your UI — playback cursors, scroll behavior, mouse and touch events, bounds lookups, and range selection.
+keywords:
+  - alphaTab
+  - interact
+  - cursor
+  - scroll
+  - selection
+  - events
+---
+
+import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
+import chapters from './_chapters';
+
+Anything a reader does with the score — following the beat during a lesson, dragging out a phrase to loop it, tapping a note to audition it, snapping the viewport back to the cursor — flows through the APIs in this chapter. Cursors track the current beat, auto-scroll keeps that beat on screen, mouse and touch events fire for every beat and note the user hits, and the bounds lookup returns the same pixel geometry the renderer produced so overlays and hit-tests line up exactly.
+
+Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
+
+{chapters.map((chapter) => (
+  <section key={chapter.id}>
+    <h2 id={chapter.anchor ?? chapter.id}>{chapter.label}</h2>
+    {chapter.description ? <p>{chapter.description}</p> : null}
+    <FeatureChapterGrid
+      group="interact"
+      chapter={chapter.id}
+      defaultAccent={chapter.defaultAccent}
+    />
+  </section>
+))}

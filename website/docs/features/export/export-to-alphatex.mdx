@@ -1,0 +1,77 @@
+---
+title: "Export to alphaTex"
+description: "Serialize a loaded score to alphaTex text via `AlphaTexExporter`, with byte-buffer or plain-string output."
+sidebar_custom_props:
+  since: "1.7"
+  feature_chapter: score-formats
+  feature_order: 20
+keywords:
+  - alphaTab
+  - alphaTex
+  - export
+  - exporter
+  - text
+---
+
+import { AlphaTexExporterSample } from '@site/src/components/AlphaTexExporterSample';
+
+Turn a binary Guitar Pro file into a diff-friendly text blob you can commit to git. Embed a full piece inside a static HTML page without an extra HTTP request. Round-trip a score through a text editor for hand tweaks. `AlphaTexExporter` writes a loaded `Score` back to [alphaTex](/docs/alphatex/introduction) source, and every construct the alphaTex importer understands survives the trip.
+
+<AlphaTexExporterSample />
+
+The demo loads a `.gp` file and shows the alphaTex string the exporter produces. Drop another score onto it or double-click to swap the source file.
+
+## Two output shapes
+
+`AlphaTexExporter` exposes both a byte-buffer and a string API:
+
+- `export(score, settings)` — returns a `Uint8Array` (UTF-8 bytes). Use this when you want to persist to disk, upload to a server, or hand the buffer to a download link.
+- `exportToString(score, settings)` — returns the alphaTex code as a plain string. Use this when you want to render the text in a `<pre>` block, feed it into `api.tex(...)`, or diff it against another string.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on(() => {
+  const exporter = new alphaTab.exporter.AlphaTexExporter();
+
+  const exportSettings = new alphaTab.Settings();
+  exportSettings.exporter.indent = 2;
+  exportSettings.exporter.comments = true;
+
+  const tex = exporter.exportToString(api.score, exportSettings);
+  console.log(tex);
+
+  const bytes = exporter.export(api.score, exportSettings);
+  const fileName = (api.score.title || 'Untitled') + '.alphatex';
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'text/plain' }));
+
+  const a = document.createElement('a');
+  a.download = fileName;
+  a.href = url;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+```
+
+`getAlphaTabContainer()` is the platform-specific render target. The exporter runs on every runtime; only the download step is browser-specific.
+
+## Formatting knobs
+
+`settings.exporter` controls how the output looks:
+
+- `exporter.indent` — spaces of indentation per level. Set to `0` to emit a compact single-line stream. Defaults to `2`.
+- `exporter.comments` — when `true`, the exporter annotates the output with bar and voice markers. Helpful when a reader is learning the syntax; turn it off for machine-readable exports.
+
+## Where to look next
+
+- [alphaTex introduction](/docs/alphatex/introduction) — the syntax the exporter emits.
+- [Load alphaTex inline](/docs/features/import-load/load-alphatex-inline) — feed the exported string straight back into a fresh API instance.
+- [Export to Guitar Pro 7](export-to-guitar-pro-7) — the binary counterpart when your users need `.gp`.
+- [`AlphaTexExporter`](/docs/reference/types/exporter/alphatexexporter) in the API reference, and the [`ExporterSettings`](/docs/reference/types/exportersettings) that shape the output.

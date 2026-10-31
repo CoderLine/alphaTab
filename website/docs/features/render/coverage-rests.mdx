@@ -1,0 +1,110 @@
+---
+title: "Rests and full-bar notes"
+description: "Centered full-bar notes and rests, explicit rest positions per beat, and rest placement with several voices."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 75
+  since: "1.9"
+keywords:
+  - alphaTab
+  - rests
+  - rest position
+  - full-bar rest
+  - whole rest
+  - multi-voice
+  - restDisplayPitch
+---
+
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+
+A rest tells the reader to stay silent, and its position on the staff tells them which voice is silent. alphaTab centers notes and rests that fill a whole bar, places rests automatically on the standard notation staff, and accepts an explicit position per rest when the automatic one does not fit the part. The alphaTex beat property `restDisplayPitch` and the model fields `Beat.restDisplayTone` and `Beat.restDisplayOctave` control the explicit position.
+
+<AlphaTexSample player={true}>{`
+\\track "Piano"
+\\staff {score}
+:1 C5{txt "whole note"} | r.1 | :4 r C5 r C5 | \\ts (3 4) :2 C5{d dy p} | r.2{d} | :4 C5{gr} :2 C5{d}
+`}</AlphaTexSample>
+
+## Centered full-bar notes and rests *(new in 1.9)* {#centered}
+
+When a bar holds a single beat that lasts the whole bar, alphaTab centers that beat horizontally in the bar, following Behind Bars (p. 41). Annotations attached to the beat, such as texts and dynamics, move with it. In the demo above this applies to the whole note and the whole rest in 4/4 and to the dotted half note and the dotted half rest in 3/4.
+
+The rule looks at every staff and voice rendered in the bar. All of them must contribute exactly one beat of the same duration that fills the bar. A bar with a second voice that has several beats, or a bar with a grace note, keeps the regular positioning from the start of the bar, as the last bar of the demo shows.
+
+[Multi-bar rests](./multi-bar-rests) are centered in their bar as well.
+
+## Rest position per beat *(new in 1.9)* {#rest-position}
+
+By default a rest sits in the middle of the standard notation staff. To move a single rest, give it the pitch whose staff position it should take. The alphaTex beat property [`restDisplayPitch`](/docs/alphatex/beat-properties#restdisplaypitch) takes a pitch name such as `C5` or `E4`:
+
+<AlphaTexSample player={true}>{`
+\\hideDynamics
+\\track "Piano"
+\\staff {score}
+:4 r C5 r C5 | r{restDisplayPitch C5} C5 r{restDisplayPitch E4} C5 | r.2{restDisplayPitch A5} r.2{restDisplayPitch D4} | r.1{restDisplayPitch C5}
+`}</AlphaTexSample>
+
+The first bar shows the automatic position. In the second and third bars every rest takes the line or space of its pitch, so the position follows the clef of the bar. The last bar shows that a centered full-bar rest keeps its explicit height.
+
+In the data model the position lives on [`Beat.restDisplayTone`](/docs/reference/types/model/beat/#restdisplaytone) (the chromatic tone, `0`–`11`, with `0` = C) and [`Beat.restDisplayOctave`](/docs/reference/types/model/beat/#restdisplayoctave) (the octave of the pitch name, so `C5` is tone `0` in octave `5`). Both default to `NaN`, which means automatic placement. The rest only moves when both values are set.
+
+The explicit position applies to the standard notation staff. alphaTab does not read rest positions from Guitar Pro or MusicXML files, and the alphaTex exporter does not write `restDisplayPitch`.
+
+## Rests with several voices {#multi-voice}
+
+In a bar with several voices, alphaTab keeps the rests of the first voice at their regular position. A rest of another voice that would collide with the notes sounding at the same time moves out of the way in whole staff spaces: rests of the second voice move up, rests of further voices move down. Rests that start at the same time and have the same duration in several voices are drawn once.
+
+Where the automatic result is not what the part needs, `restDisplayPitch` works per voice. The demo pins the rest of the upper voice to `D5` and the rest of the lower voice to `F4` in the second bar:
+
+<AlphaTexSample player={true}>{`
+\\hideDynamics
+\\track "Piano"
+\\staff {score}
+\\voice
+r.2 :4 E5 F5 | r.2{restDisplayPitch D5} :4 E5 F5
+\\voice
+:4 C4 D4 r.2 | :4 C4 D4 r.2{restDisplayPitch F4}
+`}</AlphaTexSample>
+
+## Show it in code
+
+Set the rest position on the model in a `scoreLoaded` handler. This example moves every rest of the second voice to the position of `E4`:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      for (const bar of staff.bars) {
+        if (bar.voices.length < 2) {
+          continue;
+        }
+        for (const beat of bar.voices[1].beats) {
+          if (beat.isRest) {
+            beat.restDisplayTone = 4; // E
+            beat.restDisplayOctave = 4;
+          }
+        }
+      }
+    }
+  }
+});
+```
+
+alphaTab renders the score after the `scoreLoaded` handlers ran, so the changed positions show up in the first render. Set both values back to `NaN` to return to automatic placement.
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Multi-bar rests](./multi-bar-rests) — collapse runs of empty bars into one rest with a count.
+- [Special notes](./coverage-special-notes) — the sibling coverage page for harmonics, ghost notes, dead notes, and ties.
+- [Density and spacing](./density-and-spacing) — how the width of a bar is distributed between its beats.
+- [`restDisplayPitch`](/docs/alphatex/beat-properties#restdisplaypitch) in the alphaTex beat properties.
+- [`Beat`](/docs/reference/types/model/beat) — the model type that carries `restDisplayTone` and `restDisplayOctave`.

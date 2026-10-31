@@ -1,0 +1,57 @@
+---
+title: playbackRangeHighlightChanged
+sidebar_custom_props:
+  kind: event
+  category: Events - Player
+  since: 1.8.0
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
+
+<SinceBadge since="1.8.0" />
+This event is fired the shown highlights for the selected playback range changes. This event is fired already during selection and not only when the selection is completed.
+This event can be used to place additional custom selection markers (like drag handles).
+
+<Signature style="block"
+           js={[["keyword","readonly"],["whitespace"," "],["identifier","playbackRangeHighlightChanged"],["token",":"],["whitespace"," "],["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","PlaybackHighlightChangeEventArgs","/docs/reference/types/playbackhighlightchangeeventargs"],["token",">"],["token",";"]]}
+           csharp={[["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","PlaybackHighlightChangeEventArgs","/docs/reference/types/playbackhighlightchangeeventargs"],["token",">"],["whitespace"," "],["identifier","PlaybackRangeHighlightChanged"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["token","}"]]}
+           kotlin={[["keyword","val"],["whitespace"," "],["identifier","playbackRangeHighlightChanged"],["token",":"],["whitespace"," "],["identifier","IEventEmitterOfT","/docs/reference/types/ieventemitteroft"],["token","<"],["identifier","PlaybackHighlightChangeEventArgs","/docs/reference/types/playbackhighlightchangeeventargs"],["token",">"]]}
+/>
+
+
+## Examples
+
+<Tabs
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.playbackRangeHighlightChanged.on(e => {
+   updateSelectionHandles(e);
+});
+```
+</TabItem>
+<TabItem value="csharp">
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.PlaybackRangeHighlightChanged.On(e =>
+{
+   UpdateSelectionHandles(e);
+});
+```
+</TabItem>
+<TabItem value="android">
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.playbackRangeHighlightChanged.on { e ->
+    updateSelectionHandles(e)
+}
+```
+</TabItem>
+</Tabs>

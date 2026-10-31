@@ -1,0 +1,65 @@
+---
+title: "Handling load errors"
+description: "`error` event, `FormatError`, `FileLoadError`, and what to render when a load fails."
+sidebar_custom_props:
+  feature_chapter: lifecycle
+  feature_order: 30
+keywords:
+  - alphaTab
+  - error
+  - FormatError
+---
+
+import { LoadErrorDemo } from '@site/src/components/LoadErrorDemo';
+
+A user pastes a link that 404s, uploads a `.zip` instead of a `.gp`, or types alphaTex with a stray backslash — you want to surface a user-friendly error banner rather than let the render silently fail. The `error` event is alphaTab's single funnel for every failure: bad URLs, unreadable file formats, malformed content, rendering exceptions. Subscribe once, branch on the error type, and show the reader something useful.
+
+<LoadErrorDemo showCode={false} />
+
+## The error types
+
+alphaTab surfaces four error classes, all extending the base `AlphaTabError`:
+
+- **`FileLoadError`** — the network fetch behind `api.load(url)` failed. Carries the `XMLHttpRequest` on `error.xhr`, so you can read the HTTP status. Wrong URL, offline, CORS denied — all land here. Web-only.
+- **`UnsupportedFormatError`** — the fetched bytes did not match any importer alphaTab knows. Wrong file type, or a corrupted header that no sniffer recognised.
+- **`FormatError`** — the format was recognised but the content is malformed. Truncated GP archive, invalid MusicXML, malformed alphaTex.
+- **`AlphaTabError`** — everything else, including render-side failures and API misuse (for example, calling `renderTracks()` with tracks from different scores).
+
+Every emitted value has a `type` field with an `AlphaTabErrorType` enum (`General`, `Format`, `AlphaTex`) — handy when you cannot rely on `instanceof` (workers, cross-realm bundles).
+
+The event fires for **any** error alphaTab raises, not only loading errors. Rendering exceptions, worker crashes, and playback synth failures all come through the same channel. Filter by type or class inside the handler if you want to show different UI per source.
+
+## Show it in code
+
+Subscribe to the error event and branch on the concrete class:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.error.on((error) => {
+  if (error instanceof alphaTab.importer.UnsupportedFormatError) {
+    showBanner('That file type is not supported.');
+  } else if (error instanceof alphaTab.FormatError) {
+    showBanner('The file is corrupted or malformed.');
+  } else if (error instanceof alphaTab.FileLoadError) {
+    showBanner(`Could not fetch the score (HTTP ${error.xhr.status}).`);
+  } else {
+    showBanner(`alphaTab error: ${error.message}`);
+  }
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Reacting to a loaded score](./reacting-to-loaded-score) — the success-path counterpart to `error`.
+- [Load from URL](./load-from-url) — the network path that raises `FileLoadError` on failure.
+- [Direct importer use](./direct-importer-use) — when you invoke importers yourself, errors surface as thrown exceptions instead of an event.
+- [`api.error`](/docs/reference/api/error) in the reference.
+- [`AlphaTabError`](/docs/reference/types/alphataberror), [`FormatError`](/docs/reference/types/formaterror), [`FileLoadError`](/docs/reference/types/fileloaderror), [`UnsupportedFormatError`](/docs/reference/types/importer/unsupportedformaterror), and [`AlphaTabErrorType`](/docs/reference/types/alphataberrortype) — the error classes and enum shown above.

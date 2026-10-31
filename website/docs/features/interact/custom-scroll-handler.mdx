@@ -1,0 +1,79 @@
+---
+title: "A custom scroll handler"
+description: "Assign an IScrollHandler to api.customScrollHandler to control scroll behavior with your own logic."
+sidebar_custom_props:
+  feature_chapter: scroll
+  feature_order: 30
+keywords:
+  - alphaTab
+  - scroll
+  - handler
+  - IScrollHandler
+  - customScrollHandler
+---
+
+import { ScrollModeSwitch } from '@site/src/components/ScrollModeSwitch';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Keeping the active bar centered inside a container whose height changes with the viewport — a lesson player embedded in a resizable pane, a modal that stretches to fit its content — cannot be expressed as a fixed `scrollOffsetY`. Assign an `IScrollHandler` to `api.customScrollHandler` and drive the scroll yourself using the container geometry at scroll time. Pick "Center bar" in the mode pills below to switch from the built-in strategies to a handler that keeps the current bar vertically centered in the scroll container.
+
+<ScrollModeSwitch customHandler="center-bar" showCode={false} tex={Riffs.BACH_PRELUDE_C_LONG} />
+
+## When to reach for it
+
+- The active bar should sit at a container-relative position — vertical center, one-third from the top, snapped to a grid — that the fixed `scrollOffsetY` cannot express because it depends on the container height at render time.
+- The scroll target is not a DOM element — a virtualized list, a canvas overlay, an external component.
+- The layout scrolls in a way alphaTab does not model — paged pagination, snap points, an animation library.
+
+`IScrollHandler` has two methods. `forceScrollTo(beatBounds)` is invoked when alphaTab needs an instant scroll (`scrollToCursor()`, seek). `onBeatCursorUpdating(...)` fires each time the beat cursor advances and passes the current bar bounds and the cursor's raw motion parameters. Both receive `beatBounds.barBounds.masterBarBounds.realBounds` — the pixel rectangle of the bar in the render target — which is enough to compute any container-relative target.
+
+Setting `customScrollHandler` replaces alphaTab's default handler for the running session. Set it back to `undefined` to restore the built-in behavior.
+
+## Show it in code
+
+The example below centers the active bar vertically inside a bounded scroll container — the same logic the live demo uses.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const scroller = document.getElementById('scroller');
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+    scrollElement: scroller,
+  },
+});
+
+const centerBar = (beatBounds, behavior) => {
+  const bar = beatBounds.barBounds.masterBarBounds.realBounds;
+  const height = scroller.clientHeight;
+  const maxScroll = Math.max(0, scroller.scrollHeight - height);
+  const target = Math.min(
+    maxScroll,
+    Math.max(0, bar.y - (height - bar.h) / 2),
+  );
+  scroller.scrollTo({ top: target, behavior });
+};
+
+api.customScrollHandler = {
+  forceScrollTo(currentBeatBounds) {
+    centerBar(currentBeatBounds, 'instant');
+  },
+  onBeatCursorUpdating(startBeat) {
+    centerBar(startBeat, 'smooth');
+  },
+  [Symbol.dispose]() {},
+};
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Auto-scroll modes](./auto-scroll-modes) and [Scroll target and offsets](./scroll-target-and-offsets) — the built-in strategies you are replacing.
+- [`customScrollHandler`](/docs/reference/api/customscrollhandler) and the [`IScrollHandler`](/docs/reference/types/iscrollhandler) interface reference.

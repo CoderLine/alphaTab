@@ -1,0 +1,76 @@
+---
+title: "Styling the playback cursor"
+description: "CSS classes on Web for cursor / beat highlight / selection."
+sidebar_custom_props:
+  feature_chapter: coloring
+  feature_order: 30
+keywords:
+  - alphaTab
+  - cursor
+  - styling
+  - highlight
+  - selection
+  - CSS
+---
+
+import { PlayerCursorStylingDemo } from '@site/src/components/PlayerCursorStylingDemo';
+
+On the Web platform, alphaTab paints its playback cursor, beat highlight, and range selection as regular DOM elements with stable CSS classes. Style them with the rest of your site's CSS — no JavaScript hooks needed. Reach for it to match your app's brand color on the cursor, or to widen and slow the highlight for a visually-accessible player.
+
+<PlayerCursorStylingDemo showCode={false} />
+
+## Range selection {#selection}
+
+When range selection is enabled, alphaTab wraps the mouse-selected area in a `div` with class `at-selection`. The wrapper contains one child `div` per bar area covered by the selection. A translucent background reads as a highlight without hiding the notation underneath.
+
+```css
+.at-selection div {
+    background: rgba(64, 64, 255, 0.1);
+}
+```
+
+![Selection](/img/guides/styling/at-selection.png)
+
+## Bar cursor {#cursor-bar}
+
+During playback alphaTab positions a `div` behind the currently played bar and assigns it the class `at-cursor-bar`. A translucent fill marks the active bar without masking the glyphs on top.
+
+```css
+.at-cursor-bar {
+    background: rgba(255, 242, 0, 0.25);
+}
+```
+
+![Bar Cursor](/img/guides/styling/at-cursor-bar.png)
+
+## Beat cursor {#cursor-beat}
+
+alphaTab also places a thin `div` at the currently played beat, animates it forward, and marks it with class `at-cursor-beat`. Give it an explicit `width` — without one, the cursor collapses to zero and disappears.
+
+```css
+.at-cursor-beat {
+    background: rgba(64, 64, 255, 0.75);
+    width: 3px;
+}
+```
+
+![Beat Cursor](/img/guides/styling/at-cursor-beat.png)
+
+## Beat highlight {#highlight}
+
+When alphaTab renders as SVG in the browser, it tags the SVG groups belonging to the currently played beat with class `at-highlight`. Because the highlighted glyphs are a mix of paths, lines, and text, style both `fill` and `stroke` to catch every shape.
+
+```css
+.at-highlight * {
+    fill: #0078ff;
+    stroke: #0078ff;
+}
+```
+
+![Played Elements](/img/guides/styling/at-highlight.png)
+
+## Where to look next
+
+- [Score-wide palette](./score-wide-palette) — default colors for staff lines, glyphs, and text.
+- [Per-element colors](./per-element-colors) — recolor a single notehead, stem, or effect glyph.
+- [`enableCursor`](/docs/reference/settings/player/enablecursor) and [`enableElementHighlighting`](/docs/reference/settings/player/enableelementhighlighting) — toggle the cursor and highlight overlays.

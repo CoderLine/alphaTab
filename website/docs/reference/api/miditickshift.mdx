@@ -1,0 +1,20 @@
+---
+title: midiTickShift
+sidebar_custom_props:
+  kind: property
+  category: Properties - Core
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
+
+<PropertyDescription />
+An indicator by how many midi-ticks the song contents are shifted.
+Grace beats at start might require a shift for the first beat to start at 0.
+This information can be used to translate back the player time axis to the music notation.
+
+<Signature style="block"
+           js={[["keyword","readonly"],["whitespace"," "],["identifier","midiTickShift"],["token",":"],["whitespace"," "],["identifier","number"],["token",";"]]}
+           csharp={[["identifier","double"],["whitespace"," "],["identifier","MidiTickShift"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["token","}"]]}
+           kotlin={[["keyword","val"],["whitespace"," "],["identifier","midiTickShift"],["token",":"],["whitespace"," "],["identifier","Double"]]}
+/>
+

@@ -1,0 +1,77 @@
+---
+title: "Tuning importer behavior"
+description: "Encoding hints, MusicXML part-group merging, beat-text-as-lyrics for GP3-5, decoding buffer size. One page with a sample showing every importer knob in context."
+sidebar_custom_props:
+  feature_chapter: configuration
+  feature_order: 10
+keywords:
+  - alphaTab
+  - importer
+  - configuration
+---
+
+import { ImporterKnobsDemo } from '@site/src/components/ImporterKnobsDemo';
+
+Users hand you a GP5 file with Cyrillic or Japanese titles, a Guitar Pro 4 file that stashed the lyrics inside beat text, a piano MusicXML export that treats the right and left hand as two parts, or an oversized GP file with embedded audio. Each case has an importer setting that fixes it in one line.
+
+<ImporterKnobsDemo showCode={false} />
+
+## The knobs
+
+### `importer.encoding` and `importer.gp3To5encoding`
+
+Two encoding hints control string decoding:
+
+- `importer.encoding` applies to Guitar Pro 6 to 8, MusicXML, Capella, and alphaTex. Default: `utf-8`.
+- `importer.gp3To5encoding` applies to the older Guitar Pro 3-5 binary format, which stored strings in the system ANSI code page of the author's machine. Default: `windows-1252`, the code page of western European Windows systems. Available since 1.9.0.
+
+When titles, lyrics, or comments come back garbled, the source was written in another code page. Set the matching encoding (for example `windows-1251` for Cyrillic, `shift_jis` for Japanese) and reload. Supported encoding names depend on the runtime: browsers accept whatever `TextDecoder` supports, .NET uses `System.Text.Encoding`.
+
+`importer.encoding` takes precedence for Guitar Pro 3-5 files when you set it to any value other than `utf-8`, so settings written before 1.9.0 keep their effect. Before 1.9.0, Guitar Pro 3-5 strings were decoded with `importer.encoding` and therefore as UTF-8 by default. Set `gp3To5encoding` to `utf-8` to restore that.
+
+### `importer.mergePartGroupsInMusicXml`
+
+MusicXML `part-group` elements bracket related parts (piano left and right hand, choir voices, brass section). Default: `false` — each `part` becomes its own alphaTab track. Set to `true` to fold every group into a single track with multiple staves. Use it when your source treats each staff of a grand-staff instrument as a separate part.
+
+### `importer.beatTextAsLyrics`
+
+Older Guitar Pro 3-5 files often stored lyrics in the per-beat text field because the dedicated lyrics feature was awkward to use. Default: `false`, which shows those texts as beat texts above the notation. Set to `true` and alphaTab parses those beat texts as lyrics, splitting on dashes, underscores, and spaces the way GP renders them. The heuristic is imperfect — enable it only for files that suffer from the old workflow, and only when the track has no proper lyrics attached.
+
+## Untrusted input
+
+Corrupt or crafted files can declare huge sizes and counts to exhaust memory. The importers guard against that and stop with an error instead of reading on.
+
+### `importer.maxDecodingBufferSize`
+
+Upper limit in bytes for buffers the importers allocate from sizes declared in the file: unpacked entries of zip-based Guitar Pro 7/8 files, the Guitar Pro 7/8 binary stylesheet, and strings in Guitar Pro 3-5 files. Default: `128000000` (128 MB). A file exceeding the limit fails to load, and the `error` event reports an error of type `AlphaTabErrorType.Format`. Very large scores, especially Guitar Pro files with embedded backing-track audio, may need a higher limit. Server-side callers should keep it low. Available since 1.8.3.
+
+## Show it in code
+
+Set all five in one settings object:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp5' },
+  importer: {
+    encoding: 'utf-8',               // GP6-8, MusicXML, Capella, alphaTex
+    gp3To5encoding: 'shift_jis',     // GP3-5, applies while encoding is 'utf-8'
+    mergePartGroupsInMusicXml: true, // MusicXML-only
+    beatTextAsLyrics: true,          // GP3-5 lyrics-in-beat-text workaround
+    maxDecodingBufferSize: 256_000_000,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [`importer` settings](/docs/reference/settings) — the reference index for every field on this page.
+- [`importer.encoding`](/docs/reference/settings/importer/encoding) and [`importer.gp3To5encoding`](/docs/reference/settings/importer/gp3to5encoding) — the two text-encoding hints.
+- [`importer.beatTextAsLyrics`](/docs/reference/settings/importer/beattextaslyrics) and [`importer.mergePartGroupsInMusicXml`](/docs/reference/settings/importer/mergepartgroupsinmusicxml) — the two behavioural flags.
+- [`importer.maxDecodingBufferSize`](/docs/reference/settings/importer/maxdecodingbuffersize) — the buffer cap.
+- [Guitar Pro (3 through 8)](./guitar-pro) — where `encoding`, `gp3To5encoding`, and `beatTextAsLyrics` matter most.
+- [MusicXML](./musicxml) — the format that consumes `mergePartGroupsInMusicXml`.

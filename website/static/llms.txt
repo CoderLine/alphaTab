@@ -1,0 +1,200 @@
+# alphaTab
+
+> alphaTab is an SDK for JavaScript, .NET, and Kotlin that renders and plays interactive music notation. It parses Guitar Pro, MusicXML, CapXML, and alphaTex files and produces engraved sheet music with playback in the browser, on the desktop, and on Android.
+
+alphaTab is not a drop-in widget — it exposes an API you build your own score UI on top of. The four internal modules are the data model, importers, render engine, and audio engine. The documentation is organised as a concept page (introduction), platform-specific getting-started tracks for Web, .NET, and Android, a feature catalog grouped by capability, the alphaTex language reference, format and API references, and step-by-step tutorials.
+
+## Introduction
+
+- [Introduction](https://alphatab.net/docs/introduction): overview of alphaTab, its four internal modules, and the three supported platforms.
+- [Documentation style guide](https://alphatab.net/docs/style-guide): voice, structure, and code-sample rules every doc page follows.
+- [Contributing](https://alphatab.net/docs/contributing): how to contribute code, docs, and bug reports.
+
+## Getting Started (Web)
+
+- [Installation (Web)](https://alphatab.net/docs/getting-started/installation-web): install via npm, a CDN, or a local copy, then render your first score in the browser.
+- [Installation (WebPack)](https://alphatab.net/docs/getting-started/installation-webpack): configure WebPack 5 to bundle alphaTab, its Web Workers, Audio Worklets, and font and SoundFont assets.
+- [Installation (Vite)](https://alphatab.net/docs/getting-started/installation-vite): configure Vite to bundle alphaTab, its Web Workers, Audio Worklets, and font and SoundFont assets.
+- [Configuration (Web)](https://alphatab.net/docs/getting-started/configuration-web): mount the API, pass settings, subscribe to events, and drive playback from JavaScript.
+
+## Getting Started (.NET)
+
+- [Installation (.NET)](https://alphatab.net/docs/getting-started/installation-net): install AlphaTab or AlphaTab.Windows from NuGet, render from console, WPF, or WinForms.
+- [Configuration (.NET)](https://alphatab.net/docs/getting-started/configuration-net): set up the API on your host, pass settings, subscribe to events, drive playback from C#.
+
+## Getting Started (Android)
+
+- [Installation (Android)](https://alphatab.net/docs/getting-started/installation-android): install from Maven Central and render music notation with AlphaTabView.
+- [Configuration (Android)](https://alphatab.net/docs/getting-started/configuration-android): access the API, pass settings, subscribe to events, drive playback from Kotlin.
+
+## Features
+
+- [Features overview](https://alphatab.net/docs/features/): What alphaTab can do — grouped by capability, each entry with a demo and a link into the reference.
+- [Import & load](https://alphatab.net/docs/features/import-load/): How alphaTab gets a score into memory — file loading, supported formats, importer configuration, and the load lifecycle.
+- [Load from a URL](https://alphatab.net/docs/features/import-load/load-from-url): `core.file` and `api.load(url)`; demo loads a `.gp` from `/static/files/`.
+- [Load from bytes](https://alphatab.net/docs/features/import-load/load-from-bytes): `Uint8Array` / `ArrayBuffer` after fetching or reading; the pattern for Node.js and post-fetch pipelines.
+- [Load alphaTex inline](https://alphatab.net/docs/features/import-load/load-alphatex-inline): Writing score content in the DOM or through `api.tex()`; demo with a short tex snippet.
+- [Direct importer use](https://alphatab.net/docs/features/import-load/direct-importer-use): `alphaTab.importer.*` classes (`ScoreLoader`, `Gp7To8Importer`, `MusicXmlImporter`, etc.) for advanced pipelines that bypass `AlphaTabApi`.
+- [Guitar Pro (3 through 8)](https://alphatab.net/docs/features/import-load/guitar-pro): One page covering every GP version, what each ships, and how alphaTab picks the right importer. Cross-links to per-version compatibility under `/docs/formats/`.
+- [MusicXML](https://alphatab.net/docs/features/import-load/musicxml): MusicXML support: part-group merging, chord diagrams, ties, track volume, tempo, lyrics.
+- [Capella (CapXML)](https://alphatab.net/docs/features/import-load/capella): `.capx` support and its scope.
+- [Tuning importer behavior](https://alphatab.net/docs/features/import-load/tuning-importer-behavior): Encoding hint, MusicXML part-group merging, beat-text-as-lyrics for GP3-5, decoding buffer size. One page with a sample showing the four knobs in context.
+- [Selecting and switching tracks](https://alphatab.net/docs/features/import-load/selecting-and-switching-tracks): `core.tracks` for the initial render; `api.renderTracks()` for switching which tracks are visible at runtime (change instrument, focus on solo, etc.).
+- [Reacting to a loaded score](https://alphatab.net/docs/features/import-load/reacting-to-loaded-score): `scoreLoaded` event, post-load setup patterns (apply styles, register handlers, adjust playback).
+- [Handling load errors](https://alphatab.net/docs/features/import-load/handling-load-errors): `error` event, `FormatError`, `FileLoadError`, and what to render when a load fails.
+
+- [Render](https://alphatab.net/docs/features/render/): How alphaTab lays out and draws music notation — layouts, backends, notation types, engraving details, and styling.
+- [Page layout](https://alphatab.net/docs/features/render/page-layout): The default LayoutMode.Page; bars flowing into rows, when to use.
+- [Horizontal layout](https://alphatab.net/docs/features/render/horizontal-layout): LayoutMode.Horizontal; single-line scrolling view for timeline UIs.
+- [Parchment layout](https://alphatab.net/docs/features/render/parchment-layout): LayoutMode.Parchment; respects the systems layout from the source file (Guitar Pro embedded layout), with per-bar displayScale for relative sizing.
+- [Density and spacing](https://alphatab.net/docs/features/render/density-and-spacing): One page for spacing controls. In 1.9 the classical Gourlay stretchForce was replaced by a power-law model, new stretching / spacing options exist, and fillLastSystem now takes a fill-factor.
+- [Effect placement](https://alphatab.net/docs/features/render/effect-placement): How alphaTab places annotations such as texts, chord names, dynamics, palm mute and let ring against the outline of the notation, and which settings control their clearances.
+- [Zoom and scale](https://alphatab.net/docs/features/render/zoom-and-scale): display.scale, live slider demo.
+- [Responsive resize](https://alphatab.net/docs/features/render/responsive-resize): ResizeObserver, triggerResize(), resize event.
+- [Rendering a slice](https://alphatab.net/docs/features/render/bar-range): startBar / barCount to render partial scores.
+- [Standard notation](https://alphatab.net/docs/features/render/standard-notation): The traditional five-line staff, showStandardNotation.
+- [Guitar tablature](https://alphatab.net/docs/features/render/guitar-tablature): String-and-fret rendering, rhythm modes, small grace tabs.
+- [Slash notation](https://alphatab.net/docs/features/render/slash-notation): Chord rhythm slashes, showSlash.
+- [Numbered notation (jiǎnpǔ)](https://alphatab.net/docs/features/render/numbered-notation): Cipher notation, showNumbered.
+- [Drum and percussion notation](https://alphatab.net/docs/features/render/drum-tabs): Percussion staff with 1/2/3 lines, drum piece heads.
+- [Multi-track and grand staff](https://alphatab.net/docs/features/render/multi-track-rendering): Piano grand staff, multi-track rendering, multiple tunings displayed.
+- [SVG rendering](https://alphatab.net/docs/features/render/svg-output): Vector output, scaling, print, when to reach for it.
+- [HTML5 Canvas](https://alphatab.net/docs/features/render/html5-canvas): Raster output, HighDPI awareness, when it's the right choice.
+- [Skia rendering (.NET / Android)](https://alphatab.net/docs/features/render/skia-backend): Native rendering via alphaSkia.
+- [Node.js headless rendering](https://alphatab.net/docs/features/render/nodejs-headless-rendering): Server-side image rendering.
+- [Choosing a backend](https://alphatab.net/docs/features/render/choosing-a-backend): Decision guide comparing SVG / Canvas / Skia.
+- [Bravura and SMuFL](https://alphatab.net/docs/features/render/bravura-default): The default music font, why SMuFL matters.
+- [Using a custom music font](https://alphatab.net/docs/features/render/custom-smufl-fonts): Swap Bravura for Petaluma or Leland, live demo.
+- [Custom fonts on Skia](https://alphatab.net/docs/features/render/custom-fonts-on-skia): Register any font with the Skia rendering backend used on .NET and Android via Environment.registerAlphaSkiaCustomFont.
+- [Custom text fonts](https://alphatab.net/docs/features/render/custom-text-fonts): Configure title / subtitle / lyrics / chord / effect / marker fonts.
+- [Font family fallbacks](https://alphatab.net/docs/features/render/font-family-fallbacks): Multiple families with graceful fallback.
+- [Hiding dynamics](https://alphatab.net/docs/features/render/hide-dynamics): Score-wide dynamics visibility, live toggle.
+- [Track name policies](https://alphatab.net/docs/features/render/track-name-policies): Where names appear (first-system vs every-system), format, orientation; one page for all four track-name fields.
+- [Multi-bar rests](https://alphatab.net/docs/features/render/multi-bar-rests): Collapse consecutive empty bars.
+- [Bracket extend mode](https://alphatab.net/docs/features/render/bracket-extend-mode): How instrument brackets span multiple staves.
+- [Chord diagrams on top](https://alphatab.net/docs/features/render/chord-diagrams-on-top): Position chord diagrams above the first system.
+- [System sign separator](https://alphatab.net/docs/features/render/system-sign-separator): Diagonal separator glyph between systems.
+- [Tuning display](https://alphatab.net/docs/features/render/tuning-display): Show or hide guitar tuning at the start.
+- [Staff element display](https://alphatab.net/docs/features/render/staff-element-display): Show, hide or restrict clefs, key signatures, time signatures, bar numbers and tab rests per staff type, on the score, staff or bar level.
+- [Bar numbers](https://alphatab.net/docs/features/render/bar-numbers): Bar numbering with pick-up bars, custom numbers and texts, and display on every bar, the first bar of each system, or nowhere.
+- [Per-element colors](https://alphatab.net/docs/features/render/per-element-colors): Color any note head, stem, beam, or effect via the `style.colors` map on the corresponding model class.
+- [Score-wide palette](https://alphatab.net/docs/features/render/score-wide-palette): display.resources default colors for staff lines, glyphs, and text.
+- [Styling the playback cursor](https://alphatab.net/docs/features/render/player-cursor-styling): CSS classes on Web for cursor / beat highlight / selection.
+- [Effects and articulations](https://alphatab.net/docs/features/render/coverage-effects-articulations): Bends, whammy, vibrato, palm mute, let ring, taps, slaps, pops, tremolo picking, slides, hammer-ons, pull-offs. Section per effect, mini-demo per section.
+- [Chord diagrams and chord names](https://alphatab.net/docs/features/render/coverage-chord-diagrams): Chord diagrams above bars and inline chord symbols.
+- [Dynamics, hairpins, and accents](https://alphatab.net/docs/features/render/coverage-dynamics): ppp-fff, crescendo / decrescendo, sudden accents.
+- [Grace notes, tuplets, and ornaments](https://alphatab.net/docs/features/render/coverage-grace-tuplets-ornaments): Grace positioning, tuplet brackets, trills, mordents, turns.
+- [Repeats and structural elements](https://alphatab.net/docs/features/render/coverage-repeats): Repeats, alternate endings, D.C./D.S., segno, coda, markers.
+- [Lyrics](https://alphatab.net/docs/features/render/coverage-lyrics): Multi-verse lyrics aligned to beats.
+- [Special notes](https://alphatab.net/docs/features/render/coverage-special-notes): Harmonics, ghost notes, dead notes, tied notes.
+- [Rests and full-bar notes](https://alphatab.net/docs/features/render/coverage-rests): Centered full-bar notes and rests, explicit rest positions per beat, and rest placement with several voices.
+- [Special tracks](https://alphatab.net/docs/features/render/coverage-special-tracks): Drums, percussion, piano grand staff, string instruments with unusual tunings.
+- [Toggling notation elements off](https://alphatab.net/docs/features/render/coverage-toggle-elements): Hide any notation category — bends, dynamics, markers, lyrics, tuning — through the `notation.elements` map.
+
+- [Play & sync](https://alphatab.net/docs/features/play-sync/): Drive playback with alphaTab's synth, shape the feel with mixer and metronome controls, and sync to external audio, video, or MIDI streams.
+- [Play, pause, stop](https://alphatab.net/docs/features/play-sync/play-pause-stop): The basic transport, `playPause` toggle, live demo.
+- [Playback speed](https://alphatab.net/docs/features/play-sync/playback-speed): Slower-for-practice, live slider demo.
+- [Looping a section](https://alphatab.net/docs/features/play-sync/looping-a-section): `playbackRange`, `isLooping`, live loop demo.
+- [Seeking by tick and time](https://alphatab.net/docs/features/play-sync/seeking-by-tick-and-time): `tickPosition` vs `timePosition`, `endTick` / `endTime`.
+- [Playing a beat or a note](https://alphatab.net/docs/features/play-sync/playing-a-beat-or-note): `playBeat`, `playNote`; auditioning individual items in editor UIs.
+- [Master and monitoring volumes](https://alphatab.net/docs/features/play-sync/master-and-monitoring-volumes): `masterVolume`, `metronomeVolume`, `countInVolume` on one page.
+- [Per-track mixing](https://alphatab.net/docs/features/play-sync/per-track-mixing): Volume, solo, mute, transposition per track; live mixer demo.
+- [Count-in and metronome](https://alphatab.net/docs/features/play-sync/count-in-and-metronome): One bar of clicks before playback, metronome during playback.
+- [Triplet feel (swing)](https://alphatab.net/docs/features/play-sync/triplet-feel-swing): Enable swing on straight-eighth scores, live demo.
+- [Vibrato and slide fine-tuning](https://alphatab.net/docs/features/play-sync/vibrato-and-slide-fine-tuning): Timing parameters for how the synth interprets vibrato and slide effects.
+- [SongBook mode](https://alphatab.net/docs/features/play-sync/songbook-mode): Songbook-specific bend and dip durations.
+- [SoundFont2 with TinySoundFont](https://alphatab.net/docs/features/play-sync/soundfont2-with-tinysoundfont): How alphaTab makes sound, the bundled SoundFont, the synth pipeline.
+- [Custom SoundFonts](https://alphatab.net/docs/features/play-sync/custom-soundfonts): Swap in a different SF2 for different instruments, live demo.
+- [Combining multiple SoundFonts](https://alphatab.net/docs/features/play-sync/combining-multiple-soundfonts): Layered SoundFonts via `append`.
+- [Audio buffer size](https://alphatab.net/docs/features/play-sync/audio-buffer-size): Latency vs stability trade-off.
+- [Selecting an output device (Web)](https://alphatab.net/docs/features/play-sync/selecting-an-output-device): `enumerateOutputDevices` and `setOutputDevice` on the web platform.
+- [Web Audio and AudioWorklet](https://alphatab.net/docs/features/play-sync/web-audio-and-audioworklet): How alphaTab drives Web Audio in the browser, with AudioWorklet as the primary output and ScriptProcessor as the fallback.
+- [NAudio (.NET)](https://alphatab.net/docs/features/play-sync/naudio-net): On .NET, alphaTab routes synthesized samples through NAudio's DirectSound output, with device enumeration exposed via the standard API.
+- [AudioTrack (Android)](https://alphatab.net/docs/features/play-sync/audiotrack-android): On Android, alphaTab feeds synthesized samples into an AudioTrack via a background worker, with device selection through AudioManager.
+- [Backing-track audio](https://alphatab.net/docs/features/play-sync/backing-track-audio): Drive the alphaTab playback cursor from an embedded or external audio track instead of the synth.
+- [Video sync](https://alphatab.net/docs/features/play-sync/video-sync): Drive the alphaTab cursor from a YouTube iframe or an HTML5 video element via IExternalMediaHandler.
+- [Sync points at runtime](https://alphatab.net/docs/features/play-sync/sync-points-at-runtime): Attach or refresh backing-track sync points from code with FlatSyncPoint entries and api.updateSyncPoints().
+- [The MIDI event stream](https://alphatab.net/docs/features/play-sync/midi-event-stream): Subscribe to midiEventsPlayed to react to note-on, note-off, metronome, and tempo events at playback time.
+
+- [Interact](https://alphatab.net/docs/features/interact/): Wire the score into your UI — playback cursors, scroll behavior, mouse and touch events, bounds lookups, and range selection.
+- [Cursor and element highlighting](https://alphatab.net/docs/features/interact/cursor-and-element-highlighting): The bar cursor, beat cursor, and beat highlight follow the music together — toggled by two flags and two events.
+- [Customizing cursor colors and animation](https://alphatab.net/docs/features/interact/customizing-cursor-colors-and-animation): Restyle the bar cursor, beat cursor, beat highlight, and selection via CSS classes, and toggle the beat-cursor animation.
+- [A custom cursor handler](https://alphatab.net/docs/features/interact/custom-cursor-handler): Swap in your own ICursorHandler to place and animate the bar and beat cursors with custom logic.
+- [Auto-scroll modes](https://alphatab.net/docs/features/interact/auto-scroll-modes): Pick how alphaTab keeps the played bar on screen — Continuous, OffScreen, Smooth, or Off — and force a scroll on demand.
+- [Scroll target and offsets](https://alphatab.net/docs/features/interact/scroll-target-and-offsets): Pick which element scrolls, add X/Y padding, and choose between native smooth scroll and alphaTab's timed animation.
+- [A custom scroll handler](https://alphatab.net/docs/features/interact/custom-scroll-handler): Assign an IScrollHandler to api.customScrollHandler to control scroll behavior with your own logic.
+- [Lazy loading with IntersectionObserver](https://alphatab.net/docs/features/interact/lazy-loading): Defer DOM insertion of off-screen rendered chunks so large scores load faster and use less memory.
+- [Reacting to beat and note clicks](https://alphatab.net/docs/features/interact/reacting-to-beat-and-note-clicks): The six sibling events (`beatMouseDown` / `Move` / `Up`, `noteMouseDown` / `Move` / `Up`) with a click-to-seek demo and a per-note click hook demo.
+- [Enabling and disabling interaction](https://alphatab.net/docs/features/interact/enabling-and-disabling-interaction): The `player.enableUserInteraction` master toggle for the built-in seek and range-select behavior, and when to turn it off.
+- [Bounds lookup](https://alphatab.net/docs/features/interact/bounds-lookup): `api.boundsLookup` maps every rendered beat and note to a screen rectangle so you can hit-test and paint overlays on top of the score.
+- [Beat visibility and note bounds](https://alphatab.net/docs/features/interact/beat-visibility-and-note-bounds): Use `api.isVisible(beat)` for camera-visible checks and `core.includeNoteBounds` to opt into per-note geometry for precise hit-testing.
+- [Range selection](https://alphatab.net/docs/features/interact/range-selection): Drive the playback-range highlight programmatically with `highlightPlaybackRange`, commit it to a loop with `applyPlaybackRangeFromHighlight`, and reset with `clearPlaybackRangeHighlight`.
+- [Selection change events](https://alphatab.net/docs/features/interact/selection-change-events): Subscribe to `playbackRangeHighlightChanged` to stream selection updates — start beat, end beat, and per-line highlight rectangles — into your own UI.
+
+- [Export](https://alphatab.net/docs/features/export/): Send a loaded score back out — as Guitar Pro or alphaTex, as MIDI, as rendered audio, or as JSON for storage and diffing.
+- [Export to Guitar Pro 7](https://alphatab.net/docs/features/export/export-to-guitar-pro-7): Write `.gp` files with `Gp7Exporter`, wire the resulting bytes into a browser download.
+- [Export to alphaTex](https://alphatab.net/docs/features/export/export-to-alphatex): Serialize a loaded score to alphaTex text via `AlphaTexExporter`, with byte-buffer or plain-string output.
+- [Export MIDI](https://alphatab.net/docs/features/export/export-midi): Write a Standard MIDI File from the loaded score — the browser one-liner and the cross-platform pipeline in one page.
+- [Export audio to WAV](https://alphatab.net/docs/features/export/export-audio-to-wav): Render PCM samples from the score with `exportAudio`, encode the chunks to WAV, download or persist the result.
+- [Score to JSON and back](https://alphatab.net/docs/features/export/score-to-json): Round-trip the in-memory `Score` model through JSON with `JsonConverter` for storage, transport, and web-worker messaging.
+- [Settings to JSON](https://alphatab.net/docs/features/export/settings-to-json): Serialize a `Settings` instance to JSON with `JsonConverter` for user preferences, defaults, and worker transport.
+
+- [Extend](https://alphatab.net/docs/features/extend/): Push alphaTab beyond its defaults — swap fonts, build scores in code, wire custom bundlers and workers, and embed the engine in your own host.
+- [Programmatic score construction](https://alphatab.net/docs/features/extend/programmatic-score-construction): Instantiate the alphaTab model classes directly and render a score built entirely in code — no importer, no source file.
+- [Traversing and mutating the model](https://alphatab.net/docs/features/extend/traversing-and-mutating-the-model): Walk the loaded score tree — tracks, staves, bars, voices, beats, notes — and apply changes before or after render.
+- [Worker and worklet initialization](https://alphatab.net/docs/features/extend/worker-and-worklet-initialization): `initializeMain`, `initializeWorker`, `initializeAudioWorklet` for custom setups.
+- [Custom bundler integration](https://alphatab.net/docs/features/extend/custom-bundler-integration): Going beyond the shipped Vite / webpack plugins.
+- [AlphaTabView on Android](https://alphatab.net/docs/features/extend/alphatabview-android): Embed in Android layouts (Views).
+- [WPF and WinForms controls](https://alphatab.net/docs/features/extend/wpf-and-winforms-controls): Embed in .NET desktop apps.
+- [Custom UI facade](https://alphatab.net/docs/features/extend/custom-ui-facade): Implement `IUiFacade` for a host alphaTab does not know about.
+
+
+## alphaTex
+
+- [Introduction to alphaTex](https://alphatab.net/docs/alphatex/introduction): alphaTab's plain-text music notation format — write scores as source, load them through the `tex` option or the `tex()` API.
+- [Syntax](https://alphatab.net/docs/alphatex/syntax): how to write alphaTex — comments, strings, numbers, argument lists, properties, metadata tags, scopes, signatures, case rules, and fret-note notation. Anchors every other page cross-links into.
+- [Document structure](https://alphatab.net/docs/alphatex/document-structure): how an alphaTex file is organised — bars, beats, notes, tracks, staves, and voices, and where score-level metadata belongs.
+- [Structural metadata](https://alphatab.net/docs/alphatex/structural-metadata): reference for `\track`, `\staff`, and `\voice` — the metadata tags that open new tracks, staves, and voices.
+- [Score metadata](https://alphatab.net/docs/alphatex/score-metadata): reference for the song-wide metadata tags such as title, artist, tempo defaults, and other piece-level settings.
+- [Staff metadata](https://alphatab.net/docs/alphatex/staff-metadata): reference for the per-staff metadata tags — instrument, tuning, articulation tables, and other staff-level settings.
+- [Bar metadata](https://alphatab.net/docs/alphatex/bar-metadata): reference for the per-bar metadata tags — clefs, key signatures, time signatures, repeats, and other bar-level settings.
+- [Beat properties](https://alphatab.net/docs/alphatex/beat-properties): reference for the properties applied to a whole beat — effects and annotations that affect every note in the beat.
+- [Note properties](https://alphatab.net/docs/alphatex/note-properties): reference for the properties applied to a single note — bends, slides, ties, harmonics, and other per-note effects.
+- [Importer and parser](https://alphatab.net/docs/alphatex/importer): using the alphaTex importer and parser directly, including access to the syntax tree and diagnostics.
+- [Language server](https://alphatab.net/docs/alphatex/lsp): the `@coderline/alphatab-language-server` package for editor integrations.
+- [Monaco editor integration](https://alphatab.net/docs/alphatex/monaco): alphaTex editing with syntax highlighting and language-server features in Monaco.
+- [Troubleshooting](https://alphatab.net/docs/alphatex/troubleshooting): every alphaTex diagnostic alphaTab can raise, grouped by category, with a start-here guide for the failures musicians hit most often.
+
+## API reference
+
+- [API](https://alphatab.net/docs/reference/api): the AlphaTabApi surface — every method, event, and property.
+- [Settings](https://alphatab.net/docs/reference/settings): every configurable setting alphaTab exposes, grouped by category.
+- [Data Model](https://alphatab.net/docs/reference/score): the Score, Track, Beat, and Note model classes.
+- [All Types](https://alphatab.net/docs/reference/types): index of every public type in the SDK.
+- [File formats](https://alphatab.net/docs/category/formats): per-format compatibility tables for every supported input format.
+
+## Tutorials
+
+- [Tutorials overview](https://alphatab.net/docs/tutorials): guided walkthroughs for building a full alphaTab UI on each platform.
+- [Tutorial (Web)](https://alphatab.net/docs/tutorial-web/introduction): step-by-step web app tutorial from setup to playback.
+- [Tutorial (.NET)](https://alphatab.net/docs/tutorial-net/introduction): step-by-step .NET app tutorial from setup to playback.
+- [Tutorial (Android)](https://alphatab.net/docs/tutorial-android/introduction): step-by-step Android app tutorial from setup to playback.
+
+## Formats
+
+- [Guitar Pro 8](https://alphatab.net/docs/formats/guitar-pro-8): supported features and compatibility notes for the `.gp` format.
+- [Guitar Pro 7](https://alphatab.net/docs/formats/guitar-pro-7): supported features and compatibility notes for the Guitar Pro 7 `.gp` format.
+- [Guitar Pro 6](https://alphatab.net/docs/formats/guitar-pro-6): supported features and compatibility notes for the `.gpx` format.
+- [Guitar Pro 3-5](https://alphatab.net/docs/formats/guitar-pro-3-5): supported features and compatibility notes for the binary `.gp3`, `.gp4`, and `.gp5` formats.
+- [MusicXML](https://alphatab.net/docs/formats/musicxml): supported features and compatibility notes for the MusicXML standard.
+- [Capella / CapXML](https://alphatab.net/docs/formats/capella): supported features and compatibility notes for the `.capx` format.
+
+## Optional
+
+- [Playground](https://alphatab.net/playground): interactive alphaTex editor with live rendering, playback, and the Media Sync Editor.
+- [Media Sync Editor](https://alphatab.net/docs/guides/media-sync-editor): synchronizing a score with an external audio or video backing track in the Playground.
+- [Audio & video sync](https://alphatab.net/docs/guides/audio-video-sync): syncing alphaTab with Guitar Pro 8 audio tracks or external media.
+- [Low level APIs](https://alphatab.net/docs/guides/lowlevel-apis): `ScoreLoader`, `ScoreRenderer`, `MidiFileGenerator`, and `AlphaSynth` without the UI-bound API object.
+- [Use in Node.js](https://alphatab.net/docs/guides/nodejs): end-to-end walkthrough rendering a file to SVG and PNG in Node.js.
+- [Handling MIDI events](https://alphatab.net/docs/guides/handling-midi-events): reacting to MIDI messages generated during playback.
+- [Release notes (v1.9)](https://alphatab.net/docs/releases/release1_9): changes and additions of the latest release; older versions are listed alongside it.

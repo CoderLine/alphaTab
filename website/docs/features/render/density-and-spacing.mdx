@@ -1,0 +1,71 @@
+---
+title: "Density and spacing"
+description: "Control horizontal note spacing with spacingRatio and stretchForce, and decide with lastSystemFillThreshold when the last system of a page is justified."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 40
+  since: "1.9"
+keywords:
+  - alphaTab
+  - spacing
+  - density
+---
+
+import { SpacingSlidersDemo } from '@site/src/components/SpacingSlidersDemo';
+
+Tune density when a chart needs to fit on a single printed page, when a projector view demands looser spacing for readability from across the room, or when the house engraving style calls for tighter or airier note spacing than the defaults. Three orthogonal knobs control the fit: how the widths of successive note durations relate (`spacingRatio`), how densely alphaTab packs a row overall (`stretchForce`), and whether the last row of a page stretches to full width (`lastSystemFillThreshold`).
+
+<SpacingSlidersDemo showCode={false} />
+
+## Shape: `spacingRatio` *(new in 1.9)*
+
+`display.spacingRatio` controls the ratio between the width allocated to a note of duration *d* and one of duration *2d*. alphaTab uses a power-law model — the same approach as Dorico, MuseScore, and Finale. Reference values:
+
+- `Math.SQRT2` ≈ `1.414` (default, Dorico-style) — tight, efficient. Suits guitar tablature where rest bars and whole notes would otherwise dominate the row.
+- `1.5` (MuseScore-style) — balanced, general-purpose.
+- `1.618` (Finale-style, golden ratio) — loose, traditional engraving.
+
+Values are clamped to `[1.2, 2.0]`.
+
+## Density: `stretchForce`
+
+`display.stretchForce` scales the overall spring strength of the layout. Higher values pack fewer bars per row; lower values pack more. Defaults to `1`. Think of it as the density dial on top of `spacingRatio`'s shape:
+
+- **`spacingRatio` shapes** the proportions between long and short notes.
+- **`stretchForce` scales** the whole row up or down without changing those proportions.
+
+## Last-system fill: `lastSystemFillThreshold` *(new in 1.9)*
+
+`display.lastSystemFillThreshold` decides when the final row of a page justifies to the full container width. The threshold compares the natural width of the last row to the container width:
+
+- `1` (default) — never justify. A three-bar tail on a page of six-bar rows renders at natural width.
+- `0` — always justify.
+- `0.4`–`0.7` — Dorico/MuseScore behavior: justify when the row is reasonably full, leave sparse tails compact.
+
+Values are clamped to `[0, 1]`. A last row that is wider than the container still compresses to fit, whatever the threshold.
+
+The boolean [`display.justifyLastSystem`](/docs/reference/settings/display/justifylastsystem) is deprecated in favor of `lastSystemFillThreshold`. It still works: `true` sets the threshold to `0`, `false` sets it to `1`.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  display: {
+    spacingRatio: 1.5,
+    stretchForce: 1.2,
+    lastSystemFillThreshold: 0.5,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Page layout](./page-layout) — where these knobs apply.
+- [Effect placement](./effect-placement) — how annotations are placed once the notes have their horizontal positions.
+- [`display.spacingRatio`](/docs/reference/settings/display/spacingratio), [`display.stretchForce`](/docs/reference/settings/display/stretchforce), and [`display.lastSystemFillThreshold`](/docs/reference/settings/display/lastsystemfillthreshold) reference entries.

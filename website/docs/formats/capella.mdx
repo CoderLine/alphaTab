@@ -1,0 +1,440 @@
+---
+title: Capella/CapXML (.capx)
+description: The open file format of Capella.
+---
+
+## Introduction
+
+Capella is a music notation software developed by the German company capella-software AG.
+https://www.capella.de
+
+Older versions of Capella had binary formats. alphaTab is only compatible with the XML based formats. 
+Capella files are Zip archives containing one single `score.xml` file following the [CapXML schema](https://www.capella.de/CapXML/).
+
+**Compatibility Level:** Only very basic support, not well tested
+
+Capella describes a lot of notation elements rather visually through "graphical objects" than semantically. 
+This requires alphaTab to make a best-guess on which exact beats/notes what elements should be applied.
+
+## Feature Table
+
+import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, FeatureStatus } from '@site/src/components/FileFormatFeatureTable'
+
+<FileFormatFeatureTable>
+
+    <FileFormatFeatureGroup title="Top Level">
+        <FileFormatFeatureRow feature="Score Information (info)" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported, "", "Author and Comment"]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Page Objects (pageObjects)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Bar Numbering (barCount)" 
+                              model={[FeatureStatus.NotSupported]}
+                              reading={[FeatureStatus.NotSupported]}
+                              render={[FeatureStatus.Partial, "", "Bar numbers are always rendered"]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.NotSupported]} />
+        <FileFormatFeatureRow feature="Gallery (gallery)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+    </FileFormatFeatureGroup>
+
+    <FileFormatFeatureGroup title="Layout">
+        <FileFormatFeatureRow feature="layout/singlePart" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Page Size (layout/pages)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Margins (layout/distances)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Score > General > Instrument Names (layout/instrumentNames)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Note Sizes (layout/style/noteSpaces)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Notation Style & Sizes (layout/style)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Spacing (layout/spacing)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Beam gradient (layout/beamFlattening)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Automatically place new objects (layout/autoPlacement)" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+    </FileFormatFeatureGroup>
+
+    <FileFormatFeatureGroup title="Track Level">                            
+        <FileFormatFeatureRow feature="Track Name"
+                                    model={[FeatureStatus.Supported]}
+                                    reading={[FeatureStatus.Supported]}
+                                    render={[FeatureStatus.Ignored]}
+                                    audio={[FeatureStatus.Ignored]}
+                                    tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Track Short Name"
+                                    model={[FeatureStatus.Supported]}
+                                    reading={[FeatureStatus.Supported]}
+                                    render={[FeatureStatus.Supported]}
+                                    audio={[FeatureStatus.Ignored]}
+                                    tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Stave Arrangement (layout/brackets and layout/staves)" 
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.Supported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Ignored]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Custom Spacings" 
+                            model={[FeatureStatus.Ignored]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported, "", "Via settings.display"]}
+                            audio={[FeatureStatus.Ignored]}
+                            tex={[FeatureStatus.Ignored]} />
+    </FileFormatFeatureGroup>
+
+    <FileFormatFeatureGroup title="Bar Level">
+        <FileFormatFeatureRow feature="Clefs" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Supported]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Key Signatures" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Supported]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Time Signatures" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Supported]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Double Bar" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Anacrusis" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Supported]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Repeats" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Supported]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Alternate Endings" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Supported]}
+                              tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Free Time" 
+                              model={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Supported]}
+                              tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Multibar Rest" 
+                              model={[FeatureStatus.NotSupported]}
+                              reading={[FeatureStatus.NotSupported]}
+                              render={[FeatureStatus.NotSupported]}
+                              audio={[FeatureStatus.NotSupported]}
+                              tex={[FeatureStatus.NotSupported]} />
+
+        <FileFormatFeatureRow feature="Simile Marks (Bar Repeats)"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />                              
+    </FileFormatFeatureGroup>
+
+
+    <FileFormatFeatureGroup title="Beat Level">
+        <FileFormatFeatureRow feature="Chords" 
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.Supported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Durations (Double Whole to 128th)" 
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Durations (Dots)" 
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Durations (Tuplets)"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Stem Direction"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Beam (force/divide)"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Lyrics"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Fermata"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Partial]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Dynamics"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Partial]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Text"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Partial]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Vibrato"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Crescendo/Descrescendo"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Slur"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Partial]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Tempo Changes"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.NotSupported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Directions"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.NotSupported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Ottavia"
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.NotSupported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Grace Notes"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Pick Strokes"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Remaining Articulations 1"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Sustain Pedal"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.NotSupported]}
+                            tex={[FeatureStatus.Supported]} />
+
+
+        <FileFormatFeatureRow feature="Arpeggios"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.NotSupported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Chord Repeat"
+                            model={[FeatureStatus.NotSupported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.NotSupported]}
+                            audio={[FeatureStatus.NotSupported]}
+                            tex={[FeatureStatus.NotSupported]} />
+
+        <FileFormatFeatureRow feature="Trills"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Ornaments"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Chord Diagram"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+
+        <FileFormatFeatureRow feature="Custom Shapes (lines, rectangles, circles)"
+                            model={[FeatureStatus.Ignored]}
+                            reading={[FeatureStatus.Ignored]}
+                            render={[FeatureStatus.Ignored]}
+                            audio={[FeatureStatus.Ignored]}
+                            tex={[FeatureStatus.Ignored]} />
+
+
+        <FileFormatFeatureRow feature="Tremolo Picking"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+</FileFormatFeatureGroup>
+    <FileFormatFeatureGroup title="Note Level">
+        <FileFormatFeatureRow feature="Rests" 
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.Supported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Staccato" 
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.Supported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Accentuation (Normal/Heavy)" 
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.Supported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Ties" 
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.Partial]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+        <FileFormatFeatureRow feature="Accidentals"
+                            model={[FeatureStatus.Supported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.Supported]}
+                            audio={[FeatureStatus.Supported]}
+                            tex={[FeatureStatus.Supported]} />
+
+
+        <FileFormatFeatureRow feature="Custom note heads"
+                            model={[FeatureStatus.NotSupported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.NotSupported]}
+                            audio={[FeatureStatus.NotSupported]}
+                            tex={[FeatureStatus.NotSupported]} />
+
+        <FileFormatFeatureRow feature="Note Colors"
+                            model={[FeatureStatus.NotSupported]}
+                            reading={[FeatureStatus.NotSupported]}
+                            render={[FeatureStatus.NotSupported]}
+                            audio={[FeatureStatus.NotSupported]}
+                            tex={[FeatureStatus.NotSupported]} />
+
+
+    </FileFormatFeatureGroup>
+</FileFormatFeatureTable>

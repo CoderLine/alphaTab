@@ -1,0 +1,64 @@
+@use './breakpoints' as *;
+
+.header {
+  --eye-to-h2: 24px;
+  --h2-to-lede: 16px;
+  --head-to-demo: 48px;
+
+  margin-bottom: var(--head-to-demo);
+
+  @include tablet {
+    --eye-to-h2: 20px;
+    --h2-to-lede: 14px;
+    --head-to-demo: 36px;
+  }
+
+  @include mobile {
+    --eye-to-h2: 16px;
+    --h2-to-lede: 12px;
+    --head-to-demo: 28px;
+  }
+}
+
+.eyebrowRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--at-line);
+  margin-bottom: var(--eye-to-h2);
+}
+
+.eyebrow {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.meta {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  letter-spacing: 0.5px;
+}
+
+.title {
+  font-size: var(--h2-size, 36px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin: 0;
+  font-weight: 700;
+  text-wrap: balance;
+  color: var(--at-ink);
+}
+
+.lede {
+  font-size: var(--lede-size, 18px);
+  line-height: 1.5;
+  color: var(--at-ink-soft);
+  margin: var(--h2-to-lede) 0 0;
+  text-wrap: pretty;
+}

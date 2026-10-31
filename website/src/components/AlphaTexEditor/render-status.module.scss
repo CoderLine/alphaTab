@@ -1,0 +1,42 @@
+@use '../landing/breakpoints' as *;
+
+.status {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+button.status {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+
+  &:hover .statusDetail { text-decoration: underline; }
+}
+
+.statusOk { color: var(--at-success); }
+.statusWarning { color: var(--at-track-orange); }
+.statusError { color: var(--at-danger); }
+
+.statusCount { flex-shrink: 0; }
+
+.statusDetail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--at-ink-soft);
+}
+
+.statusNote {
+  flex-shrink: 0;
+  color: var(--at-muted);
+
+  @include not-desktop { display: none; }
+}
+
+.onCode .statusDetail { color: var(--at-syntax-plain); }
+.onCode .statusNote { color: var(--at-syntax-comment); }

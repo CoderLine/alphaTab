@@ -1,0 +1,59 @@
+---
+title: "Per-track mixing"
+description: "Volume, solo, mute, transposition per track; live mixer demo."
+sidebar_custom_props:
+  feature_chapter: mixer
+  feature_order: 20
+keywords:
+  - alphaTab
+  - mixer
+  - track
+  - solo
+  - mute
+---
+
+import { TrackMixerDemo } from '@site/src/components/PlaySync';
+
+A channel-strip mixer — one row per track, each with a volume fader, a Solo and a Mute button, plus a transpose readout — is a standard practice-tool feature. Mute the drums to hear the bass line alone. Solo the vocal against a click. Transpose the guitar track down a whole step to match a capo. Four methods on `AlphaTabApi` control that fader stage, each accepting an array of tracks so you can adjust one, several, or all of them in a single call.
+
+<TrackMixerDemo file="/files/Bach_Prelude_BWV999.gp" showCode={false} />
+
+## The four methods
+
+- **`changeTrackVolume(tracks, volume)`** — scale the level of one or more tracks. The value is a multiplier applied on top of the score's own mix, not an absolute gain, so `1.0` leaves the track at its notated level and `0` silences it.
+- **`changeTrackSolo(tracks, solo)`** — when `true`, other non-solo tracks are muted so the selected tracks play alone. Multiple tracks can be solo at once — they all sound; everything else falls silent.
+- **`changeTrackMute(tracks, mute)`** — silence the given tracks without touching their volume. Mute and solo are independent flags: a muted track stays silent even when another track is solo.
+- **`changeTrackTranspositionPitch(tracks, semitones)`** — shift the playback pitch of a track without moving what's rendered on the staff. Use it to accommodate a capo, a re-tuned guitar, or a singer's key.
+
+Each call takes effect immediately, even during playback. Passing an empty array is a no-op.
+
+## When to reach for each
+
+`changeTrackVolume` is the everyday fader — bind it to a slider in your mixer UI. `changeTrackSolo` and `changeTrackMute` are the buttons next to it. `changeTrackTranspositionPitch` is not a mixer knob per se; it's the transposition control that lets playback follow a physical instrument's tuning without re-rendering the score.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: { playerMode: alphaTab.PlayerMode.EnabledSynthesizer },
+});
+
+api.scoreLoaded.on((score) => {
+  api.changeTrackSolo([score.tracks[0]], true);
+  api.changeTrackMute([score.tracks[1]], true);
+  api.changeTrackVolume([score.tracks[2]], 0.5);
+  api.changeTrackTranspositionPitch([score.tracks[3]], -2);
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Master and monitoring volumes](./master-and-monitoring-volumes) — the master fader every track feeds into.
+- [Selecting and switching tracks](/docs/features/import-load/selecting-and-switching-tracks) — control which tracks render on screen, independent of the mix.
+- [`changeTrackVolume`](/docs/reference/api/changetrackvolume), [`changeTrackSolo`](/docs/reference/api/changetracksolo), [`changeTrackMute`](/docs/reference/api/changetrackmute), and [`changeTrackTranspositionPitch`](/docs/reference/api/changetracktranspositionpitch) reference entries.

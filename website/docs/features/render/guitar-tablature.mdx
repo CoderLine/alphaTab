@@ -1,0 +1,78 @@
+---
+title: "Guitar tablature"
+description: "String-and-fret rendering, rhythm modes, small grace tabs."
+sidebar_custom_props:
+  feature_chapter: notation-types
+  feature_order: 20
+keywords:
+  - alphaTab
+  - tablature
+  - guitar
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Tablature draws each string as a horizontal line and prints fret numbers on top. It's the notation most guitar and bass players read first — reach for it whenever the audience is fretted-string players. Pair it with standard notation for scores that must serve both audiences, or render it alone for a tab-only chart.
+
+<AlphaTab
+  tex={true}
+  settings={{ notation: { rhythmMode: 'showWithBars' } }}
+>{`
+\\title "Folk arpeggio"
+\\tempo 84
+\\track "Guitar"
+  \\staff{tabs}
+  :8 (3.6 0.3) 0.2 (0.3) 0.1 (0.3) 0.2 (0.3) 0.1 |
+  :8 (0.4 2.3) 3.2 (2.3) 2.1 (2.3) 3.2 (2.3) 2.1 |
+  :8 (0.6 0.4) 0.3 (0.4) 0.2 (0.4) 0.3 (0.4) 0.2 |
+  :8 (3.5 2.4) 0.3 (2.4) 1.2 (2.4) 0.3 (2.4) 1.2
+`}</AlphaTab>
+
+## Showing rhythm on a tab-only staff
+
+When you hide standard notation, the tab staff loses stems and beams. Turn them back on through `notation.rhythmMode`:
+
+- `Hidden` (default when both staves show) — no rhythm indicators on the tab staff.
+- `ShowWithBars` — each beat draws a stem with flags; grouped beats connect through a common bar under the staff.
+- `ShowWithBeams` — same as above but individual notes use flags instead of a bar, matching the standard-notation convention.
+- `Automatic` — `Hidden` when standard notation is visible, `ShowWithBars` when it isn't.
+
+`notation.rhythmHeight` controls how far the stems drop below the tab staff (default `15`), and `notation.smallGraceTabNotes` prints grace notes at a reduced size so they don't crowd the main fret numbers.
+
+Because these are settings on the `notation` group, they apply to every staff in the render. Combine them with per-staff `showTablature` toggles when you need mixed layouts.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  notation: {
+    rhythmMode: alphaTab.TabRhythmMode.ShowWithBars,
+    rhythmHeight: 20,
+    smallGraceTabNotes: true,
+  },
+});
+
+api.scoreLoaded.on((score) => {
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      staff.showStandardNotation = false;
+      staff.showTablature = true;
+    }
+  }
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Standard notation](/docs/features/render/standard-notation) — pair the tab staff with a score staff.
+- [Slash notation](/docs/features/render/slash-notation) — swap fret numbers for chord-rhythm slashes.
+- [Drum tablature](/docs/features/render/drum-tabs#drum-tablature) — the same tab staff for percussion tracks.
+- [`notation.rhythmMode`](/docs/reference/settings/notation/rhythmmode), [`notation.rhythmHeight`](/docs/reference/settings/notation/rhythmheight), and [`notation.smallGraceTabNotes`](/docs/reference/settings/notation/smallgracetabnotes) in the settings reference.
+- [`Staff.showTablature`](/docs/reference/types/model/staff) in the model reference.

@@ -1,0 +1,376 @@
+@use '../breakpoints' as *;
+
+// ─── File tabs ──────────────────────────────────────────────────────
+.fileTabHideOnTablet {
+  @include tablet { display: none; }
+}
+
+.fileTabOverflow {
+  display: none;
+  padding: 7px 9px;
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+
+  @include tablet { display: inline-flex; align-items: center; }
+}
+
+.fileTabClose {
+  margin-left: 6px;
+  color: var(--at-muted);
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.fileTabSpacer {
+  flex: 1;
+}
+
+.openLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--at-muted);
+  font-family: var(--at-font-mono);
+  padding-bottom: 8px;
+  text-decoration: none;
+
+  &:hover { color: var(--at-ink); }
+}
+
+.openLinkFull {
+  @include tablet { display: none; }
+}
+
+.openLinkShort {
+  display: none;
+  @include tablet { display: inline; }
+}
+
+.fileTabBadge {
+  margin-left: 6px;
+  color: var(--tab-color, var(--at-accent));
+  flex-shrink: 0;
+}
+
+// ─── Sidebar ────────────────────────────────────────────────────────
+.sidebar {
+  flex-basis: 220px;
+  padding: 22px;
+  background: var(--at-surface-alt);
+  color: var(--at-muted);
+  font-size: 12px;
+  transition: flex-basis 220ms ease, padding 220ms ease;
+
+  @include tablet {
+    flex-basis: 180px;
+    padding: 16px;
+    font-size: 11.5px;
+  }
+}
+
+.sidebarCollapsed {
+  flex-basis: 44px;
+  padding: 22px 6px;
+
+  @include tablet { flex-basis: 44px; }
+}
+
+.sidebarHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+  margin-bottom: 12px;
+
+  .sidebarLabel { flex: 1; margin-bottom: 0; }
+
+  .sidebarCollapsed & {
+    justify-content: center;
+    margin-bottom: 0;
+  }
+}
+
+.sidebarToggle {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface);
+  color: var(--at-muted);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 120ms ease, background 120ms ease;
+
+  &:hover { color: var(--at-ink); }
+}
+
+.sidebarToggleIcon {
+  display: block;
+  transition: transform 220ms ease;
+  transform: rotate(90deg);
+
+  .sidebarCollapsed & { transform: rotate(-90deg); }
+}
+
+.expandedOnly {
+  .sidebarCollapsed & { display: none; }
+}
+
+.trackRowCollapsed {
+  justify-content: center;
+  padding: 8px 4px;
+  gap: 0;
+
+  .trackName,
+  .trackSpacer,
+  svg {
+    display: none;
+  }
+
+  .trackDot {
+    width: 10px;
+    height: 10px;
+    opacity: 0.7;
+  }
+
+  &.trackRowActive .trackDot { opacity: 1; }
+}
+
+.sidebarSection {
+  margin-top: 22px;
+
+  &:first-child { margin-top: 0; }
+}
+
+.sidebarLabel {
+  font-family: var(--at-font-mono);
+  font-size: 10px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+
+.scoreTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  color: var(--at-ink);
+
+  @include tablet { font-size: 14px; }
+}
+
+.scoreMeta {
+  font-size: 12px;
+  color: var(--at-muted);
+
+  @include tablet { font-size: 11px; }
+}
+
+.trackRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  margin-bottom: 3px;
+  color: var(--at-muted);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+
+  &:hover { background: var(--at-surface); }
+
+  @include tablet {
+    padding: 5px 6px;
+  }
+}
+
+.trackRowActive {
+  background: var(--at-surface);
+  border-color: var(--at-line);
+  color: var(--at-ink);
+}
+
+.trackDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--track-color, var(--at-muted));
+  opacity: 0.5;
+
+  .trackRowActive & {
+    opacity: 1;
+  }
+}
+
+.trackName {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackSpacer { flex: 0 0 auto; }
+
+.detailsList {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--at-ink-soft);
+  margin: 0;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+
+  dt {
+    color: var(--at-muted);
+    margin: 0;
+  }
+
+  dd {
+    color: var(--at-ink);
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.tuning {
+  font-family: var(--at-font-mono);
+  letter-spacing: 0.4px;
+}
+
+.dim {
+  color: var(--at-muted);
+}
+
+// ─── Phone ──────────────────────────────────────────────────────────
+.mobileFileBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--at-line);
+  background: var(--at-surface-alt);
+  font-family: var(--at-font-mono);
+  font-size: 11.5px;
+}
+
+.mobileFileDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--at-accent);
+  flex-shrink: 0;
+}
+
+.mobileFileName {
+  color: var(--at-ink);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileFileSpacer { flex: 1; }
+
+.mobileFileCount {
+  color: var(--at-muted);
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.mobileTrackBar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--at-line);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.mobileTrackPill {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface);
+  color: var(--at-muted);
+  font-size: 11.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mobileTrackPillActive {
+  border-color: var(--track-color, var(--at-accent));
+  background: color-mix(in srgb, var(--track-color, var(--at-accent)) 8%, transparent);
+  color: var(--at-ink);
+  font-weight: 600;
+}
+
+.mobileTrackDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--track-color, var(--at-muted));
+  opacity: 0.5;
+
+  .mobileTrackPillActive & { opacity: 1; }
+}
+
+.mobileScoreCard {
+  padding: 14px 16px;
+  background: var(--at-surface);
+  border: 1px solid var(--at-line);
+  border-radius: 10px;
+}
+
+.mobileScoreHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mobileScoreTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--at-ink);
+}
+
+.mobileScoreMeta {
+  font-size: 12px;
+  color: var(--at-muted);
+}
+
+.mobileDetailsList {
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--at-font-mono);
+  font-size: 11.5px;
+  color: var(--at-ink-soft);
+}

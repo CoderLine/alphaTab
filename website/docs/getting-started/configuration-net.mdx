@@ -1,0 +1,92 @@
+---
+title: Configuration (.NET)
+description: Configure alphaTab in a .NET project — set up the API on your host, pass settings, subscribe to events, and drive playback.
+keywords:
+  - alphaTab
+  - configuration
+  - .NET
+  - C#
+  - WPF
+  - WinForms
+  - settings
+  - events
+  - API
+---
+
+The .NET setup differs by host: console apps use the low-level classes directly, while WPF and WinForms controls wrap those classes behind a UI-friendly API. This page walks through each of the four surfaces — setup, settings, events, and API — on all three hosts.
+
+## Setup
+
+### Console
+
+Non-UI code uses the low-level classes directly — `ScoreLoader`, `ScoreRenderer`, `Settings`, and the model classes under `AlphaTab.Model`. The [installation page](installation-net#render-from-a-console-app) shows the full render pipeline. To see how the UI controls are built on top of the same classes, browse the [C# sources on GitHub](https://github.com/CoderLine/alphaTab/tree/develop/src.csharp).
+
+### WPF
+
+The WPF `AlphaTab` control exposes the same functionality as the web `AlphaTabApi`, wrapped in a WPF-idiomatic component. Drop it into any XAML and bind its properties:
+
+```xml
+<wpf:AlphaTab xmlns:wpf="clr-namespace:AlphaTab.Wpf;assembly=AlphaTab.Windows"
+              Tracks="{Binding TracksToDisplay}" />
+```
+
+### WinForms
+
+The WinForms `AlphaTabControl` mirrors the WPF control's API. Add it to the form via the designer or in code:
+
+```csharp
+using AlphaTab.WinForms;
+
+var control = new AlphaTabControl
+{
+    Dock = System.Windows.Forms.DockStyle.Fill
+};
+Controls.Add(control);
+```
+
+## Settings
+
+The `Settings` class configures every aspect of alphaTab — rendering engine, layout mode, playback options, imported file. Console code creates a `Settings` instance directly and passes it to the renderer:
+
+```csharp
+using AlphaTab;
+
+var settings = new Settings();
+settings.Core.Engine = "skia";
+settings.Display.LayoutMode = LayoutMode.Page;
+```
+
+The WPF and WinForms controls expose a `Settings` property. Mutating that object does not trigger a re-render automatically — call `Api.UpdateSettings()` to apply the changes:
+
+```csharp
+control.Settings.Display.LayoutMode = LayoutMode.Horizontal;
+control.Api.UpdateSettings();
+```
+
+Both controls also expose a `Tracks` property. Assign it to change which tracks are rendered.
+
+The [Settings reference](/docs/reference/settings) documents every option.
+
+## Events
+
+alphaTab uses its own event pattern for consistency with the JavaScript version — not C# events. Subscribe with `.On(handler)` and unsubscribe with `.Off(handler)`. Console code hooks events on the `ScoreRenderer`; UI controls expose the same events through their `Api` property:
+
+```csharp
+control.Api.PlayedBeatChanged.On(beat =>
+{
+    UpdateFretboard(beat);
+});
+```
+
+The [API reference](/docs/reference/api) lists every event alphaTab exposes.
+
+## API
+
+The high-level API is available on UI controls through the `Api` property. Use it to load scores, drive playback, and query state:
+
+```csharp
+control.Api.Tex("\\title \"Hello alphaTab\" . 3.3*4");
+control.Api.PlayPause();
+```
+
+Console code operates one layer below the API — directly on `ScoreLoader`, `ScoreRenderer`, and the model classes. See the [full API reference](/docs/reference/api) for both surfaces.

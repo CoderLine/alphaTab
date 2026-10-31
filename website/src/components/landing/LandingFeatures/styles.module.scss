@@ -1,0 +1,84 @@
+@use '../breakpoints' as *;
+@use '../section' as *;
+
+.section {
+  border-bottom: 1px solid var(--at-line);
+  background: var(--at-bg);
+  @include section-tokens;
+}
+
+.inner {
+  @include section-container;
+  padding-top: var(--section-pad-y);
+  padding-bottom: var(--section-pad-y);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--at-line);
+  border: 1px solid var(--at-line);
+  border-radius: 14px;
+  overflow: hidden;
+
+  @include tablet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @include mobile { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--at-surface);
+  padding: 28px 28px 24px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  @include mobile { padding: 22px 22px 20px; }
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cardNum {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+}
+
+.cardRule {
+  flex: 1;
+  height: 1px;
+  background: var(--at-line);
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.3px;
+  color: var(--at-ink);
+
+  @include mobile { font-size: 16.5px; }
+}
+
+.cardBody {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--at-ink-soft);
+  margin: 8px 0 18px;
+  text-wrap: pretty;
+
+  @include mobile { font-size: 13.5px; }
+}
+
+.cardVisual {
+  margin-top: auto;
+  border-top: 1px solid var(--at-line-soft);
+  padding-top: 14px;
+  min-height: 100px;
+  overflow: hidden;
+}

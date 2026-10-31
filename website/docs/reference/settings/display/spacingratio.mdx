@@ -1,0 +1,40 @@
+---
+title: display.spacingRatio
+sidebar_label: spacingRatio
+sidebar_custom_props:
+  jsOnParent: true
+  category: Display
+  since: 1.9.0
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature, PropertyDescription } from '@site/src/reference-commons'
+
+<SinceBadge since="1.9.0" />
+<PropertyDescription showJson={true} />
+The proportional spacing ratio between successive note durations. Controls the *shape* of the horizontal spacing curve - how much wider a note of duration `2d` is rendered relative to a note of duration `d`.
+AlphaTab uses a power-law spacing model (the same approach used by Dorico, MuseScore and Finale): doubling the note duration multiplies its
+allocated horizontal space by `spacingRatio`.
+
+Reference values for cross-application comparison:
+
+| Application / Style        | Ratio                | Character                          |
+|----------------------------|----------------------|------------------------------------|
+| Dorico default             | √2 ≈ 1.414           | Tight, efficient, orchestral       |
+| MuseScore default          | 1.5                  | Balanced, general-purpose          |
+| Finale default (Fibonacci) | φ ≈ 1.618            | Loose, traditional engraving       |
+
+AlphaTab defaults to `√2` (Dorico's value). This produces tighter spacing at long
+durations than the alternatives, which matters for guitar tablature where rest bars and
+whole notes are common - looser ratios make those bars dominate system width.
+
+This setting is orthogonal to <Signature style="inline" js={[["identifier","stretchForce","/docs/reference/settings/display/stretchforce"]]}>stretchForce</Signature> : `spacingRatio` controls the *shape* of the spacing (proportions between durations),
+`stretchForce` controls the overall *density* (how tightly or loosely the music is packed). Both can be adjusted independently.
+
+Values are clamped to the range `[1.2, 2.0]`. A value of `1.0` would produce equal spacing for all durations and is rejected.
+
+<Signature style="block"
+           js={[["identifier","spacingRatio"],["token",":"],["whitespace"," "],["identifier","number"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","`Math.SQRT2` (≈ 1.414, matches Dorico's default)"],["token",";"]]}
+           csharp={[["identifier","double"],["whitespace"," "],["identifier","SpacingRatio"],["whitespace"," "],["token","{"],["whitespace"," "],["keyword","get"],["token",";"],["whitespace"," "],["keyword","set"],["token",";"],["whitespace"," "],["token","}"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","`Math.SQRT2` (≈ 1.414, matches Dorico's default)"]]}
+           kotlin={[["keyword","var"],["whitespace"," "],["identifier","spacingRatio"],["token",":"],["whitespace"," "],["identifier","Double"],["whitespace"," "],["token","="],["whitespace"," "],["identifier","`Math.SQRT2` (≈ 1.414, matches Dorico's default)"]]}
+/>
+

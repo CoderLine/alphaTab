@@ -1,0 +1,97 @@
+---
+title: "Export MIDI"
+description: "Write a Standard MIDI File from the loaded score — the browser one-liner and the cross-platform pipeline in one page."
+sidebar_custom_props:
+  since: "1.3"
+  feature_chapter: midi
+  feature_order: 10
+keywords:
+  - alphaTab
+  - MIDI
+  - SMF
+  - export
+  - download
+---
+
+import { MidiExporterDemo } from '@site/src/components/MidiExporterDemo';
+
+Hand the score to a DAW so a producer can layer a professional sampler on top. Drive an external hardware synth from a rendered `.mid`. Ship rehearsal tracks to a music-notation tool that speaks MIDI. alphaTab writes Standard MIDI File 1.0 output from any loaded score — tempo map, time signatures, program changes, note on/off with expression and pitch bend all come out of the same `MidiFileGenerator` that drives the built-in synth.
+
+<MidiExporterDemo showCode={false} />
+
+## Browser one-liner
+
+On Web, `AlphaTabApi.downloadMidi(format?)` builds the file and triggers a browser download in a single call:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = document.querySelector('#alphaTab');
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on(() => {
+  api.downloadMidi();
+});
+```
+
+The download uses `<score.title>.mid` as the filename, falling back to `File.mid` when the score has no title.
+
+## Programmatic pipeline
+
+For server-side rendering, .NET, Android, or any flow where you want the bytes without a download, build the pipeline yourself:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on(() => {
+  const midiFile = new alphaTab.midi.MidiFile();
+  midiFile.format = alphaTab.midi.MidiFileFormat.MultiTrack;
+
+  const handler = new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile, true);
+  const generator = new alphaTab.midi.MidiFileGenerator(
+    api.score,
+    api.settings,
+    handler
+  );
+  generator.generate();
+
+  const bytes = midiFile.toBinary();
+  // bytes is a Uint8Array holding a valid SMF 1.0 file
+});
+```
+
+`getAlphaTabContainer()` is the platform-specific render target. `bytes` is a `Uint8Array` on every runtime. Persist it, ship it over the network, or hand it to a native audio subsystem.
+
+## Two file formats
+
+`MidiFileFormat` picks the container layout SMF 1.0 defines:
+
+- `SingleTrackMultiChannel` (SMF Type 0) — every event in one merged track, tracks distinguished by MIDI channel. Compact and the default for `downloadMidi()`.
+- `MultiTrack` (SMF Type 1) — one MIDI track per alphaTab track, all sharing a common time base. Preserves per-track structure when you import the file into a DAW.
+
+Pick `MultiTrack` when the target opens the file in a multi-track editor. Pick `SingleTrackMultiChannel` for simple playback tools that expect Type 0.
+
+## SMF 1.0 caveats
+
+Standard MIDI File 1.0 has no per-note pitch bend. Where the score assigns independent bends to notes on the same channel — two simultaneous strings bending at different rates, vibrato layered on top of a whole-step bend — the exporter merges them into a single channel-wide pitch-bend curve. The audible result approximates the notation; the fine detail available in alphaTab's own synth does not survive the export.
+
+The generator also reads `settings.notation.transpositionPitches` when emitting events. If you export for playback in an external tool that applies its own transposition, disable that step:
+
+```js
+generator.applyTranspositionPitches = false;
+generator.generate();
+```
+
+## Where to look next
+
+- [Export audio to WAV](export-audio-to-wav) — render synthesized audio instead of MIDI events.
+- [MIDI event stream](/docs/features/play-sync/midi-event-stream) — subscribe to the same events at play time instead of writing them to a file.
+- [`AlphaTabApi.downloadMidi`](/docs/reference/api/downloadmidi) in the API reference.
+- [`MidiFile`](/docs/reference/types/midi/midifile), [`MidiFileGenerator`](/docs/reference/types/midi/midifilegenerator), and [`MidiFileFormat`](/docs/reference/types/midi/midifileformat) in the API reference.

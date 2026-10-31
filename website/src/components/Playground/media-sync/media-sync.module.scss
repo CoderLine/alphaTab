@@ -1,0 +1,451 @@
+.root {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--at-surface);
+}
+
+.header {
+  flex-wrap: wrap;
+  row-gap: 6px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.toolbar {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  min-width: 0;
+  order: 0;
+  margin-left: 8px;
+}
+
+// Narrow drawers put the toolbar on its own row below the title and close button.
+@container (max-width: 980px) {
+  .toolbar {
+    order: 10;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--at-line);
+}
+
+.spacer { flex: 1; }
+
+.count {
+  font-family: var(--at-font-mono);
+  font-size: 10.5px;
+  color: var(--at-muted);
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: color-mix(in srgb, var(--at-danger) 10%, var(--at-surface));
+  color: var(--at-danger);
+  font-size: 12px;
+
+  button {
+    margin-left: auto;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--at-muted);
+
+  p { margin: 0; max-width: 60ch; }
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.emptyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--at-line);
+  border-radius: 8px;
+  background: var(--at-surface);
+  color: var(--at-ink);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+
+  &:hover { border-color: var(--at-accent); color: var(--at-accent); }
+}
+
+// ─── Timeline ───────────────────────────────────────────────────────
+.scroller {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--at-surface-alt);
+}
+
+.content {
+  position: relative;
+  height: 100%;
+}
+
+.canvas {
+  position: sticky;
+  left: 0;
+  display: block;
+  pointer-events: none;
+}
+
+.lane {
+  position: absolute;
+  inset: 20px 0 0 0;
+  cursor: text;
+  touch-action: pan-x;
+}
+
+.marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 13px;
+  margin-left: -6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: ew-resize;
+  touch-action: none;
+  display: flex;
+  justify-content: center;
+  will-change: transform;
+
+  &:focus { outline: none; }
+}
+
+.markerLine {
+  position: absolute;
+  bottom: 0;
+  left: 6px;
+  width: 1px;
+  background: var(--at-muted);
+  opacity: 0.55;
+}
+
+.markerBeat .markerLine { height: 18%; opacity: 0.35; }
+.markerBar .markerLine { height: 42%; }
+
+.markerSync {
+  z-index: 2;
+
+  .markerLine {
+    top: 0;
+    width: 2px;
+    left: 5.5px;
+    background: var(--at-accent);
+    opacity: 1;
+  }
+}
+
+.markerLabel {
+  position: absolute;
+  bottom: 2px;
+  left: 9px;
+  font-family: var(--at-font-mono);
+  font-size: 9.5px;
+  line-height: 1;
+  color: var(--at-muted);
+  white-space: nowrap;
+  pointer-events: none;
+
+  .markerSync & {
+    top: 3px;
+    bottom: auto;
+    left: 1px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: var(--at-accent);
+    color: var(--at-accent-ink);
+    font-weight: 600;
+  }
+}
+
+.markerStart .markerLabel,
+.markerEnd .markerLabel { opacity: 0.85; }
+
+.markerEnd .markerLabel {
+  .markerSync & { left: auto; right: 7px; }
+}
+
+.markerSelected {
+  z-index: 3;
+
+  .markerLine {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--at-accent) 35%, transparent);
+    opacity: 1;
+  }
+
+  &:focus-visible .markerLabel,
+  &:focus-visible .markerLine {
+    outline: 2px solid var(--at-ink);
+    outline-offset: 1px;
+  }
+}
+
+.markerDragging {
+  z-index: 4;
+  cursor: grabbing;
+
+  .markerLabel { box-shadow: var(--at-shadow-md); }
+}
+
+.playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--at-danger);
+  pointer-events: none;
+  z-index: 5;
+  will-change: transform;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -4px;
+    border: 5px solid transparent;
+    border-top-color: var(--at-danger);
+  }
+}
+
+.hints {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 7px 14px;
+  border-top: 1px solid var(--at-line);
+  font-size: 11px;
+  color: var(--at-muted);
+
+  kbd {
+    font-family: var(--at-font-mono);
+    font-size: 10px;
+    padding: 0 4px;
+    border: 1px solid var(--at-line);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: var(--at-surface);
+    color: var(--at-ink-soft);
+    box-shadow: none;
+  }
+}
+
+.hintFile {
+  margin-left: auto;
+  font-family: var(--at-font-mono);
+}
+
+// ─── Dialogs ────────────────────────────────────────────────────────
+.dialogForm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dialogLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--at-ink);
+}
+
+.dialogInput {
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--at-line);
+  border-radius: 8px;
+  background: var(--at-surface);
+  color: var(--at-ink);
+  font: inherit;
+  font-weight: 400;
+
+  &:focus-visible {
+    outline: 2px solid var(--at-accent);
+    border-color: transparent;
+  }
+
+  &[aria-invalid='true'] { border-color: var(--at-danger); }
+}
+
+.dialogError {
+  font-size: 11.5px;
+  color: var(--at-danger);
+}
+
+.privacy {
+  margin: 6px 0 0 !important;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--at-surface-alt);
+  font-size: 11.5px;
+  color: var(--at-muted);
+}
+
+.dialogBtn,
+.dialogBtnPrimary {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--at-line);
+  background: var(--at-surface);
+  color: var(--at-ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.dialogBtnPrimary {
+  border-color: var(--at-accent);
+  background: var(--at-accent);
+  color: var(--at-accent-ink);
+}
+
+.code {
+  margin: 14px 0 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--at-code-surface);
+}
+
+.codeHeader {
+  display: flex;
+  align-items: center;
+  padding: 7px 10px 7px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-syntax-punctuation);
+}
+
+.codeCopy {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  background: none;
+  color: var(--at-syntax-plain);
+  font: inherit;
+  cursor: pointer;
+
+  &:hover { border-color: var(--at-accent); }
+}
+
+.codeBody {
+  margin: 0;
+  max-height: 260px;
+  overflow: auto;
+  padding: 12px 14px;
+  background: transparent;
+  color: var(--at-syntax-plain);
+  font-family: var(--at-font-mono);
+  font-size: 11.5px;
+  line-height: 1.6;
+  border-radius: 0;
+}
+
+// ─── YouTube dock ───────────────────────────────────────────────────
+.videoDock {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 15;
+  width: min(360px, 45%);
+  border: 1px solid var(--at-line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: var(--at-shadow-lg);
+}
+
+.videoDockCollapsed {
+  width: auto;
+
+  .videoFrame { display: none; }
+}
+
+.videoBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 4px 4px 10px;
+  background: var(--at-surface);
+  border-bottom: 1px solid var(--at-line);
+  font-family: var(--at-font-mono);
+  font-size: 10.5px;
+  color: var(--at-muted);
+}
+
+.videoFrame {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  > div { width: 100%; height: 100%; }
+}

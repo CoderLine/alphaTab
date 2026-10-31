@@ -1,0 +1,110 @@
+---
+title: "Count-in and metronome"
+description: "One bar of clicks before playback, metronome during playback."
+sidebar_custom_props:
+  feature_chapter: feel
+  feature_order: 10
+keywords:
+  - alphaTab
+  - metronome
+  - count-in
+  - pick-up bar
+  - anacrusis
+---
+
+import { CountInMetronomeDemo } from '@site/src/components/PlaySync';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Ship the click a bandmate would give you. Before the song starts, the count-in taps out one bar so the reader locks into the tempo; during playback, the metronome keeps clicking on every beat. Both are staples of any practice tool worth shipping.
+
+<CountInMetronomeDemo
+  tex={Riffs.STEADY_PULSE}
+  showCode={false}
+/>
+
+Hit play with the count-in enabled and the state readout flips to `Count-in bar` for one bar before advancing to `Playing`. The `Restart from top` button stops and re-plays without waiting for the song to end, so the lead-in fires again.
+
+## The two toggles
+
+alphaTab treats both clicks as monitoring channels rather than settings — flip them on by raising their volume above zero.
+
+- `api.metronomeVolume` — the click that runs during playback. `0` mutes it (the default). `1` matches the master output; typical values sit between `0.3` and `0.8`.
+- `api.countInVolume` — the one-bar lead-in before the transport actually starts. Also defaults to `0`. When non-zero, alphaTab inserts a count of the loaded bar's time signature before playback begins, then hands off to the score.
+
+Both are floats in the `[0, 1]` range and can change at runtime. Wire them to a practice-mode toggle, a beginner switch, or a slider in your UI.
+
+## Detecting the count-in
+
+While the count-in is playing, `playerPositionChanged` reports a negative `currentTick`. The score's tick `0` is the first note of bar 1, so the count-in bar runs from a negative tick up to `0`. A UI can hide the playback cursor or show a "Count-in" badge during that window:
+
+```js
+api.playerPositionChanged.on((args) => {
+  const isCountIn = args.currentTick < 0;
+  document.body.classList.toggle('is-count-in', isCountIn);
+});
+```
+
+`playerStateChanged` still fires with `state = Playing` for the count-in; the negative-tick check is what distinguishes the lead-in from the song itself.
+
+## Pick-up bars *(new in 1.9)* {#pick-up-bars}
+
+A pick-up bar (anacrusis) is shorter than its time signature, for example [`\ac`](/docs/alphatex/bar-metadata#ac) in alphaTex or an implicit measure in MusicXML. alphaTab treats it as the end of a full bar and aligns beaming and playback to the real beats of the meter.
+
+<CountInMetronomeDemo
+  tex={`\\ts (2 4)
+\\ac C4.8 D4.8 E4.8 |
+F4.4 G4.4 |
+A4.8 B4.8 C5.8 D5.8 |
+C4.2`}
+  showCode={false}
+/>
+
+```
+\ts (2 4)
+\ac C4.8 D4.8 E4.8 |
+F4.4 G4.4 |
+A4.8 B4.8 C5.8 D5.8 |
+C4.2
+```
+
+The pick-up holds the last three eighths of a 2/4 bar: C sits on the off-beat of beat 1, D and E on beat 2.
+
+- Metronome: clicks fall on the beats of the time signature inside the pick-up. The first click sounds with D, not with the first note.
+- Beaming and triplet feel: groups follow the same beat grid. C keeps its own flag, D and E are beamed together as beat 2. [Triplet feel](triplet-feel-swing) pairs the eighths on that grid too.
+- Count-in: counts one full bar and continues until the beat playback starts on. Here you hear 1, 2, 1, C enters on the off-beat that follows, and D falls on beat 2. The same applies when you start playback in the middle of a bar.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
+  },
+});
+
+// Enable the metronome at half volume during playback.
+api.metronomeVolume = 0.5;
+
+// Give the reader a one-bar count-in before the track starts.
+api.countInVolume = 0.7;
+
+api.playPause();
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Reacting to each click
+
+Every metronome tick fires through `midiEventsPlayed` as an `AlphaTabMetronomeEvent`. Subscribe if you want a visual flash, a haptic pulse on mobile, or a beat counter overlay. See [The MIDI event stream](midi-event-stream) for the subscription pattern.
+
+## Where to look next
+
+- [Master and monitoring volumes](master-and-monitoring-volumes) — the mixer view of the same two volumes plus `masterVolume`.
+- [The MIDI event stream](midi-event-stream) — subscribe to `AlphaTabMetronomeEvent` for per-click hooks.
+- [`api.metronomeVolume`](/docs/reference/api/metronomevolume) and [`api.countInVolume`](/docs/reference/api/countinvolume) in the reference.
+- [`AlphaTabMetronomeEvent`](/docs/reference/types/midi/alphatabmetronomeevent) — the per-click event shape emitted through `midiEventsPlayed`.

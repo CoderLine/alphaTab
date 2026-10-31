@@ -1,0 +1,51 @@
+---
+title: Render
+description: How alphaTab lays out and draws music notation — layouts, backends, notation types, engraving details, and styling.
+keywords:
+  - alphaTab
+  - render
+  - engraving
+  - layout
+  - SVG
+  - Canvas
+  - Skia
+  - SMuFL
+  - Bravura
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
+import chapters from './_chapters';
+
+The render engine walks the score model, applies traditional music-engraving rules, and draws the result through a pluggable canvas backend. alphaTab uses the [Bravura](https://github.com/steinbergmedia/bravura) SMuFL font for every glyph and re-flows the score when the container it lives in changes size.
+
+Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
+
+{chapters.map((chapter) => (
+  <section key={chapter.id}>
+    <h2 id={chapter.anchor ?? chapter.id}>{chapter.label}</h2>
+    {chapter.description ? <p>{chapter.description}</p> : null}
+    <FeatureChapterGrid
+      group="render"
+      chapter={chapter.id}
+      defaultAccent={chapter.defaultAccent}
+    />
+  </section>
+))}
+
+## See it live {#demo}
+
+The layout and stylesheet settings above compose freely. Try switching them live on the [playground](/playground):
+
+<AlphaTab tex={true} settings={{ display: { layoutMode: 'page' } }}>{Riffs.FOLK_ARPEGGIO}</AlphaTab>
+
+## Adding a feature card {#adding-a-card}
+
+Each card on this page comes from an `.mdx` file in this directory. Two kinds are supported:
+
+- **Highlight page** — a full page with prose (e.g. [Per-element colors](/docs/features/render/per-element-colors)). Add `sidebar_custom_props.feature_chapter: <chapter-id>` to its frontmatter and it appears as a card. The card links to the page.
+- **External-link stub** — a `.mdx` file that only exists to source a card. Set `unlisted: true` and `sidebar_custom_props.feature_external_link: <url>`. The card links to that URL and the stub is hidden from the sidebar.
+
+Chapters are defined in [`_chapters.ts`](https://github.com/CoderLine/alphaTabWebsite/blob/main/docs/features/render/_chapters.ts) — add a new entry there to introduce a new H2 section. Full frontmatter schema lives in the [`FeatureChapterGrid` component source](https://github.com/CoderLine/alphaTabWebsite/blob/main/src/components/FeatureChapterGrid/index.tsx).

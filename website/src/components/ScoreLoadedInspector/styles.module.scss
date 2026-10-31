@@ -1,0 +1,75 @@
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.panel {
+  padding: 0.75rem 1rem;
+  background: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 0.375rem;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+
+  h4 {
+    margin: 0;
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ifm-color-emphasis-700);
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.4rem 1rem;
+  font-size: 0.9em;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.label {
+  font-size: 0.75em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.value {
+  font-weight: 600;
+}
+
+.tracks {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.85em;
+
+  li {
+    padding: 0.15rem 0;
+  }
+}
+
+.staff {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.85em;
+}
+
+.placeholder {
+  margin: 0;
+  color: var(--ifm-color-emphasis-500);
+  font-size: 0.9em;
+  font-style: italic;
+}

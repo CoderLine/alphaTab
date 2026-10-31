@@ -1,0 +1,44 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    audio {
+        width: 100%;
+        color-scheme: light dark;
+        border-radius: 6px;
+        background: var(--ifm-background-surface-color);
+    }
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+
+    label {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        user-select: none;
+    }
+}
+
+.badge {
+    padding: 0.15rem 0.55rem;
+    border-radius: 4px;
+    background: var(--ifm-color-emphasis-100);
+    color: var(--ifm-color-emphasis-800);
+    font-size: 0.85rem;
+}
+
+[data-theme="dark"] .wrapper audio {
+    color-scheme: dark;
+}
+
+[data-theme="light"] .wrapper audio {
+    color-scheme: light;
+}

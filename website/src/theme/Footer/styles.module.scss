@@ -1,0 +1,134 @@
+@use '../../components/landing/breakpoints' as *;
+
+.footer {
+  background: var(--at-surface);
+  border-top: 1px solid var(--at-line);
+  color: var(--at-ink-soft);
+}
+
+.inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 64px 40px 28px;
+
+  @include not-desktop { padding: 48px 28px 24px; }
+  @include mobile { padding: 48px 16px 24px; }
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 56px;
+
+  @include not-desktop {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-bottom: 36px;
+  }
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--at-ink);
+
+  @include not-desktop {
+    gap: 12px;
+  }
+}
+
+.tagline {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--at-muted);
+  max-width: 320px;
+}
+
+.linkGrid {
+  display: contents;
+
+  @include not-desktop {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px 16px;
+  }
+}
+
+.col {
+  min-width: 0;
+}
+
+.colTitle {
+  font-family: var(--at-font-mono);
+  font-size: 11px;
+  color: var(--at-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.item {
+  font-size: 13px;
+  color: var(--at-ink-soft);
+}
+
+.link {
+  color: var(--at-ink-soft);
+  text-decoration: none;
+  transition: color 120ms ease;
+
+  &:hover {
+    color: var(--at-ink);
+    text-decoration: none;
+  }
+}
+
+.bottom {
+  padding-top: 20px;
+  border-top: 1px solid var(--at-line);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--at-muted);
+
+  @include mobile {
+    padding-top: 16px;
+    gap: 10px;
+  }
+}
+
+.copyright {
+  color: var(--at-muted);
+
+  // The configured copyright string is already a separator-joined sentence
+  // like "© 2010—2026 ... · MPL-2.0 · v1.8.1" — render it as-is.
+}
+
+.bottomSpacer {
+  flex: 1;
+}
+
+.version {
+  font-family: var(--at-font-mono);
+  color: var(--at-muted);
+}

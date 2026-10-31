@@ -1,0 +1,30 @@
+---
+title: Extend
+description: Push alphaTab beyond its defaults — build scores in code, mutate the loaded model, wire your own bundler and workers, and embed the engine in a native UI framework.
+keywords:
+  - alphaTab
+  - extend
+  - customization
+  - model
+  - workers
+  - hosting
+---
+
+import { FeatureChapterGrid } from '@site/src/components/FeatureChapterGrid';
+import chapters from './_chapters';
+
+alphaTab is designed to be embedded. When the shipped defaults are not enough, you can build scores in code, walk and mutate the loaded model, wire the worker and worklet into your own bundler, or host the engine in a native UI framework it does not already know about.
+
+Every capability below is available on Web, .NET, and Android unless a card names specific platforms. Follow any card into the [reference](/docs/reference/api/) for the exact signature.
+
+{chapters.map((chapter) => (
+  <section key={chapter.id}>
+    <h2 id={chapter.anchor ?? chapter.id}>{chapter.label}</h2>
+    {chapter.description ? <p>{chapter.description}</p> : null}
+    <FeatureChapterGrid
+      group="extend"
+      chapter={chapter.id}
+      defaultAccent={chapter.defaultAccent}
+    />
+  </section>
+))}

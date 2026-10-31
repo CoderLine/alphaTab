@@ -1,0 +1,26 @@
+// Breakpoints — mapped from the design's three artboards (1440 / 820 / 390)
+// to web-realistic ranges that cover phones, tablets and desktops.
+//
+// Mobile  ≤ 640  covers phones (390 artboard) in both portrait and landscape
+// Tablet  641 – 1023  covers iPad portrait, small tablets (820 artboard)
+// Desktop ≥ 1024  covers laptops and desktops (1440 artboard)
+//
+// The Docusaurus navbar collapses to a hamburger at < 996 by default, so the
+// tablet range overlaps the hamburger range — acceptable, since the hamburger
+// drawer is a reasonable substitute for the design's condensed tablet nav.
+
+@mixin mobile {
+  @media (max-width: 640px) { @content; }
+}
+
+@mixin tablet {
+  @media (min-width: 641px) and (max-width: 1023px) { @content; }
+}
+
+@mixin not-desktop {
+  @media (max-width: 1023px) { @content; }
+}
+
+@mixin desktop {
+  @media (min-width: 1024px) { @content; }
+}

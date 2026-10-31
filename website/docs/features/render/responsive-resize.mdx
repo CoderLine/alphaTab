@@ -1,0 +1,53 @@
+---
+title: "Responsive resize"
+description: "ResizeObserver, triggerResize(), resize event."
+sidebar_custom_props:
+  feature_chapter: layout
+  feature_order: 60
+keywords:
+  - alphaTab
+  - resize
+  - responsive
+---
+
+import { ResponsiveResizeDemo } from '@site/src/components/ResponsiveResizeDemo';
+
+alphaTab watches its container and reflows the score whenever the width changes. This is what lets a resizable panel in a DAW, a two-pane editor where the score share of the width changes as the user drags a splitter, or a responsive page layout stay in sync with the container it lives in — no manual re-render call needed. Drag the right edge of the demo below and watch the score re-paginate without a page reload.
+
+<ResponsiveResizeDemo showCode={false} />
+
+## How the reflow happens
+
+- On Web, alphaTab attaches a `ResizeObserver` to the render container. When the observer fires and the width changed meaningfully, alphaTab reruns layout and repaints. No user code is needed for the default responsive behavior.
+- On .NET and Android the platform hosting control drives the same pipeline through the layout system's size-change callbacks.
+- The `resize` event fires immediately before the re-render. Its `ResizeEventArgs` carries `oldWidth`, `newWidth`, and a mutable `settings` object — mutate `settings.display.*` in the handler to change scale, layout mode, or spacing as a function of width.
+
+Call `api.triggerResize()` when you resize the container programmatically and the platform's automatic detection did not pick it up — for example after toggling a sidebar with a CSS transition, or after switching a flex layout that leaves the width identical for one frame.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.resize.on((args) => {
+  args.settings.display.scale =
+    args.newWidth > 1300 ? 1.5 : args.newWidth > 800 ? 1.2 : 1.0;
+});
+
+// After a manual layout change that the ResizeObserver missed
+document.getElementById('toggle-sidebar').addEventListener('click', () => {
+  api.triggerResize();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Zoom and scale](./zoom-and-scale) — the scale knob you'll most often tune from a `resize` handler.
+- [`resize`](/docs/reference/api/resize) event and [`ResizeEventArgs`](/docs/reference/types/resizeeventargs) reference entries.

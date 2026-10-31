@@ -1,0 +1,56 @@
+---
+title: "Skia rendering (.NET / Android)"
+description: "Native rendering via alphaSkia."
+sidebar_custom_props:
+  feature_chapter: backends
+  feature_order: 30
+keywords:
+  - alphaTab
+  - Skia
+  - native
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Skia is the default rendering engine on .NET and Android — reach for it when building a WPF or MAUI desktop app, an Android app hosting `AlphaTabView`, or any pipeline where you need PNG bytes off a native runtime. alphaTab renders through [alphaSkia](https://github.com/CoderLine/alphaSkia), a thin wrapper around Google's [Skia](https://skia.org/) library, so the same score produces identical glyph metrics across Windows, macOS, Linux, and Android.
+
+The preview below is a browser-side SVG rendering; the code snippet configures the exact same pipeline on .NET or Android, where Skia takes over and produces raster output.
+
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{Riffs.PACHELBEL_CANON}</AlphaTab>
+
+## What Skia gets you
+
+- **Native raster on every non-web target.** Skia is the default engine on .NET and Android, so leaving `engine` unset already picks it. Setting it explicitly makes intent clear.
+- **Consistent output across platforms.** The same score renders identically on WPF, MAUI, and Android — no more platform-specific font hinting differences.
+- **PNG export.** The alphaSkia canvas exposes `toPng()`, which is what powers the [Node.js headless rendering](nodejs-headless-rendering) workflow.
+- **Custom font support.** Register `.ttf` / `.otf` files with `Environment.registerAlphaSkiaCustomFont` and use them in `display.resources`. See [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia).
+
+Skia is not available on the Web runtime. If you request `engine: 'skia'` from a browser context, alphaTab falls back to the platform default (SVG).
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/song.gp',
+    engine: 'skia',
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — an `AlphaTab` control on .NET or an `AlphaTabView` on Android. On desktop .NET you typically embed the WPF or WinForms control; on Android you place `AlphaTabView` in a layout.
+
+For a Node.js pipeline that renders to PNG on the server, see [Node.js headless rendering](nodejs-headless-rendering).
+
+## Where to look next
+
+- [Node.js headless rendering](nodejs-headless-rendering) — Skia in a Node.js pipeline.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — register `.ttf` / `.otf` files.
+- [Choosing a backend](choosing-a-backend) — side-by-side comparison.
+- [`core.engine`](/docs/reference/settings/core/engine) in the settings reference.
+- [alphaSkia on GitHub](https://github.com/CoderLine/alphaSkia) — the underlying library.

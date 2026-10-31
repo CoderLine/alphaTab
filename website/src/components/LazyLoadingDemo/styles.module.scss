@@ -1,0 +1,31 @@
+.wrapper {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 90%;
+}
+
+.pills {
+  margin: 0;
+}
+
+.counter {
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+  background: var(--ifm-background-surface-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.scroller {
+  max-height: 480px;
+  overflow: auto;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 4px;
+}

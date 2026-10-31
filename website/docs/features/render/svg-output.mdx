@@ -1,0 +1,53 @@
+---
+title: "SVG rendering"
+description: "Vector output, scaling, print, when to reach for it."
+sidebar_custom_props:
+  feature_chapter: backends
+  feature_order: 10
+keywords:
+  - alphaTab
+  - SVG
+  - rendering
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+Render every glyph, staff line, and beam as SVG geometry. Reach for SVG when the score has to survive scaling and print — a hit-testable notation view that responds to clicks on individual notes, a print-preview page that generates a PDF from the DOM, or an embed inside a page whose readers zoom in for detail.
+
+<AlphaTab tex={true} settings={{ core: { engine: 'svg' } }}>{Riffs.GREENSLEEVES}</AlphaTab>
+
+## When SVG is the right pick
+
+SVG is the default backend on Web and the recommended output whenever the render target has to survive scaling or printing:
+
+- **Scales without loss.** Zoom or export at any DPI; the glyph outlines stay crisp.
+- **Prints cleanly.** Browsers rasterize SVG at printer resolution, so bar lines and note heads land pixel-accurate on paper.
+- **Hit-testable.** Each rendered element sits in the DOM, so custom overlays and DOM queries work directly against the score geometry.
+- **Available on every platform.** SVG runs the same on Web, .NET, and Android — pass `engine: 'svg'` anywhere and get identical output.
+
+The trade-off is throughput. On very dense scores (hundreds of bars in a single view) the DOM grows large and layout thrash can appear during scroll. For that case, reach for [HTML5 Canvas](html5-canvas) on Web or [Skia](skia-backend) on .NET / Android.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/song.gp',
+    engine: 'svg',
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [HTML5 Canvas](html5-canvas) — Web-only raster alternative for dense scores.
+- [Skia rendering (.NET / Android)](skia-backend) — native raster on non-web runtimes.
+- [Choosing a backend](choosing-a-backend) — side-by-side comparison.
+- [`core.engine`](/docs/reference/settings/core/engine) in the settings reference.

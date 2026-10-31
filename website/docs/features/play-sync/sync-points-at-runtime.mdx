@@ -1,0 +1,77 @@
+---
+title: "Sync points at runtime"
+description: "Attach or refresh backing-track sync points from code with FlatSyncPoint entries and api.updateSyncPoints()."
+sidebar_custom_props:
+  feature_chapter: sync
+  feature_order: 30
+keywords:
+  - alphaTab
+  - sync points
+  - FlatSyncPoint
+  - runtime
+---
+
+import { SyncPointsRuntimeDemo } from '@site/src/components/SyncPointsRuntimeDemo';
+
+Aligning a backing track to a score means putting a timestamp on each barline. The [Media Sync Editor](/docs/guides/media-sync-editor) is where that authoring workflow lives — load a waveform, tap the bar positions, export the resulting list of anchor points. Once you have that list (either from the editor or from your own UI), this page shows how to push it into a live alphaTab instance so playback follows the audio.
+
+The demo below loads Bach's Prelude in D Minor (BWV 999) against its audio recording and lets you flip between two sync-point layouts at runtime. "Linear" stretches the 4 bars evenly across the audio; "back-loaded" spends 70% of the audio on the first two bars and rushes through the last two. Press play and toggle — the cursor re-aligns without a reload because `api.updateSyncPoints()` refreshes the mapping on the running instance.
+
+<SyncPointsRuntimeDemo />
+
+:::info Author sync points in the editor
+Building a full waveform-and-drag-handle editor from scratch rivals what the [Media Sync Editor](/docs/guides/media-sync-editor) already offers. The right workflow is: author sync points in the editor (or copy the exported list into your source), then use the runtime API below to load or refresh them on the running instance.
+:::
+
+## The data shape
+
+Each sync point lives on `MasterBar.syncPoints` as an `Automation` whose `type` is `AutomationType.SyncPoint`, with the timestamp on the automation's `value`. For serialization and programmatic construction, use the flat form (`FlatSyncPoint`), which flattens that model into a plain object with four fields:
+
+- **`barIndex`** — the index of the target masterbar in `score.masterBars`.
+- **`barPosition`** — a `0..1` ratio inside the bar. `0` is the downbeat, `0.5` is the halfway point, `1` is the next barline.
+- **`barOccurence`** — the repeat count this sync point applies to (`0` for the first pass, `1` for the second pass through the same bar after a repeat).
+- **`millisecondOffset`** — the audio timestamp in milliseconds this point maps to.
+
+The `Score` model has two helpers for this shape: `applyFlatSyncPoints(list)` replaces every sync point on every masterbar with the entries you provide, and `exportFlatSyncPoints()` returns the reverse.
+
+## Refreshing after edits
+
+After applying the list, call `api.updateSyncPoints()` to regenerate the internal midi-time mapping. Without that call, alphaTab keeps using the sync points that existed at load time.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledBackingTrack,
+    soundFont: '/soundfont/sonivox.sf2',
+  },
+});
+
+api.scoreLoaded.on((score) => {
+  const points = [
+    { barIndex: 0, barPosition: 0, barOccurence: 0, millisecondOffset: 0 },
+    { barIndex: 0, barPosition: 0, barOccurence: 0, millisecondOffset: 1500 },
+    { barIndex: 1, barPosition: 0, barOccurence: 0, millisecondOffset: 4075 },
+    { barIndex: 2, barPosition: 0, barOccurence: 0, millisecondOffset: 6475 },
+    { barIndex: 3, barPosition: 0, barOccurence: 0, millisecondOffset: 10223 },
+  ];
+
+  score.applyFlatSyncPoints(points);
+  api.updateSyncPoints();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Where to look next
+
+- [Backing-track audio](backing-track-audio) — the mode that consumes sync points.
+- [Video sync](video-sync) — the external-media variant that also relies on sync points.
+- [Media Sync Editor](/docs/guides/media-sync-editor) — the interactive editor that produces `FlatSyncPoint` lists against a waveform.
+- [`api.updateSyncPoints`](/docs/reference/api/updatesyncpoints) — the refresh call in the reference.
+- [`FlatSyncPoint`](/docs/reference/types/model/flatsyncpoint), [`SyncPointData`](/docs/reference/types/model/syncpointdata), and [`Automation`](/docs/reference/types/model/automation) in the model reference.

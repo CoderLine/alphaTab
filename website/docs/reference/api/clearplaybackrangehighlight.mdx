@@ -1,0 +1,50 @@
+---
+title: clearPlaybackRangeHighlight
+sidebar_custom_props:
+  kind: method
+  category: Methods - Player
+  since: 1.8.0
+---
+
+import { Tabs, TabItem, CodeBadge, SinceBadge, DynHeading, Link, Signature } from '@site/src/reference-commons'
+
+<SinceBadge since="1.8.0" />
+Clears the highlight markers marking the currently selected playback range. Unlike actually setting <Signature style="inline" js={[["identifier","playbackRange","/docs/reference/types/alphatabapibase/#playbackrange"]]}>playbackRange</Signature>  this method only clears the selection markers without actually
+changing the playback range. This method can be used when building custom selection systems (e.g. having draggable handles).
+
+<Signature style="block"
+           js={[["identifier","clearPlaybackRangeHighlight"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","void"]]}
+           csharp={[["keyword","void"],["whitespace"," "],["identifier","ClearPlaybackRangeHighlight"],["token","("],["token",")"]]}
+           kotlin={[["identifier","fun"],["whitespace"," "],["identifier","clearPlaybackRangeHighlight"],["token","("],["token",")"],["token",":"],["whitespace"," "],["identifier","Unit"]]}
+/>
+
+
+## Examples
+
+<Tabs
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.clearPlaybackRangeHighlight();
+```
+</TabItem>
+<TabItem value="csharp">
+```cs
+var api = new AlphaTabApi<MyControl>(...);
+api.clearPlaybackRangeHighlight();
+```
+</TabItem>
+<TabItem value="android">
+```kotlin
+val api = AlphaTabApi<MyControl>(...)
+api.clearPlaybackRangeHighlight()
+```
+</TabItem>
+</Tabs>

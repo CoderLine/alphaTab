@@ -1,0 +1,81 @@
+---
+title: Introduction
+description: alphaTab is an SDK for JavaScript, .NET, and Kotlin that renders and plays interactive music notation inside your own applications.
+keywords:
+  - alphaTab
+  - music notation
+  - guitar tab
+  - SDK
+  - SMuFL
+  - MIDI
+  - MusicXML
+  - Guitar Pro
+---
+
+alphaTab is an SDK for rendering and playing interactive music notation. Use it in JavaScript for the browser and Node.js, in .NET for desktop or server, or in Kotlin for Android. Feed it a Guitar Pro, MusicXML, CapXML, or alphaTex file, wire it into your UI, and you get engraved sheet music that resizes, scrolls, and plays back.
+
+## An SDK, not a widget
+
+alphaTab is not a ready-made component you drop onto a page. It gives you the pieces to build the score view your application needs — the toolbar, the track selector, the transport controls, and the layout around the sheet are yours to design. If you want a pre-built player, you assemble it from what alphaTab exposes.
+
+In exchange, you decide exactly how the score integrates with your product. No styling and no interaction model is imposed on you.
+
+## How it fits together
+
+alphaTab has four internal modules. Together they load, engrave, and play a score.
+
+### Data model
+
+Every piece of information about a score — title, artists, tracks, staves, bars, beats, notes, effects, dynamics — lives in one strongly-typed model. Every other module reads from or writes to it.
+
+### Importers
+
+Parsers that fill the data model from a file. Currently supported:
+
+- Guitar Pro 3–5 (`.gp3`, `.gp4`, `.gp5`) — proprietary binary formats from [Arobas Music](https://www.guitar-pro.com/)
+- Guitar Pro 6 (`.gpx`) — proprietary archive containing XML
+- Guitar Pro 7 and 8 (`.gp`) — ZIP archive containing XML
+- [MusicXML](https://www.musicxml.com/) (`.xml`) — open XML standard
+- [CapXML](https://www.capella.de/CapXML/) (`.cap`) — open XML standard from Capella Software
+- [alphaTex](/docs/alphatex/introduction) — a text format for writing music notation by hand
+
+### Render engine
+
+The render engine takes the data model and produces engraved music notation following the rules of traditional music engraving. It builds a visual tree of every symbol and relayouts dynamically when the container resizes. Symbols come from the [SMuFL](https://www.smufl.org/) music font [Bravura](https://github.com/steinbergmedia/bravura). Output goes to HTML Canvas or SVG in the browser, and to Skia or the platform-native canvas on .NET and Android.
+
+### Audio engine
+
+The audio engine converts the data model to MIDI, then plays the MIDI through an embedded synthesizer based on [TinySoundFont](https://github.com/schellingb/TinySoundFont) and a SoundFont2 file. You get playback, a visual cursor tracking the current beat, and hooks to build your own transport UI.
+
+## Where it runs
+
+The three implementations share one source. TypeScript is authoritative; a toolchain compiles it to C# and Kotlin so every platform gets the same features on the same release cycle.
+
+### JavaScript / TypeScript {#javascript}
+
+Distributed as the [`@coderline/alphatab`](https://www.npmjs.com/package/@coderline/alphatab) npm package. Runs in any evergreen browser with ES2020 support and in Node.js. alphaTab has no runtime dependencies — everything it needs to render and play is bundled.
+
+Under the hood it uses [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API), [Audio Worklets](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_AudioWorklet), the [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API), and both Canvas and SVG rendering paths. In Node.js, headless rendering to images through [alphaSkia](https://github.com/CoderLine/alphaSkia) is supported.
+
+### .NET {#dotnet}
+
+Two NuGet packages, depending on where you need it:
+
+- [`AlphaTab`](https://www.nuget.org/packages/AlphaTab/) targets .NET Standard 2.0 for console, server, and headless use.
+- [`AlphaTab.Windows`](https://www.nuget.org/packages/AlphaTab.Windows/) targets .NET 8.0 and adds WPF and WinForms controls.
+
+The .NET build has a small number of third-party dependencies for drawing (through alphaSkia) and audio (NAudio).
+
+### Kotlin for Android {#android}
+
+Distributed on Maven Central as [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab). It ships an `AlphaTabView` for classic Android layouts. A Jetpack Compose control is not included yet — [vote on the roadmap issue](https://github.com/CoderLine/alphaTab/issues/1475) or [wrap the classic view](https://developer.android.com/develop/ui/compose/libraries) inside a Compose tree.
+
+## Next steps
+
+Pick your platform:
+
+- [Getting Started (Web)](/docs/getting-started/installation-web)
+- [Getting Started (.NET)](/docs/getting-started/installation-net)
+- [Getting Started (Android)](/docs/getting-started/installation-android)
+
+Once installed, browse the [Features](/docs/features/) catalog to see what alphaTab does grouped by capability, or explore [alphaTex](/docs/alphatex/introduction), the text format for authoring music notation.

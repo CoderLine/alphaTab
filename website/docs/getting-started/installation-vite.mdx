@@ -1,0 +1,142 @@
+---
+title: Installation (Vite)
+description: Configure Vite to bundle alphaTab correctly, including its Web Workers, Audio Worklets, and font and SoundFont assets.
+keywords:
+  - alphaTab
+  - Vite
+  - bundler
+  - Web Worker
+  - Audio Worklet
+  - plugin
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.3.0" />
+
+Add the alphaTab plugin to your Vite config:
+
+```js
+import { defineConfig } from 'vite';
+import { alphaTab } from '@coderline/alphatab-vite';
+
+export default defineConfig({
+    plugins: [alphaTab()]
+});
+```
+
+That is normally the only change Vite needs. The plugin copies Bravura and the bundled SoundFont into the build output, resolves the Web Worker and Audio Worklet entry points, and hooks the files into Vite's dev server.
+
+## Why the plugin is needed {#why}
+
+alphaTab spawns [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) and [Audio Worklets](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_AudioWorklet) at runtime to keep rendering and audio synthesis off the main thread. Without a bundler, alphaTab loads these workers directly from `./alphaTab.worker.[m]js` and `./alphaTab.worklet.[m]js`:
+
+```mermaid
+flowchart LR
+    app.mjs-- import -->alphaTab.mjs
+    alphaTab.mjs-- new Worker -->alphaTab.worker.mjs
+    alphaTab.mjs-- import -->alphaTab.core.mjs
+    alphaTab.mjs-- audioWorklet.addModule -->alphaTab.worklet.mjs
+    alphaTab.worker.mjs-- import -->alphaTab.core.mjs
+    alphaTab.worklet.mjs-- import -->alphaTab.core.mjs
+```
+
+Vite may split and rename these files during bundling. The plugin ensures the worker and worklet entry points resolve correctly in the production build and that the runtime assets ship with the output.
+
+The plugin also handles two concerns Vite does not cover cleanly:
+
+- Audio Worklets — Vite has no built-in support; the plugin fills the gap.
+- Web Workers — Vite ships worker support, but it uses one global configuration for the whole project, which conflicts with anything else that needs custom worker settings. The plugin isolates alphaTab's worker configuration from the rest of your project.
+
+## Configure the plugin {#configure-plugin}
+
+<Tabs defaultValue="source-dir" values={[
+    { label: "Source directory", value: "source-dir"},
+    { label: "Asset copy", value: "assets"},
+    { label: "Audio Worklets", value: "worklets"},
+    { label: "Web Workers", value: "workers"},
+]}>
+
+<TabItem value="source-dir">
+
+By default the plugin looks for alphaTab files in `node_modules/@coderline/alphaTab/dist`. Point it at a different location for custom builds:
+
+```js
+export default defineConfig({
+    plugins: [alphaTab({
+        alphaTabSourceDir: path.resolve('../../node_modules/@coderline/alphaTab/dist')
+    })]
+});
+```
+
+</TabItem>
+
+<TabItem value="assets">
+
+The plugin copies Bravura and the bundled SoundFont into the build output under `/font/` and `/soundfont/`, and serves them through the Vite dev server. Disable the copy or change the output path:
+
+```js
+// Skip asset copying entirely
+export default defineConfig({
+    plugins: [alphaTab({
+        assetOutputDir: false
+    })]
+});
+
+// Copy to a custom path
+export default defineConfig({
+    plugins: [alphaTab({
+        assetOutputDir: path.resolve('../dist/vendor/assets/')
+    })]
+});
+```
+
+</TabItem>
+
+<TabItem value="worklets">
+
+Disable the Audio Worklet handler if another plugin covers the same ground:
+
+```js
+export default defineConfig({
+    plugins: [alphaTab({
+        audioWorklets: false
+    })]
+});
+```
+
+:::warning
+Disabling worklet support breaks worklet-based playback. Set [`player.outputMode`](/docs/reference/settings/player/outputmode) to always use the ScriptProcessorNode instead.
+:::
+
+</TabItem>
+
+<TabItem value="workers">
+
+Disable the Web Worker handler if another plugin covers the same ground:
+
+```js
+export default defineConfig({
+    plugins: [alphaTab({
+        webWorkers: false
+    })]
+});
+```
+
+:::warning
+Disabling worker support pushes rendering and audio playback onto the main thread. UI responsiveness may degrade sharply. Set [`core.useWorkers`](/docs/reference/settings/core/useworkers) to `false` if you take this path.
+:::
+
+</TabItem>
+
+</Tabs>
+
+## Angular note {#angular}
+
+Angular does not expose the underlying bundler configuration. In current versions it uses Vite for the development server and esbuild for production builds, but no customization hooks are provided, and popular third-party builders like [angular-builders](https://github.com/just-jeb/angular-builders) do not yet support Vite either. To use alphaTab in an Angular application today, take the [WebPack path](installation-webpack) instead.
+
+## Samples {#samples}
+
+Reference projects for various Vite setups live at [github.com/CoderLine/alphaTabSamplesWeb](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src). Each is a minimal, working starting point.

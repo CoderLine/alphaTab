@@ -1,0 +1,89 @@
+---
+title: Configuration (Web)
+description: Configure alphaTab in a web project — mount the API, pass settings, subscribe to events, and drive playback.
+keywords:
+  - alphaTab
+  - configuration
+  - settings
+  - events
+  - API
+  - web
+  - JavaScript
+  - TypeScript
+---
+
+alphaTab exposes a single top-level class: `AlphaTabApi`. Every setting, event, and action goes through an instance of it. This page walks through those four surfaces on the web.
+
+## Setup
+
+Create a container `<div>` where the score should render. When alphaTab uses the page layout, it resizes to match the container's width; when the container has a fixed width in CSS, alphaTab stays at that width.
+
+```html
+<div id="alphaTab"></div>
+```
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const element = document.getElementById('alphaTab');
+const api = new alphaTab.AlphaTabApi(element);
+```
+
+All alphaTab types live under the top-level `alphaTab` namespace. Data model classes are under `alphaTab.model`, MIDI under `alphaTab.midi`, and so on. The [API reference](/docs/reference/api) documents the full surface.
+
+## Settings
+
+Pass a settings object as the second argument to the constructor:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const element = document.getElementById('alphaTab');
+const api = new alphaTab.AlphaTabApi(element, {
+    core: {
+        file: '/scores/song.gp'
+    },
+    display: {
+        layoutMode: alphaTab.LayoutMode.Page
+    }
+});
+```
+
+To change settings at runtime, mutate the settings object and call `api.updateSettings()` — alphaTab does not observe the object automatically. See the [Settings reference](/docs/reference/settings) for every option.
+
+## Events
+
+Subscribe with `.on(handler)` and unsubscribe with `.off(handler)`:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const element = document.getElementById('alphaTab');
+const api = new alphaTab.AlphaTabApi(element);
+
+api.scoreLoaded.on(score => {
+    console.log('Score loaded:', score.title);
+});
+
+api.playedBeatChanged.on(beat => {
+    highlightBeat(beat);
+});
+```
+
+The [API reference](/docs/reference/api) lists every event alphaTab exposes.
+
+## API
+
+Call methods on the API object to drive alphaTab — load a score, jump to a bar, start playback, transpose:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const element = document.getElementById('alphaTab');
+const api = new alphaTab.AlphaTabApi(element);
+
+api.tex('\\title "Hello alphaTab" . 1.1*4');
+api.playPause();
+```
+
+The full method surface is documented in the [API reference](/docs/reference/api).

@@ -1,0 +1,172 @@
+---
+title: Contributing
+description: How to report bugs, request features, and contribute code or documentation to alphaTab.
+keywords:
+  - alphaTab
+  - contributing
+  - GitHub
+  - pull request
+  - MPL-2.0
+  - TypeScript
+  - C#
+  - Kotlin
+  - monorepo
+---
+
+alphaTab welcomes contributions of every kind — bug reports, feature requests, code, and documentation. Everything happens on GitHub. All participation follows the project's [code of conduct](https://github.com/CoderLine/alphaTab/blob/develop/code-of-conduct.md).
+
+## Report a bug
+
+Open an issue in the [alphaTab repository](https://github.com/CoderLine/alphaTab/issues/new/choose) using the bug-report template. Open an issue only when:
+
+- You can reproduce the problem and describe the exact steps to reproduce it.
+- Something is clearly missing from an existing, documented feature.
+
+Fill every field in the template — reproduction, environment, expected versus actual behaviour. Issues that skip the template are closed unread. Two minutes of context on your side saves multiple back-and-forth rounds on the maintainer side.
+
+Before opening a new issue, search the tracker — if the topic already exists, comment on the existing thread instead of creating a duplicate.
+
+## Ask a question or float an idea
+
+Anything short of a confirmed bug belongs in [GitHub Discussions](https://github.com/CoderLine/alphaTab/discussions), not the issue tracker. Use Discussions when:
+
+- You have an idea for a feature and want to talk it through before it becomes work.
+- You need help using alphaTab.
+- You are not sure whether alphaTab already supports what you need.
+- Something looks wrong but you are not yet certain whether the cause sits in alphaTab or in your integration.
+
+Discussions keep the issue tracker focused on confirmed work items.
+
+## Contribute code
+
+alphaTab lives in one monorepo — [github.com/CoderLine/alphaTab](https://github.com/CoderLine/alphaTab) — built on npm workspaces. Every package listed below is a workspace under `packages/`:
+
+- `alphatab` — the main library and the source of truth for all platforms
+- `alphatex` — the alphaTex text-format parser and tools
+- `csharp` — the .NET build, transpiled from the TypeScript source
+- `kotlin` — the Kotlin/Android build, transpiled from the TypeScript source
+- `transpiler` — the TypeScript-to-C#-and-Kotlin transpiler both platforms consume
+- `vite`, `webpack` — the bundler plugins
+- `monaco`, `lsp` — the Monaco editor integration and alphaTex language server
+- `playground` — the local dev sandbox
+- `tooling` — shared build configuration used by the other packages
+
+### Branching model
+
+alphaTab uses a GitFlow-style layout:
+
+- `develop` — the default branch and integration point. All new work targets `develop`.
+- `feature/<name>` — one branch per new feature or bug fix, taken off `develop`. Name it after the feature (`feature/alphatex-alternate-endings`) or the issue (`feature/issue-1234`).
+- `main` — the last released, tagged state.
+- `release/*` — short-lived branches for stabilising a release.
+- `hotfix/*` — patches against a shipped release.
+
+### Pull request workflow
+
+1. Fork [alphaTab](https://github.com/CoderLine/alphaTab) to your GitHub account.
+2. Branch off `develop` with a `feature/<name>` branch.
+3. Make your change. Include tests where reasonable, and run the relevant test scripts locally (see [Development environment](#development-environment)).
+4. Open a pull request against `develop`. Fill out the PR template — what changed and why. Mark it as a [draft pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests) if it is not yet ready for review.
+5. Clear the draft state once you are ready. CI runs against every push.
+6. Address review feedback. Style, structure, or scope adjustments may come back — this is normal.
+7. Once approved and green, a maintainer merges the change into `develop`. Contributors are credited in the release notes when the change ships.
+
+### License and contributor ownership
+
+alphaTab is released under [MPL-2.0](https://www.mozilla.org/en-US/MPL/2.0/). By contributing you transfer ownership of your change to the alphaTab project. This is not about taking your work away — it keeps the door open to future license changes (for example to MIT) without needing to track down every past contributor. Any such change will be discussed publicly before it happens. Keeping alphaTab a free and open library for anyone to integrate is a primary goal.
+
+## Development environment
+
+You will need:
+
+- [Node.js](https://nodejs.org/) 20 or newer — for TypeScript builds, tests, and workspace management
+- [.NET SDK](https://dotnet.microsoft.com/download) 8.0 or newer — only if you plan to build or test the C# port
+- [Java 17+](https://adoptium.net/) and the [Android SDK](https://developer.android.com/studio) — only if you plan to build or test the Kotlin/Android port
+
+Any modern web-focused IDE works. Visual Studio Code is a good default — the repository ships editor settings and recommended extensions it picks up automatically.
+
+Clone the repository and install dependencies once:
+
+```bash
+git clone https://github.com/CoderLine/alphaTab.git
+cd alphaTab
+npm install
+```
+
+`npm install` installs every workspace under `packages/` in one pass. From here on, run scripts against the root — the root `package.json` orchestrates the workspaces.
+
+### Everyday commands
+
+Run at the repository root:
+
+```bash
+npm run dev         # start the local playground with the current alphaTab source
+npm run build       # build the alphatab package
+npm test            # run the alphatab test suite (vitest)
+npm run lint        # lint every workspace via Biome
+npm run typecheck   # run tsc --noEmit across every workspace
+npm run clean       # remove build output from every workspace
+```
+
+### Platform-specific commands
+
+The web build is the default. To build or test the other platforms, use the per-platform scripts.
+
+**Web (main library + bundler plugins)**
+
+```bash
+npm run build-web   # build alphatab + webpack + vite plugins
+npm run test-web    # run every web-workspace test suite
+```
+
+**C# / .NET**
+
+```bash
+npm run build-csharp   # transpile TypeScript to C#, then run dotnet build
+npm run test-csharp    # run the .NET unit tests via dotnet test
+```
+
+**Kotlin for Android**
+
+```bash
+npm run build-kotlin   # transpile TypeScript to Kotlin, then run gradle assembleRelease
+npm run test-kotlin    # run the Android instrumentation tests
+```
+
+**Bundler plugins in isolation**
+
+```bash
+npm run build-vite     # build only the Vite plugin
+npm run test-vite      # test only the Vite plugin
+npm run build-webpack  # build only the WebPack plugin
+npm run test-webpack   # test only the WebPack plugin
+```
+
+### Toolchain {#toolchain}
+
+TypeScript is the source of truth. All alphaTab development happens in the [`packages/alphatab`](https://github.com/CoderLine/alphaTab/tree/develop/packages/alphatab) workspace. The [`packages/transpiler`](https://github.com/CoderLine/alphaTab/tree/develop/packages/transpiler) workspace is a custom compiler built on top of the TypeScript compiler that translates the same source to C# and Kotlin. The `csharp` and `kotlin` packages consume the transpiler and hand off to `dotnet build` and `gradle` respectively.
+
+<img src="/img/toolchain.svg" alt="alphaTab toolchain: TypeScript source, cross-compiled to JavaScript, C#, and Kotlin" />
+
+alphaTab targets zero runtime dependencies. The core modules are written to run on any platform with a garbage collector — JavaScript, .NET, or Kotlin for Android — without pulling in third-party libraries. Contributions to the core need to keep this constraint in mind: no new runtime dependencies without an architectural discussion first.
+
+### Code style
+
+Biome ([biomejs.dev](https://biomejs.dev/)) formats and lints the TypeScript source. Run `npm run lint` before opening a pull request — CI will run it too. The formatter uses four-space indentation and a 120-character line width; the configuration lives in [biome.jsonc](https://github.com/CoderLine/alphaTab/blob/develop/biome.jsonc) at the repository root.
+
+## Contribute to the documentation
+
+The documentation site is a separate repository: [alphaTabWebsite](https://github.com/CoderLine/alphaTabWebsite), built with [Docusaurus](https://docusaurus.io/).
+
+Every documentation page follows the [documentation style guide](/docs/style-guide) — voice, structure, formatting, and code-sample rules. Read it before writing new pages or rewriting existing ones.
+
+Run the site locally:
+
+```bash
+git clone https://github.com/CoderLine/alphaTabWebsite.git
+cd alphaTabWebsite
+npm install
+npm start
+```
+
+The dev server serves the site at `http://localhost:3000` with hot-reload. Open a pull request against `develop` when your change is ready.

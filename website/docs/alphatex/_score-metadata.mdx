@@ -1,0 +1,1594 @@
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+import { ParameterValuesTable } from '@site/src/components/ParameterValuesTable';
+
+## `\title`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\title (value template textAlign)
+```
+
+**Description:** Set the title of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+C4
+
+`}</AlphaTexSample>
+
+## `\subtitle`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\subtitle (value template textAlign)
+```
+
+**Description:** Set the subtitle of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+\\subtitle ("Subtitle" "[%SUBTITLE%]" left)
+C4
+
+`}</AlphaTexSample>
+
+## `\artist`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\artist (value template textAlign)
+```
+
+**Description:** Set the artist of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+\\artist "alphaTab"
+    C4
+
+`}</AlphaTexSample>
+
+## `\album`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\album (value template textAlign)
+```
+
+**Description:** Set the album of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title ("Song Title" "Title: %TITLE%" left)
+\\album "alphaTab vol.1"
+C4
+
+`}</AlphaTexSample>
+
+## `\words`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\words (value template textAlign)
+```
+
+**Description:** Set the lyrics author of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\words "CoderLine"
+C4
+
+`}</AlphaTexSample>
+
+## `\music`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\music (value template textAlign)
+```
+
+**Description:** Set the music author of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\music "CoderLine and Contributors"
+C4
+
+`}</AlphaTexSample>
+
+## `\wordsAndMusic`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\wordsAndMusic (template textAlign)
+```
+
+**Description:** Sets the template and text align for combined words and music authors.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `template` | The template used to render the text | `String` | yes  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\words "CoderLine"
+\\music "CoderLine"
+\\wordsAndMusic ("Words & Music: %WORDS%")
+C4
+
+`}</AlphaTexSample>
+
+## `\copyright`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\copyright (value template textAlign)
+```
+
+**Description:** Set the copyright owner of the song.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\copyright "CoderLine"
+C4
+
+`}</AlphaTexSample>
+
+## `\copyright2`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\copyright2 (template textAlign)
+```
+
+**Description:** Sets the template and text align for the second copyright line.
+    
+    There is no own "value" as it is typically used to just define a static text like "All rights reserved". The "template" can be used for defining the display.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `template` | The template used to render the text | `String` | yes  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\copyright "CoderLine"
+\\copyright2 "All rights reserved"
+C4
+
+`}</AlphaTexSample>
+
+## `\instructions`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\instructions value
+```
+
+**Description:** Sets additional textual instructions for the song (not displayed).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\instructions "Practice this piece until you get it perfect."
+C4
+
+`}</AlphaTexSample>
+
+## `\notices`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\notices value
+```
+
+**Description:** Sets general notices for the song (not displayed).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\notices "I hope you appreciate this music sheet, it was a lot of effort to create!"
+C4
+
+`}</AlphaTexSample>
+
+## `\tab`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\tab (value template textAlign)
+```
+
+**Description:** Set the transcriber of the music sheet.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `value` | The value to set | `String` | yes  |
+|  `template` | The template used to render the text | `String` | no  |
+|  `textAlign` | The alignment of the text on the music sheet | `left\|center\|right` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `textAlign` | <ParameterValuesTable values={[["left","Left-align the text"],["center","Center-align the text"],["right","Right-align the text"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\tab "Transcribed by me"
+C4
+
+`}</AlphaTexSample>
+
+## `\systemsLayout`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\systemsLayout (numberOfBars)
+```
+
+**Description:** Defines the number of bars to display per system when rendering multiple tracks.
+
+The `systemsLayout` and `defaultSystemsLayout` allow configuring the system layout. The system layout, defines how many bars should be displayed per system (line) if enabled via [`systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode).
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `numberOfBars` | Defines for every system (line) the number of bars it should contain | `Number[]` | no  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\systemsLayout (2 3 2)
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+
+`}</AlphaTexSample>
+
+## `\defaultSystemsLayout`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\defaultSystemsLayout numberOfBars
+```
+
+**Description:** Defines the default number of bars to display per system when rendering multiple tracks.
+
+The `systemsLayout` and `defaultSystemsLayout` allow configuring the system layout. The system layout, defines how many bars should be displayed per system (line) if enabled via [`systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode).
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `numberOfBars` | The number of bars the system should contain. | `Number` | yes  |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\defaultSystemsLayout 2
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+\\track 
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4
+
+`}</AlphaTexSample>
+
+## `\showDynamics`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\showDynamics ()
+```
+
+**Description:** Enables the display of dynamics.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\showDynamics
+    C4 {dy FFF} D4
+    E4 {dy PP} F4
+
+`}</AlphaTexSample>
+
+## `\hideDynamics`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\hideDynamics ()
+```
+
+**Description:** Disables the display of dynamics.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\hideDynamics
+    C4 {dy FFF} D4
+    E4 {dy PP} F4
+
+`}</AlphaTexSample>
+
+## `\useSystemSignSeparator`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\useSystemSignSeparator ()
+```
+
+**Description:** Configures whether a system sign separator should be added (in case multiple tracks are shown).
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\useSystemSignSeparator
+\\defaultSystemsLayout 2
+\\track "T1"
+:1 C4 | C4 | C4
+\\track "T2"
+:1 C4 | C4 | C4
+
+`}</AlphaTexSample>
+
+## `\tuningDisplayMode`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\tuningDisplayMode mode
+```
+
+**Description:** Sets where string tuning information is displayed.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `score\|staff` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["score","Display tuning information above the score."],["staff","Display tuning note names beside tab staff lines."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\tuningDisplayMode staff
+\\track "Guitar"
+    \\staff { score tabs }
+    0.6.4 2.6.4 3.6.4 0.5.4
+
+`}</AlphaTexSample>
+
+## `\multiBarRest`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\multiBarRest ()
+```
+
+**Description:** Show multibar rests when rendering multiple tracks.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\title "Multi Track"
+\\multiBarRest
+\\track "Piano 1" "pno1"
+  \\staff {score}
+  C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | C4
+
+\\track "Piano 2" "pno1"
+  \\staff {score}
+  C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | r |
+
+`}</AlphaTexSample>
+
+## `\bracketExtendMode`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\bracketExtendMode mode
+```
+
+**Description:** Set the mode for [brackets and braces](/docs/features/render/bracket-extend-mode).
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `noBrackets\|groupStaves\|groupSimilarInstruments` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["noBrackets","No brackets"],["groupStaves","Group staves of same track"],["groupSimilarInstruments","Group similar instruments"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\bracketextendmode GroupSimilarInstruments
+\\track "Piano1"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+  \\staff {score}
+  \\clef f4 C3 D3 E3 F3
+\\track "Piano2"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+\\track "Flute 1"
+  \\staff { score }
+\\instrument flute
+  C4 D4 E4 F4
+\\track "Flute 2"
+  \\staff { score }
+\\instrument flute
+  \\clef f4 C3 D3 E3 F3
+\\track "Guitar 1"
+  \\staff { score tabs }
+  0.3.4 2.3.4 5.3.4 7.3.4
+
+`}</AlphaTexSample>
+
+## `\singleTrackTrackNamePolicy`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\singleTrackTrackNamePolicy mode
+```
+
+**Description:** Configures on which systems to show the [track names](/docs/features/render/track-name-policies) when only a single track is rendered.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `hidden\|firstSystem\|allSystems` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["hidden","Track names are hidden everywhere."],["firstSystem","Track names are displayed on the first system."],["allSystems","Track names are displayed on all systems."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+    \\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+      C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\multiTrackTrackNamePolicy`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\multiTrackTrackNamePolicy mode
+```
+
+**Description:** Configures on which systems to show the [track names](/docs/features/render/track-name-policies) when multiple tracks are rendered.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `hidden\|firstSystem\|allSystems` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["hidden","Track names are hidden everywhere."],["firstSystem","Track names are displayed on the first system."],["allSystems","Track names are displayed on all systems."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+    \\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+      C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\firstSystemTrackNameMode`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\firstSystemTrackNameMode mode
+```
+
+**Description:** Configures the text how to show as [track names](/docs/features/render/track-name-policies) on the first system.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `fullName\|shortName` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["fullName","Short track names (abbreviations) are displayed."],["shortName","Full track names are displayed."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+  C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\otherSystemsTrackNameMode`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\otherSystemsTrackNameMode mode
+```
+
+**Description:** Configures the text how to show as [track names](/docs/features/render/track-name-policies) on the second and subsequent systems.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `fullName\|shortName` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["fullName","Short track names (abbreviations) are displayed."],["shortName","Full track names are displayed."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+  C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\firstSystemTrackNameOrientation`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\firstSystemTrackNameOrientation orientation
+```
+
+**Description:** Configures the orientation of the [track names](/docs/features/render/track-name-policies) on the first system.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `orientation` | The orientation to use | `horizontal\|vertical` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `orientation` | <ParameterValuesTable values={[["horizontal","Text is shown horizontally (left-to-right)."],["vertical","Vertically rotated (bottom-to-top)."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\firstsystemtracknameorientation horizontal
+\\othersystemstracknameorientation vertical
+
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+  \\staff {score}
+  C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\otherSystemsTrackNameOrientation`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\otherSystemsTrackNameOrientation orientation
+```
+
+**Description:** Configures the orientation of the [track names](/docs/features/render/track-name-policies) on the second and subsequent systems.
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `orientation` | The orientation to use | `horizontal\|vertical` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `orientation` | <ParameterValuesTable values={[["horizontal","Text is shown horizontally (left-to-right)."],["vertical","Vertically rotated (bottom-to-top)."]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\singletracktracknamepolicy AllSystems
+  \\firstsystemtracknamemode fullname
+  \\othersystemstracknamemode shortname
+  \\firstsystemtracknameorientation horizontal
+  \\othersystemstracknameorientation vertical
+
+  \\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+    \\staff {score}
+    C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+
+`}</AlphaTexSample>
+
+## `\extendBarLines`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\extendBarLines ()
+```
+
+**Description:** Extend the bar lines across staves in the same system.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\extendBarLines
+\\track "Piano1"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+  \\staff {score}
+  \\clef f4 C3 D3 E3 F3
+\\track "Piano2"
+  \\staff {score}
+\\instrument piano
+  C4 D4 E4 F4
+\\track "Flute 1"
+  \\staff { score }
+\\instrument flute
+  C4 D4 E4 F4
+\\track "Flute 2"
+  \\staff { score }
+\\instrument flute
+  \\clef f4 C3 D3 E3 F3
+\\track "Guitar 1"
+  \\staff { score tabs }
+  0.3.4 2.3.4 5.3.4 7.3.4
+
+`}</AlphaTexSample>
+
+## `\chordDiagramsInScore`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\chordDiagramsInScore visibility
+```
+
+**Description:** Configures whether chord diagrams are shown inline in the score..
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `visibility` | The visibility of the diagrams | `true\|false` | no `true` |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `visibility` | <ParameterValuesTable values={[["true","Show the diagrams"],["false","Hide the diagrams"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\chordDiagramsInScore
+\\chord ("E" 0 0 1 2 2 0)
+(0.1 0.2 1.3 2.4 2.5 0.6){ch "E"}
+
+`}</AlphaTexSample>
+
+## `\hideEmptyStaves`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\hideEmptyStaves ()
+```
+
+**Description:** Hide empty staves.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\hideEmptyStaves
+\\defaultSystemsLayout 3
+\\track "Track 1"
+    C4 * 4 | C4 * 4 | C4 * 4 | 
+    C4 * 4 | C4 * 4 | C4 * 4 | 
+\\track "Track 2"
+    r | r | r |
+    r | C4.1 | r |
+
+`}</AlphaTexSample>
+
+## `\hideEmptyStavesInFirstSystem`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\hideEmptyStavesInFirstSystem ()
+```
+
+**Description:** Hide empty staves in first system.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\hideEmptyStaves
+\\hideEmptyStavesInFirstSystem
+\\defaultSystemsLayout 3
+\\track "Track 1"
+    C4 * 4 | C4 * 4 | C4 * 4 | 
+    r | r | r | 
+\\track "Track 2"
+    r | r | r |
+    r | C4.1 | r |
+
+`}</AlphaTexSample>
+
+## `\showSingleStaffBrackets`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\showSingleStaffBrackets ()
+```
+
+**Description:** Show brackets and braces on single staves.
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"systemsLayoutMode":"UseModelLayout"}}}>{`
+\\hideEmptyStaves
+\\hideEmptyStavesInFirstSystem
+\\showSingleStaffBrackets
+\\defaultSystemsLayout 3
+\\track "Track 1"
+    \\staff { score }
+    C4 * 4 | C4 * 4 | C4 * 4 |
+    C4 * 4 | C4 * 4 | C4 * 4 |
+    \\staff { score }
+    r | r | r | 
+    r | C4.1 | r | 
+
+`}</AlphaTexSample>
+
+## `\defaultBarNumberDisplay`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\defaultBarNumberDisplay mode
+```
+
+**Description:** Sets the display mode for bar numbers on all bars.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `allBars\|firstOfSystem\|hide` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["allBars","All bars"],["firstOfSystem","First bar of every system"],["hide","Hide"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultBarNumberDisplay allBars
+\\title "All Bars"
+    \\track { defaultsystemslayout 3 }
+    C4.1 | C4.1 | C4.1 |
+    C4.1 | C4.1 | C4.1 
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultBarNumberDisplay firstOfSystem
+\\title "First of System"
+    \\track { defaultsystemslayout 3 }
+    C4.1 | C4.1 | C4.1 |
+    C4.1 | C4.1 | C4.1 
+
+`}</AlphaTexSample>
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultBarNumberDisplay hide
+\\title "Hide"
+    \\track { defaultsystemslayout 3 }
+    C4.1 | C4.1 | C4.1 |
+    C4.1 | C4.1 | C4.1 
+
+`}</AlphaTexSample>
+
+## `\defaultStaffDisplay`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+\defaultStaffDisplay (staffTypes)
+```
+
+**Description:** Defines the song-wide display of elements like clefs, key signatures, time signatures, rests and bar numbers.
+
+The arguments select the staff types to which the properties apply. If no staff types are specified, every property applies to all staff types supporting the related element.
+
+All properties are optional. Properties which are not specified keep their default. The values can be overridden per staff with [`\staffDisplay`](/docs/alphatex/staff-metadata#staffdisplay) and per bar with [`\barDisplay`](/docs/alphatex/bar-metadata#bardisplay).
+
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `staffTypes` | The staff types to which the properties apply. If omitted, every property applies to all staff types supporting it. | `score\|tabs\|slash\|numbered[]` | no  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `staffTypes` | <ParameterValuesTable values={[["score","Standard notation"],["tabs","Guitar tablature"],["slash","Slash notation"],["numbered","Numbered notation (Jianpu)"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} >{`
+\\defaultStaffDisplay { clefPlacement primary }
+\\defaultStaffDisplay tabs { tsVisibility true tsPlacement allStaves }
+\\track
+    \\staff {score tabs}
+    3.3.4 3.3 3.3 3.3 | 3.3 3.3 3.3 3.3
+
+`}</AlphaTexSample>
+
+**Properties:**
+
+### `clefVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+// [1]: 
+clefVisibility ()
+// [2]: 
+clefVisibility visibility
+// [3]: 
+clefVisibility visibility
+// [4]: 
+clefVisibility visibility
+```
+
+**Description:** Show or hide the clef. Supported staff types: `score`, `tabs`.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | Whether the clef is shown | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | Whether the clef is shown | `true\|false` | yes  |
+| `[4]` |  `visibility` | Whether the clef is shown | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the clef"],["\"false\"","Hide the clef"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the clef"],["false","Hide the clef"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the clef"],["0","Hide the clef"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { clefVisibility false }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `clefPlacement`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+clefPlacement placement
+```
+
+**Description:** Show the clef on all staves or only on the primary (topmost) staff. Supported staff types: `score`, `tabs`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `placement` | On which staves the clef is shown | `allStaves\|primary` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `placement` | <ParameterValuesTable values={[["allStaves","All staves"],["primary","Only the primary (topmost) staff"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { clefPlacement primary }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `clefSystems`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+clefSystems systems
+```
+
+**Description:** Show the clef on all systems or only on the first system. Supported staff types: `score`, `tabs`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `systems` | On which systems the clef is shown | `allSystems\|firstSystemOnly` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `systems` | <ParameterValuesTable values={[["allSystems","All systems"],["firstSystemOnly","Only the first system"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { clefSystems firstSystemOnly }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `ksVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+// [1]: 
+ksVisibility ()
+// [2]: 
+ksVisibility visibility
+// [3]: 
+ksVisibility visibility
+// [4]: 
+ksVisibility visibility
+```
+
+**Description:** Show or hide the key signature. Supported staff types: `score`, `slash`.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | Whether the key signature is shown | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | Whether the key signature is shown | `true\|false` | yes  |
+| `[4]` |  `visibility` | Whether the key signature is shown | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the key signature"],["\"false\"","Hide the key signature"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the key signature"],["false","Hide the key signature"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the key signature"],["0","Hide the key signature"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { ksVisibility false }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `ksPlacement`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+ksPlacement placement
+```
+
+**Description:** Show the key signature on all staves or only on the primary (topmost) staff. Supported staff types: `score`, `slash`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `placement` | On which staves the key signature is shown | `allStaves\|primary` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `placement` | <ParameterValuesTable values={[["allStaves","All staves"],["primary","Only the primary (topmost) staff"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { ksPlacement primary }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `ksSystems`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+ksSystems systems
+```
+
+**Description:** Show the key signature on all systems or only on the first system. Supported staff types: `score`, `slash`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `systems` | On which systems the key signature is shown | `allSystems\|firstSystemOnly` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `systems` | <ParameterValuesTable values={[["allSystems","All systems"],["firstSystemOnly","Only the first system"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { ksSystems firstSystemOnly }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `tsVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+// [1]: 
+tsVisibility ()
+// [2]: 
+tsVisibility visibility
+// [3]: 
+tsVisibility visibility
+// [4]: 
+tsVisibility visibility
+```
+
+**Description:** Show or hide the time signature. Supported staff types: `score`, `tabs`, `slash`, `numbered`.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | Whether the time signature is shown | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | Whether the time signature is shown | `true\|false` | yes  |
+| `[4]` |  `visibility` | Whether the time signature is shown | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the time signature"],["\"false\"","Hide the time signature"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the time signature"],["false","Hide the time signature"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the time signature"],["0","Hide the time signature"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { tsVisibility false }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `tsPlacement`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+tsPlacement placement
+```
+
+**Description:** Show the time signature on all staves or only on the primary (topmost) staff. Supported staff types: `score`, `tabs`, `slash`, `numbered`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `placement` | On which staves the time signature is shown | `allStaves\|primary` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `placement` | <ParameterValuesTable values={[["allStaves","All staves"],["primary","Only the primary (topmost) staff"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { tsPlacement primary }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `tsSystems`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+tsSystems systems
+```
+
+**Description:** Show the time signature on all systems or only on the first system. Supported staff types: `score`, `tabs`, `slash`, `numbered`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `systems` | On which systems the time signature is shown | `allSystems\|firstSystemOnly` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `systems` | <ParameterValuesTable values={[["allSystems","All systems"],["firstSystemOnly","Only the first system"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { tsSystems firstSystemOnly }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `restsVisibility`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+// [1]: 
+restsVisibility ()
+// [2]: 
+restsVisibility visibility
+// [3]: 
+restsVisibility visibility
+// [4]: 
+restsVisibility visibility
+```
+
+**Description:** Show or hide the rests. Supported staff types: `tabs`.
+
+**Parameters:**
+
+| Overload | Name | Description | Type | Required |
+|----------|------|-------------|------|----------|
+| `[2]` |  `visibility` | Whether the rests is shown | `"true"\|"false"` | yes  |
+| `[3]` |  `visibility` | Whether the rests is shown | `true\|false` | yes  |
+| `[4]` |  `visibility` | Whether the rests is shown | `1\|0` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Overload | Name | Values |
+|----------|------|--------|
+| `[2]` | `visibility` | <ParameterValuesTable values={[["\"true\"","Show the rests"],["\"false\"","Hide the rests"]]} /> |
+| `[3]` | `visibility` | <ParameterValuesTable values={[["true","Show the rests"],["false","Hide the rests"]]} /> |
+| `[4]` | `visibility` | <ParameterValuesTable values={[["1","Show the rests"],["0","Hide the rests"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { restsVisibility false }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `restsPlacement`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+restsPlacement placement
+```
+
+**Description:** Show the rests on all staves or only on the primary (topmost) staff. Supported staff types: `tabs`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `placement` | On which staves the rests is shown | `allStaves\|primary` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `placement` | <ParameterValuesTable values={[["allStaves","All staves"],["primary","Only the primary (topmost) staff"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { restsPlacement primary }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `restsSystems`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+restsSystems systems
+```
+
+**Description:** Show the rests on all systems or only on the first system. Supported staff types: `tabs`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `systems` | On which systems the rests is shown | `allSystems\|firstSystemOnly` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `systems` | <ParameterValuesTable values={[["allSystems","All systems"],["firstSystemOnly","Only the first system"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { restsSystems firstSystemOnly }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `barNumber`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+barNumber mode
+```
+
+**Description:** Set how bar numbers are shown. Supported staff types: all.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `allBars\|firstOfSystem\|hide` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["allBars","All bars"],["firstOfSystem","First bar of every system"],["hide","Hide"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { barNumber allBars }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+
+### `rhythm`
+
+**Scope:** [Score metadata](./syntax#score-metadata)
+
+```plain title="Syntax"
+rhythm mode
+```
+
+**Description:** Set how the rhythm notation is shown. Supported staff types: `tabs`.
+
+**Parameters:**
+
+| Name | Description | Type | Required |
+|------|-------------|------|----------|
+|  `mode` | The mode to use | `hidden\|showWithBeams\|showWithBars\|automatic` | yes  |
+
+**Parameter Values:**
+
+Following parameters have value limitations
+
+| Name | Values |
+|------|--------|
+| `mode` | <ParameterValuesTable values={[["hidden","Hidden"],["showWithBeams","Individual beams per beat"],["showWithBars","Connected bars like standard notation"],["automatic","Shown if no standard notation is shown"]]} /> |
+
+**Example:**
+
+<AlphaTexSample tracks="all" player={true} settings={{"display":{"layoutMode":"Parchment"}}}>{`
+\\defaultStaffDisplay { rhythm showWithBeams }
+\\track { defaultSystemsLayout 2 }
+    \\staff {score tabs}
+    \\ks D 3.3.4 r 3.3 3.3 | 3.3.4 3.3 r 3.3 | \\ts (3 4) \\ks A 3.3.4 3.3 r | 3.3.4 r 3.3
+`}</AlphaTexSample>
+

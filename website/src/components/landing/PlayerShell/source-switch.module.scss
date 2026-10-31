@@ -1,0 +1,99 @@
+.switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 2px;
+  gap: 2px;
+  border: 1px solid var(--at-line);
+  border-radius: 7px;
+  background: var(--at-surface-alt);
+}
+
+.segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--at-muted);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover:not(:disabled):not(.segmentActive) { color: var(--at-ink); }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+}
+
+.segmentActive {
+  background: var(--at-surface);
+  color: var(--at-ink);
+  font-weight: 600;
+  box-shadow: 0 1px 0 var(--at-line);
+  cursor: default;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--at-line);
+}
+
+.dotLive {
+  background: var(--at-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--at-success) 20%, transparent);
+}
+
+.dotPreparing {
+  animation: source-preparing 900ms ease-in-out infinite alternate;
+}
+
+@keyframes source-preparing {
+  to { opacity: 0.3; }
+}
+
+// Phone: one button, accented while the backing track plays.
+.toggle {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--at-line);
+  border-radius: 8px;
+  background: var(--at-surface);
+  color: var(--at-muted);
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+}
+
+.toggleOn {
+  border-color: color-mix(in srgb, var(--at-success) 45%, transparent);
+  background: color-mix(in srgb, var(--at-success) 12%, transparent);
+  color: var(--at-success);
+}
+
+.flash {
+  animation: source-flash 1600ms ease-out;
+}
+
+@keyframes source-flash {
+  0%, 30% { box-shadow: 0 0 0 3px var(--at-accent-soft-strong); border-color: var(--at-accent); }
+  100% { box-shadow: 0 0 0 3px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash, .dotPreparing { animation: none; }
+}

@@ -1,0 +1,79 @@
+---
+title: "Custom SoundFonts"
+description: "Swap in a different SF2 for different instruments, live demo."
+sidebar_custom_props:
+  feature_chapter: synthesis
+  feature_order: 20
+keywords:
+  - alphaTab
+  - SoundFont
+  - SF2
+---
+
+import { SoundFontSwitcher, Riffs } from '@site/src/components/PlaySync';
+
+The bundled Sonivox SoundFont covers General MIDI but is deliberately small. When the score needs a Steinway rather than a GM piano, a metal amp emulation rather than a clean guitar, or a rock drum kit rather than the stock kick and snare, swap in a purpose-built `.sf2` file. The synth pipeline stays identical — only the sample bank changes.
+
+The score below is the opening bars of Beethoven's *Ode to Joy* voiced as a chord-melody — long, sustained notes give the sample bank room to speak. Toggle the SoundFont to hear the same MIDI events re-rendered through a different bank.
+
+<SoundFontSwitcher
+  tex={Riffs.BLUES_SHUFFLE_A}
+  options={[
+    { label: 'Sonivox (bundled default)' },
+    { label: 'GeneralUser GS', url: '/files/soundfonts/GeneralUser-GS.v2.0.3.sf3' },
+  ]}
+  showCode={false}
+/>
+
+The two options give an audible A/B: the bundled Sonivox is a compact General-MIDI bank tuned for small footprint; [GeneralUser GS](https://schristiancollins.com/generaluser.php) by S. Christian Collins is a refined GM/GS bank (about 9 MB as compressed SF3) with Steinway-lineage piano samples and richer guitar/drum presets. Toggle to hear the same MIDI events re-rendered through a much fuller-bodied bank. GeneralUser GS is redistributed here under its author's permissive license (commercial and modification allowed).
+
+## Two ways to load one
+
+- `api.loadSoundFont(data)` — pass a `Uint8Array` or `ArrayBuffer` of SoundFont bytes and alphaTab wires them into the synth. Works on every runtime.
+- `api.loadSoundFont(url)` — on Web only, pass a URL string and alphaTab downloads the file for you.
+
+Both forms replace whatever is currently loaded — the second parameter, `append`, defaults to `false`. When it fires, `api.soundFontLoaded` signals that the synth is ready. Trigger `api.resetSoundFonts()` to release all presets and free the memory before loading a fresh one.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+  player: {
+    playerMode: alphaTab.PlayerMode.EnabledSynthesizer,
+  },
+});
+
+api.soundFontLoaded.on(() => {
+  console.log('Ready for playback.');
+});
+
+// Swap in a bytes-based SoundFont.
+const bytes = await readScoreFile('/assets/fluidr3-guitars.sf2');
+api.loadSoundFont(bytes);
+
+// Later, drop everything and load a different one.
+api.resetSoundFonts();
+const drums = await readScoreFile('/assets/rock-drums.sf2');
+api.loadSoundFont(drums);
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+`readScoreFile()` is a placeholder for the platform-specific step of producing a `Uint8Array` — `fs.promises.readFile` on Node.js, `System.IO.File.ReadAllBytes` on .NET, `ContentResolver.openInputStream` on Android, or `fetch(...).then(r => r.arrayBuffer())` in the browser.
+
+## Picking a SoundFont
+
+- SoundFonts are a public format — [FluidR3](https://member.keymusician.com/Member/FluidR3_GM/), [Timbres of Heaven](https://midkar.com/soundfonts/), and many commercial packs work as-is.
+- Larger files mean better samples but longer downloads on Web. Trim unused presets with [Polyphone](https://www.polyphone-soundfonts.com/) before shipping.
+- If your score uses only guitars and drums, a 5 MB targeted SoundFont beats a 200 MB general-purpose one on both download time and RAM footprint.
+
+## Where to look next
+
+- [Combining multiple SoundFonts](combining-multiple-soundfonts) — load several SoundFonts side by side.
+- [SoundFont2 with TinySoundFont](soundfont2-with-tinysoundfont) — how the synth pipeline uses the loaded file.
+- [`api.loadSoundFont`](/docs/reference/api/loadsoundfont), [`api.resetSoundFonts`](/docs/reference/api/resetsoundfonts), and [`api.soundFontLoaded`](/docs/reference/api/soundfontloaded) in the reference.
+- [`player.soundFont`](/docs/reference/settings/player/soundfont) — the settings-side entry point for a single-file replacement.

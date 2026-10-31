@@ -1,0 +1,70 @@
+---
+title: "Numbered notation (jiǎnpǔ)"
+description: "Cipher notation, showNumbered."
+sidebar_custom_props:
+  feature_chapter: notation-types
+  feature_order: 40
+keywords:
+  - alphaTab
+  - numbered notation
+  - jianpu
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Numbered notation (jiǎnpǔ, 简谱) prints digits 1–7 for the seven scale degrees, with octave dots and duration lines. It is the dominant popular-music notation across East Asia. Turn it on when your reader base expects jiǎnpǔ instead of the five-line western staff, or show both staves side-by-side to build bilingual sheet music for choir and church song leaders.
+
+<AlphaTab tex={true}>{`
+\\title "Ode to Joy"
+\\subtitle "in jiǎnpǔ"
+\\tempo 92
+.
+\\track "Melody"
+  \\staff {score numbered}
+  :4 E4 E4 F4 G4 |
+  :4 G4 F4 E4 D4 |
+  :4 C4 C4 D4 E4 |
+  :4 E4 :8 D4 D4 :2 D4 |
+  :4 E4 E4 F4 G4 |
+  :4 G4 F4 E4 D4 |
+  :4 C4 C4 D4 E4 |
+  :4 D4 :8 C4 C4 :2 C4
+`}</AlphaTab>
+
+## How the staff reads
+
+- Digits `1` through `7` map to scale degrees relative to the current key signature. A rest is `0`.
+- Dots above or below a digit shift it up or down an octave. Sharp and flat markers appear as prefixes when the pitch falls outside the key.
+- Duration is drawn as underlines below the digit — one line for eighths, two for sixteenths, and so on. Dotted rhythms add a trailing dot; ties and slurs curve above the digits exactly as they do on a standard staff.
+
+The numbered staff carries every rhythmic and structural detail the standard staff carries — ties, tuplets, repeats, dynamics, chord names — so you can hand a reader a jiǎnpǔ-only chart and preserve the full arrangement. Set `showNumbered = true` on the `Staff` and turn off the notations you don't need.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  for (const track of score.tracks) {
+    for (const staff of track.staves) {
+      staff.showStandardNotation = false;
+      staff.showTablature = false;
+      staff.showNumbered = true;
+    }
+  }
+  api.render();
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [Standard notation](/docs/features/render/standard-notation) — the western five-line staff, often shown alongside jiǎnpǔ.
+- [Slash notation](/docs/features/render/slash-notation) — another single-line rhythm notation.
+- [`Staff.showNumbered`](/docs/reference/types/model/staff) and [`NumberedStaffConfig`](/docs/reference/types/model/numberedstaffconfig) in the model reference.

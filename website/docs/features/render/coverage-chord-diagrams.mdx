@@ -1,0 +1,76 @@
+---
+title: "Chord diagrams and chord names"
+description: "Chord diagrams above bars and inline chord symbols."
+sidebar_custom_props:
+  feature_chapter: notation-coverage
+  feature_order: 20
+keywords:
+  - alphaTab
+  - chord diagram
+  - chord name
+  - chord symbol
+  - fretboard
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+Chord information lives at two levels in a score — the diagram that shows the fingering and the inline chord name over a beat. alphaTab renders both, and the source file decides which appear where.
+
+## Chord names on beats {#names}
+
+Any beat can carry a chord name — the shorthand `Cmaj7` or `G/B` that sits above the staff on a lead sheet. alphaTab renders the name in the chord font directly above the beat, respecting sharp, flat, and slash-bass characters.
+
+<AlphaTab file="/files/features/Chords.gp5" />
+
+## Chord diagrams above the first system {#diagrams}
+
+When a chord definition ships with a fretboard diagram — the six-string grid used in songbooks to show fingering — alphaTab draws it above the first system by default. The embed under the previous heading already shows the top-of-score layout. The same score can render each diagram inline above the bar that first references it instead, driven by two boolean fields on `score.stylesheet`; see the [Chord diagrams on top](./chord-diagrams-on-top) stylesheet page for a live toggle between the two layouts.
+
+## Show it in code
+
+Toggle whether diagrams collect above the first system or attach to each beat individually. The knobs live on the stylesheet, so apply them in a `scoreLoaded` handler:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  // Collect diagrams above the first system (the default):
+  score.stylesheet.globalDisplayChordDiagramsOnTop = true;
+
+  // Also render each diagram inline above the bar that first uses it:
+  score.stylesheet.globalDisplayChordDiagramsInScore = true;
+
+  api.render();
+});
+```
+
+See [Chord diagrams on top](./chord-diagrams-on-top) for the interactive demo that walks these two flags together.
+
+To hide chord names or diagrams entirely, disable them through `notation.elements`:
+
+```js
+api.settings.notation.elements.set(
+  alphaTab.NotationElement.EffectChordNames,
+  false,
+);
+api.settings.notation.elements.set(
+  alphaTab.NotationElement.ChordDiagrams,
+  false,
+);
+api.updateSettings();
+api.render();
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android.
+
+## Where to look next
+
+- [Chord diagrams on top](./chord-diagrams-on-top) — the stylesheet policy that governs the diagrams-above-first-system layout, with a live toggle.
+- [Toggling notation elements off](./coverage-toggle-elements) — hide chord names or diagrams score-wide.
+- [`globalDisplayChordDiagramsOnTop`](/docs/reference/types/model/renderstylesheet/#globaldisplaychorddiagramsontop) and [`globalDisplayChordDiagramsInScore`](/docs/reference/types/model/renderstylesheet/#globaldisplaychorddiagramsinscore) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
+- [`NotationElement`](/docs/reference/types/notationelement) — every element key you can flip.

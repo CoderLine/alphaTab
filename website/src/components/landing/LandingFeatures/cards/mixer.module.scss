@@ -1,0 +1,43 @@
+.mixer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--at-ink);
+}
+
+.name {
+  width: 60px;
+}
+
+.muted {
+  color: var(--at-muted);
+  text-decoration: line-through;
+}
+
+.barTrack {
+  flex: 1;
+  height: 4px;
+  background: var(--at-surface-alt);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+}
+
+.value {
+  font-family: var(--at-font-mono);
+  font-size: 10px;
+  color: var(--at-muted);
+  width: 28px;
+  text-align: right;
+}

@@ -1,0 +1,50 @@
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.5rem;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 0.375rem;
+}
+
+.tab {
+  appearance: none;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: transparent;
+  color: var(--ifm-font-color-base);
+  padding: 0.3rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.tab:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+.tabActive {
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-white);
+  border-color: var(--ifm-color-primary);
+}
+
+.badge {
+  padding: 0.2rem 0.6rem;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8em;
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 999px;
+}
+
+.title {
+  margin-left: auto;
+  font-size: 0.9em;
+}

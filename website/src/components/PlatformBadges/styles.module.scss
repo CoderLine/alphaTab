@@ -1,0 +1,29 @@
+.wrap {
+  margin: 0 0 1.5rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.label {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pill {
+  font-weight: 500;
+  padding: 0.15rem 0.5rem;
+}
+
+.caption {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}

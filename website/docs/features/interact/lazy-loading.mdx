@@ -1,0 +1,54 @@
+---
+title: "Lazy loading with IntersectionObserver"
+description: "Defer DOM insertion of off-screen rendered chunks so large scores load faster and use less memory."
+sidebar_custom_props:
+  feature_chapter: scroll
+  feature_order: 40
+keywords:
+  - alphaTab
+  - lazy-loading
+  - IntersectionObserver
+  - performance
+---
+
+import { LazyLoadingDemo } from '@site/src/components/LazyLoadingDemo';
+import * as Riffs from '@site/src/tex-riffs';
+
+
+A five-hundred-bar guitar piece rendered as SVG can push tens of thousands of nodes into the DOM. That is expensive to paint, expensive to keep in memory, and slow to open on a phone. Lazy loading holds the off-screen chunks back until an `IntersectionObserver` says they are about to become visible. Scroll the pane below and watch the SVG chunk count climb with lazy loading on, then flip it off to see every chunk mounted at once.
+
+<LazyLoadingDemo showCode={false} tex={Riffs.BACH_PRELUDE_C_LONG} />
+
+## What lazy loading does
+
+alphaTab breaks rendering into sub-chunks so the UI stays responsive during a long render. `core.enableLazyLoading` controls whether the finished chunks are appended immediately or held back until they are about to become visible.
+
+- **`true` (default)** — chunks are appended when an `IntersectionObserver` detects they are near the viewport. Off-screen bars stay out of the DOM until the reader scrolls toward them.
+- **`false`** — every rendered chunk is appended to the DOM the moment rendering completes.
+
+Turn it off when the surrounding layout confuses the observer — a hidden tab that keeps the container off-screen forever, a transform-scaled ancestor, a portal into another document — or when you need every bar in the DOM for printing, screenshotting, or measuring.
+
+The feature is Web-only. Other platforms append all rendered content immediately.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: {
+    file: '/scores/song.gp',
+    enableLazyLoading: true,
+  },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of
+obtaining the render target. Every other line runs unchanged on all three
+runtimes.
+
+## Where to look next
+
+- [Auto-scroll modes](./auto-scroll-modes) — how scrolling interacts with lazy rendering.
+- [`enableLazyLoading`](/docs/reference/settings/core/enablelazyloading) in the settings reference.

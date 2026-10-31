@@ -1,0 +1,62 @@
+.demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--ifm-background-surface-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 0.375rem;
+}
+
+.status {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9em;
+  border-radius: 0.375rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-100);
+}
+
+.statusError {
+  background: rgba(220, 53, 69, 0.08);
+  border-color: rgba(220, 53, 69, 0.4);
+}
+
+.statusOk {
+  background: rgba(40, 167, 69, 0.08);
+  border-color: rgba(40, 167, 69, 0.4);
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.4rem 1rem;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.statusLabel {
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.statusValue {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.9em;
+  word-break: break-word;
+}
+
+.placeholder {
+  color: var(--ifm-color-emphasis-600);
+  font-style: italic;
+}
