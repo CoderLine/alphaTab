@@ -90,21 +90,12 @@ jobs:
           path: ~/.npm
           key: npm-website-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-website-${{ runner.os }}-
-      - id: workspaces
-        run: |
-          args="-w website"
-          if [ -f packages/ui/package.json ]; then args="$args -w packages/ui"; fi
-          # building react from source needs the alphaTab sources and the shared build tooling
-          if [ -f packages/react/package.json ]; then
-            args="$args -w packages/react -w packages/alphatab -w packages/transpiler -w packages/tooling"
-          fi
-          echo "args=$args" >> "$GITHUB_OUTPUT"
-      - run: npm ci $WORKSPACES --include-workspace-root
-        env:
-          WORKSPACES: ${{ steps.workspaces.outputs.args }}
+      # building react from source needs the alphaTab sources and the shared build tooling
+      - run: >
+          npm ci --include-workspace-root -w website -w packages/ui
+          -w packages/react -w packages/alphatab -w packages/transpiler -w packages/tooling
 
-      - if: hashFiles('packages/react/package.json') != ''
-        run: |
+      - run: |
           npm run generate-typescript
           npm run build -w packages/react
 
