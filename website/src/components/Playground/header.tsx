@@ -16,7 +16,7 @@ import {
     MenuLabel,
     type ScoreDocument,
 } from '@coderline/alphatab-ui';
-import { isIOS } from '@site/src/utils';
+import { isIOS } from './is-ios';
 import { PLAYGROUND_SAMPLES, type PlaygroundSample } from './sources';
 import styles from './playground.module.scss';
 

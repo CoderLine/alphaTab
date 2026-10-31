@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import * as alphaTab from '@coderline/alphatab';
 import { useAlphaTabApi } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
 import {
     IconCheck,
     IconCopy,
@@ -46,7 +46,6 @@ interface MediaSyncPanelProps {
 export const MediaSyncPanel: React.FC<MediaSyncPanelProps> = ({ doc, onClose }) => {
     const sync = useMediaSync();
     const api = useAlphaTabApi();
-    const module = useAlphaTabModule();
     const isPhone = useMediaQuery(PHONE_QUERY);
     const audioInputRef = useRef<HTMLInputElement>(null);
     const timelineRef = useRef<SyncTimelineHandle>(null);
@@ -70,8 +69,8 @@ export const MediaSyncPanel: React.FC<MediaSyncPanelProps> = ({ doc, onClose }) 
     };
 
     const downloadGp = () => {
-        if (!api?.score || !module) { return; }
-        const bytes = new module.exporter.Gp7Exporter().export(api.score, api.settings);
+        if (!api?.score) { return; }
+        const bytes = new alphaTab.exporter.Gp7Exporter().export(api.score, api.settings);
         downloadBytes(withExtension(doc.document?.fileName ?? 'score', 'gp'), bytes);
     };
 

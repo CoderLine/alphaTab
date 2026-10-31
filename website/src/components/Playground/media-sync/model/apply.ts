@@ -1,13 +1,14 @@
+import type * as alphaTab from '@coderline/alphatab';
 import type { AlphaTabApi, model } from '@coderline/alphatab';
-import type { AlphaTabModule } from '@site/src/alphatab-react';
 import { isSyncPoint, type SyncMarker, type TimelineInput } from './timeline';
 
 /**
  * Reads the timeline of the score loaded in `api`. `createSyncPoints` adds sync points at every
  * tempo change (for an initial sync) instead of using only the ones in the score.
- * `null` until alphaTab has generated the playback for the score.
+ * `null` until alphaTab has generated the playback for the score. alphaTab is passed in so the
+ * model stays free of runtime alphaTab imports.
  */
-export function readTimelineInput(module: AlphaTabModule, api: AlphaTabApi, createSyncPoints: boolean): TimelineInput | null {
+export function readTimelineInput(module: typeof alphaTab, api: AlphaTabApi, createSyncPoints: boolean): TimelineInput | null {
     const score = api.score;
     const cache = api.tickCache;
     if (!score || !cache || cache.masterBars.length === 0) { return null; }

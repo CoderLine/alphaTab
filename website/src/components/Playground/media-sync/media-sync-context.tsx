@@ -1,8 +1,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import * as alphaTab from '@coderline/alphatab';
 import type { model, synth } from '@coderline/alphatab';
 import { usePlayerControls, usePlayerSelector, type MediaElementLike } from '@coderline/alphatab-ui';
 import { useAlphaTabApi, useAlphaTabEvent } from '@coderline/alphatab-react';
-import { useAlphaTabModule } from '@site/src/alphatab-react';
 import { analyseAudio, type AudioAnalysis } from './model/audio';
 import { applySyncPoints, readTimelineInput, scoreHasSyncPoints, toFlatSyncPoints } from './model/apply';
 import { autoSync, markersFromScore } from './model/edit';
@@ -89,7 +89,6 @@ function audioElementOf(output: synth.ISynthOutput | undefined): HTMLAudioElemen
 export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const api = useAlphaTabApi();
     const store = usePlayerControls();
-    const module = useAlphaTabModule();
     const score = usePlayerSelector((s) => s.currentScore);
     const effective = usePlayerSelector((s) => s.playback.effective);
     const hasAudio = usePlayerSelector((s) => s.playback.hasBackingTrack);
@@ -200,8 +199,8 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const syncing = kind !== 'synth';
 
     useEffect(() => {
-        if (!api || !module || !score || !syncing) { return; }
-        const input = readTimelineInput(module, api, false);
+        if (!api || !score || !syncing) { return; }
+        const input = readTimelineInput(alphaTab, api, false);
         if (!input) { return; }
         const signature = timelineSignature(input);
         if (timeline.current?.signature === signature && history.present) {
@@ -217,15 +216,15 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             markers = markersFromScore(input);
         } else if (kind === 'audio') {
             if (!analysis) { return; }
-            markers = autoSync(readTimelineInput(module, api, true)!, analysis.songRange);
+            markers = autoSync(readTimelineInput(alphaTab, api, true)!, analysis.songRange);
         } else {
-            markers = autoSync(readTimelineInput(module, api, true)!, null);
+            markers = autoSync(readTimelineInput(alphaTab, api, true)!, null);
         }
         timeline.current = { signature, score };
         dispatch({ type: 'reset', value: markers });
         // `history.present` is read, not reacted to: edits are applied by the effect below.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [api, module, score, syncing, kind, analysis, midiRevision]);
+    }, [api, score, syncing, kind, analysis, midiRevision]);
 
     const appliedRef = useRef<SyncMarker[] | null>(null);
     useEffect(() => {
@@ -240,21 +239,21 @@ export const MediaSyncProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const redo = useCallback(() => dispatch({ type: 'redo' }), []);
 
     const autoSyncNow = useCallback(() => {
-        if (!api || !module) { return; }
-        const input = readTimelineInput(module, api, true);
+        if (!api) { return; }
+        const input = readTimelineInput(alphaTab, api, true);
         if (!input) { return; }
         commit(autoSync(input, kind === 'audio' ? (analysis?.songRange ?? null) : null));
-    }, [api, module, kind, analysis, commit]);
+    }, [api, kind, analysis, commit]);
 
     const clearSyncPoints = useCallback(() => {
-        if (!api || !module) { return; }
-        const input = readTimelineInput(module, api, false);
+        if (!api) { return; }
+        const input = readTimelineInput(alphaTab, api, false);
         if (!input) { return; }
         const markers = buildMarkers({ ...input, syncPoints: [] });
         markers[0].syncBpm = markers[0].synthBpm;
         markers[markers.length - 1].syncBpm = markers[markers.length - 1].synthBpm;
         commit(markers);
-    }, [api, module, commit]);
+    }, [api, commit]);
 
     const resetDocument = useCallback(() => {
         setChosenKind(null);
