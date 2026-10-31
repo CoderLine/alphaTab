@@ -7,7 +7,7 @@ export type AlphaTabEventName = {
     [K in keyof AlphaTabApi]-?: AlphaTabApi[K] extends IEventEmitter | IEventEmitterOfT<any> ? K : never;
 }[keyof AlphaTabApi];
 
-/** The argument alphaTab passes to handlers of the event `E`; `unknown` for events without one. */
+/** The argument alphaTab passes to handlers of the event `E`; `never` for events without one. */
 export type AlphaTabEventArgs<E extends AlphaTabEventName> =
     AlphaTabApi[E] extends IEventEmitterOfT<infer T> ? T : never;
 
