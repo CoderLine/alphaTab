@@ -17,7 +17,7 @@ import {
   writeReferenceTable,
 } from "./generate-common.mjs";
 import ts from "typescript";
-import { FileStream, openFileStream } from "./util.mjs";
+import { clearGeneratedPages, FileStream, openFileStream } from "./util.mjs";
 
 type Member<TMember> = {
   parent: ts.ClassDeclaration | ts.InterfaceDeclaration,
@@ -26,6 +26,7 @@ type Member<TMember> = {
 
 export async function generateApiDocs(context: GenerateContext) {
   const basePath = path.join(repositoryRoot, "docs", "reference", "api");
+  await clearGeneratedPages(basePath);
   await fs.promises.mkdir(basePath, { recursive: true });
 
   const properties: Member<ts.PropertyDeclaration

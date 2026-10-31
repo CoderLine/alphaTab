@@ -17,11 +17,15 @@ import {
   writeReferenceTable,
 } from "./generate-common.mjs";
 import { GenerateContext } from "./typeschema.mjs";
-import { openFileStream } from "./util.mjs";
+import { clearGeneratedPages, openFileStream } from "./util.mjs";
 
 export async function generateSettings(context: GenerateContext) {
   enableWarningsOnMissingDocs();
   try {
+    await clearGeneratedPages(
+      path.join(repositoryRoot, "docs", "reference", "settings")
+    );
+
     const allProps = context.settings.members.filter((m) => {
       const isStatic =
         ts.canHaveModifiers(m) &&

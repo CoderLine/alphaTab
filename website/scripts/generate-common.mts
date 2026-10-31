@@ -1224,7 +1224,7 @@ export function collectMembers(
       (ts.isClassDeclaration(baseType) || ts.isInterfaceDeclaration(baseType))
     ) {
       collectMembers(context, members, baseType);
-    } else if (symbol.members) {
+    } else if (symbol?.members) {
       for (const [_, member] of symbol.members) {
         const decl = valueOrFirstDeclarationInDts(context, member);
         if (decl) {

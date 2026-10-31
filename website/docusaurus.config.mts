@@ -9,12 +9,39 @@ import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-di
 
 import * as path from "path";
 import * as fs from "fs";
+import { createRequire } from "module";
+import { fileURLToPath } from "url";
 import { AlphaTabWebPackPlugin } from "@coderline/alphatab-webpack";
 import { RuleSetRule } from "webpack";
 
-const alphaTabVersionFull = JSON.parse(
+const siteDir = path.dirname(fileURLToPath(import.meta.url));
+
+// The docs and the site styles import these generator outputs; without them the
+// build fails with unrelated-looking "Module not found" or sass errors.
+const generatedFiles = [
+  "docs/reference/_apiTable.mdx",
+  "docs/reference/_settingsTable.mdx",
+  "docs/alphatex/_score-metadata.mdx",
+  "src/css/highlight.scss",
+];
+const missingGeneratedFiles = generatedFiles.filter(
+  (f) => !fs.existsSync(path.join(siteDir, f))
+);
+if (missingGeneratedFiles.length > 0) {
+  throw new Error(
+    `Generated reference docs are missing (${missingGeneratedFiles.join(", ")}). ` +
+      "Run `npm run generate-alphatabdoc` in website/ first; `npm run build` and `npm start` do this automatically."
+  );
+}
+
+// alphaTab's package exports don't expose ./package.json, so it is located
+// relative to the resolved entry (dist/alphaTab.js).
+const alphaTabVersionFull: string = JSON.parse(
   fs.readFileSync(
-    path.join("node_modules", "@coderline", "alphatab", "package.json"),
+    path.resolve(
+      createRequire(import.meta.url).resolve("@coderline/alphatab"),
+      "../../package.json"
+    ),
     "utf8"
   )
 ).version;
@@ -48,7 +75,7 @@ const githubRepo = "CoderLine/alphaTab";
 // Discover the latest release-notes page so the landing banner's "Release
 // notes" link always points to the newest release without manual edits.
 function findLatestReleaseNotesPath(): string {
-  const dir = path.join("docs", "releases");
+  const dir = path.join(siteDir, "docs", "releases");
   const files = fs.readdirSync(dir);
   // Filenames look like `release1_8.mdx`. Sort by the numeric suffix and pick
   // the highest. Strip the extension for the docs URL.
@@ -174,7 +201,10 @@ async function createConfig(): Promise<Config> {
         blog: false,
         docs: {
           sidebarPath: "./sidebars.ts",
-          editUrl: "https://github.com/CoderLine/alphaTabWebsite/tree/main/",
+          editUrl: ({ versionDocsDirPath, docPath }) =>
+            /^reference\/(api|settings|types)\//.test(docPath)
+              ? undefined
+              : `https://github.com/CoderLine/alphaTab/edit/develop/website/${versionDocsDirPath}/${docPath}`,
           beforeDefaultRemarkPlugins: [remarkGithubAdmonitionsToDirectives],
           async sidebarItemsGenerator({
             defaultSidebarItemsGenerator,
@@ -214,7 +244,7 @@ async function createConfig(): Promise<Config> {
             // Group feature-catalog pages under their chapter — matching the
             // card grid on the group index. Chapter order and labels come from
             // `_chapters.ts` next to each group directory.
-            const featuresRoot = path.join("docs", "features");
+            const featuresRoot = path.join(siteDir, "docs", "features");
             const chaptersCache = new Map<
               string,
               { id: string; label: string }[]

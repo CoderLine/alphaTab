@@ -1,4 +1,34 @@
 import fs from "fs";
+import path from "path";
+
+/**
+ * Deletes the generated `.mdx` pages below `dir` and the folders left empty.
+ * Hand-written `_*.mdx` partials stay.
+ */
+export async function clearGeneratedPages(dir: string): Promise<void> {
+  let entries: fs.Dirent[];
+  try {
+    entries = await fs.promises.readdir(dir, { withFileTypes: true });
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") {
+      return;
+    }
+    throw e;
+  }
+
+  for (const entry of entries) {
+    const entryPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await clearGeneratedPages(entryPath);
+    } else if (entry.name.endsWith(".mdx") && !entry.name.startsWith("_")) {
+      await fs.promises.rm(entryPath);
+    }
+  }
+
+  if ((await fs.promises.readdir(dir)).length === 0) {
+    await fs.promises.rmdir(dir);
+  }
+}
 
 export interface FileStream extends AsyncDisposable {
   suspend: boolean;

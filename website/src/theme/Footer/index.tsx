@@ -57,7 +57,7 @@ export default function Footer(): React.ReactElement | null {
   const { links, copyright } = footer;
   const columns: FooterColumn[] = isMultiColumn(links) ? links : [];
   const version =
-    (siteConfig.customFields?.alphaTabVersion as string | undefined) ?? '';
+    (siteConfig.customFields?.alphaTabVersionFull as string | undefined) ?? '';
 
   return (
     <footer className={styles.footer}>

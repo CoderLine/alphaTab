@@ -19,9 +19,13 @@ import {
   getTypeWithNullableInfo,
   repositoryRoot,
 } from "./typeschema.mjs";
-import { FileStream, openFileStream } from "./util.mjs";
+import { clearGeneratedPages, FileStream, openFileStream } from "./util.mjs";
 
 export async function generateTypeDocs(context: GenerateContext) {
+  await clearGeneratedPages(
+    path.join(repositoryRoot, "docs", "reference", "types")
+  );
+
   for (const [exportedName, exportedType] of context.flatExports) {
     const parts = exportedName.split(".");
     if (parts[0] === "alphaTab") {
