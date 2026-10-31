@@ -72,6 +72,12 @@
             "@coderline/alphatab-monaco": [
                 "${configDir}/../monaco/src/alphaTab.monaco"
             ],
+            "@coderline/alphatab-react/*": [
+                "${configDir}/../react/src/*"
+            ],
+            "@coderline/alphatab-react": [
+                "${configDir}/../react/src/index"
+            ],
             "@coderline/alphatab-alphatex/*": [
                 "${configDir}/../alphatex/src/*"
             ],

@@ -43,6 +43,8 @@
 
         "build-monaco": "npm run build --workspace=packages/monaco",
 
+        "build-react": "npm run build --workspace=packages/react",
+
         "build-website": "npm run build --workspace=website",
         "dev-website": "npm run start --workspace=website",
 
