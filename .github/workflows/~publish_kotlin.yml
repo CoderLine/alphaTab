@@ -28,7 +28,7 @@ jobs:
           distribution: "temurin"
 
       - run: npm run update-version -- ${{inputs.version}}
-      - run: npm ci
+      - run: npm ci -w packages/alphatab -w packages/transpiler -w packages/tooling -w packages/kotlin --include-workspace-root
       - run: npm run build-kotlin
 
       - run: npm run nightly-pack -- --platform kotlin --force ${{ inputs.force }}

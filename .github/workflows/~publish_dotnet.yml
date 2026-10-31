@@ -27,7 +27,7 @@ jobs:
           dotnet-version: "8"
 
       - run: npm run update-version -- ${{inputs.version}}
-      - run: npm ci
+      - run: npm ci -w packages/alphatab -w packages/transpiler -w packages/tooling -w packages/csharp --include-workspace-root
       - run: npm run build-csharp
 
       - run: npm run nightly-pack -- --platform dotnet --force ${{ inputs.force }}
