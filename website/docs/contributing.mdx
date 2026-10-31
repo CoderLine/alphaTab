@@ -39,7 +39,7 @@ Discussions keep the issue tracker focused on confirmed work items.
 
 ## Contribute code
 
-alphaTab lives in one monorepo — [github.com/CoderLine/alphaTab](https://github.com/CoderLine/alphaTab) — built on npm workspaces. Every package listed below is a workspace under `packages/`:
+alphaTab lives in one monorepo — [github.com/CoderLine/alphaTab](https://github.com/CoderLine/alphaTab) — built on npm workspaces. Every package listed below is a workspace under `packages/`; the documentation site is the `website/` workspace:
 
 - `alphatab` — the main library and the source of truth for all platforms
 - `alphatex` — the alphaTex text-format parser and tools
@@ -93,7 +93,7 @@ cd alphaTab
 npm install
 ```
 
-`npm install` installs every workspace under `packages/` in one pass. From here on, run scripts against the root — the root `package.json` orchestrates the workspaces.
+`npm install` installs every workspace, including the documentation site under `website/`, in one pass. From here on, run scripts against the root — the root `package.json` orchestrates the workspaces.
 
 ### Everyday commands
 
@@ -152,21 +152,23 @@ alphaTab targets zero runtime dependencies. The core modules are written to run 
 
 ### Code style
 
-Biome ([biomejs.dev](https://biomejs.dev/)) formats and lints the TypeScript source. Run `npm run lint` before opening a pull request — CI will run it too. The formatter uses four-space indentation and a 120-character line width; the configuration lives in [biome.jsonc](https://github.com/CoderLine/alphaTab/blob/develop/biome.jsonc) at the repository root.
+Biome ([biomejs.dev](https://biomejs.dev/)) formats and lints the TypeScript source. Run `npm run lint` before opening a pull request — CI will run it too. The formatter uses four-space indentation and a 120-character line width; the configuration lives in [biome.jsonc](https://github.com/CoderLine/alphaTab/blob/develop/biome.jsonc) at the repository root. The documentation site under `website/` is linted but not formatted by Biome; it keeps its own code style.
 
 ## Contribute to the documentation
 
-The documentation site is a separate repository: [alphaTabWebsite](https://github.com/CoderLine/alphaTabWebsite), built with [Docusaurus](https://docusaurus.io/).
+The documentation site lives in the [`website/`](https://github.com/CoderLine/alphaTab/tree/develop/website) folder of the alphaTab repository and is built with [Docusaurus](https://docusaurus.io/). Documentation changes go into the same pull request as the code they describe.
 
 Every documentation page follows the [documentation style guide](/docs/style-guide) — voice, structure, formatting, and code-sample rules. Read it before writing new pages or rewriting existing ones.
 
-Run the site locally:
+The API, settings and type reference pages are generated from alphaTab's JSDoc when the site builds. To change them, edit the JSDoc in `packages/alphatab/src` or the hand-written `_<member>.mdx` partials next to the generated pages.
+
+The site builds against the local alphaTab packages. Build them once, and again after changing their source, then start the site from the repository root:
 
 ```bash
-git clone https://github.com/CoderLine/alphaTabWebsite.git
-cd alphaTabWebsite
-npm install
-npm start
+npm run build-web
+npm run build-language-server
+npm run build-monaco
+npm run dev-website
 ```
 
-The dev server serves the site at `http://localhost:3000` with hot-reload. Open a pull request against `develop` when your change is ready.
+The dev server serves the site at `http://localhost:3000` with hot-reload. `npm run build-website` runs the production build, including the broken-link check. Open a pull request against `develop` when your change is ready.

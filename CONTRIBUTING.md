@@ -72,6 +72,7 @@ you'd like your AI to follow them, point it at that file before you start.
 ## Contributing Code
 
 The [docs page for contributing](https://www.alphatab.net/docs/contributing) is a good thing to read for new contributors.
+The documentation site lives in [`website/`](./website/); update it in the same pull request as the code it describes.
 
 Code changes can be offered by opening pull requests. To do so, we recommend following workflow:
 
