@@ -187,6 +187,8 @@ async function createConfig(): Promise<Config> {
       rspackPersistentCache: false,
       mdxCrossCompilerCache: true,
       ssgWorkerThreads: true,
+      swcJsLoader: true,
+      swcJsMinimizer: true,
     },
   },
   customFields: {
