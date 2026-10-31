@@ -1,4 +1,4 @@
-import React, { ReactElement, ReactNode } from "react";
+import React, { ReactElement } from "react";
 import { TooltipSinceBadge } from "../SinceBadge";
 import Details from "@theme/Details";
 import { Tooltip } from "react-tooltip";
@@ -6,11 +6,11 @@ import ReactDOMServer from "react-dom/server";
 import styles from "./styles.module.scss";
 
 export enum FeatureStatus {
-  Supported,
-  Partial,
-  NotSupported,
-  Ignored,
-  Unspecified,
+  Supported = 0,
+  Partial = 1,
+  NotSupported = 2,
+  Ignored = 3,
+  Unspecified = 4,
 }
 
 const FeatureStatusDisplay: React.FC<{ status: FeatureStatus }> = ({
@@ -85,7 +85,7 @@ function computeFeatureStatistics(node: React.ReactNode): {
   let supportedFeatures = featureRows
     .map((f) => {
       const status = toFeatureStatusDefinitionFull(f.props.reading)?.status;
-      if (status == undefined) {
+      if (status == null) {
         return 1;
       }
       switch (status) {
@@ -114,9 +114,9 @@ function computeFeatureStatistics(node: React.ReactNode): {
     const status = toFeatureStatusDefinitionFull(f.props.reading)?.status;
     return (
       status === undefined ||
-      status == FeatureStatus.Ignored ||
-      status == FeatureStatus.Supported ||
-      status == FeatureStatus.Unspecified
+      status === FeatureStatus.Ignored ||
+      status === FeatureStatus.Supported ||
+      status === FeatureStatus.Unspecified
     );
   }).length;
 

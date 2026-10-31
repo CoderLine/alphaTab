@@ -29,7 +29,7 @@ export async function generateSettings(context: GenerateContext) {
     const allProps = context.settings.members.filter((m) => {
       const isStatic =
         ts.canHaveModifiers(m) &&
-        m.modifiers?.some((mod) => mod.kind == ts.SyntaxKind.StaticKeyword);
+        m.modifiers?.some((mod) => mod.kind === ts.SyntaxKind.StaticKeyword);
 
       return ts.isPropertyDeclaration(m) && !isStatic;
     }) as ts.PropertyDeclaration[];
@@ -56,7 +56,7 @@ export async function generateSettings(context: GenerateContext) {
           const isSubSettingPropStatic =
             ts.canHaveModifiers(member) &&
             member.modifiers?.some(
-              (mod) => mod.kind == ts.SyntaxKind.StaticKeyword
+              (mod) => mod.kind === ts.SyntaxKind.StaticKeyword
             );
 
           if ((ts.isPropertyDeclaration(member) || ts.isGetAccessorDeclaration(member)) && !isSubSettingPropStatic) {

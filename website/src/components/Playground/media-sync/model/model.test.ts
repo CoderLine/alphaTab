@@ -137,7 +137,9 @@ describe('toggleMarker', () => {
     it('adding a sync point keeps positions unchanged', () => {
         const added = toggleMarker(synced, 2);
         assert.ok(isSyncPoint(added[2]));
-        added.forEach((m, i) => near(m.syncTime, synced[i].syncTime, `marker ${i}`));
+        added.forEach((m, i) => {
+            near(m.syncTime, synced[i].syncTime, `marker ${i}`);
+        });
     });
 });
 

@@ -31,9 +31,7 @@ const TOKEN_RE =
 function tokenize(src: string): Token[] {
   const out: Token[] = [];
   let last = 0;
-  let m: RegExpExecArray | null;
-  TOKEN_RE.lastIndex = 0;
-  while ((m = TOKEN_RE.exec(src)) !== null) {
+  for (const m of src.matchAll(TOKEN_RE)) {
     if (m.index > last) { out.push({ t: src.slice(last, m.index), c: 'plain' }); }
     if (m[1]) { out.push({ t: m[1], c: 'comment' }); }
     else if (m[2]) { out.push({ t: m[2], c: 'string' }); }
@@ -42,7 +40,7 @@ function tokenize(src: string): Token[] {
     else if (m[5]) { out.push({ t: m[5], c: 'cls' }); }
     else if (m[6]) { out.push({ t: m[6], c: 'fn' }); }
     else if (m[7]) { out.push({ t: m[7], c: 'punc' }); }
-    last = TOKEN_RE.lastIndex;
+    last = m.index + m[0].length;
   }
   if (last < src.length) { out.push({ t: src.slice(last), c: 'plain' }); }
   return out;

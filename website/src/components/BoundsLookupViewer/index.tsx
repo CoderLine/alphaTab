@@ -189,7 +189,7 @@ const Overlay: React.FC<InnerProps> = ({ selectedType, selectedElements }) => {
 
   const hexToRgba = (hex: string, alpha: number) => {
     let c = hex.substring(1).split("");
-    if (c.length == 3) {
+    if (c.length === 3) {
       c = [c[0], c[0], c[1], c[1], c[2], c[2]];
     }
     const n = parseInt(c.join(""), 16);

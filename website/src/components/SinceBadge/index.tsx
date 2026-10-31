@@ -11,7 +11,7 @@ export const SinceBadge: React.FC<SinceBadgeProps> = ({ since, inline }) => {
   if (
     inline &&
     doc.frontMatter.sidebar_custom_props?.since &&
-    doc.frontMatter.sidebar_custom_props?.since == since
+    String(doc.frontMatter.sidebar_custom_props.since) === since
   ) {
     return <></>;
   }

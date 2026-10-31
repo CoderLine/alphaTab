@@ -323,7 +323,7 @@ export function valueOrFirstDeclarationInDts(
 
   const d = s.declarations?.find(
     (d) =>
-      path.basename(d.getSourceFile().fileName) == path.basename(context.dts)
+      path.basename(d.getSourceFile().fileName) === path.basename(context.dts)
   );
   if (d) {
     return d;

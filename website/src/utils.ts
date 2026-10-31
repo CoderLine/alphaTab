@@ -45,5 +45,5 @@ export function isIOS() {
   // - iPhone 16 - iOS 18 (navigator.platform = "iPhone")
   // - iPhone 16 - iOS 18.6 (navigator.platform = "iPhone")
   return iOSPlatforms.has(navigator.platform) ||
-    navigator.platform == "MacIntel" && navigator.maxTouchPoints > 1;
+    navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
 }

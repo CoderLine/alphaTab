@@ -2,7 +2,6 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import { FC } from "react";
 import Link from "@docusaurus/Link";
-import { useDoc } from "@docusaurus/plugin-content-docs/lib/client/doc.js";
 
 export type SignatureToken =
     [string, string] | [string, string, string];
@@ -45,7 +44,6 @@ export const SignatureItem: FC<SignatureItemProps> = ({ style, tokens }) => {
                     {tokens.map((t, i) => <SignatureItemToken key={i} token={t} />)}
                 </code>
             )
-            break;
         case "block":
             return (
                 <div className="codeBlockContainer">

@@ -103,7 +103,7 @@ export const AlphaTabFull: React.FC<AlphaTabProps> = ({ settings }) => {
     scrollMode: alphaTab.ScrollMode | undefined,
     width: number
   ) => {
-    if (layoutMode == undefined) {
+    if (layoutMode == null) {
       if (width > 750) {
         settings.display.scale = 1;
         settings.display.layoutMode = alphaTab.LayoutMode.Page;

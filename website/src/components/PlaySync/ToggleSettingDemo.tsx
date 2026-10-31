@@ -5,7 +5,6 @@ import {
   AlphaTabPlayer,
   AlphaTabCanvas,
   useAlphaTabControls,
-  useAlphaTabApi,
 } from '@site/src/alphatab-react';
 import { TransportBar } from './TransportControls';
 import styles from './styles.module.scss';

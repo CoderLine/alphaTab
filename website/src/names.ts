@@ -2,7 +2,7 @@ import { Page } from "./page";
 
 export function toPascalCase(v: string | string[]) {
   if (typeof v === "string") {
-    var parts = v.split(".");
+    const parts = v.split(".");
     for (let i = 0; i < parts.length; i++) {
       parts[i] = parts[i].slice(0, 1).toUpperCase() + parts[i].slice(1);
     }
@@ -13,11 +13,7 @@ export function toPascalCase(v: string | string[]) {
 
 export function toCamelCase(v: string | string[]) {
   if (typeof v === "string") {
-    var parts = v.split(".");
-    for (let i = 0; i < parts.length; i++) {
-      parts[i] = parts[i];
-    }
-    return parts.join(".");
+    return v;
   }
   return v.map(toCamelCase);
 }

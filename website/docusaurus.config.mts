@@ -95,10 +95,10 @@ function findLatestReleaseNotesPath(): string {
 }
 const latestReleaseNotesPath = findLatestReleaseNotesPath();
 const isPreRelease = alphaTabVersionFull.indexOf("-") >= 0;
-let alphaTabVersion;
+let alphaTabVersion: string;
 let algoliaAppId = '26AE6KNYRK';
 let algoliaApiKey = '3db9646111702a74fe1f2249ddafa870';
-let algoliaIndexName;
+let algoliaIndexName: string;
 if (isPreRelease) {
   alphaTabVersion = alphaTabVersionFull.substring(
     0,
@@ -262,8 +262,7 @@ async function createConfig(): Promise<Config> {
               if (fs.existsSync(filePath)) {
                 const text = fs.readFileSync(filePath, "utf-8");
                 const regex = /\{\s*id:\s*['"]([^'"]+)['"][\s\S]*?label:\s*['"]([^'"]+)['"]/g;
-                let m;
-                while ((m = regex.exec(text)) !== null) {
+                for (const m of text.matchAll(regex)) {
                   chapters.push({ id: m[1], label: m[2] });
                 }
               }
@@ -303,7 +302,9 @@ async function createConfig(): Promise<Config> {
                 (c: any) => c.type === "doc" && c.id === indexId
               );
               const buckets = new Map<string, any[]>();
-              chapters.forEach((c) => buckets.set(c.id, []));
+              for (const c of chapters) {
+                buckets.set(c.id, []);
+              }
               const rest: any[] = [];
               for (const child of item.items) {
                 if (child === indexItem) { continue; }
@@ -371,7 +372,7 @@ async function createConfig(): Promise<Config> {
                     bv = bv === undefined ? bv : String(bv);
                   }
 
-                  var result = 0;
+                  let result = 0;
 
                   if (av === undefined && bv === undefined) {
                     // continue

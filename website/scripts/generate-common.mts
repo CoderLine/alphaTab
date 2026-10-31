@@ -533,7 +533,7 @@ function tryGetSettingsUrl(
         (m) =>
           ts.isPropertyDeclaration(m) &&
           m.type &&
-          context.checker.getTypeAtLocation(m.type).symbol == symbol.parent
+          context.checker.getTypeAtLocation(m.type).symbol === symbol.parent
       );
       if (settingsProp) {
         return `/docs/reference/settings/${settingsProp
@@ -1185,7 +1185,7 @@ function shouldGenerateMember(
     ts.canHaveModifiers(m) &&
     m.modifiers?.some(
       (mod) =>
-        mod.kind == ts.SyntaxKind.PrivateKeyword ||
+        mod.kind === ts.SyntaxKind.PrivateKeyword ||
         mod.kind === ts.SyntaxKind.ProtectedKeyword
     )
   ) {

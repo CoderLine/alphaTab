@@ -2,7 +2,6 @@ import type {
   PropSidebarItem,
   PropSidebarItemLink,
   PropVersionDoc,
-  DocFrontMatter,
   DocMetadata
 } from "@docusaurus/plugin-content-docs";
 

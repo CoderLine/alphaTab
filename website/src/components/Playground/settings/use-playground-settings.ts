@@ -195,7 +195,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
         if (effects.has('reload')) { onReloadRef.current(); }
     }, [store, api, module, entries, defaults, setOverrides]);
 
-    const valueOf = useCallback(
+    const readValue = useCallback(
         (entry: SchemaEntry): SettingValue | undefined => {
             if (entry.effect === 'stylesheet') { return score ? entry.read(score) : undefined; }
             return overrides[entry.id] ?? defaults[entry.id];
@@ -210,7 +210,7 @@ export function usePlaygroundSettings(onReload: () => void): PlaygroundSettings 
     return {
         groups,
         quick,
-        valueOf,
+        valueOf: readValue,
         isOverridden,
         setValue,
         resetValue,

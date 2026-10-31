@@ -9,7 +9,7 @@ import styles from "./styles.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import { useAlphaTabEvent } from "@site/src/hooks";
-import { openFile, openInputFile } from "@site/src/utils";
+import { openInputFile } from "@site/src/utils";
 
 export interface PlayerControlsGroupProps {
   api: alphaTab.AlphaTabApi;
@@ -39,7 +39,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
     setSoundFontLoadPercentage(1);
   });
   useAlphaTabEvent(api, "playerStateChanged", (e) => {
-    setPlaying(e.state == alphaTab.synth.PlayerState.Playing);
+    setPlaying(e.state === alphaTab.synth.PlayerState.Playing);
   });
   useAlphaTabEvent(api, "playerPositionChanged", (e) => {
     // reduce number of UI updates to second changes.

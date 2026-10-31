@@ -74,7 +74,7 @@ export async function openFileStream(path: string): Promise<FileStream> {
 
 export function toPascalCase(v: string | string[]) {
   if (typeof v === "string") {
-    var parts = v.split(".");
+    const parts = v.split(".");
     for (let i = 0; i < parts.length; i++) {
       parts[i] = parts[i].slice(0, 1).toUpperCase() + parts[i].slice(1);
     }
