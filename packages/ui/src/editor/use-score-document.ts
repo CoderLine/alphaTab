@@ -36,6 +36,11 @@ export interface ScoreDocumentAdapter {
      * mirrored into the address bar and `buildShareUrl` returns links.
      */
     buildLink?(target: ScoreLinkTarget): Promise<string>;
+    /**
+     * `sessionStorage` key that keeps an open alphaTex document with its edits, so a reload of the
+     * page reopens it when the address names no document. Binary documents are not kept.
+     */
+    sessionKey?: string;
 }
 
 interface DocumentBase {
@@ -87,6 +92,53 @@ let nextDocumentId = 1;
  * reopens it, including local files and unsaved alphaTex edits, which the URL cannot carry.
  */
 let remembered: { document: ScoreDocument; text: string } | null = null;
+
+interface SessionDocument {
+    fileName: string;
+    originalText: string;
+    text: string;
+    sampleId?: string;
+}
+
+function readSession(key: string): SessionDocument | null {
+    try {
+        const raw = sessionStorage.getItem(key);
+        const parsed: unknown = raw === null ? null : JSON.parse(raw);
+        if (typeof parsed !== 'object' || parsed === null) { return null; }
+        const { fileName, originalText, text, sampleId } = parsed as Record<string, unknown>;
+        if (typeof fileName !== 'string' || typeof originalText !== 'string' || typeof text !== 'string') { return null; }
+        return { fileName, originalText, text, sampleId: typeof sampleId === 'string' ? sampleId : undefined };
+    } catch {
+        return null;
+    }
+}
+
+function writeSession(key: string, document: ScoreDocument, text: string): void {
+    try {
+        if (document.kind === 'tex') {
+            const entry: SessionDocument = { fileName: document.fileName, originalText: document.originalText, text, sampleId: document.sampleId };
+            sessionStorage.setItem(key, JSON.stringify(entry));
+        } else {
+            sessionStorage.removeItem(key);
+        }
+    } catch {
+        // Storage can be unavailable or full; the document then only lives as long as the page.
+    }
+}
+
+function documentForSession(entry: SessionDocument, adapter: ScoreDocumentAdapter): ScoreDocument {
+    const sample = entry.sampleId ? adapter.findSample(entry.sampleId) : undefined;
+    return {
+        id: nextDocumentId++,
+        kind: 'tex',
+        fileName: entry.fileName,
+        color: sample?.color ?? 'var(--at-accent)',
+        initialTracks: 'all',
+        originalText: entry.originalText,
+        sampleId: sample?.id,
+        backingTrack: sample?.source.backingTrack,
+    };
+}
 
 function fileNameOfUrl(url: string): string {
     return decodeURIComponent(url.split(/[?#]/)[0].split('/').pop() || 'score');
@@ -141,7 +193,7 @@ function documentForTarget(target: ScoreLinkTarget | null, adapter: ScoreDocumen
  * The score document of a player view: opens samples, files and alphaTex, loads them through the
  * store (alphaTex re-renders on every edit, keeping the viewport), and with `adapter.buildLink`
  * keeps the page address and share links in sync. The open document survives a remount of the
- * player within the page. Must be used inside `<PlayerProvider>`; keep `adapter` stable.
+ * player within the page, and with `adapter.sessionKey` an alphaTex document also a reload. Must be used inside `<PlayerProvider>`; keep `adapter` stable.
  */
 export function useScoreDocument(adapter: ScoreDocumentAdapter): ScoreDocumentState {
     const controls = usePlayerControls();
@@ -174,6 +226,12 @@ export function useScoreDocument(adapter: ScoreDocumentAdapter): ScoreDocumentSt
                 setText(remembered.text);
                 return;
             }
+            const session = !target && adapter.sessionKey ? readSession(adapter.sessionKey) : null;
+            if (session) {
+                open(documentForSession(session, adapter));
+                setText(session.text);
+                return;
+            }
             open(documentForTarget(target, adapter));
         });
         return () => {
@@ -184,7 +242,8 @@ export function useScoreDocument(adapter: ScoreDocumentAdapter): ScoreDocumentSt
     useEffect(() => {
         if (!document) { return; }
         remembered = { document, text };
-    }, [document, text]);
+        if (adapter.sessionKey) { writeSession(adapter.sessionKey, document, text); }
+    }, [document, text, adapter]);
 
     // Binary documents load once per open.
     useEffect(() => {
