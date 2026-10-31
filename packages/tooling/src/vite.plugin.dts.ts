@@ -1,31 +1,28 @@
 import path from 'node:path';
 import url from 'node:url';
 import { Extractor, ExtractorConfig, type ExtractorResult } from '@microsoft/api-extractor';
-import type ts from 'typescript';
 
-import { ExportAnalyzer } from '@microsoft/api-extractor/lib/analyzer/ExportAnalyzer';
+import { TypeScriptInternals } from '@microsoft/api-extractor/lib/analyzer/TypeScriptInternals';
 
-const original = (ExportAnalyzer.prototype as any)._isExternalModulePath;
-let exportAnalyzerExternals: (string | RegExp)[] = [];
-(ExportAnalyzer.prototype as any)._isExternalModulePath = function (
-    importOrExportDeclaration: ts.ImportDeclaration | ts.ExportDeclaration | ts.ImportTypeNode,
-    moduleSpecifier: string
-) {
-    if (exportAnalyzerExternals.length > 0) {
-        for (const ex of exportAnalyzerExternals) {
-            if (typeof ex === 'string' && ex === moduleSpecifier) {
-                return true;
-            } else if (ex instanceof RegExp && ex.test(moduleSpecifier)) {
-                return true;
-            }
-        }
-    }
-
-    return original.call(this, importOrExportDeclaration, moduleSpecifier);
+// API Extractor inlines every module the compiler does not resolve from node_modules, including the
+// tsconfig path aliases to sibling packages; modules marked here stay imports in the bundled `.d.ts`.
+const originalGetResolvedModule = TypeScriptInternals.getResolvedModule;
+let externalTypeModules: (string | RegExp)[] = [];
+TypeScriptInternals.getResolvedModule = (program, sourceFile, moduleNameText, mode) => {
+    const resolved = originalGetResolvedModule(program, sourceFile, moduleNameText, mode);
+    const isExternal = externalTypeModules.some(ex =>
+        typeof ex === 'string' ? ex === moduleNameText : ex.test(moduleNameText)
+    );
+    return resolved && isExternal ? { ...resolved, isExternalLibraryImport: true } : resolved;
 };
 
-export default function generateDts(root: string, dtsPath: string, outputFile: string, externals: (string | RegExp)[]) {
-    exportAnalyzerExternals = externals;
+export default function generateDts(
+    root: string,
+    dtsPath: string,
+    outputFile: string,
+    externalTypes: (string | RegExp)[]
+) {
+    externalTypeModules = externalTypes;
 
     const extractorConfig: ExtractorConfig = ExtractorConfig.prepare({
         packageJsonFullPath: path.resolve(root, 'package.json'),

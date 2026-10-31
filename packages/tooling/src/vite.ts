@@ -182,6 +182,11 @@ export interface DtsRegistration {
     shouldEmitForChunk?: (chunk: OutputChunk) => boolean;
     /** Override the tsconfig used for declaration emission. */
     tsconfigPath?: string;
+    /**
+     * Modules whose declarations the bundled `.d.ts` imports instead of inlining. Needed for sibling
+     * packages that the tsconfig path aliases resolve to source; packages from node_modules stay imports anyway.
+     */
+    externalTypes?: (string | RegExp)[];
 }
 
 /**
@@ -199,7 +204,7 @@ export function addDts(config: UserConfig, projectDir: string, options: DtsRegis
 
     config.plugins!.push(emitDtsPlugin({ projectDir, tsconfigPath, declarationDir: 'dist/types' }));
 
-    const externals = config.build!.rollupOptions!.external! as (string | RegExp)[];
+    const externalTypes = options.externalTypes ?? [];
 
     const output = config.build!.rollupOptions!.output as OutputOptions[];
     const ensureBundlingPlugin = (o: OutputOptions) => {
@@ -224,7 +229,7 @@ export function addDts(config: UserConfig, projectDir: string, options: DtsRegis
                         this.error(`Could not find intermediate d.ts at ${intermediate}`);
                     }
                     const outFile = path.resolve(opts.dir!, fileName.replace(/\.mjs$/, '.d.ts'));
-                    generateDts(projectDir, intermediate, outFile, externals);
+                    generateDts(projectDir, intermediate, outFile, externalTypes);
                 }
             }
         });
