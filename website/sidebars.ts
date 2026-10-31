@@ -18,8 +18,31 @@ const sidebars: SidebarsConfig = {
     ],
     "Getting Started (Web)": [
       "getting-started/installation-web",
-      "getting-started/installation-webpack",
-      "getting-started/installation-vite",
+      "getting-started/installation-web-projects",
+      {
+        type: "category",
+        label: "Bundlers",
+        collapsible: true,
+        collapsed: false,
+        items: [
+          "getting-started/installation-webpack",
+          "getting-started/installation-vite",
+          "getting-started/installation-other-bundlers",
+        ],
+      },
+      {
+        type: "category",
+        label: "Frameworks",
+        collapsible: true,
+        collapsed: false,
+        items: [
+          "getting-started/installation-react",
+          "getting-started/installation-vue",
+          "getting-started/installation-angular",
+          "getting-started/installation-svelte",
+          "getting-started/installation-solid",
+        ],
+      },
       "getting-started/configuration-web",
     ],
     "Getting Started (.NET)": [

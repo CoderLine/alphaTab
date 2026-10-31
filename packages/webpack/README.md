@@ -12,7 +12,7 @@ alphaTab internally off-loads some work to background workers to not block the b
 
 Sharing the core chunk needs two optimization settings, which the plugin configures:
 
-* `optimization.usedExports` is set to `'global'` unless configured. With `true` (webpack's production default), the used exports get optimized per runtime and the core is bundled once for the page and once more for the workers; the plugin reports a warning in that case.
+* `optimization.usedExports` is set to `'global'` in production builds unless configured. With `true` (webpack's production default), the used exports get optimized per runtime and the core is bundled once for the page and once more for the workers; the plugin reports a warning in that case.
 * A `splitChunks` cache group `alphaTabCore` moves alphaTab's core module into its own chunk shared by all runtimes. Other cache groups and the `splitChunks` defaults stay as configured. With `optimization.splitChunks: false`, no chunk is shared and every runtime includes its own copy of the core.
 
 See https://alphatab.net/docs/getting-started/installation-webpack for more details.

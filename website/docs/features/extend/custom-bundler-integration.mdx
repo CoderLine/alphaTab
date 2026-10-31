@@ -1,77 +1,17 @@
 ---
 title: "Custom bundler integration"
-description: "Going beyond the shipped Vite / webpack plugins."
+description: "Bundle alphaTab with esbuild, Rollup, Parcel or another bundler without an alphaTab plugin."
 sidebar_custom_props:
   feature_chapter: workers
+  feature_external_link: "/docs/getting-started/installation-other-bundlers"
   feature_order: 20
+unlisted: true
 keywords:
   - alphaTab
   - bundler
-  - Vite
-  - webpack
-  - Rollup
   - esbuild
+  - Rollup
   - Parcel
 ---
 
-import { AlphaTab } from '@site/src/components/AlphaTab';
-import * as Riffs from '@site/src/tex-riffs';
-
-
-Wiring alphaTab into esbuild, Rollup, Parcel, or a bespoke build without the shipped [Vite](/docs/getting-started/installation-vite) and [webpack](/docs/getting-started/installation-webpack) plugins comes down to four responsibilities. The plugins handle each one automatically for their host bundler; everywhere else you replicate the pipeline by hand and hand the worker and worklet URLs to alphaTab yourself.
-
-<AlphaTab tex={true} player={true}>{Riffs.BLUES_SHUFFLE_A}</AlphaTab>
-
-The site itself is a working reference. Open DevTools and press play — the network tab shows the four moving parts the sections below enumerate: the worker bundle, the worklet bundle, the Bravura font files, and the SoundFont.
-
-## What the shipped plugins do
-
-Every alphaTab install has four moving parts that need to reach the browser. A custom bundler pipeline covers each one.
-
-- **Worker bundle.** Emit a separate bundle whose entry calls `Environment.initializeWorker()`. This is the script the browser loads inside a `Worker`. Ship it as a module worker so ES imports resolve.
-- **Worklet bundle.** Emit a separate bundle whose entry calls `Environment.initializeAudioWorklet()`. This is the script `audioWorklet.addModule(...)` loads. It must be a self-contained ES module.
-- **Static assets.** Copy the Bravura font files from `@coderline/alphatab/dist/font/` and the bundled SoundFont from `@coderline/alphatab/dist/soundfont/sonivox.sf3` into your output. Serve them at stable URLs — the defaults are `/font/` and `/soundfont/`, matching what the shipped plugins produce.
-- **Main-thread wiring.** In your application code, call [`Environment.initializeMain`](worker-and-worklet-initialization) before creating the `AlphaTabApi`. Pass factories that construct `new Worker(...)` and call `audioWorklet.addModule(...)` against the URLs your bundler emitted.
-
-## Show it in code
-
-The main-thread call looks the same regardless of bundler — you swap in the URLs your build produces:
-
-```js
-import * as alphaTab from '@coderline/alphatab/core';
-
-alphaTab.Environment.initializeMain(
-  (settings, nameHint) => new Worker(
-    new URL('./alphaTab.worker.js', import.meta.url),
-    { type: 'module', name: nameHint },
-  ),
-  (context, settings) => context.audioWorklet.addModule(
-    new URL('./alphaTab.worklet.js', import.meta.url),
-  ),
-);
-
-const container = getAlphaTabContainer();
-const api = new alphaTab.AlphaTabApi(container, {
-  core: {
-    file: '/scores/song.gp',
-    fontDirectory: '/font/',
-  },
-  player: {
-    soundFont: '/soundfont/sonivox.sf3',
-  },
-});
-```
-
-`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web is the only relevant target for this page.
-
-## Verify the pipeline
-
-Load the app once and check the network tab. You should see a request for the worker script, a request for the worklet script, requests for the Bravura font files, and a request for the SoundFont. If any of these 404, the corresponding responsibility above is not wired.
-
-## Where to look next
-
-- [Worker and worklet initialization](/docs/features/extend/worker-and-worklet-initialization) — the API contract for `initializeMain`, `initializeWorker`, `initializeAudioWorklet`.
-- [`Environment`](/docs/reference/types/environment) — the class those three statics live on.
-- [`core.fontDirectory`](/docs/reference/settings/core/fontdirectory) and [`player.soundFont`](/docs/reference/settings/player/soundfont) — the two settings that point alphaTab at the static assets your bundler emitted.
-- [Installation (Vite)](/docs/getting-started/installation-vite) — reference implementation of every responsibility above, as a Vite plugin.
-- [Installation (webpack)](/docs/getting-started/installation-webpack) — the same responsibilities, as a webpack plugin.
+This page is a stub — its content lives on [Installation (other bundlers)](/docs/getting-started/installation-other-bundlers).

@@ -7,7 +7,7 @@ import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
 ## 1.9.0
 
-This release gives the alphaTab attribution a smaller, quieter place in the score, reworks note spacing and the placement of annotations, adds per-staff control over clefs, key and time signatures and bar numbers, plays repeats and jumps in the right order, and imports MusicXML files more faithfully. The [upgrade notes](#upgrade-notes) at the end list the visual changes, changed defaults and deprecations.
+This release gives the alphaTab attribution a smaller, quieter place in the score, reworks note spacing and the placement of annotations, adds per-staff control over clefs, key and time signatures and bar numbers, plays repeats and jumps in the right order, imports MusicXML files more faithfully, and loads alphaTab's core once for the page, its workers and its Audio Worklet with webpack, Rspack and Vite. The [upgrade notes](#upgrade-notes) at the end list the visual changes, changed defaults and deprecations.
 
 ### Attribution
 
@@ -375,6 +375,35 @@ Thanks to [@chenkigba](https://github.com/chenkigba) for contributing this chang
 * importer/exporter: the tuning display mode of Guitar Pro 7 and 8 files is read and written ([#2742](https://github.com/CoderLine/alphaTab/pull/2742), thanks [@kulek1](https://github.com/kulek1); see [Tuning display](/docs/features/render/tuning-display#tuning-on-staff))
 * importer/exporter: the drum tablature lines of Guitar Pro 7 and 8 files are kept on import and export ([#2591](https://github.com/CoderLine/alphaTab/pull/2591), thanks [@leocaseiro](https://github.com/leocaseiro); see [Drum tablature](/docs/features/render/drum-tabs#drum-tablature))
 
+### Bundlers and Frameworks
+
+#### bundlers: one alphaTab core for the page, the workers and the worklet
+
+With webpack, Rspack and Vite, the page, the Web Workers and the Audio Worklet load alphaTab's core from one shared chunk instead of a copy each, so the browser downloads and compiles about 1.2 MiB (minified) once instead of up to three times. alphaTab starts its worker with the standard `new Worker(new URL('./alphaTab.worker.mjs', import.meta.url), { type: 'module' })` and its worklet from `alphaTab.worklet.mjs`, both importing `alphaTab.core.mjs`.
+
+The new page [Installing in web projects](/docs/getting-started/installation-web-projects) lists the setup for every bundler and framework with the number of core copies each one loads, and links to a verified sample project for each. New pages cover [other bundlers](/docs/getting-started/installation-other-bundlers), [React and Next.js](/docs/getting-started/installation-react), [Vue and Nuxt](/docs/getting-started/installation-vue), [Angular](/docs/getting-started/installation-angular), [Svelte and SvelteKit](/docs/getting-started/installation-svelte) and [Solid](/docs/getting-started/installation-solid).
+
+#### webpack: Rspack and Rsbuild support
+
+`@coderline/alphatab-webpack` works with webpack 5 (5.90 or later), Rspack 1.7 and 2, and Rsbuild through `tools.rspack`. It bundles alphaTab's worker and worklet as entries and moves the core into an `alphaTabCore` split chunk. For that it sets `optimization.usedExports` to `'global'` in production builds when you did not set it. See [Installation (webpack, Rspack, Rsbuild)](/docs/getting-started/installation-webpack).
+
+#### vite: worker and worklet as chunks of the main build
+
+`@coderline/alphatab-vite` emits alphaTab's worker and worklet as chunks of the main build, sharing the core chunk with the page, and supports Vite 6, 7 and 8. The URLs are written relative to the chunk that references them, so a relative `base`, `renderBuiltUrl`, SvelteKit and Nuxt 4 work. In the dev server, alphaTab is excluded from dependency pre-bundling. See [Installation (Vite)](/docs/getting-started/installation-vite).
+
+#### integration: entries for bundlers without a plugin
+
+The new exports `@coderline/alphatab/core`, `@coderline/alphatab/worker` and `@coderline/alphatab/worklet` let your app own alphaTab's worker and worklet entries. `@coderline/alphatab/core` exports the full API and starts nothing on its own; you register the worker and worklet with [`Environment.initializeMain`](/docs/features/extend/worker-and-worklet-initialization). [Installation (other bundlers)](/docs/getting-started/installation-other-bundlers) shows the setup for esbuild, Rollup and Parcel.
+
+#### bundlers: Turbopack detection
+
+alphaTab detects Turbopack ([`Environment.isTurbopackBundled`](/docs/reference/types/environment), also printed by `Environment.printEnvironmentInfo()`) and starts its workers in the form Turbopack bundles, sharing the core chunk with the page. Turbopack does not bundle Audio Worklets, so there alphaTab loads its worklet from [`core.scriptFile`](/docs/reference/settings/core/scriptfile). See [Next.js with Turbopack](/docs/getting-started/installation-react#turbopack).
+
+#### Other changes
+
+* bundlers: the minified files reference each other: `alphaTab.min.mjs` imports `alphaTab.core.min.mjs` and starts `alphaTab.worker.min.mjs` and `alphaTab.worklet.min.mjs`, which import the minified core too, so a CDN or copied setup loads only minified files.
+* player: without a detectable script file, loading the Audio Worklet fails with the error "Could not detect alphaTab script file, cannot initialize audio worklet".
+
 ### Improvements & Bugfixes
 
 * render: the horizontal layout with [`display.scale`](/docs/reference/settings/display/scale) above 1 gets its full size, so the end of the score is visible and scrolls with the playhead ([#2894](https://github.com/CoderLine/alphaTab/pull/2894), thanks [@leocaseiro](https://github.com/leocaseiro) for contributing this fix and [@fiskpinne](https://github.com/fiskpinne) for reporting it)
@@ -409,6 +438,9 @@ The deprecated members still work.
 
 #### For integrations
 
+* With `@coderline/alphatab-webpack`, alphaTab's core is a chunk of its own that the page loads next to your entry script. HTML generated by `HtmlWebpackPlugin`, `HtmlRspackPlugin`, Rsbuild or Next.js includes it. A hand-written `<script>` list must include every file of the entrypoint, and hosts that only inject chunks they know by name, such as Angular's webpack builder, set `optimization.splitChunks.cacheGroups.alphaTabCore = false`. See [Optimization settings](/docs/getting-started/installation-webpack#optimization).
+* `@coderline/alphatab-webpack` sets `optimization.usedExports` to `'global'` in production builds when you did not set it, and warns when it is `true`, which bundles the core twice.
+* With Vite and Rsbuild, the scripts are emitted into a subfolder (`assets/`, `static/js/`), so set [`core.fontDirectory`](/docs/reference/settings/core/fontdirectory) to the font the plugin copies; see [Point alphaTab to the font and the SoundFont](/docs/getting-started/installation-web-projects#assets).
 * Unset values of [`Note.fret`](/docs/reference/types/model/note/#fret), [`Note.string`](/docs/reference/types/model/note/#string), [`Note.octave`](/docs/reference/types/model/note/#octave), [`Note.tone`](/docs/reference/types/model/note/#tone) and [`Note.percussionArticulation`](/docs/reference/types/model/note/#percussionarticulation) are `NaN` instead of `-1` ([#2591](https://github.com/CoderLine/alphaTab/pull/2591)). Replace `=== -1` checks with [`note.isStringed`](/docs/reference/types/model/note/#isstringed), [`note.isPercussion`](/docs/reference/types/model/note/#ispercussion), [`note.isPiano`](/docs/reference/types/model/note/#ispiano) or `Number.isNaN(...)`. A percussion note in a drum tablature is both percussion and stringed.
 * Custom [`IMidiFileHandler`](/docs/reference/types/midi/imidifilehandler) implementations need the new member [`addMetronome(tick, counter, durationInTicks)`](/docs/reference/types/midi/imidifilehandler/#addmetronome); handlers that write standard MIDI files can ignore the call. In pick-up bars, [`Automation.ratioPosition`](/docs/reference/types/model/automation/#ratioposition) is relative to the full bar of the time signature, as Guitar Pro writes it ([#2939](https://github.com/CoderLine/alphaTab/pull/2939)).
 * [`AutomationType.Bank`](/docs/reference/types/model/automationtype) changes from `4` to `5`; in 1.8 it had the same value as `AutomationType.SyncPoint`. Score JSON written by 1.8 stores bank changes as `4`, which 1.9 loads as sync points ([#2907](https://github.com/CoderLine/alphaTab/pull/2907)).
@@ -419,6 +451,10 @@ The deprecated members still work.
 
 #### Package changes
 
+* `@coderline/alphatab-vite/workerPlugin` is removed. Register `alphaTab()` from `@coderline/alphatab-vite`; it covers the worker and the worklet.
+* `@coderline/alphatab-vite` accepts Vite `^6 || ^7 || ^8` as peer dependency.
+* `@coderline/alphatab-webpack` declares `webpack` (`^5.0.0`) and `@rspack/core` (`^1.7.0 || ^2.0.0`) as optional peer dependencies; install the one your project builds with.
+* `@coderline/alphatab` exports `./core`, `./worker` and `./worklet`. Bundlers that resolve package `exports` find them without configuration; Parcel needs `packageExports` enabled.
 * `@coderline/alphatab-webpack` declares webpack as a peer dependency (`^5.0.0`) instead of a dependency. Install webpack in your project if it is not there yet ([#2806](https://github.com/CoderLine/alphaTab/pull/2806)).
 * `@coderline/alphatab-language-server` has separate entry points for browsers and Node.js ([#2830](https://github.com/CoderLine/alphaTab/pull/2830)):
   * Import `startWebWorkerLanguageServer` from `@coderline/alphatab-language-server/server/browser` and `startNodeLanguageServer` from `@coderline/alphatab-language-server/server/node`. The package root resolves to the browser entry only for bundlers that apply the `browser` condition; TypeScript with `moduleResolution: "bundler"` does not, and reports that the root has no `startWebWorkerLanguageServer`.

@@ -37,7 +37,7 @@ const chapters: FeatureChapter[] = [
     id: 'workers',
     label: 'Custom bundling & workers',
     anchor: 'workers',
-    description: 'Wire the render worker and audio worklet by hand for bundlers alphaTab does not ship a plugin for — esbuild, Rollup, Parcel, or a bespoke pipeline.',
+    description: 'Wire the Web Worker and Audio Worklet by hand for bundlers alphaTab does not ship a plugin for — esbuild, Rollup, Parcel, or a bespoke pipeline.',
     defaultAccent: 'slate',
   },
   {

@@ -13,8 +13,15 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 ## Getting Started (Web)
 
 - [Installation (Web)](https://alphatab.net/docs/getting-started/installation-web): install via npm, a CDN, or a local copy, then render your first score in the browser.
-- [Installation (WebPack)](https://alphatab.net/docs/getting-started/installation-webpack): configure WebPack 5 to bundle alphaTab, its Web Workers, Audio Worklets, and font and SoundFont assets.
-- [Installation (Vite)](https://alphatab.net/docs/getting-started/installation-vite): configure Vite to bundle alphaTab, its Web Workers, Audio Worklets, and font and SoundFont assets.
+- [Installing in web projects](https://alphatab.net/docs/getting-started/installation-web-projects): choose the setup for your bundler or framework, compare how often each setup loads alphaTab's core, and learn what every setup needs.
+- [Installation (webpack, Rspack, Rsbuild)](https://alphatab.net/docs/getting-started/installation-webpack): bundle alphaTab with webpack 5, Rspack or Rsbuild using @coderline/alphatab-webpack, so the page, the Web Workers and the Audio Worklet share one alphaTab core.
+- [Installation (Vite)](https://alphatab.net/docs/getting-started/installation-vite): bundle alphaTab with Vite 6, 7 or 8 using @coderline/alphatab-vite, so the page, the Web Workers and the Audio Worklet share one alphaTab core.
+- [Installation (other bundlers)](https://alphatab.net/docs/getting-started/installation-other-bundlers): bundle alphaTab with esbuild, Rollup, Parcel or any bundler without an alphaTab plugin through the core, worker and worklet exports.
+- [React and Next.js](https://alphatab.net/docs/getting-started/installation-react): use alphaTab in React with Vite and in Next.js with webpack or Turbopack.
+- [Vue and Nuxt](https://alphatab.net/docs/getting-started/installation-vue): use alphaTab in Vue 3 with Vite and in Nuxt 3 and 4 with server-side rendering.
+- [Angular](https://alphatab.net/docs/getting-started/installation-angular): use alphaTab in Angular 20 to 22 with the application builder through an import map, or with the webpack builder and @coderline/alphatab-webpack.
+- [Svelte and SvelteKit](https://alphatab.net/docs/getting-started/installation-svelte): use alphaTab in Svelte 5 with Vite and in SvelteKit with server-side rendering.
+- [Solid](https://alphatab.net/docs/getting-started/installation-solid): use alphaTab in Solid with Vite.
 - [Configuration (Web)](https://alphatab.net/docs/getting-started/configuration-web): mount the API, pass settings, subscribe to events, and drive playback from JavaScript.
 
 ## Getting Started (.NET)
@@ -142,8 +149,7 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 - [Extend](https://alphatab.net/docs/features/extend/): Push alphaTab beyond its defaults — swap fonts, build scores in code, wire custom bundlers and workers, and embed the engine in your own host.
 - [Programmatic score construction](https://alphatab.net/docs/features/extend/programmatic-score-construction): Instantiate the alphaTab model classes directly and render a score built entirely in code — no importer, no source file.
 - [Traversing and mutating the model](https://alphatab.net/docs/features/extend/traversing-and-mutating-the-model): Walk the loaded score tree — tracks, staves, bars, voices, beats, notes — and apply changes before or after render.
-- [Worker and worklet initialization](https://alphatab.net/docs/features/extend/worker-and-worklet-initialization): `initializeMain`, `initializeWorker`, `initializeAudioWorklet` for custom setups.
-- [Custom bundler integration](https://alphatab.net/docs/features/extend/custom-bundler-integration): Going beyond the shipped Vite / webpack plugins.
+- [Worker and worklet initialization](https://alphatab.net/docs/features/extend/worker-and-worklet-initialization): `initializeMain`, `initializeWorker`, `initializeAudioWorklet` and the core, worker and worklet exports for custom setups.
 - [AlphaTabView on Android](https://alphatab.net/docs/features/extend/alphatabview-android): Embed in Android layouts (Views).
 - [WPF and WinForms controls](https://alphatab.net/docs/features/extend/wpf-and-winforms-controls): Embed in .NET desktop apps.
 - [Custom UI facade](https://alphatab.net/docs/features/extend/custom-ui-facade): Implement `IUiFacade` for a host alphaTab does not know about.

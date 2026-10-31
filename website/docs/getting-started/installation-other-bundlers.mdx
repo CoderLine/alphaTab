@@ -1,0 +1,213 @@
+---
+title: Installation (other bundlers)
+description: Bundle alphaTab with esbuild, Rollup, Parcel or any bundler without an alphaTab plugin by owning the worker and worklet entries through the core, worker and worklet exports.
+keywords:
+  - alphaTab
+  - bundler
+  - esbuild
+  - Rollup
+  - Parcel
+  - Web Worker
+  - Audio Worklet
+  - initializeMain
+---
+
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.9.0" />
+
+For bundlers without an alphaTab plugin, your app owns the entry files of alphaTab's Web Worker and Audio Worklet and tells alphaTab how to start them. This page shows the recipe with esbuild, then the differences for Rollup and Parcel.
+
+```bash
+npm install @coderline/alphatab
+npm install --save-dev esbuild
+```
+
+## The recipe {#recipe}
+
+The default `@coderline/alphatab` entry starts its worker and worklet from files inside the alphaTab package, which only a plugin resolves. Three exports let you build those entries yourself:
+
+| Export | Contents |
+| --- | --- |
+| `@coderline/alphatab/core` | The full alphaTab API. Starts nothing on its own. |
+| `@coderline/alphatab/worker` | The Web Worker entry: imports the core and calls `Environment.initializeWorker()`. |
+| `@coderline/alphatab/worklet` | The Audio Worklet entry: imports the core and calls `Environment.initializeAudioWorklet()`. |
+
+1. Create the worker entry `src/alphaTab.worker.ts`:
+
+   ```ts
+   import '@coderline/alphatab/worker';
+   ```
+
+2. Create the worklet entry `src/alphaTab.worklet.ts`:
+
+   ```ts
+   import '@coderline/alphatab/worklet';
+   ```
+
+3. In the page `src/main.ts`, import `@coderline/alphatab/core` and register the worker and worklet factories with [`Environment.initializeMain`](/docs/features/extend/worker-and-worklet-initialization) before you create the API. Use `@coderline/alphatab/core` everywhere in your app, never `@coderline/alphatab`:
+
+   ```ts
+   import * as alphaTab from '@coderline/alphatab/core';
+
+   alphaTab.Environment.initializeMain(
+       (_settings, nameHint) =>
+           new Worker(new URL('./alphaTab.worker.js', import.meta.url), { type: 'module', name: nameHint }),
+       context => context.audioWorklet.addModule(new URL('./alphaTab.worklet.js', import.meta.url))
+   );
+
+   const element = document.getElementById('alphaTab')!;
+   const api = new alphaTab.AlphaTabApi(element, {
+       core: {
+           file: new URL('./song.gp', import.meta.url).href,
+           fontDirectory: new URL('./font/', import.meta.url).href
+       },
+       player: {
+           enablePlayer: true,
+           soundFont: new URL('./soundfont/sonivox.sf2', import.meta.url).href
+       }
+   });
+   ```
+
+   The page `public/index.html` loads the bundled `main.js` as a module:
+
+   ```html
+   <!doctype html>
+   <html>
+     <body>
+       <div id="alphaTab"></div>
+       <script type="module" src="./main.js"></script>
+     </body>
+   </html>
+   ```
+
+4. Bundle all three entries in one build with code splitting and ES module output, in `build.mjs`:
+
+   ```js
+   import fs from 'node:fs';
+   import * as esbuild from 'esbuild';
+
+   const alphaTabDist = 'node_modules/@coderline/alphatab/dist';
+   fs.cpSync('public', 'dist', { recursive: true });
+   fs.cpSync(`${alphaTabDist}/font`, 'dist/font', { recursive: true });
+   fs.cpSync(`${alphaTabDist}/soundfont`, 'dist/soundfont', { recursive: true });
+
+   await esbuild.build({
+       entryPoints: ['src/main.ts', 'src/alphaTab.worker.ts', 'src/alphaTab.worklet.ts'],
+       bundle: true,
+       splitting: true,
+       format: 'esm',
+       outdir: 'dist',
+       entryNames: '[name]',
+       chunkNames: '[name]-[hash]',
+       minify: true
+   });
+   ```
+
+5. Copy your static files (`public/`, here with `song.gp`), the font and the SoundFonts into the output, as the script above does. `core.fontDirectory` and `player.soundFont` point to the copies.
+
+Why each part matters:
+
+- **One build, splitting, ESM.** The bundler moves alphaTab's core into one chunk that the page, the worker and the worklet import, so the browser loads it once. Three separate builds would contain three copies of the core. The worker is therefore a module worker (`type: 'module'`), and the worklet imports the shared chunk as an ES module, which Audio Worklets support.
+- **Fixed entry names.** esbuild and Rollup do not rewrite `new URL('./file', import.meta.url)`. The URL resolves at runtime relative to `main.js`, so the worker and worklet entries must be emitted next to it under the names the page uses. Chunks keep their content hash.
+- **Caching.** The entry files have no content hash. Serve them with revalidation (`Cache-Control: no-cache`) or add your own versioning, for example a query string from the build.
+
+Sample: [`bundler-esbuild`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-esbuild).
+
+## esbuild {#esbuild}
+
+The recipe above is the esbuild setup. The same build as a command line:
+
+```bash
+esbuild src/main.ts src/alphaTab.worker.ts src/alphaTab.worklet.ts --bundle --splitting --format=esm --outdir=dist --entry-names=[name] --chunk-names=[name]-[hash]
+```
+
+esbuild's watch mode and built-in server work for development; there is no hot reload.
+
+## Rollup {#rollup}
+
+Use the same three entry files and declare them as inputs of one build in `rollup.config.js`:
+
+```js
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import terser from '@rollup/plugin-terser';
+
+export default {
+    input: {
+        main: 'src/main.js',
+        'alphaTab.worker': 'src/alphaTab.worker.js',
+        'alphaTab.worklet': 'src/alphaTab.worklet.js'
+    },
+    output: {
+        dir: 'dist',
+        format: 'esm',
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name]-[hash].js'
+    },
+    plugins: [nodeResolve(), terser()]
+};
+```
+
+Rollup has no step for copying files; copy `font/` and `soundfont/` with a small plugin or a script. The default `@coderline/alphatab` import does not work with plain Rollup: Rollup does not emit the worker from `new URL('./alphaTab.worker.mjs', import.meta.url)`, the request fails with 404, and the page stays empty without a console error.
+
+Sample: [`bundler-rollup-4`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-rollup-4).
+
+## Parcel {#parcel}
+
+Parcel needs three changes to the recipe.
+
+Enable package `exports` in `package.json`, or Parcel cannot resolve `@coderline/alphatab/core`, `/worker` and `/worklet`:
+
+```json
+{
+    "@parcel/resolver-default": {
+        "packageExports": true
+    }
+}
+```
+
+Load the worklet through a `worklet:` import, which Parcel bundles as a worklet, in `src/main.ts`:
+
+```ts
+import * as alphaTab from '@coderline/alphatab/core';
+import workletUrl from 'worklet:./alphaTab.worklet.ts';
+
+alphaTab.Environment.initializeMain(
+    (_settings, nameHint) =>
+        new Worker(new URL('./alphaTab.worker.ts', import.meta.url), { type: 'module', name: nameHint }),
+    context => context.audioWorklet.addModule(workletUrl)
+);
+```
+
+Declare the `worklet:` imports for TypeScript in `src/worklet.d.ts`:
+
+```ts
+declare module 'worklet:*' {
+    const url: string;
+    export default url;
+}
+```
+
+Parcel has no step for copying static files either; copy `font/` and `soundfont/` into `dist/` before `parcel serve` and `parcel build`.
+
+Limitations:
+
+- **Three copies of the core.** Parcel emits the worker as a self-contained classic script, also with modern browserslist targets, and the `worklet:` import as a self-contained module. Neither shares a bundle with the page.
+- `addModule(new URL('./alphaTab.worklet.ts', import.meta.url))` instead of `worklet:` shares one bundle between page and worklet in production builds, but breaks the dev server: playback fails with "The node name 'alphatab' is not defined in AudioWorkletGlobalScope".
+- The default `@coderline/alphatab` import does not work: Parcel replaces `import.meta.url` with a `file://` URL at build time, and alphaTab starts neither workers nor player ("Could not detect alphaTab script file").
+
+Sample: [`bundler-parcel-2`](https://github.com/CoderLine/alphaTabSamplesWeb/tree/main/src/bundler-parcel-2).
+
+## Turbopack {#turbopack}
+
+Turbopack bundles alphaTab's workers with the default `@coderline/alphatab` import, but not its Audio Worklet. See [Next.js with Turbopack](installation-react#turbopack).
+
+## Load alphaTab unbundled {#unbundled}
+
+If your bundler cannot handle workers inside dependencies at all, keep alphaTab out of the bundle. Mark `@coderline/alphatab` as external, copy `alphaTab.mjs`, `alphaTab.core.mjs`, `alphaTab.worker.mjs` and `alphaTab.worklet.mjs` from `node_modules/@coderline/alphatab/dist` into your output, and map the package name to the copy with an import map:
+
+```html
+<script type="importmap">{ "imports": { "@coderline/alphatab": "/alphatab/alphaTab.mjs" } }</script>
+```
+
+alphaTab then finds its worker and worklet next to `alphaTab.mjs`, and all three share `alphaTab.core.mjs`. The [Angular application builder](installation-angular#application-builder) setup uses this approach.

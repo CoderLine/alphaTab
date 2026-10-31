@@ -93,22 +93,11 @@ const api = new alphaTab.AlphaTabApi(element, { tex: true });
 
 If you are not yet using JavaScript modules, alphaTab also ships a UMD build that exposes a global `alphaTab` variable — reference `dist/alphaTab.min.js` from a classic `<script>` tag and initialize the API the same way.
 
-## Bundler integration
+## Bundlers and frameworks {#bundlers}
 
-alphaTab spawns Web Workers and Audio Worklets internally. Bundlers may split and rename files, which prevents alphaTab from locating the right worker entry points at runtime. To handle this cleanly, alphaTab ships bundler plugins:
+alphaTab starts Web Workers and an Audio Worklet from its own files, which a bundler has to bundle with it. alphaTab ships plugins for webpack, Rspack, Rsbuild and Vite, and documents a recipe for the other bundlers. alphaTab has no wrappers for React, Vue, Angular, Svelte or Solid; a component creates the `AlphaTabApi` on an element when it mounts and destroys it when it unmounts.
 
-- [Installation (WebPack)](installation-webpack) for WebPack 5 projects, including most Angular setups
-- [Installation (Vite)](installation-vite) for Vite-based projects
-
-## Framework integration
-
-alphaTab does not yet ship official wrappers for Angular, React, or Vue. To integrate it in these frameworks:
-
-1. Create a DOM element through the framework's usual mechanism (`ElementRef` in Angular, `useRef` in React, `template ref` in Vue).
-2. Instantiate `AlphaTabApi` against that element inside the framework's mount lifecycle.
-3. Use the framework's update and unmount hooks to push settings changes and to destroy the API instance when the component unmounts.
-
-The bundler plugins above cover the WebPack and Vite configuration most frameworks depend on. Sample projects for a range of setups are available at [github.com/CoderLine/alphaTabSamplesWeb](https://github.com/CoderLine/alphaTabSamplesWeb).
+[Installing in web projects](installation-web-projects) lists the setup for each bundler and framework, with a sample project for each in [alphaTabSamplesWeb](https://github.com/CoderLine/alphaTabSamplesWeb).
 
 ## Node.js
 
@@ -131,4 +120,4 @@ alphaTab has no runtime dependencies of its own. Two assets ship with the packag
 - [Bravura](https://github.com/steinbergmedia/bravura), a [SMuFL](https://www.smufl.org/) music font, supplies every notation symbol alphaTab draws.
 - A SoundFont2 file supplies the instrument samples the audio engine plays. alphaTab bundles a SONiVOX-based SoundFont from the [Android Open Source Project](https://source.android.com/), released under the [Apache License](https://www.apache.org/licenses/LICENSE-2.0).
 
-Both files sit next to the alphaTab scripts by default. The bundler plugins linked above copy them into your build output automatically.
+Both files sit next to the alphaTab scripts in the package. The bundler plugins copy them into your build output; see [Point alphaTab to the font and the SoundFont](installation-web-projects#assets).
