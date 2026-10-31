@@ -38,6 +38,10 @@ describe('createApiDtsFiles', () => {
         return errors;
     }
 
+    function written(name: string) {
+        return fs.existsSync(path.join(projectDir, 'out', name));
+    }
+
     it('rejects public declarations that reference a removed internal type', async () => {
         const errors = await run(
             "import type { Hidden } from './internal';\n/**\n * @public\n */\nexport declare function f(): Hidden[];\n"
@@ -54,6 +58,18 @@ describe('createApiDtsFiles', () => {
         const out = fs.readFileSync(path.join(projectDir, 'out', 'entry.d.ts'), 'utf8');
         expect(out).toContain("import type { Shown } from './internal';");
         expect(out).not.toContain('Hidden');
+    });
+
+    it('drops files whose exports are all internal but keeps modules without exports', async () => {
+        const errors = await run('/**\n * @public\n */\nexport declare function f(): void;\n', {
+            'allInternal.d.ts':
+                "import type { Plugin } from 'external';\ntype Local = Plugin;\n/**\n * @internal\n */\nexport type Hooks = Local;\nexport {};\n",
+            'sideEffect.d.ts': 'export {};\n'
+        });
+        expect(errors).toEqual([]);
+        expect(written('entry.d.ts')).toBe(true);
+        expect(written('allInternal.d.ts')).toBe(false);
+        expect(written('sideEffect.d.ts')).toBe(true);
     });
 
     it('rejects relative imports of files that are not shipped', async () => {

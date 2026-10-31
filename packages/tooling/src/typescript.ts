@@ -194,6 +194,22 @@ function findTypeReferences(file: ts.SourceFile, names: string[]): Set<string> {
     return found;
 }
 
+/** Whether the file exports anything; `export {}`, which only marks a file as module, counts if `withEmpty` is set. */
+function hasExports(file: ts.SourceFile, withEmpty: boolean) {
+    return file.statements.some(e => {
+        if (ts.isExportDeclaration(e)) {
+            return (
+                withEmpty ||
+                e.moduleSpecifier !== undefined ||
+                !e.exportClause ||
+                !ts.isNamedExports(e.exportClause) ||
+                e.exportClause.elements.length > 0
+            );
+        }
+        return ts.canHaveModifiers(e) && e.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword);
+    });
+}
+
 const declarationTargets = ['', '.d.ts', '.d.mts', '/index.d.ts'];
 
 /**
@@ -257,7 +273,8 @@ export async function createApiDtsFiles(
         host: ts.createCompilerHost(parsedCommandLine.options)
     });
 
-    let sourceFiles = dtsFiles.map(f => program.getSourceFile(f)!);
+    const originalSourceFiles = dtsFiles.map(f => program.getSourceFile(f)!);
+    let sourceFiles = originalSourceFiles;
 
     const checker = program.getTypeChecker();
 
@@ -282,13 +299,9 @@ export async function createApiDtsFiles(
         return filtered;
     });
 
-    // Pass 3: filter any files which do not have any exports
-    sourceFiles = sourceFiles.filter(s =>
-        s.statements.some(
-            e =>
-                ts.isExportDeclaration(e) ||
-                (ts.canHaveModifiers(e) && e.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword))
-        )
+    // Pass 3: filter any files which do not have any exports, or lost all of them in pass 1
+    sourceFiles = sourceFiles.filter(
+        (s, i) => hasExports(s, true) && (hasExports(s, false) || !hasExports(originalSourceFiles[i], false))
     );
 
     // Pass 4(todo): Collect and Filter any unused imports from externals
