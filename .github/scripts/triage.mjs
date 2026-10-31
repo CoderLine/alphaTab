@@ -14,7 +14,16 @@
 //   context — @actions/github context.
 //   core    — @actions/core helpers.
 
-import { aiDisclosureToken, gracePeriodDays, labelDefs, labels } from './triage-config.mjs';
+import { readFile } from 'node:fs/promises';
+import {
+    aiDisclosureToken,
+    docsOnlyPathPrefixes,
+    gracePeriodDays,
+    issueTemplates,
+    labelDefs,
+    labels,
+    pullRequestHeaders
+} from './triage-config.mjs';
 
 // HTML marker used to find the bot's own prior comment on re-runs.
 const commentMarker = '<!-- triage-bot -->';
@@ -26,41 +35,8 @@ const commentMarker = '<!-- triage-bot -->';
 const aiCommitTrailerPattern =
     /^\s*(?:co-authored-by:|generated with)[^\n]*?(?:claude|anthropic|openai|codex|cursor|chatgpt|copilot|gpt-)/im;
 
-// ── Rules ────────────────────────────────────────────────────────────────
-// A rule has:
-//   id          — stable machine identifier for logs / summaries.
-//   appliesTo   — 'pr', 'issue', or 'both'.
-//   passes      — predicate: (body) => boolean. True = the body is fine.
-//   title       — short headline shown as the bullet's bold prefix.
-//   body        — string OR (itemBody) => string. Function form lets the
-//                 rule generate a dynamic description (e.g. "missing X, Y, Z").
-// To add a rule: append an entry below.
-// ─────────────────────────────────────────────────────────────────────────
-
-// Section headers emitted by the bug-report form template (each `label:` in
-// .github/ISSUE_TEMPLATE/bug_report_form.yml renders as `### <label>`).
-// Keep in sync with that file.
-const expectedIssueHeaders = [
-    'Is there an existing issue for this?',
-    'I have read the contribution rules',
-    'AI authorship',
-    'Current Behavior',
-    'Expected Behavior',
-    'Steps To Reproduce',
-    'Link to jsFiddle, CodePen, Project',
-    'Version and Environment',
-    'Platform',
-    'Anything else?'
-];
-
-// Section headers in .github/pull_request_template.md.
-const expectedPrHeaders = [
-    'Issues',
-    'Proposed changes',
-    'Root-cause analysis',
-    'Checklist',
-    'AI authorship disclosure'
-];
+// What GitHub issue forms render for an optional field left empty.
+const noResponse = '_No response_';
 
 // Matches the linked-issue references GitHub itself accepts as closing
 // keywords on PRs:
@@ -69,47 +45,197 @@ const expectedPrHeaders = [
 const linkedIssuePattern =
     /(?:close(?:s|d)?|fix(?:es|ed)?|resolve(?:s|d)?)\s+(?:https?:\/\/github\.com\/[\w.-]+\/[\w.-]+\/(?:issues|pull)\/\d+|[\w.-]+\/[\w.-]+#\d+|#\d+)/i;
 
+// ── Templates ────────────────────────────────────────────────────────────
+
+/**
+ * The section headers an issue form renders, in form order: the `label` of
+ * every non-markdown body item (each becomes `### <label>` in the issue).
+ * Checkbox options (`- label:`) are not headers.
+ */
+export function formHeaders(yaml) {
+    const headers = [];
+    let itemType = null;
+    for (const line of yaml.split(/\r?\n/)) {
+        const item = /^- type:\s*(\S+)/.exec(line);
+        if (item) {
+            itemType = item[1];
+            continue;
+        }
+        const label = /^ {4}label:\s*(.+?)\s*$/.exec(line);
+        if (label && itemType !== 'markdown') {
+            headers.push(unquote(label[1]));
+        }
+    }
+    return headers;
+}
+
+function unquote(value) {
+    if (value.length >= 2 && value.startsWith("'") && value.endsWith("'")) {
+        return value.slice(1, -1).replaceAll("''", "'");
+    }
+    if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) {
+        return value.slice(1, -1).replaceAll('\\"', '"');
+    }
+    return value;
+}
+
+/** The registry entries of triage-config.mjs, each with its form's `headers`. */
+export async function loadIssueTemplates() {
+    return Promise.all(
+        issueTemplates.map(async template => {
+            const yaml = await readFile(new URL(`../ISSUE_TEMPLATE/${template.file}`, import.meta.url), 'utf8');
+            return { ...template, headers: formHeaders(yaml) };
+        })
+    );
+}
+
+/**
+ * The template whose own headers (those no other template has) appear most
+ * often in `body`, or null when none of them appear. Labels play no part,
+ * so relabelling an issue doesn't change the match.
+ */
+export function matchTemplate(body, templates) {
+    let best = null;
+    let bestScore = 0;
+    for (const template of templates) {
+        const isUnique = h => !templates.some(other => other !== template && other.headers.includes(h));
+        const score = template.headers.filter(h => isUnique(h) && bodyContainsHeader(body, h)).length;
+        if (score > bestScore) {
+            best = template;
+            bestScore = score;
+        }
+    }
+    return best;
+}
+
+function splitLines(body) {
+    return body.split(/\r?\n/);
+}
+
 function bodyContainsHeader(body, header) {
     const expected = `### ${header}`;
-    return body.split('\n').some(line => line.trimEnd() === expected);
+    return splitLines(body).some(line => line.trimEnd() === expected);
 }
 
 function missingHeaders(body, expected) {
     return expected.filter(h => !bodyContainsHeader(body, h));
 }
 
-function describeMissing(missing, all, kind) {
-    // If almost everything is missing, we assume the template wasn't used
-    // at all rather than just partially edited.
-    if (missing.length >= all.length - 1) {
-        return kind === 'issue'
-            ? 'The bug report template doesn\'t appear to have been used. Please open the issue via the "Bug Report" template — the form collects the specific info we need to reproduce the problem.'
-            : 'The pull request template appears to have been overwritten. Please put the sections back — each one serves a specific purpose in review.';
+/**
+ * The trimmed text between `### <header>` and the next `### ` line, or null
+ * when the header is absent. An optional form field left empty yields
+ * `_No response_`.
+ */
+export function sectionContent(body, header) {
+    const lines = splitLines(body);
+    const start = lines.findIndex(line => line.trimEnd() === `### ${header}`);
+    if (start < 0) {
+        return null;
     }
+    const end = lines.findIndex((line, i) => i > start && line.startsWith('### '));
+    return lines
+        .slice(start + 1, end < 0 ? undefined : end)
+        .join('\n')
+        .trim();
+}
+
+function isBlank(content) {
+    return content === '' || content === noResponse;
+}
+
+function sectionList(missing) {
     const plural = missing.length > 1 ? 's' : '';
     const list = missing.map(m => `\`${m}\``).join(', ');
-    return `The description is missing section${plural}: ${list}. Please include ${missing.length > 1 ? 'them' : 'it'} — even a short answer keeps the report actionable.`;
+    return { plural, list, pronoun: missing.length > 1 ? 'them' : 'it' };
 }
+
+function describeIssueTemplateProblem({ body, template, templates }) {
+    if (!template) {
+        const choices = templates.map(t => `${t.name} (${t.purpose})`).join(' or ');
+        return `The issue doesn't appear to use one of our templates. Please open the issue via ${choices} — the form collects the specific info we need to act on it.`;
+    }
+    const { plural, list, pronoun } = sectionList(missingHeaders(body, template.headers));
+    return `The description is missing section${plural} of the ${template.name} template: ${list}. Please include ${pronoun} — even a short answer keeps the report actionable.`;
+}
+
+function describeMissingPrSections({ body }) {
+    const missing = missingHeaders(body, pullRequestHeaders);
+    // Nearly everything gone means the template was replaced, not edited.
+    if (missing.length >= pullRequestHeaders.length - 1) {
+        return 'The pull request template appears to have been overwritten. Please put the sections back — each one serves a specific purpose in review.';
+    }
+    const { plural, list, pronoun } = sectionList(missing);
+    return `The description is missing section${plural}: ${list}. Please include ${pronoun} — even a short answer keeps the report actionable.`;
+}
+
+function isDocsOnly(changedFiles) {
+    const isDocsPath = path => docsOnlyPathPrefixes.some(prefix => path.startsWith(prefix));
+    return (
+        changedFiles.length > 0 &&
+        changedFiles.every(f => isDocsPath(f.filename) && (!f.previous_filename || isDocsPath(f.previous_filename)))
+    );
+}
+
+// ── Rules ────────────────────────────────────────────────────────────────
+// A rule has:
+//   id          — stable machine identifier for logs / summaries.
+//   appliesTo   — 'pr', 'issue', or 'both'.
+//   template    — optional issue template id; the rule then only applies
+//                 to issues matched to that template.
+//   skip        — optional predicate: (ctx) => boolean. True = not checked.
+//   passes      — predicate: (ctx) => boolean. True = the body is fine.
+//   title       — string OR (ctx) => string; the bullet's bold prefix.
+//   body        — string OR (ctx) => string. Function form lets the rule
+//                 generate a dynamic description (e.g. "missing X, Y, Z").
+// `ctx` is { body, templates, template, changedFiles }: `template` is the
+// matched issue template (null for PRs or when none matches),
+// `changedFiles` the PR's files as returned by pulls.listFiles.
+// To add a rule: append an entry below.
+// ─────────────────────────────────────────────────────────────────────────
 
 const rules = [
     {
         id: 'issue-template-incomplete',
         appliesTo: 'issue',
-        passes: body => missingHeaders(body, expectedIssueHeaders).length === 0,
-        title: 'Use the bug report template',
-        body: itemBody => describeMissing(missingHeaders(itemBody, expectedIssueHeaders), expectedIssueHeaders, 'issue')
+        passes: ({ body, template }) => template !== null && missingHeaders(body, template.headers).length === 0,
+        title: ({ template }) => (template ? `Complete the ${template.name} template` : 'Use an issue template'),
+        body: describeIssueTemplateProblem
+    },
+    {
+        id: 'docs-page-url',
+        appliesTo: 'issue',
+        template: 'docs',
+        passes: ({ body }) => {
+            const page = sectionContent(body, 'Affected page');
+            return page === null || /\balphatab\.net\b/i.test(page);
+        },
+        title: 'Link the affected page',
+        body: 'Put the full URL of the page into `Affected page`, e.g. `https://www.alphatab.net/docs/…` or `https://next.alphatab.net/docs/…`. The host tells us which release the page belongs to.'
+    },
+    {
+        id: 'docs-broken-needs-environment',
+        appliesTo: 'issue',
+        template: 'docs',
+        passes: ({ body }) => {
+            const kind = sectionContent(body, 'Kind of problem');
+            const environment = sectionContent(body, 'Browser and operating system');
+            return !kind?.startsWith('Broken') || environment === null || !isBlank(environment);
+        },
+        title: 'Name your browser and operating system',
+        body: 'Broken pages and examples often depend on the browser. Please fill in `Browser and operating system`, e.g. "Firefox 144 on Windows 11".'
     },
     {
         id: 'pr-template-incomplete',
         appliesTo: 'pr',
-        passes: body => missingHeaders(body, expectedPrHeaders).length === 0,
+        passes: ({ body }) => missingHeaders(body, pullRequestHeaders).length === 0,
         title: 'Keep the pull request template sections',
-        body: itemBody => describeMissing(missingHeaders(itemBody, expectedPrHeaders), expectedPrHeaders, 'pr')
+        body: describeMissingPrSections
     },
     {
         id: 'pr-needs-linked-issue',
         appliesTo: 'pr',
-        passes: body => linkedIssuePattern.test(body),
+        skip: ({ changedFiles }) => isDocsOnly(changedFiles),
+        passes: ({ body }) => linkedIssuePattern.test(body),
         title: 'Link the issue this addresses',
         body: 'Reference it in the description with `Fixes #<n>` (or `Closes` / `Resolves`) so the change can be traced back to the discussion we agreed on.'
     }
@@ -141,7 +267,10 @@ const rules = [
     // ─────────────────────────────────────────────────────────────────────
 ];
 
-function ruleAppliesTo(rule, isPr) {
+function ruleAppliesTo(rule, isPr, template) {
+    if (rule.template !== undefined && rule.template !== template?.id) {
+        return false;
+    }
     if (rule.appliesTo === 'both') {
         return true;
     }
@@ -166,20 +295,29 @@ export default async function triage({ github, context, core }) {
     const target = isPr ? context.payload.pull_request : context.payload.issue;
     const body = target.body || '';
 
-    const violations = rules
-        .filter(r => ruleAppliesTo(r, isPr) && !r.passes(body))
-        .map(r => ({
-            id: r.id,
-            title: r.title,
-            description: typeof r.body === 'function' ? r.body(body) : r.body
-        }));
-    const hasAiToken = body.includes(aiDisclosureToken);
-
     const args = {
         owner: context.repo.owner,
         repo: context.repo.repo,
         issue_number: target.number
     };
+
+    const templates = isPr ? [] : await loadIssueTemplates();
+    const ctx = {
+        body,
+        templates,
+        template: isPr ? null : matchTemplate(body, templates),
+        changedFiles: isPr ? await listPrFiles(github, args.owner, args.repo, target.number) : []
+    };
+    const resolve = value => (typeof value === 'function' ? value(ctx) : value);
+
+    const violations = rules
+        .filter(r => ruleAppliesTo(r, isPr, ctx.template) && !r.skip?.(ctx) && !r.passes(ctx))
+        .map(r => ({
+            id: r.id,
+            title: resolve(r.title),
+            description: resolve(r.body)
+        }));
+    const hasAiToken = body.includes(aiDisclosureToken);
 
     const hasAiCommitTrailer = isPr
         ? await prCommitsHaveAiTrailer(github, args.owner, args.repo, target.number)
@@ -281,9 +419,19 @@ export default async function triage({ github, context, core }) {
     const aiSignals = [hasAiToken && 'disclosure token', hasAiCommitTrailer && 'commit trailer'].filter(Boolean);
     core.summary
         .addHeading(`Triage: #${target.number} (${isPr ? 'PR' : 'issue'})`)
+        .addRaw(isPr ? '' : `\nTemplate: ${ctx.template?.id ?? 'none'}\n`)
         .addRaw(`\nViolations: ${violations.map(v => v.id).join(', ') || 'none'}\n`)
         .addRaw(`AI signals: ${aiSignals.join(', ') || 'none detected'}\n`)
         .write();
+}
+
+async function listPrFiles(github, owner, repo, pullNumber) {
+    return github.paginate(github.rest.pulls.listFiles, {
+        owner,
+        repo,
+        pull_number: pullNumber,
+        per_page: 100
+    });
 }
 
 async function prCommitsHaveAiTrailer(github, owner, repo, pullNumber) {
