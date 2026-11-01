@@ -6,6 +6,7 @@ import type { Note } from '@coderline/alphatab/model/Note';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import type { Staff } from '@coderline/alphatab/model/Staff';
+import type { Track } from '@coderline/alphatab/model/Track';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { TabFingeringSegment } from '@coderline/alphatab/rendering/utils/TabFingeringSegment';
 
@@ -139,6 +140,21 @@ export class TabFingeringSolver {
             b--;
         }
         return b;
+    }
+
+    /**
+     * The first bar whose tab fingering may change when the given bar changes, considering the transposed tabs of all tracks.
+     */
+    public static firstAffectedBarIndex(tracks: Track[], barIndex: number): number {
+        let first = barIndex;
+        for (const track of tracks) {
+            for (const staff of track.staves) {
+                if (staff.showTablature && TabFingeringSolver.isActive(staff) && barIndex < staff.bars.length) {
+                    first = Math.min(first, TabFingeringSolver.segmentStart(staff, barIndex));
+                }
+            }
+        }
+        return first;
     }
 
     /**
@@ -568,7 +584,11 @@ export class TabFingeringRun {
                     while (insertAt > optionStart) {
                         const previousDelta = options[insertAt - 1];
                         const previousFret = optionFret[insertAt - 1];
-                        if (previousDelta === 0 || previousFret < headFret || (previousFret === headFret && previousDelta < delta)) {
+                        if (
+                            previousDelta === 0 ||
+                            previousFret < headFret ||
+                            (previousFret === headFret && previousDelta < delta)
+                        ) {
                             break;
                         }
                         insertAt--;
@@ -782,7 +802,8 @@ export class TabFingeringRun {
             let sequence = 0;
             const previousStart = t === 0 ? -1 : stateBase[t - 1];
             const previousCount = t === 0 ? 1 : stateCount[t - 1];
-            const gapQuarters = t === 0 ? 0 : (this._sliceTick[t] - this._sliceTick[t - 1]) / TabFingeringRun._ticksPerQuarter;
+            const gapQuarters =
+                t === 0 ? 0 : (this._sliceTick[t] - this._sliceTick[t - 1]) / TabFingeringRun._ticksPerQuarter;
 
             for (let p = 0; p < previousCount; p++) {
                 const previousState = previousStart + p;
@@ -829,7 +850,10 @@ export class TabFingeringRun {
                         let same = true;
                         for (let a = activeStart; a < activeEnd && same; a++) {
                             const g = this._activeGroups[a];
-                            if (this._groupLast[g] > t && cDeltas[c * activeLength + (a - activeStart)] !== groupDelta[g]) {
+                            if (
+                                this._groupLast[g] > t &&
+                                cDeltas[c * activeLength + (a - activeStart)] !== groupDelta[g]
+                            ) {
                                 same = false;
                             }
                         }
@@ -840,7 +864,16 @@ export class TabFingeringRun {
 
                     let write = -1;
                     if (slot >= 0) {
-                        if (TabFingeringRun._isBetter(unplayable, moved, rest, cUnplayable[slot], cMoved[slot], cRest[slot])) {
+                        if (
+                            TabFingeringRun._isBetter(
+                                unplayable,
+                                moved,
+                                rest,
+                                cUnplayable[slot],
+                                cMoved[slot],
+                                cRest[slot]
+                            )
+                        ) {
                             write = slot;
                         }
                     } else if (candidateCount < beamWidth) {
@@ -882,7 +915,16 @@ export class TabFingeringRun {
                                 worst = c;
                             }
                         }
-                        if (TabFingeringRun._isBetter(unplayable, moved, rest, cUnplayable[worst], cMoved[worst], cRest[worst])) {
+                        if (
+                            TabFingeringRun._isBetter(
+                                unplayable,
+                                moved,
+                                rest,
+                                cUnplayable[worst],
+                                cMoved[worst],
+                                cRest[worst]
+                            )
+                        ) {
                             write = worst;
                         }
                     }
@@ -929,8 +971,22 @@ export class TabFingeringRun {
                     }
                     if (
                         best < 0 ||
-                        TabFingeringRun._isBetter(cUnplayable[c], cMoved[c], cRest[c], cUnplayable[best], cMoved[best], cRest[best]) ||
-                        (TabFingeringRun._isEqual(cUnplayable[c], cMoved[c], cRest[c], cUnplayable[best], cMoved[best], cRest[best]) &&
+                        TabFingeringRun._isBetter(
+                            cUnplayable[c],
+                            cMoved[c],
+                            cRest[c],
+                            cUnplayable[best],
+                            cMoved[best],
+                            cRest[best]
+                        ) ||
+                        (TabFingeringRun._isEqual(
+                            cUnplayable[c],
+                            cMoved[c],
+                            cRest[c],
+                            cUnplayable[best],
+                            cMoved[best],
+                            cRest[best]
+                        ) &&
                             cSequence[c] < cSequence[best])
                     ) {
                         best = c;

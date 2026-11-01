@@ -10,6 +10,8 @@ import type { Settings } from '@coderline/alphatab/Settings';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GeneralMidi } from '@coderline/alphatab/midi/GeneralMidi';
+import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 
 /**
  * @internal
@@ -18,6 +20,11 @@ export class FingeringInfo {
     public line: number = 0;
     public symbols: MusicFontSymbol[];
     public color: Color | undefined;
+    /**
+     * The notes of the left-hand fingers in {@link symbols}.
+     */
+    public leftHandNotes: Note[] = [];
+    public otherSymbolCount: number = 0;
 
     public constructor(line: number, symbols: MusicFontSymbol[]) {
         this.line = line;
@@ -30,6 +37,7 @@ export class FingeringInfo {
  */
 export class FingeringGroupGlyph extends GlyphGroup {
     private _infos: Map<number, FingeringInfo> = new Map<number, FingeringInfo>();
+    private _glyphInfos: FingeringInfo[] = [];
 
     public constructor() {
         super(0, 0);
@@ -72,7 +80,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
             true
         );
         if (symbolLeft !== MusicFontSymbol.None) {
-            this._addFinger(note, symbolLeft);
+            this._addFinger(note, symbolLeft, true);
         }
         const symbolRight = FingeringGroupGlyph.fingerToMusicFontSymbol(
             this.renderer.settings,
@@ -81,7 +89,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
             false
         );
         if (symbolRight !== MusicFontSymbol.None) {
-            this._addFinger(note, symbolRight);
+            this._addFinger(note, symbolRight, false);
         }
     }
 
@@ -153,18 +161,51 @@ export class FingeringGroupGlyph extends GlyphGroup {
         }
     }
 
-    private _addFinger(note: Note, symbol: MusicFontSymbol) {
+    private _addFinger(note: Note, symbol: MusicFontSymbol, isLeftHand: boolean) {
         const sr = this.renderer as ScoreBarRenderer;
         const steps: number = sr.getNoteSteps(note);
 
+        let info: FingeringInfo;
         if (!this._infos.has(steps)) {
-            const info = new FingeringInfo(steps, [symbol]);
+            info = new FingeringInfo(steps, [symbol]);
             info.color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationEffects, note);
             this._infos.set(steps, info);
         } else {
-            const info = this._infos.get(steps)!;
+            info = this._infos.get(steps)!;
             info.symbols.push(symbol);
         }
+        if (isLeftHand) {
+            info.leftHandNotes.push(note);
+        } else {
+            info.otherSymbolCount++;
+        }
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const glyphs = this.glyphs;
+        if (!glyphs) {
+            return;
+        }
+        const x = cx + this.x;
+        const y = cy + this.y;
+        for (let i = 0; i < glyphs.length; i++) {
+            if (!this._isReFingered(this._glyphInfos[i])) {
+                glyphs[i].paint(x, y, canvas);
+            }
+        }
+    }
+
+    // resolved on paint: the tab of the bar is laid out after this staff
+    private _isReFingered(info: FingeringInfo): boolean {
+        if (info.otherSymbolCount > 0 || info.leftHandNotes.length === 0) {
+            return false;
+        }
+        for (const note of info.leftHandNotes) {
+            if (!TabBarRenderer.isFingeringChanged(this.renderer, note)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public override doLayout(): void {
@@ -178,6 +219,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
             g.doLayout();
             g.offsetY = g.height / 2;
             this.addGlyph(g);
+            this._glyphInfos.push(info);
             this.width = Math.max(this.width, g.width);
         }
 

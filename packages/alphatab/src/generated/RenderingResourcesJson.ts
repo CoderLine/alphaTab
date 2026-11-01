@@ -199,4 +199,10 @@ export interface RenderingResourcesJson {
      * @since 0.9.6
      */
     scoreInfoColor?: ColorJson;
+    /**
+     * The color of tab fret numbers which cannot be played on the tuning of the staff after transposition.
+     * @defaultValue `rgb(200, 0, 0)`
+     * @since 1.10.0
+     */
+    tabUnplayableFretColor?: ColorJson;
 }

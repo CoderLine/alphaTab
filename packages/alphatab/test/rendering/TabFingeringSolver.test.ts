@@ -130,9 +130,7 @@ describe('TabFingeringSolverTest', () => {
     });
 
     it('moves hammer-ons and slides as a whole', () => {
-        expect(display(staffOf('\\transpose -4 2.3{h} 4.3 2.3{ss} 4.3'))).toEqual([
-            ['3.4*', '5.4*', '3.4*', '5.4*']
-        ]);
+        expect(display(staffOf('\\transpose -4 2.3{h} 4.3 2.3{ss} 4.3'))).toEqual([['3.4*', '5.4*', '3.4*', '5.4*']]);
     });
 
     it('allows pull-offs to open strings', () => {

@@ -7,6 +7,7 @@ import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarR
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -20,6 +21,8 @@ export class TabNoteChordGlyph extends Glyph {
     public beat!: Beat;
     public maxStringNote: Note | null = null;
     public minStringNote: Note | null = null;
+    private _maxString: number = 0;
+    private _minString: number = 0;
     private _beatEffects: Map<string, Glyph> | null = null;
     public noteStringWidth: number = 0;
 
@@ -36,11 +39,24 @@ export class TabNoteChordGlyph extends Glyph {
     public getNoteGlyphForString(str: number): NoteNumberGlyph | null {
         const notes = this._notes;
         for (let i = notes.length - 1; i >= 0; i--) {
-            if (notes[i].note.string === str) {
+            if (notes[i].displayString === str) {
                 return notes[i];
             }
         }
         return null;
+    }
+
+    /**
+     * The glyph of the given note, or the glyph shown on its string if the note has none (e.g. a hidden note).
+     */
+    public getNoteGlyph(note: Note): NoteNumberGlyph | null {
+        const notes = this._notes;
+        for (let i = notes.length - 1; i >= 0; i--) {
+            if (notes[i].note === note) {
+                return notes[i];
+            }
+        }
+        return this.getNoteGlyphForString((this.renderer as TabBarRenderer).getDisplayString(note));
     }
 
     public get beatEffects(): Map<string, Glyph> {
@@ -64,7 +80,7 @@ export class TabNoteChordGlyph extends Glyph {
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        const n = this.getNoteGlyphForString(note.string);
+        const n = this.getNoteGlyph(note);
         if (n) {
             let pos = this.x + n.x;
             switch (requestedPosition) {
@@ -92,7 +108,7 @@ export class TabNoteChordGlyph extends Glyph {
     }
 
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        const n = this.getNoteGlyphForString(note.string);
+        const n = this.getNoteGlyph(note);
         if (n) {
             let pos = this.y + n.y;
 
@@ -176,17 +192,20 @@ export class TabNoteChordGlyph extends Glyph {
     /**
      * Adds a note number that is already laid out.
      */
-    public addNoteGlyph(noteGlyph: NoteNumberGlyph, note: Note): void {
+    public addNoteGlyph(noteGlyph: NoteNumberGlyph): void {
         if (this._notes.length === 0) {
             this._notes = [noteGlyph];
         } else {
             this._notes.push(noteGlyph);
         }
-        if (!this.minStringNote || note.string < this.minStringNote.string) {
-            this.minStringNote = note;
+        const str = noteGlyph.displayString;
+        if (!this.minStringNote || str < this._minString) {
+            this.minStringNote = noteGlyph.note;
+            this._minString = str;
         }
-        if (!this.maxStringNote || note.string > this.maxStringNote.string) {
-            this.maxStringNote = note;
+        if (!this.maxStringNote || str > this._maxString) {
+            this.maxStringNote = noteGlyph.note;
+            this._maxString = str;
         }
     }
 

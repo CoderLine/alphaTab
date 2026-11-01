@@ -455,7 +455,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             } else {
                 container = aboveBeatEffects.get('StringNumber')! as StringNumberContainerGlyph;
             }
-            container.addString(n.string, n.realValue);
+            container.addString(n.string, n.realValue, n);
         }
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);

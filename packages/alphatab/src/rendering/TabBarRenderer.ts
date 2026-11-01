@@ -2,7 +2,7 @@ import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
 import type { ElementDisplay } from '@coderline/alphatab/model/ElementDisplay';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
-import type { Note } from '@coderline/alphatab/model/Note';
+import { Note } from '@coderline/alphatab/model/Note';
 import type { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
@@ -25,6 +25,8 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { ScrambledPath } from '@coderline/alphatab/rendering/utils/ScrambledPath';
+import { TabFingeringSegment } from '@coderline/alphatab/rendering/utils/TabFingeringSegment';
+import { TabFingeringSolver } from '@coderline/alphatab/rendering/utils/TabFingeringSolver';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -137,7 +139,211 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     public override getNoteLine(note: Note): number {
-        return this.bar.staff.tuning.length - note.string;
+        return this.bar.staff.tuning.length - this.getDisplayString(note);
+    }
+
+    /**
+     * The display fingering of the transposed segment this bar belongs to, null if all notes
+     * keep their model string.
+     */
+    public fingering: TabFingeringSegment | null = null;
+
+    /**
+     * The last bar of the segment this bar belongs to when all its notes keep their model string, -1 otherwise.
+     */
+    public identityUntilBarIndex: number = -1;
+
+    private _isFingeringActive: boolean = false;
+
+    private _resolveFingering(): void {
+        const staff = this.bar.staff;
+        this.fingering = null;
+        this.identityUntilBarIndex = -1;
+        this._isFingeringActive = TabFingeringSolver.isActive(staff);
+        if (!this._isFingeringActive) {
+            return;
+        }
+
+        const barIndex = this.bar.index;
+        const previous = this.previousRenderer;
+        if (previous instanceof TabBarRenderer) {
+            const previousFingering = previous.fingering;
+            if (previousFingering !== null && previousFingering.covers(barIndex)) {
+                this.fingering = previousFingering;
+                return;
+            }
+            if (previous.identityUntilBarIndex >= barIndex) {
+                this.identityUntilBarIndex = previous.identityUntilBarIndex;
+                return;
+            }
+        }
+
+        const lastBarIndex = TabFingeringSolver.segmentEnd(staff, barIndex);
+        this.fingering = TabFingeringSolver.solve(staff, barIndex, lastBarIndex);
+        if (this.fingering === null) {
+            this.identityUntilBarIndex = lastBarIndex;
+        }
+    }
+
+    protected override createBeatGlyphs(): void {
+        this._resolveFingering();
+        super.createBeatGlyphs();
+    }
+
+    private _fingeringFor(note: Note): TabFingeringSegment | null {
+        const bar = note.beat.voice.bar;
+        const own = this.fingering;
+        if (own !== null && own.covers(bar.index)) {
+            return own;
+        }
+        if (bar === this.bar) {
+            return null;
+        }
+        const renderer = this.scoreRenderer.layout!.getRendererForBar(TabBarRenderer.StaffId, bar);
+        if (renderer instanceof TabBarRenderer) {
+            const fingering = renderer.fingering;
+            if (fingering !== null && fingering.covers(bar.index)) {
+                return fingering;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The string (1 = lowest) on which the note is shown in this tab.
+     */
+    public getDisplayString(note: Note): number {
+        if (!this._isFingeringActive || !note.isStringed) {
+            return note.string;
+        }
+        const fingering = this._fingeringFor(note);
+        return fingering !== null ? fingering.getString(note) : note.string;
+    }
+
+    /**
+     * The fret shown for the note: the natural harmonic node for natural harmonics, the base fret otherwise.
+     */
+    public getDisplayFret(note: Note): number {
+        const staff = note.beat.voice.bar.staff;
+        const isNaturalHarmonic = TabFingeringSolver.isNaturalHarmonic(note);
+        if (!this._isFingeringActive || !note.isStringed) {
+            return (isNaturalHarmonic ? note.harmonicValue : note.fret) - staff.transpositionPitch;
+        }
+        const fingering = this._fingeringFor(note);
+        if (fingering === null) {
+            if (isNaturalHarmonic) {
+                const modelStringNode = TabFingeringSolver.findNaturalNodeOnModelString(note);
+                return modelStringNode >= 0
+                    ? TabFingeringSolver.naturalNodeValues[modelStringNode]
+                    : note.harmonicValue - staff.transpositionPitch;
+            }
+            return note.fret - staff.transpositionPitch;
+        }
+        const node = fingering.getNode(note);
+        return node >= 0 ? TabFingeringSolver.naturalNodeValues[node] : fingering.getFret(note);
+    }
+
+    /**
+     * The combination of {@link TabFingeringSegment} flags describing how the note differs from the model.
+     */
+    public getDisplayFlags(note: Note): number {
+        if (!this._isFingeringActive || !note.isStringed) {
+            return 0;
+        }
+        const fingering = this._fingeringFor(note);
+        return fingering !== null ? fingering.getFlags(note) : 0;
+    }
+
+    /**
+     * The fret of the trill target on the displayed string of the note.
+     */
+    public getDisplayTrillFret(note: Note): number {
+        const staff = note.beat.voice.bar.staff;
+        return (
+            note.trillValue -
+            staff.transpositionPitch -
+            (staff.capo + Note.getStringTuning(staff, this.getDisplayString(note)))
+        );
+    }
+
+    /**
+     * The stringed note of the beat shown on the highest string.
+     */
+    public getDisplayMaxStringNote(beat: Beat): Note | null {
+        if (!this._isFingeringActive) {
+            return beat.maxStringNote;
+        }
+        let result: Note | null = null;
+        let resultString = 0;
+        for (const note of beat.notes) {
+            if (!note.isStringed) {
+                continue;
+            }
+            const str = this.getDisplayString(note);
+            if (result === null || str > resultString) {
+                result = note;
+                resultString = str;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The stringed note of the beat shown on the lowest string.
+     */
+    public getDisplayMinStringNote(beat: Beat): Note | null {
+        if (!this._isFingeringActive) {
+            return beat.minStringNote;
+        }
+        let result: Note | null = null;
+        let resultString = 0;
+        for (const note of beat.notes) {
+            if (!note.isStringed) {
+                continue;
+            }
+            const str = this.getDisplayString(note);
+            if (result === null || str < resultString) {
+                result = note;
+                resultString = str;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * The string on which the given note is shown in the tab of its staff, for renderers of other notations.
+     */
+    public static resolveDisplayString(renderer: BarRendererBase, note: Note): number {
+        if (!TabFingeringSolver.isActive(note.beat.voice.bar.staff)) {
+            return note.string;
+        }
+        const tab = TabBarRenderer._tabRendererOf(renderer, note);
+        return tab !== null ? tab.getDisplayString(note) : note.string;
+    }
+
+    // a renderer is registered in the layout only after its own layout
+    private static _tabRendererOf(renderer: BarRendererBase, note: Note): TabBarRenderer | null {
+        const bar = note.beat.voice.bar;
+        if (renderer instanceof TabBarRenderer && renderer.bar === bar) {
+            return renderer;
+        }
+        const tab = renderer.scoreRenderer.layout!.getRendererForBar(TabBarRenderer.StaffId, bar);
+        return tab instanceof TabBarRenderer ? tab : null;
+    }
+
+    /**
+     * Whether the tab of the note's staff shows it on another string or as open string, so left-hand
+     * fingerings of the model do not apply to it.
+     */
+    public static isFingeringChanged(renderer: BarRendererBase, note: Note): boolean {
+        if (!note.isStringed || !TabFingeringSolver.isActive(note.beat.voice.bar.staff)) {
+            return false;
+        }
+        const tab = TabBarRenderer._tabRendererOf(renderer, note);
+        if (tab === null) {
+            return false;
+        }
+        return (tab.getDisplayFlags(note) & TabFingeringSegment.flagMoved) !== 0 || tab.getDisplayFret(note) === 0;
     }
 
     public minString = Number.NaN;
@@ -295,7 +501,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     const noteGlyphs = noteNumbers.noteGlyphs;
                     for (let k = 0, nk = noteGlyphs.length; k < nk; k++) {
                         const g = noteGlyphs[k];
-                        const str = g.note.string;
+                        const str = g.displayString;
                         if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
@@ -342,7 +548,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     const noteGlyphs = noteNumbers.noteGlyphs;
                     for (let k = 0, nk = noteGlyphs.length; k < nk; k++) {
                         const g = noteGlyphs[k];
-                        const str = g.note.string;
+                        const str = g.displayString;
                         if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
@@ -402,8 +608,10 @@ export class TabBarRenderer extends LineBarRenderer {
         // Per-beat half-line overflow, not bar-wide. Strings are 1-indexed: top = tuning.length, bottom = 1.
         const beat = beatContainer.beat;
         const stringCount = this.bar.staff.tuning.length;
-        const hasTop = beat.maxStringNote !== null && beat.maxStringNote.string === stringCount;
-        const hasBottom = beat.minStringNote !== null && beat.minStringNote.string === 1;
+        const maxStringNote = this.getDisplayMaxStringNote(beat);
+        const minStringNote = this.getDisplayMinStringNote(beat);
+        const hasTop = maxStringNote !== null && this.getDisplayString(maxStringNote) === stringCount;
+        const hasBottom = minStringNote !== null && this.getDisplayString(minStringNote) === 1;
         if (!hasTop && !hasBottom) {
             return;
         }
@@ -516,7 +724,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
-        const maxNote = beat.maxStringNote;
+        const maxNote = this.getDisplayMaxStringNote(beat);
         const position = direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown;
         if (maxNote) {
             return this.getNoteY(maxNote, position);
@@ -526,7 +734,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
-        const maxNote = beat.minStringNote;
+        const maxNote = this.getDisplayMinStringNote(beat);
         const position = direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem;
 
         if (maxNote) {

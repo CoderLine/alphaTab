@@ -62,12 +62,12 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         // effect slurs: one arc per side of the beat (see TabSlurGlyph)
         // start effect slur on first beat
         if (n.isEffectSlurOrigin && n.effectSlurDestination) {
-            const direction = TabTieGlyph.getBeamDirectionForNote(n);
+            const direction = TabTieGlyph.getBeamDirectionForString(renderer.getDisplayString(n));
             let slurStarts = this._effectSlurStarts;
             const group =
                 slurStarts !== null && slurStarts.has(direction)
                     ? null
-                    : TabSlurGlyph.getEffectSlurGroup(this.beat, direction);
+                    : TabSlurGlyph.getEffectSlurGroup(renderer, this.beat, direction);
             if (group) {
                 if (!slurStarts) {
                     slurStarts = new Set<BeamDirection>();
@@ -81,12 +81,12 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
         }
         // end effect slur on last beat
         if (n.isEffectSlurDestination && n.effectSlurOrigin) {
-            const direction = TabTieGlyph.getBeamDirectionForNote(n.effectSlurOrigin);
+            const direction = TabTieGlyph.getBeamDirectionForString(renderer.getDisplayString(n.effectSlurOrigin));
             let slurEnds = this._effectSlurEnds;
             const group =
                 slurEnds !== null && slurEnds.has(direction)
                     ? null
-                    : TabSlurGlyph.getEffectSlurGroup(n.effectSlurOrigin.beat, direction);
+                    : TabSlurGlyph.getEffectSlurGroup(renderer, n.effectSlurOrigin.beat, direction);
             if (group && group.endNote === n) {
                 if (!slurEnds) {
                     slurEnds = new Set<BeamDirection>();

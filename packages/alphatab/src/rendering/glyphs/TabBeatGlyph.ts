@@ -232,12 +232,12 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
 
     private _createNoteGlyph(n: Note): void {
         const tr: TabBarRenderer = this.renderer as TabBarRenderer;
-        const noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n);
+        const noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n, tr.getDisplayString(n));
         const l: number = tr.getNoteLine(n);
         noteNumberGlyph.y = tr.getLineY(l);
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
-        this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
+        this.noteNumbers!.addNoteGlyph(noteNumberGlyph);
         if (tr.drawsRhythm) {
             tr.collisionHelper.reserveBeatSlot(
                 this.container.beat,

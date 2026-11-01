@@ -566,6 +566,9 @@ export class SerializerFill {
         {
             obj.scoreInfoColor = new Color(1, 2, 3, 4);
         }
+        {
+            obj.tabUnplayableFretColor = new Color(1, 2, 3, 4);
+        }
     }
     public static fillSettings(obj: Settings, depth: number = 0): void {
         if (depth > 8) {

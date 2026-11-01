@@ -1,4 +1,5 @@
 import { BendType } from '@coderline/alphatab/model/BendType';
+import type { Color } from '@coderline/alphatab/model/Color';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
@@ -9,6 +10,7 @@ import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
+import { TabFingeringSegment } from '@coderline/alphatab/rendering/utils/TabFingeringSegment';
 import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
@@ -20,12 +22,20 @@ export class NoteNumberGlyph extends Glyph {
     private _trillNoteString: string | null = null;
     private _trillNoteStringWidth: number = 0;
 
+    private _isUnplayable: boolean = false;
+
     public isEmpty: boolean = false;
     public noteStringWidth: number = 0;
 
-    public constructor(x: number, y: number, note: Note) {
+    /**
+     * The string (1 = lowest) on which the note is shown.
+     */
+    public displayString: number;
+
+    public constructor(x: number, y: number, note: Note, displayString: number) {
         super(x, y);
         this._note = note;
+        this.displayString = displayString;
     }
 
     public get note(): Note {
@@ -46,11 +56,17 @@ export class NoteNumberGlyph extends Glyph {
 
     public override doLayout(): void {
         const n: Note = this._note;
+        const tr = this.renderer as TabBarRenderer;
         let fret: number;
+        let harmonicType = n.harmonicType;
+        let harmonicValue = n.harmonicValue;
         if (n.isStringed) {
-            fret = n.fret - n.beat.voice.bar.staff.transpositionPitch;
-            if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
-                fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
+            fret = tr.getDisplayFret(n);
+            const flags = tr.getDisplayFlags(n);
+            this._isUnplayable = (flags & TabFingeringSegment.flagUnplayable) !== 0;
+            if ((flags & TabFingeringSegment.flagAsArtificial) !== 0) {
+                harmonicType = HarmonicType.Artificial;
+                harmonicValue = 12;
             }
         } else {
             const articulation = PercussionMapper.getArticulation(n);
@@ -65,7 +81,7 @@ export class NoteNumberGlyph extends Glyph {
             this._noteString = n.isDead ? 'x' : fret.toString();
             if (n.isGhost) {
                 this._noteString = `(${this._noteString})`;
-            } else if (n.harmonicType === HarmonicType.Natural) {
+            } else if (harmonicType === HarmonicType.Natural) {
                 // only first decimal char
                 const i: number = this._noteString.indexOf(String.fromCharCode(46));
                 if (i >= 0) {
@@ -78,20 +94,20 @@ export class NoteNumberGlyph extends Glyph {
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
                 this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {
-            this._noteString = `(${(n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
+            this._noteString = `(${tr.getDisplayFret(n.tieOrigin!).toString()})`;
         } else {
             this._noteString = '';
         }
         if (n.isTrill) {
-            this._trillNoteString = `(${(n.trillFret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
-        } else if (!ModelUtils.isAlmostEqualTo(n.harmonicValue, 0)) {
-            switch (n.harmonicType) {
+            this._trillNoteString = `(${tr.getDisplayTrillFret(n).toString()})`;
+        } else if (!ModelUtils.isAlmostEqualTo(harmonicValue, 0)) {
+            switch (harmonicType) {
                 case HarmonicType.Artificial:
                 case HarmonicType.Pinch:
                 case HarmonicType.Tap:
                 case HarmonicType.Semi:
                 case HarmonicType.Feedback:
-                    let s: string = (fret + n.harmonicValue).toString();
+                    let s: string = (fret + harmonicValue).toString();
                     // only first decimal char
                     const i: number = s.indexOf(String.fromCharCode(46));
                     if (i >= 0) {
@@ -141,7 +157,7 @@ export class NoteNumberGlyph extends Glyph {
 
         this.paintTrill(x, y, canvas);
 
-        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        const previousColor = this._applyColor(canvas);
         try {
             canvas.fillText(this._noteString!, x, y);
         } finally {
@@ -155,7 +171,7 @@ export class NoteNumberGlyph extends Glyph {
         if (!this._trillNoteString) {
             return;
         }
-        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        const previousColor = this._applyColor(canvas);
         try {
             const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
             this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
@@ -164,6 +180,17 @@ export class NoteNumberGlyph extends Glyph {
         } finally {
             ElementStyleHelper.restore(canvas, previousColor);
         }
+    }
+
+    private _applyColor(canvas: ICanvas): Color | undefined {
+        return this._isUnplayable
+            ? ElementStyleHelper.applyNoteWithDefault(
+                  canvas,
+                  NoteSubElement.GuitarTabFretNumber,
+                  this._note,
+                  this.renderer.resources.tabUnplayableFretColor
+              )
+            : ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
     }
 
     public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {

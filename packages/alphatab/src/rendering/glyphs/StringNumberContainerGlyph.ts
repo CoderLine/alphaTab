@@ -2,6 +2,7 @@ import { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import { Note } from '@coderline/alphatab/model/Note';
 import { CanvasHelper, type ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 
 /**
  * @internal
@@ -10,13 +11,15 @@ export class StringNumberContainerGlyph extends EffectGlyph {
     // top to bottom: highest note first
     private _strings: number[] = [];
     private _pitches: number[] = [];
+    private _notes: Note[] = [];
 
-    public addString(string: number, pitch: number) {
+    public addString(string: number, pitch: number, note: Note) {
         if (this._strings.indexOf(string) >= 0) {
             return;
         }
         this._strings.push(string);
         this._pitches.push(pitch);
+        this._notes.push(note);
         let i = this._strings.length - 1;
         while (
             i > 0 &&
@@ -24,10 +27,12 @@ export class StringNumberContainerGlyph extends EffectGlyph {
         ) {
             this._strings[i] = this._strings[i - 1];
             this._pitches[i] = this._pitches[i - 1];
+            this._notes[i] = this._notes[i - 1];
             i--;
         }
         this._strings[i] = string;
         this._pitches[i] = pitch;
+        this._notes[i] = note;
     }
 
     public override doLayout(): void {
@@ -43,8 +48,9 @@ export class StringNumberContainerGlyph extends EffectGlyph {
         let y = 0;
         const circleHeight =
             this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GuitarString0)! * this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
-        for (const s of this._strings) {
-            const stringValue = stringCount - s;
+        for (const note of this._notes) {
+            // resolved on paint: the tab of the bar is laid out after this staff
+            const stringValue = stringCount - TabBarRenderer.resolveDisplayString(this.renderer, note);
             const symbol = ((MusicFontSymbol.GuitarString1 as number) + stringValue) as MusicFontSymbol;
             CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
