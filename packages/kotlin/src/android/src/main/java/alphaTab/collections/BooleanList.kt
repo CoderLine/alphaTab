@@ -48,8 +48,9 @@ internal class BooleanList : IBooleanIterable {
         return Iterator(this)
     }
 
-    public fun fill(b: Boolean) {
+    public fun fill(b: Boolean): BooleanList {
         _data.fill(b, 0, _size)
+        return this
     }
 
     public fun spread(): BooleanArray {

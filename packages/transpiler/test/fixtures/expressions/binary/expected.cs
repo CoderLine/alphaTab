@@ -44,7 +44,7 @@ namespace AlphaTab
         public double Mask(double a, double m)
         {
             double x = a;
-            x = (double)(((int)x) & (m));
+            x = (double)(((int)x) & ((int)(m)));
             x = (double)(((int)x) | (16));
             x = (double)(((int)x) ^ (255));
             x = (double)(((int)x) << (2));

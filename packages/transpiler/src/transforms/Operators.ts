@@ -147,11 +147,17 @@ function _visitBitwiseAssignmentBinaryOp(state: AstTransformer, parent: cs.Node,
             return null;
         }
 
-        (bitOp.right as cs.ParenthesizedExpression).expression = state.visitExpression(bitOp.right, expression.right)!;
-
-        if (!(bitOp.right as cs.ParenthesizedExpression).expression) {
+        const right = state.visitExpression(bitOp.right, expression.right)!;
+        if (!right) {
             return null;
         }
+        const isShift =
+            expression.operatorToken.kind === ts.SyntaxKind.LessThanLessThanEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.GreaterThanGreaterThanEqualsToken ||
+            expression.operatorToken.kind === ts.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken;
+        (bitOp.right as cs.ParenthesizedExpression).expression = _hasBinaryOperationMakeInt(state, right)
+            ? right
+            : makeInt(state, right, !isShift);
     } else {
         (bitOp.left as cs.ParenthesizedExpression).expression = state.visitExpression(assignment, expression.left)!;
 
@@ -493,7 +499,26 @@ export function visitAsExpression(
     return castExpression;
 }
 
+/**
+ * Whether the expression reads an element of a value-type array through a runtime helper
+ * which returns the plain element type (e.g. `IList<double>.Pop()`), not a nullable one.
+ */
+function _isArrayElementRemoval(state: AstTransformer, expression: ts.Expression): boolean {
+    if (!ts.isCallExpression(expression) || !ts.isPropertyAccessExpression(expression.expression)) {
+        return false;
+    }
+    const name = expression.expression.name.text;
+    if (name !== 'pop' && name !== 'shift') {
+        return false;
+    }
+    const receiverType = state.context.typeChecker.getTypeAtLocation(expression.expression.expression);
+    return state.context.typeChecker.isArrayType(receiverType);
+}
+
 export function visitNonNullExpression(state: AstTransformer, parent: cs.Node, expression: ts.NonNullExpression) {
+    if (state.context.isValueTypeExpression(expression) && _isArrayElementRemoval(state, expression.expression)) {
+        return state.visitExpression(parent, expression.expression);
+    }
     if (state.context.isValueTypeExpression(expression)) {
         const valueAccessExpression = {
             expression: {} as cs.Expression,
