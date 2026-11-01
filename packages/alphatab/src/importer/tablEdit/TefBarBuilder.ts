@@ -1,12 +1,25 @@
 import { Bar } from '@coderline/alphatab/model/Bar';
 import { Beat } from '@coderline/alphatab/model/Beat';
+import { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { BrushType } from '@coderline/alphatab/model/BrushType';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { FadeType } from '@coderline/alphatab/model/FadeType';
+import { Fingers } from '@coderline/alphatab/model/Fingers';
+import { GraceType } from '@coderline/alphatab/model/GraceType';
+import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PickStroke } from '@coderline/alphatab/model/PickStroke';
+import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
+import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import type { Track } from '@coderline/alphatab/model/Track';
+import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
+import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
@@ -102,6 +115,11 @@ class TefEvent {
     public realStart: number = 0;
     public realEnd: number = 0;
     public lane: number = -1;
+    /**
+     * The next note on the same string.
+     */
+    public next: TefEvent | null = null;
+    public extension: Uint8Array | null = null;
 }
 
 /**
@@ -134,6 +152,10 @@ export class TefBarBuilder {
     private static readonly _tieDynamics = 7;
     private static readonly _upperVoice = 2;
     private static readonly _lowerVoice = 3;
+    private static readonly _extensionMarker = 0x7d;
+    private static readonly _graceFlag = 0x40;
+    private static readonly _pitchChangeFlag = 0x80;
+    private static readonly _acciaccaturaFlag = 0x40;
 
     private _tracks: TefTrackInfo[];
     private _measureStarts: number[];
@@ -146,12 +168,22 @@ export class TefBarBuilder {
     }
 
     public build(cells: TefCell[]): void {
+        const extensions = new Map<string, Uint8Array>();
+        for (const cell of cells) {
+            if (cell.data[0] === TefBarBuilder._extensionMarker && (cell.data[1] & 0x07) !== 0) {
+                extensions.set(`${cell.row}:${cell.position - 1}`, cell.data);
+            }
+        }
         for (const info of this._tracks) {
             const events: TefEvent[] = [];
             for (const cell of cells) {
                 if (cell.row >= info.firstString && cell.row < info.firstString + info.stringCount) {
                     const e = this._decode(cell, info);
                     if (e) {
+                        const ext = extensions.get(`${cell.row}:${cell.position}`);
+                        if (ext) {
+                            e.extension = ext;
+                        }
                         events.push(e);
                     }
                 }
@@ -269,6 +301,17 @@ export class TefBarBuilder {
             }
             return a.cell.row - b.cell.row;
         });
+
+        const lastOnString = new Map<number, TefEvent>();
+        for (const e of events) {
+            if (!e.isRest) {
+                const previous = lastOnString.get(e.stringIndex);
+                if (previous) {
+                    previous.next = e;
+                }
+                lastOnString.set(e.stringIndex, e);
+            }
+        }
 
         for (let i = 0; i < barCount; i++) {
             const bar = new Bar();
@@ -539,6 +582,9 @@ export class TefBarBuilder {
                 u.duration && end - u.start === u.duration.length
                     ? [u.duration]
                     : TefBarBuilder._splitPlain(u.start, end);
+            if (!u.isRest) {
+                this._addGraceBeat(info, voice, u);
+            }
             for (let k = 0; k < values.length; k++) {
                 const beat = TefBarBuilder._createBeat(values[k]);
                 voice.addBeat(beat);
@@ -626,11 +672,319 @@ export class TefBarBuilder {
                 loudest = e.dynamics;
             }
             beat.addNote(note);
+            if (!isContinuation) {
+                this._applyEffects(beat, note, e, unit);
+            }
         }
         if (loudest < 7) {
             beat.dynamics = TefBarBuilder._dynamicsOf(loudest);
             beat.showDynamics = false;
         }
+    }
+
+    private _addGraceBeat(info: TefTrackInfo, voice: Voice, unit: TefUnit): void {
+        let grace: Beat | null = null;
+        for (const e of unit.events) {
+            const data = e.cell.data;
+            if ((data[0] & TefBarBuilder._graceFlag) === 0) {
+                continue;
+            }
+            const kind = data[3] >> 5;
+            // complex graces become ornaments
+            if (kind >= 4) {
+                continue;
+            }
+            let stringIndex = e.stringIndex;
+            let fret = data[3] & 0x1f;
+            if (e.extension) {
+                if ((e.extension[3] & 0x80) !== 0) {
+                    stringIndex = e.extension[3] & 0x0f;
+                }
+                if ((e.extension[4] & 0x80) !== 0) {
+                    fret = e.extension[4] & 0x3f;
+                }
+            }
+            if (kind === 0) {
+                fret = e.fret;
+            }
+            // a grace on the main note's fret without its own duration is neither shown nor played
+            const hasDuration = e.extension !== null && (e.extension[1] & 0x07) > 1;
+            if (fret === e.fret && stringIndex === e.stringIndex && !hasDuration) {
+                continue;
+            }
+            if (!grace) {
+                grace = new Beat();
+                grace.duration = Duration.ThirtySecond;
+                grace.graceType =
+                    e.extension && (e.extension[7] & TefBarBuilder._acciaccaturaFlag) !== 0
+                        ? GraceType.BeforeBeat
+                        : GraceType.OnBeat;
+                voice.addBeat(grace);
+            }
+            const note = new Note();
+            note.string = info.stringCount - stringIndex;
+            note.fret = fret;
+            switch (kind) {
+                case 1:
+                    note.isHammerPullOrigin = true;
+                    break;
+                case 2:
+                    note.slideOutType = SlideOutType.Legato;
+                    break;
+                case 3:
+                    TefBarBuilder._addBend(note, (e.fret - fret) * 2, false);
+                    break;
+            }
+            grace.addNote(note);
+        }
+    }
+
+    /**
+     * The primary effect sits in the low nibble of the third byte, effects of the second dialog
+     * column in the low nibble of the fifth byte; its high nibble holds the combination effect.
+     */
+    private _applyEffects(beat: Beat, note: Note, e: TefEvent, unit: TefUnit): void {
+        const data = e.cell.data;
+        let effect = data[2] & 0x0f;
+        const combination = data[4] >> 4;
+        if (effect === 0 && combination !== 3 && (data[4] & 0x0f) !== 0) {
+            effect = 0x10 + (data[4] & 0x0f);
+        }
+        const hasParameter = (data[0] & (TefBarBuilder._graceFlag | TefBarBuilder._pitchChangeFlag)) === 0;
+        const parameter = hasParameter ? data[3] : 0;
+
+        TefBarBuilder._applyEffect(beat, note, e, unit, effect, parameter, combination === 11);
+        switch (combination) {
+            case 1:
+            case 2:
+                note.isHammerPullOrigin = true;
+                break;
+            case 3:
+                TefBarBuilder._applyEffect(beat, note, e, unit, 14, 0, false);
+                break;
+            case 5:
+                TefBarBuilder._applyEffect(beat, note, e, unit, 5, 0, false);
+                break;
+            case 6:
+                note.harmonicType = HarmonicType.Natural;
+                break;
+            case 7:
+                note.harmonicType = HarmonicType.Artificial;
+                note.harmonicValue = 12;
+                break;
+            case 8:
+                note.isLetRing = true;
+                break;
+            case 9:
+                note.isGhost = true;
+                break;
+            case 10:
+                note.isDead = true;
+                break;
+        }
+
+        if ((data[0] & TefBarBuilder._graceFlag) !== 0) {
+            switch (data[3] >> 5) {
+                case 4:
+                    note.ornament = NoteOrnament.UpperMordent;
+                    break;
+                case 5:
+                case 6:
+                    note.ornament = NoteOrnament.Turn;
+                    break;
+                case 7:
+                    note.trillValue = note.realValue + 2;
+                    break;
+            }
+        }
+
+        if ((data[0] & TefBarBuilder._pitchChangeFlag) !== 0) {
+            const semitones = (data[3] & 0x07) - 4;
+            if (semitones > 0) {
+                note.bendPoints = null;
+                note.addBendPoint(new BendPoint(0, semitones * 2));
+                note.addBendPoint(new BendPoint(BendPoint.MaxPosition, semitones * 2));
+            }
+        }
+
+        const fingering = data[6] & 0x1f;
+        const leftHand = fingering % 6;
+        const rightHand = Math.floor(fingering / 6);
+        if (leftHand > 0) {
+            note.leftHandFinger = TefBarBuilder._fingerOf(leftHand - 1);
+        }
+        if (rightHand > 0) {
+            note.rightHandFinger = TefBarBuilder._fingerOf(rightHand - 1);
+        }
+        switch (data[6] >> 5) {
+            case 3:
+                beat.pickStroke = PickStroke.Up;
+                break;
+            case 4:
+                beat.pickStroke = PickStroke.Down;
+                break;
+        }
+
+        switch (data[7] & 0x44) {
+            case 0x40:
+                beat.ottava = Ottavia._8vb;
+                break;
+            case 0x44:
+                beat.ottava = Ottavia._8va;
+                break;
+        }
+    }
+
+    private static _applyEffect(
+        beat: Beat,
+        note: Note,
+        e: TefEvent,
+        unit: TefUnit,
+        effect: number,
+        parameter: number,
+        isVariation: boolean
+    ): void {
+        switch (effect) {
+            case 1:
+            case 2:
+                note.isHammerPullOrigin = true;
+                break;
+            case 3:
+                // the destination is only struck again when it carries a pick stroke
+                note.slideOutType =
+                    e.next && TefBarBuilder._hasPickStroke(e.next) ? SlideOutType.Shift : SlideOutType.Legato;
+                break;
+            case 4:
+                TefBarBuilder._addBend(note, Math.max(1, parameter & 0x0f), false);
+                break;
+            case 5:
+            case 14:
+                TefBarBuilder._applyBrush(beat, e, unit, effect === 14);
+                break;
+            case 6:
+                note.harmonicType = HarmonicType.Natural;
+                break;
+            case 7:
+                note.harmonicType = HarmonicType.Artificial;
+                note.harmonicValue = TefBarBuilder._artificialHarmonicOffset(parameter);
+                break;
+            case 8:
+                note.isPalmMute = true;
+                break;
+            case 9:
+                beat.tap = true;
+                break;
+            case 10:
+                note.vibrato = VibratoType.Slight;
+                break;
+            case 11: {
+                const tremolo = new TremoloPickingEffect();
+                tremolo.marks = 3;
+                beat.tremoloPicking = tremolo;
+                break;
+            }
+            case 12:
+            case 13:
+                if (e.next && e.next.isTied && e.next.fret !== e.fret) {
+                    TefBarBuilder._addBend(note, (e.next.fret - e.fret) * 2, effect === 13);
+                }
+                break;
+            case 15:
+                note.isDead = true;
+                break;
+            case 0x11:
+                note.isLetRing = true;
+                break;
+            case 0x12:
+                beat.slap = true;
+                break;
+            case 0x13:
+                beat.rasgueado = Rasgueado.Ii;
+                break;
+            case 0x14:
+                note.isGhost = true;
+                break;
+            case 0x17:
+                note.isStaccato = true;
+                break;
+            case 0x18:
+                beat.fade = FadeType.FadeIn;
+                break;
+            case 0x19:
+                beat.fade = FadeType.FadeOut;
+                break;
+        }
+    }
+
+    /**
+     * The brush direction follows the string carrying the effect: on the lowest sounding string
+     * the chord is struck from the bass, on the highest from the treble.
+     */
+    private static _applyBrush(beat: Beat, e: TefEvent, unit: TefUnit, isRoll: boolean): void {
+        let highest = e.stringIndex;
+        for (const other of unit.events) {
+            if (other.stringIndex < highest) {
+                highest = other.stringIndex;
+            }
+        }
+        const fromTreble = e.stringIndex === highest && unit.events.length > 1;
+        if (isRoll) {
+            beat.brushType = fromTreble ? BrushType.ArpeggioUp : BrushType.ArpeggioDown;
+        } else {
+            beat.brushType = fromTreble ? BrushType.BrushUp : BrushType.BrushDown;
+        }
+    }
+
+    private static _hasPickStroke(e: TefEvent): boolean {
+        const stroke = e.cell.data[6] >> 5;
+        return stroke === 3 || stroke === 4;
+    }
+
+    private static _addBend(note: Note, quarterTones: number, release: boolean): void {
+        if (quarterTones === 0) {
+            return;
+        }
+        note.bendPoints = null;
+        note.addBendPoint(new BendPoint(0, 0));
+        if (release) {
+            note.addBendPoint(new BendPoint(BendPoint.MaxPosition / 4, quarterTones));
+            note.addBendPoint(new BendPoint((BendPoint.MaxPosition * 3) / 4, quarterTones));
+            note.addBendPoint(new BendPoint(BendPoint.MaxPosition, 0));
+        } else {
+            note.addBendPoint(new BendPoint(BendPoint.MaxPosition / 2, quarterTones));
+            note.addBendPoint(new BendPoint(BendPoint.MaxPosition, quarterTones));
+        }
+    }
+
+    private static _artificialHarmonicOffset(parameter: number): number {
+        if ((parameter & 0xf0) === 0xb0) {
+            switch (parameter & 0x0f) {
+                case 3:
+                    return 31;
+                case 4:
+                case 9:
+                    return 28;
+                case 5:
+                    return 24;
+                case 7:
+                    return 19;
+            }
+        }
+        return 12;
+    }
+
+    private static _fingerOf(value: number): Fingers {
+        switch (value) {
+            case 0:
+                return Fingers.Thumb;
+            case 1:
+                return Fingers.IndexFinger;
+            case 2:
+                return Fingers.MiddleFinger;
+            case 3:
+                return Fingers.AnnularFinger;
+        }
+        return Fingers.LittleFinger;
     }
 
     private static _dynamicsOf(value: number): DynamicValue {
