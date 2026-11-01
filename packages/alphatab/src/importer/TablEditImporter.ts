@@ -11,6 +11,8 @@ import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { OverflowError } from '@coderline/alphatab/io/IReadable';
 import { Chord } from '@coderline/alphatab/model/Chord';
 import { Clef } from '@coderline/alphatab/model/Clef';
+import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
+import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Score } from '@coderline/alphatab/model/Score';
@@ -33,6 +35,8 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _maxCellCount = 1000000;
     private static readonly _cellSize = 12;
     private static readonly _drumFlag = 0x80;
+    private static readonly _pickupFlag = 0x08;
+    private static readonly _minorFlag = 0x20;
     private static readonly _maxTextCount = 4096;
     private static readonly _maxReadingListCount = 4096;
     private static readonly _readingGuideMarker = 0xb7;
@@ -45,6 +49,9 @@ export class TablEditImporter extends ScoreImporter {
     private _measureSizes: number[] = [];
     private _tracks: TefTrackInfo[] = [];
     private _totalStrings: number = 0;
+    private _pickupBars: Set<number> = new Set<number>();
+    private _minorBars: Set<number> = new Set<number>();
+    private _keys: number[] = [];
 
     public get name(): string {
         return 'TablEdit';
@@ -72,11 +79,20 @@ export class TablEditImporter extends ScoreImporter {
         const cells = this._readContents(this._u32(60));
 
         const builder = new TefBarBuilder(this._tracks, this._measureStarts, this._measureSizes);
+        builder.pickupBars = this._pickupBars;
         builder.initialTempo = this._u16(6) > 0 ? this._u16(6) : 120;
         builder.initialSyncopation = Math.max(-3, Math.min(3, this._s16(12)));
         builder.texts = this._readTexts(this._u32(84));
         builder.chords = this._readChords(this._u32(88));
         builder.build(cells);
+
+        for (const track of this._score.tracks) {
+            const bars = track.staves[0].bars;
+            for (let b = 0; b < bars.length && b < this._keys.length; b++) {
+                bars[b].keySignature = Math.max(-7, Math.min(7, this._keys[b])) as KeySignature;
+                bars[b].keySignatureType = this._minorBars.has(b) ? KeySignatureType.Minor : KeySignatureType.Major;
+            }
+        }
 
         const readingList = this._readReadingList(this._u32(128));
         TefReadingList.apply(this._score, readingList, this._readGuides(cells));
@@ -130,6 +146,15 @@ export class TablEditImporter extends ScoreImporter {
             const numerator = this._u8(p + 5);
             masterBar.timeSignatureNumerator = numerator > 0 ? numerator : 4;
             masterBar.timeSignatureDenominator = denominator > 0 ? denominator : 4;
+            const flags = this._u8(p);
+            if ((flags & TablEditImporter._pickupFlag) !== 0) {
+                masterBar.isAnacrusis = true;
+                this._pickupBars.add(i);
+            }
+            if ((flags & TablEditImporter._minorFlag) !== 0) {
+                this._minorBars.add(i);
+            }
+            this._keys.push(this._s8(p + 2));
             this._score.addMasterBar(masterBar);
 
             let size = (64 / masterBar.timeSignatureDenominator) * masterBar.timeSignatureNumerator;

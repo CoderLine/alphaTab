@@ -192,6 +192,11 @@ export class TefBarBuilder {
     private _beatStarts: Map<number, number[]> = new Map<number, number[]>();
     private _beatsByBar: Map<number, Beat[]> = new Map<number, Beat[]>();
 
+    /**
+     * Bars flagged as pick-up measures. They keep their nominal size on the grid.
+     */
+    public pickupBars: Set<number> = new Set<number>();
+    private _columnOffsets: Map<number, number> = new Map<number, number>();
     public texts: string[] = [];
     public chords: Chord[] = [];
     public initialTempo: number = 120;
@@ -204,6 +209,7 @@ export class TefBarBuilder {
     }
 
     public build(cells: TefCell[]): void {
+        this._trimPickupBars(cells);
         const extensions = new Map<string, Uint8Array>();
         for (const cell of cells) {
             if (cell.data[0] === TefBarBuilder._extensionMarker && (cell.data[1] & 0x07) !== 0) {
@@ -236,6 +242,40 @@ export class TefBarBuilder {
         this._applyGlobalMarkers(cells);
     }
 
+    /**
+     * Pick-up measures only last from their first to their last sounding note.
+     */
+    private _trimPickupBars(cells: TefCell[]): void {
+        for (const bar of this.pickupBars) {
+            const start = this._measureStarts[bar];
+            const size = this._measureSizes[bar];
+            let first = size;
+            let end = 0;
+            for (const cell of cells) {
+                const type = cell.data[0] & 0x3f;
+                if (type >= TefBarBuilder._restCode || cell.position < start || cell.position >= start + size) {
+                    continue;
+                }
+                const d = TefBarBuilder._durationOf(cell.data[1] & 0x1f);
+                if (!d) {
+                    continue;
+                }
+                const column = cell.position - start;
+                first = Math.min(first, column);
+                end = Math.max(end, column + Math.ceil(d.length / TefBarBuilder.subUnitsPerCell));
+            }
+            if (first < end) {
+                this._columnOffsets.set(bar, first);
+                this._measureSizes[bar] = Math.min(size, end) - first;
+            }
+        }
+    }
+
+    private _columnOf(position: number, bar: number): number {
+        const offset = this._columnOffsets.get(bar);
+        return position - this._measureStarts[bar] - (offset === undefined ? 0 : offset);
+    }
+
     private _applyGlobalMarkers(cells: TefCell[]): void {
         const score = this._tracks[0].track.score;
         const syncopation: number[] = [];
@@ -247,7 +287,7 @@ export class TefBarBuilder {
         for (const cell of cells) {
             const data = cell.data;
             const bar = this._barOf(cell.position);
-            const column = cell.position - this._measureStarts[bar];
+            const column = Math.max(0, this._columnOf(cell.position, bar));
             switch (data[0]) {
                 case TefBarBuilder._tempoMarker: {
                     const bpm = data[1] | (data[2] << 8);
@@ -341,7 +381,7 @@ export class TefBarBuilder {
     private _applyTrackMarker(info: TefTrackInfo, cell: TefCell): void {
         const data = cell.data;
         const bar = this._barOf(cell.position);
-        const column = cell.position - this._measureStarts[bar];
+        const column = Math.max(0, this._columnOf(cell.position, bar));
         const beat = this._beatAt(bar, column);
         if (!beat) {
             return;
@@ -481,7 +521,7 @@ export class TefBarBuilder {
         e.voiceHint = (cell.data[2] >> 4) & 0x03;
         e.accidental = cell.data[2] >> 6;
         e.bar = this._barOf(cell.position);
-        e.column = cell.position - this._measureStarts[e.bar];
+        e.column = this._columnOf(cell.position, e.bar);
         return e;
     }
 
