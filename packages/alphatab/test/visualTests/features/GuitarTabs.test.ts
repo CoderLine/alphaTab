@@ -61,33 +61,53 @@ describe('GuitarTabsTests', () => {
         );
     });
 
-    it('transpose-down', async () => {
-        // open strings, chords, ties across bars, legato, bends, harmonics, trills and dead notes
-        // which do not fit on their string after transposing down
-        const settings = new Settings();
-        settings.notation.transpositionPitches = [-4];
-        await VisualTestHelper.runVisualTestTex(
-            `
-            \\track \\staff { score tabs }
-            :4 0.6 3.5{string} 2.4 0.3 | (0.1 0.2 0.3) 3.5 3.5 3.5 | 3.5{t} 2.3{h} 4.3 4.3{b (0 4)} |
-            12.6{nh} 12.5{nh} 5.3{tr 7 16} 0.6{x}
-            `,
-            'test-data/visual-tests/guitar-tabs/transpose-down.png',
-            settings
-        );
-    });
+    describe('transpose', () => {
+        // the original and the transposed track, to compare note and tab placement
+        async function transposeTest(name: string, semitones: number, music: string, staffMetadata?: string) {
+            const settings = new Settings();
+            settings.notation.transpositionPitches = [0, semitones];
+            const staff = `\\staff { score tabs } ${staffMetadata ?? ''}`;
+            const transposed = `Transposed ${semitones > 0 ? '+' : ''}${semitones}`;
+            await VisualTestHelper.runVisualTestTex(
+                `\\track "Original" "Original" ${staff} ${music} \\track "${transposed}" "${transposed}" ${staff} ${music}`,
+                `test-data/visual-tests/guitar-tabs/transpose-${name}.png`,
+                settings,
+                o => {
+                    o.tracks = [0, 1];
+                }
+            );
+        }
 
-    it('transpose-up', async () => {
-        // frets beyond the neck after transposing up
-        const settings = new Settings();
-        settings.display.staveProfile = StaveProfile.Tab;
-        settings.notation.transpositionPitches = [7];
-        await VisualTestHelper.runVisualTestTex(
-            `
-            :4 17.1 20.1 (19.2 20.1) 22.2 | 5.6 7.5 0.1 3.3
-            `,
-            'test-data/visual-tests/guitar-tabs/transpose-up.png',
-            settings
-        );
+        it('down', async () =>
+            await transposeTest(
+                'down',
+                -4,
+                `:4 0.6 3.5{string} 2.4 0.3 | (0.1 0.2 0.3) 3.5 3.5 3.5 | 3.5{t} 2.3{h} 4.3 4.3{b (0 4)} |
+                12.6{nh} 12.5{nh} 5.3{tr 7 16} 0.6{x}`
+            ));
+        it('up', async () => await transposeTest('up', 7, ':4 17.1 20.1 (19.2 20.1) 22.2 | 5.6 7.5 0.1 3.3'));
+        it('keep-strings', async () => await transposeTest('keep-strings', 2, ':4 3.3 5.2 0.1 12.6'));
+        it('open-strings', async () => await transposeTest('open-strings', -4, ':4 3.5 2.4 5.3 0.6'));
+        it('chords', async () =>
+            await transposeTest('chords', -4, ':4 (0.1 0.2) (0.1 0.2 0.3) (3.5 2.4) (0.6 2.5 2.4)'));
+        it('ties', async () => await transposeTest('ties', -4, ':4 3.5 3.5 3.5 3.5 | -.5 2.4 2.4 -.4'));
+        it('legato', async () => await transposeTest('legato', -4, ':4 2.3{h} 4.3 2.3{ss} 4.3'));
+        it('pull-off-to-open', async () => await transposeTest('pull-off-to-open', -2, ':4 6.3{h} 2.3 5.2{h} 2.2'));
+        it('bends', async () => await transposeTest('bends', -4, ':4 4.3{b (0 4)} 0.1{b (0 4)} 2.2{b (0 4)} 5.3'));
+        it('natural-harmonics-up', async () =>
+            await transposeTest('natural-harmonics-up', 7, ':4 12.6{nh} 7.5{nh} 5.4{nh} 12.1{nh}'));
+        it('natural-harmonics-down', async () =>
+            await transposeTest('natural-harmonics-down', -4, ':4 12.6{nh} 7.5{nh} 5.4{nh} 12.1{nh}'));
+        it('dead-notes', async () =>
+            await transposeTest('dead-notes', -4, ':4 0.6{x} 0.5{x} (0.6{x} 0.5{x} 0.4{x}) 3.5'));
+        it('trills', async () => await transposeTest('trills', -6, ':2 5.3{tr 7 16} 7.2{tr 8 16}'));
+        it('ukulele', async () => await transposeTest('ukulele', -6, ':4 2.1 0.2 0.3 0.4', '\\tuning A4 E4 C4 G4'));
+        it('bass', async () => await transposeTest('bass', -1, ':4 0.3 0.4 3.4 5.4', '\\tuning G2 D2 A1 E1'));
+        it('capo', async () => await transposeTest('capo', 3, ':4 20.1 15.2 3.3 0.6', '\\capo 2'));
+        it('grace-notes', async () => await transposeTest('grace-notes', -4, ':4 2.3{ss} {gr ob} 4.3 3.3 3.3'));
+        it('repeated-bars', async () =>
+            await transposeTest('repeated-bars', -4, ':4 3.5 2.4 0.3 2.4 | 3.5 2.4 0.3 2.4'));
+        it('multi-voice', async () =>
+            await transposeTest('multi-voice', -4, '\\voice :4 0.1 0.1 0.2 0.2 \\voice :4 1.2 1.2 0.3 0.3'));
     });
 });

@@ -9,7 +9,6 @@ import type { RenderHints } from '@coderline/alphatab/rendering/IScoreRenderer';
 import { ScoreRenderer } from '@coderline/alphatab/rendering/ScoreRenderer';
 import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { Settings } from '@coderline/alphatab/Settings';
-import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { describe, expect, it } from 'vitest';
 
 /**
@@ -28,7 +27,6 @@ describe('TabFingeringPartialUpdate', () => {
         const settings = new Settings();
         settings.core.engine = 'svg';
         settings.core.enableLazyLoading = true;
-        settings.display.staveProfile = StaveProfile.Tab;
         settings.display.barsPerRow = 2;
         return settings;
     }
@@ -39,7 +37,7 @@ describe('TabFingeringPartialUpdate', () => {
     function createScore(settings: Settings): Score {
         // the hammer-on crosses from the first into the second system
         return ScoreLoader.loadAlphaTex(
-            '\\transpose -4 :4 5.3 5.3 5.3 5.3 | 5.3 5.3 5.3 2.3{h} | 4.3 5.3 5.3 5.3 | 5.3 5.3 5.3 5.3',
+            '\\track \\staff { tabs } \\transpose -4 :4 5.3 5.3 5.3 5.3 | 5.3 5.3 5.3 2.3{h} | 4.3 5.3 5.3 5.3 | 5.3 5.3 5.3 5.3',
             settings
         );
     }
