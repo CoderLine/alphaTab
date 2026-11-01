@@ -151,6 +151,10 @@ describe('TabFingeringSolverTest', () => {
         expect(display(staffOf('\\transpose -4 12.5{nh}'))).toEqual([['1.6*A']]);
     });
 
+    it('shows natural harmonics without node on their string as artificial harmonics', () => {
+        expect(display(staffOf('\\transpose 1 12.6{nh}'))).toEqual([['1.6A']]);
+    });
+
     it('ignores the fret of dead notes', () => {
         const staff = staffOf('\\transpose -4 0.6{x}');
         expect(TabFingeringSolver.solve(staff, 0, 0)).toBe(null);

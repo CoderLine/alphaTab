@@ -115,9 +115,12 @@ export class TabFingeringSolver {
     public static isSegmentStart(staff: Staff, barIndex: number): boolean {
         const firstChecked = Math.max(0, barIndex - TabFingeringSolver._maxLinkBarDistance);
         for (let b = barIndex - 1; b >= firstChecked; b--) {
-            for (const voice of staff.bars[b].voices) {
-                for (const beat of voice.beats) {
-                    for (const note of beat.notes) {
+            for (let v = 0; v < staff.bars[b].voices.length; v++) {
+                const voice = staff.bars[b].voices[v];
+                for (let k = 0; k < voice.beats.length; k++) {
+                    const beat = voice.beats[k];
+                    for (let n = 0; n < beat.notes.length; n++) {
+                        const note = beat.notes[n];
                         for (let kind = 0; kind < 3; kind++) {
                             const target = TabFingeringSolver.nextLinked(note, kind);
                             if (target !== null && target.beat.voice.bar.index >= barIndex) {
@@ -164,9 +167,12 @@ export class TabFingeringSolver {
         let last = firstBarIndex;
         let scanned = firstBarIndex;
         while (scanned <= last && scanned < staff.bars.length) {
-            for (const voice of staff.bars[scanned].voices) {
-                for (const beat of voice.beats) {
-                    for (const note of beat.notes) {
+            for (let v = 0; v < staff.bars[scanned].voices.length; v++) {
+                const voice = staff.bars[scanned].voices[v];
+                for (let k = 0; k < voice.beats.length; k++) {
+                    const beat = voice.beats[k];
+                    for (let n = 0; n < beat.notes.length; n++) {
+                        const note = beat.notes[n];
                         for (let kind = 0; kind < 3; kind++) {
                             const target = TabFingeringSolver.nextLinked(note, kind);
                             if (target !== null && target.beat.voice.bar.index > last) {
@@ -300,10 +306,10 @@ export class TabFingeringRun {
     }
 
     public solve(): TabFingeringSegment | null {
-        this._collectNotes();
         if (this._isIdentity()) {
             return null;
         }
+        this._collectNotes();
 
         this._buildGroups();
         this._buildSlices();
@@ -342,7 +348,8 @@ export class TabFingeringRun {
         let voiceCount = 0;
         let beatCount = 0;
         for (let b = this._firstBarIndex; b <= this._lastBarIndex; b++) {
-            for (const voice of bars[b].voices) {
+            for (let v = 0; v < bars[b].voices.length; v++) {
+                const voice = bars[b].voices[v];
                 voiceCount++;
                 beatCount += voice.beats.length;
             }
@@ -357,13 +364,16 @@ export class TabFingeringRun {
         let beatIndex = 0;
         for (let b = this._firstBarIndex; b <= this._lastBarIndex; b++) {
             this._barVoiceBase[b - this._firstBarIndex] = voiceIndex;
-            for (const voice of bars[b].voices) {
+            for (let v = 0; v < bars[b].voices.length; v++) {
+                const voice = bars[b].voices[v];
                 this._voiceBeatBase[voiceIndex] = beatIndex;
                 voiceIndex++;
-                for (const beat of voice.beats) {
+                for (let k = 0; k < voice.beats.length; k++) {
+                    const beat = voice.beats[k];
                     this._beatNoteBase[beatIndex] = notes.length;
                     beatIndex++;
-                    for (const note of beat.notes) {
+                    for (let n = 0; n < beat.notes.length; n++) {
+                        const note = beat.notes[n];
                         notes.push(note);
                     }
                 }
@@ -467,26 +477,61 @@ export class TabFingeringRun {
 
         const fret = target - stringPitch;
         this._evalFret = fret;
-        if (fret < 0 || fret > maxFret) {
-            return false;
-        }
-        if (fret === 0 && this._noOpen[i] !== 0) {
-            return false;
-        }
         const trill = this._trill[i];
-        if (trill >= 0) {
-            const trillFret = trill - stringPitch;
-            if (trillFret < 0 || trillFret > maxFret) {
-                return false;
-            }
-        }
-        return true;
+        return TabFingeringRun._isPlayableFret(fret, maxFret, this._noOpen[i] !== 0, trill >= 0, trill - stringPitch);
     }
 
+    private static _isPlayableFret(
+        fret: number,
+        maxFret: number,
+        needsFrettedString: boolean,
+        hasTrill: boolean,
+        trillFret: number
+    ): boolean {
+        if (fret < 0 || fret > maxFret || (fret === 0 && needsFrettedString)) {
+            return false;
+        }
+        return !hasTrill || (trillFret >= 0 && trillFret <= maxFret);
+    }
+
+    /**
+     * Whether every note is playable on its model string with the fret shifted by the transposition,
+     * natural harmonics on a node of their string. Reads the model directly to allocate nothing for
+     * the common case.
+     */
     private _isIdentity(): boolean {
-        for (let i = 0; i < this._notes.length; i++) {
-            if (this._kind[i] !== TabFingeringRun._kindSkip && !this._evaluate(i, this._originalString[i])) {
-                return false;
+        const staff = this._staff;
+        const transpositionPitch = staff.transpositionPitch;
+        for (let b = this._firstBarIndex; b <= this._lastBarIndex; b++) {
+            for (let v = 0; v < staff.bars[b].voices.length; v++) {
+                const voice = staff.bars[b].voices[v];
+                for (let k = 0; k < voice.beats.length; k++) {
+                    const beat = voice.beats[k];
+                    for (let n = 0; n < beat.notes.length; n++) {
+                        const note = beat.notes[n];
+                        if (!note.isStringed || note.string < 1 || note.string > this._stringCount || note.isDead) {
+                            continue;
+                        }
+                        if (TabFingeringSolver.isNaturalHarmonic(note)) {
+                            if (TabFingeringSolver.findNaturalNodeOnModelString(note) < 0) {
+                                return false;
+                            }
+                            continue;
+                        }
+                        const maxFret = Math.max(this._options.defaultMaxFret - this._capo, note.fret);
+                        if (
+                            !TabFingeringRun._isPlayableFret(
+                                note.fret - transpositionPitch,
+                                maxFret,
+                                TabFingeringRun._needsFrettedString(note),
+                                note.isTrill,
+                                note.isTrill ? note.trillFret - transpositionPitch : 0
+                            )
+                        ) {
+                            return false;
+                        }
+                    }
+                }
             }
         }
         return true;
@@ -594,8 +639,14 @@ export class TabFingeringRun {
                         insertAt--;
                     }
                 }
-                options.splice(insertAt, 0, delta);
-                optionFret.splice(insertAt, 0, headFret);
+                options.push(delta);
+                optionFret.push(headFret);
+                for (let m = options.length - 1; m > insertAt; m--) {
+                    options[m] = options[m - 1];
+                    optionFret[m] = optionFret[m - 1];
+                }
+                options[insertAt] = delta;
+                optionFret[insertAt] = headFret;
             }
             if (!hasZero) {
                 // last resort: keep the model strings, unplayable notes are flagged
@@ -604,6 +655,16 @@ export class TabFingeringRun {
             }
         }
         this._groupOptionBase.push(options.length);
+    }
+
+    private _hasSolvedNotes(beat: Beat): boolean {
+        const notes = beat.notes;
+        for (let n = 0; n < notes.length; n++) {
+            if (this._kind[this._indexOf(notes[n])] !== TabFingeringRun._kindSkip) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static _graceRank(beat: Beat): number {
@@ -630,51 +691,69 @@ export class TabFingeringRun {
 
     private _buildSlices(): void {
         const bars = this._staff.bars;
-        const beats: Beat[] = [];
-        for (let b = this._firstBarIndex; b <= this._lastBarIndex; b++) {
-            for (const voice of bars[b].voices) {
-                for (const beat of voice.beats) {
-                    for (const note of beat.notes) {
-                        const i = this._indexOf(note);
-                        if (this._kind[i] !== TabFingeringRun._kindSkip) {
-                            beats.push(beat);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        beats.sort((a, b) => TabFingeringRun._compareBeats(a, b));
-
         const endTick: number[] = [];
         const sliceTick = this._sliceTick;
         let previous: Beat | null = null;
-        for (const beat of beats) {
-            if (
-                previous === null ||
-                previous.voice.bar.index !== beat.voice.bar.index ||
-                previous.displayStart !== beat.displayStart ||
-                TabFingeringRun._graceRank(previous) !== TabFingeringRun._graceRank(beat)
-            ) {
-                this._sliceNoteBase.push(this._sliceNotes.length);
-                sliceTick.push(beat.absoluteDisplayStart);
+        let voicePosition = new Int32Array(4);
+        for (let b = this._firstBarIndex; b <= this._lastBarIndex; b++) {
+            const voices = bars[b].voices;
+            if (voicePosition.length < voices.length) {
+                voicePosition = new Int32Array(voices.length);
             }
-            previous = beat;
-            const slice = sliceTick.length - 1;
-            for (const note of beat.notes) {
-                const i = this._indexOf(note);
-                if (this._kind[i] === TabFingeringRun._kindSkip) {
-                    continue;
+            voicePosition.fill(0);
+            // merge the voices, each of them is in slice order already
+            while (true) {
+                let beat: Beat | null = null;
+                let beatVoice = -1;
+                for (let v = 0; v < voices.length; v++) {
+                    const voiceBeats = voices[v].beats;
+                    while (
+                        voicePosition[v] < voiceBeats.length &&
+                        !this._hasSolvedNotes(voiceBeats[voicePosition[v]])
+                    ) {
+                        voicePosition[v]++;
+                    }
+                    if (voicePosition[v] < voiceBeats.length) {
+                        const candidate = voiceBeats[voicePosition[v]];
+                        if (beat === null || TabFingeringRun._compareBeats(candidate, beat) < 0) {
+                            beat = candidate;
+                            beatVoice = v;
+                        }
+                    }
                 }
-                this._slice[i] = slice;
-                this._sliceNotes.push(i);
-                let end = beat.absoluteDisplayStart + beat.displayDuration;
-                const letRingDestination = note.isLetRing ? note.letRingDestination : null;
-                if (letRingDestination !== null) {
-                    const destinationBeat = letRingDestination.beat;
-                    end = Math.max(end, destinationBeat.absoluteDisplayStart + destinationBeat.displayDuration);
+                if (beat === null) {
+                    break;
                 }
-                endTick.push(end);
+                voicePosition[beatVoice]++;
+
+                if (
+                    previous === null ||
+                    previous.voice.bar.index !== beat.voice.bar.index ||
+                    previous.displayStart !== beat.displayStart ||
+                    TabFingeringRun._graceRank(previous) !== TabFingeringRun._graceRank(beat)
+                ) {
+                    this._sliceNoteBase.push(this._sliceNotes.length);
+                    sliceTick.push(beat.absoluteDisplayStart);
+                }
+                previous = beat;
+                const slice = sliceTick.length - 1;
+                const notes = beat.notes;
+                for (let n = 0; n < notes.length; n++) {
+                    const note = notes[n];
+                    const i = this._indexOf(note);
+                    if (this._kind[i] === TabFingeringRun._kindSkip) {
+                        continue;
+                    }
+                    this._slice[i] = slice;
+                    this._sliceNotes.push(i);
+                    let end = beat.absoluteDisplayStart + beat.displayDuration;
+                    const letRingDestination = note.isLetRing ? note.letRingDestination : null;
+                    if (letRingDestination !== null) {
+                        const destinationBeat = letRingDestination.beat;
+                        end = Math.max(end, destinationBeat.absoluteDisplayStart + destinationBeat.displayDuration);
+                    }
+                    endTick.push(end);
+                }
             }
         }
         this._sliceNoteBase.push(this._sliceNotes.length);
@@ -707,9 +786,9 @@ export class TabFingeringRun {
 
     private _fillBuckets(counts: number[], base: number[]): void {
         let sum = 0;
-        for (const c of counts) {
+        for (let i = 0; i < counts.length; i++) {
             base.push(sum);
-            sum += c;
+            sum += counts[i];
         }
         base.push(sum);
     }
@@ -755,86 +834,112 @@ export class TabFingeringRun {
 
     /**
      * Beam search over the slices, each state holding the string delta of every group active in its slice.
+     * Only the states of the previous slice are kept, plus per slice the back pointers and the deltas of the
+     * groups starting there to follow the best path back.
      * @returns The string delta per group.
      */
-    private _search(): number[] {
+    private _search(): Int32Array {
         const options = this._options;
         const beamWidth = options.beamWidth;
         const sliceCount = this._sliceTick.length;
+        const groupCount = this._groupCount;
+        const activeBase = this._activeBase;
+        const activeGroups = this._activeGroups;
+        const groupFirst = this._groupFirst;
+        const groupLast = this._groupLast;
 
-        // committed states of all slices
-        const stateBase: number[] = [];
-        const stateCount: number[] = [];
-        const stUnplayable: number[] = [];
-        const stMoved: number[] = [];
-        const stRest: number[] = [];
-        const stCenter: number[] = [];
-        const stBack: number[] = [];
-        const stDeltaBase: number[] = [];
-        const stDeltas: number[] = [];
-
-        // candidates of the current slice
-        const cUnplayable: number[] = [];
-        const cMoved: number[] = [];
-        const cRest: number[] = [];
-        const cCenter: number[] = [];
-        const cBack: number[] = [];
-        const cSequence: number[] = [];
-        const cDeltas: number[] = [];
-
-        const groupDelta: number[] = new Array<number>(this._groupCount).fill(0);
-        const choice: number[] = [];
-        const newGroups: number[] = [];
-
+        let maxActive = 1;
         for (let t = 0; t < sliceCount; t++) {
-            const activeStart = this._activeBase[t];
-            const activeEnd = this._activeBase[t + 1];
-            const activeLength = activeEnd - activeStart;
-            newGroups.splice(0, newGroups.length);
-            for (let a = activeStart; a < activeEnd; a++) {
-                const g = this._activeGroups[a];
-                if (this._groupFirst[g] === t) {
-                    newGroups.push(g);
+            maxActive = Math.max(maxActive, activeBase[t + 1] - activeBase[t]);
+        }
+
+        // groups starting per slice, in the order of the active groups
+        const newGroupBase = new Int32Array(sliceCount + 1);
+        for (let g = 0; g < groupCount; g++) {
+            newGroupBase[groupFirst[g] + 1]++;
+        }
+        for (let t = 0; t < sliceCount; t++) {
+            newGroupBase[t + 1] += newGroupBase[t];
+        }
+        const newGroupIds = new Int32Array(groupCount);
+        const newGroupPositions = new Int32Array(groupCount);
+        for (let t = 0; t < sliceCount; t++) {
+            let n = newGroupBase[t];
+            for (let a = activeBase[t]; a < activeBase[t + 1]; a++) {
+                const g = activeGroups[a];
+                if (groupFirst[g] === t) {
+                    newGroupIds[n] = g;
+                    newGroupPositions[n] = a - activeBase[t];
+                    n++;
                 }
             }
+        }
+
+        // the sorted states of the previous slice
+        const stateUnplayable = new Int32Array(beamWidth);
+        const stateMoved = new Int32Array(beamWidth);
+        const stateRest: number[] = new Array<number>(beamWidth).fill(0);
+        const stateCenter: number[] = new Array<number>(beamWidth).fill(0);
+        const stateDeltas = new Int8Array(beamWidth * maxActive);
+        let stateCount = 0;
+
+        // the unsorted candidates of the current slice
+        const candidateUnplayable = new Int32Array(beamWidth);
+        const candidateMoved = new Int32Array(beamWidth);
+        const candidateRest: number[] = new Array<number>(beamWidth).fill(0);
+        const candidateCenter: number[] = new Array<number>(beamWidth).fill(0);
+        const candidateBack = new Int32Array(beamWidth);
+        const candidateSequence = new Int32Array(beamWidth);
+        const candidateDeltas = new Int8Array(beamWidth * maxActive);
+        const candidateCommitted = new Uint8Array(beamWidth);
+
+        // kept for the path back
+        const back = new Int32Array(sliceCount * beamWidth);
+        const newDeltas = new Int8Array(groupCount * beamWidth);
+
+        const groupDelta = new Int32Array(groupCount);
+        const choice = new Int32Array(maxActive);
+
+        for (let t = 0; t < sliceCount; t++) {
+            const activeStart = activeBase[t];
+            const activeEnd = activeBase[t + 1];
+            const activeLength = activeEnd - activeStart;
+            const newStart = newGroupBase[t];
+            const newCount = newGroupBase[t + 1] - newStart;
 
             let candidateCount = 0;
             let sequence = 0;
-            const previousStart = t === 0 ? -1 : stateBase[t - 1];
-            const previousCount = t === 0 ? 1 : stateCount[t - 1];
+            const previousCount = t === 0 ? 1 : stateCount;
+            const previousActiveStart = t === 0 ? 0 : activeBase[t - 1];
+            const previousActiveLength = t === 0 ? 0 : activeStart - previousActiveStart;
             const gapQuarters =
                 t === 0 ? 0 : (this._sliceTick[t] - this._sliceTick[t - 1]) / TabFingeringRun._ticksPerQuarter;
 
             for (let p = 0; p < previousCount; p++) {
-                const previousState = previousStart + p;
                 let previousUnplayable = 0;
                 let previousMoved = 0;
                 let previousRest = 0;
                 let previousCenter = -1;
                 if (t > 0) {
-                    previousUnplayable = stUnplayable[previousState];
-                    previousMoved = stMoved[previousState];
-                    previousRest = stRest[previousState];
-                    previousCenter = stCenter[previousState];
+                    previousUnplayable = stateUnplayable[p];
+                    previousMoved = stateMoved[p];
+                    previousRest = stateRest[p];
+                    previousCenter = stateCenter[p];
                     // groups continuing from the previous slice keep their delta
-                    const previousActiveStart = this._activeBase[t - 1];
-                    const previousActiveEnd = this._activeBase[t];
-                    const deltaBase = stDeltaBase[previousState];
-                    for (let a = previousActiveStart; a < previousActiveEnd; a++) {
-                        groupDelta[this._activeGroups[a]] = stDeltas[deltaBase + (a - previousActiveStart)];
+                    for (let a = 0; a < previousActiveLength; a++) {
+                        groupDelta[activeGroups[previousActiveStart + a]] = stateDeltas[p * previousActiveLength + a];
                     }
                 }
 
-                choice.splice(0, choice.length);
-                for (let k = 0; k < newGroups.length; k++) {
-                    choice.push(0);
+                for (let k = 0; k < newCount; k++) {
+                    choice[k] = 0;
                 }
 
                 let leaves = 0;
                 let done = false;
                 while (!done && leaves < options.maxLeavesPerState) {
-                    for (let k = 0; k < newGroups.length; k++) {
-                        const g = newGroups[k];
+                    for (let k = 0; k < newCount; k++) {
+                        const g = newGroupIds[newStart + k];
                         groupDelta[g] = this._groupOptions[this._groupOptionBase[g] + choice[k]];
                     }
                     leaves++;
@@ -848,12 +953,9 @@ export class TabFingeringRun {
                     let slot = -1;
                     for (let c = 0; c < candidateCount && slot < 0; c++) {
                         let same = true;
-                        for (let a = activeStart; a < activeEnd && same; a++) {
-                            const g = this._activeGroups[a];
-                            if (
-                                this._groupLast[g] > t &&
-                                cDeltas[c * activeLength + (a - activeStart)] !== groupDelta[g]
-                            ) {
+                        for (let a = 0; a < activeLength && same; a++) {
+                            const g = activeGroups[activeStart + a];
+                            if (groupLast[g] > t && candidateDeltas[c * activeLength + a] !== groupDelta[g]) {
                                 same = false;
                             }
                         }
@@ -869,9 +971,9 @@ export class TabFingeringRun {
                                 unplayable,
                                 moved,
                                 rest,
-                                cUnplayable[slot],
-                                cMoved[slot],
-                                cRest[slot]
+                                candidateUnplayable[slot],
+                                candidateMoved[slot],
+                                candidateRest[slot]
                             )
                         ) {
                             write = slot;
@@ -879,38 +981,18 @@ export class TabFingeringRun {
                     } else if (candidateCount < beamWidth) {
                         write = candidateCount;
                         candidateCount++;
-                        if (cUnplayable.length < candidateCount) {
-                            cUnplayable.push(0);
-                            cMoved.push(0);
-                            cRest.push(0);
-                            cCenter.push(0);
-                            cBack.push(0);
-                            cSequence.push(0);
-                        }
-                        while (cDeltas.length < candidateCount * activeLength) {
-                            cDeltas.push(0);
-                        }
                     } else {
                         let worst = 0;
                         for (let c = 1; c < candidateCount; c++) {
                             if (
-                                TabFingeringRun._isBetter(
-                                    cUnplayable[worst],
-                                    cMoved[worst],
-                                    cRest[worst],
-                                    cUnplayable[c],
-                                    cMoved[c],
-                                    cRest[c]
-                                ) ||
-                                (TabFingeringRun._isEqual(
-                                    cUnplayable[worst],
-                                    cMoved[worst],
-                                    cRest[worst],
-                                    cUnplayable[c],
-                                    cMoved[c],
-                                    cRest[c]
-                                ) &&
-                                    cSequence[c] > cSequence[worst])
+                                TabFingeringRun._isCandidateBefore(
+                                    worst,
+                                    c,
+                                    candidateUnplayable,
+                                    candidateMoved,
+                                    candidateRest,
+                                    candidateSequence
+                                )
                             ) {
                                 worst = c;
                             }
@@ -920,9 +1002,9 @@ export class TabFingeringRun {
                                 unplayable,
                                 moved,
                                 rest,
-                                cUnplayable[worst],
-                                cMoved[worst],
-                                cRest[worst]
+                                candidateUnplayable[worst],
+                                candidateMoved[worst],
+                                candidateRest[worst]
                             )
                         ) {
                             write = worst;
@@ -930,22 +1012,22 @@ export class TabFingeringRun {
                     }
 
                     if (write >= 0) {
-                        cUnplayable[write] = unplayable;
-                        cMoved[write] = moved;
-                        cRest[write] = rest;
-                        cCenter[write] = this._scoreCenter;
-                        cBack[write] = previousState;
-                        cSequence[write] = sequence;
-                        for (let a = activeStart; a < activeEnd; a++) {
-                            cDeltas[write * activeLength + (a - activeStart)] = groupDelta[this._activeGroups[a]];
+                        candidateUnplayable[write] = unplayable;
+                        candidateMoved[write] = moved;
+                        candidateRest[write] = rest;
+                        candidateCenter[write] = this._scoreCenter;
+                        candidateBack[write] = p;
+                        candidateSequence[write] = sequence;
+                        for (let a = 0; a < activeLength; a++) {
+                            candidateDeltas[write * activeLength + a] = groupDelta[activeGroups[activeStart + a]];
                         }
                     }
                     sequence++;
 
                     // next combination of the new groups' options
-                    let n = newGroups.length - 1;
+                    let n = newCount - 1;
                     while (n >= 0) {
-                        const g = newGroups[n];
+                        const g = newGroupIds[newStart + n];
                         choice[n]++;
                         if (choice[n] < this._groupOptionBase[g + 1] - this._groupOptionBase[g]) {
                             break;
@@ -959,67 +1041,75 @@ export class TabFingeringRun {
                 }
             }
 
-            // commit the candidates best first
-            stateBase.push(stUnplayable.length);
-            stateCount.push(candidateCount);
-            const committed: boolean[] = new Array<boolean>(candidateCount).fill(false);
+            // the candidates become the states of this slice, best first
+            candidateCommitted.fill(0);
             for (let k = 0; k < candidateCount; k++) {
                 let best = -1;
                 for (let c = 0; c < candidateCount; c++) {
-                    if (committed[c]) {
-                        continue;
-                    }
                     if (
-                        best < 0 ||
-                        TabFingeringRun._isBetter(
-                            cUnplayable[c],
-                            cMoved[c],
-                            cRest[c],
-                            cUnplayable[best],
-                            cMoved[best],
-                            cRest[best]
-                        ) ||
-                        (TabFingeringRun._isEqual(
-                            cUnplayable[c],
-                            cMoved[c],
-                            cRest[c],
-                            cUnplayable[best],
-                            cMoved[best],
-                            cRest[best]
-                        ) &&
-                            cSequence[c] < cSequence[best])
+                        candidateCommitted[c] === 0 &&
+                        (best < 0 ||
+                            TabFingeringRun._isCandidateBefore(
+                                c,
+                                best,
+                                candidateUnplayable,
+                                candidateMoved,
+                                candidateRest,
+                                candidateSequence
+                            ))
                     ) {
                         best = c;
                     }
                 }
-                committed[best] = true;
-                stUnplayable.push(cUnplayable[best]);
-                stMoved.push(cMoved[best]);
-                stRest.push(cRest[best]);
-                stCenter.push(cCenter[best]);
-                stBack.push(cBack[best]);
-                stDeltaBase.push(stDeltas.length);
+                candidateCommitted[best] = 1;
+                stateUnplayable[k] = candidateUnplayable[best];
+                stateMoved[k] = candidateMoved[best];
+                stateRest[k] = candidateRest[best];
+                stateCenter[k] = candidateCenter[best];
+                back[t * beamWidth + k] = candidateBack[best];
                 for (let a = 0; a < activeLength; a++) {
-                    stDeltas.push(cDeltas[best * activeLength + a]);
+                    stateDeltas[k * activeLength + a] = candidateDeltas[best * activeLength + a];
+                }
+                for (let j = 0; j < newCount; j++) {
+                    newDeltas[newStart * beamWidth + k * newCount + j] =
+                        candidateDeltas[best * activeLength + newGroupPositions[newStart + j]];
                 }
             }
+            stateCount = candidateCount;
         }
 
         // follow the best path back, each group takes the delta chosen in its first slice
-        const result: number[] = new Array<number>(this._groupCount).fill(0);
-        let state = sliceCount > 0 ? stateBase[sliceCount - 1] : -1;
-        for (let t = sliceCount - 1; t >= 0 && state >= 0; t--) {
-            const activeStart = this._activeBase[t];
-            const activeEnd = this._activeBase[t + 1];
-            for (let a = activeStart; a < activeEnd; a++) {
-                const g = this._activeGroups[a];
-                if (this._groupFirst[g] === t) {
-                    result[g] = stDeltas[stDeltaBase[state] + (a - activeStart)];
-                }
+        const result = new Int32Array(groupCount);
+        let state = 0;
+        for (let t = sliceCount - 1; t >= 0; t--) {
+            const newStart = newGroupBase[t];
+            const newCount = newGroupBase[t + 1] - newStart;
+            for (let j = 0; j < newCount; j++) {
+                result[newGroupIds[newStart + j]] = newDeltas[newStart * beamWidth + state * newCount + j];
             }
-            state = stBack[state];
+            state = back[t * beamWidth + state];
         }
         return result;
+    }
+
+    /**
+     * Whether candidate a ranks before candidate b: better costs, then generated earlier.
+     */
+    private static _isCandidateBefore(
+        a: number,
+        b: number,
+        unplayable: Int32Array,
+        moved: Int32Array,
+        rest: number[],
+        sequence: Int32Array
+    ): boolean {
+        if (TabFingeringRun._isBetter(unplayable[a], moved[a], rest[a], unplayable[b], moved[b], rest[b])) {
+            return true;
+        }
+        return (
+            TabFingeringRun._isEqual(unplayable[a], moved[a], rest[a], unplayable[b], moved[b], rest[b]) &&
+            sequence[a] < sequence[b]
+        );
     }
 
     private static _isBetter(
@@ -1056,7 +1146,7 @@ export class TabFingeringRun {
     private _scoreRest: number = 0;
     private _scoreCenter: number = -1;
 
-    private _scoreSlice(t: number, groupDelta: number[], previousCenter: number, gapQuarters: number): void {
+    private _scoreSlice(t: number, groupDelta: Int32Array, previousCenter: number, gapQuarters: number): void {
         const options = this._options;
         let unplayable = 0;
         let moved = 0;
