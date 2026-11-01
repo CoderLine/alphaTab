@@ -109,18 +109,58 @@ export class TabFingering {
                     bestString = str;
                 }
             }
+            if (bestCost === Number.POSITIVE_INFINITY) {
+                bestString = TabFingering._unplayableString(n, usedStrings);
+            }
             TabFingering._place(next, bestString, n.string);
             usedStrings |= 1 << (bestString - 1);
         }
     }
 
+    /**
+     * The string for a note no string can play: its own string if free, otherwise the free string
+     * where its fret is closest to the frets of the neck.
+     */
+    private static _unplayableString(n: Note, usedStrings: number): number {
+        if ((usedStrings & (1 << (n.string - 1))) === 0) {
+            return n.string;
+        }
+        const staff = n.beat.voice.bar.staff;
+        const maxFret = Math.max(TabFingering._maxFret - staff.capo, n.fret);
+        let bestString = n.string;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        for (let str = 1; str <= staff.tuning.length; str++) {
+            if ((usedStrings & (1 << (str - 1))) !== 0) {
+                continue;
+            }
+            const fret = TabFingering._unplayableFret(n, str);
+            const distance = fret < 0 ? -fret : Math.max(0, fret - maxFret);
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestString = str;
+            }
+        }
+        return bestString;
+    }
+
     private static _place(g: NoteNumberGlyph, str: number, modelString: number): void {
         const fret = TabFingering._fretOn(g.note, str);
         if (Number.isNaN(fret)) {
-            g.setDisplay(str, TabFingering._modelFret(g.note), str !== modelString, true);
+            g.setDisplay(str, TabFingering._unplayableFret(g.note, str), str !== modelString, true);
         } else {
             g.setDisplay(str, fret, str !== modelString, false);
         }
+    }
+
+    /**
+     * The out-of-range fret shown for a note which cannot be played on the given string.
+     */
+    private static _unplayableFret(n: Note, str: number): number {
+        if (str === n.string || TabFingering._isNaturalHarmonic(n)) {
+            return TabFingering._modelFret(n);
+        }
+        const staff = n.beat.voice.bar.staff;
+        return n.realValueWithoutHarmonic - staff.capo - Note.getStringTuning(staff, str);
     }
 
     /**
