@@ -10,6 +10,7 @@ import { UnsupportedFormatError } from '@coderline/alphatab/importer/Unsupported
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { OverflowError } from '@coderline/alphatab/io/IReadable';
 import { Chord } from '@coderline/alphatab/model/Chord';
+import { Clef } from '@coderline/alphatab/model/Clef';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Score } from '@coderline/alphatab/model/Score';
@@ -31,6 +32,7 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _maxStringCount = 12;
     private static readonly _maxCellCount = 1000000;
     private static readonly _cellSize = 12;
+    private static readonly _drumFlag = 0x80;
     private static readonly _maxTextCount = 4096;
     private static readonly _maxReadingListCount = 4096;
     private static readonly _readingGuideMarker = 0xb7;
@@ -162,20 +164,47 @@ export class TablEditImporter extends ScoreImporter {
             track.playbackInfo.bank = this._u8(p + 9);
 
             const capo = this._u16(p + 12);
-            staff.capo = capo;
-            const tuning: number[] = [];
+            const openPitches: number[] = [];
             for (let s = 0; s < stringCount; s++) {
-                tuning.push(96 - this._u8(p + 20 + s) - capo);
+                openPitches.push(96 - this._u8(p + 20 + s));
             }
-            staff.stringTuning.tunings = tuning;
-            staff.displayTranspositionPitch = this._s8(p + 14) - 12;
-            staff.showTablature = true;
-            staff.showStandardNotation = true;
+            const isPercussion = (this._u8(p + 4) & TablEditImporter._drumFlag) !== 0;
+            staff.isPercussion = isPercussion;
+            if (!isPercussion) {
+                staff.capo = capo;
+                const tuning: number[] = [];
+                for (const pitch of openPitches) {
+                    tuning.push(pitch - capo);
+                }
+                staff.stringTuning.tunings = tuning;
+            }
+            staff.displayTranspositionPitch =
+                this._s8(p + 14) - 12 - TablEditImporter._transpositionOf(this._u8(p + 11) & 0x07);
+
+            switch ((this._u8(p + 16) >> 4) & 0x03) {
+                case 1:
+                    staff.showTablature = true;
+                    staff.showStandardNotation = false;
+                    break;
+                case 2:
+                    staff.showTablature = false;
+                    staff.showStandardNotation = true;
+                    break;
+                default:
+                    staff.showTablature = true;
+                    staff.showStandardNotation = true;
+                    break;
+            }
+            track.playbackInfo.balance = Math.round(((this._u8(p + 17) & 0x0f) * 16) / 15);
+            track.playbackInfo.volume = Math.round(((15 - (this._u8(p + 18) & 0x0f)) * 16) / 15);
 
             const info = new TefTrackInfo();
             info.track = track;
             info.firstString = this._totalStrings;
             info.stringCount = stringCount;
+            info.openPitches = openPitches;
+            info.isPercussion = isPercussion;
+            info.clef = TablEditImporter._clefOf(this._u8(p + 15) & 0x07, openPitches);
             this._tracks.push(info);
             this._totalStrings += stringCount;
             p += recordSize;
@@ -257,6 +286,40 @@ export class TablEditImporter extends ScoreImporter {
             p += recordSize;
         }
         return chords;
+    }
+
+    /**
+     * The written pitch shift of a transposing instrument in semitones.
+     */
+    private static _transpositionOf(value: number): number {
+        if ((value & 0x03) === 0) {
+            return 0;
+        }
+        const shift = ((((4 - value) * 7) % 12) + 12) % 12;
+        return shift === 9 ? -3 : shift;
+    }
+
+    private static _clefOf(value: number, openPitches: number[]): Clef {
+        switch (value) {
+            case 1:
+                return Clef.G2;
+            case 2:
+            case 3:
+                return Clef.F4;
+            case 4:
+                return Clef.C4;
+            case 5:
+            case 6:
+            case 7:
+                return Clef.C3;
+        }
+        let highest = 0;
+        let lowest = 127;
+        for (const pitch of openPitches) {
+            highest = Math.max(highest, pitch);
+            lowest = Math.min(lowest, pitch);
+        }
+        return openPitches.length > 0 && highest < 46 && lowest < 30 ? Clef.F4 : Clef.G2;
     }
 
     private _readContents(offset: number): TefCell[] {

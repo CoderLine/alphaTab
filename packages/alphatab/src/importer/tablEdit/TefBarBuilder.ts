@@ -5,6 +5,7 @@ import { Beat } from '@coderline/alphatab/model/Beat';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
 import { BrushType } from '@coderline/alphatab/model/BrushType';
 import type { Chord } from '@coderline/alphatab/model/Chord';
+import { Clef } from '@coderline/alphatab/model/Clef';
 import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
@@ -19,6 +20,7 @@ import { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
+import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
@@ -52,6 +54,12 @@ export class TefTrackInfo {
     public track!: Track;
     public firstString: number = 0;
     public stringCount: number = 0;
+    /**
+     * The open string pitches from the highest string, capo included.
+     */
+    public openPitches: number[] = [];
+    public isPercussion: boolean = false;
+    public clef: Clef = Clef.G2;
 }
 
 /**
@@ -413,19 +421,26 @@ export class TefBarBuilder {
     }
 
     private _applySlur(bar: number, column: number, length: number): void {
+        const starts = this._beatStarts.get(bar);
+        const beats = this._beatsByBar.get(bar);
+        if (!starts || !beats) {
+            return;
+        }
+        const from = column * TefBarBuilder.subUnitsPerCell;
+        const to = (column + length) * TefBarBuilder.subUnitsPerCell;
         let first: Beat | null = null;
         let last: Beat | null = null;
-        this._applyToRange(bar, column, length, b => {
-            if (b.notes.length > 0) {
+        for (let i = 0; i < starts.length; i++) {
+            if (starts[i] >= from && starts[i] < to && beats[i].notes.length > 0) {
                 if (!first) {
-                    first = b;
+                    first = beats[i];
                 }
-                last = b;
+                last = beats[i];
             }
-        });
+        }
         if (first && last && first !== last) {
-            const origin = (first as Beat).notes[0];
-            const destination = (last as Beat).notes[0];
+            const origin = first.notes[0];
+            const destination = last.notes[0];
             origin.slurDestination = destination;
             destination.slurOrigin = origin;
             destination.isSlurDestination = true;
@@ -569,6 +584,7 @@ export class TefBarBuilder {
 
         for (let i = 0; i < barCount; i++) {
             const bar = new Bar();
+            bar.clef = info.isPercussion ? Clef.Neutral : info.clef;
             staff.addBar(bar);
         }
 
@@ -795,7 +811,8 @@ export class TefBarBuilder {
             const bar = staff.bars[b];
             const barLength = this._measureSizes[b] * TefBarBuilder.subUnitsPerCell;
             for (let v = 0; v < order.length; v++) {
-                const [group, lane] = order[v];
+                const group = order[v][0];
+                const lane = order[v][1];
                 const voice = new Voice();
                 bar.addVoice(voice);
                 const laneUnits: TefUnit[] = [];
@@ -939,8 +956,16 @@ export class TefBarBuilder {
         let loudest = 7;
         for (const e of unit.events) {
             const note = new Note();
-            note.string = info.stringCount - e.stringIndex;
-            note.fret = e.fret;
+            if (info.isPercussion) {
+                const articulation = PercussionMapper.getArticulationById(info.openPitches[e.stringIndex] + e.fret);
+                if (articulation) {
+                    note.percussionArticulation = info.track.getOrRegisterPercussionArticulation(articulation);
+                }
+                note.fret = Number.NaN;
+            } else {
+                note.string = info.stringCount - e.stringIndex;
+                note.fret = e.fret;
+            }
             note.isTieDestination = e.isTied || isContinuation;
             switch (e.accidental) {
                 case 1:
