@@ -43,6 +43,9 @@ jobs:
 
   dotnet:
     uses: ./.github/workflows/~publish_dotnet.yml
+    permissions:
+      contents: read
+      id-token: write
     secrets: inherit
     if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch' && github.event.inputs.release_csharp == 'true')
     with: 

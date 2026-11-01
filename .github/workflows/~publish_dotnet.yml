@@ -14,6 +14,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v7
         with: 
@@ -31,6 +34,11 @@ jobs:
       - run: npm run build-csharp
 
       - run: npm run nightly-pack -- --platform dotnet --force ${{ inputs.force }}
+      # nuget.org trusted publishing: the policy matches this file (job_workflow_ref), not the calling workflow
+      - uses: NuGet/login@v1
+        id: nuget_login
+        with:
+          user: ${{ secrets.NUGET_USER }}
       - run: npm run nightly-publish -- --platform dotnet --force ${{ inputs.force }} --dry-run ${{ inputs.dry_run }}
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget_login.outputs.NUGET_API_KEY }}
