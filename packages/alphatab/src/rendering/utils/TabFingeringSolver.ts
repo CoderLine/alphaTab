@@ -31,6 +31,7 @@ export class TabFingeringOptions {
     public occupancyPenalty: number = 8;
     public asArtificialPenalty: number = 20;
     public handMovementWeight: number = 1;
+    /** The states kept per time slice, at most 255. */
     public beamWidth: number = 16;
     public maxLeavesPerState: number = 256;
 }
@@ -197,13 +198,11 @@ export class TabFingeringSolver {
         lastBarIndex: number,
         options?: TabFingeringOptions
     ): TabFingeringSegment | null {
-        const run = new TabFingeringRun(
-            staff,
-            firstBarIndex,
-            lastBarIndex,
-            options ?? TabFingeringSolver._defaultOptions
-        );
-        return run.solve();
+        const resolvedOptions = options ?? TabFingeringSolver._defaultOptions;
+        if (TabFingeringRun.isIdentity(staff, firstBarIndex, lastBarIndex, resolvedOptions)) {
+            return null;
+        }
+        return new TabFingeringRun(staff, firstBarIndex, lastBarIndex, resolvedOptions).solve();
     }
 
     /**
@@ -305,10 +304,10 @@ export class TabFingeringRun {
         this._stringCount = staff.tuning.length;
     }
 
-    public solve(): TabFingeringSegment | null {
-        if (this._isIdentity()) {
-            return null;
-        }
+    /**
+     * Solves the bars, which must not be playable as they are (see {@link isIdentity}).
+     */
+    public solve(): TabFingeringSegment {
         this._collectNotes();
 
         this._buildGroups();
@@ -499,17 +498,22 @@ export class TabFingeringRun {
      * natural harmonics on a node of their string. Reads the model directly to allocate nothing for
      * the common case.
      */
-    private _isIdentity(): boolean {
-        const staff = this._staff;
+    public static isIdentity(
+        staff: Staff,
+        firstBarIndex: number,
+        lastBarIndex: number,
+        options: TabFingeringOptions
+    ): boolean {
         const transpositionPitch = staff.transpositionPitch;
-        for (let b = this._firstBarIndex; b <= this._lastBarIndex; b++) {
+        const stringCount = staff.tuning.length;
+        for (let b = firstBarIndex; b <= lastBarIndex; b++) {
             for (let v = 0; v < staff.bars[b].voices.length; v++) {
                 const voice = staff.bars[b].voices[v];
                 for (let k = 0; k < voice.beats.length; k++) {
                     const beat = voice.beats[k];
                     for (let n = 0; n < beat.notes.length; n++) {
                         const note = beat.notes[n];
-                        if (!note.isStringed || note.string < 1 || note.string > this._stringCount || note.isDead) {
+                        if (!note.isStringed || note.string < 1 || note.string > stringCount || note.isDead) {
                             continue;
                         }
                         if (TabFingeringSolver.isNaturalHarmonic(note)) {
@@ -518,7 +522,7 @@ export class TabFingeringRun {
                             }
                             continue;
                         }
-                        const maxFret = Math.max(this._options.defaultMaxFret - this._capo, note.fret);
+                        const maxFret = Math.max(options.defaultMaxFret - staff.capo, note.fret);
                         if (
                             !TabFingeringRun._isPlayableFret(
                                 note.fret - transpositionPitch,
@@ -840,7 +844,8 @@ export class TabFingeringRun {
      */
     private _search(): Int32Array {
         const options = this._options;
-        const beamWidth = options.beamWidth;
+        // back pointers are stored as bytes
+        const beamWidth = Math.min(options.beamWidth, 255);
         const sliceCount = this._sliceTick.length;
         const groupCount = this._groupCount;
         const activeBase = this._activeBase;
@@ -883,18 +888,21 @@ export class TabFingeringRun {
         const stateDeltas = new Int8Array(beamWidth * maxActive);
         let stateCount = 0;
 
-        // the unsorted candidates of the current slice
-        const candidateUnplayable = new Int32Array(beamWidth);
-        const candidateMoved = new Int32Array(beamWidth);
-        const candidateRest: number[] = new Array<number>(beamWidth).fill(0);
-        const candidateCenter: number[] = new Array<number>(beamWidth).fill(0);
+        // the unsorted candidates of the current slice, the last slot holds the candidate being scored
+        // (costs are compared by slot, passing doubles between functions would box them)
+        const scored = beamWidth;
+        const candidateUnplayable = new Int32Array(beamWidth + 1);
+        const candidateMoved = new Int32Array(beamWidth + 1);
+        const candidateRest: number[] = new Array<number>(beamWidth + 1).fill(0);
+        const candidateCenter: number[] = new Array<number>(beamWidth + 1).fill(0);
         const candidateBack = new Int32Array(beamWidth);
-        const candidateSequence = new Int32Array(beamWidth);
+        const candidateSequence = new Int32Array(beamWidth + 1);
+        const scores = this._scores;
         const candidateDeltas = new Int8Array(beamWidth * maxActive);
         const candidateCommitted = new Uint8Array(beamWidth);
 
         // kept for the path back
-        const back = new Int32Array(sliceCount * beamWidth);
+        const back = new Uint8Array(sliceCount * beamWidth);
         const newDeltas = new Int8Array(groupCount * beamWidth);
 
         const groupDelta = new Int32Array(groupCount);
@@ -912,19 +920,19 @@ export class TabFingeringRun {
             const previousCount = t === 0 ? 1 : stateCount;
             const previousActiveStart = t === 0 ? 0 : activeBase[t - 1];
             const previousActiveLength = t === 0 ? 0 : activeStart - previousActiveStart;
-            const gapQuarters =
+            scores[TabFingeringRun._scoreGapQuarters] =
                 t === 0 ? 0 : (this._sliceTick[t] - this._sliceTick[t - 1]) / TabFingeringRun._ticksPerQuarter;
 
             for (let p = 0; p < previousCount; p++) {
                 let previousUnplayable = 0;
                 let previousMoved = 0;
                 let previousRest = 0;
-                let previousCenter = -1;
+                scores[TabFingeringRun._scorePreviousCenter] = -1;
                 if (t > 0) {
                     previousUnplayable = stateUnplayable[p];
                     previousMoved = stateMoved[p];
                     previousRest = stateRest[p];
-                    previousCenter = stateCenter[p];
+                    scores[TabFingeringRun._scorePreviousCenter] = stateCenter[p];
                     // groups continuing from the previous slice keep their delta
                     for (let a = 0; a < previousActiveLength; a++) {
                         groupDelta[activeGroups[previousActiveStart + a]] = stateDeltas[p * previousActiveLength + a];
@@ -944,10 +952,12 @@ export class TabFingeringRun {
                     }
                     leaves++;
 
-                    this._scoreSlice(t, groupDelta, previousCenter, gapQuarters);
-                    const unplayable = previousUnplayable + this._scoreUnplayable;
-                    const moved = previousMoved + this._scoreMoved;
-                    const rest = previousRest + this._scoreRest;
+                    this._scoreSlice(t, groupDelta);
+                    candidateUnplayable[scored] = previousUnplayable + this._scoreUnplayable;
+                    candidateMoved[scored] = previousMoved + this._scoreMoved;
+                    candidateRest[scored] = previousRest + scores[TabFingeringRun._scoreRest];
+                    candidateCenter[scored] = scores[TabFingeringRun._scoreCenter];
+                    candidateSequence[scored] = sequence;
 
                     // candidates are interchangeable for later slices if all continuing groups agree
                     let slot = -1;
@@ -967,13 +977,13 @@ export class TabFingeringRun {
                     let write = -1;
                     if (slot >= 0) {
                         if (
-                            TabFingeringRun._isBetter(
-                                unplayable,
-                                moved,
-                                rest,
-                                candidateUnplayable[slot],
-                                candidateMoved[slot],
-                                candidateRest[slot]
+                            TabFingeringRun._isCandidateBefore(
+                                scored,
+                                slot,
+                                candidateUnplayable,
+                                candidateMoved,
+                                candidateRest,
+                                candidateSequence
                             )
                         ) {
                             write = slot;
@@ -998,13 +1008,13 @@ export class TabFingeringRun {
                             }
                         }
                         if (
-                            TabFingeringRun._isBetter(
-                                unplayable,
-                                moved,
-                                rest,
-                                candidateUnplayable[worst],
-                                candidateMoved[worst],
-                                candidateRest[worst]
+                            TabFingeringRun._isCandidateBefore(
+                                scored,
+                                worst,
+                                candidateUnplayable,
+                                candidateMoved,
+                                candidateRest,
+                                candidateSequence
                             )
                         ) {
                             write = worst;
@@ -1012,10 +1022,10 @@ export class TabFingeringRun {
                     }
 
                     if (write >= 0) {
-                        candidateUnplayable[write] = unplayable;
-                        candidateMoved[write] = moved;
-                        candidateRest[write] = rest;
-                        candidateCenter[write] = this._scoreCenter;
+                        candidateUnplayable[write] = candidateUnplayable[scored];
+                        candidateMoved[write] = candidateMoved[scored];
+                        candidateRest[write] = candidateRest[scored];
+                        candidateCenter[write] = candidateCenter[scored];
                         candidateBack[write] = p;
                         candidateSequence[write] = sequence;
                         for (let a = 0; a < activeLength; a++) {
@@ -1103,50 +1113,31 @@ export class TabFingeringRun {
         rest: number[],
         sequence: Int32Array
     ): boolean {
-        if (TabFingeringRun._isBetter(unplayable[a], moved[a], rest[a], unplayable[b], moved[b], rest[b])) {
-            return true;
+        if (unplayable[a] !== unplayable[b]) {
+            return unplayable[a] < unplayable[b];
         }
-        return (
-            TabFingeringRun._isEqual(unplayable[a], moved[a], rest[a], unplayable[b], moved[b], rest[b]) &&
-            sequence[a] < sequence[b]
-        );
+        if (moved[a] !== moved[b]) {
+            return moved[a] < moved[b];
+        }
+        if (rest[a] !== rest[b]) {
+            return rest[a] < rest[b];
+        }
+        return sequence[a] < sequence[b];
     }
 
-    private static _isBetter(
-        unplayableA: number,
-        movedA: number,
-        restA: number,
-        unplayableB: number,
-        movedB: number,
-        restB: number
-    ): boolean {
-        if (unplayableA !== unplayableB) {
-            return unplayableA < unplayableB;
-        }
-        if (movedA !== movedB) {
-            return movedA < movedB;
-        }
-        return restA < restB;
-    }
+    // inputs and results of _scoreSlice which are no integers
+    private static readonly _scorePreviousCenter: number = 0;
+    private static readonly _scoreGapQuarters: number = 1;
+    private static readonly _scoreRest: number = 2;
+    private static readonly _scoreCenter: number = 3;
+    private readonly _scores: number[] = [0, 0, 0, 0];
 
-    private static _isEqual(
-        unplayableA: number,
-        movedA: number,
-        restA: number,
-        unplayableB: number,
-        movedB: number,
-        restB: number
-    ): boolean {
-        return unplayableA === unplayableB && movedA === movedB && restA === restB;
-    }
-
-    // results of _scoreSlice
     private _scoreUnplayable: number = 0;
     private _scoreMoved: number = 0;
-    private _scoreRest: number = 0;
-    private _scoreCenter: number = -1;
 
-    private _scoreSlice(t: number, groupDelta: Int32Array, previousCenter: number, gapQuarters: number): void {
+    private _scoreSlice(t: number, groupDelta: Int32Array): void {
+        const scores = this._scores;
+        const previousCenter = scores[TabFingeringRun._scorePreviousCenter];
         const options = this._options;
         let unplayable = 0;
         let moved = 0;
@@ -1216,13 +1207,15 @@ export class TabFingeringRun {
             }
             center = fretSum / frettedCount;
             if (previousCenter >= 0) {
-                rest += (Math.abs(center - previousCenter) * options.handMovementWeight) / (1 + gapQuarters);
+                rest +=
+                    (Math.abs(center - previousCenter) * options.handMovementWeight) /
+                    (1 + scores[TabFingeringRun._scoreGapQuarters]);
             }
         }
 
         this._scoreUnplayable = unplayable;
         this._scoreMoved = moved;
-        this._scoreRest = rest;
-        this._scoreCenter = center;
+        scores[TabFingeringRun._scoreRest] = rest;
+        scores[TabFingeringRun._scoreCenter] = center;
     }
 }
