@@ -10,6 +10,7 @@ import { ScoreLayout } from '@coderline/alphatab/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@coderline/alphatab/rendering/RenderFinishedEventArgs';
 import type { MasterBarsRenderers } from '@coderline/alphatab/rendering/staves/MasterBarsRenderers';
 import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSystem';
+import { TabFingering } from '@coderline/alphatab/rendering/utils/TabFingering';
 
 /**
  * How the fill loop chose the bars of a pooled system: the system holds the measured master bars
@@ -117,7 +118,11 @@ export abstract class VerticalLayoutBase extends ScoreLayout {
 
     public override doUpdateForBars(renderHints: RenderHints): boolean {
         this._reuseViewPort = renderHints.reuseViewport ?? false;
-        const firstModifiedMasterBar = renderHints.firstChangedMasterBar!;
+        // a transposed tab is fingered per segment of linked bars which has to be laid out as a whole
+        const firstModifiedMasterBar = TabFingering.firstAffectedBarIndex(
+            this.renderer.tracks!,
+            renderHints.firstChangedMasterBar!
+        );
 
         // first update existing systems as needed
         const systemIndex = this._systems.findIndex(s => {

@@ -176,17 +176,29 @@ public class DoubleList : IDoubleIterable {
     }
 
     public fun splice(start: Double, deleteCount: Double) {
-        val firstAfterDelete = (start + deleteCount).toInt()
-        val itemsAfterDelete = this.length.toInt() - firstAfterDelete;
-        if(itemsAfterDelete > 0) {
-            _items.copyInto(
-                _items,
-                start.toInt(),
-                firstAfterDelete,
-                itemsAfterDelete
-            )
+        val startIndex = start.toInt().coerceIn(0, _size)
+        val removed = deleteCount.toInt().coerceIn(0, _size - startIndex)
+        val firstAfterDelete = startIndex + removed
+        if (firstAfterDelete < _size) {
+            _items.copyInto(_items, startIndex, firstAfterDelete, _size)
         }
-        this._size -= deleteCount.toInt()
+        this._size -= removed
+    }
+
+    public fun splice(start: Double, deleteCount: Double, vararg newElements: Double) {
+        splice(start, deleteCount)
+        val insertAt = start.toInt().coerceIn(0, _size)
+        val inserted = newElements.size
+        if (inserted == 0) {
+            return
+        }
+        val size = _size
+        if (size + inserted > _items.size) {
+            grow(size + inserted)
+        }
+        _items.copyInto(_items, insertAt + inserted, insertAt, size)
+        newElements.copyInto(_items, insertAt)
+        _size = size + inserted
     }
     private class Iterator(private val list: DoubleList) : DoubleIterator() {
         private var _index = 0

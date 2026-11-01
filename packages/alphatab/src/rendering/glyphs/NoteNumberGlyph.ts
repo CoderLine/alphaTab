@@ -1,8 +1,9 @@
 import { BendType } from '@coderline/alphatab/model/BendType';
+import type { Color } from '@coderline/alphatab/model/Color';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
@@ -23,9 +24,33 @@ export class NoteNumberGlyph extends Glyph {
     public isEmpty: boolean = false;
     public noteStringWidth: number = 0;
 
+    /**
+     * The string (1 = lowest) on which the note is shown, 0 until it is placed.
+     */
+    public displayString: number = 0;
+    /**
+     * The shown fret, the node for natural harmonics.
+     */
+    public displayFret: number = 0;
+    /**
+     * Whether the note is shown on another string than in the model.
+     */
+    public isMoved: boolean = false;
+    /**
+     * Whether no string of the transposed tab can play the note.
+     */
+    public isUnplayable: boolean = false;
+
     public constructor(x: number, y: number, note: Note) {
         super(x, y);
         this._note = note;
+    }
+
+    public setDisplay(str: number, fret: number, isMoved: boolean, isUnplayable: boolean): void {
+        this.displayString = str;
+        this.displayFret = fret;
+        this.isMoved = isMoved;
+        this.isUnplayable = isUnplayable;
     }
 
     public get note(): Note {
@@ -46,12 +71,10 @@ export class NoteNumberGlyph extends Glyph {
 
     public override doLayout(): void {
         const n: Note = this._note;
+        const tr = this.renderer as TabBarRenderer;
         let fret: number;
         if (n.isStringed) {
-            fret = n.fret - n.beat.voice.bar.staff.transpositionPitch;
-            if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
-                fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
-            }
+            fret = this.displayFret;
         } else {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation) {
@@ -78,12 +101,15 @@ export class NoteNumberGlyph extends Glyph {
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
                 this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {
-            this._noteString = `(${(n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
+            this._noteString = `(${tr.getDisplayFret(n.tieOrigin!).toString()})`;
         } else {
             this._noteString = '';
         }
         if (n.isTrill) {
-            this._trillNoteString = `(${(n.trillFret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
+            const staff = n.beat.voice.bar.staff;
+            const trillFret =
+                n.trillValue - staff.transpositionPitch - staff.capo - Note.getStringTuning(staff, this.displayString);
+            this._trillNoteString = `(${trillFret.toString()})`;
         } else if (!ModelUtils.isAlmostEqualTo(n.harmonicValue, 0)) {
             switch (n.harmonicType) {
                 case HarmonicType.Artificial:
@@ -141,7 +167,7 @@ export class NoteNumberGlyph extends Glyph {
 
         this.paintTrill(x, y, canvas);
 
-        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        const previousColor = this._applyColor(canvas);
         try {
             canvas.fillText(this._noteString!, x, y);
         } finally {
@@ -155,7 +181,7 @@ export class NoteNumberGlyph extends Glyph {
         if (!this._trillNoteString) {
             return;
         }
-        const previousColor = ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        const previousColor = this._applyColor(canvas);
         try {
             const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
             this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
@@ -164,6 +190,17 @@ export class NoteNumberGlyph extends Glyph {
         } finally {
             ElementStyleHelper.restore(canvas, previousColor);
         }
+    }
+
+    private _applyColor(canvas: ICanvas): Color | undefined {
+        return this.isUnplayable
+            ? ElementStyleHelper.applyNoteWithDefault(
+                  canvas,
+                  NoteSubElement.GuitarTabFretNumber,
+                  this._note,
+                  this.renderer.resources.tabUnplayableFretColor
+              )
+            : ElementStyleHelper.applyNote(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
     }
 
     public buildBoundingsLookup(writer: IBoundsLookupWriter, cx: number, cy: number) {

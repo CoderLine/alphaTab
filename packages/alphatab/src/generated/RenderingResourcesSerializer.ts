@@ -16,7 +16,7 @@ import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
  * @internal
  */
 export class RenderingResourcesSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["smuflfontfamilyname", "engravingsettings", "copyrightfont", "titlefont", "subtitlefont", "wordsfont", "timerfont", "directionsfont", "fretboardnumberfont", "fingeringfont", "inlinefingeringfont", "markerfont", "effectfont", "barnumberfont", "elementfonts", "numberednotationfont", "numberednotationgracefont", "tablaturefont", "gracefont", "stafflinecolor", "barseparatorcolor", "barnumbercolor", "mainglyphcolor", "secondaryglyphcolor", "scoreinfocolor"]);
+    private static readonly _fields: RecordFields = new RecordFields(["smuflfontfamilyname", "engravingsettings", "copyrightfont", "titlefont", "subtitlefont", "wordsfont", "timerfont", "directionsfont", "fretboardnumberfont", "fingeringfont", "inlinefingeringfont", "markerfont", "effectfont", "barnumberfont", "elementfonts", "numberednotationfont", "numberednotationgracefont", "tablaturefont", "gracefont", "stafflinecolor", "barseparatorcolor", "barnumbercolor", "mainglyphcolor", "secondaryglyphcolor", "scoreinfocolor", "tabunplayablefretcolor"]);
     public static read(obj: RenderingResources, reader: IObjectReader): void {
         reader.readRecord(RenderingResourcesSerializer._fields, (id, k, rr) => RenderingResourcesSerializer._readField(obj, id, rr, false));
     }
@@ -101,6 +101,9 @@ export class RenderingResourcesSerializer {
             case 24:
                 obj.scoreInfoColor = Color.fromJson(r.readValue())!;
                 return true;
+            case 25:
+                obj.tabUnplayableFretColor = Color.fromJson(r.readValue())!;
+                return true;
         }
         return false;
     }
@@ -148,6 +151,7 @@ export class RenderingResourcesSerializer {
         w.valueField(22, Color.toJson(obj.mainGlyphColor));
         w.valueField(23, Color.toJson(obj.secondaryGlyphColor));
         w.valueField(24, Color.toJson(obj.scoreInfoColor));
+        w.valueField(25, Color.toJson(obj.tabUnplayableFretColor));
         w.endObject();
     }
 }

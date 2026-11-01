@@ -125,6 +125,7 @@ export default class TypeResolver {
      * ArrayBuffer generic.
      */
     private static readonly _typedArraySymbolNames: ReadonlySet<string> = new Set([
+        'Int8Array',
         'Uint8Array',
         'Int16Array',
         'Uint16Array',
@@ -691,14 +692,6 @@ export default class TypeResolver {
             reference: externalModule + symbolName,
             typeArguments: typeArguments
         } as cs.TypeReference;
-
-        if (symbolName === 'Int8Array' && this.isNodeEmitted(node)) {
-            this._ctx.addNodeDiagnostics(
-                node,
-                'Int8Array is not supported. The C# runtime has no Int8Array class. Use Uint8Array or a custom sbyte[] wrapper instead.',
-                ts.DiagnosticCategory.Error
-            );
-        }
 
         // Typed arrays (Int8Array, ..., DataView) wrap an ArrayBuffer that
         // does not exist as a generic on the target type.

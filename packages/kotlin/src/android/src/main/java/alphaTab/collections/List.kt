@@ -57,8 +57,9 @@ public class List<T> : Iterable<T> {
         _data.add(item)
     }
 
-    public fun fill(item: T) {
+    public fun fill(item: T): List<T> {
         _data.fill(item)
+        return this
     }
 
     public fun push(vararg items: T) {

@@ -200,9 +200,10 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
             }
         }
         this.width = 0;
+        const tabRenderer = this.renderer as TabBarRenderer;
         this._notes.sort((a, b) => {
             if (a.isStringed) {
-                return a.string - b.string;
+                return tabRenderer.getDisplayString(a) - tabRenderer.getDisplayString(b);
             }
             return a.realValue - b.realValue;
         });
@@ -691,7 +692,9 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
         if (firstPt.value === 0) {
             y1 = cy + smufl.tabBendStaffPadding;
             if (secondPt.offset === firstPt.offset) {
-                y1 += noteRenderer.getNoteY(note.beat.maxStringNote!, NoteYPosition.Top) - noteNumberAndLinePaddingY;
+                y1 +=
+                    noteRenderer.getNoteY(noteRenderer.getDisplayMaxStringNote(note.beat)!, NoteYPosition.Top) -
+                    noteNumberAndLinePaddingY;
             } else {
                 y1 += noteRenderer.getNoteY(note, NoteYPosition.Center);
             }
@@ -702,7 +705,10 @@ export class TabBendGlyph extends Glyph implements ITieGlyph {
         const x2 = cx + dX * secondPt.offset;
         let y2: number;
         if (secondPt.lineValue === 0) {
-            y2 = cy + smufl.tabBendStaffPadding + noteRenderer.getNoteY(note.beat.maxStringNote!, NoteYPosition.Center);
+            y2 =
+                cy +
+                smufl.tabBendStaffPadding +
+                noteRenderer.getNoteY(noteRenderer.getDisplayMaxStringNote(note.beat)!, NoteYPosition.Center);
         } else {
             y2 = cy - smufl.tabBendPerValueHeight * secondPt.lineValue;
         }

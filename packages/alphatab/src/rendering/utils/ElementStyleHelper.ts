@@ -314,6 +314,19 @@ export class ElementStyleHelper {
     }
 
     /**
+     * Applies the color of the given note element like {@link applyNote}, using the given color
+     * when the note style does not define the element.
+     */
+    public static applyNoteWithDefault(
+        canvas: ICanvas,
+        element: NoteSubElement,
+        note: Note,
+        defaultColor: Color
+    ): Color | undefined {
+        return ElementStyleHelper._apply<NoteSubElement>(canvas, element, note.style, defaultColor, true);
+    }
+
+    /**
      * Restores the canvas color changed by one of the `apply*` methods.
      * @param previousColor The value returned by the `apply*` method.
      */

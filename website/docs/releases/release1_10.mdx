@@ -1,0 +1,24 @@
+---
+title: v1.10
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+## 1.10.0
+
+### Music Notation
+
+#### render: transposed tabs on playable strings
+
+Guitar tabs of a track transposed with [`notation.transpositionPitches`](/docs/reference/settings/notation/transpositionpitches) (or the alphaTex `\transpose` metadata tag) no longer show negative frets or frets beyond the neck. A note keeps its string while the shifted fret is playable there; otherwise it moves to another string, together with the notes it is tied, slid, or hammered to. Natural harmonics move to the node of the transposed pitch. Notes that fit on no string keep their string and show the fret in the new [`display.resources.tabUnplayableFretColor`](/docs/reference/types/renderingresources/).
+
+<AlphaTab
+  tex={true}
+  settings={{ notation: { transpositionPitches: [-4] } }}
+>{`
+\\track "Guitar"
+  \\staff{score tabs}
+  :4 0.6 3.5 2.4 0.3 | (0.1 0.2 0.3) 3.5 3.5 3.5 | 3.5{t} 2.3{h} 4.3 4.3{b (0 4)}
+`}</AlphaTab>
+
+The loaded score is not changed: the new positions exist only on the rendered tab. Details: [Transposed tablature](/docs/features/render/guitar-tablature#transposed-tablature).

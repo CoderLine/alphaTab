@@ -25,6 +25,8 @@ import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection
 import type { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 import type { ScrambledPath } from '@coderline/alphatab/rendering/utils/ScrambledPath';
+import { TabFingering } from '@coderline/alphatab/rendering/utils/TabFingering';
+import type { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -137,7 +139,73 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     public override getNoteLine(note: Note): number {
-        return this.bar.staff.tuning.length - note.string;
+        return this.bar.staff.tuning.length - this.getDisplayString(note);
+    }
+
+    /**
+     * The glyph showing the given note in the tab of its bar, null if the note is not shown.
+     */
+    public getNoteGlyph(note: Note): NoteNumberGlyph | null {
+        const bar = note.beat.voice.bar;
+        // a renderer is registered in the layout only after its own layout
+        const renderer =
+            bar === this.bar ? this : this.scoreRenderer.layout!.getRendererForBar(TabBarRenderer.StaffId, bar);
+        const container = renderer instanceof TabBarRenderer ? renderer.getBeatContainer(note.beat) : undefined;
+        const noteNumbers = container
+            ? ((container as TabBeatContainerGlyph).onNotes as TabBeatGlyph).noteNumbers
+            : null;
+        return noteNumbers ? noteNumbers.findNoteGlyph(note) : null;
+    }
+
+    /**
+     * The string (1 = lowest) on which the note is shown, see {@link TabFingering}.
+     */
+    public getDisplayString(note: Note): number {
+        const glyph = this.getNoteGlyph(note);
+        return glyph !== null && glyph.displayString > 0 ? glyph.displayString : note.string;
+    }
+
+    /**
+     * The fret shown for the note, the node for natural harmonics.
+     */
+    public getDisplayFret(note: Note): number {
+        const glyph = this.getNoteGlyph(note);
+        return glyph !== null && glyph.displayString > 0
+            ? glyph.displayFret
+            : note.fret - note.beat.voice.bar.staff.transpositionPitch;
+    }
+
+    /**
+     * The stringed note of the beat shown on the highest string.
+     */
+    public getDisplayMaxStringNote(beat: Beat): Note | null {
+        const container = this.getBeatContainer(beat);
+        const noteNumbers = container
+            ? ((container as TabBeatContainerGlyph).onNotes as TabBeatGlyph).noteNumbers
+            : null;
+        return noteNumbers ? noteNumbers.maxStringNote : beat.maxStringNote;
+    }
+
+    /**
+     * The stringed note of the beat shown on the lowest string.
+     */
+    public getDisplayMinStringNote(beat: Beat): Note | null {
+        const container = this.getBeatContainer(beat);
+        const noteNumbers = container
+            ? ((container as TabBeatContainerGlyph).onNotes as TabBeatGlyph).noteNumbers
+            : null;
+        return noteNumbers ? noteNumbers.minStringNote : beat.minStringNote;
+    }
+
+    /**
+     * The tab glyph of the note for renderers of other notations, resolved on paint when all tab bars are laid out.
+     */
+    public static findTabNoteGlyph(renderer: BarRendererBase, note: Note): NoteNumberGlyph | null {
+        if (!TabFingering.isActive(note.beat.voice.bar.staff)) {
+            return null;
+        }
+        const tab = renderer.scoreRenderer.layout!.getRendererForBar(TabBarRenderer.StaffId, note.beat.voice.bar);
+        return tab instanceof TabBarRenderer ? tab.getNoteGlyph(note) : null;
     }
 
     public minString = Number.NaN;
@@ -295,7 +363,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     const noteGlyphs = noteNumbers.noteGlyphs;
                     for (let k = 0, nk = noteGlyphs.length; k < nk; k++) {
                         const g = noteGlyphs[k];
-                        const str = g.note.string;
+                        const str = g.displayString;
                         if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
@@ -342,7 +410,7 @@ export class TabBarRenderer extends LineBarRenderer {
                     const noteGlyphs = noteNumbers.noteGlyphs;
                     for (let k = 0, nk = noteGlyphs.length; k < nk; k++) {
                         const g = noteGlyphs[k];
-                        const str = g.note.string;
+                        const str = g.displayString;
                         if (!g.isEmpty && noteNumbers.getNoteGlyphForString(str) === g) {
                             const lineIdx = tuningLen - str;
                             if (lineIdx >= 0 && lineIdx < drawnLineCount) {
@@ -402,8 +470,10 @@ export class TabBarRenderer extends LineBarRenderer {
         // Per-beat half-line overflow, not bar-wide. Strings are 1-indexed: top = tuning.length, bottom = 1.
         const beat = beatContainer.beat;
         const stringCount = this.bar.staff.tuning.length;
-        const hasTop = beat.maxStringNote !== null && beat.maxStringNote.string === stringCount;
-        const hasBottom = beat.minStringNote !== null && beat.minStringNote.string === 1;
+        const maxStringNote = this.getDisplayMaxStringNote(beat);
+        const minStringNote = this.getDisplayMinStringNote(beat);
+        const hasTop = maxStringNote !== null && this.getDisplayString(maxStringNote) === stringCount;
+        const hasBottom = minStringNote !== null && this.getDisplayString(minStringNote) === 1;
         if (!hasTop && !hasBottom) {
             return;
         }
@@ -516,7 +586,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
-        const maxNote = beat.maxStringNote;
+        const maxNote = this.getDisplayMaxStringNote(beat);
         const position = direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown;
         if (maxNote) {
             return this.getNoteY(maxNote, position);
@@ -526,7 +596,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
-        const maxNote = beat.minStringNote;
+        const maxNote = this.getDisplayMinStringNote(beat);
         const position = direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem;
 
         if (maxNote) {

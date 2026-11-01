@@ -48,6 +48,15 @@ public class TypedArrays
     public var floats: alphaTab.core.ecmaScript.Float32Array = alphaTab.core.ecmaScript.Float32Array(0.0)
     
     
+    public var signedBytes: alphaTab.core.ecmaScript.Int8Array = alphaTab.core.ecmaScript.Int8Array(0.0)
+    
+    
+    public var shorts: alphaTab.core.ecmaScript.Int16Array = alphaTab.core.ecmaScript.Int16Array(0.0)
+    
+    
+    public var unsignedShorts: alphaTab.core.ecmaScript.Uint16Array = alphaTab.core.ecmaScript.Uint16Array(0.0)
+    
+    
     /**
      */
     public fun byteAt(i: Double): Double{
@@ -58,6 +67,18 @@ public class TypedArrays
      */
     public fun makeBuffer(size: Double): alphaTab.core.ecmaScript.Uint8Array{
         return alphaTab.core.ecmaScript.Uint8Array(size)
+    }
+    
+    /**
+     */
+    public fun resetSigned(size: Double): Unit{
+        this.signedBytes = alphaTab.core.ecmaScript.Int8Array(size)
+        this.signedBytes.fill(-1.0)
+        this.signedBytes[(0).toInt()] = -128.0
+        this.shorts = alphaTab.core.ecmaScript.Int16Array(size)
+        this.shorts.fill(-1.0)
+        this.shorts.set(this.shorts.subarray(0.0, 1.0), 1.0)
+        this.unsignedShorts.fill(0.0)
     }
     
     public constructor()

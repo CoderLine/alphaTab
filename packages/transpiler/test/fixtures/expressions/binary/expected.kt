@@ -75,7 +75,7 @@ public class Binary
      */
     public fun mask(a: Double, m: Double): Double{
         var x: Double = a
-        x = ((x.toInt()) and (m)).toDouble()
+        x = ((x.toInt()) and ((m).toInt())).toDouble()
         x = ((x.toInt()) or (16)).toDouble()
         x = ((x.toInt()) xor (255)).toDouble()
         x = ((x.toInt()) shl (2)).toDouble()

@@ -37,8 +37,12 @@ export class TabBrushGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const tabBarRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        const startY: number = cy + this.x + tabBarRenderer.getNoteY(this._beat.maxStringNote!, NoteYPosition.Top);
-        const endY: number = cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
+        const startY: number =
+            cy + this.x + tabBarRenderer.getNoteY(tabBarRenderer.getDisplayMaxStringNote(this._beat)!, NoteYPosition.Top);
+        const endY: number =
+            cy +
+            this.y +
+            tabBarRenderer.getNoteY(tabBarRenderer.getDisplayMinStringNote(this._beat)!, NoteYPosition.Bottom);
         const arrowX: number = cx + this.x + this.width / 2;
         const arrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
         if (this._beat.brushType !== BrushType.None) {

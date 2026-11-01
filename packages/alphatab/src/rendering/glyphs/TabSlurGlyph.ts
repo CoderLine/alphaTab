@@ -1,6 +1,7 @@
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { TabTieGlyph } from '@coderline/alphatab/rendering/glyphs/TabTieGlyph';
+import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
@@ -25,7 +26,11 @@ export class TabSlurGlyph extends TabTieGlyph {
      * Gets the notes the effect slur arc on the given side of the beat connects.
      * @returns The notes, or null if no effect slur chain starts on this side of the beat.
      */
-    public static getEffectSlurGroup(beat: Beat, direction: BeamDirection): TabEffectSlurGroup | null {
+    public static getEffectSlurGroup(
+        renderer: TabBarRenderer,
+        beat: Beat,
+        direction: BeamDirection
+    ): TabEffectSlurGroup | null {
         const isUp = direction === BeamDirection.Up;
         let startNote: Note | null = null;
         let endNote: Note | null = null;
@@ -35,7 +40,7 @@ export class TabSlurGlyph extends TabTieGlyph {
                 !n.isVisible ||
                 !n.isEffectSlurOrigin ||
                 !destination ||
-                TabTieGlyph.getBeamDirectionForNote(n) !== direction
+                TabTieGlyph.getBeamDirectionForString(renderer.getDisplayString(n)) !== direction
             ) {
                 continue;
             }

@@ -349,6 +349,13 @@ export class RenderingResources {
      */
     public scoreInfoColor: Color = new Color(0, 0, 0, 0xff);
 
+    /**
+     * The color of tab fret numbers which cannot be played on the tuning of the staff after transposition.
+     * @defaultValue `rgb(200, 0, 0)`
+     * @since 1.10.0
+     */
+    public tabUnplayableFretColor: Color = new Color(200, 0, 0, 0xff);
+
     public constructor() {
         for (const [k, v] of RenderingResources.defaultFonts) {
             this.elementFonts.set(k, v.withSize(v.size));

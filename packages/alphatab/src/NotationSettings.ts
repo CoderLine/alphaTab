@@ -534,6 +534,9 @@ export class NotationSettings {
      * @remarks
      * This setting allows transposing of tracks for display and playback.
      * The `transpositionPitches` setting allows defining an additional pitch offset per track, that is then considered when displaying the music sheet.
+     *
+     * {@since 1.10.0} Guitar tabs of transposed tracks move notes to other strings when the shifted fret is not playable
+     * on their string. Notes which fit on no string keep their string and are painted in `display.resources.tabUnplayableFretColor`.
      */
     public transpositionPitches: number[] = [];
 
