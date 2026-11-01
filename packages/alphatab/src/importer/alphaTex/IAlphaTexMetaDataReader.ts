@@ -1,5 +1,5 @@
 import type {
-    AlphaTexArgumentList, 
+    AlphaTexArgumentList,
     AlphaTexMetaDataTagNode,
     AlphaTexPropertyNode
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';

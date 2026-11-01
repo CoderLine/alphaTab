@@ -2817,8 +2817,7 @@ export class GpifParser {
                 if (isPercussion) {
                     staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
                 } else {
-                    const fallback =
-                        staff.index === 0 ? Tuning.getDefaultTuningFor(6) : Tuning.getDefaultTuningFor(5);
+                    const fallback = staff.index === 0 ? Tuning.getDefaultTuningFor(6) : Tuning.getDefaultTuningFor(5);
                     if (fallback !== null) {
                         staff.stringTuning.tunings = fallback.tunings.slice();
                         staff.stringTuning.name = fallback.name;

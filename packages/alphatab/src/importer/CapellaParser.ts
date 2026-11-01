@@ -1,4 +1,5 @@
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
+import { Logger } from '@coderline/alphatab/Logger';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
 import { Bar, BarLineStyle } from '@coderline/alphatab/model/Bar';
@@ -7,25 +8,23 @@ import { Chord } from '@coderline/alphatab/model/Chord';
 import { Clef } from '@coderline/alphatab/model/Clef';
 import { CrescendoType } from '@coderline/alphatab/model/CrescendoType';
 import { Duration } from '@coderline/alphatab/model/Duration';
+import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
+import { Fermata, FermataType } from '@coderline/alphatab/model/Fermata';
+import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Note } from '@coderline/alphatab/model/Note';
+import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { Score } from '@coderline/alphatab/model/Score';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
+import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import type { Settings } from '@coderline/alphatab/Settings';
 import { XmlDocument } from '@coderline/alphatab/xml/XmlDocument';
-
 import type { XmlNode } from '@coderline/alphatab/xml/XmlNode';
-import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { Logger } from '@coderline/alphatab/Logger';
-import { Fermata, FermataType } from '@coderline/alphatab/model/Fermata';
-import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
-import { Ottavia } from '@coderline/alphatab/model/Ottavia';
-import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 
 /**
  * @internal
@@ -500,7 +499,13 @@ export class CapellaParser {
                 break;
         }
     }
-    private _parseVoices(staffId: string, staff: Staff, systemElement: XmlNode, firstBarIndex: number, element: XmlNode) {
+    private _parseVoices(
+        staffId: string,
+        staff: Staff,
+        systemElement: XmlNode,
+        firstBarIndex: number,
+        element: XmlNode
+    ) {
         let voiceIndex = 0;
         for (const c of element.childElements()) {
             switch (c.localName) {

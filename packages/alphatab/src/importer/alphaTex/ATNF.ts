@@ -1,4 +1,5 @@
 import {
+    type AlphaTexArgumentList,
     type AlphaTexBackSlashTokenNode,
     type AlphaTexBraceCloseTokenNode,
     type AlphaTexBraceOpenTokenNode,
@@ -12,7 +13,6 @@ import {
     type AlphaTexPropertiesNode,
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
-    type AlphaTexArgumentList,
     type IAlphaTexArgumentValue
 } from '@coderline/alphatab/importer/alphaTex/AlphaTexAst';
 

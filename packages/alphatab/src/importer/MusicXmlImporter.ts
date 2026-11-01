@@ -24,7 +24,7 @@ import { Clef } from '@coderline/alphatab/model/Clef';
 import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
-import { FermataType, Fermata } from '@coderline/alphatab/model/Fermata';
+import { Fermata, FermataType } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
@@ -3084,11 +3084,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // on a staff with tuning, string and pitch define the tab position of a note written without fret
         // (e.g. dead notes written by Guitar Pro 5)
-        if (
-            !note.isStringed &&
-            (note.isDead || !note.isPercussion) &&
-            note.beat.voice.bar.staff.tuning.length > 0
-        ) {
+        if (!note.isStringed && (note.isDead || !note.isPercussion) && note.beat.voice.bar.staff.tuning.length > 0) {
             const fret = this._calculatePitchedNoteValue(note) - note.stringTuning;
             if (fret >= 0) {
                 note.fret = fret;

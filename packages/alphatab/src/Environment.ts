@@ -23,9 +23,7 @@ import { SkiaCanvas } from '@coderline/alphatab/platform/skia/SkiaCanvas';
 import { CssFontSvgCanvas } from '@coderline/alphatab/platform/svg/CssFontSvgCanvas';
 import { AlphaSynthWebWorker } from '@coderline/alphatab/platform/worker/AlphaSynthWebWorker';
 import { AlphaTabWebWorker } from '@coderline/alphatab/platform/worker/AlphaTabWebWorker';
-import type {
-    IAlphaTabWorkerGlobalScope
-} from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
+import type { IAlphaTabWorkerGlobalScope } from '@coderline/alphatab/platform/worker/AlphaTabWorkerProtocol';
 import { type BarRendererFactory, EffectBandMode } from '@coderline/alphatab/rendering/BarRendererFactory';
 import { alternateEndingsEffectInfo } from '@coderline/alphatab/rendering/effects/AlternateEndingsEffectInfo';
 import { barNumberEffectInfo } from '@coderline/alphatab/rendering/effects/BarNumberEffectInfo';
@@ -36,6 +34,10 @@ import { chordsEffectInfo } from '@coderline/alphatab/rendering/effects/ChordsEf
 import { crescendoEffectInfo } from '@coderline/alphatab/rendering/effects/CrescendoEffectInfo';
 import { directionsEffectInfo } from '@coderline/alphatab/rendering/effects/DirectionsEffectInfo';
 import { dynamicsEffectInfo } from '@coderline/alphatab/rendering/effects/DynamicsEffectInfo';
+import {
+    hammerPullLabelEffectInfo,
+    slideLabelEffectInfo
+} from '@coderline/alphatab/rendering/effects/EffectSlurLabelEffectInfo';
 import { fadeEffectInfo } from '@coderline/alphatab/rendering/effects/FadeEffectInfo';
 import { fermataEffectInfo } from '@coderline/alphatab/rendering/effects/FermataEffectInfo';
 import { fingeringEffectInfo } from '@coderline/alphatab/rendering/effects/FingeringEffectInfo';
@@ -59,7 +61,6 @@ import { createSlightNoteVibratoEffectInfo } from '@coderline/alphatab/rendering
 import { sustainPedalEffectInfo } from '@coderline/alphatab/rendering/effects/SustainPedalEffectInfo';
 import { tabWhammyEffectInfo } from '@coderline/alphatab/rendering/effects/TabWhammyEffectInfo';
 import { tapEffectInfo } from '@coderline/alphatab/rendering/effects/TapEffectInfo';
-import { hammerPullLabelEffectInfo, slideLabelEffectInfo } from '@coderline/alphatab/rendering/effects/EffectSlurLabelEffectInfo';
 import { tempoEffectInfo } from '@coderline/alphatab/rendering/effects/TempoEffectInfo';
 import { textEffectInfo } from '@coderline/alphatab/rendering/effects/TextEffectInfo';
 import { trillEffectInfo } from '@coderline/alphatab/rendering/effects/TrillEffectInfo';
