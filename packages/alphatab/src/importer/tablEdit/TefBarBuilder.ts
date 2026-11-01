@@ -276,6 +276,135 @@ export class TefBarBuilder {
         return position - this._measureStarts[bar] - (offset === undefined ? 0 : offset);
     }
 
+    /**
+     * Applies the lyrics block: one section per track, introduced by '>' and the track letter.
+     */
+    public applyLyrics(text: string): void {
+        const sections = text.split('>');
+        for (const section of sections) {
+            if (section.length === 0) {
+                continue;
+            }
+            const trackIndex = section.charCodeAt(0) - 65;
+            if (trackIndex < 0 || trackIndex >= this._tracks.length) {
+                continue;
+            }
+            const lines = section.split('\n');
+            const verses: string[] = [];
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].split('\r').join('');
+                const verseStart = TefBarBuilder._verseStart(line);
+                if (verseStart > 0) {
+                    verses.push(line.substring(verseStart));
+                } else if (verses.length === 0) {
+                    verses.push(line);
+                } else {
+                    verses[verses.length - 1] += ` ${line}`;
+                }
+            }
+            for (let v = 0; v < verses.length; v++) {
+                this._applyVerse(this._tracks[trackIndex].track, v, TefBarBuilder._syllables(verses[v]));
+            }
+        }
+    }
+
+    /**
+     * Returns the length of a leading verse number like "2. ", or 0.
+     */
+    private static _verseStart(line: string): number {
+        let i = 0;
+        while (i < line.length && line.charAt(i) === ' ') {
+            i++;
+        }
+        const digits = i;
+        while (i < line.length && line.charCodeAt(i) >= 48 && line.charCodeAt(i) <= 57) {
+            i++;
+        }
+        if (i === digits || i >= line.length || line.charAt(i) !== '.') {
+            return 0;
+        }
+        i++;
+        while (i < line.length && line.charAt(i) === ' ') {
+            i++;
+        }
+        return i;
+    }
+
+    private _applyVerse(track: Track, verse: number, syllables: string[]): void {
+        let index = 0;
+        for (const bar of track.staves[0].bars) {
+            for (const beat of bar.voices[0].beats) {
+                if (index >= syllables.length) {
+                    return;
+                }
+                if (beat.isRest || beat.graceType !== GraceType.None || beat.notes.every(n => n.isTieDestination)) {
+                    continue;
+                }
+                if (!beat.lyrics) {
+                    beat.lyrics = [];
+                }
+                while (beat.lyrics.length <= verse) {
+                    beat.lyrics.push('');
+                }
+                beat.lyrics[verse] = syllables[index];
+                index++;
+            }
+        }
+    }
+
+    /**
+     * Splits lyrics into one entry per note: spaces and hyphens move to the next note,
+     * '+' and '_' are a space and a hyphen within the syllable.
+     */
+    private static _syllables(text: string): string[] {
+        const syllables: string[] = [];
+        let current = '';
+        let inChord = false;
+        let pendingSpace = false;
+        for (let i = 0; i < text.length; i++) {
+            const c = text.charAt(i);
+            if (inChord) {
+                inChord = c !== ']';
+                continue;
+            }
+            switch (c) {
+                case '[':
+                    inChord = true;
+                    break;
+                case ' ':
+                case '\t':
+                    if (current.length > 0) {
+                        syllables.push(current);
+                        current = '';
+                    } else if (pendingSpace) {
+                        syllables.push('');
+                    }
+                    pendingSpace = true;
+                    break;
+                case '-':
+                case '~':
+                    syllables.push(c === '-' ? `${current}-` : current);
+                    current = '';
+                    pendingSpace = false;
+                    break;
+                case '+':
+                    current += ' ';
+                    break;
+                case '_':
+                    current += '-';
+                    break;
+                default:
+                    current += c;
+                    pendingSpace = false;
+                    break;
+            }
+        }
+        if (current.length > 0) {
+            syllables.push(current);
+        }
+        return syllables;
+    }
+
     private _applyGlobalMarkers(cells: TefCell[]): void {
         const score = this._tracks[0].track.score;
         const syncopation: number[] = [];

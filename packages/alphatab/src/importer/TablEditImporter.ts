@@ -85,6 +85,7 @@ export class TablEditImporter extends ScoreImporter {
         builder.texts = this._readTexts(this._u32(84));
         builder.chords = this._readChords(this._u32(88));
         builder.build(cells);
+        builder.applyLyrics(this._readString(this._u32(80)));
 
         for (const track of this._score.tracks) {
             const bars = track.staves[0].bars;
