@@ -20,7 +20,7 @@ import { ComparisonHelpers } from './ComparisonHelpers';
  * hand-offs must decode to the same model and the public JSON strings must stay byte-identical.
  */
 describe('JsonConverterJsObjectTest', () => {
-    const scoreExtensions = /\.(gp|gp[3-5]|gpx|xml|musicxml|mxml|mxl|cap|capx|json)$/i;
+    const scoreExtensions = /\.(gp|gp[3-5]|gpx|xml|musicxml|mxml|mxl|cap|capx|tef|json)$/i;
 
     function mapReplacer(_: string, v: unknown) {
         return v instanceof Map ? Object.fromEntries(v) : v;

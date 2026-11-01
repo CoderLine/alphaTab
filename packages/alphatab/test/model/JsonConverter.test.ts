@@ -1,10 +1,10 @@
-import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
-import { describe, expect, it } from 'vitest';
 import { NoteSerializer } from '@coderline/alphatab/generated/model/NoteSerializer';
+import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { LogLevel } from '@coderline/alphatab/LogLevel';
 import { BarStyle, BarSubElement } from '@coderline/alphatab/model/Bar';
@@ -18,8 +18,8 @@ import { TrackStyle, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { VoiceStyle, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
-import type { SettingsJson } from '@coderline/alphatab/generated/SettingsJson';
 import { TestPlatform } from 'test/TestPlatform';
+import { describe, expect, it } from 'vitest';
 import { ComparisonHelpers } from './ComparisonHelpers';
 
 describe('JsonConverterTest', () => {
@@ -91,6 +91,14 @@ describe('JsonConverterTest', () => {
 
     it('visual-music-notation', async () => {
         await testRoundTripFolderEqual('visual-tests/music-notation');
+    });
+
+    it('visual-tabledit', async () => {
+        await testRoundTripFolderEqual('visual-tests/tabledit');
+    });
+
+    it('importer-tabledit', async () => {
+        await testRoundTripFolderEqual('tabledit');
     });
 
     it('visual-notation-legend', async () => {
