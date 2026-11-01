@@ -3,14 +3,13 @@ import type { Color } from '@coderline/alphatab/model/Color';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
-import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
+import { Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { NotationElement, NotationMode } from '@coderline/alphatab/NotationSettings';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
-import { TabFingeringSegment } from '@coderline/alphatab/rendering/utils/TabFingeringSegment';
 import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
 
 /**
@@ -22,20 +21,36 @@ export class NoteNumberGlyph extends Glyph {
     private _trillNoteString: string | null = null;
     private _trillNoteStringWidth: number = 0;
 
-    private _isUnplayable: boolean = false;
-
     public isEmpty: boolean = false;
     public noteStringWidth: number = 0;
 
     /**
-     * The string (1 = lowest) on which the note is shown.
+     * The string (1 = lowest) on which the note is shown, 0 until it is placed.
      */
-    public displayString: number;
+    public displayString: number = 0;
+    /**
+     * The shown fret, the node for natural harmonics.
+     */
+    public displayFret: number = 0;
+    /**
+     * Whether the note is shown on another string than in the model.
+     */
+    public isMoved: boolean = false;
+    /**
+     * Whether no string of the transposed tab can play the note.
+     */
+    public isUnplayable: boolean = false;
 
-    public constructor(x: number, y: number, note: Note, displayString: number) {
+    public constructor(x: number, y: number, note: Note) {
         super(x, y);
         this._note = note;
-        this.displayString = displayString;
+    }
+
+    public setDisplay(str: number, fret: number, isMoved: boolean, isUnplayable: boolean): void {
+        this.displayString = str;
+        this.displayFret = fret;
+        this.isMoved = isMoved;
+        this.isUnplayable = isUnplayable;
     }
 
     public get note(): Note {
@@ -58,16 +73,8 @@ export class NoteNumberGlyph extends Glyph {
         const n: Note = this._note;
         const tr = this.renderer as TabBarRenderer;
         let fret: number;
-        let harmonicType = n.harmonicType;
-        let harmonicValue = n.harmonicValue;
         if (n.isStringed) {
-            fret = tr.getDisplayFret(n);
-            const flags = tr.getDisplayFlags(n);
-            this._isUnplayable = (flags & TabFingeringSegment.flagUnplayable) !== 0;
-            if ((flags & TabFingeringSegment.flagAsArtificial) !== 0) {
-                harmonicType = HarmonicType.Artificial;
-                harmonicValue = 12;
-            }
+            fret = this.displayFret;
         } else {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation) {
@@ -81,7 +88,7 @@ export class NoteNumberGlyph extends Glyph {
             this._noteString = n.isDead ? 'x' : fret.toString();
             if (n.isGhost) {
                 this._noteString = `(${this._noteString})`;
-            } else if (harmonicType === HarmonicType.Natural) {
+            } else if (n.harmonicType === HarmonicType.Natural) {
                 // only first decimal char
                 const i: number = this._noteString.indexOf(String.fromCharCode(46));
                 if (i >= 0) {
@@ -99,15 +106,18 @@ export class NoteNumberGlyph extends Glyph {
             this._noteString = '';
         }
         if (n.isTrill) {
-            this._trillNoteString = `(${tr.getDisplayTrillFret(n).toString()})`;
-        } else if (!ModelUtils.isAlmostEqualTo(harmonicValue, 0)) {
-            switch (harmonicType) {
+            const staff = n.beat.voice.bar.staff;
+            const trillFret =
+                n.trillValue - staff.transpositionPitch - staff.capo - Note.getStringTuning(staff, this.displayString);
+            this._trillNoteString = `(${trillFret.toString()})`;
+        } else if (!ModelUtils.isAlmostEqualTo(n.harmonicValue, 0)) {
+            switch (n.harmonicType) {
                 case HarmonicType.Artificial:
                 case HarmonicType.Pinch:
                 case HarmonicType.Tap:
                 case HarmonicType.Semi:
                 case HarmonicType.Feedback:
-                    let s: string = (fret + harmonicValue).toString();
+                    let s: string = (fret + n.harmonicValue).toString();
                     // only first decimal char
                     const i: number = s.indexOf(String.fromCharCode(46));
                     if (i >= 0) {
@@ -183,7 +193,7 @@ export class NoteNumberGlyph extends Glyph {
     }
 
     private _applyColor(canvas: ICanvas): Color | undefined {
-        return this._isUnplayable
+        return this.isUnplayable
             ? ElementStyleHelper.applyNoteWithDefault(
                   canvas,
                   NoteSubElement.GuitarTabFretNumber,

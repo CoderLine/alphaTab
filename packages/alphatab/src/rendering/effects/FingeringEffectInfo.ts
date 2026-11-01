@@ -2,7 +2,6 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { FingeringMode, NotationElement } from '@coderline/alphatab/NotationSettings';
-import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
@@ -31,15 +30,7 @@ export const fingeringEffectInfo: EffectInfo = {
         if (beat.notes.length !== 1) {
             return false;
         }
-        const note = beat.notes[0];
-        if (
-            note.leftHandFinger !== Fingers.Unknown &&
-            renderer instanceof TabBarRenderer &&
-            TabBarRenderer.isFingeringChanged(renderer, note)
-        ) {
-            return false;
-        }
-        return note.isFingering;
+        return beat.notes[0].isFingering;
     },
     createNewGlyph: (renderer: BarRendererBase, beat: Beat): EffectGlyph => {
         let finger: Fingers = Fingers.Unknown;

@@ -5,10 +5,9 @@ import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import type { BarRendererBase } from '@coderline/alphatab/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@coderline/alphatab/rendering/EffectBarGlyphSizing';
 import { EffectBandPlacementCategory, type EffectInfo } from '@coderline/alphatab/rendering/EffectInfo';
+import { createNoteShouldCreateGlyph } from '@coderline/alphatab/rendering/effects/NoteEffectInfoBase';
 import type { EffectGlyph } from '@coderline/alphatab/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@coderline/alphatab/rendering/glyphs/LineRangedGlyph';
-import { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
-import { TabFingeringSegment } from '@coderline/alphatab/rendering/utils/TabFingeringSegment';
 
 /**
  * @internal
@@ -53,31 +52,6 @@ function harmonicEffectId(harmonicType: HarmonicType): string {
 }
 
 /**
- * Natural harmonics without a node on the transposed tab are shown as artificial harmonics.
- */
-function displayedHarmonicType(renderer: BarRendererBase, note: Note): HarmonicType {
-    if (
-        note.harmonicType === HarmonicType.Natural &&
-        renderer instanceof TabBarRenderer &&
-        (renderer.getDisplayFlags(note) & TabFingeringSegment.flagAsArtificial) !== 0
-    ) {
-        return HarmonicType.Artificial;
-    }
-    return note.harmonicType;
-}
-
-function hasDisplayedHarmonic(renderer: BarRendererBase, beat: Beat, harmonicType: HarmonicType): boolean {
-    const notes = beat.notes;
-    for (let i = 0; i < notes.length; i++) {
-        const note = notes[i];
-        if (note.isHarmonic && displayedHarmonicType(renderer, note) === harmonicType) {
-            return true;
-        }
-    }
-    return false;
-}
-
-/**
  * @internal
  */
 export function createHarmonicsEffectInfo(harmonicType: HarmonicType): EffectInfo {
@@ -86,8 +60,9 @@ export function createHarmonicsEffectInfo(harmonicType: HarmonicType): EffectInf
         notationElement: NotationElement.EffectHarmonics,
         hideOnMultiTrack: false,
         sizingMode: EffectBarGlyphSizing.GroupedOnBeat,
-        shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean =>
-            hasDisplayedHarmonic(renderer, beat, harmonicType),
+        shouldCreateGlyph: createNoteShouldCreateGlyph(
+            (note: Note): boolean => note.isHarmonic && note.harmonicType === harmonicType
+        ),
         createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph =>
             new LineRangedGlyph(harmonicToString(harmonicType), NotationElement.EffectHarmonics),
         canExpand: (_from: Beat, _to: Beat): boolean => true,

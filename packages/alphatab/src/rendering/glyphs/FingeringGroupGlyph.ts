@@ -201,7 +201,8 @@ export class FingeringGroupGlyph extends GlyphGroup {
             return false;
         }
         for (const note of info.leftHandNotes) {
-            if (!TabBarRenderer.isFingeringChanged(this.renderer, note)) {
+            const tabGlyph = TabBarRenderer.findTabNoteGlyph(this.renderer, note);
+            if (tabGlyph === null || !(tabGlyph.isMoved || tabGlyph.displayFret === 0)) {
                 return false;
             }
         }

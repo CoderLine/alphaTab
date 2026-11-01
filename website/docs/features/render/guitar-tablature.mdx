@@ -44,9 +44,9 @@ Because these are settings on the `notation` group, they apply to every staff in
 
 ## Transposed tablature {#transposed-tablature}
 
-[`notation.transpositionPitches`](/docs/reference/settings/notation/transpositionpitches) shifts a track by a number of semitones for display and playback. On the tab staff, a note keeps its string and fret position shifted by the transposition while that fret is playable. When the fret would drop below the open string or rise beyond the 24th fret, alphaTab moves the note to another string. It picks the position which keeps the hand closest to the surrounding notes and keeps chord notes on separate strings.
+[`notation.transpositionPitches`](/docs/reference/settings/notation/transpositionpitches) shifts a track by a number of semitones for display and playback. On the tab staff, a note keeps its string and fret position shifted by the transposition while that fret is playable. When the fret would drop below the open string or rise beyond the 24th fret, alphaTab moves the note to another string. It picks the string whose fret is closest to the previous notes and keeps chord notes on separate strings.
 
-Notes connected by ties, slides, and hammer-ons or pull-offs move together, so they stay on one string. Bends, slides, and vibrato never land on an open string. Natural harmonics move to the node that sounds the transposed pitch. When no string has such a node, the tab shows an artificial harmonic an octave above the fretted note.
+Notes connected by ties, slides, and hammer-ons or pull-offs move together, so they stay on one string. Bends, slides, and vibrato never land on an open string. Natural harmonics move to the node that sounds the transposed pitch. When no string has such a node, the harmonic counts as unplayable.
 
 The example below is transposed down four semitones. The open strings and the low notes no longer fit on their strings:
 

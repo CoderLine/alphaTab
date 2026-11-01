@@ -15,6 +15,7 @@ import { TremoloPickingGlyph } from '@coderline/alphatab/rendering/glyphs/Tremol
 import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { BeamingHelper } from '@coderline/alphatab/rendering/utils/BeamingHelper';
 import type { IBoundsLookupWriter } from '@coderline/alphatab/rendering/utils/IBoundsLookupWriter';
+import { TabFingering } from '@coderline/alphatab/rendering/utils/TabFingering';
 
 /**
  * @internal
@@ -147,13 +148,21 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 this.noteNumbers = tabNoteNumbers;
                 tabNoteNumbers.beat = this.container.beat;
+                tabNoteNumbers.renderer = this.renderer;
                 for (const note of this.container.beat.notes) {
                     // pitched notes without tab position (e.g. string annotations) have no fret to show
                     if (note.isVisible && (note.isStringed || note.isPercussion)) {
-                        this._createNoteGlyph(note);
+                        const noteNumberGlyph = new NoteNumberGlyph(0, 0, note);
+                        noteNumberGlyph.renderer = this.renderer;
+                        tabNoteNumbers.addNoteGlyph(noteNumberGlyph);
                     }
                 }
-                tabNoteNumbers.renderer = this.renderer;
+                TabFingering.assign(tabRenderer, tabNoteNumbers.noteGlyphs);
+                for (let i = 0; i < tabNoteNumbers.noteGlyphs.length; i++) {
+                    const noteNumberGlyph = tabNoteNumbers.noteGlyphs[i];
+                    this._layoutNoteGlyph(noteNumberGlyph);
+                }
+                tabNoteNumbers.updateStringRange();
             }
 
             //
@@ -230,14 +239,11 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    private _createNoteGlyph(n: Note): void {
+    private _layoutNoteGlyph(noteNumberGlyph: NoteNumberGlyph): void {
         const tr: TabBarRenderer = this.renderer as TabBarRenderer;
-        const noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n, tr.getDisplayString(n));
-        const l: number = tr.getNoteLine(n);
+        const l: number = this.renderer.bar.staff.tuning.length - noteNumberGlyph.displayString;
         noteNumberGlyph.y = tr.getLineY(l);
-        noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
-        this.noteNumbers!.addNoteGlyph(noteNumberGlyph);
         if (tr.drawsRhythm) {
             tr.collisionHelper.reserveBeatSlot(
                 this.container.beat,

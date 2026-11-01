@@ -50,7 +50,8 @@ export class StringNumberContainerGlyph extends EffectGlyph {
             this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GuitarString0)! * this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
         for (const note of this._notes) {
             // resolved on paint: the tab of the bar is laid out after this staff
-            const stringValue = stringCount - TabBarRenderer.resolveDisplayString(this.renderer, note);
+            const tabGlyph = TabBarRenderer.findTabNoteGlyph(this.renderer, note);
+            const stringValue = stringCount - (tabGlyph !== null ? tabGlyph.displayString : note.string);
             const symbol = ((MusicFontSymbol.GuitarString1 as number) + stringValue) as MusicFontSymbol;
             CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,

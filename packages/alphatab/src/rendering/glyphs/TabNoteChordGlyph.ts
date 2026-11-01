@@ -7,7 +7,6 @@ import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarR
 import { DeadSlappedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/DeadSlappedBeatGlyph';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
 import type { NoteNumberGlyph } from '@coderline/alphatab/rendering/glyphs/NoteNumberGlyph';
-import type { TabBarRenderer } from '@coderline/alphatab/rendering/TabBarRenderer';
 import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementStyleHelper';
 
 /**
@@ -21,8 +20,6 @@ export class TabNoteChordGlyph extends Glyph {
     public beat!: Beat;
     public maxStringNote: Note | null = null;
     public minStringNote: Note | null = null;
-    private _maxString: number = 0;
-    private _minString: number = 0;
     private _beatEffects: Map<string, Glyph> | null = null;
     public noteStringWidth: number = 0;
 
@@ -46,17 +43,21 @@ export class TabNoteChordGlyph extends Glyph {
         return null;
     }
 
-    /**
-     * The glyph of the given note, or the glyph shown on its string if the note has none (e.g. a hidden note).
-     */
-    public getNoteGlyph(note: Note): NoteNumberGlyph | null {
+    public findNoteGlyph(note: Note): NoteNumberGlyph | null {
         const notes = this._notes;
         for (let i = notes.length - 1; i >= 0; i--) {
             if (notes[i].note === note) {
                 return notes[i];
             }
         }
-        return this.getNoteGlyphForString((this.renderer as TabBarRenderer).getDisplayString(note));
+        return null;
+    }
+
+    /**
+     * The glyph of the given note, or the glyph shown on its string if the note has none (e.g. a hidden note).
+     */
+    public getNoteGlyph(note: Note): NoteNumberGlyph | null {
+        return this.findNoteGlyph(note) ?? this.getNoteGlyphForString(note.string);
     }
 
     public get beatEffects(): Map<string, Glyph> {
@@ -198,14 +199,24 @@ export class TabNoteChordGlyph extends Glyph {
         } else {
             this._notes.push(noteGlyph);
         }
-        const str = noteGlyph.displayString;
-        if (!this.minStringNote || str < this._minString) {
-            this.minStringNote = noteGlyph.note;
-            this._minString = str;
-        }
-        if (!this.maxStringNote || str > this._maxString) {
-            this.maxStringNote = noteGlyph.note;
-            this._maxString = str;
+    }
+
+    /**
+     * Updates {@link minStringNote} and {@link maxStringNote} once the notes are placed on their strings.
+     */
+    public updateStringRange(): void {
+        let minString = 0;
+        let maxString = 0;
+        for (let i = 0; i < this._notes.length; i++) {
+            const g = this._notes[i];
+            if (!this.minStringNote || g.displayString < minString) {
+                this.minStringNote = g.note;
+                minString = g.displayString;
+            }
+            if (!this.maxStringNote || g.displayString > maxString) {
+                this.maxStringNote = g.note;
+                maxString = g.displayString;
+            }
         }
     }
 
