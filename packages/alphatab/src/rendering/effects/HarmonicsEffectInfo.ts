@@ -66,6 +66,17 @@ function displayedHarmonicType(renderer: BarRendererBase, note: Note): HarmonicT
     return note.harmonicType;
 }
 
+function hasDisplayedHarmonic(renderer: BarRendererBase, beat: Beat, harmonicType: HarmonicType): boolean {
+    const notes = beat.notes;
+    for (let i = 0; i < notes.length; i++) {
+        const note = notes[i];
+        if (note.isHarmonic && displayedHarmonicType(renderer, note) === harmonicType) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /**
  * @internal
  */
@@ -76,7 +87,7 @@ export function createHarmonicsEffectInfo(harmonicType: HarmonicType): EffectInf
         hideOnMultiTrack: false,
         sizingMode: EffectBarGlyphSizing.GroupedOnBeat,
         shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean =>
-            beat.notes.some(note => note.isHarmonic && displayedHarmonicType(renderer, note) === harmonicType),
+            hasDisplayedHarmonic(renderer, beat, harmonicType),
         createNewGlyph: (_renderer: BarRendererBase, _beat: Beat): EffectGlyph =>
             new LineRangedGlyph(harmonicToString(harmonicType), NotationElement.EffectHarmonics),
         canExpand: (_from: Beat, _to: Beat): boolean => true,
