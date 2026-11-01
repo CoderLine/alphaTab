@@ -4,7 +4,7 @@ import { TefBarBuilder, TefCell, TefTrackInfo } from '@coderline/alphatab/import
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { OverflowError } from '@coderline/alphatab/io/IReadable';
-import { Automation } from '@coderline/alphatab/model/Automation';
+import { Chord } from '@coderline/alphatab/model/Chord';
 import { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Score } from '@coderline/alphatab/model/Score';
@@ -26,6 +26,8 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _maxStringCount = 12;
     private static readonly _maxCellCount = 1000000;
     private static readonly _cellSize = 12;
+    private static readonly _maxTextCount = 4096;
+    private static readonly _maxChordCount = 4096;
     private static readonly _cellEnd = 4294967295;
 
     private _bytes!: Uint8Array;
@@ -61,13 +63,11 @@ export class TablEditImporter extends ScoreImporter {
         const cells = this._readContents(this._u32(60));
 
         const builder = new TefBarBuilder(this._tracks, this._measureStarts, this._measureSizes);
+        builder.initialTempo = this._u16(6) > 0 ? this._u16(6) : 120;
+        builder.initialSyncopation = Math.max(-3, Math.min(3, this._s16(12)));
+        builder.texts = this._readTexts(this._u32(84));
+        builder.chords = this._readChords(this._u32(88));
         builder.build(cells);
-
-        if (this._score.masterBars.length > 0) {
-            this._score.masterBars[0].tempoAutomations.push(
-                Automation.buildTempoAutomation(false, 0, this._u16(6) > 0 ? this._u16(6) : 120, 2)
-            );
-        }
 
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
@@ -169,6 +169,46 @@ export class TablEditImporter extends ScoreImporter {
             this._totalStrings += stringCount;
             p += recordSize;
         }
+    }
+
+    private _readTexts(offset: number): string[] {
+        const texts: string[] = [];
+        if (offset === 0) {
+            return texts;
+        }
+        const count = this._u16(offset);
+        this._ensureLoopBoundary(count, TablEditImporter._maxTextCount, 'text count');
+        let p = offset + 2;
+        for (let i = 0; i < count; i++) {
+            texts.push(this._readString(p));
+            p += 2 + this._u16(p);
+        }
+        return texts;
+    }
+
+    private _readChords(offset: number): Chord[] {
+        const chords: Chord[] = [];
+        if (offset === 0) {
+            return chords;
+        }
+        const recordSize = this._u16(offset);
+        const count = this._u16(offset + 2);
+        this._ensureLoopBoundary(count, TablEditImporter._maxChordCount, 'chord count');
+        let p = offset + 4;
+        for (let i = 0; i < count; i++) {
+            const chord = new Chord();
+            chord.name = this._readCString(p + 14, 17);
+            const stringCount = this._tracks.length > 0 ? this._tracks[0].stringCount : 6;
+            for (let s = 0; s < stringCount && s < 14; s++) {
+                const value = this._u8(p + s);
+                chord.strings.push(value === 0xff ? -1 : value & 0x1f);
+            }
+            const firstFret = this._s8(p + 31);
+            chord.firstFret = firstFret > 0 ? firstFret : 1;
+            chords.push(chord);
+            p += recordSize;
+        }
+        return chords;
     }
 
     private _readContents(offset: number): TefCell[] {
@@ -274,6 +314,11 @@ export class TablEditImporter extends ScoreImporter {
     private _s8(offset: number): number {
         const v = this._u8(offset);
         return v > 127 ? v - 256 : v;
+    }
+
+    private _s16(offset: number): number {
+        const v = this._u16(offset);
+        return v > 32767 ? v - 65536 : v;
     }
 
     private _u16(offset: number): number {
