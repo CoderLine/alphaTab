@@ -26,6 +26,27 @@ namespace AlphaTab
         }
          = new AlphaTab.Core.EcmaScript.Float32Array(0);
         
+        public AlphaTab.Core.EcmaScript.Int8Array SignedBytes
+        {
+            get;
+            set;
+        }
+         = new AlphaTab.Core.EcmaScript.Int8Array(0);
+        
+        public AlphaTab.Core.EcmaScript.Int16Array Shorts
+        {
+            get;
+            set;
+        }
+         = new AlphaTab.Core.EcmaScript.Int16Array(0);
+        
+        public AlphaTab.Core.EcmaScript.Uint16Array UnsignedShorts
+        {
+            get;
+            set;
+        }
+         = new AlphaTab.Core.EcmaScript.Uint16Array(0);
+        
         public double ByteAt(double i)
         {
             return this.Bytes[(int)(i)];
@@ -35,6 +56,18 @@ namespace AlphaTab
         public AlphaTab.Core.EcmaScript.Uint8Array MakeBuffer(double size)
         {
             return new AlphaTab.Core.EcmaScript.Uint8Array(size);
+        }
+        
+        
+        public void ResetSigned(double size)
+        {
+            this.SignedBytes = new AlphaTab.Core.EcmaScript.Int8Array(size);
+            this.SignedBytes.Fill(-1);
+            this.SignedBytes[(int)(0)] = -128;
+            this.Shorts = new AlphaTab.Core.EcmaScript.Int16Array(size);
+            this.Shorts.Fill(-1);
+            this.Shorts.Set(this.Shorts.Subarray(0, 1), 1);
+            this.UnsignedShorts.Fill(0);
         }
         
         
