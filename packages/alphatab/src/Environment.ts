@@ -7,6 +7,7 @@ import { Gp7To8Importer } from '@coderline/alphatab/importer/Gp7To8Importer';
 import { GpxImporter } from '@coderline/alphatab/importer/GpxImporter';
 import { MusicXmlImporter } from '@coderline/alphatab/importer/MusicXmlImporter';
 import type { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import { TablEditImporter } from '@coderline/alphatab/importer/TablEditImporter';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Logger } from '@coderline/alphatab/Logger';
 import type { Font } from '@coderline/alphatab/model/Font';
@@ -404,6 +405,7 @@ export class Environment {
             new Gp7To8Importer(),
             new MusicXmlImporter(),
             new CapellaImporter(),
+            new TablEditImporter(),
             new AlphaTexImporter()
         ];
     }
