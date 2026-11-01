@@ -1,6 +1,6 @@
 ---
 title: "Guitar tablature"
-description: "String-and-fret rendering, rhythm modes, small grace tabs."
+description: "String-and-fret rendering, rhythm modes, small grace tabs, transposed tabs."
 sidebar_custom_props:
   feature_chapter: notation-types
   feature_order: 20
@@ -8,6 +8,7 @@ keywords:
   - alphaTab
   - tablature
   - guitar
+  - transpose
 ---
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
@@ -40,6 +41,27 @@ When you hide standard notation, the tab staff loses stems and beams. Turn them 
 `notation.rhythmHeight` controls how far the stems drop below the tab staff (default `15`), and `notation.smallGraceTabNotes` prints grace notes at a reduced size so they don't crowd the main fret numbers.
 
 Because these are settings on the `notation` group, they apply to every staff in the render. Combine them with per-staff `showTablature` toggles when you need mixed layouts.
+
+## Transposed tablature {#transposed-tablature}
+
+[`notation.transpositionPitches`](/docs/reference/settings/notation/transpositionpitches) shifts a track by a number of semitones for display and playback. On the tab staff, a note keeps its string and fret position shifted by the transposition while that fret is playable. When the fret would drop below the open string or rise beyond the 24th fret, alphaTab moves the note to another string. It picks the position which keeps the hand closest to the surrounding notes and keeps chord notes on separate strings.
+
+Notes connected by ties, slides, and hammer-ons or pull-offs move together, so they stay on one string. Bends, slides, and vibrato never land on an open string. Natural harmonics move to the node that sounds the transposed pitch. When no string has such a node, the tab shows an artificial harmonic an octave above the fretted note.
+
+The example below is transposed down four semitones. The open strings and the low notes no longer fit on their strings:
+
+<AlphaTab
+  tex={true}
+  settings={{ notation: { transpositionPitches: [-4] } }}
+>{`
+\\track "Guitar"
+  \\staff{score tabs}
+  :4 0.6 3.5 2.4 0.3 | (0.1 0.2 0.3) 3.5 3.5 3.5 | 3.5{t} 2.3{h} 4.3 4.3{b (0 4)}
+`}</AlphaTab>
+
+A note that fits on no string of the tuning keeps its string and shows the out-of-range fret in [`display.resources.tabUnplayableFretColor`](/docs/reference/types/renderingresources/). The low E above is such a note.
+
+The new positions exist only on the rendered tab. The loaded score keeps its strings and frets, and changing `transpositionPitches` at runtime takes effect on the next `render()`. Frets count from the capo, so a capo lowers the highest usable fret. String number circles in the standard notation follow the moved strings, and left-hand finger numbers of moved notes are hidden. Chord diagrams are not transposed.
 
 ## Show it in code
 
@@ -74,5 +96,5 @@ api.scoreLoaded.on((score) => {
 - [Standard notation](/docs/features/render/standard-notation) — pair the tab staff with a score staff.
 - [Slash notation](/docs/features/render/slash-notation) — swap fret numbers for chord-rhythm slashes.
 - [Drum tablature](/docs/features/render/drum-tabs#drum-tablature) — the same tab staff for percussion tracks.
-- [`notation.rhythmMode`](/docs/reference/settings/notation/rhythmmode), [`notation.rhythmHeight`](/docs/reference/settings/notation/rhythmheight), and [`notation.smallGraceTabNotes`](/docs/reference/settings/notation/smallgracetabnotes) in the settings reference.
+- [`notation.rhythmMode`](/docs/reference/settings/notation/rhythmmode), [`notation.rhythmHeight`](/docs/reference/settings/notation/rhythmheight), [`notation.smallGraceTabNotes`](/docs/reference/settings/notation/smallgracetabnotes), and [`notation.transpositionPitches`](/docs/reference/settings/notation/transpositionpitches) in the settings reference.
 - [`Staff.showTablature`](/docs/reference/types/model/staff) in the model reference.

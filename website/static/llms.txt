@@ -60,7 +60,7 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 - [Responsive resize](https://alphatab.net/docs/features/render/responsive-resize): ResizeObserver, triggerResize(), resize event.
 - [Rendering a slice](https://alphatab.net/docs/features/render/bar-range): startBar / barCount to render partial scores.
 - [Standard notation](https://alphatab.net/docs/features/render/standard-notation): The traditional five-line staff, showStandardNotation.
-- [Guitar tablature](https://alphatab.net/docs/features/render/guitar-tablature): String-and-fret rendering, rhythm modes, small grace tabs.
+- [Guitar tablature](https://alphatab.net/docs/features/render/guitar-tablature): String-and-fret rendering, rhythm modes, small grace tabs, transposed tabs.
 - [Slash notation](https://alphatab.net/docs/features/render/slash-notation): Chord rhythm slashes, showSlash.
 - [Numbered notation (jiǎnpǔ)](https://alphatab.net/docs/features/render/numbered-notation): Cipher notation, showNumbered.
 - [Drum and percussion notation](https://alphatab.net/docs/features/render/drum-tabs): Percussion staff with 1/2/3 lines, drum piece heads.
