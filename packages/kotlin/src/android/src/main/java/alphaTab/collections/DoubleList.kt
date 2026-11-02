@@ -168,7 +168,7 @@ public class DoubleList : IDoubleIterable {
     }
 
     public fun spread(): DoubleArray {
-        return _items;
+        return if (_size == _items.size) _items else _items.copyOf(_size)
     }
 
     public override fun iterator(): DoubleIterator {
