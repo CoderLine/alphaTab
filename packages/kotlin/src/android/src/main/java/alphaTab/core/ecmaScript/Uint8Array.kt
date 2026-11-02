@@ -22,6 +22,13 @@ public class Uint8Array : Iterable<UByte> {
     public constructor() : this(UByteArray(0)) {
     }
 
+    public constructor(other: Uint8Array) {
+        val start = other.byteOffset.toInt()
+        this.buffer = other.buffer.copyOfRange(start, start + other.length.toInt())
+        this.length = other.length
+        this.byteOffset = 0.0
+    }
+
     public constructor(data: UByteArray) {
         this.buffer = data
         this.length = data.size.toDouble()
@@ -77,7 +84,11 @@ public class Uint8Array : Iterable<UByte> {
     }
 
     public fun fill(value: Double) {
-        val start = byteOffset.toInt()
-        buffer.fill(value.toInt().toUByte(), start, start + length.toInt())
+        fill(value, 0.0, length)
+    }
+
+    public fun fill(value: Double, start: Double, end: Double) {
+        val offset = byteOffset.toInt()
+        buffer.fill(value.toInt().toUByte(), offset + start.toInt(), offset + end.toInt())
     }
 }

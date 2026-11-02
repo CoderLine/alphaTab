@@ -115,18 +115,23 @@ public class Uint8Array : IEnumerable<byte>, IEnumerable<double>
 
     public void Fill(double value)
     {
-        var start = (int)ByteOffset;
-        var length = (int)Length;
+        Fill(value, 0, Length);
+    }
+
+    public void Fill(double value, double start, double end)
+    {
+        var length = (int)end - (int)start;
+        var from = (int)ByteOffset + (int)start;
         if (value == 0)
         {
-            System.Array.Clear(Buffer.Raw, start, length);
+            System.Array.Clear(Buffer.Raw, from, length);
         }
         else
         {
             var b = (byte)value;
             for (var i = 0; i < length; i++)
             {
-                Buffer.Raw[start + i] = b;
+                Buffer.Raw[from + i] = b;
             }
         }
     }

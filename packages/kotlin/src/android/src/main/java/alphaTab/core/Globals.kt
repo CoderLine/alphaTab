@@ -39,8 +39,8 @@ internal inline fun UByteArray.decodeToDoubleArray(): DoubleArray {
     return da
 }
 
-internal inline fun <T : Comparable<T>> List<T>.sort() {
-    this.sort { a, b ->
+internal inline fun <T : Comparable<T>> List<T>.sort(): List<T> {
+    return this.sort { a, b ->
         a.compareTo(b).toDouble()
     }
 }

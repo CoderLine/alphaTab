@@ -223,6 +223,23 @@ public class DoubleList : IDoubleIterable {
         return accumulator
     }
 
+    public fun includes(value: Double): Boolean {
+        for (i in 0 until _size) {
+            if (_items[i] == value) {
+                return true
+            }
+        }
+        return false
+    }
+
+    public fun <TOut> flatMap(transform: (v: Double) -> Iterable<TOut>): List<TOut> {
+        val result = List<TOut>()
+        for (i in 0 until _size) {
+            result.push(transform(_items[i]))
+        }
+        return result
+    }
+
     public fun some(predicate: (Double) -> Boolean): Boolean {
         for (el in this) {
             if(predicate(el)) {
