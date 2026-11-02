@@ -1,6 +1,11 @@
 import { FormatError } from '@coderline/alphatab/FormatError';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { TefBarBuilder, TefCell, TefTrackInfo } from '@coderline/alphatab/importer/tablEdit/TefBarBuilder';
+import {
+    TefReadingGuide,
+    TefReadingList,
+    TefReadingListItem
+} from '@coderline/alphatab/importer/tablEdit/TefReadingList';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { OverflowError } from '@coderline/alphatab/io/IReadable';
@@ -27,6 +32,8 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _maxCellCount = 1000000;
     private static readonly _cellSize = 12;
     private static readonly _maxTextCount = 4096;
+    private static readonly _maxReadingListCount = 4096;
+    private static readonly _readingGuideMarker = 0xb7;
     private static readonly _maxChordCount = 4096;
     private static readonly _cellEnd = 4294967295;
 
@@ -69,9 +76,13 @@ export class TablEditImporter extends ScoreImporter {
         builder.chords = this._readChords(this._u32(88));
         builder.build(cells);
 
+        const readingList = this._readReadingList(this._u32(128));
+        TefReadingList.apply(this._score, readingList, this._readGuides(cells));
+
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
+        TefReadingList.verify(this._score, readingList);
         return this._score;
     }
 
@@ -169,6 +180,43 @@ export class TablEditImporter extends ScoreImporter {
             this._totalStrings += stringCount;
             p += recordSize;
         }
+    }
+
+    private _readReadingList(offset: number): TefReadingListItem[] {
+        const items: TefReadingListItem[] = [];
+        if (offset === 0) {
+            return items;
+        }
+        const recordSize = this._u16(offset);
+        const count = this._u16(offset + 2);
+        this._ensureLoopBoundary(count, TablEditImporter._maxReadingListCount, 'reading list count');
+        let p = offset + 4;
+        for (let i = 0; i < count; i++) {
+            const item = new TefReadingListItem();
+            item.first = this._u16(p) - 1;
+            item.last = this._u16(p + 2) - 1;
+            item.label = this._readCString(p + 4, recordSize - 4);
+            items.push(item);
+            p += recordSize;
+        }
+        return items;
+    }
+
+    private _readGuides(cells: TefCell[]): TefReadingGuide[] {
+        const guides: TefReadingGuide[] = [];
+        for (const cell of cells) {
+            if (cell.data[0] === TablEditImporter._readingGuideMarker) {
+                const guide = new TefReadingGuide();
+                let bar = 0;
+                while (bar + 1 < this._measureStarts.length && this._measureStarts[bar + 1] <= cell.position) {
+                    bar++;
+                }
+                guide.bar = bar;
+                guide.value = cell.data[2];
+                guides.push(guide);
+            }
+        }
+        return guides;
     }
 
     private _readTexts(offset: number): string[] {
