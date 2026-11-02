@@ -17,7 +17,7 @@ function openInputFile(api: alphaTab.AlphaTabApi) {
     const input = document.createElement('input');
     input.type = 'file';
     if (!isIOS()) {
-        input.accept = '.gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.mxml,.xml,.capx';
+        input.accept = '.gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.mxml,.xml,.capx,.tef';
     }
     input.onchange = () => {
         if (input.files?.length === 1) {

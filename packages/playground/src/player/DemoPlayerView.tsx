@@ -48,7 +48,7 @@ export interface DemoPlayerViewProps {
     scoreOverlay?: React.ReactNode;
 }
 
-const FILE_ACCEPT = '.gp,.gp3,.gp4,.gp5,.gpx,.gp7,.gp8,.xml,.musicxml,.mxl,.capx,.alphatex,.atex,.tex,.txt';
+const FILE_ACCEPT = '.gp,.gp3,.gp4,.gp5,.gpx,.gp7,.gp8,.xml,.musicxml,.mxl,.capx,.tef,.alphatex,.atex,.tex,.txt';
 const noop = () => {};
 
 /**

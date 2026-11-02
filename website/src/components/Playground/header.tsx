@@ -24,7 +24,7 @@ export type PanelId = 'editor' | 'tracks' | 'settings' | 'sync';
 
 const FILE_ACCEPT = [
     '.gp', '.gp3', '.gp4', '.gp5', '.gpx', '.gp7', '.gp8',
-    '.xml', '.musicxml', '.mxl', '.capx',
+    '.xml', '.musicxml', '.mxl', '.capx', '.tef',
     '.alphatex', '.atex', '.tex', '.txt',
 ].join(',');
 

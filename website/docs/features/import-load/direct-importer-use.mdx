@@ -44,7 +44,7 @@ The bytes method is what you reach for on Node.js and every non-browser runtime.
 - `UnsupportedFormatError` — raised by `ScoreLoader` when no importer accepts the bytes.
 - `alphaTex` — a nested namespace with the lexer / parser primitives for advanced tooling.
 
-The format-specific importers (`Gp7To8Importer`, `Gp3To5Importer`, `MusicXmlImporter`, `CapellaImporter`, `GpxImporter`) are internal — `ScoreLoader.loadScoreFromBytes` selects and drives them for you. Instantiate a `ScoreLoader` or an `AlphaTexImporter`; leave the rest to the loader.
+The format-specific importers (`Gp7To8Importer`, `Gp3To5Importer`, `MusicXmlImporter`, `CapellaImporter`, `TablEditImporter`, `GpxImporter`) are internal — `ScoreLoader.loadScoreFromBytes` selects and drives them for you. Instantiate a `ScoreLoader` or an `AlphaTexImporter`; leave the rest to the loader.
 
 ## Show it in code
 

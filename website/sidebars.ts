@@ -125,6 +125,7 @@ const sidebars: SidebarsConfig = {
           "formats/guitar-pro-3-5",
           "formats/musicxml",
           "formats/capella",
+          "formats/tabledit",
         ],
       },
       {

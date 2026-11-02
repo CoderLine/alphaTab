@@ -6,7 +6,7 @@ import styles from './overlays.module.scss';
 
 /** The drop target hint shown while a file is dragged over a player view. */
 export const DropOverlay: React.FC<{ hint?: React.ReactNode; className?: string }> = ({
-    hint = 'Guitar Pro 3–8, MusicXML, Capella or alphaTex',
+    hint = 'Guitar Pro 3–8, MusicXML, Capella, TablEdit or alphaTex',
     className
 }) => (
     <div className={clsx(styles.dropOverlay, className)} aria-hidden="true">
