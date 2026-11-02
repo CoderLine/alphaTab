@@ -49,7 +49,10 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _chordStringBytes = 14;
     private static readonly _bankMsbFactor = 128;
     private static readonly _letRingOption = 0x0200;
-    private static readonly _abbreviationSeparator = '^';
+    private static readonly _nameOffset = 32;
+    private static readonly _nameLength = 36;
+    private static readonly _abbreviationOffset = 26;
+    private static readonly _abbreviationMark = 0x5e;
     private static readonly _cellEnd = 4294967295;
 
     private _data!: TefBinary;
@@ -272,13 +275,14 @@ export class TablEditImporter extends ScoreImporter {
             track.ensureStaveCount(1);
             const staff: Staff = track.staves[0];
             this._score.addTrack(track);
-            const name = data.readCString(p + 32, 36);
-            const separator = name.indexOf(TablEditImporter._abbreviationSeparator);
-            if (separator >= 0) {
-                track.name = name.substring(0, separator).trim();
-                track.shortName = name.substring(separator + 1).trim();
-            } else {
-                track.name = name;
+            track.name = data.readCString(p + TablEditImporter._nameOffset, TablEditImporter._nameLength);
+            // the bytes between the name and the abbreviation are leftovers of earlier names
+            const abbreviation = p + TablEditImporter._nameOffset + TablEditImporter._abbreviationOffset;
+            if (data.u8(abbreviation) === TablEditImporter._abbreviationMark) {
+                track.shortName = data.readCString(
+                    abbreviation + 1,
+                    TablEditImporter._nameLength - TablEditImporter._abbreviationOffset - 1
+                );
             }
             track.playbackInfo.program = data.u8(p + 8);
             track.playbackInfo.bank = data.u8(p + 9) * TablEditImporter._bankMsbFactor;
