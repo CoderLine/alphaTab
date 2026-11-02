@@ -11,9 +11,10 @@ import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { OverflowError } from '@coderline/alphatab/io/IReadable';
 import { Chord } from '@coderline/alphatab/model/Chord';
 import { Clef } from '@coderline/alphatab/model/Clef';
+import { Duration } from '@coderline/alphatab/model/Duration';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
-import { MasterBar } from '@coderline/alphatab/model/MasterBar';
+import { BeamingRules, MasterBar } from '@coderline/alphatab/model/MasterBar';
 import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Score } from '@coderline/alphatab/model/Score';
 import type { Staff } from '@coderline/alphatab/model/Staff';
@@ -37,10 +38,17 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _drumFlag = 0x80;
     private static readonly _pickupFlag = 0x08;
     private static readonly _minorFlag = 0x20;
+    private static readonly _freeBarFlags = 0x06;
+    private static readonly _halfBarBeamingFlag = 0x04;
     private static readonly _maxTextCount = 4096;
     private static readonly _maxReadingListCount = 4096;
     private static readonly _readingGuideMarker = 0xb7;
     private static readonly _maxChordCount = 4096;
+    private static readonly _readingListRecordSize = 0x20;
+    private static readonly _chordStringBytes = 14;
+    private static readonly _bankMsbFactor = 128;
+    private static readonly _letRingOption = 0x0200;
+    private static readonly _abbreviationSeparator = '^';
     private static readonly _cellEnd = 4294967295;
 
     private _bytes!: Uint8Array;
@@ -84,19 +92,20 @@ export class TablEditImporter extends ScoreImporter {
         builder.initialSyncopation = Math.max(-3, Math.min(3, this._s16(12)));
         builder.texts = this._readTexts(this._u32(84));
         builder.chords = this._readChords(this._u32(88));
+        builder.version = this._u16(2);
         builder.build(cells);
         builder.applyLyrics(this._readString(this._u32(80)));
 
-        for (const track of this._score.tracks) {
-            const bars = track.staves[0].bars;
+        for (const info of this._tracks) {
+            const bars = info.track.staves[0].bars;
             for (let b = 0; b < bars.length && b < this._keys.length; b++) {
-                bars[b].keySignature = Math.max(-7, Math.min(7, this._keys[b])) as KeySignature;
+                bars[b].keySignature = TablEditImporter._writtenKey(this._keys[b], info.keyShift);
                 bars[b].keySignatureType = this._minorBars.has(b) ? KeySignatureType.Minor : KeySignatureType.Major;
             }
         }
 
         const readingList = this._readReadingList(this._u32(128));
-        TefReadingList.apply(this._score, readingList, this._readGuides(cells));
+        TefReadingList.apply(this._score, readingList, readingList.length > 0 ? [] : this._readGuides(cells));
 
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
@@ -162,11 +171,38 @@ export class TablEditImporter extends ScoreImporter {
             if (size <= 0 || size > 1024 || size !== Math.floor(size)) {
                 size = 64;
             }
+            if ((flags & TablEditImporter._freeBarFlags) !== 0) {
+                masterBar.beamingRules = TablEditImporter._freeBarBeaming(
+                    masterBar,
+                    size,
+                    (flags & TablEditImporter._halfBarBeamingFlag) !== 0
+                );
+            }
             this._measureStarts.push(position);
             this._measureSizes.push(size);
             position += size;
             p += recordSize;
         }
+    }
+
+    /**
+     * Free bars beam their eighths across the whole bar or across each half.
+     */
+    private static _freeBarBeaming(masterBar: MasterBar, size: number, halves: boolean): BeamingRules {
+        const eighths = Math.max(1, Math.floor(size / 8));
+        const groups: number[] = [];
+        if (halves && eighths > 1) {
+            groups.push(Math.ceil(eighths / 2));
+            groups.push(Math.floor(eighths / 2));
+        } else {
+            groups.push(eighths);
+        }
+        return BeamingRules.createSimple(
+            masterBar.timeSignatureNumerator,
+            masterBar.timeSignatureDenominator,
+            Duration.Eighth,
+            groups
+        );
     }
 
     private _readInstruments(offset: number): void {
@@ -185,9 +221,16 @@ export class TablEditImporter extends ScoreImporter {
             track.ensureStaveCount(1);
             const staff: Staff = track.staves[0];
             this._score.addTrack(track);
-            track.name = this._readCString(p + 32, 36);
+            const name = this._readCString(p + 32, 36);
+            const separator = name.indexOf(TablEditImporter._abbreviationSeparator);
+            if (separator >= 0) {
+                track.name = name.substring(0, separator).trim();
+                track.shortName = name.substring(separator + 1).trim();
+            } else {
+                track.name = name;
+            }
             track.playbackInfo.program = this._u8(p + 8);
-            track.playbackInfo.bank = this._u8(p + 9);
+            track.playbackInfo.bank = this._u8(p + 9) * TablEditImporter._bankMsbFactor;
 
             const capo = this._u16(p + 12);
             const openPitches: number[] = [];
@@ -204,8 +247,8 @@ export class TablEditImporter extends ScoreImporter {
                 }
                 staff.stringTuning.tunings = tuning;
             }
-            staff.displayTranspositionPitch =
-                this._s8(p + 14) - 12 - TablEditImporter._transpositionOf(this._u8(p + 11) & 0x07);
+            const transposition = this._u8(p + 11) & 0x07;
+            staff.displayTranspositionPitch = this._s8(p + 14) - 12 - TablEditImporter._transpositionOf(transposition);
 
             switch ((this._u8(p + 16) >> 4) & 0x03) {
                 case 1:
@@ -231,6 +274,8 @@ export class TablEditImporter extends ScoreImporter {
             info.openPitches = openPitches;
             info.isPercussion = isPercussion;
             info.clef = TablEditImporter._clefOf(this._u8(p + 15) & 0x07, openPitches);
+            info.keyShift = (transposition & 0x03) === 0 ? 0 : 4 - transposition;
+            info.isLetRing = (this._u16(p + 18) & TablEditImporter._letRingOption) !== 0;
             this._tracks.push(info);
             this._totalStrings += stringCount;
             p += recordSize;
@@ -243,6 +288,9 @@ export class TablEditImporter extends ScoreImporter {
             return items;
         }
         const recordSize = this._u16(offset);
+        if (recordSize !== TablEditImporter._readingListRecordSize) {
+            return items;
+        }
         const count = this._u16(offset + 2);
         this._ensureLoopBoundary(count, TablEditImporter._maxReadingListCount, 'reading list count');
         let p = offset + 4;
@@ -289,6 +337,10 @@ export class TablEditImporter extends ScoreImporter {
         return texts;
     }
 
+    /**
+     * Reads the chord diagrams with one fret per string slot. The records do not say which instrument
+     * they belong to, the strings are cut to the instrument when the chord is attached.
+     */
     private _readChords(offset: number): Chord[] {
         const chords: Chord[] = [];
         if (offset === 0) {
@@ -301,8 +353,7 @@ export class TablEditImporter extends ScoreImporter {
         for (let i = 0; i < count; i++) {
             const chord = new Chord();
             chord.name = this._readCString(p + 14, 17);
-            const stringCount = this._tracks.length > 0 ? this._tracks[0].stringCount : 6;
-            for (let s = 0; s < stringCount && s < 14; s++) {
+            for (let s = 0; s < TablEditImporter._chordStringBytes; s++) {
                 const value = this._u8(p + s);
                 chord.strings.push(value === 0xff ? -1 : value & 0x1f);
             }
@@ -312,6 +363,19 @@ export class TablEditImporter extends ScoreImporter {
             p += recordSize;
         }
         return chords;
+    }
+
+    /**
+     * The key shown for an instrument whose written key is shifted by the given number of sharps.
+     */
+    private static _writtenKey(key: number, shift: number): KeySignature {
+        let written = key + shift;
+        if (written > 7) {
+            written -= 12;
+        } else if (written < -7) {
+            written += 12;
+        }
+        return Math.max(-7, Math.min(7, written)) as KeySignature;
     }
 
     /**
