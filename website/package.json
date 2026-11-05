@@ -40,7 +40,7 @@
     "webpack": "^5.98.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.3",
+    "@biomejs/biome": "^2.6.4",
     "@coderline/alphatab-language-server": "*",
     "@coderline/alphatab-webpack": "*",
     "@docusaurus/faster": "3.10.2",
