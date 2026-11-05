@@ -36,7 +36,7 @@
     "prism-react-renderer": "^2.4.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-tooltip": "^5.28.1",
+    "react-tooltip": "^6.0.9",
     "webpack": "^5.98.0"
   },
   "devDependencies": {
