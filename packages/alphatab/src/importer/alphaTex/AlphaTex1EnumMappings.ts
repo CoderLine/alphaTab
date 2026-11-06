@@ -1,3 +1,4 @@
+import type { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import type {
     AlphaTexAccidentalMode,
     AlphaTexStaffType,
@@ -30,7 +31,6 @@ import type { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import type { TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
 import type { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import type { WhammyType } from '@coderline/alphatab/model/WhammyType';
-import type { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import type { TextAlign } from '@coderline/alphatab/platform/ICanvas';
 /**
  * @internal

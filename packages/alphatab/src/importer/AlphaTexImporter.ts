@@ -300,10 +300,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
         for (const [sustainPedal, beat] of this._state.sustainPedalToBeat) {
             if (sustainPedal.ratioPosition < 1) {
-                sustainPedal.ratioPosition = ModelUtils.tickToRatioPosition(
-                    beat.voice.bar.masterBar,
-                    beat.playbackStart
-                );
+                sustainPedal.ratioPosition = ModelUtils.tickToRatioPosition(beat.voice.bar.masterBar, beat.playbackStart);
             }
         }
         return this._state.score;
@@ -721,10 +718,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
                     if (node.noteString) {
                         const percussionNoteString: number = node.noteString!.value;
-                        if (
-                            percussionNoteString < 1 ||
-                            percussionNoteString > this._state.currentStaff!.tuning.length
-                        ) {
+                        if (percussionNoteString < 1 || percussionNoteString > this._state.currentStaff!.tuning.length) {
                             this.addSemanticDiagnostic({
                                 code: AlphaTexDiagnosticCode.AT208,
                                 message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,

@@ -1,11 +1,14 @@
-import { CapellaParser } from '@coderline/alphatab/importer/CapellaParser';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
-import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import { Logger } from '@coderline/alphatab/Logger';
+
 import type { Score } from '@coderline/alphatab/model/Score';
-import type { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
+
+import { Logger } from '@coderline/alphatab/Logger';
+
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import type { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { CapellaParser } from '@coderline/alphatab/importer/CapellaParser';
 
 /**
  * This ScoreImporter can read Capella (cap/capx) files.

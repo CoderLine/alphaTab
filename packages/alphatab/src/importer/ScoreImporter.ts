@@ -1,4 +1,4 @@
-import { type IReadable, ThrowingReadable } from '@coderline/alphatab/io/IReadable';
+import { ThrowingReadable, type IReadable } from '@coderline/alphatab/io/IReadable';
 import { Score } from '@coderline/alphatab/model/Score';
 import type { Settings } from '@coderline/alphatab/Settings';
 

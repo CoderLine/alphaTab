@@ -1,14 +1,17 @@
 import { BinaryStylesheet } from '@coderline/alphatab/importer/BinaryStylesheet';
 import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
-import { LayoutConfiguration } from '@coderline/alphatab/importer/LayoutConfiguration';
 import { PartConfiguration } from '@coderline/alphatab/importer/PartConfiguration';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
-import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import { Logger } from '@coderline/alphatab/Logger';
+
 import type { Score } from '@coderline/alphatab/model/Score';
-import type { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
+
+import { Logger } from '@coderline/alphatab/Logger';
+
 import { ZipReader } from '@coderline/alphatab/zip/ZipReader';
+import type { ZipEntry } from '@coderline/alphatab/zip/ZipEntry';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { LayoutConfiguration } from '@coderline/alphatab/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 7 and 8 (gp) files.
@@ -63,10 +66,10 @@ export class Gp7To8Importer extends ScoreImporter {
         // the score information as XML we need to parse.
         Logger.trace(this.name, 'Start Parsing score.gpif');
         const gpifParser: GpifParser = new GpifParser();
-        gpifParser.loadAsset = fileName => {
-            if (entryLookup.has(fileName)) {
+        gpifParser.loadAsset = (fileName) => {
+            if(entryLookup.has(fileName)) {
                 return entryLookup.get(fileName)!.data;
-            }
+            };
             return undefined;
         };
         gpifParser.parseXml(xml, this.settings);
@@ -75,10 +78,7 @@ export class Gp7To8Importer extends ScoreImporter {
 
         if (binaryStylesheetData) {
             Logger.trace(this.name, 'Start Parsing BinaryStylesheet');
-            const stylesheet: BinaryStylesheet = new BinaryStylesheet(
-                binaryStylesheetData,
-                this.settings.importer.maxDecodingBufferSize
-            );
+            const stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData, this.settings.importer.maxDecodingBufferSize);
             stylesheet.apply(score);
             Logger.trace(this.name, 'BinaryStylesheet parsed');
         }

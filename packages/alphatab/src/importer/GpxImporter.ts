@@ -1,13 +1,13 @@
 import { BinaryStylesheet } from '@coderline/alphatab/importer/BinaryStylesheet';
 import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { GpxFileSystem } from '@coderline/alphatab/importer/GpxFileSystem';
-import { LayoutConfiguration } from '@coderline/alphatab/importer/LayoutConfiguration';
 import { PartConfiguration } from '@coderline/alphatab/importer/PartConfiguration';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
+import type { Score } from '@coderline/alphatab/model/Score';
+import { Logger } from '@coderline/alphatab/Logger';
 import { UnsupportedFormatError } from '@coderline/alphatab/importer/UnsupportedFormatError';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import { Logger } from '@coderline/alphatab/Logger';
-import type { Score } from '@coderline/alphatab/model/Score';
+import { LayoutConfiguration } from '@coderline/alphatab/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 6 (gpx) files.
@@ -70,10 +70,7 @@ export class GpxImporter extends ScoreImporter {
 
         if (binaryStylesheetData) {
             Logger.trace(this.name, 'Start Parsing BinaryStylesheet');
-            const binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(
-                binaryStylesheetData,
-                this.settings.importer.maxDecodingBufferSize
-            );
+            const binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData, this.settings.importer.maxDecodingBufferSize);
             binaryStylesheet.apply(score);
             Logger.trace(this.name, 'BinaryStylesheet parsed');
         }

@@ -1,11 +1,10 @@
-import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
-import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
+import { type HeaderFooterStyle, type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
-import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { GpBinaryHelpers } from '@coderline/alphatab/importer/Gp3To5Importer';
 import { BendPoint } from '@coderline/alphatab/model/BendPoint';
+import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 import { Color } from '@coderline/alphatab/model/Color';
-import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import {
     BarNumberDisplay,
     type BracketExtendMode,
@@ -14,9 +13,10 @@ import {
     TrackNamePolicy,
     TuningDisplayMode
 } from '@coderline/alphatab/model/RenderStylesheet';
-import { type HeaderFooterStyle, type Score, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import type { IWriteable } from '@coderline/alphatab/io/IWriteable';
+import { AlphaTabError, AlphaTabErrorType } from '@coderline/alphatab/AlphaTabError';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { TextAlign } from '@coderline/alphatab/platform/ICanvas';
-import { Bounds } from '@coderline/alphatab/rendering/utils/Bounds';
 
 /**
  * @internal
@@ -625,7 +625,7 @@ export class BinaryStylesheet {
                 binaryStylesheet.addValue('Global/TuningDisplayMode', 0, DataType.Integer);
                 break;
         }
-
+        
         const writer = ByteBuffer.withCapacity(128);
         binaryStylesheet.writeTo(writer);
         return writer.toArray();
