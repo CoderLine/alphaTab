@@ -897,6 +897,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     this.write(arrayTupleType.types.length.toString());
                     this.write('<');
                     this.writeCommaSeparated(arrayTupleType.types, p => this.writeType(p));
+                    this.write('>');
                 } else {
                     let arrayTupleName = '';
                     const newTypeArgs: cs.TypeNode[] = [];
