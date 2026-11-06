@@ -235,6 +235,10 @@ export class TefBarBuilder {
     private static readonly _lyricsTextPrefix = '>';
     private static readonly _lyricsSectionStart = '\n>';
     private static readonly _noChord = 0xffff;
+    /**
+     * The primary effect matching each combination effect; 3 (roll) and 7 (artificial harmonic) differ.
+     */
+    private static readonly _combinationEffects = [0, 1, 2, 0, 0, 5, 6, 0, 0x11, 0x14, 15, 0, 0, 0, 0, 0];
 
     private static readonly _durations: (TefDuration | null)[] = [
         new TefDuration(Duration.Whole, 0, -1, -1),
@@ -1634,10 +1638,6 @@ export class TefBarBuilder {
 
         TefBarBuilder._applyEffect(beat, note, e, unit, effect, parameter, hasParameterByte);
         switch (combination) {
-            case 1:
-            case 2:
-                note.isHammerPullOrigin = true;
-                break;
             case 3:
                 TefBarBuilder._applyBrush(
                     beat,
@@ -1647,25 +1647,20 @@ export class TefBarBuilder {
                     hasParameterByte && (parameter & 0x0f) !== 0 ? parameter & 0x07 : 4
                 );
                 break;
-            case 5:
-                TefBarBuilder._applyEffect(beat, note, e, unit, 5, parameter, hasParameterByte);
-                break;
-            case 6:
-                note.harmonicType = HarmonicType.Natural;
-                note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
-                break;
             case 7:
                 note.harmonicType = HarmonicType.Artificial;
                 note.harmonicValue = 12;
                 break;
-            case 8:
-                note.isLetRing = true;
-                break;
-            case 9:
-                note.isGhost = true;
-                break;
-            case 10:
-                note.isDead = true;
+            default:
+                TefBarBuilder._applyEffect(
+                    beat,
+                    note,
+                    e,
+                    unit,
+                    TefBarBuilder._combinationEffects[combination],
+                    parameter,
+                    hasParameterByte
+                );
                 break;
         }
         if (info.isLetRing) {
