@@ -343,11 +343,15 @@ export class TefFormat2Reader {
         return raw;
     }
 
+    /**
+     * Reads the reading list; a list longer than TablEdit allows is skipped.
+     */
     private _readReadingList(count: number, measureCount: number): void {
-        if (count === 0 || count > TefFormat2Reader._maxReadingListCount) {
+        const wide = measureCount > TefFormat2Reader._wideReadingListMeasures;
+        if (count > TefFormat2Reader._maxReadingListCount) {
+            this._skip(count * (wide ? 4 : 2));
             return;
         }
-        const wide = measureCount > TefFormat2Reader._wideReadingListMeasures;
         for (let i = 0; i < count; i++) {
             const item = new TefReadingListItem();
             if (wide) {
@@ -368,13 +372,10 @@ export class TefFormat2Reader {
             const length = this._data.u16(this._p);
             const entry = this._data.u16(this._p + 2);
             this._p += 4;
-            if (length > 0 && entry < TefFormat2Reader._maxLabelEntry) {
-                const label = this._data.readCString(this._p, length);
-                if (entry < this.readingList.length) {
-                    this.readingList[entry].label = label;
-                }
-                this._p += length;
+            if (length > 0 && entry < TefFormat2Reader._maxLabelEntry && entry < this.readingList.length) {
+                this.readingList[entry].label = this._data.readCString(this._p, length);
             }
+            this._skip(length);
         }
     }
 
@@ -551,7 +552,7 @@ export class TefFormat2Reader {
             case TefFormat2Reader._crescendoCell:
                 data[0] = TefFormat2Reader._currentCrescendo;
                 data[1] = b2;
-                data[2] = ((b2 & 0x0f) * 4 + b3) * 4;
+                data[2] = (((b2 & 0x0f) * 4 + b3) * 4) & 0xff;
                 data[6] = TefFormat2Reader._defaultCrescendoAmount;
                 return data;
             case TefFormat2Reader._connectionCell:

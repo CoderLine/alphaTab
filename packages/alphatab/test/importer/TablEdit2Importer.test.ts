@@ -2,6 +2,7 @@ import { FormatError } from '@coderline/alphatab/FormatError';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { TablEditImporter } from '@coderline/alphatab/importer/TablEditImporter';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
+import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
 import { type Beat, BeatBeamingMode } from '@coderline/alphatab/model/Beat';
@@ -70,6 +71,14 @@ describe('TablEdit2ImporterTest', () => {
 
     function beats(score: Score, bar: number, voice: number = 0, track: number = 0): Beat[] {
         return score.tracks[track].staves[0].bars[bar].voices[voice].beats;
+    }
+
+    /**
+     * The offset of the given cell record; the records start at 258 with 6 bytes each.
+     */
+    function cellRecord(data: Uint8Array, index: number): number {
+        expect(index).toBeLessThanOrEqual(data[256] | (data[257] << 8));
+        return 258 + index * 6;
     }
 
     function noteNames(beat: Beat): string[] {
@@ -290,6 +299,70 @@ describe('TablEdit2ImporterTest', () => {
             expect(score.masterBars.map(m => m.isRepeatStart)).toEqual([true, false, false, false]);
             expect(score.masterBars.map(m => m.repeatCount)).toEqual([0, 2, 0, 0]);
             expect(score.masterBars[0].section!.text).toBe('Start');
+        });
+
+        it('markers-crescendo-length', async () => {
+            // the crescendo at 2.16 with B3 = 0x41: TablEdit stores ((B2 & 0xF) * 4 + B3) * 4 = 260 64ths in
+            // a byte, which keeps 4 64ths, the first eighth
+            const data = await loadData('markers');
+            const cell = cellRecord(data, 10);
+            expect(data[cell + 2]).toBe(0x9e);
+            data[cell + 4] = 0x41;
+            expect(beats(readBytes(data), 1).map(b => b.crescendo)).toEqual([
+                CrescendoType.None,
+                CrescendoType.None,
+                CrescendoType.Crescendo,
+                CrescendoType.None,
+                CrescendoType.Decrescendo,
+                CrescendoType.Decrescendo,
+                CrescendoType.None,
+                CrescendoType.None
+            ]);
+        });
+
+        it('reading-list-too-long', async () => {
+            // markers.tef with 97 reading-list entries, more than TablEdit keeps: the list is dropped, the blocks
+            // after it are read
+            const plain = await loadData('markers');
+            const list = cellRecord(plain, plain[256] | (plain[257] << 8));
+            const entries = 97;
+            const data = new Uint8Array(plain.length + (entries - 2) * 2);
+            data.set(plain.subarray(0, list), 0);
+            for (let i = 0; i < entries; i++) {
+                data[list + i * 2] = 1;
+                data[list + i * 2 + 1] = 4;
+            }
+            data.set(plain.subarray(list + 4, plain.length), list + entries * 2);
+            data[222] = entries;
+            const score = readBytes(data);
+            expect(score.masterBars.some(m => m.isRepeatStart || m.repeatCount > 0)).toBe(false);
+            expect(score.masterBars[0].section).toBe(null);
+            expect(beats(score, 0)[0].text).toBe('Intro');
+            expect(beats(score, 2)[2].text).toBe('Fine');
+            expect(score.tracks[0].staves[0].chords!.get(beats(score, 2)[0].chordId!)!.name).toBe('G');
+            const patch = beats(score, 3)[0].automations.find(a => a.type === AutomationType.Instrument);
+            expect(patch!.value).toBe(24);
+        });
+
+        it('reading-list-label-entries', async () => {
+            // markers.tef with a label for entry 0x60 before the label 'Start': TablEdit skips its text
+            const plain = await loadData('markers');
+            let start = -1;
+            for (let i = 256; i + 5 <= plain.length; i++) {
+                if (IOHelper.toString(plain.subarray(i, i + 5), 'utf-8') === 'Start') {
+                    start = i - 4;
+                }
+            }
+            expect(start).toBeGreaterThan(0);
+            const label = [3, 0, 0x60, 0, 0x41, 0x42, 0x43];
+            const data = new Uint8Array(plain.length + label.length);
+            data.set(plain.subarray(0, start), 0);
+            for (let i = 0; i < label.length; i++) {
+                data[start + i] = label[i];
+            }
+            data.set(plain.subarray(start, plain.length), start + label.length);
+            data[225] = 2;
+            expect(readBytes(data).masterBars[0].section!.text).toBe('Start');
         });
 
         it('measures', async () => {
