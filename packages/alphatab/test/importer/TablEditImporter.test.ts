@@ -356,6 +356,12 @@ describe('TablEditImporterTest', () => {
             const data = await loadHealthy();
             setU32(data, 16, 1);
             expect(() => readBytes(data)).toThrow(FormatError);
+            // TablEdit ignores the protection code of files older than 3.04 b6 (version 0x0304, sub-version 0xB6)
+            setU16(data, 2, 0x0304);
+            setU16(data, 4, 0xb5);
+            expect(readBytes(data).masterBars.length).toBe(5);
+            setU16(data, 4, 0xb6);
+            expect(() => readBytes(data)).toThrow(FormatError);
         });
 
         it('newer-format', async () => {

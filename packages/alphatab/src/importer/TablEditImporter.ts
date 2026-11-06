@@ -54,6 +54,10 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _abbreviationOffset = 26;
     private static readonly _abbreviationMark = 0x5e;
     private static readonly _cellEnd = 4294967295;
+    /**
+     * Older files may carry a stale protection code, which TablEdit ignores.
+     */
+    private static readonly _protectionVersion = 0x030400b6;
 
     private _data!: TefBinary;
     private _score!: Score;
@@ -110,7 +114,9 @@ export class TablEditImporter extends ScoreImporter {
     }
 
     private _readFormat3(format: number): TefBarBuilder {
-        if (this._u32(16) !== 0 || format === TablEditImporter._protectedFormat) {
+        const version = this._u16(2) * 0x10000 + this._u16(4);
+        const isProtected = version >= TablEditImporter._protectionVersion && this._u32(16) !== 0;
+        if (isProtected || format === TablEditImporter._protectedFormat) {
             throw new FormatError('Protected TablEdit files are not supported');
         }
         this._readInformation();
