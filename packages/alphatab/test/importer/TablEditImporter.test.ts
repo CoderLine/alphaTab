@@ -2144,6 +2144,18 @@ describe('TablEditImporterTest', () => {
             ]);
         });
 
+        it('markers-slur-length', async () => {
+            // a slur at 1.0 with the length byte 0x9F: files older than 3.06 A4 keep the dashed flag in bit 7,
+            // so it covers 32 64ths, newer files 160 64ths
+            const cells: [number, number, number[]][] = [[0, 1, [0x3d, 0x9f]]];
+            const older = withCells(await loadHealthy(), cells);
+            setU16(older, 4, 0xa3);
+            const olderScore = readBytes(older);
+            expect(single(beats(olderScore, 0)[0]).slurDestination!.beat).toBe(beats(olderScore, 0)[1]);
+            const current = readBytes(withCells(await loadHealthy(), cells));
+            expect(single(beats(current, 0)[0]).slurDestination!.beat).toBe(beats(current, 2)[1]);
+        });
+
         it('markers-tempo-at-start', async () => {
             // healthy.tef with a tempo marker of 90 at 1.0: it replaces the header tempo
             const score = readBytes(withCells(await loadHealthy(), [[0, 1, [0xfe, 90, 0, 0]]]));

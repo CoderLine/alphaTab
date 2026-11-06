@@ -221,6 +221,7 @@ export class TefBarBuilder {
     private static readonly _strumTicksPerSpeed = 20;
     private static readonly _defaultCrescendoAmount = 16;
     private static readonly _crescendoAmountVersion = 0x03060000;
+    private static readonly _maskedSlurLengthVersion = 0x030600a4;
     private static readonly _decrescendoFlag = 0x10;
     private static readonly _doubleBarFlag = 0x04;
     private static readonly _fermataSymbols = [0x6b, 0x6c];
@@ -835,7 +836,11 @@ export class TefBarBuilder {
                         const last = (tuplet.start + (lastColumn - tuplet.start) * stretch) * unit;
                         TefBarBuilder._applySlur(this._beatsInRange(bar, tuplet.start * unit, last + 1));
                     } else {
-                        TefBarBuilder._applySlur(this._beatsInRange(bar, column * unit, (column + data[1] + 1) * unit));
+                        const length =
+                            this.version < TefBarBuilder._maskedSlurLengthVersion
+                                ? data[1] & TefBarBuilder._connectionLengthMask
+                                : data[1];
+                        TefBarBuilder._applySlur(this._beatsInRange(bar, column * unit, (column + length + 1) * unit));
                     }
                 }
                 break;
