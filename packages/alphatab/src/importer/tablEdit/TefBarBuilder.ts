@@ -123,6 +123,7 @@ class TefEvent {
     public stringIndex: number = 0;
     public fret: number = 0;
     public durationCode: number = 0;
+    public duration!: TefDuration;
     public dynamics: number = 0;
     public isTied: boolean = false;
     public voiceHint: number = 0;
@@ -163,6 +164,27 @@ class TefUnit {
 }
 
 /**
+ * A beat of a bar with its voice and its real start in the bar.
+ * @internal
+ */
+class TefBeatRecord {
+    public beat: Beat;
+    public voice: number;
+    public start: number;
+    /**
+     * The grid column of the note or rest the beat starts, -1 for a beat that continues one or fills a gap.
+     */
+    public column: number;
+
+    public constructor(beat: Beat, voice: number, start: number, column: number) {
+        this.beat = beat;
+        this.voice = voice;
+        this.start = start;
+        this.column = column;
+    }
+}
+
+/**
  * Builds the bars, voices and beats of each track from the TablEdit grid.
  * @internal
  */
@@ -177,6 +199,8 @@ export class TefBarBuilder {
      */
     private static readonly _smallestPlain = TefBarBuilder.subUnitsPerCell / 2;
 
+    private static readonly _cellsPerQuarter = 16;
+    private static readonly _durationMask = 0x1f;
     private static readonly _tieDynamics = 7;
     private static readonly _upperVoice = 2;
     private static readonly _lowerVoice = 3;
@@ -204,17 +228,50 @@ export class TefBarBuilder {
     private static readonly _connectionLengthMask = 0x3f;
     private static readonly _maxSyncopation = 3;
     private static readonly _lyricsTextPrefix = '>';
-
     private static readonly _noChord = 0xffff;
+
+    private static readonly _durations: (TefDuration | null)[] = [
+        new TefDuration(Duration.Whole, 0, -1, -1),
+        new TefDuration(Duration.Half, 1, -1, -1),
+        new TefDuration(Duration.Whole, 0, 3, 2),
+        new TefDuration(Duration.Half, 0, -1, -1),
+        new TefDuration(Duration.Quarter, 1, -1, -1),
+        new TefDuration(Duration.Half, 0, 3, 2),
+        new TefDuration(Duration.Quarter, 0, -1, -1),
+        new TefDuration(Duration.Eighth, 1, -1, -1),
+        new TefDuration(Duration.Quarter, 0, 3, 2),
+        new TefDuration(Duration.Eighth, 0, -1, -1),
+        new TefDuration(Duration.Sixteenth, 1, -1, -1),
+        new TefDuration(Duration.Eighth, 0, 3, 2),
+        new TefDuration(Duration.Sixteenth, 0, -1, -1),
+        new TefDuration(Duration.ThirtySecond, 1, -1, -1),
+        new TefDuration(Duration.Sixteenth, 0, 3, 2),
+        new TefDuration(Duration.ThirtySecond, 0, -1, -1),
+        new TefDuration(Duration.SixtyFourth, 1, -1, -1),
+        new TefDuration(Duration.ThirtySecond, 0, 3, 2),
+        new TefDuration(Duration.SixtyFourth, 0, -1, -1),
+        new TefDuration(Duration.Half, 2, -1, -1),
+        new TefDuration(Duration.Sixteenth, 0, 5, 4),
+        null,
+        new TefDuration(Duration.Quarter, 2, -1, -1),
+        new TefDuration(Duration.Sixteenth, 0, 7, 4),
+        null,
+        new TefDuration(Duration.Eighth, 2, -1, -1),
+        new TefDuration(Duration.ThirtySecond, 0, 9, 8),
+        null,
+        new TefDuration(Duration.Sixteenth, 2, -1, -1),
+        new TefDuration(Duration.ThirtySecond, 0, 10, 8),
+        null,
+        new TefDuration(Duration.Whole, 1, -1, -1)
+    ];
 
     private _tracks: TefTrackInfo[];
     private _measureStarts: number[];
     private _measureSizes: number[];
     /**
-     * Per bar, the beats of the first voice of the track being built with their real start.
+     * Per bar, the beats of the track being built, voice by voice in time order.
      */
-    private _beatStarts: Map<number, number[]> = new Map<number, number[]>();
-    private _beatsByBar: Map<number, Beat[]> = new Map<number, Beat[]>();
+    private _beats: TefBeatRecord[][] = [];
 
     /**
      * Bars flagged as pick-up measures. They keep their nominal size on the grid.
@@ -229,11 +286,6 @@ export class TefBarBuilder {
      * The version and sub-version of TablEdit which saved the file, as 0xMMmmSSSS.
      */
     public version: number = 0;
-    /**
-     * Per bar, the beats of all voices that start a note or rest with their grid column.
-     */
-    private _columnStarts: Map<number, number[]> = new Map<number, number[]>();
-    private _columnBeats: Map<number, Beat[]> = new Map<number, Beat[]>();
 
     public constructor(tracks: TefTrackInfo[], measureStarts: number[], measureSizes: number[]) {
         this._tracks = tracks;
@@ -244,44 +296,57 @@ export class TefBarBuilder {
     public build(cells: TefCell[]): void {
         this._trimPickupBars(cells);
         const extensions = new Map<string, Uint8Array>();
+        const rowTracks: number[] = [];
+        const trackCells: TefCell[][] = [];
+        for (let t = 0; t < this._tracks.length; t++) {
+            trackCells.push([]);
+            for (let s = 0; s < this._tracks[t].stringCount; s++) {
+                rowTracks.push(t);
+            }
+        }
         for (const cell of cells) {
             if (cell.data[0] === TefCell.extensionMarker && cell.data[1] !== 0) {
                 extensions.set(`${cell.row}:${cell.position - 1}`, cell.data);
             }
+            if (cell.row < rowTracks.length) {
+                trackCells[rowTracks[cell.row]].push(cell);
+            }
         }
-        for (const info of this._tracks) {
-            const tuplets: TefTupletRange[] = [];
-            for (const cell of cells) {
-                if (cell.row >= info.firstString && cell.row < info.firstString + info.stringCount) {
-                    const tuplet = this._tupletRangeOf(cell);
-                    if (tuplet) {
-                        tuplets.push(tuplet);
+        for (let t = 0; t < this._tracks.length; t++) {
+            const info = this._tracks[t];
+            const tuplets = new Map<number, TefTupletRange[]>();
+            for (const cell of trackCells[t]) {
+                const tuplet = this._tupletRangeOf(cell);
+                if (tuplet) {
+                    if (!tuplets.has(tuplet.bar)) {
+                        tuplets.set(tuplet.bar, []);
                     }
+                    tuplets.get(tuplet.bar)!.push(tuplet);
                 }
             }
             const events: TefEvent[] = [];
-            for (const cell of cells) {
-                if (cell.row >= info.firstString && cell.row < info.firstString + info.stringCount) {
-                    const e = this._decode(cell, info);
-                    if (e) {
-                        const ext = extensions.get(`${cell.row}:${cell.position}`);
-                        if (ext) {
-                            e.extension = ext;
-                        }
-                        e.tuplet = TefBarBuilder._tupletAt(tuplets, e);
-                        events.push(e);
+            for (const cell of trackCells[t]) {
+                const e = this._decode(cell, info);
+                if (e) {
+                    const ext = extensions.get(`${cell.row}:${cell.position}`);
+                    if (ext) {
+                        e.extension = ext;
                     }
+                    e.tuplet = TefBarBuilder._tupletAt(tuplets, e);
+                    e.duration = e.tuplet
+                        ? new TefDuration(
+                              e.duration.duration,
+                              e.duration.dots,
+                              e.tuplet.numerator,
+                              e.tuplet.denominator
+                          )
+                        : e.duration;
+                    events.push(e);
                 }
             }
-            this._beatStarts = new Map<number, number[]>();
-            this._beatsByBar = new Map<number, Beat[]>();
-            this._columnStarts = new Map<number, number[]>();
-            this._columnBeats = new Map<number, Beat[]>();
             this._buildTrack(info, events);
-            for (const cell of cells) {
-                if (cell.row >= info.firstString && cell.row < info.firstString + info.stringCount) {
-                    this._applyTrackMarker(info, cell);
-                }
+            for (const cell of trackCells[t]) {
+                this._applyTrackMarker(info, cell);
             }
         }
         this._applyGlobalMarkers(cells);
@@ -318,58 +383,66 @@ export class TefBarBuilder {
         return range;
     }
 
-    private static _tupletAt(ranges: TefTupletRange[], e: TefEvent): TefTupletRange | null {
-        if (TefBarBuilder._durationOf(e.durationCode)!.isTuplet) {
+    private static _tupletAt(ranges: Map<number, TefTupletRange[]>, e: TefEvent): TefTupletRange | null {
+        if (e.duration.isTuplet || !ranges.has(e.bar)) {
             return null;
         }
-        for (const range of ranges) {
-            if (range.bar === e.bar && e.column >= range.start && e.column <= range.end) {
+        for (const range of ranges.get(e.bar)!) {
+            if (e.column >= range.start && e.column <= range.end) {
                 return range;
             }
         }
         return null;
     }
 
-    private static _eventDuration(e: TefEvent): TefDuration {
-        const d = TefBarBuilder._durationOf(e.durationCode)!;
-        if (e.tuplet) {
-            return new TefDuration(d.duration, d.dots, e.tuplet.numerator, e.tuplet.denominator);
-        }
-        return d;
-    }
-
     /**
      * Pick-up measures only last from their first to their last sounding note.
      */
     private _trimPickupBars(cells: TefCell[]): void {
-        for (const bar of this.pickupBars) {
-            const start = this._measureStarts[bar];
-            const size = this._measureSizes[bar];
-            let first = size;
-            let end = 0;
-            for (const cell of cells) {
-                const type = cell.data[0] & TefCell.typeMask;
-                if (type >= TefCell.rest || cell.position < start || cell.position >= start + size) {
-                    continue;
-                }
-                const d = TefBarBuilder._durationOf(cell.data[1] & 0x1f);
-                if (!d) {
-                    continue;
-                }
-                const column = cell.position - start;
-                first = Math.min(first, column);
-                end = Math.max(end, column + Math.ceil(d.length / TefBarBuilder.subUnitsPerCell));
+        if (this.pickupBars.size === 0) {
+            return;
+        }
+        const firsts = new Map<number, number>();
+        const ends = new Map<number, number>();
+        for (const cell of cells) {
+            const type = cell.data[0] & TefCell.typeMask;
+            const d = TefBarBuilder._durations[cell.data[1] & TefBarBuilder._durationMask];
+            if (type === 0 || type >= TefCell.rest || !d) {
+                continue;
             }
-            if (first < end) {
+            const bar = this.barOf(cell.position);
+            if (!this.pickupBars.has(bar)) {
+                continue;
+            }
+            const column = cell.position - this._measureStarts[bar];
+            const end = column + Math.ceil(d.length / TefBarBuilder.subUnitsPerCell);
+            if (!firsts.has(bar)) {
+                firsts.set(bar, column);
+                ends.set(bar, end);
+            } else {
+                firsts.set(bar, Math.min(firsts.get(bar)!, column));
+                ends.set(bar, Math.max(ends.get(bar)!, end));
+            }
+        }
+        for (const bar of this.pickupBars) {
+            if (firsts.has(bar)) {
+                const first = firsts.get(bar)!;
                 this._columnOffsets.set(bar, first);
-                this._measureSizes[bar] = Math.min(size, end) - first;
+                this._measureSizes[bar] = Math.min(this._measureSizes[bar], ends.get(bar)!) - first;
             }
         }
     }
 
-    private _columnOf(position: number, bar: number): number {
+    /**
+     * The grid position at which the content of the bar starts.
+     */
+    private _gridStart(bar: number): number {
         const offset = this._columnOffsets.get(bar);
-        return position - this._measureStarts[bar] - (offset === undefined ? 0 : offset);
+        return this._measureStarts[bar] + (offset === undefined ? 0 : offset);
+    }
+
+    private _columnOf(position: number, bar: number): number {
+        return position - this._gridStart(bar);
     }
 
     /**
@@ -404,8 +477,11 @@ export class TefBarBuilder {
             const track = this._tracks[trackIndex].track;
             const beats: Beat[] = [];
             for (const bar of track.staves[0].bars) {
-                for (const beat of bar.voices[0].beats) {
-                    beats.push(beat);
+                const voice = bar.voices.find(v => v.beats.length > 0);
+                if (voice) {
+                    for (const beat of voice.beats) {
+                        beats.push(beat);
+                    }
                 }
             }
             for (let v = 0; v < verses.length; v++) {
@@ -557,12 +633,11 @@ export class TefBarBuilder {
         for (const cell of cells) {
             const data = cell.data;
             const bar = this.barOf(cell.position);
-            const column = Math.max(0, this._columnOf(cell.position, bar));
             switch (data[0]) {
                 case TefCell.tempoMarker: {
                     const bpm = data[1] | (data[2] << 8);
                     if (bpm > 1) {
-                        this._addTempoChange(bar, column, tempo, bpm, data[3]);
+                        this._addTempoChange(Math.max(cell.position, this._gridStart(bar)), tempo, bpm, data[3]);
                         tempo = bpm;
                     }
                     break;
@@ -615,25 +690,19 @@ export class TefBarBuilder {
     /**
      * Gradual tempo changes are approximated with a hidden tempo change on every quarter note.
      */
-    private _addTempoChange(bar: number, column: number, from: number, to: number, rampQuarters: number): void {
+    private _addTempoChange(position: number, from: number, to: number, rampQuarters: number): void {
         const score = this._tracks[0].track.score;
         const steps = Math.max(1, rampQuarters);
-        const start = this._measureStarts[bar] + column;
         for (let i = 1; i <= steps; i++) {
-            const position = start + (i - 1) * 16;
-            const b = this.barOf(position);
-            if (b >= score.masterBars.length || position >= this._measureStarts[b] + this._measureSizes[b]) {
-                break;
+            const stepPosition = position + (i - 1) * TefBarBuilder._cellsPerQuarter;
+            const b = this.barOf(stepPosition);
+            const column = stepPosition - this._gridStart(b);
+            if (column < 0 || column >= this._measureSizes[b]) {
+                continue;
             }
             const value = steps === 1 ? to : Math.round(from + ((to - from) * i) / steps);
             score.masterBars[b].tempoAutomations.push(
-                Automation.buildTempoAutomation(
-                    false,
-                    (position - this._measureStarts[b]) / this._measureSizes[b],
-                    value,
-                    2,
-                    i === 1
-                )
+                Automation.buildTempoAutomation(false, column / this._measureSizes[b], value, 2, i === 1)
             );
         }
     }
@@ -651,17 +720,19 @@ export class TefBarBuilder {
         return TripletFeel.NoTripletFeel;
     }
 
+    /**
+     * The beat sounding at the given column in the first voice of the bar that has content.
+     */
     private _beatAt(bar: number, column: number): Beat | null {
-        const starts = this._beatStarts.get(bar);
-        const beats = this._beatsByBar.get(bar);
-        if (!starts || !beats) {
-            return null;
-        }
+        const records = this._beats[bar];
         const time = column * TefBarBuilder.subUnitsPerCell;
         let found: Beat | null = null;
-        for (let i = 0; i < starts.length; i++) {
-            if (starts[i] <= time) {
-                found = beats[i];
+        for (const r of records) {
+            if (r.voice !== records[0].voice) {
+                break;
+            }
+            if (r.start <= time) {
+                found = r.beat;
             }
         }
         return found;
@@ -675,6 +746,7 @@ export class TefBarBuilder {
         if (!beat) {
             return;
         }
+        const unit = TefBarBuilder.subUnitsPerCell;
         switch (data[0]) {
             case TefCell.textMarker: {
                 const index = data[1] | (data[2] << 8);
@@ -729,9 +801,9 @@ export class TefBarBuilder {
                         (data[1] & TefBarBuilder._decrescendoFlag) !== 0
                             ? CrescendoType.Decrescendo
                             : CrescendoType.Crescendo;
-                    this._applyToRange(bar, column, data[2], b => {
+                    for (const b of this._beatsInRange(bar, column * unit, (column + data[2]) * unit)) {
                         b.crescendo = type;
-                    });
+                    }
                 }
                 break;
             }
@@ -745,21 +817,19 @@ export class TefBarBuilder {
             case TefCell.connectionMarker:
                 if ((data[7] & TefBarBuilder._bracketFlag) === 0) {
                     const tuplet = this._tupletRangeOf(cell);
-                    const unit = TefBarBuilder.subUnitsPerCell;
                     if (tuplet) {
                         // the covered notes are spread out, so the slur ends at the last covered column
                         let lastColumn = tuplet.start;
-                        const columns = this._columnStarts.get(bar) ?? [];
-                        for (const c of columns) {
-                            if (c > lastColumn && c <= tuplet.end) {
-                                lastColumn = c;
+                        for (const r of this._beats[bar]) {
+                            if (r.column > lastColumn && r.column <= tuplet.end) {
+                                lastColumn = r.column;
                             }
                         }
                         const stretch = (2 * tuplet.denominator) / tuplet.numerator;
                         const last = (tuplet.start + (lastColumn - tuplet.start) * stretch) * unit;
-                        this._applySlur(bar, tuplet.start * unit, last + 1);
+                        TefBarBuilder._applySlur(this._beatsInRange(bar, tuplet.start * unit, last + 1));
                     } else {
-                        this._applySlur(bar, column * unit, (column + data[1] + 1) * unit);
+                        TefBarBuilder._applySlur(this._beatsInRange(bar, column * unit, (column + data[1] + 1) * unit));
                     }
                 }
                 break;
@@ -780,12 +850,34 @@ export class TefBarBuilder {
      */
     private _beatsAtColumn(bar: number, column: number): Beat[] {
         const found: Beat[] = [];
-        const starts = this._columnStarts.get(bar);
-        const beats = this._columnBeats.get(bar);
-        if (starts && beats) {
-            for (let i = 0; i < starts.length; i++) {
-                if (starts[i] === column) {
-                    found.push(beats[i]);
+        for (const r of this._beats[bar]) {
+            if (r.column === column) {
+                found.push(r.beat);
+            }
+        }
+        return found;
+    }
+
+    /**
+     * The beats starting in the given stretch of real time, counted from the start of the given bar,
+     * taken per bar from the first voice that has content.
+     */
+    private _beatsInRange(bar: number, from: number, to: number): Beat[] {
+        const found: Beat[] = [];
+        const origin = this._gridStart(bar);
+        for (let b = bar; b < this._beats.length; b++) {
+            const offset = (this._gridStart(b) - origin) * TefBarBuilder.subUnitsPerCell;
+            if (offset >= to) {
+                break;
+            }
+            const records = this._beats[b];
+            for (const r of records) {
+                if (r.voice !== records[0].voice) {
+                    break;
+                }
+                const start = offset + r.start;
+                if (start >= from && start < to) {
+                    found.push(r.beat);
                 }
             }
         }
@@ -803,38 +895,18 @@ export class TefBarBuilder {
         return result;
     }
 
-    private _applyToRange(bar: number, column: number, length: number, action: (beat: Beat) => void): void {
-        const starts = this._beatStarts.get(bar);
-        const beats = this._beatsByBar.get(bar);
-        if (!starts || !beats) {
-            return;
-        }
-        const from = column * TefBarBuilder.subUnitsPerCell;
-        const to = (column + length) * TefBarBuilder.subUnitsPerCell;
-        for (let i = 0; i < starts.length; i++) {
-            if (starts[i] >= from && starts[i] < to) {
-                action(beats[i]);
-            }
-        }
-    }
-
     /**
-     * Slurs the first to the last note starting in the given stretch of sub-units.
+     * Slurs the first to the last of the given beats that have notes.
      */
-    private _applySlur(bar: number, from: number, to: number): void {
-        const starts = this._beatStarts.get(bar);
-        const beats = this._beatsByBar.get(bar);
-        if (!starts || !beats) {
-            return;
-        }
+    private static _applySlur(beats: Beat[]): void {
         let first: Beat | null = null;
         let last: Beat | null = null;
-        for (let i = 0; i < starts.length; i++) {
-            if (starts[i] >= from && starts[i] < to && beats[i].notes.length > 0) {
+        for (const b of beats) {
+            if (b.notes.length > 0) {
                 if (!first) {
-                    first = beats[i];
+                    first = b;
                 }
-                last = beats[i];
+                last = b;
             }
         }
         if (first && last && first !== last) {
@@ -860,27 +932,31 @@ export class TefBarBuilder {
         return t.trim();
     }
 
+    /**
+     * The note or rest of a cell, null for anything else and for rests outside a trimmed pick-up measure.
+     */
     private _decode(cell: TefCell, info: TefTrackInfo): TefEvent | null {
         const type = cell.data[0] & TefCell.typeMask;
-        if (type > TefCell.rest) {
-            return null;
-        }
-        const code = cell.data[1] & 0x1f;
-        if (!TefBarBuilder._durationOf(code)) {
+        const duration = TefBarBuilder._durations[cell.data[1] & TefBarBuilder._durationMask];
+        if (type === 0 || type > TefCell.rest || !duration) {
             return null;
         }
         const e = new TefEvent();
         e.cell = cell;
+        e.bar = this.barOf(cell.position);
+        e.column = this._columnOf(cell.position, e.bar);
+        if (e.column < 0 || e.column >= this._measureSizes[e.bar]) {
+            return null;
+        }
         e.isRest = type === TefCell.rest;
         e.stringIndex = cell.row - info.firstString;
         e.fret = type - 1;
-        e.durationCode = code;
+        e.durationCode = cell.data[1] & TefBarBuilder._durationMask;
+        e.duration = duration;
         e.dynamics = cell.data[1] >> 5;
         e.isTied = !e.isRest && e.dynamics === TefBarBuilder._tieDynamics;
         e.voiceHint = (cell.data[2] >> 4) & 0x03;
         e.accidental = cell.data[2] >> 6;
-        e.bar = this.barOf(cell.position);
-        e.column = this._columnOf(cell.position, e.bar);
         return e;
     }
 
@@ -899,68 +975,6 @@ export class TefBarBuilder {
             }
         }
         return lo;
-    }
-
-    private static _durationOf(code: number): TefDuration | null {
-        switch (code) {
-            case 0:
-                return new TefDuration(Duration.Whole, 0, -1, -1);
-            case 1:
-                return new TefDuration(Duration.Half, 1, -1, -1);
-            case 2:
-                return new TefDuration(Duration.Whole, 0, 3, 2);
-            case 3:
-                return new TefDuration(Duration.Half, 0, -1, -1);
-            case 4:
-                return new TefDuration(Duration.Quarter, 1, -1, -1);
-            case 5:
-                return new TefDuration(Duration.Half, 0, 3, 2);
-            case 6:
-                return new TefDuration(Duration.Quarter, 0, -1, -1);
-            case 7:
-                return new TefDuration(Duration.Eighth, 1, -1, -1);
-            case 8:
-                return new TefDuration(Duration.Quarter, 0, 3, 2);
-            case 9:
-                return new TefDuration(Duration.Eighth, 0, -1, -1);
-            case 10:
-                return new TefDuration(Duration.Sixteenth, 1, -1, -1);
-            case 11:
-                return new TefDuration(Duration.Eighth, 0, 3, 2);
-            case 12:
-                return new TefDuration(Duration.Sixteenth, 0, -1, -1);
-            case 13:
-                return new TefDuration(Duration.ThirtySecond, 1, -1, -1);
-            case 14:
-                return new TefDuration(Duration.Sixteenth, 0, 3, 2);
-            case 15:
-                return new TefDuration(Duration.ThirtySecond, 0, -1, -1);
-            case 16:
-                return new TefDuration(Duration.SixtyFourth, 1, -1, -1);
-            case 17:
-                return new TefDuration(Duration.ThirtySecond, 0, 3, 2);
-            case 18:
-                return new TefDuration(Duration.SixtyFourth, 0, -1, -1);
-            case 19:
-                return new TefDuration(Duration.Half, 2, -1, -1);
-            case 20:
-                return new TefDuration(Duration.Sixteenth, 0, 5, 4);
-            case 22:
-                return new TefDuration(Duration.Quarter, 2, -1, -1);
-            case 23:
-                return new TefDuration(Duration.Sixteenth, 0, 7, 4);
-            case 25:
-                return new TefDuration(Duration.Eighth, 2, -1, -1);
-            case 26:
-                return new TefDuration(Duration.ThirtySecond, 0, 9, 8);
-            case 28:
-                return new TefDuration(Duration.Sixteenth, 2, -1, -1);
-            case 29:
-                return new TefDuration(Duration.ThirtySecond, 0, 10, 8);
-            case 31:
-                return new TefDuration(Duration.Whole, 1, -1, -1);
-        }
-        return null;
     }
 
     private _buildTrack(info: TefTrackInfo, events: TefEvent[]): void {
@@ -984,27 +998,23 @@ export class TefBarBuilder {
             }
         }
 
+        const barEvents: TefEvent[][] = [];
+        this._beats = [];
         for (let i = 0; i < barCount; i++) {
             const bar = new Bar();
             bar.clef = info.isPercussion ? Clef.Neutral : info.clef;
             staff.addBar(bar);
+            barEvents.push([]);
+            this._beats.push([]);
+        }
+        for (const e of events) {
+            barEvents[e.bar].push(e);
         }
 
         const units: TefUnit[] = [];
         for (let b = 0; b < barCount; b++) {
-            const barEvents: TefEvent[] = [];
-            for (const e of events) {
-                if (e.bar === b) {
-                    barEvents.push(e);
-                }
-            }
             for (let group = 0; group < 3; group++) {
-                const groupEvents: TefEvent[] = [];
-                for (const e of barEvents) {
-                    if (TefBarBuilder._voiceGroupOf(e) === group) {
-                        groupEvents.push(e);
-                    }
-                }
+                const groupEvents = barEvents[b].filter(e => TefBarBuilder._voiceGroupOf(e) === group);
                 if (groupEvents.length > 0) {
                     this._assignRealTime(groupEvents, b, info.track);
                     TefBarBuilder._collectUnits(groupEvents, group, b, units);
@@ -1039,7 +1049,7 @@ export class TefBarBuilder {
         let runCode = -1;
         let runAnchor = 0;
         for (const e of events) {
-            const d = TefBarBuilder._eventDuration(e);
+            const d = e.duration;
             const column = e.column;
             let start = column * unit;
             if (e.tuplet) {
@@ -1061,10 +1071,7 @@ export class TefBarBuilder {
                 }
             }
             e.realStart = start;
-            e.realEnd = start + d.length;
-            if (e.realEnd > barEnd) {
-                e.realEnd = barEnd;
-            }
+            e.realEnd = Math.min(start + d.length, barEnd);
         }
     }
 
@@ -1109,6 +1116,9 @@ export class TefBarBuilder {
     private static _collectUnits(events: TefEvent[], group: number, bar: number, units: TefUnit[]): void {
         const byKey = new Map<string, TefUnit>();
         for (const e of events) {
+            if (e.realStart >= e.realEnd) {
+                continue;
+            }
             const key = `${e.isRest}:${e.realStart}:${e.realEnd}:${e.durationCode}:${e.tuplet ? e.tuplet.numerator : 0}`;
             let unit = byKey.get(key);
             if (!unit) {
@@ -1118,9 +1128,8 @@ export class TefBarBuilder {
                 unit.bar = bar;
                 unit.isRest = e.isRest;
                 unit.voiceGroup = group;
-                const d = TefBarBuilder._eventDuration(e);
-                if (d.length === e.realEnd - e.realStart) {
-                    unit.duration = d;
+                if (e.duration.length === e.realEnd - e.realStart) {
+                    unit.duration = e.duration;
                 }
                 byKey.set(key, unit);
                 units.push(unit);
@@ -1197,7 +1206,7 @@ export class TefBarBuilder {
 
     private _createVoices(info: TefTrackInfo, units: TefUnit[], laneCounts: number[]): void {
         const staff = info.track.staves[0];
-        // upper voices first, then lower ones, keeping alphaTab's stem convention for voice 0 and 1
+        // per lane the upper, automatic and lower voice, so that voice 0 and 1 get alphaTab's stems up and down
         const order: number[][] = [];
         const maxLanes = Math.max(laneCounts[0], laneCounts[1], laneCounts[2]);
         for (let l = 0; l < maxLanes; l++) {
@@ -1211,61 +1220,55 @@ export class TefBarBuilder {
             order.push([0, 0]);
         }
 
+        const barUnits: TefUnit[][] = [];
+        for (let b = 0; b < staff.bars.length; b++) {
+            barUnits.push([]);
+        }
+        for (const u of units) {
+            if (u.lane >= 0) {
+                barUnits[u.bar].push(u);
+            }
+        }
         for (let b = 0; b < staff.bars.length; b++) {
             const bar = staff.bars[b];
             const barLength = this._measureSizes[b] * TefBarBuilder.subUnitsPerCell;
             for (let v = 0; v < order.length; v++) {
-                const group = order[v][0];
-                const lane = order[v][1];
                 const voice = new Voice();
                 bar.addVoice(voice);
-                const laneUnits: TefUnit[] = [];
-                for (const u of units) {
-                    if (u.bar === b && u.voiceGroup === group && u.lane === lane) {
-                        laneUnits.push(u);
-                    }
-                }
-                laneUnits.sort((x, y) => x.start - y.start);
-                this._fillVoice(info, voice, laneUnits, barLength, group, v === 0 ? b : -1);
-                if (voice.beats.length === 0) {
-                    bar.voices.pop();
-                    ModelUtils.appendPlaceholderVoice(bar);
-                }
+                const group = order[v][0];
+                const lane = order[v][1];
+                const laneUnits = barUnits[b].filter(u => u.voiceGroup === group && u.lane === lane);
+                this._fillVoice(info, voice, v, laneUnits, barLength, group);
             }
         }
     }
 
+    /**
+     * Fills a voice with the units of one lane, which follow each other without overlap, and the rests between them.
+     */
     private _fillVoice(
         info: TefTrackInfo,
         voice: Voice,
+        voiceIndex: number,
         units: TefUnit[],
         barLength: number,
-        group: number,
-        recordBar: number
+        group: number
     ): void {
+        if (units.length === 0) {
+            return;
+        }
+        const bar = units[0].bar;
         let cursor = 0;
-        let hasContent = false;
         let previous: TefDuration | null = null;
         const staff = info.track.staves[0];
-        for (let i = 0; i < units.length; i++) {
-            const u = units[i];
-            if (u.start < cursor) {
-                continue;
-            }
+        for (const u of units) {
             if (u.start > cursor) {
-                this._addRests(voice, cursor, u.start, u.duration, previous, recordBar);
-            }
-            let end = u.end;
-            if (i + 1 < units.length && units[i + 1].start < end) {
-                end = units[i + 1].start;
-            }
-            if (end > barLength) {
-                end = barLength;
+                this._addRests(voice, bar, voiceIndex, cursor, u.start, u.duration, previous);
             }
             const values =
-                u.duration && end - u.start === u.duration.length
+                u.duration && u.end - u.start === u.duration.length
                     ? [u.duration]
-                    : TefBarBuilder._splitPlain(u.start, end);
+                    : TefBarBuilder._splitPlain(u.start, u.end);
             if (!u.isRest) {
                 this._addGraceBeat(info, voice, u);
             }
@@ -1273,9 +1276,9 @@ export class TefBarBuilder {
             for (let k = 0; k < values.length; k++) {
                 const beat = TefBarBuilder._createBeat(values[k]);
                 voice.addBeat(beat);
-                if (recordBar >= 0) {
-                    this._recordBeat(recordBar, beatStart, beat);
-                }
+                this._beats[bar].push(
+                    new TefBeatRecord(beat, voiceIndex, beatStart, k === 0 ? u.events[0].column : -1)
+                );
                 beatStart += values[k].length;
                 if (group !== 0) {
                     beat.preferredBeamDirection = group === 1 ? BeamDirection.Up : BeamDirection.Down;
@@ -1284,30 +1287,15 @@ export class TefBarBuilder {
                     this._addNotes(info, beat, u, k > 0);
                 }
                 if (k === 0) {
-                    this._recordColumn(u, beat);
                     TefBarBuilder._applyLayoutAttributes(staff, voice, beat, u);
                 }
             }
             previous = values.length > 0 ? values[values.length - 1] : previous;
-            hasContent = true;
-            cursor = end;
+            cursor = u.end;
         }
-        if (hasContent && cursor < barLength) {
-            this._addRests(voice, cursor, barLength, null, previous, recordBar);
+        if (cursor < barLength) {
+            this._addRests(voice, bar, voiceIndex, cursor, barLength, null, previous);
         }
-    }
-
-    private _recordColumn(unit: TefUnit, beat: Beat): void {
-        let starts = this._columnStarts.get(unit.bar);
-        let beats = this._columnBeats.get(unit.bar);
-        if (!starts || !beats) {
-            starts = [];
-            beats = [];
-            this._columnStarts.set(unit.bar, starts);
-            this._columnBeats.set(unit.bar, beats);
-        }
-        starts.push(unit.events[0].column);
-        beats.push(beat);
     }
 
     /**
@@ -1365,29 +1353,17 @@ export class TefBarBuilder {
         return null;
     }
 
-    private _recordBeat(bar: number, start: number, beat: Beat): void {
-        let starts = this._beatStarts.get(bar);
-        let beats = this._beatsByBar.get(bar);
-        if (!starts || !beats) {
-            starts = [];
-            beats = [];
-            this._beatStarts.set(bar, starts);
-            this._beatsByBar.set(bar, beats);
-        }
-        starts.push(start);
-        beats.push(beat);
-    }
-
     /**
      * Fills a gap with rests. Gaps off the plain grid follow the tuplet of the neighbouring notes.
      */
     private _addRests(
         voice: Voice,
+        bar: number,
+        voiceIndex: number,
         start: number,
         end: number,
         next: TefDuration | null,
-        previous: TefDuration | null,
-        recordBar: number
+        previous: TefDuration | null
     ): void {
         const gap = end - start;
         let values: TefDuration[];
@@ -1415,9 +1391,7 @@ export class TefBarBuilder {
         for (const v of values) {
             const beat = TefBarBuilder._createBeat(v);
             voice.addBeat(beat);
-            if (recordBar >= 0) {
-                this._recordBeat(recordBar, t, beat);
-            }
+            this._beats[bar].push(new TefBeatRecord(beat, voiceIndex, t, -1));
             t += v.length;
         }
     }

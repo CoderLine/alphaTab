@@ -241,6 +241,46 @@ describe('TablEditImporterTest', () => {
         return TestPlatform.loadFile('test-data/corrupt/healthy.tef');
     }
 
+    /**
+     * Appends cells, each given as 64th, string row and data bytes, to the cells of a 6-string file.
+     */
+    function withCells(data: Uint8Array, cells: [number, number, number[]][]): Uint8Array {
+        const start = u32(data, cellsPointer);
+        let end = start;
+        while (u32(data, end) !== 0xffffffff) {
+            end += cellSize;
+        }
+        const block = new Uint8Array(end - start + cells.length * cellSize + 4);
+        block.set(data.subarray(start, end), 0);
+        let p = end - start;
+        for (const [position, row, bytes] of cells) {
+            setU32(block, p, (position * stringCount + row) * 8);
+            for (let k = 0; k < bytes.length; k++) {
+                block[p + 4 + k] = bytes[k];
+            }
+            p += cellSize;
+        }
+        setU32(block, p, 0xffffffff);
+        return withBlock(data, cellsPointer, block);
+    }
+
+    /**
+     * Sets the upper voice on the notes and rests of a bar of a 6-string file whose bars up to it are 4/4.
+     */
+    function withUpperVoice(data: Uint8Array, bar: number): Uint8Array {
+        const result = new Uint8Array(data);
+        let p = u32(result, cellsPointer);
+        while (u32(result, p) !== 0xffffffff) {
+            const position = Math.floor(Math.floor(u32(result, p) / 8) / stringCount);
+            const type = result[p + 4] & 0x3f;
+            if (Math.floor(position / 64) === bar && type > 0 && type <= 0x33) {
+                result[p + 6] = (result[p + 6] & 0xcf) | 0x20;
+            }
+            p += cellSize;
+        }
+        return result;
+    }
+
     function directionsOf(m: MasterBar): Direction[] {
         return m.directions ? Array.from(m.directions) : [];
     }
@@ -452,6 +492,54 @@ describe('TablEditImporterTest', () => {
             const score = readBytes(withBlock(data, cellsPointer, cells));
             expect(score.masterBars.length).toBe(5);
             expect(toTex(score)).toBe(toTex(readBytes(await loadHealthy())));
+        });
+
+        it('cell-without-fret', async () => {
+            // the first byte of 1.0 s1 f0 with only the grace flag left: no fret, so no note
+            const data = await loadHealthy();
+            data[cellData(data, 0, 5)] = 0x40;
+            expect(beats(readBytes(data), 0).map(b => b.isRest)).toEqual([true, false, false, false]);
+        });
+
+        it('large-file', async () => {
+            // healthy.tef with its first bar repeated: the import time grows linearly with the bar count
+            const healthy = await loadHealthy();
+            const measures = u32(healthy, measuresPointer);
+            const cells = u32(healthy, cellsPointer);
+            const barCells: Uint8Array[] = [];
+            for (let p = cells; u32(healthy, p) !== 0xffffffff; p += cellSize) {
+                if (u32(healthy, p) < 64 * stringCount * 8) {
+                    barCells.push(healthy.subarray(p, p + cellSize));
+                }
+            }
+            const importTime = (bars: number) => {
+                const measureBlock = new Uint8Array(8 + bars * 8);
+                measureBlock.set(healthy.subarray(measures, measures + 8), 0);
+                setU16(measureBlock, 2, bars);
+                const cellBlock = new Uint8Array(bars * barCells.length * cellSize + 4);
+                let p = 0;
+                for (let bar = 0; bar < bars; bar++) {
+                    measureBlock.set(healthy.subarray(measures + 8, measures + 16), 8 + bar * 8);
+                    for (const cell of barCells) {
+                        cellBlock.set(cell, p);
+                        setU32(cellBlock, p, u32(cell, 0) + bar * 64 * stringCount * 8);
+                        p += cellSize;
+                    }
+                }
+                setU32(cellBlock, p, 0xffffffff);
+                const data = withBlock(withBlock(healthy, measuresPointer, measureBlock), cellsPointer, cellBlock);
+                const start = Date.now();
+                const score = readBytes(data);
+                const time = Date.now() - start;
+                expect(score.masterBars.length).toBe(bars);
+                expect(beats(score, bars - 1).length).toBe(4);
+                return time;
+            };
+            importTime(500);
+            const small = importTime(1000);
+            const large = importTime(8000);
+            // eight times the bars: linear time stays far below the 64 times of quadratic time
+            expect(large).toBeLessThan(small * 16 + 250);
         });
 
         it('unknown-duration-codes', async () => {
@@ -1814,6 +1902,21 @@ describe('TablEditImporterTest', () => {
             expect(score.masterBars.slice(1).some(m => m.isAnacrusis)).toBe(false);
         });
 
+        it('bars-pickup-trailing-rests', async () => {
+            // healthy.tef with bar 1 a pick-up and its notes at 1.32 and 1.48 turned into rests: the pick-up
+            // lasts from 1.0 to the end of the quarter at 1.16
+            const data = await loadHealthy();
+            data[u32(data, measuresPointer) + 8] |= 0x08;
+            data[cellData(data, 32, 3)] = 0x33;
+            data[cellData(data, 48, 0)] = 0x33;
+            const score = readBytes(data);
+            expect(timeline(score, 0)).toEqual([
+                [0, Duration.Quarter, 0, 0],
+                [3, Duration.Quarter, 0, quarter]
+            ]);
+            expect(beats(score, 1)[0].absolutePlaybackStart).toBe(2 * quarter);
+        });
+
         it('bars-flags', async () => {
             const score = await load('bars-flags');
             // hidden time signature: still read
@@ -1974,6 +2077,72 @@ describe('TablEditImporterTest', () => {
                 CrescendoType.None,
                 CrescendoType.None,
                 CrescendoType.None
+            ]);
+        });
+
+        it('markers-upper-voice', async () => {
+            // the notes of bar 2 forced into the upper voice: its markers and lyrics stay on its beats, and the
+            // other bars keep theirs on the automatic voice, which follows the upper one; alphaTab puts the initial
+            // instrument on the first beat of the first voice
+            const markersOf = (b: Beat) =>
+                `${b.text}|${b.chord ? b.chord.name : ''}|${b.lyrics ? b.lyrics.join('/') : ''}|${b.crescendo}|` +
+                `${b.fermata !== null}|${b.pickStroke}|` +
+                `${b.voice.bar.index > 0 ? b.automations.map(a => a.value).join(',') : ''}|` +
+                b.notes.map(n => `${n.accentuated}:${n.isSlurOrigin}:${n.isSlurDestination}`).join(',');
+            for (const name of ['markers-text-chords', 'markers-playback', 'lyrics', 'fermata']) {
+                const original = readBytes(await loadData(name));
+                const upper = readBytes(withUpperVoice(await loadData(name), 1));
+                for (let bar = 0; bar < original.masterBars.length; bar++) {
+                    expect(beats(upper, bar, bar === 1 ? 0 : 1).map(markersOf), `${name} bar ${bar}`).toEqual(
+                        beats(original, bar).map(markersOf)
+                    );
+                }
+            }
+        });
+
+        it('markers-across-barlines', async () => {
+            // healthy.tef: a slur at 1.48 over 32 64ths and a crescendo at 1.32 over 64 64ths
+            const score = readBytes(
+                withCells(await loadHealthy(), [
+                    [48, 1, [0x3d, 31]],
+                    [32, 1, [0x38, 0, 64, 0, 0, 0, 16]]
+                ])
+            );
+            const bar1 = beats(score, 0);
+            const bar2 = beats(score, 1);
+            expect(single(bar1[3]).slurDestination!.beat).toBe(bar2[0]);
+            expect(bar1.map(b => b.crescendo)).toEqual([
+                CrescendoType.None,
+                CrescendoType.None,
+                CrescendoType.Crescendo,
+                CrescendoType.Crescendo
+            ]);
+            expect(bar2.map(b => b.crescendo)).toEqual([
+                CrescendoType.Crescendo,
+                CrescendoType.Crescendo,
+                CrescendoType.None,
+                CrescendoType.None
+            ]);
+        });
+
+        it('markers-tempo-ramp-from-pickup', async () => {
+            // healthy.tef with bar 1 a pick-up from 1.32 (its notes at 1.0 and 1.16 turned into rests) and a tempo
+            // marker at 1.48 going from 120 to 160 within four quarters
+            const data = await loadHealthy();
+            data[u32(data, measuresPointer) + 8] |= 0x08;
+            data[cellData(data, 0, 5)] = 0x33;
+            data[cellData(data, 16, 4)] = 0x33;
+            const score = readBytes(withCells(data, [[48, 1, [0xfe, 160, 0, 4]]]));
+            const tempo = (bar: number) =>
+                score.masterBars[bar].tempoAutomations.map(a => [a.value, a.ratioPosition] as number[]);
+            expect(tempo(0)).toEqual([
+                [120, 0],
+                [130, 0.5]
+            ]);
+            expect(tempo(1)).toEqual([
+                [140, 0],
+                [150, 0.25],
+                [160, 0.5]
             ]);
         });
 
