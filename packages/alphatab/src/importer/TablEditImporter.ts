@@ -199,6 +199,9 @@ export class TablEditImporter extends ScoreImporter {
         }
         const recordSize = this._u16(offset) === TablEditImporter._wideMeasureRecordHeader ? 12 : 8;
         const count = this._u16(offset + 2);
+        if (count === 0) {
+            throw new FormatError('TablEdit file without measures');
+        }
         this._ensureLoopBoundary(count, TablEditImporter._maxMeasureCount, 'measure count');
         let position = 0;
         let p = offset + 8;
@@ -258,7 +261,7 @@ export class TablEditImporter extends ScoreImporter {
     }
 
     private _readInstruments(offset: number): void {
-        if (offset === 0) {
+        if (offset === 0 || this._u16(offset + 2) === 0) {
             throw new FormatError('TablEdit file without instruments');
         }
         this._readInstrumentRecords(this._data, offset + 4, this._u16(offset + 2), this._u16(offset));
@@ -334,6 +337,9 @@ export class TablEditImporter extends ScoreImporter {
             this._tracks.push(info);
             this._totalStrings += stringCount;
             p += recordSize;
+        }
+        if (this._totalStrings === 0) {
+            throw new FormatError('TablEdit file without strings');
         }
     }
 

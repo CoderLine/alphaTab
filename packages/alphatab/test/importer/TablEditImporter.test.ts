@@ -25,13 +25,13 @@ import { Fingers } from '@coderline/alphatab/model/Fingers';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
+import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
-import type { MasterBar } from '@coderline/alphatab/model/MasterBar';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
@@ -237,6 +237,10 @@ describe('TablEditImporterTest', () => {
         return result;
     }
 
+    function loadHealthy(): Promise<Uint8Array> {
+        return TestPlatform.loadFile('test-data/corrupt/healthy.tef');
+    }
+
     function directionsOf(m: MasterBar): Direction[] {
         return m.directions ? Array.from(m.directions) : [];
     }
@@ -299,10 +303,6 @@ describe('TablEditImporterTest', () => {
     });
 
     describe('corrupt', () => {
-        function loadHealthy(): Promise<Uint8Array> {
-            return TestPlatform.loadFile('test-data/corrupt/healthy.tef');
-        }
-
         async function patched(offset: number, value: number): Promise<Uint8Array> {
             const data = await loadHealthy();
             data[offset] = value;
@@ -372,6 +372,15 @@ describe('TablEditImporterTest', () => {
             const noInstruments = await loadHealthy();
             setU32(noInstruments, instrumentsPointer, 0);
             expect(() => readBytes(noInstruments)).toThrow(FormatError);
+            const zeroMeasures = await loadHealthy();
+            setU16(zeroMeasures, u32(zeroMeasures, measuresPointer) + 2, 0);
+            expect(() => readBytes(zeroMeasures)).toThrow(FormatError);
+            const zeroInstruments = await loadHealthy();
+            setU16(zeroInstruments, u32(zeroInstruments, instrumentsPointer) + 2, 0);
+            expect(() => readBytes(zeroInstruments)).toThrow(FormatError);
+            const zeroStrings = await loadHealthy();
+            setU16(zeroStrings, u32(zeroStrings, instrumentsPointer) + 4, 0);
+            expect(() => readBytes(zeroStrings)).toThrow(FormatError);
         });
 
         it('offset-out-of-range', async () => {
@@ -2260,6 +2269,25 @@ describe('TablEditImporterTest', () => {
             expect(score.masterBars.some(m => m.isRepeatStart || m.repeatCount > 0 || m.alternateEndings > 0)).toBe(
                 false
             );
+        });
+
+        it('reading-list-label-before-first-bar', async () => {
+            // the first entry of reading-list.tef, labelled 'Intro', moved to the non-existing bar 0: the list
+            // stops before it and the label is not shown
+            const data = await loadData('reading-list');
+            setU16(data, u32(data, readingListPointer) + 4, 0);
+            const score = readBytes(data);
+            expect(score.masterBars.map(m => m.section?.text ?? null)).toEqual([
+                null,
+                null,
+                'Verse',
+                null,
+                null,
+                null,
+                'Outro',
+                null
+            ]);
+            expect(TefReadingList.playbackOrder(score, 100)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
         });
 
         it('reading-guides-no-list', async () => {

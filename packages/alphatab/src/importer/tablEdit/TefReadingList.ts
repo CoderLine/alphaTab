@@ -40,7 +40,12 @@ export class TefReadingList {
         const runs = TefReadingList._runs(score, items);
         for (const item of items) {
             const label = item.label;
-            if (label.length > 0 && label.charAt(0) !== ' ' && item.first < score.masterBars.length) {
+            if (
+                label.length > 0 &&
+                label.charAt(0) !== ' ' &&
+                item.first >= 0 &&
+                item.first < score.masterBars.length
+            ) {
                 const section = new Section();
                 section.text = label.trim();
                 score.masterBars[item.first].section = section;
