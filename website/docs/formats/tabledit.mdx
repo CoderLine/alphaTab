@@ -489,8 +489,8 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                               tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Tremolo bar up/down and dive-return"
                               model={[FeatureStatus.Supported]}
-                              reading={[FeatureStatus.Supported]}
-                              render={[FeatureStatus.Supported]}
+                              reading={[FeatureStatus.Supported, "", "The amount comes from the next note on the string; a tremolo bar without an amount is not shown"]}
+                              render={[FeatureStatus.Supported, "", "The amount comes from the next note on the string; a tremolo bar without an amount is not shown"]}
                               audio={[FeatureStatus.Supported]}
                               tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Staccato, including staccato on the stem"

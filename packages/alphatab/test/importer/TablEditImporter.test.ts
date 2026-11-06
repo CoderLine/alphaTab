@@ -168,6 +168,10 @@ describe('TablEditImporterTest', () => {
         return note.bendPoints ? note.bendPoints.map(p => [p.offset, p.value] as number[]) : null;
     }
 
+    function whammy(b: Beat): number[][] | null {
+        return b.whammyBarPoints ? b.whammyBarPoints.map(p => [p.offset, p.value] as number[]) : null;
+    }
+
     function expectNoNoteEffect(beat: Beat) {
         for (const n of beat.notes) {
             expect(n.isHammerPullOrigin).toBe(false);
@@ -1061,8 +1065,6 @@ describe('TablEditImporterTest', () => {
 
         it('effects-target-fret', async () => {
             const score = await load('effects-target');
-            const whammy = (b: Beat) =>
-                b.whammyBarPoints ? b.whammyBarPoints.map(p => [p.offset, p.value] as number[]) : null;
             const bar1 = beats(score, 0);
             const bar2 = beats(score, 1);
             expect([...bar1, ...bar2].map(b => single(b).fret)).toEqual([7, 9, 5, 7, 7, 4, 5, 8]);
@@ -1103,10 +1105,21 @@ describe('TablEditImporterTest', () => {
             expect(single(bar1[2]).isGhost).toBe(true);
             expect(single(bar1[3]).isStaccato).toBe(true);
 
-            // tremolo bar up / dive-return without a tied target note: no amount, note kept
+            // tremolo bar up/down from fret 5 towards fret 3, dive-return from fret 5 towards fret 7
             const bar2 = beats(score, 1);
-            for (const b of bar2) {
-                expect(single(b).fret).toBe(5);
+            expect(bar2.map(b => single(b).fret)).toEqual([5, 3, 5, 7]);
+            expect(whammy(bar2[0])).toEqual([
+                [0, 0],
+                [30, -4],
+                [60, -4]
+            ]);
+            expect(whammy(bar2[2])).toEqual([
+                [0, 0],
+                [30, 4],
+                [60, 0]
+            ]);
+            for (const b of [bar2[1], bar2[3]]) {
+                expect(single(b).isTieDestination).toBe(false);
                 expectNoNoteEffect(b);
             }
 
@@ -1166,6 +1179,16 @@ describe('TablEditImporterTest', () => {
                 const data = new Uint8Array(base);
                 data[cellData(data, 64 + 16, 0) + 4] = 0x94;
                 expectNoNoteEffect(beats(readBytes(data), 1)[1]);
+            }
+            {
+                // tremolo bars whose next note on the string is on the same fret have no amount
+                const data = new Uint8Array(base);
+                data[cellData(data, 64 + 16, 0)] = 0x06;
+                data[cellData(data, 64 + 48, 0)] = 0x06;
+                for (const b of beats(readBytes(data), 1)) {
+                    expect(single(b).fret).toBe(5);
+                    expectNoNoteEffect(b);
+                }
             }
         });
 
