@@ -84,11 +84,7 @@ public class Uint8Array : Iterable<UByte> {
     }
 
     public fun fill(value: Double) {
-        fill(value, 0.0, length)
-    }
-
-    public fun fill(value: Double, start: Double, end: Double) {
-        val offset = byteOffset.toInt()
-        buffer.fill(value.toInt().toUByte(), offset + start.toInt(), offset + end.toInt())
+        val start = byteOffset.toInt()
+        buffer.fill(value.toInt().toUByte(), start, start + length.toInt())
     }
 }
