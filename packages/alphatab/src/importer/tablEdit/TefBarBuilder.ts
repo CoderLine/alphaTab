@@ -689,6 +689,7 @@ export class TefBarBuilder {
 
     /**
      * Gradual tempo changes are approximated with a hidden tempo change on every quarter note.
+     * A change at the very start replaces the initial tempo.
      */
     private _addTempoChange(position: number, from: number, to: number, rampQuarters: number): void {
         const score = this._tracks[0].track.score;
@@ -701,9 +702,14 @@ export class TefBarBuilder {
                 continue;
             }
             const value = steps === 1 ? to : Math.round(from + ((to - from) * i) / steps);
-            score.masterBars[b].tempoAutomations.push(
-                Automation.buildTempoAutomation(false, column / this._measureSizes[b], value, 2, i === 1)
-            );
+            const automations = score.masterBars[b].tempoAutomations;
+            if (b === 0 && column === 0) {
+                automations[0].value = value;
+            } else {
+                automations.push(
+                    Automation.buildTempoAutomation(false, column / this._measureSizes[b], value, 2, i === 1)
+                );
+            }
         }
     }
 

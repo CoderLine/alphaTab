@@ -2125,6 +2125,15 @@ describe('TablEditImporterTest', () => {
             ]);
         });
 
+        it('markers-tempo-at-start', async () => {
+            // healthy.tef with a tempo marker of 90 at 1.0: it replaces the header tempo
+            const score = readBytes(withCells(await loadHealthy(), [[0, 1, [0xfe, 90, 0, 0]]]));
+            expect(score.masterBars[0].tempoAutomations.map(a => [a.value, a.ratioPosition] as number[])).toEqual([
+                [90, 0]
+            ]);
+            expect(score.tempo).toBe(90);
+        });
+
         it('markers-tempo-ramp-from-pickup', async () => {
             // healthy.tef with bar 1 a pick-up from 1.32 (its notes at 1.0 and 1.16 turned into rests) and a tempo
             // marker at 1.48 going from 120 to 160 within four quarters
