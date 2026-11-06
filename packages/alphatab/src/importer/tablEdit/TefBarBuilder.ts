@@ -1470,16 +1470,7 @@ export class TefBarBuilder {
         let loudest = 7;
         for (const e of unit.events) {
             const note = new Note();
-            if (info.isPercussion) {
-                const articulation = PercussionMapper.getArticulationById(info.openPitches[e.stringIndex] + e.fret);
-                if (articulation) {
-                    note.percussionArticulation = info.track.getOrRegisterPercussionArticulation(articulation);
-                }
-                note.fret = Number.NaN;
-            } else {
-                note.string = info.stringCount - e.stringIndex;
-                note.fret = e.fret;
-            }
+            TefBarBuilder._setPosition(info, note, e.stringIndex, e.fret);
             note.isTieDestination = e.isTied || isContinuation;
             switch (e.accidental) {
                 case 1:
@@ -1508,6 +1499,22 @@ export class TefBarBuilder {
         if (loudest < 7) {
             beat.dynamics = TefBarBuilder._dynamicsOf(loudest);
             beat.showDynamics = false;
+        }
+    }
+
+    /**
+     * Places the note on a string and fret, or on the drum instrument of a line and fret.
+     */
+    private static _setPosition(info: TefTrackInfo, note: Note, stringIndex: number, fret: number): void {
+        if (info.isPercussion) {
+            const articulation = PercussionMapper.getArticulationById(info.openPitches[stringIndex] + fret);
+            if (articulation) {
+                note.percussionArticulation = info.track.getOrRegisterPercussionArticulation(articulation);
+            }
+            note.fret = Number.NaN;
+        } else {
+            note.string = info.stringCount - stringIndex;
+            note.fret = fret;
         }
     }
 
@@ -1547,8 +1554,7 @@ export class TefBarBuilder {
                 voice.addBeat(grace);
             }
             const note = new Note();
-            note.string = info.stringCount - stringIndex;
-            note.fret = fret;
+            TefBarBuilder._setPosition(info, note, stringIndex, fret);
             switch (kind) {
                 case 1:
                     // alphaTab ties hammer-ons and pull-offs to one string, a slur keeps the connection

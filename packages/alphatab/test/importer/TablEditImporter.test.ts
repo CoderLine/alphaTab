@@ -1852,6 +1852,25 @@ describe('TablEditImporterTest', () => {
         });
     });
 
+    it('drums-grace', async () => {
+        // drums.tef (8 lines) with a grace on fret 2 before its first note: a flam on the same drum line
+        const data = await loadData('drums');
+        let p = u32(data, cellsPointer);
+        while ((data[p + 4] & 0x3f) === 0 || (data[p + 4] & 0x3f) >= 0x33) {
+            p += cellSize;
+        }
+        data[p + 4] |= 0x40;
+        data[p + 7] = 0x02;
+        const line = Math.floor(u32(data, p) / 8) % 8;
+        // GM key = 96 - tuning byte of the line + fret
+        const pitch = 96 - data[u32(data, instrumentsPointer) + 4 + 20 + line];
+        const score = readBytes(data);
+        const grace = beats(score, 0)[0];
+        expect(grace.graceType).toBe(GraceType.OnBeat);
+        const note = single(grace);
+        expect(score.tracks[0].percussionArticulations[note.percussionArticulation].outputMidiNumber).toBe(pitch + 2);
+    });
+
     describe('bars', () => {
         it('bars-time-key', async () => {
             const score = await load('bars');
