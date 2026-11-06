@@ -153,6 +153,10 @@ class TefEvent {
  * @internal
  */
 class TefUnit {
+    /**
+     * The order in which the unit was found, which decides between units that sort equal.
+     */
+    public index: number = 0;
     public events: TefEvent[] = [];
     public start: number = 0;
     public end: number = 0;
@@ -1136,6 +1140,7 @@ export class TefBarBuilder {
             let unit = byKey.get(key);
             if (!unit) {
                 unit = new TefUnit();
+                unit.index = units.length;
                 unit.start = e.realStart;
                 unit.end = e.realEnd;
                 unit.bar = bar;
@@ -1167,7 +1172,8 @@ export class TefBarBuilder {
             if (a.isRest !== b.isRest) {
                 return a.isRest ? 1 : -1;
             }
-            return a.end - a.start - (b.end - b.start);
+            const length = a.end - a.start - (b.end - b.start);
+            return length !== 0 ? length : a.index - b.index;
         });
 
         const laneEnds: number[][] = [[], [], []];
