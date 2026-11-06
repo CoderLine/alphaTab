@@ -229,6 +229,7 @@ export class TefBarBuilder {
     private static readonly _connectionLengthMask = 0x3f;
     private static readonly _maxSyncopation = 3;
     private static readonly _lyricsTextPrefix = '>';
+    private static readonly _lyricsSectionStart = '\n>';
     private static readonly _noChord = 0xffff;
 
     private static readonly _durations: (TefDuration | null)[] = [
@@ -447,13 +448,14 @@ export class TefBarBuilder {
     }
 
     /**
-     * Applies the lyrics block: sections introduced by '>' and the track letter. TablEdit shows only
+     * Applies the lyrics block: sections are lines starting with '>' and the track letter. TablEdit shows only
      * the first section of a track.
      */
     public applyLyrics(text: string): void {
-        const sections = text.split('>');
+        const sections = `\n${text}`.split(TefBarBuilder._lyricsSectionStart);
         const applied = new Set<number>();
-        for (const section of sections) {
+        for (let s = 1; s < sections.length; s++) {
+            const section = sections[s];
             if (section.length === 0) {
                 continue;
             }

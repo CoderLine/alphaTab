@@ -2394,6 +2394,24 @@ describe('TablEditImporterTest', () => {
         expect(chord.showDiagram).toBe(false);
     });
 
+    it('lyrics-greater-than', async () => {
+        // lyrics.tef with 'world' changed to 'wor>d': only a line start begins a section
+        const data = await loadData('lyrics');
+        const lyrics = u32(data, 80);
+        const length = u16(data, lyrics);
+        let world = -1;
+        for (let i = lyrics + 2; i + 5 <= lyrics + 2 + length; i++) {
+            if (IOHelper.toString(data.subarray(i, i + 5), 'utf-8') === 'world') {
+                world = i;
+            }
+        }
+        expect(world).toBeGreaterThan(0);
+        data[world + 3] = 0x3e;
+        const score = readBytes(data);
+        expect(beats(score, 0).map(b => b.lyrics)).toEqual([['Hel-', 'Verse'], ['lo', 'two'], ['my-'], ['wor>d']]);
+        expect(beats(score, 3)[0].lyrics).toEqual(['line']);
+    });
+
     it('lyrics-sections', async () => {
         // lyrics.tef with two sections for the module ("One two", then "Five six seven"), re-saved in TablEdit,
         // which shows only the first
