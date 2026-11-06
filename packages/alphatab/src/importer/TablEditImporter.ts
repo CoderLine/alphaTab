@@ -1,7 +1,8 @@
 import { FormatError } from '@coderline/alphatab/FormatError';
 import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
-import { TefBarBuilder, TefCell, TefTrackInfo } from '@coderline/alphatab/importer/tablEdit/TefBarBuilder';
+import { TefBarBuilder, TefTrackInfo } from '@coderline/alphatab/importer/tablEdit/TefBarBuilder';
 import { TefBinary } from '@coderline/alphatab/importer/tablEdit/TefBinary';
+import { TefCell } from '@coderline/alphatab/importer/tablEdit/TefCell';
 import { TefFormat2Reader } from '@coderline/alphatab/importer/tablEdit/TefFormat2Reader';
 import {
     TefReadingGuide,
@@ -27,7 +28,7 @@ import { Track } from '@coderline/alphatab/model/Track';
 export class TablEditImporter extends ScoreImporter {
     private static readonly _headerSize = 256;
     private static readonly _firstFormat2 = 3;
-    private static readonly _firstSupportedFormat = 10;
+    private static readonly _firstFormat3 = 10;
     private static readonly _protectedFormat = 12;
     private static readonly _lastSupportedFormat = 12;
     private static readonly _wideMeasureRecordHeader = 16;
@@ -43,7 +44,6 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _halfBarBeamingFlag = 0x04;
     private static readonly _maxTextCount = 4096;
     private static readonly _maxReadingListCount = 4096;
-    private static readonly _readingGuideMarker = 0xb7;
     private static readonly _maxChordCount = 4096;
     private static readonly _readingListRecordSize = 0x20;
     private static readonly _chordStringBytes = 14;
@@ -53,7 +53,7 @@ export class TablEditImporter extends ScoreImporter {
     private static readonly _nameLength = 36;
     private static readonly _abbreviationOffset = 26;
     private static readonly _abbreviationMark = 0x5e;
-    private static readonly _cellEnd = 4294967295;
+    private static readonly _cellEnd = 0xffffffff;
     /**
      * Older files may carry a stale protection code, which TablEdit ignores.
      */
@@ -64,8 +64,14 @@ export class TablEditImporter extends ScoreImporter {
     private _cells: TefCell[] = [];
     private _lyrics: string = '';
     private _readingList: TefReadingListItem[] = [];
+    private _tempo: number = 120;
+    private _syncopation: number = 0;
+    private _texts: string[] = [];
+    private _chords: Chord[] = [];
+    private _version: number = 0;
     private _measureStarts: number[] = [];
     private _measureSizes: number[] = [];
+    private _length: number = 0;
     private _tracks: TefTrackInfo[] = [];
     private _totalStrings: number = 0;
     private _pickupBars: Set<number> = new Set<number>();
@@ -89,8 +95,17 @@ export class TablEditImporter extends ScoreImporter {
         }
 
         this._score = new Score();
-        const builder =
-            format < TablEditImporter._firstSupportedFormat ? this._readFormat2() : this._readFormat3(format);
+        if (format < TablEditImporter._firstFormat3) {
+            this._readFormat2();
+        } else {
+            this._readFormat3(format);
+        }
+        const builder = new TefBarBuilder(this._tracks, this._measureStarts, this._measureSizes);
+        builder.initialTempo = this._tempo;
+        builder.initialSyncopation = this._syncopation;
+        builder.texts = this._texts;
+        builder.chords = this._chords;
+        builder.version = this._version;
         builder.pickupBars = this._pickupBars;
         builder.build(this._cells);
         builder.applyLyrics(this._lyrics);
@@ -104,7 +119,11 @@ export class TablEditImporter extends ScoreImporter {
         }
 
         const readingList = this._readingList;
-        TefReadingList.apply(this._score, readingList, readingList.length > 0 ? [] : this._readGuides(this._cells));
+        TefReadingList.apply(
+            this._score,
+            readingList,
+            readingList.length > 0 ? [] : TablEditImporter._readGuides(this._cells, builder)
+        );
 
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
@@ -113,63 +132,65 @@ export class TablEditImporter extends ScoreImporter {
         return this._score;
     }
 
-    private _readFormat3(format: number): TefBarBuilder {
-        const version = this._u16(2) * 0x10000 + this._u16(4);
-        const isProtected = version >= TablEditImporter._protectionVersion && this._u32(16) !== 0;
+    private _readFormat3(format: number): void {
+        const d = this._data;
+        this._version = d.u16(2) * 0x10000 + d.u16(4);
+        const isProtected = this._version >= TablEditImporter._protectionVersion && d.u32(16) !== 0;
         if (isProtected || format === TablEditImporter._protectedFormat) {
             throw new FormatError('Protected TablEdit files are not supported');
         }
         this._readInformation();
-        this._readMeasures(this._u32(92));
-        this._readInstruments(this._u32(96));
-        this._cells = this._readContents(this._u32(60));
-
-        const builder = new TefBarBuilder(this._tracks, this._measureStarts, this._measureSizes);
-        builder.initialTempo = this._u16(6) > 0 ? this._u16(6) : 120;
-        builder.initialSyncopation = Math.max(-3, Math.min(3, this._s16(12)));
-        builder.texts = this._readTexts(this._u32(84));
-        builder.chords = this._readChords(this._u32(88));
-        builder.version = this._u16(2);
-        this._lyrics = this._readString(this._u32(80));
-        this._readingList = this._readReadingList(this._u32(128));
-        return builder;
+        this._readMeasures(d.u32(92));
+        this._readInstruments(d.u32(96));
+        this._cells = this._readContents(d.u32(60));
+        this._tempo = d.u16(6) > 0 ? d.u16(6) : 120;
+        this._syncopation = d.s16(12);
+        this._texts = this._readTexts(d.u32(84));
+        this._chords = this._readChords(d.u32(88));
+        this._lyrics = this._readString(d.u32(80));
+        this._readingList = this._readReadingList(d.u32(128));
     }
 
-    private _readFormat2(): TefBarBuilder {
+    private _readFormat2(): void {
         const reader = new TefFormat2Reader(this._data, this.settings.importer.maxDecodingBufferSize);
         reader.read();
         this._score.title = reader.title;
         this._score.subTitle = reader.author;
         this._score.instructions = reader.comment;
         this._score.notices = reader.notes;
-
-        let position = 0;
-        for (let i = 0; i < reader.measures.length; i++) {
-            const measure = reader.measures[i];
-            const masterBar = new MasterBar();
-            masterBar.timeSignatureNumerator = measure.numerator;
-            masterBar.timeSignatureDenominator = measure.denominator;
-            this._score.addMasterBar(masterBar);
-            this._keys.push(measure.key);
-            if (measure.isMinor) {
-                this._minorBars.add(i);
-            }
-            this._measureStarts.push(position);
-            this._measureSizes.push(measure.size);
-            position += measure.size;
+        for (const measure of reader.measures) {
+            this._addMeasure(measure.numerator, measure.denominator, measure.size, measure.key, measure.isMinor);
         }
         this._readInstrumentRecords(reader.instruments, 0, reader.instrumentCount, reader.instrumentRecordSize);
         this._cells = reader.cells;
-
-        const builder = new TefBarBuilder(this._tracks, this._measureStarts, this._measureSizes);
-        builder.initialTempo = reader.tempo;
-        builder.initialSyncopation = Math.max(-3, Math.min(3, reader.syncopation));
-        builder.texts = reader.texts;
-        builder.chords = this._readChordRecords(reader.chordsOffset, reader.chordCount, reader.chordRecordSize);
-        builder.version = reader.version;
+        this._tempo = reader.tempo;
+        this._syncopation = reader.syncopation;
+        this._texts = reader.texts;
+        this._chords = this._readChordRecords(reader.chordsOffset, reader.chordCount, reader.chordRecordSize);
+        this._version = reader.version * 0x10000;
         this._lyrics = reader.lyrics;
         this._readingList = reader.readingList;
-        return builder;
+    }
+
+    private _addMeasure(
+        numerator: number,
+        denominator: number,
+        size: number,
+        key: number,
+        isMinor: boolean
+    ): MasterBar {
+        const masterBar = new MasterBar();
+        masterBar.timeSignatureNumerator = numerator;
+        masterBar.timeSignatureDenominator = denominator;
+        if (isMinor) {
+            this._minorBars.add(this._score.masterBars.length);
+        }
+        this._score.addMasterBar(masterBar);
+        this._keys.push(key);
+        this._measureStarts.push(this._length);
+        this._measureSizes.push(size);
+        this._length += size;
+        return masterBar;
     }
 
     /**
@@ -180,9 +201,9 @@ export class TablEditImporter extends ScoreImporter {
         if (this._data.length < TablEditImporter._headerSize) {
             throw new UnsupportedFormatError('Data too short for a TablEdit file');
         }
-        const numerator = this._u16(202);
-        const denominator = this._u8(204);
-        const format = this._u8(205);
+        const numerator = this._data.u16(202);
+        const denominator = this._data.u8(204);
+        const format = this._data.u8(205);
         const isPowerOfTwo = denominator > 0 && (denominator & (denominator - 1)) === 0;
         const longestMeasure = isPowerOfTwo ? (64 / denominator) * numerator : 0;
         if (!isPowerOfTwo || format === 0 || longestMeasure < 4 || longestMeasure > 256) {
@@ -192,45 +213,43 @@ export class TablEditImporter extends ScoreImporter {
     }
 
     private _readInformation(): void {
-        this._score.title = this._readString(this._u32(64));
-        this._score.subTitle = this._readString(this._u32(68));
-        this._score.instructions = this._readString(this._u32(72));
-        this._score.notices = this._readString(this._u32(76));
-        this._score.copyright = this._readString(this._u32(140));
+        this._score.title = this._readString(this._data.u32(64));
+        this._score.subTitle = this._readString(this._data.u32(68));
+        this._score.instructions = this._readString(this._data.u32(72));
+        this._score.notices = this._readString(this._data.u32(76));
+        this._score.copyright = this._readString(this._data.u32(140));
     }
 
     private _readMeasures(offset: number): void {
         if (offset === 0) {
             throw new FormatError('TablEdit file without measures');
         }
-        const recordSize = this._u16(offset) === TablEditImporter._wideMeasureRecordHeader ? 12 : 8;
-        const count = this._u16(offset + 2);
+        const d = this._data;
+        const recordSize = d.u16(offset) === TablEditImporter._wideMeasureRecordHeader ? 12 : 8;
+        const count = d.u16(offset + 2);
         if (count === 0) {
             throw new FormatError('TablEdit file without measures');
         }
-        this._ensureLoopBoundary(count, TablEditImporter._maxMeasureCount, 'measure count');
-        let position = 0;
+        TefBinary.ensureLoopBoundary(count, TablEditImporter._maxMeasureCount, 'measure count');
         let p = offset + 8;
         for (let i = 0; i < count; i++) {
-            const masterBar = new MasterBar();
-            const denominator = this._u8(p + 4);
-            const numerator = this._u8(p + 5);
-            masterBar.timeSignatureNumerator = numerator > 0 ? numerator : 4;
-            masterBar.timeSignatureDenominator = denominator > 0 ? denominator : 4;
-            const flags = this._u8(p);
+            const denominator = d.u8(p + 4) > 0 ? d.u8(p + 4) : 4;
+            const numerator = d.u8(p + 5) > 0 ? d.u8(p + 5) : 4;
+            let size = (64 / denominator) * numerator;
+            if (size <= 0 || size > 1024 || size !== Math.floor(size)) {
+                size = 64;
+            }
+            const flags = d.u8(p);
+            const masterBar = this._addMeasure(
+                numerator,
+                denominator,
+                size,
+                d.s8(p + 2),
+                (flags & TablEditImporter._minorFlag) !== 0
+            );
             if ((flags & TablEditImporter._pickupFlag) !== 0) {
                 masterBar.isAnacrusis = true;
                 this._pickupBars.add(i);
-            }
-            if ((flags & TablEditImporter._minorFlag) !== 0) {
-                this._minorBars.add(i);
-            }
-            this._keys.push(this._s8(p + 2));
-            this._score.addMasterBar(masterBar);
-
-            let size = (64 / masterBar.timeSignatureDenominator) * masterBar.timeSignatureNumerator;
-            if (size <= 0 || size > 1024 || size !== Math.floor(size)) {
-                size = 64;
             }
             if ((flags & TablEditImporter._freeBarFlags) !== 0) {
                 masterBar.beamingRules = TablEditImporter._freeBarBeaming(
@@ -239,9 +258,6 @@ export class TablEditImporter extends ScoreImporter {
                     (flags & TablEditImporter._halfBarBeamingFlag) !== 0
                 );
             }
-            this._measureStarts.push(position);
-            this._measureSizes.push(size);
-            position += size;
             p += recordSize;
         }
     }
@@ -267,25 +283,24 @@ export class TablEditImporter extends ScoreImporter {
     }
 
     private _readInstruments(offset: number): void {
-        if (offset === 0 || this._u16(offset + 2) === 0) {
+        if (offset === 0 || this._data.u16(offset + 2) === 0) {
             throw new FormatError('TablEdit file without instruments');
         }
-        this._readInstrumentRecords(this._data, offset + 4, this._u16(offset + 2), this._u16(offset));
+        this._readInstrumentRecords(this._data, offset + 4, this._data.u16(offset + 2), this._data.u16(offset));
     }
 
     private _readInstrumentRecords(data: TefBinary, offset: number, count: number, recordSize: number): void {
-        this._ensureLoopBoundary(count, TablEditImporter._maxInstrumentCount, 'instrument count');
+        TefBinary.ensureLoopBoundary(count, TablEditImporter._maxInstrumentCount, 'instrument count');
         let p = offset;
         for (let i = 0; i < count; i++) {
             const stringCount = data.u16(p);
-            this._ensureLoopBoundary(stringCount, TablEditImporter._maxStringCount, 'string count');
+            TefBinary.ensureLoopBoundary(stringCount, TablEditImporter._maxStringCount, 'string count');
 
             const track = new Track();
             track.ensureStaveCount(1);
             const staff: Staff = track.staves[0];
             this._score.addTrack(track);
             track.name = data.readCString(p + TablEditImporter._nameOffset, TablEditImporter._nameLength);
-            // the bytes between the name and the abbreviation are leftovers of earlier names
             const abbreviation = p + TablEditImporter._nameOffset + TablEditImporter._abbreviationOffset;
             if (data.u8(abbreviation) === TablEditImporter._abbreviationMark) {
                 track.shortName = data.readCString(
@@ -354,34 +369,30 @@ export class TablEditImporter extends ScoreImporter {
         if (offset === 0) {
             return items;
         }
-        const recordSize = this._u16(offset);
+        const recordSize = this._data.u16(offset);
         if (recordSize !== TablEditImporter._readingListRecordSize) {
             return items;
         }
-        const count = this._u16(offset + 2);
-        this._ensureLoopBoundary(count, TablEditImporter._maxReadingListCount, 'reading list count');
+        const count = this._data.u16(offset + 2);
+        TefBinary.ensureLoopBoundary(count, TablEditImporter._maxReadingListCount, 'reading list count');
         let p = offset + 4;
         for (let i = 0; i < count; i++) {
             const item = new TefReadingListItem();
-            item.first = this._u16(p) - 1;
-            item.last = this._u16(p + 2) - 1;
-            item.label = this._readCString(p + 4, recordSize - 4);
+            item.first = this._data.u16(p) - 1;
+            item.last = this._data.u16(p + 2) - 1;
+            item.label = this._data.readCString(p + 4, recordSize - 4);
             items.push(item);
             p += recordSize;
         }
         return items;
     }
 
-    private _readGuides(cells: TefCell[]): TefReadingGuide[] {
+    private static _readGuides(cells: TefCell[], builder: TefBarBuilder): TefReadingGuide[] {
         const guides: TefReadingGuide[] = [];
         for (const cell of cells) {
-            if (cell.data[0] === TablEditImporter._readingGuideMarker) {
+            if (cell.data[0] === TefCell.readingGuideMarker) {
                 const guide = new TefReadingGuide();
-                let bar = 0;
-                while (bar + 1 < this._measureStarts.length && this._measureStarts[bar + 1] <= cell.position) {
-                    bar++;
-                }
-                guide.bar = bar;
+                guide.bar = builder.barOf(cell.position);
                 guide.value = cell.data[2];
                 guides.push(guide);
             }
@@ -394,12 +405,12 @@ export class TablEditImporter extends ScoreImporter {
         if (offset === 0) {
             return texts;
         }
-        const count = this._u16(offset);
-        this._ensureLoopBoundary(count, TablEditImporter._maxTextCount, 'text count');
+        const count = this._data.u16(offset);
+        TefBinary.ensureLoopBoundary(count, TablEditImporter._maxTextCount, 'text count');
         let p = offset + 2;
         for (let i = 0; i < count; i++) {
             texts.push(this._readString(p));
-            p += 2 + this._u16(p);
+            p += 2 + this._data.u16(p);
         }
         return texts;
     }
@@ -413,21 +424,21 @@ export class TablEditImporter extends ScoreImporter {
         if (offset === 0) {
             return chords;
         }
-        return this._readChordRecords(offset + 4, this._u16(offset + 2), this._u16(offset));
+        return this._readChordRecords(offset + 4, this._data.u16(offset + 2), this._data.u16(offset));
     }
 
     private _readChordRecords(offset: number, count: number, recordSize: number): Chord[] {
         const chords: Chord[] = [];
-        this._ensureLoopBoundary(count, TablEditImporter._maxChordCount, 'chord count');
+        TefBinary.ensureLoopBoundary(count, TablEditImporter._maxChordCount, 'chord count');
         let p = offset;
         for (let i = 0; i < count; i++) {
             const chord = new Chord();
-            chord.name = this._readCString(p + 14, 17);
+            chord.name = this._data.readCString(p + 14, 17);
             for (let s = 0; s < TablEditImporter._chordStringBytes; s++) {
-                const value = this._u8(p + s);
+                const value = this._data.u8(p + s);
                 chord.strings.push(value === 0xff ? -1 : value & 0x1f);
             }
-            const firstFret = this._s8(p + 31);
+            const firstFret = this._data.s8(p + 31);
             chord.firstFret = firstFret > 0 ? firstFret : 1;
             chords.push(chord);
             p += recordSize;
@@ -484,27 +495,22 @@ export class TablEditImporter extends ScoreImporter {
 
     private _readContents(offset: number): TefCell[] {
         const cells: TefCell[] = [];
-        if (offset === 0 || this._totalStrings === 0) {
+        if (offset === 0) {
             return cells;
         }
-        const totalLength =
-            this._measureStarts.length > 0
-                ? this._measureStarts[this._measureStarts.length - 1] +
-                  this._measureSizes[this._measureSizes.length - 1]
-                : 0;
         let p = offset;
         while (true) {
-            const location = this._u32(p);
+            const location = this._data.u32(p);
             if (location === TablEditImporter._cellEnd) {
                 break;
             }
-            this._ensureLoopBoundary(cells.length, TablEditImporter._maxCellCount, 'cell count');
+            TefBinary.ensureLoopBoundary(cells.length, TablEditImporter._maxCellCount, 'cell count');
             const slot = Math.floor(location / 8);
             const cell = new TefCell();
             cell.position = Math.floor(slot / this._totalStrings);
             cell.row = slot % this._totalStrings;
             cell.data = this._data.bytes.subarray(p + 4, p + TablEditImporter._cellSize);
-            if (cell.position < totalLength) {
+            if (cell.position < this._length) {
                 cells.push(cell);
             }
             p += TablEditImporter._cellSize;
@@ -517,33 +523,5 @@ export class TablEditImporter extends ScoreImporter {
             return '';
         }
         return this._data.readString(offset, this.settings.importer.maxDecodingBufferSize);
-    }
-
-    private _readCString(offset: number, maxLength: number): string {
-        return this._data.readCString(offset, maxLength);
-    }
-
-    private _u8(offset: number): number {
-        return this._data.u8(offset);
-    }
-
-    private _s8(offset: number): number {
-        return this._data.s8(offset);
-    }
-
-    private _s16(offset: number): number {
-        return this._data.s16(offset);
-    }
-
-    private _u16(offset: number): number {
-        return this._data.u16(offset);
-    }
-
-    private _u32(offset: number): number {
-        return this._data.u32(offset);
-    }
-
-    private _ensureLoopBoundary(value: number, maximumValue: number, label: string) {
-        TefBinary.ensureLoopBoundary(value, maximumValue, label);
     }
 }

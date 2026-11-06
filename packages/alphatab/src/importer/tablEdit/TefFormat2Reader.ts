@@ -1,6 +1,6 @@
 import { FormatError } from '@coderline/alphatab/FormatError';
-import { TefCell } from '@coderline/alphatab/importer/tablEdit/TefBarBuilder';
 import { TefBinary } from '@coderline/alphatab/importer/tablEdit/TefBinary';
+import { TefCell } from '@coderline/alphatab/importer/tablEdit/TefCell';
 import { TefReadingListItem } from '@coderline/alphatab/importer/tablEdit/TefReadingList';
 import { Logger } from '@coderline/alphatab/Logger';
 
@@ -40,7 +40,6 @@ export class TefFormat2Reader {
     private static readonly _patternRecordSize = 108;
     private static readonly _chordRecordSize = 32;
     private static readonly _instrumentRecordSize = 50;
-    private static readonly _instrumentNameLength = 18;
     private static readonly _layoutBlockMarker = 0x1e0;
     private static readonly _layoutBlockSize = 480;
     private static readonly _accordionBlockMarker = 0x10;
@@ -88,36 +87,22 @@ export class TefFormat2Reader {
     private static readonly _pitchChangeKind = 0xa0;
     private static readonly _gracePitchKind = 0xc0;
     private static readonly _graceExtendedKind = 0xe0;
-    private static readonly _graceFlag = 0x40;
-    private static readonly _pitchChangeFlag = 0x80;
     private static readonly _voiceMask = 0x30;
+    /**
+     * The voice value of a stabilo note, which moves to its own flag.
+     */
     private static readonly _stabiloVoice = 0x10;
-    private static readonly _stabiloFlag = 0x10;
 
     private static readonly _noBeamAttribute = 0x0b;
     private static readonly _noStemAttribute = 0x0c;
     private static readonly _ottavaBassaAttribute = 0xc0;
     private static readonly _ottavaAltaAttribute = 0xd0;
-    private static readonly _noBeamFlag = 0x08;
     private static readonly _noStemFlag = 0x04;
-    private static readonly _ottavaBassaFlag = 0x40;
-    private static readonly _ottavaAltaFlag = 0x44;
     private static readonly _restHiddenInNotationBits = 0x42;
     private static readonly _restHiddenInTabBit = 0x10;
-    private static readonly _restHiddenInNotationFlag = 0x01;
-    private static readonly _restHiddenInTabFlag = 0x20;
     private static readonly _symbolNumberOffset = 100;
     private static readonly _securityCodeOffset = 208;
-    private static readonly _defaultCrescendoAmount = 16;
 
-    private static readonly _currentRest = 0x33;
-    private static readonly _currentChord = 0x35;
-    private static readonly _currentLineBreak = 0x36;
-    private static readonly _currentAccent = 0x37;
-    private static readonly _currentCrescendo = 0x38;
-    private static readonly _currentText = 0x39;
-    private static readonly _currentSymbol = 0xb6;
-    private static readonly _currentReadingGuide = 0xb7;
     private static readonly _currentRecordSize = 68;
     private static readonly _currentDrumFlag = 0x80;
     private static readonly _drumOutput = 89;
@@ -422,7 +407,6 @@ export class TefFormat2Reader {
             }
             records[target + 4] =
                 this._data.s16(source + 6) > TefFormat2Reader._drumOutput ? TefFormat2Reader._currentDrumFlag : 0;
-            records.fill(0, target + 32 + TefFormat2Reader._instrumentNameLength, target + size);
             this._p += TefFormat2Reader._instrumentRecordSize;
         }
         if (strings !== this.totalStrings) {
@@ -509,7 +493,7 @@ export class TefFormat2Reader {
     }
 
     private static _isNote(cell: TefCell): boolean {
-        return (cell.data[0] & 0x3f) < TefFormat2Reader._currentRest;
+        return (cell.data[0] & TefCell.typeMask) < TefCell.rest;
     }
 
     /**
@@ -523,18 +507,18 @@ export class TefFormat2Reader {
         const data = new Uint8Array(8);
         switch (b1) {
             case TefFormat2Reader._restCell:
-                data[0] = TefFormat2Reader._currentRest;
+                data[0] = TefCell.rest;
                 data[1] = b2;
                 data[2] = b3 & TefFormat2Reader._voiceMask;
                 if ((b3 & TefFormat2Reader._restHiddenInNotationBits) !== 0) {
-                    data[7] |= TefFormat2Reader._restHiddenInNotationFlag;
+                    data[7] |= TefCell.restHiddenInNotationFlag;
                 }
                 if ((b3 & TefFormat2Reader._restHiddenInTabBit) !== 0) {
-                    data[7] |= TefFormat2Reader._restHiddenInTabFlag;
+                    data[7] |= TefCell.restHiddenInTabFlag;
                 }
                 return data;
             case TefFormat2Reader._chordCell:
-                data[0] = TefFormat2Reader._currentChord;
+                data[0] = TefCell.chordMarker;
                 data[1] = b2;
                 return data;
             case TefFormat2Reader._textCell: {
@@ -542,18 +526,17 @@ export class TefFormat2Reader {
                 if (font === TefFormat2Reader._bitmapTextFont) {
                     return null;
                 }
-                data[0] = TefFormat2Reader._currentText;
+                data[0] = TefCell.textMarker;
                 data[1] = b2;
                 return data;
             }
             case TefFormat2Reader._accentCell:
-                data[0] = TefFormat2Reader._currentAccent;
+                data[0] = TefCell.accentMarker;
                 return data;
             case TefFormat2Reader._crescendoCell:
-                data[0] = TefFormat2Reader._currentCrescendo;
+                data[0] = TefCell.crescendoMarker;
                 data[1] = b2;
                 data[2] = (((b2 & 0x0f) * 4 + b3) * 4) & 0xff;
-                data[6] = TefFormat2Reader._defaultCrescendoAmount;
                 return data;
             case TefFormat2Reader._connectionCell:
                 data[0] = b1;
@@ -568,16 +551,16 @@ export class TefFormat2Reader {
                 data[6] = b4;
                 return data;
             case TefFormat2Reader._readingGuideCell:
-                data[0] = TefFormat2Reader._currentReadingGuide;
+                data[0] = TefCell.readingGuideMarker;
                 data[2] = b3;
                 return data;
             case TefFormat2Reader._lineBreakCell:
-                data[0] = TefFormat2Reader._currentLineBreak;
+                data[0] = TefCell.lineBreakMarker;
                 data[5] = b4 & 0x0f;
                 data[7] = b2;
                 return data;
             case TefFormat2Reader._symbolCell:
-                data[0] = TefFormat2Reader._currentSymbol;
+                data[0] = TefCell.symbolMarker;
                 data[1] = ((b2 & 0x7f) + TefFormat2Reader._symbolNumberOffset) & 0xff;
                 return data;
             case TefFormat2Reader._tempoCell:
@@ -604,7 +587,7 @@ export class TefFormat2Reader {
         const voice: number = b3 & TefFormat2Reader._voiceMask;
         if (voice === TefFormat2Reader._stabiloVoice) {
             data[2] = b3 & ~TefFormat2Reader._voiceMask;
-            data[5] = TefFormat2Reader._stabiloFlag;
+            data[5] = TefFormat2Reader._stabiloVoice;
         }
         let flags = 0;
         switch (b1 & TefFormat2Reader._noteKindMask) {
@@ -612,7 +595,7 @@ export class TefFormat2Reader {
                 data[6] = b4;
                 break;
             case TefFormat2Reader._graceKind:
-                flags = TefFormat2Reader._graceFlag;
+                flags = TefCell.graceFlag;
                 data[3] = b4;
                 break;
             case TefFormat2Reader._fontKind:
@@ -622,16 +605,16 @@ export class TefFormat2Reader {
                 break;
             case TefFormat2Reader._pitchChangeKind:
             case TefFormat2Reader._graceExtendedKind:
-                flags = b1 & (TefFormat2Reader._graceFlag | TefFormat2Reader._pitchChangeFlag);
+                flags = b1 & (TefCell.graceFlag | TefCell.pitchChangeFlag);
                 if (fretField === TefFormat2Reader._lastFretField) {
                     fretField += b4 & 0x1f;
-                    flags &= ~TefFormat2Reader._pitchChangeFlag;
+                    flags &= ~TefCell.pitchChangeFlag;
                 } else {
                     data[3] = b4;
                 }
                 break;
             case TefFormat2Reader._gracePitchKind:
-                flags = TefFormat2Reader._graceFlag | TefFormat2Reader._pitchChangeFlag;
+                flags = TefCell.graceFlag | TefCell.pitchChangeFlag;
                 data[3] = b4;
                 break;
             default:
@@ -645,16 +628,16 @@ export class TefFormat2Reader {
     private static _applyAttribute(data: Uint8Array, value: number): void {
         switch (value) {
             case TefFormat2Reader._noBeamAttribute:
-                data[7] = TefFormat2Reader._noBeamFlag;
+                data[7] = TefCell.excludeFromBeaming;
                 break;
             case TefFormat2Reader._noStemAttribute:
                 data[7] = TefFormat2Reader._noStemFlag;
                 break;
             case TefFormat2Reader._ottavaBassaAttribute:
-                data[7] = TefFormat2Reader._ottavaBassaFlag;
+                data[7] = TefCell.ottavaBassa;
                 break;
             case TefFormat2Reader._ottavaAltaAttribute:
-                data[7] = TefFormat2Reader._ottavaAltaFlag;
+                data[7] = TefCell.ottavaAlta;
                 break;
             default:
                 data[4] = value;

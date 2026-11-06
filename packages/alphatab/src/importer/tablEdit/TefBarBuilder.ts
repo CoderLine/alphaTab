@@ -1,3 +1,4 @@
+import { TefCell } from '@coderline/alphatab/importer/tablEdit/TefCell';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { Automation, AutomationType } from '@coderline/alphatab/model/Automation';
 import { Bar } from '@coderline/alphatab/model/Bar';
@@ -31,22 +32,6 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Voice } from '@coderline/alphatab/model/Voice';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
-
-/**
- * A raw grid cell of a TablEdit file.
- * @internal
- */
-export class TefCell {
-    /**
-     * The grid position in 1/64 notes from the start of the piece.
-     */
-    public position: number = 0;
-    /**
-     * The string row counted over all instruments.
-     */
-    public row: number = 0;
-    public data!: Uint8Array;
-}
 
 /**
  * @internal
@@ -192,13 +177,9 @@ export class TefBarBuilder {
      */
     private static readonly _smallestPlain = TefBarBuilder.subUnitsPerCell / 2;
 
-    private static readonly _restCode = 0x33;
     private static readonly _tieDynamics = 7;
     private static readonly _upperVoice = 2;
     private static readonly _lowerVoice = 3;
-    private static readonly _extensionMarker = 0x7d;
-    private static readonly _graceFlag = 0x40;
-    private static readonly _pitchChangeFlag = 0x80;
     private static readonly _acciaccaturaFlag = 0x40;
     private static readonly _graceDurationMask = 0x07;
     private static readonly _extensionParameterFlag = 0x20;
@@ -209,32 +190,21 @@ export class TefBarBuilder {
     private static readonly _harmonicIntervalTag = 0xb0;
     private static readonly _hiddenInNotation = 0x0f;
     private static readonly _restSecondaryBeamBreak = 0x07;
-    private static readonly _restHiddenInNotationFlag = 0x01;
-    private static readonly _restHiddenInTabFlag = 0x20;
     private static readonly _excludeFromBeamingMask = 0x88;
-    private static readonly _excludeFromBeaming = 0x08;
     /**
      * Ticks between two strings of a brush or roll per speed step: 5 TablEdit ticks of 240 per quarter.
      */
     private static readonly _strumTicksPerSpeed = 20;
     private static readonly _defaultCrescendoAmount = 16;
-    private static readonly _crescendoAmountVersion = 0x0306;
+    private static readonly _crescendoAmountVersion = 0x03060000;
+    private static readonly _decrescendoFlag = 0x10;
+    private static readonly _doubleBarFlag = 0x04;
+    private static readonly _fermataSymbols = [0x6b, 0x6c];
     private static readonly _bracketFlag = 0x80;
     private static readonly _connectionLengthMask = 0x3f;
-    private static readonly _maxTupletNumber = 15;
+    private static readonly _maxSyncopation = 3;
     private static readonly _lyricsTextPrefix = '>';
 
-    private static readonly _chordMarker = 0x35;
-    private static readonly _lineBreakMarker = 0x36;
-    private static readonly _accentMarker = 0x37;
-    private static readonly _crescendoMarker = 0x38;
-    private static readonly _textMarker = 0x39;
-    private static readonly _connectionMarker = 0x3d;
-    private static readonly _fingeringMarker = 0x3e;
-    private static readonly _patchMarker = 0x7e;
-    private static readonly _symbolMarker = 0xb6;
-    private static readonly _syncopationMarker = 0xfd;
-    private static readonly _tempoMarker = 0xfe;
     private static readonly _noChord = 0xffff;
 
     private _tracks: TefTrackInfo[];
@@ -256,7 +226,7 @@ export class TefBarBuilder {
     public initialTempo: number = 120;
     public initialSyncopation: number = 0;
     /**
-     * The version of TablEdit which saved the file, as 0xMMmm.
+     * The version and sub-version of TablEdit which saved the file, as 0xMMmmSSSS.
      */
     public version: number = 0;
     /**
@@ -275,7 +245,7 @@ export class TefBarBuilder {
         this._trimPickupBars(cells);
         const extensions = new Map<string, Uint8Array>();
         for (const cell of cells) {
-            if (cell.data[0] === TefBarBuilder._extensionMarker && cell.data[1] !== 0) {
+            if (cell.data[0] === TefCell.extensionMarker && cell.data[1] !== 0) {
                 extensions.set(`${cell.row}:${cell.position - 1}`, cell.data);
             }
         }
@@ -322,18 +292,16 @@ export class TefBarBuilder {
      */
     private _tupletRangeOf(cell: TefCell): TefTupletRange | null {
         const data = cell.data;
-        if (data[0] !== TefBarBuilder._connectionMarker || (data[7] & TefBarBuilder._bracketFlag) !== 0) {
+        if (data[0] !== TefCell.connectionMarker || (data[7] & TefBarBuilder._bracketFlag) !== 0) {
             return null;
         }
         const numerator = data[2] >> 4;
-        if (numerator < 3 || numerator > TefBarBuilder._maxTupletNumber) {
+        if (numerator < 3) {
             return null;
         }
-        const bar = this._barOf(cell.position);
+        const bar = this.barOf(cell.position);
         const masterBar = this._tracks[0].track.score.masterBars[bar];
         const compound = TefBarBuilder._beatCells(masterBar, this._measureSizes[bar]) % 3 === 0;
-        // the covered notes sit on the grid of half their value: n of them take the time of m / 2 notes,
-        // with m = 3 (compound beat) or 4 doubled until it reaches n
         let stretch = compound ? 3 : 4;
         while (stretch < numerator) {
             stretch *= 2;
@@ -380,8 +348,8 @@ export class TefBarBuilder {
             let first = size;
             let end = 0;
             for (const cell of cells) {
-                const type = cell.data[0] & 0x3f;
-                if (type >= TefBarBuilder._restCode || cell.position < start || cell.position >= start + size) {
+                const type = cell.data[0] & TefCell.typeMask;
+                if (type >= TefCell.rest || cell.position < start || cell.position >= start + size) {
                     continue;
                 }
                 const d = TefBarBuilder._durationOf(cell.data[1] & 0x1f);
@@ -588,10 +556,10 @@ export class TefBarBuilder {
         const barsPerLine: number[] = [];
         for (const cell of cells) {
             const data = cell.data;
-            const bar = this._barOf(cell.position);
+            const bar = this.barOf(cell.position);
             const column = Math.max(0, this._columnOf(cell.position, bar));
             switch (data[0]) {
-                case TefBarBuilder._tempoMarker: {
+                case TefCell.tempoMarker: {
                     const bpm = data[1] | (data[2] << 8);
                     if (bpm > 1) {
                         this._addTempoChange(bar, column, tempo, bpm, data[3]);
@@ -599,12 +567,12 @@ export class TefBarBuilder {
                     }
                     break;
                 }
-                case TefBarBuilder._syncopationMarker:
-                    syncopation[bar] = Math.max(-3, Math.min(3, data[1] - 8));
+                case TefCell.syncopationMarker:
+                    syncopation[bar] = TefBarBuilder._clampSyncopation(data[1] - 8);
                     break;
-                case TefBarBuilder._lineBreakMarker:
+                case TefCell.lineBreakMarker:
                     this._addLineBreak(bar + 1);
-                    if ((data[7] & 0x04) !== 0) {
+                    if ((data[7] & TefBarBuilder._doubleBarFlag) !== 0) {
                         score.masterBars[bar].isDoubleBar = true;
                     }
                     lineBreakBars.push(bar + 1);
@@ -621,7 +589,7 @@ export class TefBarBuilder {
                 }
             }
         }
-        let current = this.initialSyncopation;
+        let current = TefBarBuilder._clampSyncopation(this.initialSyncopation);
         for (let b = 0; b < score.masterBars.length; b++) {
             if (!Number.isNaN(syncopation[b])) {
                 current = syncopation[b];
@@ -630,6 +598,10 @@ export class TefBarBuilder {
             const compound = masterBar.timeSignatureNumerator % 3 === 0 && masterBar.timeSignatureDenominator >= 8;
             masterBar.tripletFeel = compound ? TripletFeel.NoTripletFeel : TefBarBuilder._tripletFeelOf(current);
         }
+    }
+
+    private static _clampSyncopation(value: number): number {
+        return Math.max(-TefBarBuilder._maxSyncopation, Math.min(TefBarBuilder._maxSyncopation, value));
     }
 
     private _addLineBreak(bar: number): void {
@@ -649,7 +621,7 @@ export class TefBarBuilder {
         const start = this._measureStarts[bar] + column;
         for (let i = 1; i <= steps; i++) {
             const position = start + (i - 1) * 16;
-            const b = this._barOf(position);
+            const b = this.barOf(position);
             if (b >= score.masterBars.length || position >= this._measureStarts[b] + this._measureSizes[b]) {
                 break;
             }
@@ -697,14 +669,14 @@ export class TefBarBuilder {
 
     private _applyTrackMarker(info: TefTrackInfo, cell: TefCell): void {
         const data = cell.data;
-        const bar = this._barOf(cell.position);
+        const bar = this.barOf(cell.position);
         const column = Math.max(0, this._columnOf(cell.position, bar));
         const beat = this._beatAt(bar, column);
         if (!beat) {
             return;
         }
         switch (data[0]) {
-            case TefBarBuilder._textMarker: {
+            case TefCell.textMarker: {
                 const index = data[1] | (data[2] << 8);
                 if (index < this.texts.length) {
                     const text = TefBarBuilder._plainText(this.texts[index]);
@@ -717,7 +689,7 @@ export class TefBarBuilder {
                 }
                 break;
             }
-            case TefBarBuilder._chordMarker: {
+            case TefCell.chordMarker: {
                 const index = data[1] | (data[2] << 8);
                 if (index !== TefBarBuilder._noChord && index < this.chords.length) {
                     const id = `${index}`;
@@ -729,14 +701,14 @@ export class TefBarBuilder {
                 }
                 break;
             }
-            case TefBarBuilder._accentMarker:
+            case TefCell.accentMarker:
                 for (const b of this._beatsAtColumn(bar, column)) {
                     for (const n of b.notes) {
                         n.accentuated = AccentuationType.Normal;
                     }
                 }
                 break;
-            case TefBarBuilder._fingeringMarker: {
+            case TefCell.fingeringMarker: {
                 const stroke = TefBarBuilder._pickStrokeOf(data[6]);
                 if (stroke !== PickStroke.None) {
                     for (const b of this._beatsAtColumn(bar, column)) {
@@ -747,27 +719,30 @@ export class TefBarBuilder {
                 }
                 break;
             }
-            case TefBarBuilder._crescendoMarker: {
+            case TefCell.crescendoMarker: {
                 const amount =
                     this.version < TefBarBuilder._crescendoAmountVersion
                         ? TefBarBuilder._defaultCrescendoAmount
                         : data[6];
                 if (data[2] !== 0 && amount !== 0) {
-                    const type = (data[1] & 0x10) !== 0 ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
+                    const type =
+                        (data[1] & TefBarBuilder._decrescendoFlag) !== 0
+                            ? CrescendoType.Decrescendo
+                            : CrescendoType.Crescendo;
                     this._applyToRange(bar, column, data[2], b => {
                         b.crescendo = type;
                     });
                 }
                 break;
             }
-            case TefBarBuilder._symbolMarker:
-                if (data[1] === 0x6b || data[1] === 0x6c) {
+            case TefCell.symbolMarker:
+                if (TefBarBuilder._fermataSymbols.indexOf(data[1]) >= 0) {
                     const fermata = new Fermata();
                     fermata.type = FermataType.Medium;
                     beat.fermata = fermata;
                 }
                 break;
-            case TefBarBuilder._connectionMarker:
+            case TefCell.connectionMarker:
                 if ((data[7] & TefBarBuilder._bracketFlag) === 0) {
                     const tuplet = this._tupletRangeOf(cell);
                     const unit = TefBarBuilder.subUnitsPerCell;
@@ -788,7 +763,7 @@ export class TefBarBuilder {
                     }
                 }
                 break;
-            case TefBarBuilder._patchMarker:
+            case TefCell.patchMarker:
                 beat.automations.push(Automation.buildInstrumentAutomation(false, 0, data[1]));
                 if (data[2] !== 0 || data[3] !== 0) {
                     const bank = new Automation();
@@ -886,8 +861,8 @@ export class TefBarBuilder {
     }
 
     private _decode(cell: TefCell, info: TefTrackInfo): TefEvent | null {
-        const type = cell.data[0] & 0x3f;
-        if (type > TefBarBuilder._restCode) {
+        const type = cell.data[0] & TefCell.typeMask;
+        if (type > TefCell.rest) {
             return null;
         }
         const code = cell.data[1] & 0x1f;
@@ -896,7 +871,7 @@ export class TefBarBuilder {
         }
         const e = new TefEvent();
         e.cell = cell;
-        e.isRest = type === TefBarBuilder._restCode;
+        e.isRest = type === TefCell.rest;
         e.stringIndex = cell.row - info.firstString;
         e.fret = type - 1;
         e.durationCode = code;
@@ -904,12 +879,15 @@ export class TefBarBuilder {
         e.isTied = !e.isRest && e.dynamics === TefBarBuilder._tieDynamics;
         e.voiceHint = (cell.data[2] >> 4) & 0x03;
         e.accidental = cell.data[2] >> 6;
-        e.bar = this._barOf(cell.position);
+        e.bar = this.barOf(cell.position);
         e.column = this._columnOf(cell.position, e.bar);
         return e;
     }
 
-    private _barOf(position: number): number {
+    /**
+     * The bar the given grid position falls into.
+     */
+    public barOf(position: number): number {
         let lo = 0;
         let hi = this._measureStarts.length - 1;
         while (lo < hi) {
@@ -1052,10 +1030,7 @@ export class TefBarBuilder {
     }
 
     /**
-     * Converts the grid columns of a bar and voice into real time. Tuplet members are stored
-     * closer together than they sound and are spread out again relative to an anchor:
-     * triplets relative to the beat of the first member of a run, other tuplets relative to
-     * the beat they are in.
+     * Sets the real start and end within the bar of the events of one bar and voice group.
      */
     private _assignRealTime(events: TefEvent[], barIndex: number, track: Track): void {
         const unit = TefBarBuilder.subUnitsPerCell;
@@ -1082,7 +1057,7 @@ export class TefBarBuilder {
                 runCode = -1;
                 if (d.isTuplet) {
                     const anchor = column - (column % beat);
-                    start = anchor * unit + (column - anchor) * TefBarBuilder._tupletStretch(e.durationCode, unit);
+                    start = anchor * unit + (column - anchor) * TefBarBuilder._tupletStretch(e.durationCode);
                 }
             }
             e.realStart = start;
@@ -1108,7 +1083,8 @@ export class TefBarBuilder {
     /**
      * Real sub-units per grid cell for the members of the other tuplet kinds.
      */
-    private static _tupletStretch(code: number, unit: number): number {
+    private static _tupletStretch(code: number): number {
+        const unit = TefBarBuilder.subUnitsPerCell;
         switch (code) {
             case 23:
                 return (unit * 8) / 7;
@@ -1198,7 +1174,7 @@ export class TefBarBuilder {
                     }
                 }
             }
-            if (u.isRest && lane !== 0 && !(ends.length === 0)) {
+            if (u.isRest && lane !== 0 && ends.length > 0) {
                 continue;
             }
             if (lane < 0) {
@@ -1343,8 +1319,8 @@ export class TefBarBuilder {
             let hidden = true;
             for (const e of unit.events) {
                 const flags = e.cell.data[7];
-                const inNotation = (flags & TefBarBuilder._restHiddenInNotationFlag) !== 0;
-                const inTab = (flags & TefBarBuilder._restHiddenInTabFlag) !== 0;
+                const inNotation = (flags & TefCell.restHiddenInNotationFlag) !== 0;
+                const inTab = (flags & TefCell.restHiddenInTabFlag) !== 0;
                 hidden =
                     hidden &&
                     (inNotation || inTab) &&
@@ -1362,7 +1338,7 @@ export class TefBarBuilder {
         }
         for (const e of unit.events) {
             const beaming: number = e.cell.data[7] & TefBarBuilder._excludeFromBeamingMask;
-            if (beaming === TefBarBuilder._excludeFromBeaming) {
+            if (beaming === TefCell.excludeFromBeaming) {
                 beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
                 const before = TefBarBuilder._previousNoteBeat(voice, beat);
                 if (before) {
@@ -1559,7 +1535,7 @@ export class TefBarBuilder {
         let grace: Beat | null = null;
         for (const e of unit.events) {
             const data = e.cell.data;
-            if ((data[0] & TefBarBuilder._graceFlag) === 0) {
+            if ((data[0] & TefCell.graceFlag) === 0) {
                 continue;
             }
             const kind = data[3] >> 5;
@@ -1571,7 +1547,6 @@ export class TefBarBuilder {
             let stringIndex = e.stringIndex;
             const fret = TefBarBuilder._graceFret(e);
             if (extension && (extension[3] & TefBarBuilder._fromStringFlag) !== 0) {
-                // the fret is given on the other string
                 const other = extension[3] & 0x0f;
                 if (other < info.stringCount) {
                     stringIndex = other;
@@ -1641,10 +1616,6 @@ export class TefBarBuilder {
         return (e.cell.data[3] & TefBarBuilder._ornamentDirectionFlag) !== 0;
     }
 
-    /**
-     * The primary effect sits in the low nibble of the third byte, effects of the second dialog
-     * column in the low nibble of the fifth byte; its high nibble holds the combination effect.
-     */
     private _applyEffects(info: TefTrackInfo, beat: Beat, note: Note, e: TefEvent, unit: TefUnit): void {
         const data = e.cell.data;
         let effect = data[2] & 0x0f;
@@ -1654,7 +1625,7 @@ export class TefBarBuilder {
         } else if (effect === 0 && combination !== 3 && (data[4] & 0x0f) !== 0) {
             effect = 0x10 + (data[4] & 0x0f);
         }
-        const hasParameter = (data[0] & (TefBarBuilder._graceFlag | TefBarBuilder._pitchChangeFlag)) === 0;
+        const hasParameter = (data[0] & (TefCell.graceFlag | TefCell.pitchChangeFlag)) === 0;
         let parameter = hasParameter ? data[3] : 0;
         let hasParameterByte = hasParameter;
         if (!hasParameter && e.extension && (e.extension[1] & TefBarBuilder._extensionParameterFlag) !== 0) {
@@ -1702,10 +1673,9 @@ export class TefBarBuilder {
             note.isLetRing = true;
         }
 
-        if ((data[0] & TefBarBuilder._graceFlag) !== 0) {
+        if ((data[0] & TefCell.graceFlag) !== 0) {
             switch (data[3] >> 5) {
                 case 4:
-                    // the grace byte holds the fret of the auxiliary note
                     note.ornament =
                         TefBarBuilder._graceFret(e) < e.fret ? NoteOrnament.LowerMordent : NoteOrnament.UpperMordent;
                     break;
@@ -1722,7 +1692,7 @@ export class TefBarBuilder {
             }
         }
 
-        if ((data[0] & TefBarBuilder._pitchChangeFlag) !== 0) {
+        if ((data[0] & TefCell.pitchChangeFlag) !== 0) {
             const semitones = (data[3] & 0x07) - 4;
             if (semitones > 0) {
                 note.bendPoints = null;
@@ -1745,11 +1715,11 @@ export class TefBarBuilder {
             beat.pickStroke = stroke;
         }
 
-        switch (data[7] & 0x44) {
-            case 0x40:
+        switch (data[7] & TefCell.ottavaMask) {
+            case TefCell.ottavaBassa:
                 beat.ottava = Ottavia._8vb;
                 break;
-            case 0x44:
+            case TefCell.ottavaAlta:
                 beat.ottava = Ottavia._8va;
                 break;
         }
@@ -1781,7 +1751,6 @@ export class TefBarBuilder {
                 TefBarBuilder._applyBrush(beat, e, unit, false, hasParameter ? ((parameter >> 4) & 0x07) + 1 : 4);
                 break;
             case 14: {
-                // speeds 1 to 3 follow 8 in the stored order
                 const speed = ((parameter >> 4) & 0x07) + 4;
                 TefBarBuilder._applyBrush(beat, e, unit, true, !hasParameter ? 4 : speed > 8 ? speed - 8 : speed);
                 break;
