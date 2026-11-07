@@ -1,4 +1,4 @@
-package alphaTab.platform.android
+package alphaTab.platform.jvm
 
 import alphaTab.core.ecmaScript.MessageEvent
 import alphaTab.platform.worker.AlphaSynthWebWorker

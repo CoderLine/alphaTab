@@ -1,6 +1,5 @@
 package alphaTab.core.ecmaScript
 
-import android.os.Build
 import java.util.regex.MatchResult
 import java.util.regex.Pattern
 
@@ -69,42 +68,31 @@ internal class RegExp {
         }
     }
 
+    // Matcher.replaceAll(Function) would interpret '$' and '\' in the replacement and needs Android API 34.
     private fun replaceMatch(s: String, replacement: (result: MatchResult) -> String): String {
         val matcher = _regex.matcher(s);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            return if (_global)
-                matcher.replaceAll {
-                    replacement(it)
-                }
-            else
-                matcher.replaceFirst {
-                    replacement(it)
-                }
-        } else {
-            // custom implementation for older android versions
-            if (!matcher.find()) {
-                return s;
-            }
+        if (!matcher.find()) {
+            return s;
+        }
 
-            val sb = StringBuilder()
+        val sb = StringBuilder()
 
-            var appendPos = 0
-            if (_global) {
+        var appendPos = 0
+        if (_global) {
 
-                do {
-                    sb.append(s, appendPos, matcher.start())
-                    sb.append(replacement(matcher))
-                    appendPos = matcher.end()
-                } while (matcher.find())
-
-                sb.append(s, appendPos, s.length)
-            } else {
+            do {
                 sb.append(s, appendPos, matcher.start())
                 sb.append(replacement(matcher))
-                sb.append(s, matcher.end(), s.length)
-            }
+                appendPos = matcher.end()
+            } while (matcher.find())
 
-            return sb.toString()
+            sb.append(s, appendPos, s.length)
+        } else {
+            sb.append(s, appendPos, matcher.start())
+            sb.append(replacement(matcher))
+            sb.append(s, matcher.end(), s.length)
         }
+
+        return sb.toString()
     }
 }

@@ -2,15 +2,12 @@ package alphaTab
 
 import alphaTab.collections.DoubleList
 import alphaTab.platform.Json
-import alphaTab.platform.android.AndroidCanvas
-import alphaTab.platform.android.AndroidEnvironment
-import alphaTab.platform.android.JavaThreadAlphaSynthWorker
-import alphaTab.platform.android.JavaThreadAlphaTabRendererWorker
+import alphaTab.platform.jvm.JavaThreadAlphaSynthWorker
+import alphaTab.platform.jvm.JavaThreadAlphaTabRendererWorker
 import alphaTab.platform.worker.IAlphaSynthWorkerMessage
 import alphaTab.platform.worker.IAlphaTabWorkerGlobalScope
 import alphaTab.platform.worker.IAlphaTabWorkerMessage
 import alphaTab.synth.AudioExportOptions
-import android.os.Build
 import kotlin.contracts.ExperimentalContracts
 
 
@@ -18,11 +15,12 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalUnsignedTypes
 internal class EnvironmentPartials {
     companion object {
+        /**
+         * Prints additional information about the host platform (e.g. the Android device).
+         */
+        internal var printHostInfo: ((print: (message: String) -> Unit) -> Unit)? = null
+
         internal fun _createPlatformSpecificRenderEngines(engines: alphaTab.collections.Map<String, RenderEngineFactory>) {
-            engines.set(
-                "android",
-                RenderEngineFactory(true) { AndroidCanvas() }
-            )
             engines.set(
                 "default",
                 engines.get("skia")!!
@@ -32,10 +30,7 @@ internal class EnvironmentPartials {
         internal fun _printPlatformInfo(print: (message: String) -> Unit) {
             print("OS Name: ${System.getProperty("os.name")}");
             print("OS Version: ${System.getProperty("os.version")}");
-            print("Device Brand: ${Build.MANUFACTURER}");
-            print("Device Model: ${Build.MODEL}");
-            print("SDK Version: ${Build.VERSION.SDK_INT}");
-            print("Screen Size: ${AndroidEnvironment.screenWidth}x${AndroidEnvironment.screenHeight}");
+            printHostInfo?.invoke(print)
         }
 
         @Suppress("NOTHING_TO_INLINE")
