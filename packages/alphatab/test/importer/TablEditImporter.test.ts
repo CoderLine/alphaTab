@@ -1123,7 +1123,7 @@ describe('TablEditImporterTest', () => {
         };
 
         // [bar, start, string] of the tied note and of the note it continues; all but the third last in other voices
-        const ties: [number, number, number, number, number, number][] = [
+        const ties: number[][] = [
             [0, half, 4, 0, 0, 4],
             [1, 0, 2, 0, half, 2],
             [2, half, 6, 2, 0, 6],

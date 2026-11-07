@@ -371,9 +371,9 @@ export class TefReadingList {
                 break;
             }
         }
-        for (let kind = 0; preferred < 0 && kind < TefReadingList._codaTargets.length; kind++) {
-            if (!passes.some(p => p.codaKind === kind)) {
-                preferred = kind;
+        for (let unused = 0; preferred < 0 && unused < TefReadingList._codaTargets.length; unused++) {
+            if (!passes.some(p => p.codaKind === unused)) {
+                preferred = unused;
             }
         }
         if (preferred < 0) {
