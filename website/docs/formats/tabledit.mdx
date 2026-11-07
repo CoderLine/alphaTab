@@ -11,9 +11,9 @@ keywords:
 ## Introduction
 
 [TablEdit](https://tabledit.com/) is a tablature and notation editor for fretted and other instruments, developed by Matthieu Leschemelle.
-alphaTab reads `.tef` files saved by TablEdit 2.6x and later, in the formats of TablEdit 2 and TablEdit 3. Files of older TablEdit versions are not supported: open them in TablEdit 3 and save them again.
+alphaTab reads `.tef` files saved by TablEdit 3. Files of TablEdit 1 and 2 are not supported: open them in TablEdit 3 and save them again.
 
-**Compatibility Level:** New, tested against the MIDI and MusicXML exports of TablEdit itself. TablEdit 2 files are tested against their conversion by TablEdit 3.
+**Compatibility Level:** New, tested against the MIDI and MusicXML exports of TablEdit itself.
 
 TablEdit stores the notes on a fine time grid instead of in beats. alphaTab rebuilds beats and voices from that grid: notes of different length that sound together are placed in additional voices.
 The playback order of a TablEdit file comes from its reading list. alphaTab expresses it through repeats, alternate endings and jump directions, and logs a warning when an order cannot be expressed exactly.
@@ -934,49 +934,7 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                               render={[FeatureStatus.NotSupported, "", "Protected files are rejected: their notes are encrypted. Like TablEdit, alphaTab ignores the protection code of files saved before TablEdit 3.04"]}
                               audio={[FeatureStatus.NotSupported, "", "Protected files are rejected: their notes are encrypted. Like TablEdit, alphaTab ignores the protection code of files saved before TablEdit 3.04"]}
                               tex={[FeatureStatus.NotSupported, "", "Protected files are rejected: their notes are encrypted. Like TablEdit, alphaTab ignores the protection code of files saved before TablEdit 3.04"]} />
-        <FileFormatFeatureRow feature="TablEdit 2 files (TablEdit 2.6x to 2.x, formats 3 to 9)"
-                              model={[FeatureStatus.Supported]}
-                              reading={[FeatureStatus.Supported]}
-                              render={[FeatureStatus.Supported]}
-                              audio={[FeatureStatus.Supported]}
-                              tex={[FeatureStatus.Supported]} />
-        <FileFormatFeatureRow feature="TablEdit 2: measures shorter than the longest measure"
-                              model={[FeatureStatus.Supported]}
-                              reading={[FeatureStatus.Supported]}
-                              render={[FeatureStatus.Supported]}
-                              audio={[FeatureStatus.Supported]}
-                              tex={[FeatureStatus.Supported]} />
-        <FileFormatFeatureRow feature="TablEdit 2: key per measure"
-                              model={[FeatureStatus.Supported]}
-                              reading={[FeatureStatus.Supported]}
-                              render={[FeatureStatus.Supported]}
-                              audio={[FeatureStatus.Ignored]}
-                              tex={[FeatureStatus.Supported]} />
-        <FileFormatFeatureRow feature="TablEdit 2: protected files"
-                              model={[FeatureStatus.Supported]}
-                              reading={[FeatureStatus.NotSupported, "", "Rejected like protected TablEdit 3 files to respect the protection set by the author"]}
-                              render={[FeatureStatus.NotSupported, "", "Rejected like protected TablEdit 3 files to respect the protection set by the author"]}
-                              audio={[FeatureStatus.NotSupported, "", "Rejected like protected TablEdit 3 files to respect the protection set by the author"]}
-                              tex={[FeatureStatus.NotSupported, "", "Rejected like protected TablEdit 3 files to respect the protection set by the author"]} />
-        <FileFormatFeatureRow feature="TablEdit 2: drum and rhythm patterns"
-                              model={[FeatureStatus.NotSupported, "", "The patterns are skipped with a warning; TablEdit 3 turns them into extra drum and rhythm tracks"]}
-                              reading={[FeatureStatus.NotSupported, "", "The patterns are skipped with a warning; TablEdit 3 turns them into extra drum and rhythm tracks"]}
-                              render={[FeatureStatus.NotSupported, "", "The patterns are skipped with a warning; TablEdit 3 turns them into extra drum and rhythm tracks"]}
-                              audio={[FeatureStatus.NotSupported, "", "The patterns are skipped with a warning; TablEdit 3 turns them into extra drum and rhythm tracks"]}
-                              tex={[FeatureStatus.NotSupported, "", "The patterns are skipped with a warning; TablEdit 3 turns them into extra drum and rhythm tracks"]} />
-        <FileFormatFeatureRow feature="TablEdit 2: spacing and grace note detail records, special characters, scale diagrams"
-                              model={[FeatureStatus.NotSupported, "", "These cells are skipped"]}
-                              reading={[FeatureStatus.NotSupported, "", "These cells are skipped"]}
-                              render={[FeatureStatus.NotSupported, "", "These cells are skipped"]}
-                              audio={[FeatureStatus.Ignored]}
-                              tex={[FeatureStatus.NotSupported, "", "These cells are skipped"]} />
-        <FileFormatFeatureRow feature="TablEdit 2: layout, print, accordion and background image blocks"
-                              model={[FeatureStatus.Ignored]}
-                              reading={[FeatureStatus.Ignored]}
-                              render={[FeatureStatus.Ignored]}
-                              audio={[FeatureStatus.Ignored]}
-                              tex={[FeatureStatus.Ignored]} />
-        <FileFormatFeatureRow feature="Files of TablEdit before version 2.6 (formats 1 and 2)"
+        <FileFormatFeatureRow feature="Files of TablEdit 1 and 2 (formats 1 to 9)"
                               model={[FeatureStatus.Supported]}
                               reading={[FeatureStatus.NotSupported, "", "The older file layout is not read. Open the file in TablEdit 3 and save it again"]}
                               render={[FeatureStatus.NotSupported, "", "The older file layout is not read. Open the file in TablEdit 3 and save it again"]}

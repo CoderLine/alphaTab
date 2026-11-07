@@ -20,7 +20,7 @@ The preview below loads a `.tef` file with a range of guitar effects:
 
 ## Scope of the TablEdit importer
 
-alphaTab reads files saved by TablEdit 2.6x and later, both in the TablEdit 2 and in the TablEdit 3 format. Files of TablEdit 1.x and early 2.x versions are rejected with a `FormatError`: open them in TablEdit 3 and save them again. Protected TablEdit files are rejected with a `FormatError` as well. Drum and rhythm patterns of TablEdit 2 files are not imported; alphaTab logs a warning when a file has them.
+alphaTab reads files saved by TablEdit 3. Files of TablEdit 1 and 2 are rejected with a `FormatError`: open them in TablEdit 3 and save them again. Protected TablEdit files are rejected with a `FormatError` as well.
 
 TablEdit stores notes on a time grid rather than in beats. The importer rebuilds the beats and voices: notes of different length that sound together are placed in additional voices, so the rhythm of every note is kept. Tuplets, special effects, grace notes, fingerings, chord diagrams, texts, tempo changes and swing are mapped to their alphaTab counterparts.
 
