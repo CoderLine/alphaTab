@@ -1161,6 +1161,25 @@ export class Note {
 
     private static _noteIdLookupKey = 'NoteIdLookup';
 
+    /**
+     * The origin note with the given id. Origins in earlier voices and bars are registered already, an origin
+     * in a later voice of the same bar (e.g. a tie from another voice) is not chained yet.
+     */
+    private _linkedNote(noteIdLookup: Map<number, Note>, id: number): Note {
+        if (!noteIdLookup.has(id)) {
+            for (const voice of this.beat.voice.bar.voices) {
+                for (const beat of voice.beats) {
+                    for (const note of beat.notes) {
+                        if (note.id === id) {
+                            noteIdLookup.set(id, note);
+                        }
+                    }
+                }
+            }
+        }
+        return noteIdLookup.get(id)!;
+    }
+
     private _noteIdBag: NoteIdBag | null = null;
     public chain(sharedDataBag: Map<string, unknown> | null = null) {
         // mainly for backwards compat in case we reach this code from somewhere outside.
@@ -1191,23 +1210,22 @@ export class Note {
                 noteIdLookup.set(this.id, this);
             }
 
-            // on any effect destiniation, lookup the origin which should already be
-            // registered
+            // on any effect destiniation, lookup the origin
             if (this._noteIdBag.hammerPullOriginNoteId !== -1) {
-                this.hammerPullOrigin = noteIdLookup.get(this._noteIdBag.hammerPullOriginNoteId)!;
+                this.hammerPullOrigin = this._linkedNote(noteIdLookup, this._noteIdBag.hammerPullOriginNoteId);
                 this.hammerPullOrigin.hammerPullDestination = this;
             }
             if (this._noteIdBag.tieOriginNoteId !== -1) {
-                this.tieOrigin = noteIdLookup.get(this._noteIdBag.tieOriginNoteId)!;
+                this.tieOrigin = this._linkedNote(noteIdLookup, this._noteIdBag.tieOriginNoteId);
                 this.tieOrigin.tieDestination = this;
             }
             if (this._noteIdBag.slurOriginNoteId !== -1) {
-                this.slurOrigin = noteIdLookup.get(this._noteIdBag.slurOriginNoteId)!;
+                this.slurOrigin = this._linkedNote(noteIdLookup, this._noteIdBag.slurOriginNoteId);
                 this.slurOrigin.slurDestination = this;
             }
 
             if (this._noteIdBag.slideOriginNoteId !== -1) {
-                this.slideOrigin = noteIdLookup.get(this._noteIdBag.slideOriginNoteId)!;
+                this.slideOrigin = this._linkedNote(noteIdLookup, this._noteIdBag.slideOriginNoteId);
                 this.slideOrigin.slideTarget = this;
             }
 
