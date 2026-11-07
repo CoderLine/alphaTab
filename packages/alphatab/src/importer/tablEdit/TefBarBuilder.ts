@@ -217,6 +217,14 @@ export class TefBarBuilder {
     private static readonly _tieDynamics = 7;
     private static readonly _upperVoice = 2;
     private static readonly _lowerVoice = 3;
+    private static readonly _automaticGroup = 0;
+    private static readonly _upperGroup = 1;
+    private static readonly _lowerGroup = 2;
+    private static readonly _voiceOrder = [
+        TefBarBuilder._automaticGroup,
+        TefBarBuilder._upperGroup,
+        TefBarBuilder._lowerGroup
+    ];
     private static readonly _acciaccaturaFlag = 0x40;
     private static readonly _graceDurationMask = 0x07;
     private static readonly _extensionParameterFlag = 0x20;
@@ -1071,17 +1079,14 @@ export class TefBarBuilder {
         }
     }
 
-    /**
-     * 0 = automatic, 1 = upper, 2 = lower.
-     */
     private static _voiceGroupOf(e: TefEvent): number {
         switch (e.voiceHint) {
             case TefBarBuilder._upperVoice:
-                return 1;
+                return TefBarBuilder._upperGroup;
             case TefBarBuilder._lowerVoice:
-                return 2;
+                return TefBarBuilder._lowerGroup;
         }
-        return 0;
+        return TefBarBuilder._automaticGroup;
     }
 
     /**
@@ -1253,18 +1258,19 @@ export class TefBarBuilder {
 
     private _createVoices(info: TefTrackInfo, units: TefUnit[], laneCounts: number[]): void {
         const staff = info.track.staves[0];
-        // per lane the upper, automatic and lower voice, so that voice 0 and 1 get alphaTab's stems up and down
+        // per lane the automatic, upper and lower voice: alphaTab draws every voice after the first one
+        // in the secondary colour, the automatic voice usually holds most notes
         const order: number[][] = [];
         const maxLanes = Math.max(laneCounts[0], laneCounts[1], laneCounts[2]);
         for (let l = 0; l < maxLanes; l++) {
-            for (const group of [1, 0, 2]) {
+            for (const group of TefBarBuilder._voiceOrder) {
                 if (l < laneCounts[group]) {
                     order.push([group, l]);
                 }
             }
         }
         if (order.length === 0) {
-            order.push([0, 0]);
+            order.push([TefBarBuilder._automaticGroup, 0]);
         }
 
         const barUnits: TefUnit[][] = [];
@@ -1279,13 +1285,25 @@ export class TefBarBuilder {
         for (let b = 0; b < staff.bars.length; b++) {
             const bar = staff.bars[b];
             const barLength = this._measureSizes[b] * TefBarBuilder.subUnitsPerCell;
+            // stems of the automatic voice point away from an upper voice
+            const automaticStems: BeamDirection | null = barUnits[b].some(
+                u => u.voiceGroup === TefBarBuilder._upperGroup
+            )
+                ? BeamDirection.Down
+                : null;
             for (let v = 0; v < order.length; v++) {
                 const voice = new Voice();
                 bar.addVoice(voice);
                 const group = order[v][0];
                 const lane = order[v][1];
                 const laneUnits = barUnits[b].filter(u => u.voiceGroup === group && u.lane === lane);
-                this._fillVoice(info, voice, v, laneUnits, barLength, group);
+                const stems: BeamDirection | null =
+                    group === TefBarBuilder._upperGroup
+                        ? BeamDirection.Up
+                        : group === TefBarBuilder._lowerGroup
+                          ? BeamDirection.Down
+                          : automaticStems;
+                this._fillVoice(info, voice, v, laneUnits, barLength, stems);
             }
         }
     }
@@ -1299,7 +1317,7 @@ export class TefBarBuilder {
         voiceIndex: number,
         units: TefUnit[],
         barLength: number,
-        group: number
+        stems: BeamDirection | null
     ): void {
         if (units.length === 0) {
             return;
@@ -1327,8 +1345,8 @@ export class TefBarBuilder {
                     new TefBeatRecord(beat, voiceIndex, beatStart, k === 0 ? u.events[0].column : -1)
                 );
                 beatStart += values[k].length;
-                if (group !== 0) {
-                    beat.preferredBeamDirection = group === 1 ? BeamDirection.Up : BeamDirection.Down;
+                if (stems !== null) {
+                    beat.preferredBeamDirection = stems;
                 }
                 if (!u.isRest) {
                     this._addNotes(info, beat, u, k > 0);

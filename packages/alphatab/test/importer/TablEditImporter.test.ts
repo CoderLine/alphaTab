@@ -1039,8 +1039,9 @@ describe('TablEditImporterTest', () => {
         const bars = score.tracks[0].staves[0].bars;
         expect(bars.every(b => b.voices.length === 4)).toBe(true);
 
-        const upper = (bar: number) => beats(score, bar, 0);
-        const automatic = (bar: number) => beats(score, bar, 1);
+        // per lane the automatic, upper and lower voice
+        const automatic = (bar: number) => beats(score, bar, 0);
+        const upper = (bar: number) => beats(score, bar, 1);
         const lower = (bar: number) => beats(score, bar, 2);
         const automatic2 = (bar: number) => beats(score, bar, 3);
 
@@ -1058,7 +1059,7 @@ describe('TablEditImporterTest', () => {
         expect(lower(0).map(b => single(b).string)).toEqual([2, 2]);
         expect(lower(0).map(b => single(b).fret)).toEqual([3, 2]);
         expect(lower(0).every(b => b.preferredBeamDirection === BeamDirection.Down)).toBe(true);
-        expect(bars[0].voices[1].isEmpty).toBe(true);
+        expect(bars[0].voices[0].isEmpty).toBe(true);
         expect(bars[0].voices[3].isEmpty).toBe(true);
 
         // bar 2: automatic voices from different lengths at one position
@@ -1076,7 +1077,7 @@ describe('TablEditImporterTest', () => {
             [1, 0],
             [3, 2]
         ]);
-        expect(bars[1].voices[0].isEmpty).toBe(true);
+        expect(bars[1].voices[1].isEmpty).toBe(true);
         expect(bars[1].voices[2].isEmpty).toBe(true);
 
         // bar 3: entered rest and empty column are both rests
@@ -1140,6 +1141,14 @@ describe('TablEditImporterTest', () => {
             expect(destination.fret, label).toBe(origin.fret);
             expect(destination.beat.voice.index !== origin.beat.voice.index, label).toBe(t[2] !== 4 || t[0] !== 3);
         }
+
+        // the automatic voice comes first, its stems point away from an upper voice in the same bar
+        const stems = (bar: number, voice: number) =>
+            bars[bar].voices[voice].beats.filter(b => !b.isRest).map(b => b.preferredBeamDirection);
+        expect(stems(0, 0)).toEqual([BeamDirection.Down, BeamDirection.Down]);
+        expect(stems(0, 1)).toEqual([BeamDirection.Up]);
+        expect(stems(1, 0)).toEqual([null, null]);
+        expect(stems(1, 2)).toEqual([BeamDirection.Down]);
 
         // only the untied notes are struck, each tied note extends the note it continues
         const handler = new FlatMidiEventGenerator();
@@ -2179,8 +2188,8 @@ describe('TablEditImporterTest', () => {
 
         it('markers-upper-voice', async () => {
             // the notes of bar 2 forced into the upper voice: its markers and lyrics stay on its beats, and the
-            // other bars keep theirs on the automatic voice, which follows the upper one; alphaTab puts the initial
-            // instrument on the first beat of the first voice
+            // other bars keep theirs on the automatic voice, which comes before the upper one; alphaTab puts the
+            // initial instrument on the first beat of the first voice
             const markersOf = (b: Beat) =>
                 `${b.text}|${b.chord ? b.chord.name : ''}|${b.lyrics ? b.lyrics.join('/') : ''}|${b.crescendo}|` +
                 `${b.fermata !== null}|${b.pickStroke}|` +
@@ -2190,7 +2199,7 @@ describe('TablEditImporterTest', () => {
                 const original = readBytes(await loadData(name));
                 const upper = readBytes(withUpperVoice(await loadData(name), 1));
                 for (let bar = 0; bar < original.masterBars.length; bar++) {
-                    expect(beats(upper, bar, bar === 1 ? 0 : 1).map(markersOf), `${name} bar ${bar}`).toEqual(
+                    expect(beats(upper, bar, bar === 1 ? 1 : 0).map(markersOf), `${name} bar ${bar}`).toEqual(
                         beats(original, bar).map(markersOf)
                     );
                 }
