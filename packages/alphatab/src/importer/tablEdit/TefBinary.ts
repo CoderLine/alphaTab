@@ -17,14 +17,14 @@ export class TefBinary {
         return this.bytes.length;
     }
 
-    public requireRange(offset: number, length: number): void {
+    private _requireRange(offset: number, length: number): void {
         if (offset < 0 || offset + length > this.bytes.length) {
             throw new FormatError(`TablEdit data at ${offset} (${length} bytes) is outside of the file`);
         }
     }
 
     public u8(offset: number): number {
-        this.requireRange(offset, 1);
+        this._requireRange(offset, 1);
         return this.bytes[offset];
     }
 
@@ -34,7 +34,7 @@ export class TefBinary {
     }
 
     public u16(offset: number): number {
-        this.requireRange(offset, 2);
+        this._requireRange(offset, 2);
         return this.bytes[offset] | (this.bytes[offset + 1] << 8);
     }
 
@@ -44,7 +44,7 @@ export class TefBinary {
     }
 
     public u32(offset: number): number {
-        this.requireRange(offset, 4);
+        this._requireRange(offset, 4);
         const b = this.bytes;
         return (b[offset] | (b[offset + 1] << 8) | (b[offset + 2] << 16)) + b[offset + 3] * 16777216;
     }
@@ -55,30 +55,30 @@ export class TefBinary {
     public readString(offset: number, maxLength: number): string {
         const length = this.u16(offset);
         TefBinary.ensureLoopBoundary(length, maxLength, 'string length');
-        this.requireRange(offset + 2, length);
+        this._requireRange(offset + 2, length);
         let end = offset + 2 + length;
         while (end > offset + 2 && this.bytes[end - 1] === 0) {
             end--;
         }
-        return TefBinary.decode(this.bytes.subarray(offset + 2, end));
+        return TefBinary._decode(this.bytes.subarray(offset + 2, end));
     }
 
     /**
      * Reads a NUL-terminated text of at most the given length.
      */
     public readCString(offset: number, maxLength: number): string {
-        this.requireRange(offset, maxLength);
+        this._requireRange(offset, maxLength);
         let end = offset;
         while (end < offset + maxLength && this.bytes[end] !== 0) {
             end++;
         }
-        return TefBinary.decode(this.bytes.subarray(offset, end));
+        return TefBinary._decode(this.bytes.subarray(offset, end));
     }
 
     /**
      * Texts are UTF-8, but older files may still carry Windows-1252 text.
      */
-    public static decode(data: Uint8Array): string {
+    private static _decode(data: Uint8Array): string {
         return IOHelper.toString(data, TefBinary._isValidUtf8(data) ? 'utf-8' : 'windows-1252');
     }
 

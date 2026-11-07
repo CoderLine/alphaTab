@@ -3,7 +3,6 @@ import { ScoreImporter } from '@coderline/alphatab/importer/ScoreImporter';
 import { TefBarBuilder, TefTrackInfo } from '@coderline/alphatab/importer/tablEdit/TefBarBuilder';
 import { TefBinary } from '@coderline/alphatab/importer/tablEdit/TefBinary';
 import { TefCell } from '@coderline/alphatab/importer/tablEdit/TefCell';
-import { TefFormat2Reader } from '@coderline/alphatab/importer/tablEdit/TefFormat2Reader';
 import {
     TefReadingGuide,
     TefReadingList,
@@ -22,13 +21,12 @@ import type { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 
 /**
- * This ScoreImporter can read TablEdit (.tef) files of TablEdit 2.6x and later (formats 3 to 12).
+ * This ScoreImporter can read TablEdit (.tef) files of TablEdit 3 (formats 10 to 12).
  * @internal
  */
 export class TablEditImporter extends ScoreImporter {
     private static readonly _headerSize = 256;
-    private static readonly _firstFormat2 = 3;
-    private static readonly _firstFormat3 = 10;
+    private static readonly _firstSupportedFormat = 10;
     private static readonly _protectedFormat = 12;
     private static readonly _lastSupportedFormat = 12;
     private static readonly _wideMeasureRecordHeader = 16;
@@ -64,11 +62,6 @@ export class TablEditImporter extends ScoreImporter {
     private _cells: TefCell[] = [];
     private _lyrics: string = '';
     private _readingList: TefReadingListItem[] = [];
-    private _tempo: number = 120;
-    private _syncopation: number = 0;
-    private _texts: string[] = [];
-    private _chords: Chord[] = [];
-    private _version: number = 0;
     private _measureStarts: number[] = [];
     private _measureSizes: number[] = [];
     private _length: number = 0;
@@ -85,27 +78,34 @@ export class TablEditImporter extends ScoreImporter {
     public readScore(): Score {
         this._data = new TefBinary(this.data.readAll());
         const format = this._detectFormat();
-        if (format < TablEditImporter._firstFormat2) {
+        if (format < TablEditImporter._firstSupportedFormat) {
             throw new FormatError(
-                'TablEdit files older than version 2.6 are not supported, re-save the file with TablEdit 3'
+                'TablEdit files saved before TablEdit 3 are not supported, open the file in TablEdit 3 and save it again'
             );
         }
         if (format > TablEditImporter._lastSupportedFormat) {
             throw new FormatError(`TablEdit file format ${format} is newer than the supported format`);
         }
+        const d = this._data;
+        const version = d.u16(2) * 0x10000 + d.u16(4);
+        const isProtected = version >= TablEditImporter._protectionVersion && d.u32(16) !== 0;
+        if (isProtected || format === TablEditImporter._protectedFormat) {
+            throw new FormatError('Protected TablEdit files are not supported');
+        }
 
         this._score = new Score();
-        if (format < TablEditImporter._firstFormat3) {
-            this._readFormat2();
-        } else {
-            this._readFormat3(format);
-        }
+        this._readInformation();
+        this._readMeasures(d.u32(92));
+        this._readInstruments(d.u32(96));
+        this._cells = this._readContents(d.u32(60));
         const builder = new TefBarBuilder(this._tracks, this._measureStarts, this._measureSizes);
-        builder.initialTempo = this._tempo;
-        builder.initialSyncopation = this._syncopation;
-        builder.texts = this._texts;
-        builder.chords = this._chords;
-        builder.version = this._version;
+        builder.initialTempo = d.u16(6) > 0 ? d.u16(6) : 120;
+        builder.initialSyncopation = d.s16(12);
+        builder.texts = this._readTexts(d.u32(84));
+        builder.chords = this._readChords(d.u32(88));
+        builder.version = version;
+        this._lyrics = this._readString(d.u32(80));
+        this._readingList = this._readReadingList(d.u32(128));
         builder.pickupBars = this._pickupBars;
         builder.build(this._cells);
         builder.applyLyrics(this._lyrics);
@@ -130,67 +130,6 @@ export class TablEditImporter extends ScoreImporter {
         this._score.rebuildRepeatGroups();
         TefReadingList.verify(this._score, readingList);
         return this._score;
-    }
-
-    private _readFormat3(format: number): void {
-        const d = this._data;
-        this._version = d.u16(2) * 0x10000 + d.u16(4);
-        const isProtected = this._version >= TablEditImporter._protectionVersion && d.u32(16) !== 0;
-        if (isProtected || format === TablEditImporter._protectedFormat) {
-            throw new FormatError('Protected TablEdit files are not supported');
-        }
-        this._readInformation();
-        this._readMeasures(d.u32(92));
-        this._readInstruments(d.u32(96));
-        this._cells = this._readContents(d.u32(60));
-        this._tempo = d.u16(6) > 0 ? d.u16(6) : 120;
-        this._syncopation = d.s16(12);
-        this._texts = this._readTexts(d.u32(84));
-        this._chords = this._readChords(d.u32(88));
-        this._lyrics = this._readString(d.u32(80));
-        this._readingList = this._readReadingList(d.u32(128));
-    }
-
-    private _readFormat2(): void {
-        const reader = new TefFormat2Reader(this._data, this.settings.importer.maxDecodingBufferSize);
-        reader.read();
-        this._score.title = reader.title;
-        this._score.subTitle = reader.author;
-        this._score.instructions = reader.comment;
-        this._score.notices = reader.notes;
-        for (const measure of reader.measures) {
-            this._addMeasure(measure.numerator, measure.denominator, measure.size, measure.key, measure.isMinor);
-        }
-        this._readInstrumentRecords(reader.instruments, 0, reader.instrumentCount, reader.instrumentRecordSize);
-        this._cells = reader.cells;
-        this._tempo = reader.tempo;
-        this._syncopation = reader.syncopation;
-        this._texts = reader.texts;
-        this._chords = this._readChordRecords(reader.chordsOffset, reader.chordCount, reader.chordRecordSize);
-        this._version = reader.version * 0x10000;
-        this._lyrics = reader.lyrics;
-        this._readingList = reader.readingList;
-    }
-
-    private _addMeasure(
-        numerator: number,
-        denominator: number,
-        size: number,
-        key: number,
-        isMinor: boolean
-    ): MasterBar {
-        const masterBar = new MasterBar();
-        masterBar.timeSignatureNumerator = numerator;
-        masterBar.timeSignatureDenominator = denominator;
-        if (isMinor) {
-            this._minorBars.add(this._score.masterBars.length);
-        }
-        this._score.addMasterBar(masterBar);
-        this._keys.push(key);
-        this._measureStarts.push(this._length);
-        this._measureSizes.push(size);
-        this._length += size;
-        return masterBar;
     }
 
     /**
@@ -240,13 +179,17 @@ export class TablEditImporter extends ScoreImporter {
                 size = 64;
             }
             const flags = d.u8(p);
-            const masterBar = this._addMeasure(
-                numerator,
-                denominator,
-                size,
-                d.s8(p + 2),
-                (flags & TablEditImporter._minorFlag) !== 0
-            );
+            const masterBar = new MasterBar();
+            masterBar.timeSignatureNumerator = numerator;
+            masterBar.timeSignatureDenominator = denominator;
+            if ((flags & TablEditImporter._minorFlag) !== 0) {
+                this._minorBars.add(i);
+            }
+            this._score.addMasterBar(masterBar);
+            this._keys.push(d.s8(p + 2));
+            this._measureStarts.push(this._length);
+            this._measureSizes.push(size);
+            this._length += size;
             if ((flags & TablEditImporter._pickupFlag) !== 0) {
                 masterBar.isAnacrusis = true;
                 this._pickupBars.add(i);
@@ -283,15 +226,14 @@ export class TablEditImporter extends ScoreImporter {
     }
 
     private _readInstruments(offset: number): void {
-        if (offset === 0 || this._data.u16(offset + 2) === 0) {
+        const data = this._data;
+        if (offset === 0 || data.u16(offset + 2) === 0) {
             throw new FormatError('TablEdit file without instruments');
         }
-        this._readInstrumentRecords(this._data, offset + 4, this._data.u16(offset + 2), this._data.u16(offset));
-    }
-
-    private _readInstrumentRecords(data: TefBinary, offset: number, count: number, recordSize: number): void {
+        const recordSize = data.u16(offset);
+        const count = data.u16(offset + 2);
         TefBinary.ensureLoopBoundary(count, TablEditImporter._maxInstrumentCount, 'instrument count');
-        let p = offset;
+        let p = offset + 4;
         for (let i = 0; i < count; i++) {
             const stringCount = data.u16(p);
             TefBinary.ensureLoopBoundary(stringCount, TablEditImporter._maxStringCount, 'string count');
@@ -424,13 +366,10 @@ export class TablEditImporter extends ScoreImporter {
         if (offset === 0) {
             return chords;
         }
-        return this._readChordRecords(offset + 4, this._data.u16(offset + 2), this._data.u16(offset));
-    }
-
-    private _readChordRecords(offset: number, count: number, recordSize: number): Chord[] {
-        const chords: Chord[] = [];
+        const recordSize = this._data.u16(offset);
+        const count = this._data.u16(offset + 2);
         TefBinary.ensureLoopBoundary(count, TablEditImporter._maxChordCount, 'chord count');
-        let p = offset;
+        let p = offset + 4;
         for (let i = 0; i < count; i++) {
             const chord = new Chord();
             chord.name = this._data.readCString(p + 14, 17);

@@ -1,5 +1,5 @@
 /**
- * A raw grid cell of a TablEdit file, with the cell codes and flags both format generations share.
+ * A raw grid cell of a TablEdit file, with its cell codes and flags.
  * @internal
  */
 export class TefCell {

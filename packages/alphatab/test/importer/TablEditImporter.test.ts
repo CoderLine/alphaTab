@@ -372,14 +372,24 @@ describe('TablEditImporterTest', () => {
             expect(() => readBytes(longMeasure)).toThrow(UnsupportedFormatError);
         });
 
-        it('old-format', async () => {
-            {
-                const data = await patched(formatOffset, 2);
-                expect(() => readBytes(data)).toThrow(FormatError);
-            }
-            {
-                const data = await patched(formatOffset, 1);
-                expect(() => readBytes(data)).toThrow(FormatError);
+        it('old-format', () => {
+            // the header fields of TablEdit 1 and 2 that detection reads: one measure of 4/4
+            const header = new Uint8Array(256);
+            setU16(header, 200, 1);
+            setU16(header, 202, 4);
+            header[204] = 4;
+            for (let format = 1; format < 10; format++) {
+                header[formatOffset] = format;
+                try {
+                    readBytes(header);
+                    throw new Error(`Expected format ${format} to fail with a FormatError`);
+                } catch (e) {
+                    if (e instanceof FormatError) {
+                        expect((e as FormatError).message, `format ${format}`).toContain('TablEdit 3');
+                        continue;
+                    }
+                    throw e;
+                }
             }
         });
 
