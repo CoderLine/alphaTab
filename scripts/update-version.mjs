@@ -95,6 +95,6 @@ for (const entry of fs.readdirSync(path.resolve(__dirname, '../packages/'), { wi
 }
 
 updateCSharpVersion(path.resolve(__dirname, '../packages/csharp/src/Directory.Build.props'));
-updateKotlinVersion(path.resolve(__dirname, '../packages/kotlin/src/android/build.gradle.kts'));
+updateKotlinVersion(path.resolve(__dirname, '../packages/kotlin/src/build.gradle.kts'));
 
 console.log('Done updating versions.');

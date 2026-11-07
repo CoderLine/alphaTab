@@ -1,8 +1,6 @@
-import com.android.build.api.variant.HostTestBuilder
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.io.FileInputStream
-import java.util.Properties
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     // AGP 9+ has built-in Kotlin support; a separate kotlin-android plugin is no
@@ -10,64 +8,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.dokka)
     alias(libs.plugins.mavenPublish)
-    `maven-publish`
-    signing
 }
-
-
-val props = Properties()
-val propsFile = project.rootProject.file("local.properties")
-if (propsFile.exists()) {
-    FileInputStream(propsFile).use {
-        props.load(it)
-    }
-}
-
-fun loadSetting(envKey: String, propKey: String, setter: (value: String) -> Unit) {
-    if (props.containsKey(propKey)) {
-        setter(props.getProperty(propKey))
-    } else {
-        val env = providers
-            .environmentVariable(envKey)
-        if (env.isPresent) {
-            setter(env.get())
-        }
-    }
-}
-
-var libDescription =
-    "alphaTab is a cross platform music notation and guitar tablature rendering library. " +
-        "The \"alphaTab.net\" attribution in rendered scores must stay visible, " +
-        "see https://alphatab.net/docs/attribution"
-var libAuthorId = "danielku15"
-var libAuthorName = "Daniel Kuschny"
-var libOrgUrl = "https://github.com/coderline"
-var libCompany = "CoderLine"
-var libVersion = "1.10.0-SNAPSHOT"
-var libProjectUrl = "https://github.com/CoderLine/alphaTab"
-var libGitUrlHttp = "https://github.com/CoderLine/alphaTab.git"
-var libGitUrlGit = "scm:git:git://github.com/CoderLine/alphaTab.git"
-var libLicenseSpdx = "MPL-2.0"
-var libLicenseUrl = "https://opensource.org/licenses/MPL-2.0"
-var libIssuesUrl = "https://github.com/CoderLine/alphaTab/issues"
-val libGroup = "net.alphatab"
-val libArtifactId = "alphaTab"
-
-loadSetting("ALPHATAB_DESCRIPTION", "alphatabDescription") { libDescription = it }
-loadSetting("ALPHATAB_AUTHOR_ID", "alphatabAuthorId") { libAuthorId = it }
-loadSetting("ALPHATAB_AUTHOR_NAME", "alphatabAuthorName") { libAuthorName = it }
-loadSetting("ALPHATAB_ORG_URL", "alphatabOrgUrl") { libOrgUrl = it }
-loadSetting("ALPHATAB_COMPANY", "alphatabCompany") { libCompany = it }
-loadSetting("ALPHATAB_VERSION", "alphatabVersion") { libVersion = it }
-loadSetting("ALPHATAB_PROJECT_URL", "alphatabProjectUrl") { libProjectUrl = it }
-loadSetting("ALPHATAB_GIT_URL_HTTP", "alphatabGitUrlHttp") { libGitUrlHttp = it }
-loadSetting("ALPHATAB_GIT_URL_GIT", "alphatabGitUrlGit") { libGitUrlGit = it }
-loadSetting("ALPHATAB_LICENSE_SPDX", "alphatabLicenseSpdx") { libLicenseSpdx = it }
-loadSetting("ALPHATAB_LICENSE_URL", "alphatabLicenseUrl") { libLicenseUrl = it }
-loadSetting("ALPHATAB_ISSUES_URL", "alphatabIssuesUrl") { libIssuesUrl = it }
-
-group = libGroup
-version = libVersion
 
 val javaVersion = JavaVersion.VERSION_17;
 var jvmTargetVersion = JvmTarget.JVM_17
@@ -75,6 +16,7 @@ var jvmTargetVersion = JvmTarget.JVM_17
 kotlin {
     compilerOptions {
         jvmTarget.set(jvmTargetVersion)
+        moduleName.set("alphaTab-android")
         freeCompilerArgs.addAll(
             listOf(
                 "-Xno-call-assertions",
@@ -82,15 +24,6 @@ kotlin {
                 "-Xno-param-assertions"
             )
         )
-    }
-}
-
-// AGP 9 only generates unit-test tasks for the debug variant by default. Our
-// pipeline runs tests against the release variant (matches published artifact),
-// so enable the release host unit-test explicitly.
-androidComponents {
-    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
-        variantBuilder.hostTests[HostTestBuilder.UNIT_TEST_TYPE]?.enable = true
     }
 }
 
@@ -116,19 +49,12 @@ android {
         targetCompatibility = javaVersion
     }
 
-
     sourceSets {
         getByName("main") {
-            java.srcDirs("src/main-generated/java")
-            kotlin.srcDirs("src/main-generated/java")
             assets.srcDirs(
                 "../../../alphatab/font/bravura",
                 "../../../alphatab/font/sonivox"
             )
-        }
-        getByName("test") {
-            java.srcDirs("src/test-generated/java")
-            kotlin.srcDirs("src/test-generated/java")
         }
     }
 
@@ -147,41 +73,37 @@ android {
     }
 }
 
-dependencies {
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+evaluationDependsOn(":core")
+val core = project(":core")
 
-    implementation(libs.alphaskia.android)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.alphaskia)
-
-    testImplementation(libs.alphaskia.macos)
-    testImplementation(libs.alphaskia.linux)
-    testImplementation(libs.alphaskia.windows)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.klaxon)
+// The Android integration uses internal members of the core, like AlphaTab.Windows does in C#
+// through InternalsVisibleTo. Both artifacts are therefore published and consumed in lockstep.
+tasks.withType<KotlinCompile>().configureEach {
+    friendPaths.from(core.tasks.named("jar"))
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "DistPath"
-            url = rootProject.projectDir.resolve("dist").toURI()
+dependencies {
+    api(core)
+    constraints {
+        api("${core.group}:alphaTab-core") {
+            version {
+                strictly(core.version.toString())
+            }
         }
     }
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.alphaskia)
+    implementation(libs.alphaskia.android)
+    implementation(libs.kotlinx.coroutines.core)
+
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
 
-internal fun Project.findOptionalProperty(propertyName: String) =
-    findProperty(propertyName)?.toString()
-
 mavenPublishing {
-    publishToMavenCentral(automaticRelease = true)
-    coordinates(libGroup, libArtifactId, libVersion)
-    signAllPublications()
-
+    coordinates(group.toString(), "alphaTab", version.toString())
     configure(
         AndroidSingleVariantLibrary(
             variant = "release",
@@ -189,43 +111,7 @@ mavenPublishing {
             publishJavadocJar = true
         )
     )
-
-    val inMemoryKeyFile = project.findOptionalProperty("signingInMemoryKeyFile")
-    if (inMemoryKeyFile != null) {
-        val inMemoryKeyId = project.findOptionalProperty("signingInMemoryKeyId")
-        val inMemoryKeyPassword =
-            project.findOptionalProperty("signingInMemoryKeyPassword").orEmpty()
-        val signing = project.extensions.getByType(SigningExtension::class.java)
-        val inMemoryKey = File(inMemoryKeyFile).readText()
-        signing.useInMemoryPgpKeys(inMemoryKeyId, inMemoryKey, inMemoryKeyPassword)
-    }
-
     pom {
-        name = libArtifactId
-        description = libDescription
-        url = libProjectUrl
-        licenses {
-            license {
-                name = libLicenseSpdx
-                url = libLicenseUrl
-            }
-        }
-        developers {
-            developer {
-                id = libAuthorId
-                name = libAuthorName
-                organization = libCompany
-                organizationUrl = libOrgUrl
-            }
-        }
-        scm {
-            url = libGitUrlHttp
-            connection = "scm:git:$libGitUrlGit"
-            developerConnection = "scm:git:$libGitUrlGit"
-        }
-        issueManagement {
-            system = "GitHub"
-            url = libIssuesUrl
-        }
+        name = "alphaTab"
     }
 }

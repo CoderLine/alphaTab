@@ -10,8 +10,8 @@ transpiler(
         {
             name: 'Kotlin',
             emit: createEmit(
-                path.resolve(__dirname, '../src/android/src/main-generated/java'),
-                path.resolve(__dirname, '../src/android/src/test-generated/java')
+                path.resolve(__dirname, '../src/core/src/main-generated/java'),
+                path.resolve(__dirname, '../src/core/src/test-generated/java')
             )
         }
     ],
