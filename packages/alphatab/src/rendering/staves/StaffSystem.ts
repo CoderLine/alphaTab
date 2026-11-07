@@ -855,8 +855,8 @@ export class StaffSystem {
     }
 
     /**
-     * Clears the staff overflows before the bars of a fully assembled system are scaled; the bars
-     * register them again from their positioned content, the effect placement adds the bands.
+     * Clears the staff overflows and the staff bottom before the bars of a fully assembled system are
+     * scaled; the bars register them again from their positioned content, the effect placement adds the bands.
      */
     public resetAllStavesOverflows(): void {
         for (let i = 0; i < this.allStaves.length; i++) {

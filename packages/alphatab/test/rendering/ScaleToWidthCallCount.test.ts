@@ -131,4 +131,21 @@ describe('ScaleToWidthCallCount', () => {
             expect(counts.get(r) ?? 0).toBe(1);
         }
     });
+
+    it('numbered staff: aligning the voice rows and chord numbers along the system adds no scaleToWidth', async () => {
+        // the chord and the second voice of the first bar move the numbers of the other bars
+        const tex = `
+            \\track "T1"
+            \\staff {numbered}
+            \\voice (C4 E4 G4).4 C4.4 C4.4 C4.4 | C4.4 *4 | C4.4 *4
+            \\voice C3.1 | r.1 | r.1
+        `;
+        for (const layoutMode of [LayoutMode.Page, LayoutMode.Horizontal]) {
+            const result = await ScaleToWidthCallCountHelper.renderAndCount(tex, 1500, layoutMode);
+            expect(result.renderers.length).toBe(3);
+            for (const r of result.renderers) {
+                expect(result.counts.get(r) ?? 0).toBe(1);
+            }
+        }
+    });
 });

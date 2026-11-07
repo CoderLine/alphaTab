@@ -499,6 +499,24 @@ export class BarRendererBase {
         this.isFinalized = true;
     }
 
+    /**
+     * Measures the height and the overflows of the bar again after its glyphs moved vertically. Only valid
+     * right before {@link scaleToWidth}, which emits the skylines and registers the overflows on the staff.
+     */
+    protected remeasureVertically(): void {
+        this.updateSizes();
+        for (const v of this.helpers.beamHelpers) {
+            for (const h of v) {
+                h.invalidateDrawingInfos();
+            }
+        }
+        this._contentTopOverflow = 0;
+        this._contentBottomOverflow = 0;
+        this._hasPositionedOverflow = false;
+        this.calculateOverflows(0, this.height);
+        this._emitPreBeatOverflows(this.height);
+    }
+
     protected emitHelperSkyline(_h: BeamingHelper): void {}
 
     public emitBeatSkyline(_beatContainer: BeatContainerGlyphBase): void {}
@@ -518,6 +536,13 @@ export class BarRendererBase {
     }
 
     protected wasFirstOfStaff: boolean = false;
+
+    /**
+     * The geometry of the header glyphs of the bar; null before the first layout.
+     */
+    protected get headerProfile(): HeaderProfile | null {
+        return this._headerProfile;
+    }
 
     public get isFirstOfStaff(): boolean {
         return this.index === 0;
@@ -789,6 +814,7 @@ export class BarRendererBase {
     private _registerStaffOverflow() {
         this.staff!.registerOverflowTop(this.topOverflow);
         this.staff!.registerOverflowBottom(this.bottomOverflow);
+        this.staff!.registerStaffBottom(this.height);
     }
 
     /** Public wrapper for `_registerStaffOverflow`. */

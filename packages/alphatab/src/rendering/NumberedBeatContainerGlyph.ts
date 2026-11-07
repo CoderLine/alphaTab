@@ -10,6 +10,7 @@ import {
 } from '@coderline/alphatab/rendering/glyphs/NumberedDashBeatContainerGlyph';
 import { NumberedSlurGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedSlurGlyph';
 import type { TieGlyph } from '@coderline/alphatab/rendering/glyphs/TieGlyph';
+import type { NumberedBarRenderer } from '@coderline/alphatab/rendering/NumberedBarRenderer';
 
 /**
  * @internal
@@ -57,10 +58,28 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
         this.hasAdditionalNumbers = true;
     }
 
+    /**
+     * The height of the duration underlines below the numbers of this beat.
+     */
+    public underlinesHeight: number = 0;
+
     public override doLayout(): void {
         this._slurs.clear();
         this._effectSlurs = [];
+        const onNotes = this.onNotes as NumberedBeatGlyph;
+        onNotes.renderer = this.renderer;
+        onNotes.container = this;
+        onNotes.prepareNotes();
         super.doLayout();
+    }
+
+    /**
+     * Moves the numbers with their accidentals and dots to the current slots of the renderer;
+     * the horizontal layout stays as it is.
+     */
+    public updateVerticalPositions(): void {
+        (this.onNotes as NumberedBeatGlyph).updateVerticalPositions();
+        this.invalidateNoteExtent();
     }
 
     protected override getBoundsVisualWidth(visualX: number, width: number): number {
@@ -88,13 +107,13 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
             return;
         }
 
-        if (n.isTieOrigin && n.tieDestination!.isVisible && !this._slurs.has('numbered.tie')) {
-            const tie = new NumberedTieGlyph(`numbered.tie.${n.beat.id}`, n, n.tieDestination!, false);
+        const renderer = this.renderer as NumberedBarRenderer;
+        if (n.isTieOrigin && n.tieDestination!.isVisible && renderer.isNoteDisplayed(n)) {
+            const tie = new NumberedTieGlyph(`numbered.tie.${n.id}`, n, n.tieDestination!, false);
             this.addTie(tie);
-            this._slurs.set(tie.slurEffectId, tie);
         }
-        if (n.isTieDestination) {
-            const tie = new NumberedTieGlyph(`numbered.tie.${n.tieOrigin!.beat.id}`, n.tieOrigin!, n, true);
+        if (n.isTieDestination && renderer.isNoteDisplayed(n.tieOrigin!)) {
+            const tie = new NumberedTieGlyph(`numbered.tie.${n.tieOrigin!.id}`, n.tieOrigin!, n, true);
             this.addTie(tie);
         }
         if (
@@ -118,7 +137,7 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
 
             if (!expanded) {
                 const effectSlur = new NumberedSlurGlyph(
-                    `numbered.slur.effect`,
+                    `numbered.slur.effect.${n.beat.id}`,
                     n,
                     n.effectSlurDestination,
                     false,
@@ -126,8 +145,6 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
                 );
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
-                this._slurs.set(effectSlur.slurEffectId, effectSlur);
-                this._slurs.set('numbered.slur.effect', effectSlur);
             }
         }
 
@@ -141,11 +158,15 @@ export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
                 }
             }
             if (!expanded) {
-                const effectSlur = new NumberedSlurGlyph(`numbered.slur.effect`, n.effectSlurOrigin, n, false, true);
+                const effectSlur = new NumberedSlurGlyph(
+                    `numbered.slur.effect.${n.effectSlurOrigin.beat.id}`,
+                    n.effectSlurOrigin,
+                    n,
+                    false,
+                    true
+                );
                 this._effectSlurs.push(effectSlur);
                 this.addTie(effectSlur);
-                this._slurs.set(effectSlur.slurEffectId, effectSlur);
-                this._slurs.set('numbered.slur.effect', effectSlur);
             }
         }
     }

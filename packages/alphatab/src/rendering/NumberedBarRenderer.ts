@@ -1,4 +1,3 @@
-import { EngravingSettings } from '@coderline/alphatab/EngravingSettings';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { BarSubElement } from '@coderline/alphatab/model/Bar';
 import { type Beat, BeatSubElement } from '@coderline/alphatab/model/Beat';
@@ -9,15 +8,21 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import type { Staff } from '@coderline/alphatab/model/Staff';
+import { NumberedNoteMode } from '@coderline/alphatab/model/StaffConfigs';
 import type { Voice } from '@coderline/alphatab/model/Voice';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
+import { NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { BeatXPosition } from '@coderline/alphatab/rendering/BeatXPosition';
 import { BarLineGlyph } from '@coderline/alphatab/rendering/glyphs/BarLineGlyph';
+import type { NumberedBeatGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedBeatGlyph';
 import {
     NumberedDashBeatContainerGlyph,
     NumberedNoteBeatContainerGlyphBase
 } from '@coderline/alphatab/rendering/glyphs/NumberedDashBeatContainerGlyph';
-import { ScoreTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/ScoreTimeSignatureGlyph';
+import { NumberedNoteHeadGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedNoteHeadGlyph';
+import { NumberedTimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/NumberedTimeSignatureGlyph';
+import { TimeSignatureGlyph } from '@coderline/alphatab/rendering/glyphs/TimeSignatureGlyph';
 import { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import { NumberedBeatContainerGlyph } from '@coderline/alphatab/rendering/NumberedBeatContainerGlyph';
 import type { HeaderKey } from '@coderline/alphatab/rendering/staves/HeaderProfile';
@@ -32,10 +37,147 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
  */
 export class NumberedBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'numbered';
+    private static readonly _systemSlotsKey: string = 'numbered.systemSlots';
 
     public simpleWhammyOverflow: number = 0;
 
     public shortestDuration = Duration.QuadrupleWhole;
+
+    /**
+     * Whether only a single number of the first voice is written per beat.
+     */
+    public isSingleNote = false;
+
+    /**
+     * How the notes of the staff are written, from the staff or the score stylesheet.
+     */
+    public static resolveNoteMode(staff: Staff): NumberedNoteMode {
+        return staff.numberedConfig?.notes ?? staff.track.score.stylesheet.numberedConfig.notes!;
+    }
+
+    /**
+     * The slots the numbers of this bar need on their own (chords, further voices);
+     * null if every number of the bar sits on the line of single numbers.
+     */
+    private _slotNeeds: NumberedSlotLayout | null = null;
+    private _slots: NumberedSlotLayout = NumberedSlotLayout.single;
+    private _numberHeight: number = 0;
+    // the last voice whose row the slot needs hold, and the height its numbers hang below the row
+    private _neededRowVoice: number = 0;
+    private _neededRowHang: number = 0;
+
+    public override doLayout(): void {
+        this._slotNeeds = null;
+        this._slots = NumberedSlotLayout.single;
+        this._numberHeight = 0;
+        this._neededRowVoice = 0;
+        this._neededRowHang = 0;
+        this.isSingleNote = NumberedBarRenderer.resolveNoteMode(this.bar.staff) === NumberedNoteMode.SingleNote;
+        super.doLayout();
+    }
+
+    /**
+     * Places the numbers on the slots of the staff in its system before the bar is scaled: all bars of the
+     * staff in the system share the slots their numbers need, as they share the staff lines.
+     */
+    public override scaleToWidth(width: number): void {
+        this._alignToSlots(this._getSystemSlots());
+        super.scaleToWidth(width);
+    }
+
+    /**
+     * The slots holding the numbers of all bars of the staff in the system. The layouts scale the bars of a
+     * staff in their order once the system holds all of them, so the first bar resolves the slots for the others.
+     */
+    private _getSystemSlots(): NumberedSlotLayout {
+        const staff = this.staff!;
+        const key = NumberedBarRenderer._systemSlotsKey;
+        if (this.index > 0) {
+            return staff.getSharedLayoutData<NumberedSlotLayout>(key, NumberedSlotLayout.single);
+        }
+        let layout = NumberedSlotLayout.single;
+        for (const r of staff.barRenderers) {
+            const needs = (r as NumberedBarRenderer)._slotNeeds;
+            if (needs) {
+                layout = NumberedSlotLayout.merge(layout, needs);
+            }
+        }
+        if (layout !== NumberedSlotLayout.single) {
+            staff.setSharedLayoutData(key, layout);
+        }
+        return layout;
+    }
+
+    /**
+     * Moves the numbers of this bar vertically onto the given slots and measures the bar again,
+     * without a new layout. The result depends only on the bar and the given slots.
+     */
+    private _alignToSlots(layout: NumberedSlotLayout): void {
+        const own = this._slotNeeds ?? NumberedSlotLayout.single;
+        // relayout passes restore the overflows measured with the own slots, so bars off their own slots
+        // are measured again on every pass
+        if (layout.matches(own) && layout.matches(this._slots)) {
+            return;
+        }
+        this._slots = layout;
+        for (const voice of this.voiceContainer.beatGlyphs) {
+            for (const c of voice) {
+                if (c instanceof NumberedBeatContainerGlyph) {
+                    c.updateVerticalPositions();
+                }
+            }
+        }
+        this.remeasureVertically();
+    }
+
+    private _getNumberHeight(): number {
+        if (this._numberHeight === 0) {
+            const canvas = this.scoreRenderer.canvas!;
+            canvas.font = this.resources.numberedNotationFont;
+            this._numberHeight = this.scoreRenderer.layout!.textMeasures.measureText(canvas, '1').height;
+        }
+        return this._numberHeight;
+    }
+
+    /**
+     * The note written for the beat when only a single number is written per beat: the highest visible note.
+     */
+    public getSingleNote(beat: Beat): Note | null {
+        return beat.maxNote;
+    }
+
+    /**
+     * Whether the given note is written as a number of its beat.
+     */
+    public isNoteDisplayed(note: Note): boolean {
+        return this.isSingleNote ? this.getSingleNote(note.beat) === note : note.isVisible;
+    }
+
+    /**
+     * The y position of the k-th number from the bottom of the chords in the row of the given voice.
+     */
+    public getNumberY(voiceIndex: number, chordIndex: number): number {
+        const slots = this._slots;
+        return this.getLineY((slots.getRowStep(voiceIndex) - slots.getChordStep(voiceIndex, chordIndex)) / 2);
+    }
+
+    /**
+     * The y position of the numbers of the given voice: every voice is written on its own row.
+     */
+    public getVoiceLineY(voiceIndex: number): number {
+        return this.getNumberY(voiceIndex, 0);
+    }
+
+    private _isVoiceWritten(voiceIndex: number): boolean {
+        return !this.isSingleNote || voiceIndex === 0;
+    }
+
+    /**
+     * Whether the row of the given voice holds content in this bar.
+     */
+    public isRowWritten(voiceIndex: number): boolean {
+        return this._isVoiceWritten(voiceIndex) && this.bar.filledVoices.has(voiceIndex);
+    }
 
     public override resolveTimeSignatureDisplay(): ElementDisplay {
         return StaffDisplayResolver.merge(
@@ -78,10 +220,37 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get heightLineCount(): number {
-        return 5;
+        return this._slots.lineCount;
     }
 
     public override get drawnLineCount(): number {
+        return 0;
+    }
+
+    public override get staffRowLineCount(): number {
+        return 5;
+    }
+
+    public override get staffRowCount(): number {
+        let count = 0;
+        for (let v = 0; v < this.bar.voices.length; v++) {
+            if (this.isRowWritten(v)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public override getStaffRowOffset(index: number): number {
+        let row = 0;
+        for (let v = 0; v < this.bar.voices.length; v++) {
+            if (this.isRowWritten(v)) {
+                if (row === index) {
+                    return this.getVoiceLineY(v) - this.getLineY(0);
+                }
+                row++;
+            }
+        }
         return 0;
     }
 
@@ -130,16 +299,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
             const previousColor = ElementStyleHelper.applyBeat(canvas, flagsElement, beat);
             try {
-                const direction: BeamDirection = this.getBeamDirection(h);
-                const isGrace: boolean = h.graceType !== GraceType.None;
-                const scaleMod: number = isGrace ? EngravingSettings.GraceScale : 1;
-
-                let barSpacing: number = (this.beamSpacing + this.beamThickness) * scaleMod;
-                let barSize = this.beamThickness * scaleMod;
-                if (direction === BeamDirection.Down) {
-                    barSpacing = -barSpacing;
-                    barSize = -barSize;
-                }
+                const container = this.voiceContainer.getBeatContainer(beat) as NumberedBeatContainerGlyph | undefined;
+                // the underlines hang below the numbers: the first line spans the whole group,
+                // shorter durations add their lines below it
+                const barSpacing: number = this.beamSpacing + this.beamThickness;
+                const barSize = this.beamThickness;
 
                 let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
                 let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes);
@@ -154,7 +318,13 @@ export class NumberedBarRenderer extends LineBarRenderer {
                     barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes);
                 }
 
-                const barStart: number = cy + this.y + this.calculateBeamY(h, beatLineX);
+                // the underline block starts with a gap below the numbers, followed by a spacing before every line
+                const barStart: number =
+                    cy +
+                    this.y +
+                    this.calculateBeamY(h, beatLineX) -
+                    (container ? container.underlinesHeight : 0) +
+                    2 * this.beamSpacing;
                 for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
                     const barY: number = barStart + barIndex * barSpacing;
 
@@ -169,7 +339,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 }
 
                 // dashes for additional numbers
-                const container = this.voiceContainer.getBeatContainer(beat) as NumberedBeatContainerGlyph | undefined;
                 if (container && container.hasAdditionalNumbers) {
                     for (const additionalNumber of container.iterateAdditionalNumbers()) {
                         barCount = additionalNumber.barCount;
@@ -213,16 +382,21 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     private _calculateBarHeight(beat: Beat) {
-        const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
-        let barHeight = 0;
-        if (barCount > 0) {
-            const smufl = this.smuflMetrics;
-            barHeight =
-                smufl.numberedBarRendererBarSpacing +
-                barCount * (smufl.numberedBarRendererBarSpacing + smufl.numberedBarRendererBarSize);
-        }
+        return this.getUnderlinesHeightForCount(ModelUtils.getIndex(beat.duration) - 2);
+    }
 
-        return barHeight;
+    /**
+     * The height of the given number of duration underlines including the gap to the number above.
+     */
+    public getUnderlinesHeightForCount(barCount: number): number {
+        if (barCount <= 0) {
+            return 0;
+        }
+        const smufl = this.smuflMetrics;
+        return (
+            smufl.numberedBarRendererBarSpacing +
+            barCount * (smufl.numberedBarRendererBarSpacing + smufl.numberedBarRendererBarSize)
+        );
     }
 
     protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
@@ -242,20 +416,23 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
-        const barHeight: number = this._calculateBarHeight(beat);
-
-        const container = this.voiceContainer.getBeatContainer(beat);
+        const container = this.voiceContainer.getBeatContainer(beat) as NumberedBeatContainerGlyph | undefined;
         if (!container) {
             if (direction === BeamDirection.Down) {
-                return this.voiceContainer.getBoundingBoxBottom() + barHeight;
+                return this.voiceContainer.getBoundingBoxBottom() + this._calculateBarHeight(beat);
             }
             return this.getLineY(0);
         }
 
         if (direction === BeamDirection.Down) {
-            return container.getBoundingBoxBottom() + barHeight;
+            // the underlines sit directly below the numbers, low octave dots go below them
+            const numbersBottom =
+                beat.isEmpty || beat.deadSlapped
+                    ? container.getBoundingBoxBottom()
+                    : container.getLowestNoteY(NoteYPosition.Bottom);
+            return numbersBottom + container.underlinesHeight;
         }
-        return this.getLineY(0);
+        return this.getVoiceLineY(beat.voice.index);
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -307,7 +484,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     private _createTimeSignatureGlyphs(): void {
         const masterBar = this.bar.masterBar;
-        const g = new ScoreTimeSignatureGlyph(
+        const g = new NumberedTimeSignatureGlyph(
             0,
             this.getLineY(0),
             masterBar.timeSignatureNumerator,
@@ -328,16 +505,173 @@ export class NumberedBarRenderer extends LineBarRenderer {
         }
     }
 
+    /**
+     * The height of the time signature the bar writes in front of its rows; 0 if it writes none.
+     */
+    private _getTimeSignatureHeight(): number {
+        const profile = this.headerProfile;
+        if (!profile) {
+            return 0;
+        }
+        for (const g of profile.glyphs) {
+            if (g.rank === TimeSignatureGlyph.HeaderRank) {
+                const masterBar = this.bar.masterBar;
+                const heights = this.smuflMetrics.glyphHeights;
+                if (masterBar.timeSignatureCommon) {
+                    const numerator = masterBar.timeSignatureNumerator;
+                    const denominator = masterBar.timeSignatureDenominator;
+                    if (numerator === 2 && denominator === 2) {
+                        return heights.get(MusicFontSymbol.TimeSigCutCommon)!;
+                    }
+                    if (numerator === 4 && denominator === 4) {
+                        return heights.get(MusicFontSymbol.TimeSigCommon)!;
+                    }
+                }
+                return 2 * heights.get(MusicFontSymbol.TimeSig0)!;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * The steps between the centres of two stacked chord numbers with the given octave dots, so that the dots
+     * of both fit between them.
+     */
+    private _getChordGapSteps(lowerDots: number, upperDots: number): number {
+        const settings = this.smuflMetrics;
+        const numberHeight = this._getNumberHeight();
+        const distance =
+            NumberedNoteHeadGlyph.getTopExtent(settings, numberHeight, lowerDots) +
+            settings.numberedChordNoteGap +
+            NumberedNoteHeadGlyph.getBottomExtent(settings, numberHeight, upperDots, 0);
+        return Math.ceil(distance / (this.lineSpacing / 2));
+    }
+
+    /**
+     * Records the slots the numbers of the voice need. The rows of the voices are recorded in their order: per row
+     * boundary the hanging part of the upper row, a separation of two staff spaces and the rising part of the lower
+     * row, both from this bar. Where the bar writes its time signature in front of both rows, the two copies keep
+     * the content padding of adjacent staves.
+     * @param gapSteps Per chord position, the most steps the chords of the voice need; null without chords.
+     * @param underlines The most duration underlines of the voice.
+     * @param lowDots The most low octave dots of the lowest numbers.
+     * @param highDots The most high octave dots of the top numbers.
+     * @param hasArcs Whether ties, effect slurs or tuplets are drawn above the numbers.
+     * @param graceTop The distance from the row to the top of its highest grace chord.
+     */
+    private _addSlotNeeds(
+        voiceIndex: number,
+        gapSteps: number[] | null,
+        underlines: number,
+        lowDots: number,
+        highDots: number,
+        hasArcs: boolean,
+        graceTop: number
+    ): void {
+        let needs = this._slotNeeds;
+        if (!needs) {
+            // numbers of a single voice without chords stay on the line of single numbers
+            if (!gapSteps && (this.isSingleNote || !this.bar.isMultiVoice)) {
+                return;
+            }
+            needs = new NumberedSlotLayout();
+            this._slotNeeds = needs;
+            this._slots = needs;
+        }
+        if (gapSteps) {
+            needs.setChordGapSteps(voiceIndex, gapSteps);
+        }
+
+        const settings = this.smuflMetrics;
+        const numberHeight = this._getNumberHeight();
+        if (voiceIndex > 0) {
+            const stepHeight = this.lineSpacing / 2;
+            // rows read as separate parts, not as chords
+            const rowSeparation = 2 * settings.oneStaffSpace;
+            let chordSteps = 0;
+            if (gapSteps) {
+                for (const g of gapSteps) {
+                    chordSteps += g;
+                }
+            }
+            let rising = chordSteps * stepHeight + NumberedNoteHeadGlyph.getTopExtent(settings, numberHeight, highDots);
+            if (hasArcs) {
+                rising += Math.max(
+                    settings.tieHeight,
+                    settings.glyphHeights.get(MusicFontSymbol.Tuplet0)! + this.tupletOffset
+                );
+            }
+            if (graceTop > rising) {
+                rising = graceTop;
+            }
+            // voices between without content keep a blank row
+            const filledVoices = this.bar.filledVoices;
+            for (let v = this._neededRowVoice + 1; v <= voiceIndex; v++) {
+                const hanging = v === this._neededRowVoice + 1 ? this._neededRowHang : numberHeight / 2;
+                let steps = Math.ceil(
+                    (hanging + rowSeparation + (v === voiceIndex ? rising : numberHeight / 2)) / stepHeight
+                );
+                if (filledVoices.has(v - 1) && filledVoices.has(v)) {
+                    const timeSignatureHeight = this._getTimeSignatureHeight();
+                    if (timeSignatureHeight > 0) {
+                        const timeSignatureSteps = Math.ceil(
+                            (timeSignatureHeight + settings.staffContentPadding) / stepHeight
+                        );
+                        if (timeSignatureSteps > steps) {
+                            steps = timeSignatureSteps;
+                        }
+                    }
+                }
+                needs.addRowGapSteps(steps);
+            }
+        }
+        const underlinesHeight = this.getUnderlinesHeightForCount(underlines);
+        this._neededRowVoice = voiceIndex;
+        this._neededRowHang = Math.max(
+            numberHeight / 2 + underlinesHeight,
+            NumberedNoteHeadGlyph.getBottomExtent(settings, numberHeight, -lowDots, underlinesHeight)
+        );
+    }
+
     protected override createVoiceGlyphs(v: Voice): void {
-        if (v.index > 0) {
+        if (!this._isVoiceWritten(v.index)) {
             return;
         }
 
         super.createVoiceGlyphs(v);
 
+        // what the numbers of the voice need on the slots; grace chords are stacked on their own and only
+        // need room above their row
+        let gapSteps: number[] | null = null;
+        let underlines = 0;
+        let lowDots = 0;
+        let highDots = 0;
+        let hasArcs = false;
+        let graceTop = 0;
+
+        let helper: BeamingHelper | null = null;
+        let helperUnderlinesHeight = 0;
         const absoluteStart = this.bar.masterBar.start;
         for (const b of v.beats) {
             const mainContainer = new NumberedBeatContainerGlyph(b);
+            const onNotes = mainContainer.onNotes as NumberedBeatGlyph;
+            onNotes.createNotes(this, b);
+            if (b.graceType === GraceType.None) {
+                // the underlines of beats beamed together are drawn from a shared bottom line
+                const h = this.helpers.getBeamingHelperForBeat(b);
+                if (!h) {
+                    mainContainer.underlinesHeight = this._calculateBarHeight(b);
+                } else {
+                    if (h !== helper) {
+                        helper = h;
+                        helperUnderlinesHeight = 0;
+                        for (const hb of h.beats) {
+                            helperUnderlinesHeight = Math.max(helperUnderlinesHeight, this._calculateBarHeight(hb));
+                        }
+                    }
+                    mainContainer.underlinesHeight = helperUnderlinesHeight;
+                }
+            }
             this.addBeatGlyph(mainContainer);
 
             // create dashes and filler glyphs
@@ -356,8 +690,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
                             absoluteStart + dashTick,
                             MidiUtils.QuarterTime
                         );
-                        this.addBeatGlyph(restNumber);
-                        mainContainer.addNotes(restNumber);
+                        this._addRepeatedNumber(mainContainer, restNumber);
+                        underlines = Math.max(underlines, restNumber.barCount);
                     } else if (isFullTick) {
                         const dash = new NumberedDashBeatContainerGlyph(v.index, absoluteStart + dashTick);
                         this.addBeatGlyph(dash);
@@ -370,14 +704,88 @@ export class NumberedBarRenderer extends LineBarRenderer {
                             absoluteStart + dashTick,
                             endTick - dashTick
                         );
-                        this.addBeatGlyph(remainingTickNumber);
-                        mainContainer.addNotes(remainingTickNumber);
+                        this._addRepeatedNumber(mainContainer, remainingTickNumber);
+                        underlines = Math.max(underlines, remainingTickNumber.barCount);
                     }
 
                     dashTick += MidiUtils.QuarterTime;
                 }
             }
+
+            if (b.graceType !== GraceType.None) {
+                // the first row rises into the space above the staff
+                const graceChord = onNotes.chord;
+                if (graceChord && v.index > 0) {
+                    // grace numbers are stacked by their own extents, which the layout of the chord measures
+                    graceChord.renderer = this;
+                    graceChord.doLayout();
+                    graceTop = Math.max(graceTop, -graceChord.highestHead.getBoundingBoxTop());
+                }
+                continue;
+            }
+            if (b.isEmpty) {
+                continue;
+            }
+            if (b.hasTuplet) {
+                hasArcs = true;
+            }
+            underlines = Math.max(underlines, ModelUtils.getIndex(b.duration) - 2);
+            const chord = onNotes.chord;
+            if (chord) {
+                const heads = chord.heads;
+                lowDots = Math.max(lowDots, -heads[0].octaveDots);
+                highDots = Math.max(highDots, heads[heads.length - 1].octaveDots);
+                if (!gapSteps) {
+                    gapSteps = [];
+                }
+                for (let k = 0; k < heads.length; k++) {
+                    if (NumberedBarRenderer._hasArcs(heads[k].note!)) {
+                        hasArcs = true;
+                    }
+                    if (k === 0) {
+                        continue;
+                    }
+                    const gap = this._getChordGapSteps(heads[k - 1].octaveDots, heads[k].octaveDots);
+                    if (k > gapSteps.length) {
+                        gapSteps.push(gap);
+                    } else if (gap > gapSteps[k - 1]) {
+                        gapSteps[k - 1] = gap;
+                    }
+                }
+            } else {
+                const head = onNotes.noteHead;
+                const note = head ? head.note : null;
+                if (head && note) {
+                    lowDots = Math.max(lowDots, -head.octaveDots);
+                    highDots = Math.max(highDots, head.octaveDots);
+                    if (NumberedBarRenderer._hasArcs(note)) {
+                        hasArcs = true;
+                    }
+                }
+            }
         }
+
+        this._addSlotNeeds(v.index, gapSteps, underlines, lowDots, highDots, hasArcs, graceTop);
+    }
+
+    private _addRepeatedNumber(main: NumberedBeatContainerGlyph, repeated: NumberedNoteBeatContainerGlyphBase): void {
+        (repeated.onNotes as NumberedBeatGlyph).createNotes(this, repeated.beat);
+        repeated.underlinesHeight = this.getUnderlinesHeightForCount(repeated.barCount);
+        this.addBeatGlyph(repeated);
+        main.addNotes(repeated);
+    }
+
+    /**
+     * Whether ties or slurs are drawn above the number of the note.
+     */
+    private static _hasArcs(note: Note): boolean {
+        return (
+            note.isTieOrigin ||
+            note.isTieDestination ||
+            note.isEffectSlurOrigin ||
+            note.isEffectSlurDestination ||
+            note.isLeftHandTapped
+        );
     }
 
     protected override paintBeamingStem(
@@ -405,7 +813,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
         flagsElement: BeatSubElement,
         beamsElement: BeatSubElement
     ): void {
-        if (h.voice?.index === 0) {
+        const voice = h.voice;
+        if (voice && this._isVoiceWritten(voice.index)) {
             super.paintBeamHelper(cx, cy, canvas, h, flagsElement, beamsElement);
         }
     }
@@ -437,5 +846,222 @@ export class NumberedBarRenderer extends LineBarRenderer {
         _bracketsAsArcs: boolean = false
     ): void {
         super.paintTuplets(cx, cy, canvas, beatElement, true);
+    }
+}
+
+/**
+ * The slots of a numbered staff in steps (half staff spaces) of its lines: the rows of the voices below the first
+ * row and the chord positions above each row. All bars of a staff in a system share one layout; a bar first holds
+ * the slots its own numbers need. A layout does not change once it is shared.
+ * @internal
+ */
+export class NumberedSlotLayout {
+    /**
+     * The layout of a staff whose numbers all sit on the line of single numbers.
+     */
+    public static readonly single: NumberedSlotLayout = new NumberedSlotLayout();
+
+    /**
+     * Per row boundary v (between the rows of voice v and v + 1), the steps between the rows; null with one row.
+     */
+    private _rowGapSteps: number[] | null = null;
+
+    /**
+     * Per voice and chord position k, the steps between the centres of number k and k + 1 from the bottom;
+     * null without chords.
+     */
+    private _chordGapSteps: (number[] | null)[] | null = null;
+
+    /**
+     * The number of staff lines spanning all rows.
+     */
+    public lineCount: number = 5;
+
+    public setChordGapSteps(voiceIndex: number, gapSteps: number[]): void {
+        let chords = this._chordGapSteps;
+        if (!chords) {
+            chords = [];
+            this._chordGapSteps = chords;
+        }
+        while (chords.length < voiceIndex) {
+            chords.push(null);
+        }
+        chords.push(gapSteps);
+    }
+
+    /**
+     * Adds the row of the next voice below the last row.
+     */
+    public addRowGapSteps(steps: number): void {
+        const rows = this._rowGapSteps;
+        if (rows) {
+            rows.push(steps);
+        } else {
+            this._rowGapSteps = [steps];
+        }
+        this.lineCount += steps / 2;
+    }
+
+    /**
+     * The step of the row of the voice, downwards from the first row; voices without a row are on the first row.
+     */
+    public getRowStep(voiceIndex: number): number {
+        const rows = this._rowGapSteps;
+        let step = 0;
+        if (rows && voiceIndex <= rows.length) {
+            for (let v = 0; v < voiceIndex; v++) {
+                step += rows[v];
+            }
+        }
+        return step;
+    }
+
+    /**
+     * The step of the k-th number of a chord (from the bottom) above the row of the voice.
+     */
+    public getChordStep(voiceIndex: number, chordIndex: number): number {
+        const chords = this._chordGapSteps;
+        const rows = this._rowGapSteps;
+        if (!chords || voiceIndex >= chords.length || voiceIndex > (rows ? rows.length : 0)) {
+            return 0;
+        }
+        const gaps = chords[voiceIndex];
+        let step = 0;
+        if (gaps) {
+            for (let k = 0; k < chordIndex && k < gaps.length; k++) {
+                step += gaps[k];
+            }
+        }
+        return step;
+    }
+
+    /**
+     * Whether both layouts place every number on the same step.
+     */
+    public matches(other: NumberedSlotLayout): boolean {
+        if (other === this) {
+            return true;
+        }
+        if (!NumberedSlotLayout._stepsMatch(this._rowGapSteps, other._rowGapSteps)) {
+            return false;
+        }
+        const a = this._chordGapSteps;
+        const b = other._chordGapSteps;
+        const count = Math.max(a ? a.length : 0, b ? b.length : 0);
+        for (let v = 0; v < count; v++) {
+            const gapsA = a && v < a.length ? a[v] : null;
+            const gapsB = b && v < b.length ? b[v] : null;
+            if (!NumberedSlotLayout._stepsMatch(gapsA, gapsB)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static _stepsMatch(a: number[] | null, b: number[] | null): boolean {
+        if (a === b) {
+            return true;
+        }
+        if (!a || !b || a.length !== b.length) {
+            return false;
+        }
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * The layout holding the numbers of both layouts: per chord position and row boundary the most steps.
+     * Returns one of them if it already holds the other.
+     */
+    public static merge(a: NumberedSlotLayout, b: NumberedSlotLayout): NumberedSlotLayout {
+        if (a._holds(b)) {
+            return a;
+        }
+        if (b._holds(a)) {
+            return b;
+        }
+        const merged = new NumberedSlotLayout();
+        const rows = NumberedSlotLayout._mergeSteps(a._rowGapSteps, b._rowGapSteps);
+        merged._rowGapSteps = rows;
+        if (rows) {
+            for (const steps of rows) {
+                merged.lineCount += steps / 2;
+            }
+        }
+        const chordsA = a._chordGapSteps;
+        const chordsB = b._chordGapSteps;
+        if (!chordsA || !chordsB) {
+            merged._chordGapSteps = chordsA ?? chordsB;
+        } else {
+            const chords: (number[] | null)[] = [];
+            const count = Math.max(chordsA.length, chordsB.length);
+            for (let v = 0; v < count; v++) {
+                chords.push(
+                    NumberedSlotLayout._mergeSteps(
+                        v < chordsA.length ? chordsA[v] : null,
+                        v < chordsB.length ? chordsB[v] : null
+                    )
+                );
+            }
+            merged._chordGapSteps = chords;
+        }
+        return merged;
+    }
+
+    /**
+     * Whether every row boundary and chord position of the other layout is at most as many steps here.
+     */
+    private _holds(other: NumberedSlotLayout): boolean {
+        if (!NumberedSlotLayout._stepsHold(this._rowGapSteps, other._rowGapSteps)) {
+            return false;
+        }
+        const chords = other._chordGapSteps;
+        if (!chords) {
+            return true;
+        }
+        const own = this._chordGapSteps;
+        for (let v = 0; v < chords.length; v++) {
+            if (!NumberedSlotLayout._stepsHold(own && v < own.length ? own[v] : null, chords[v])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static _stepsHold(own: number[] | null, other: number[] | null): boolean {
+        if (!other || own === other) {
+            return true;
+        }
+        if (!own || own.length < other.length) {
+            return false;
+        }
+        for (let i = 0; i < other.length; i++) {
+            if (other[i] > own[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static _mergeSteps(a: number[] | null, b: number[] | null): number[] | null {
+        if (!a) {
+            return b;
+        }
+        if (!b) {
+            return a;
+        }
+        const longer = a.length >= b.length ? a : b;
+        const shorter = a.length >= b.length ? b : a;
+        const merged = longer.slice();
+        for (let i = 0; i < shorter.length; i++) {
+            if (shorter[i] > merged[i]) {
+                merged[i] = shorter[i];
+            }
+        }
+        return merged;
     }
 }

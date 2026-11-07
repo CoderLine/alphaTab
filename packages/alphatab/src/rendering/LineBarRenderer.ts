@@ -61,6 +61,29 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public abstract get heightLineCount(): number;
     public abstract get drawnLineCount(): number;
 
+    /**
+     * The lines one staff row spans. Staff-sized glyphs (header bar lines, repeat dots, dead-slapped crosses) are
+     * laid out in the first row, so they do not depend on the height of renderers with several rows.
+     */
+    public get staffRowLineCount(): number {
+        return this.heightLineCount;
+    }
+
+    /**
+     * The number of staff rows stacked in the bar. Bar-level glyphs of a row (time signatures, repeat dots) are
+     * written in front of every row.
+     */
+    public get staffRowCount(): number {
+        return 1;
+    }
+
+    /**
+     * The vertical offset of the staff row with the given index from the first row.
+     */
+    public getStaffRowOffset(_index: number): number {
+        return 0;
+    }
+
     protected get topGlyphOverflow() {
         return 0;
     }
@@ -86,7 +109,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     }
 
     protected updateFirstLineY() {
-        const fullLineHeight = this.lineOffset * (this.heightLineCount - 1);
+        const fullLineHeight = this.lineOffset * (this.staffRowLineCount - 1);
         const actualLineHeight = this.drawnLineCount === 0 ? 0 : (this.drawnLineCount - 1) * this.lineOffset;
         const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
 

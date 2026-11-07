@@ -130,6 +130,12 @@ export function staffDisplayProperties(tag: string, level: StaffDisplayLevel): M
                 'Set how the rhythm notation is shown. Supported staff types: `tabs`.',
                 enumSignatures('mode', 'The mode to use', 'TabRhythmMode'),
                 'showWithBeams'
+            ),
+            prop(
+                'notes',
+                'Set how the notes of the voices and chords are written. Supported staff types: `numbered`.',
+                enumSignatures('mode', 'The mode to use', 'NumberedNoteMode'),
+                'singleNote'
             )
         );
     }

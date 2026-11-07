@@ -348,6 +348,7 @@ export class RenderStaff implements IStaffDisplayContext {
     public resetOverflows() {
         this.topOverflow = 0;
         this.bottomOverflow = 0;
+        this.staffBottom = 0;
     }
 
     public topOverflow = 0;

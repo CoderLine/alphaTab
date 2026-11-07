@@ -34,10 +34,43 @@ Numbered notation (jiǎnpǔ, 简谱) prints digits 1–7 for the seven scale deg
 ## How the staff reads
 
 - Digits `1` through `7` map to scale degrees relative to the current key signature. A rest is `0`.
-- Dots above or below a digit shift it up or down an octave. Sharp and flat markers appear as prefixes when the pitch falls outside the key.
+- Dots above or below a digit shift it up or down an octave; below a digit with duration lines, the dots go below the lines. Sharp and flat markers appear as prefixes when the pitch falls outside the key.
 - Duration is drawn as underlines below the digit — one line for eighths, two for sixteenths, and so on. Dotted rhythms add a trailing dot; ties and slurs curve above the digits exactly as they do on a standard staff.
 
 The numbered staff carries every rhythmic and structural detail the standard staff carries — ties, tuplets, repeats, dynamics, chord names — so you can hand a reader a jiǎnpǔ-only chart and preserve the full arrangement. Set `showNumbered = true` on the `Staff` and turn off the notations you don't need.
+
+## Chords and multiple voices
+
+A chord is written as a stack of digits with the lowest note at the bottom; the rows of the stack line up across all chords of a line. Every digit keeps its own octave dots, accidental and augmentation dot; the duration lines and the dashes of longer notes belong to the lowest digit. Each note of a tied chord gets its own tie.
+
+When a staff has more than one voice, every voice is written on its own row: the first voice on top, the further voices below, with beats lined up in time across the rows. A voice keeps its row on the whole staff. Systems in which only the first voice has notes are written as a single row. The distance between the rows follows their content: octave dots, duration lines, chords, ties and tuplets move the rows apart, and so does a time signature, which is written in front of every row.
+
+<AlphaTab tex={true}>{`
+\\track "Piano"
+  \\staff {score numbered}
+  \\voice
+    :4 (E4 G4 C5) (F4 A4 C5) (G4 B4 D5) (E4 G4 C5) | :2 (D4 F4 B4) (C4 E4 C5)
+  \\voice
+    :8 C3 G3 E4 G3 F3 C4 A3 C4 | :4 G2 G3 :2 C3
+`}</AlphaTab>
+
+## Single note mode
+
+Guitar Pro writes a single digit per beat and only the first voice. To get this display, set the `notes` mode of the numbered staff to `NumberedNoteMode.SingleNote`: each beat then shows the highest note of its chord. The mode can be set for the whole score on `score.stylesheet.numberedConfig`, or per staff on `staff.numberedConfig`, which takes precedence. In alphaTex, use the `notes` property of [`\defaultStaffDisplay`](/docs/alphatex/score-metadata#defaultstaffdisplay) or [`\staffDisplay`](/docs/alphatex/staff-metadata#staffdisplay).
+
+<AlphaTab tex={true}>{`
+\\track "Piano"
+  \\staff {score numbered}
+  \\staffDisplay numbered { notes singleNote }
+  \\voice
+    :4 (E4 G4 C5) (F4 A4 C5) (G4 B4 D5) (E4 G4 C5) | :2 (D4 F4 B4) (C4 E4 C5)
+  \\voice
+    :8 C3 G3 E4 G3 F3 C4 A3 C4 | :4 G2 G3 :2 C3
+`}</AlphaTab>
+
+```js
+score.stylesheet.numberedConfig.notes = alphaTab.model.NumberedNoteMode.SingleNote;
+```
 
 ## Show it in code
 
@@ -67,4 +100,4 @@ api.scoreLoaded.on((score) => {
 
 - [Standard notation](/docs/features/render/standard-notation) — the western five-line staff, often shown alongside jiǎnpǔ.
 - [Slash notation](/docs/features/render/slash-notation) — another single-line rhythm notation.
-- [`Staff.showNumbered`](/docs/reference/types/model/staff) and [`NumberedStaffConfig`](/docs/reference/types/model/numberedstaffconfig) in the model reference.
+- [`Staff.showNumbered`](/docs/reference/types/model/staff), [`NumberedStaffConfig`](/docs/reference/types/model/numberedstaffconfig) and [`NumberedNoteMode`](/docs/reference/types/model/numberednotemode) in the model reference.

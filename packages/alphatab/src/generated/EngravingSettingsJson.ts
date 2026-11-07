@@ -430,4 +430,10 @@ export interface EngravingSettingsJson {
      * The space needed by flags on the stem-side from top to bottom to place.
      */
     stemFlagHeight?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
+    /**
+     * The vertical gap between the stacked numbers of a chord in numbered notation,
+     * measured between the octave dots of the lower and the higher number.
+     * @since 1.10.0
+     */
+    numberedChordNoteGap?: number;
 }

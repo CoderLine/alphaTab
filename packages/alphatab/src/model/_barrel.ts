@@ -76,11 +76,12 @@ export {
     SystemDisplay,
     type ElementDisplay
 } from '@coderline/alphatab/model/ElementDisplay';
-export type {
-    ScoreStaffConfig,
-    TabStaffConfig,
-    SlashStaffConfig,
-    NumberedStaffConfig
+export {
+    NumberedNoteMode,
+    type ScoreStaffConfig,
+    type TabStaffConfig,
+    type SlashStaffConfig,
+    type NumberedStaffConfig
 } from '@coderline/alphatab/model/StaffConfigs';
 export type {
     ScoreBarOverride,

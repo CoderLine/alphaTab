@@ -1,6 +1,5 @@
 import type { Note } from '@coderline/alphatab/model/Note';
 import { TabSlurGlyph } from '@coderline/alphatab/rendering/glyphs/TabSlurGlyph';
-import { TabTieGlyph } from '@coderline/alphatab/rendering/glyphs/TabTieGlyph';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 
 /**
@@ -34,28 +33,12 @@ export class NumberedSlurGlyph extends TabSlurGlyph {
         if (isForEnd !== forEnd) {
             return false;
         }
-        // same draw direction
-        if (this.tieDirection !== TabTieGlyph.getBeamDirectionForNote(startNote)) {
-            return false;
+        // slurs arc above the numbers, so they attach to the highest note
+        if (startNote.realValue > this.startNote.realValue) {
+            this.startNote = startNote;
         }
-        // if we can expand, expand in correct direction
-        switch (this.tieDirection) {
-            case BeamDirection.Up:
-                if (startNote.realValue > this.startNote.realValue) {
-                    this.startNote = startNote;
-                }
-                if (endNote.realValue > this.endNote.realValue) {
-                    this.endNote = endNote;
-                }
-                break;
-            case BeamDirection.Down:
-                if (startNote.realValue < this.startNote.realValue) {
-                    this.startNote = startNote;
-                }
-                if (endNote.realValue < this.endNote.realValue) {
-                    this.endNote = endNote;
-                }
-                break;
+        if (endNote.realValue > this.endNote.realValue) {
+            this.endNote = endNote;
         }
         return true;
     }

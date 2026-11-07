@@ -582,7 +582,8 @@ export class AlphaTex1LanguageDefinitions {
                 ['restsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
                 ['restssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
                 ['barnumber', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]],
-                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]]
+                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]],
+                ['notes', [[[[100, 107], 0, ['allnotes', 'singlenote']]]]]
             ]
         ],
         [
@@ -645,7 +646,8 @@ export class AlphaTex1LanguageDefinitions {
                 ['restsplacement', [[[[100, 107], 0, ['allstaves', 'primary']]]]],
                 ['restssystems', [[[[100, 107], 0, ['allsystems', 'firstsystemonly']]]]],
                 ['barnumber', [[[[100, 107], 0, ['allbars', 'firstofsystem', 'hide']]]]],
-                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]]
+                ['rhythm', [[[[100, 107], 0, ['hidden', 'showwithbeams', 'showwithbars', 'automatic']]]]],
+                ['notes', [[[[100, 107], 0, ['allnotes', 'singlenote']]]]]
             ]
         ],
         ['ts', null],

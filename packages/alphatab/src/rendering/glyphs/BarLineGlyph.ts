@@ -117,7 +117,7 @@ class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
     public override paintExtended(cx: number, cy: number, canvas: ICanvas, _newHeight: number): void {
         const renderer = this.renderer as LineBarRenderer;
 
-        const lineOffset = renderer.heightLineCount % 2 === 0 ? 1 : 0.5;
+        const lineOffset = renderer.staffRowLineCount % 2 === 0 ? 1 : 0.5;
 
         const exactCenter = cy + this.y + this.height / 2;
         const lineHeight = renderer.getLineHeight(lineOffset);
@@ -129,20 +129,23 @@ class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
 
         const dotOffset = dotTop - dotHeight / 2;
 
-        CanvasHelper.fillMusicFontSymbolSafe(
-            canvas,
-            cx + this.x,
-            exactCenter + dotOffset - lineHeight,
-            1,
-            MusicFontSymbol.RepeatDot
-        );
-        CanvasHelper.fillMusicFontSymbolSafe(
-            canvas,
-            cx + this.x,
-            exactCenter + dotOffset + lineHeight,
-            1,
-            MusicFontSymbol.RepeatDot
-        );
+        for (let row = 0, count = renderer.staffRowCount; row < count; row++) {
+            const center = exactCenter + renderer.getStaffRowOffset(row) + dotOffset;
+            CanvasHelper.fillMusicFontSymbolSafe(
+                canvas,
+                cx + this.x,
+                center - lineHeight,
+                1,
+                MusicFontSymbol.RepeatDot
+            );
+            CanvasHelper.fillMusicFontSymbolSafe(
+                canvas,
+                cx + this.x,
+                center + lineHeight,
+                1,
+                MusicFontSymbol.RepeatDot
+            );
+        }
     }
 }
 
@@ -329,7 +332,12 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             (this._isRight && lineRenderer.isLastOfStaff)
         ) {
             top -= lineYOffset;
-            bottom += lineRenderer.height;
+            // without staff lines the layout covers the first staff row, so cached header profiles do not depend
+            // on the bar height; the painted length follows the renderer height at paint time
+            bottom +=
+                lineRenderer.drawnLineCount === 0
+                    ? Math.ceil(lineRenderer.getLineHeight(lineRenderer.staffRowLineCount - 1))
+                    : lineRenderer.height;
         } else {
             top += lineRenderer.getLineY(0) - lineYOffset / 2;
             bottom += lineRenderer.getLineY(lineRenderer.drawnLineCount - 1) + lineYOffset / 2;
@@ -421,6 +429,10 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
                 const lineTop = thisStaff.y + renderer.y;
                 const lineBottom = nextStaff.y + nextStaff.topOverflow + renderer.smuflMetrics.staffLineThickness;
                 actualLineHeight = lineBottom - lineTop;
+                isExtended = true;
+            } else if (renderer.drawnLineCount === 0) {
+                // the height of the renderer is final only once the staff is finalized (e.g. numbered voice rows)
+                actualLineHeight = renderer.smuflMetrics.staffLineThickness + renderer.height;
                 isExtended = true;
             }
 

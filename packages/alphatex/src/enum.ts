@@ -34,7 +34,8 @@ export const alphaTexMappedEnumLookup = {
     BarNumberDisplay: alphaTab.model.BarNumberDisplay,
     StaffPlacement: alphaTab.model.StaffPlacement,
     SystemDisplay: alphaTab.model.SystemDisplay,
-    TabRhythmMode: alphaTab.TabRhythmMode
+    TabRhythmMode: alphaTab.TabRhythmMode,
+    NumberedNoteMode: alphaTab.model.NumberedNoteMode
 };
 export type AlphaTexMappedEnumName = keyof typeof alphaTexMappedEnumLookup;
 
@@ -488,6 +489,16 @@ export const alphaTexMappedEnumMapping: {
         ShowWithBeams: { snippet: 'showWithBeams', shortDescription: 'Individual beams per beat' },
         ShowWithBars: { snippet: 'showWithBars', shortDescription: 'Connected bars like standard notation' },
         Automatic: { snippet: 'automatic', shortDescription: 'Shown if no standard notation is shown' }
+    },
+    NumberedNoteMode: {
+        AllNotes: {
+            snippet: 'allNotes',
+            shortDescription: 'Every voice on its own row, chords as stacked numbers'
+        },
+        SingleNote: {
+            snippet: 'singleNote',
+            shortDescription: 'Only the first voice, one number per beat showing the highest note'
+        }
     }
 };
 
