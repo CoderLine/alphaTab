@@ -4,6 +4,7 @@ import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/Alpha
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { NumberedNoteMode } from '@coderline/alphatab/model/StaffConfigs';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
@@ -331,5 +332,22 @@ describe('AlphaTexExporterTest', () => {
 
         const reimported = ScoreLoader.loadAlphaTex(exportAlphaTex(score));
         ComparisonHelpers.alphaTexExportRoundtripEqual('staff-display', reimported, score);
+    });
+
+    it('staff-display-numbered-notes', () => {
+        const score = ScoreLoader.loadAlphaTex('\\track \\staff {numbered} C4 | \\track \\staff {numbered} C4');
+        score.stylesheet.numberedConfig.notes = NumberedNoteMode.SingleNote;
+        score.tracks[1].staves[0].numberedConfig = { notes: NumberedNoteMode.AllNotes };
+
+        const exported = exportAlphaTex(score)
+            .split('\n')
+            .map(l => l.trim())
+            .join(' ');
+
+        expect(exported).toContain('\\defaultStaffDisplay numbered { notes SingleNote }');
+        expect(exported).toContain('\\staffDisplay numbered { notes AllNotes }');
+
+        const reimported = ScoreLoader.loadAlphaTex(exportAlphaTex(score));
+        ComparisonHelpers.alphaTexExportRoundtripEqual('staff-display-numbered-notes', reimported, score);
     });
 });

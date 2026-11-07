@@ -1,4 +1,5 @@
 import type { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
+import type { NumberedNoteMode } from '@coderline/alphatab/model/StaffConfigs';
 import type {
     AlphaTexAccidentalMode,
     AlphaTexStaffType,
@@ -456,6 +457,13 @@ export class AlphaTex1EnumMappings {
         ['automatic', 3]
     ]);
     public static readonly tabRhythmModeReversed = AlphaTex1EnumMappings._reverse(AlphaTex1EnumMappings.tabRhythmMode);
+    public static readonly numberedNoteMode = new Map<string, NumberedNoteMode>([
+        ['allnotes', 0],
+        ['singlenote', 1]
+    ]);
+    public static readonly numberedNoteModeReversed = AlphaTex1EnumMappings._reverse(
+        AlphaTex1EnumMappings.numberedNoteMode
+    );
     public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
         [-7, 'abminor'],
         [-6, 'ebminor'],

@@ -9,12 +9,13 @@ import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { ElementDisplaySerializer } from "@coderline/alphatab/generated/model/ElementDisplaySerializer";
 import { BarNumberDisplay } from "@coderline/alphatab/model/RenderStylesheet";
 import { JsonHelper } from "@coderline/alphatab/io/JsonHelper";
+import { NumberedNoteMode } from "@coderline/alphatab/model/StaffConfigs";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class NumberedStaffConfigSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["timesignature", "barnumber"]);
+    private static readonly _fields: RecordFields = new RecordFields(["timesignature", "barnumber", "notes"]);
     public static read(obj: NumberedStaffConfig, reader: IObjectReader): void {
         reader.readRecord(NumberedStaffConfigSerializer._fields, (id, k, rr) => NumberedStaffConfigSerializer._readField(obj, id, rr, false));
     }
@@ -35,6 +36,9 @@ export class NumberedStaffConfigSerializer {
                 return true;
             case 1:
                 obj.barNumber = JsonHelper.parseEnum<BarNumberDisplay>(r.readValue(), BarNumberDisplay);
+                return true;
+            case 2:
+                obj.notes = JsonHelper.parseEnum<NumberedNoteMode>(r.readValue(), NumberedNoteMode);
                 return true;
         }
         return false;
@@ -69,6 +73,7 @@ export class NumberedStaffConfigSerializer {
             ElementDisplaySerializer.write(obj.timeSignature, w);
         }
         w.valueField(1, obj.barNumber as number | undefined);
+        w.valueField(2, obj.notes as number | undefined);
         w.endObject();
     }
 }

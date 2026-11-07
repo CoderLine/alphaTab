@@ -162,6 +162,7 @@ import { ScoreStaffConfigSerializer } from "@coderline/alphatab/generated/model/
 import { TabStaffConfigSerializer } from "@coderline/alphatab/generated/model/TabStaffConfigSerializer";
 import { SlashStaffConfigSerializer } from "@coderline/alphatab/generated/model/SlashStaffConfigSerializer";
 import { NumberedStaffConfigSerializer } from "@coderline/alphatab/generated/model/NumberedStaffConfigSerializer";
+import { NumberedNoteMode } from "@coderline/alphatab/model/StaffConfigs";
 import { TrackStyle } from "@coderline/alphatab/model/Track";
 import { TrackStyleSerializer } from "@coderline/alphatab/generated/model/TrackStyleSerializer";
 import { TrackSubElement } from "@coderline/alphatab/model/Track";
@@ -435,6 +436,7 @@ export class SerializerFill {
             obj.stemFlagHeight = new Map<Duration, number>();
             obj.stemFlagHeight!.set(SerializerFill.otherEnumValue(Duration, undefined) as Duration, 7.25);
         }
+        obj.numberedChordNoteGap = 7.25;
     }
     public static fillExporterSettings(obj: ExporterSettings, depth: number = 0): void {
         if (depth > 8) {
@@ -1265,6 +1267,7 @@ export class SerializerFill {
             obj.timeSignature = v0;
         }
         obj.barNumber = SerializerFill.otherEnumValue(BarNumberDisplay, obj.barNumber) as BarNumberDisplay;
+        obj.notes = SerializerFill.otherEnumValue(NumberedNoteMode, obj.notes) as NumberedNoteMode;
     }
     public static fillTrackStyle(obj: TrackStyle, depth: number = 0): void {
         if (depth > 8) {

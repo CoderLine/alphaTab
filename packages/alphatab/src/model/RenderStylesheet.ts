@@ -1,10 +1,11 @@
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
-import type {
-    NumberedStaffConfig,
-    ScoreStaffConfig,
-    SlashStaffConfig,
-    TabStaffConfig
+import {
+    NumberedNoteMode,
+    type NumberedStaffConfig,
+    type ScoreStaffConfig,
+    type SlashStaffConfig,
+    type TabStaffConfig
 } from '@coderline/alphatab/model/StaffConfigs';
 import type { Track } from '@coderline/alphatab/model/Track';
 
@@ -291,6 +292,7 @@ export class RenderStylesheet {
      */
     public numberedConfig: NumberedStaffConfig = {
         timeSignature: { isVisible: true, staffPlacement: StaffPlacement.Primary, systemDisplay: SystemDisplay.AllSystems },
-        barNumber: BarNumberDisplay.FirstOfSystem
+        barNumber: BarNumberDisplay.FirstOfSystem,
+        notes: NumberedNoteMode.AllNotes
     };
 }

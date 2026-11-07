@@ -97,6 +97,7 @@ export class EngravingSettingsCloner {
         clone.beatContentPadding = original.beatContentPadding;
         clone.barlineContentPadding = original.barlineContentPadding;
         clone.stemFlagHeight = new Map(original.stemFlagHeight);
+        clone.numberedChordNoteGap = original.numberedChordNoteGap;
         return clone;
     }
 }

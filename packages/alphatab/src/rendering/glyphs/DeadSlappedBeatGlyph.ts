@@ -13,18 +13,18 @@ export class DeadSlappedBeatGlyph extends Glyph {
     }
 
     public override getBoundingBoxTop(): number {
-        return this._topY;
+        return this.y + this._topY;
     }
 
     public override getBoundingBoxBottom(): number {
-        return this._topY + this.height;
+        return this.y + this._topY + this.height;
     }
 
     public override doLayout(): void {
         this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
 
         const renderer = this.renderer as LineBarRenderer;
-        const crossHeight = renderer.getLineHeight(renderer.heightLineCount - 1);
+        const crossHeight = renderer.getLineHeight(renderer.staffRowLineCount - 1);
 
         const staffTop = renderer.getLineY(0);
         const staffHeight = renderer.drawnLineCount > 0 ? renderer.getLineHeight(renderer.drawnLineCount - 1) : 0;
@@ -39,7 +39,7 @@ export class DeadSlappedBeatGlyph extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const crossHeight = this.height;
 
-        const topY = this._topY;
+        const topY = this.y + this._topY;
 
         const lw = canvas.lineWidth;
         canvas.lineWidth = this.renderer.smuflMetrics.deadSlappedLineWidth;

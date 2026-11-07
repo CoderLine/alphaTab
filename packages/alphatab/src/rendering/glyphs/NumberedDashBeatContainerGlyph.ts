@@ -97,6 +97,9 @@ export class NumberedNoteBeatContainerGlyphBase extends NumberedBeatContainerGly
     }
 
     public override buildBoundingsLookup(_writer: IBoundsLookupWriter, _cx: number, _cy: number): void {}
+
+    // ties and slurs belong to the main number of the beat
+    protected override createTies(_n: Note): void {}
 }
 
 /**
@@ -185,7 +188,7 @@ export class NumberedDashBeatContainerGlyph extends BeatContainerGlyphBase imple
         const renderer = this.renderer as NumberedBarRenderer;
         const dashWidth = renderer.smuflMetrics.numberedDashGlyphWidth;
         const dashHeight = renderer.smuflMetrics.numberedBarRendererBarSize;
-        const dashY = Math.ceil(cy + renderer.getLineY(0) - dashHeight);
+        const dashY = Math.ceil(cy + renderer.getVoiceLineY(this._voiceIndex) - dashHeight);
         canvas.fillRect(cx + this.x, dashY, dashWidth, dashHeight);
     }
 }

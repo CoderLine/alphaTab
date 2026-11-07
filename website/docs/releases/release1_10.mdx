@@ -22,3 +22,26 @@ Guitar tabs of a track transposed with [`notation.transpositionPitches`](/docs/r
 `}</AlphaTab>
 
 The loaded score is not changed: the new positions exist only on the rendered tab. Details: [Transposed tablature](/docs/features/render/guitar-tablature#transposed-tablature).
+
+#### render: chords and multiple voices on numbered staves
+https://github.com/CoderLine/alphaTab/issues/2437
+
+Numbered staves write every note instead of a single digit per beat. A chord is a stack of digits with the lowest note at the bottom, each with its own octave dots, accidental and augmentation dot; the duration lines stay with the lowest digit. Every voice is written on its own row, the first voice on top, with beats lined up in time.
+
+<AlphaTab tex={true}>{`
+\\track "Piano"
+  \\staff {score numbered}
+  \\voice
+    :4 (E4 G4 C5) (F4 A4 C5) (G4 B4 D5) (E4 G4 C5) | :2 (D4 F4 B4) (C4 E4 C5)
+  \\voice
+    :8 C3 G3 E4 G3 F3 C4 A3 C4 | :4 G2 G3 :2 C3
+`}</AlphaTab>
+
+The previous display with a single digit of the first voice, as in Guitar Pro, is available as the new [`NumberedNoteMode.SingleNote`](/docs/reference/types/model/numberednotemode); it now shows the highest note of a chord. Details: [Chords and multiple voices](/docs/features/render/numbered-notation#chords-and-multiple-voices).
+
+### Upgrade Notes
+
+#### Visual changes
+
+* Low octave dots on numbered staves sit below the duration lines instead of between digit and lines, as in printed jiǎnpǔ.
+* Numbered staves show all notes of chords and all voices. Set `notes` of the numbered staff configuration to `NumberedNoteMode.SingleNote` (alphaTex: `\defaultStaffDisplay numbered { notes singleNote }`) for one digit per beat; see [Single note mode](/docs/features/render/numbered-notation#single-note-mode).

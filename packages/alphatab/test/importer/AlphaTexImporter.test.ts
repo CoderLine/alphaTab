@@ -17,6 +17,7 @@ import { Direction } from '@coderline/alphatab/model/Direction';
 import { Duration } from '@coderline/alphatab/model/Duration';
 import { DynamicValue } from '@coderline/alphatab/model/DynamicValue';
 import { StaffPlacement, SystemDisplay } from '@coderline/alphatab/model/ElementDisplay';
+import { NumberedNoteMode } from '@coderline/alphatab/model/StaffConfigs';
 import { FadeType } from '@coderline/alphatab/model/FadeType';
 import { FermataType } from '@coderline/alphatab/model/Fermata';
 import { Fingers } from '@coderline/alphatab/model/Fingers';
@@ -2787,6 +2788,22 @@ describe('AlphaTexImporterTest', () => {
             expect(parseTex('\\staffDisplay tabs { ksVisibility false } C4').tracks[0].staves[0].tabConfig).toBe(
                 undefined
             );
+        });
+
+        it('numbered-notes', () => {
+            const score = parseTex(`
+                \\defaultStaffDisplay numbered { notes singleNote }
+                \\track \\staff {score numbered}
+                \\staffDisplay numbered { notes allNotes }
+                C4
+                \\track \\staff {numbered}
+                C4
+            `);
+            expect(score.stylesheet.numberedConfig.notes).toBe(NumberedNoteMode.SingleNote);
+            expect(score.tracks[0].staves[0].numberedConfig!.notes).toBe(NumberedNoteMode.AllNotes);
+            expect(score.tracks[1].staves[0].numberedConfig).toBeUndefined();
+
+            testExportRoundtrip(score);
         });
 
         it('legacy-shorthands', () => {

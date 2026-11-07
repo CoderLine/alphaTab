@@ -503,6 +503,7 @@ export class EngravingSettings {
 
         this.leftHandTabTieWidth = 2.2 * this.oneStaffSpace;
         this.numberedDashGlyphWidth = 1.5 * this.oneStaffSpace;
+        this.numberedChordNoteGap = 0.5 * this.oneStaffSpace;
         this.deadSlappedLineWidth = 0.25 * this.oneStaffSpace;
 
         this.simpleSlideWidth = 1.3 * this.oneStaffSpace;
@@ -826,6 +827,13 @@ export class EngravingSettings {
      * The space needed by flags on the stem-side from top to bottom to place.
      */
     public stemFlagHeight: Map<Duration, number> = new Map<Duration, number>();
+
+    /**
+     * The vertical gap between the stacked numbers of a chord in numbered notation,
+     * measured between the octave dots of the lower and the higher number.
+     * @since 1.10.0
+     */
+    public numberedChordNoteGap = 0;
 
     // Idea: maybe we can encode and pack this large metadata into a more compact format (e.g. BSON or a custom binary blob?)
     // This metadata below is updated automatically from the bravura_metadata.json via npm script

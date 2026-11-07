@@ -12,7 +12,6 @@ import type { StaffSystem } from '@coderline/alphatab/rendering/staves/StaffSyst
  * @internal
  */
 export class HorizontalScreenLayoutPartialInfo {
-    public x: number = 0;
     public width: number = 0;
     public masterBars: MasterBar[] = [];
     public results: MasterBarsRenderers[] = [];
@@ -113,17 +112,23 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 currentPartial = this._completePartial(partials, currentPartial);
             }
 
-            this._scaleBars(result);
-
             currentPartial.results.push(result);
             currentPartial.masterBars.push(score.masterBars[currentBarIndex]);
-            currentPartial.width += result.width;
             currentBarIndex++;
         }
 
         // don't miss the last partial if not empty
         if (currentPartial.masterBars.length > 0) {
             this._completePartial(partials, currentPartial);
+        }
+
+        // as in the page layouts, the bars are scaled once the system holds all of them
+        this._system.resetAllStavesOverflows();
+        for (const partial of partials) {
+            for (const result of partial.results) {
+                this._scaleBars(result);
+                partial.width += result.width;
+            }
         }
         this._firstPartialBarCount = partials.length > 0 ? partials[0].masterBars.length : 0;
         this._finalizeStaffSystem();
@@ -222,9 +227,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         );
 
         // start new partial
-        const newPartial = new HorizontalScreenLayoutPartialInfo();
-        newPartial.x = currentPartial.x + currentPartial.width;
-        return newPartial;
+        return new HorizontalScreenLayoutPartialInfo();
     }
 
     private _finalizeStaffSystem() {

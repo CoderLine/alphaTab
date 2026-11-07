@@ -16,7 +16,7 @@ import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
  * @internal
  */
 export class EngravingSettingsSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["musicfontsize", "onestaffspace", "tablinespacing", "arrowshaftthickness", "barlineseparation", "beamspacing", "beamthickness", "bracketthickness", "dashedbarlinedashlength", "dashedbarlinegaplength", "dashedbarlinethickness", "hairpinthickness", "legerlinethickness", "legerlineextension", "octavelinethickness", "pedallinethickness", "repeatbarlinedotseparation", "repeatendinglinethickness", "slurmidpointthickness", "stafflinethickness", "stemthickness", "thickbarlinethickness", "thinbarlinethickness", "thinthickbarlineseparation", "tiemidpointthickness", "tupletbracketthickness", "stemup", "stemdown", "repeatoffsetx", "standardstemlength", "stemflagoffsets", "glyphtop", "glyphbottom", "glyphwidths", "glyphheights", "numberedbarrendererbarsize", "numberedbarrendererbarspacing", "numbereddashglyphpadding", "numbereddashglyphwidth", "linerangedglyphdashgap", "linerangedglyphdashsize", "prenoteeffectpadding", "postnoteeffectpadding", "onnoteeffectpadding", "stringnumbercirclepadding", "rowcontainerpadding", "rowcontainergap", "alternateendingspadding", "sustainpedallinepadding", "tieheight", "beattimerpadding", "bendnoteheadelementpadding", "ghostparenthesiswidth", "ghostparenthesispadding", "brokenbeamwidth", "tabwhammytextpadding", "tabwhammyperhalfheight", "tabwhammydashsize", "songbookwhammydipheight", "deadslappedlinewidth", "lefthandtabtiewidth", "tabbenddashsize", "tabbendstaffpadding", "tabbendpervalueheight", "tabbendlabelpadding", "simpleslidewidth", "simpleslideheight", "chorddiagrampaddingx", "chorddiagrampaddingy", "chorddiagramstringspacing", "chorddiagramfretspacing", "chorddiagramnutheight", "chorddiagramfretheight", "chorddiagramlinewidth", "tripletfeelbracketpadding", "accidentalpadding", "prebeatglyphspacing", "temponotescale", "tuningglyphcirclenumberscale", "tuningglyphstringcolumnscale", "tuningglyphstringrowpadding", "directionsscale", "multivoicedisplacednoteheadspacing", "staffcontentpadding", "beatcontentpadding", "barlinecontentpadding", "stemflagheight"]);
+    private static readonly _fields: RecordFields = new RecordFields(["musicfontsize", "onestaffspace", "tablinespacing", "arrowshaftthickness", "barlineseparation", "beamspacing", "beamthickness", "bracketthickness", "dashedbarlinedashlength", "dashedbarlinegaplength", "dashedbarlinethickness", "hairpinthickness", "legerlinethickness", "legerlineextension", "octavelinethickness", "pedallinethickness", "repeatbarlinedotseparation", "repeatendinglinethickness", "slurmidpointthickness", "stafflinethickness", "stemthickness", "thickbarlinethickness", "thinbarlinethickness", "thinthickbarlineseparation", "tiemidpointthickness", "tupletbracketthickness", "stemup", "stemdown", "repeatoffsetx", "standardstemlength", "stemflagoffsets", "glyphtop", "glyphbottom", "glyphwidths", "glyphheights", "numberedbarrendererbarsize", "numberedbarrendererbarspacing", "numbereddashglyphpadding", "numbereddashglyphwidth", "linerangedglyphdashgap", "linerangedglyphdashsize", "prenoteeffectpadding", "postnoteeffectpadding", "onnoteeffectpadding", "stringnumbercirclepadding", "rowcontainerpadding", "rowcontainergap", "alternateendingspadding", "sustainpedallinepadding", "tieheight", "beattimerpadding", "bendnoteheadelementpadding", "ghostparenthesiswidth", "ghostparenthesispadding", "brokenbeamwidth", "tabwhammytextpadding", "tabwhammyperhalfheight", "tabwhammydashsize", "songbookwhammydipheight", "deadslappedlinewidth", "lefthandtabtiewidth", "tabbenddashsize", "tabbendstaffpadding", "tabbendpervalueheight", "tabbendlabelpadding", "simpleslidewidth", "simpleslideheight", "chorddiagrampaddingx", "chorddiagrampaddingy", "chorddiagramstringspacing", "chorddiagramfretspacing", "chorddiagramnutheight", "chorddiagramfretheight", "chorddiagramlinewidth", "tripletfeelbracketpadding", "accidentalpadding", "prebeatglyphspacing", "temponotescale", "tuningglyphcirclenumberscale", "tuningglyphstringcolumnscale", "tuningglyphstringrowpadding", "directionsscale", "multivoicedisplacednoteheadspacing", "staffcontentpadding", "beatcontentpadding", "barlinecontentpadding", "stemflagheight", "numberedchordnotegap"]);
     public static read(obj: EngravingSettings, reader: IObjectReader): void {
         reader.readRecord(EngravingSettingsSerializer._fields, (id, k, rr) => EngravingSettingsSerializer._readField(obj, id, rr, false));
     }
@@ -287,6 +287,9 @@ export class EngravingSettingsSerializer {
             case 86:
                 EngravingSettingsSerializer._readStemFlagHeight(obj, r, flexible);
                 return true;
+            case 87:
+                obj.numberedChordNoteGap = r.readNumber();
+                return true;
         }
         return false;
     }
@@ -514,6 +517,7 @@ export class EngravingSettingsSerializer {
             w.writeNumber(v);
         }
         w.endMap();
+        w.numberField(87, obj.numberedChordNoteGap);
         w.endObject();
     }
 }
