@@ -15,7 +15,7 @@ export const LandingHero: React.FC = () => {
         </h1>
 
         <p className={styles.lede}>
-          alphaTab renders interactive guitar tabs and sheet music from Guitar&nbsp;Pro, MusicXML, Capella, and the
+          alphaTab renders interactive guitar tabs and sheet music from Guitar&nbsp;Pro, MusicXML, Capella, TablEdit, and the
           built-in alphaTex syntax. One core, three runtimes — JavaScript, .NET, and Kotlin&nbsp;for&nbsp;Android.
         </p>
 

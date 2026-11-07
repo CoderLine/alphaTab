@@ -22,7 +22,7 @@ Users hand you a GP5 file with Cyrillic or Japanese titles, a Guitar Pro 4 file 
 
 Two encoding hints control string decoding:
 
-- `importer.encoding` applies to Guitar Pro 6 to 8, MusicXML, Capella, and alphaTex. Default: `utf-8`.
+- `importer.encoding` applies to Guitar Pro 6 to 8, MusicXML, Capella, and alphaTex. Default: `utf-8`. TablEdit files are always read as UTF-8, with a fallback to Windows-1252 for texts of older files.
 - `importer.gp3To5encoding` applies to the older Guitar Pro 3-5 binary format, which stored strings in the system ANSI code page of the author's machine. Default: `windows-1252`, the code page of western European Windows systems. Available since 1.9.0.
 
 When titles, lyrics, or comments come back garbled, the source was written in another code page. Set the matching encoding (for example `windows-1251` for Cyrillic, `shift_jis` for Japanese) and reload. Supported encoding names depend on the runtime: browsers accept whatever `TextDecoder` supports, .NET uses `System.Text.Encoding`.

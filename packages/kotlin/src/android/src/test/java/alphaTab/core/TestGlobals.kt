@@ -310,6 +310,18 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
         equal(expected)
     }
 
+    /**
+     * Numbers and enum values compare as the plain numbers they are in JavaScript, map entries by key and value.
+     */
+    private fun normalizeElement(value: Any?): Any? {
+        return when (value) {
+            is IAlphaTabEnum -> value.toDouble()
+            is Int -> value.toDouble()
+            is alphaTab.collections.DoubleDoubleMapEntry -> kotlin.collections.listOf(value.key, value.value)
+            else -> value
+        }
+    }
+
     fun toEqual(expected: Any?, message: String? = null) {
         val a = actual
         // Sequences compare element-wise; runtime List types don't override equals.
@@ -333,7 +345,7 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
                 if (expectedElement is Iterable<*> && expectedElement !is String) {
                     Expector(actualElement, elementMessage).toEqual(expectedElement)
                 } else {
-                    Assert.assertEquals(elementMessage, expectedElement, actualElement)
+                    Assert.assertEquals(elementMessage, normalizeElement(expectedElement), normalizeElement(actualElement))
                 }
                 i++
             }
@@ -397,6 +409,10 @@ class Expector<T>(private val actual: T, private val message: String? = null) {
 
     fun toBeUndefined() {
         Assert.assertNull(message, actual)
+    }
+
+    fun toBeDefined() {
+        Assert.assertNotNull(message, actual)
     }
 
     fun toThrow(expected: KClass<out Throwable>) {
