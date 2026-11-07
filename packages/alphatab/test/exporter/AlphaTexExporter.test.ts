@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import { AlphaTexExporter } from '@coderline/alphatab/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
@@ -13,6 +12,8 @@ import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
 import { ComparisonHelpers } from 'test/model/ComparisonHelpers';
 import { TestPlatform } from 'test/TestPlatform';
+import { describe, expect, it } from 'vitest';
+
 describe('AlphaTexExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         const data = await TestPlatform.loadFile(`test-data/${name}`);
@@ -226,6 +227,34 @@ describe('AlphaTexExporterTest', () => {
 
     it('visual-special-tracks', async () => {
         await testRoundTripFolderEqual('visual-tests/special-tracks');
+    });
+
+    it('visual-tabledit', async () => {
+        const files: string[] = await TestPlatform.listDirectory('test-data/visual-tests/tabledit');
+        for (const file of files.filter(f => !f.endsWith('.png'))) {
+            // alphaTex cannot express dynamics without a shown marking; it ties a note to an earlier note of its
+            // own voice, which loses a tie from another voice or takes the fret of another note
+            await testRoundTripEqual(
+                `visual-tests/tabledit/${file}`,
+                file === 'voices-ties.tef' ? ['showdynamics', 'istiedestination', 'fret'] : ['showdynamics']
+            );
+        }
+    });
+
+    it('importer-tabledit', async () => {
+        const files: string[] = await TestPlatform.listDirectory('test-data/tabledit');
+        for (const file of files) {
+            // alphaTex cannot express dynamics without a shown marking, nor forced line breaks; it puts
+            // percussion notes on a line, the 8 lines of a TablEdit drum tab have none in alphaTab; it ties a note
+            // to an earlier note of its own voice, which loses a tie from another voice or takes another fret
+            const ignored = ['showdynamics', 'linebreaks'];
+            if (file === 'drums.tef') {
+                ignored.push('string');
+            } else if (file === 'voices-ties.tef') {
+                ignored.push('istiedestination', 'fret');
+            }
+            await testRoundTripEqual(`tabledit/${file}`, ignored);
+        }
     });
 
     it('gp4-to-alphaTex', async () => {

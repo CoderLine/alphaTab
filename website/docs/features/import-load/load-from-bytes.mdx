@@ -26,7 +26,7 @@ Any pipeline that already has the file in memory belongs here:
 - Browser code that fetched the file with a custom `fetch` (auth headers, retries, progress reporting).
 - Desktop and mobile hosts that read from the local filesystem or a content provider.
 
-`api.load()` accepts a `Uint8Array` or an `ArrayBuffer` on every runtime. alphaTab probes the leading bytes to pick an importer — Guitar Pro, MusicXML, Capella, or alphaTex — so you do not tell it what format you handed over.
+`api.load()` accepts a `Uint8Array` or an `ArrayBuffer` on every runtime. alphaTab probes the leading bytes to pick an importer — Guitar Pro, MusicXML, Capella, TablEdit, or alphaTex — so you do not tell it what format you handed over.
 
 ## Pair it with track selection
 

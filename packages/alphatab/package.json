@@ -1,7 +1,7 @@
 {
     "name": "@coderline/alphatab",
     "version": "1.10.0",
-    "description": "Render and play interactive sheet music and guitar tablature from Guitar Pro, MusicXML, Capella and alphaTex, in the browser, Node.js, .NET and Android.",
+    "description": "Render and play interactive sheet music and guitar tablature from Guitar Pro, MusicXML, Capella, TablEdit and alphaTex, in the browser, Node.js, .NET and Android.",
     "keywords": [
         "music-notation",
         "sheet-music",

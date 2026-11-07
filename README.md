@@ -2,7 +2,7 @@
 
 **Music notation, rendered as a first-class SDK.**
 
-alphaTab renders interactive sheet music and guitar tablature from Guitar Pro, MusicXML, Capella and alphaTex files, and plays it back with a built-in synthesizer or in sync with your own audio and video. One TypeScript core ships for the web, .NET and Android, with no runtime dependencies and TypeScript types included. Open source since 2010.
+alphaTab renders interactive sheet music and guitar tablature from Guitar Pro, MusicXML, Capella, TablEdit and alphaTex files, and plays it back with a built-in synthesizer or in sync with your own audio and video. One TypeScript core ships for the web, .NET and Android, with no runtime dependencies and TypeScript types included. Open source since 2010.
 
 [![npm](https://img.shields.io/npm/v/@coderline/alphatab?label=npm)](https://www.npmjs.com/package/@coderline/alphatab)
 [![npm downloads](https://img.shields.io/npm/dm/@coderline/alphatab?label=downloads)](https://www.npmjs.com/package/@coderline/alphatab)
@@ -29,7 +29,7 @@ alphaTab renders interactive sheet music and guitar tablature from Guitar Pro, M
 
 | | Formats |
 |---|---|
-| **Reads** | Guitar Pro 3–8 (`.gp3` `.gp4` `.gp5` `.gpx` `.gp`), MusicXML (`.xml` `.musicxml` `.mxl`), Capella (`.capx`), [alphaTex](https://alphatab.net/docs/alphatex/introduction) |
+| **Reads** | Guitar Pro 3–8 (`.gp3` `.gp4` `.gp5` `.gpx` `.gp`), MusicXML (`.xml` `.musicxml` `.mxl`), Capella (`.capx`), TablEdit (`.tef`), [alphaTex](https://alphatab.net/docs/alphatex/introduction) |
 | **Writes** | Guitar Pro 7+ (`.gp`), alphaTex, MIDI, audio (PCM samples) |
 
 ## Quick start

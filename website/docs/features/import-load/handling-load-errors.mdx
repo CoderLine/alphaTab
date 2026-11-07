@@ -22,7 +22,7 @@ alphaTab surfaces four error classes, all extending the base `AlphaTabError`:
 
 - **`FileLoadError`** — the network fetch behind `api.load(url)` failed. Carries the `XMLHttpRequest` on `error.xhr`, so you can read the HTTP status. Wrong URL, offline, CORS denied — all land here. Web-only.
 - **`UnsupportedFormatError`** — the fetched bytes did not match any importer alphaTab knows. Wrong file type, or a corrupted header that no sniffer recognised.
-- **`FormatError`** — the format was recognised but the content is malformed. Truncated GP archive, invalid MusicXML, malformed alphaTex.
+- **`FormatError`** — the format was recognised but the content is malformed. Truncated GP archive, invalid MusicXML, malformed alphaTex, a protected TablEdit file or one saved by TablEdit before version 3.
 - **`AlphaTabError`** — everything else, including render-side failures and API misuse (for example, calling `renderTracks()` with tracks from different scores).
 
 Every emitted value has a `type` field with an `AlphaTabErrorType` enum (`General`, `Format`, `AlphaTex`) — handy when you cannot rely on `instanceof` (workers, cross-realm bundles).

@@ -53,6 +53,10 @@ internal class BooleanList : IBooleanIterable {
         return this
     }
 
+    public fun slice(start: Double, end: Double): BooleanList {
+        return BooleanList(*_data.copyOfRange(start.toInt(), minOf(end.toInt(), _size)))
+    }
+
     public fun spread(): BooleanArray {
         return if (_size == _data.size) _data else _data.copyOf(_size)
     }

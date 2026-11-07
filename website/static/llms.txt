@@ -1,6 +1,6 @@
 # alphaTab
 
-> alphaTab is an SDK for JavaScript, .NET, and Kotlin that renders and plays interactive music notation. It parses Guitar Pro, MusicXML, CapXML, and alphaTex files and produces engraved sheet music with playback in the browser, on the desktop, and on Android.
+> alphaTab is an SDK for JavaScript, .NET, and Kotlin that renders and plays interactive music notation. It parses Guitar Pro, MusicXML, CapXML, TablEdit, and alphaTex files and produces engraved sheet music with playback in the browser, on the desktop, and on Android.
 
 alphaTab is not a drop-in widget — it exposes an API you build your own score UI on top of. The four internal modules are the data model, importers, render engine, and audio engine. The documentation is organised as a concept page (introduction), platform-specific getting-started tracks for Web, .NET, and Android, a feature catalog grouped by capability, the alphaTex language reference, format and API references, and step-by-step tutorials.
 
@@ -45,6 +45,7 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 - [Guitar Pro (3 through 8)](https://alphatab.net/docs/features/import-load/guitar-pro): One page covering every GP version, what each ships, and how alphaTab picks the right importer. Cross-links to per-version compatibility under `/docs/formats/`.
 - [MusicXML](https://alphatab.net/docs/features/import-load/musicxml): MusicXML support: part-group merging, chord diagrams, ties, track volume, tempo, lyrics.
 - [Capella (CapXML)](https://alphatab.net/docs/features/import-load/capella): `.capx` support and its scope.
+- [TablEdit](https://alphatab.net/docs/features/import-load/tabledit): `.tef` support and its scope.
 - [Tuning importer behavior](https://alphatab.net/docs/features/import-load/tuning-importer-behavior): Encoding hint, MusicXML part-group merging, beat-text-as-lyrics for GP3-5, decoding buffer size. One page with a sample showing the four knobs in context.
 - [Selecting and switching tracks](https://alphatab.net/docs/features/import-load/selecting-and-switching-tracks): `core.tracks` for the initial render; `api.renderTracks()` for switching which tracks are visible at runtime (change instrument, focus on solo, etc.).
 - [Reacting to a loaded score](https://alphatab.net/docs/features/import-load/reacting-to-loaded-score): `scoreLoaded` event, post-load setup patterns (apply styles, register handlers, adjust playback).
@@ -194,6 +195,7 @@ alphaTab is not a drop-in widget — it exposes an API you build your own score 
 - [Guitar Pro 3-5](https://alphatab.net/docs/formats/guitar-pro-3-5): supported features and compatibility notes for the binary `.gp3`, `.gp4`, and `.gp5` formats.
 - [MusicXML](https://alphatab.net/docs/formats/musicxml): supported features and compatibility notes for the MusicXML standard.
 - [Capella / CapXML](https://alphatab.net/docs/formats/capella): supported features and compatibility notes for the `.capx` format.
+- [TablEdit](https://alphatab.net/docs/formats/tabledit): supported features and compatibility notes for the `.tef` format.
 
 ## Optional
 

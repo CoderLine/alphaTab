@@ -1,0 +1,47 @@
+---
+title: "TablEdit"
+description: "`.tef` support and its scope."
+sidebar_custom_props:
+  feature_chapter: formats
+  feature_order: 35
+keywords:
+  - alphaTab
+  - TablEdit
+  - tef
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab';
+
+[TablEdit](https://tabledit.com/) saves tablature and notation as `.tef` files. alphaTab imports them, so a TablEdit tab opens in the same viewer as your Guitar Pro and MusicXML files.
+
+The preview below loads a `.tef` file with a range of guitar effects:
+
+<AlphaTab tex={false} file="/files/tabledit-effects.tef" />
+
+## Scope of the TablEdit importer
+
+alphaTab reads files saved by TablEdit 3. Files of TablEdit 1 and 2 are rejected with a `FormatError`: open them in TablEdit 3 and save them again. Protected TablEdit files are rejected with a `FormatError` as well.
+
+TablEdit stores notes on a time grid rather than in beats. The importer rebuilds the beats and voices: notes of different length that sound together are placed in additional voices, so the rhythm of every note is kept. TablEdit's automatic voice becomes the first voice. Notes forced into the upper or lower voice follow as further voices with their stems up or down; alphaTab draws further voices in the secondary colour (`display.resources.secondaryGlyphColor`). Tuplets, special effects, grace notes, fingerings, chord diagrams, texts, tempo changes and swing are mapped to their alphaTab counterparts.
+
+The playback order of a TablEdit file is its reading list. alphaTab expresses it through repeats, alternate endings and D.C., D.S., Coda and Fine directions. An order that these cannot express is played as closely as possible, with a warning in the log. For example, after a D.C. or D.S. alphaTab plays every repeat once until the coda, so a reading list that repeats a section again after the jump is shortened.
+
+Non-chromatic instruments such as the mountain dulcimer play with their correct pitches, but the tablature shows chromatic fret numbers. The [compatibility page](/docs/formats/tabledit) lists every TablEdit feature and its status.
+
+## Show it in code
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.tef' },
+});
+```
+
+`getAlphaTabContainer()` is a placeholder for the platform-specific step of obtaining the render target — a `<div>` on Web, an `AlphaTab` control on .NET, or an `AlphaTabView` on Android. Every other line runs unchanged on all three runtimes.
+
+## Where to look next
+
+- [TablEdit compatibility](/docs/formats/tabledit) — every TablEdit feature and how alphaTab handles it.
+- [Handling load errors](/docs/features/import-load/handling-load-errors) — what `FormatError` and `UnsupportedFormatError` mean.

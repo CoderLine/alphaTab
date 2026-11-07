@@ -18,6 +18,7 @@ const READS: FormatItem[] = [
   { name: 'Guitar Pro', meta: '.gp3 — .gp8', color: 'var(--at-accent)' },
   { name: 'MusicXML', meta: '.musicxml / .mxl', color: 'var(--at-track-purple)' },
   { name: 'Capella', meta: '.capx', color: 'var(--at-track-green)' },
+  { name: 'TablEdit', meta: '.tef', color: 'var(--at-track-green)' },
   { name: 'alphaTex', meta: 'native syntax', color: 'var(--at-track-orange)' },
 ];
 

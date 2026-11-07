@@ -11,6 +11,19 @@ interface IArrayTuple<T0, T1> {
 
 data class ArrayTuple<T0, T1>(override var v0: T0, override var v1: T1) : IArrayTuple<T0, T1>
 
+interface IArrayTuple3<T0, T1, T2> {
+    var v0: T0
+    var v1: T1
+    var v2: T2
+
+    operator fun component1(): T0
+    operator fun component2(): T1
+    operator fun component3(): T2
+}
+
+data class ArrayTuple3<T0, T1, T2>(override var v0: T0, override var v1: T1, override var v2: T2) :
+    IArrayTuple3<T0, T1, T2>
+
 // strong typed variants (Kotlin should compile this to non-boxed variants where possible)
 interface IObjectBooleanArrayTuple<T> : IArrayTuple<T, Boolean>
 data class ObjectBooleanArrayTuple<T>(override var v0: T, override var v1: Boolean) :

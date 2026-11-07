@@ -34,6 +34,11 @@ internal static class TestGlobals
         return new Expector<Action>(actual);
     }
 
+    public static Expector<Action> Expect(Action actual, string message)
+    {
+        return new Expector<Action>(actual, message);
+    }
+
     public static void Fail(object? message)
     {
         Assert.Fail(Convert.ToString(message) ?? string.Empty);
@@ -422,6 +427,10 @@ internal class Expector<T>
                 {
                     new Expector<object>(a.Current, elementMessage).ToEqual(e.Current);
                 }
+                else if (IsNumber(e.Current) && IsNumber(a.Current))
+                {
+                    Assert.AreEqual(ToNumber(e.Current), ToNumber(a.Current), elementMessage);
+                }
                 else
                 {
                     Assert.AreEqual(e.Current, a.Current, elementMessage);
@@ -433,6 +442,12 @@ internal class Expector<T>
         if (expectedType == actualType)
         {
             Assert.AreEqual(expected, _actual, message ?? _message);
+            return;
+        }
+
+        if (IsNumber(expected) && IsNumber(_actual))
+        {
+            Assert.AreEqual(ToNumber(expected), ToNumber(_actual), message ?? _message);
             return;
         }
 
@@ -455,6 +470,19 @@ internal class Expector<T>
             var actualValue = actualProp.GetValue(_actual);
             Assert.AreEqual(expectedValue, actualValue, $"Property '{prop.Name}'");
         }
+    }
+
+    /// <summary>
+    /// Numbers and enum values, which are all plain numbers in JavaScript.
+    /// </summary>
+    private static bool IsNumber(object? value)
+    {
+        return value is double or int or long or float or Enum;
+    }
+
+    private static double ToNumber(object value)
+    {
+        return Convert.ToDouble(value, System.Globalization.CultureInfo.InvariantCulture);
     }
 
     public void ToThrow(Type expected)
