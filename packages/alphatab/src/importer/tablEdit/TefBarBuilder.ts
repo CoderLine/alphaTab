@@ -1526,7 +1526,7 @@ export class TefBarBuilder {
     }
 
     private _addNotes(info: TefTrackInfo, beat: Beat, unit: TefUnit, isContinuation: boolean): void {
-        let loudest = 7;
+        let loudest = TefBarBuilder._tieDynamics;
         for (const e of unit.events) {
             const note = new Note();
             TefBarBuilder._setPosition(info, note, e.stringIndex, e.fret);
@@ -1561,9 +1561,10 @@ export class TefBarBuilder {
                 }
             }
         }
-        if (loudest < 7) {
+        // TablEdit shows no dynamics markings, also not on a beat of tied notes only
+        beat.showDynamics = false;
+        if (loudest < TefBarBuilder._tieDynamics) {
             beat.dynamics = TefBarBuilder._dynamicsOf(loudest);
-            beat.showDynamics = false;
         }
     }
 

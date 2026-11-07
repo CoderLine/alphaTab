@@ -1142,6 +1142,13 @@ describe('TablEditImporterTest', () => {
             expect(destination.beat.voice.index !== origin.beat.voice.index, label).toBe(t[2] !== 4 || t[0] !== 3);
         }
 
+        // no dynamics marking, also on the beats of tied notes only
+        for (const b of bars) {
+            for (const v of b.voices) {
+                expect(v.beats.filter(beat => !beat.isRest).every(beat => beat.showDynamics === false)).toBe(true);
+            }
+        }
+
         // the automatic voice comes first, its stems point away from an upper voice in the same bar
         const stems = (bar: number, voice: number) =>
             bars[bar].voices[voice].beats.filter(b => !b.isRest).map(b => b.preferredBeamDirection);
