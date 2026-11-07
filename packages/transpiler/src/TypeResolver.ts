@@ -241,8 +241,11 @@ export default class TypeResolver {
             return handleNullablePrimitive(cs.PrimitiveType.Object);
         }
 
-        // undefined -> nullable object
-        if ((tsType.flags & ts.TypeFlags.Undefined) === ts.TypeFlags.Undefined) {
+        // undefined or null -> nullable object
+        if (
+            (tsType.flags & ts.TypeFlags.Undefined) === ts.TypeFlags.Undefined ||
+            (tsType.flags & ts.TypeFlags.Null) === ts.TypeFlags.Null
+        ) {
             const undefinedType = handleNullablePrimitive(cs.PrimitiveType.Object);
             undefinedType.isNullable = true;
             return undefinedType;
