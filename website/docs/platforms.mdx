@@ -1,0 +1,54 @@
+---
+title: Platforms and packages
+description: The alphaTab packages for Web, .NET and Kotlin, what each one contains, and where it runs.
+keywords:
+  - alphaTab
+  - platforms
+  - packages
+  - npm
+  - NuGet
+  - Maven
+  - JVM
+  - Android
+---
+
+alphaTab ships for three ecosystems from one TypeScript source. This page lists every package, what it contains, and which package to install for your runtime.
+
+## At a glance
+
+| Package | Runs on | UI control | Render engines | Audio output |
+|---|---|---|---|---|
+| [`@coderline/alphatab`](https://www.npmjs.com/package/@coderline/alphatab) | Evergreen browsers, Node.js | `AlphaTabApi` on any DOM element | SVG, HTML5 Canvas; alphaSkia in Node.js | Web Audio (browser) |
+| [`AlphaTab`](https://www.nuget.org/packages/AlphaTab/) | .NET Standard 2.0 | — | Skia, GDI+, SVG | — |
+| [`AlphaTab.Windows`](https://www.nuget.org/packages/AlphaTab.Windows/) | .NET 8 on Windows | WPF and WinForms controls | Skia, GDI+, SVG | NAudio |
+| [`net.alphatab:alphaTab-core`](https://central.sonatype.com/artifact/net.alphatab/alphaTab-core) | JVM 17+ | — | Skia, SVG | — |
+| [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab) | Android 8.0+ (API 26) | `AlphaTabView` | Skia, Android Canvas, SVG | Android `AudioTrack` |
+
+Packages without a UI control are used through the [low-level APIs](/docs/guides/lowlevel-apis): load files, render to images or SVG, generate MIDI, synthesize and export audio. Packages without an audio output still run the synthesizer; to play its samples, implement `ISynthOutput` for the sound API of your platform.
+
+## Web
+
+- [`@coderline/alphatab`](https://www.npmjs.com/package/@coderline/alphatab) contains everything for the browser and for Node.js, with no runtime dependencies.
+- [`@coderline/alphatab-webpack`](/docs/getting-started/installation-webpack) and [`@coderline/alphatab-vite`](/docs/getting-started/installation-vite) are build plugins that wire up alphaTab's workers, worklets, font and SoundFont in your bundler.
+- [`@coderline/alphatab-monaco`](https://www.npmjs.com/package/@coderline/alphatab-monaco) and [`@coderline/alphatab-language-server`](https://www.npmjs.com/package/@coderline/alphatab-language-server) add alphaTex editing support.
+- [`@coderline/alphaskia`](https://www.npmjs.com/package/@coderline/alphaskia) plus `@coderline/alphaskia-windows`, `-linux` or `-macos` enable PNG rendering in Node.js; see [Node.js headless rendering](/docs/features/render/nodejs-headless-rendering).
+
+Start with [Installation (Web)](/docs/getting-started/installation-web).
+
+## .NET
+
+- [`AlphaTab`](https://www.nuget.org/packages/AlphaTab/) targets .NET Standard 2.0 for console tools, servers and headless rendering.
+- [`AlphaTab.Windows`](https://www.nuget.org/packages/AlphaTab.Windows/) targets .NET 8.0 on Windows and adds the WPF and WinForms controls and NAudio playback. It depends on `AlphaTab`.
+- `AlphaSkia.Native.Windows`, `AlphaSkia.Native.Linux` and `AlphaSkia.Native.MacOs` provide the native Skia library per operating system. `AlphaTab.Windows` brings the Windows one.
+
+Start with [Installation (.NET)](/docs/getting-started/installation-net).
+
+## Kotlin
+
+- [`net.alphatab:alphaTab-core`](https://central.sonatype.com/artifact/net.alphatab/alphaTab-core) runs on any JVM 17 or newer, on servers, in command-line tools and in desktop applications. It is the platform-independent part of alphaTab for Kotlin and Java code.
+- [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab) is the Android library. It adds the `AlphaTabView`, the Android canvas and audio output, bundles the Bravura font and the default SoundFont, and depends on `alphaTab-core` in exactly the same version.
+- `net.alphatab:alphaSkia-windows`, `alphaSkia-linux` and `alphaSkia-macos` provide the native Skia library on the JVM. The Android library brings `alphaSkia-android`.
+
+There is no UI control for desktop JVM toolkits such as Swing or JavaFX, and none is planned.
+
+Start with [Installation (Kotlin)](/docs/getting-started/installation-kotlin).

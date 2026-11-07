@@ -15,7 +15,7 @@
  * sidebar_custom_props:
  *   feature_chapter: layout                 # required — chapter id from _chapters.ts
  *   since: "1.3"                            # optional — small "since" pill on the card
- *   feature_platforms: [web, net, android]  # optional — platform pills; omit for "all"
+ *   feature_platforms: [web, net, kotlin]  # optional — platform pills; omit for "all"
  *   feature_accent: violet                  # optional — accent colour override
  *   feature_hook: ...                       # optional — overrides description as hook
  *   feature_order: 20                       # optional — sort within chapter (asc)
@@ -79,7 +79,7 @@ const KNOWN_ACCENTS: readonly CardAccent[] = [
   'slate',
 ];
 
-const KNOWN_PLATFORMS: readonly Platform[] = ['web', 'net', 'android'];
+const KNOWN_PLATFORMS: readonly Platform[] = ['web', 'net', 'kotlin', 'android'];
 
 function normalizeAccent(v: unknown): CardAccent | undefined {
   return typeof v === 'string' && (KNOWN_ACCENTS as readonly string[]).includes(v)

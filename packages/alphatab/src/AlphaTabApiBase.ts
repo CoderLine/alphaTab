@@ -225,7 +225,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * val container = api.container;
@@ -265,7 +265,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * updateScoreInfo(api.score)
@@ -297,7 +297,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * showSettingsDialog(api.settings)
@@ -325,7 +325,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * highlightCurrentTracksInTrackSelector(api.tracks)
@@ -498,7 +498,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.destroy()
@@ -552,7 +552,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      *
@@ -626,7 +626,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * contentResolver.openInputStream(uri).use {
@@ -675,7 +675,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.renderScore(generateScore(), alphaTab.collections.DoubleList(2, 3));
@@ -732,7 +732,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.renderTracks(alphaTab.collections.List(
@@ -873,7 +873,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.tex("\\title 'Test' . 3.3.4");
@@ -921,7 +921,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * contentResolver.openInputStream(uri).use {
@@ -965,7 +965,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.loadSoundFont(readResource("guitars.sf2"), true)
@@ -1002,7 +1002,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.render()
@@ -1066,7 +1066,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.customCursorHandler = CustomCursorHandler();
@@ -1131,7 +1131,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.customScrollHandler = CustomScrollHandler();
@@ -1167,7 +1167,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * val lookupResult = api.tickCache.findBeat(alphaTab.core.ecmaScript.Set(0, 1), 100);
@@ -1234,7 +1234,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * setupPlayerEvents(api.player)
@@ -1266,7 +1266,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * if (api.isReadyForPlayback) api.play()
@@ -1297,7 +1297,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * if (api.playerState != PlayerState.Playing) api.play()
@@ -1328,7 +1328,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.masterVolume = 0.5
@@ -1364,7 +1364,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.metronomeVolume = 0.5
@@ -1400,7 +1400,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.countInVolume = 0.5
@@ -1457,7 +1457,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...);
      * api.midiEventsPlayedFilter = alphaTab.collections.List<alphaTab.midi.MidiEventType>( alphaTab.midi.MidiEventType.AlphaTabMetronome )
@@ -1497,7 +1497,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.tickPosition = 4000
@@ -1530,7 +1530,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.timePosition = 4000
@@ -1584,7 +1584,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playbackRange = PlaybackRange.apply {
@@ -1627,7 +1627,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playbackSpeed = 0.5
@@ -1663,7 +1663,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.isLooping = true
@@ -1820,7 +1820,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...);
      * api.changeTrackVolume(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), 1.5);
@@ -1861,7 +1861,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.changeTrackSolo(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), true);
@@ -1900,7 +1900,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.changeTrackMute(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), true);
@@ -1940,7 +1940,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...);
      * api.changeTrackTranspositionPitch(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), 3);
@@ -1975,7 +1975,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.play()
@@ -2005,7 +2005,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.pause();
@@ -2037,7 +2037,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playPause()
@@ -2069,7 +2069,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.stop()
@@ -2106,7 +2106,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playBeat(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0])
@@ -2152,7 +2152,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playNote(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0]);
@@ -2565,7 +2565,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playedBeatChanged.on { beat ->
@@ -2613,7 +2613,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.activeBeatsChanged.on { args ->
@@ -2663,7 +2663,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.beatMouseDown.on { beat ->
@@ -2699,7 +2699,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.beatMouseMove.on { beat ->
@@ -2739,7 +2739,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.beatMouseUp.on { beat ->
@@ -2780,7 +2780,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.noteMouseDown.on { note ->
@@ -2822,7 +2822,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.noteMouseMove.on { note ->
@@ -2866,7 +2866,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.noteMouseUp.on { note ->
@@ -3126,7 +3126,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * val startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]
@@ -3172,7 +3172,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * val startBeat = api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]
@@ -3271,7 +3271,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.clearPlaybackRangeHighlight()
@@ -3312,7 +3312,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playbackRangeHighlightChanged.on { e ->
@@ -3491,7 +3491,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.scoreLoaded.on { score ->
@@ -3573,7 +3573,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.resize.on { args ->
@@ -3622,7 +3622,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.renderStarted.on { resized ->
@@ -3670,7 +3670,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.renderFinished.on {
@@ -3722,7 +3722,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.postRenderFinished.on {
@@ -3779,7 +3779,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.error.on { error ->
@@ -3831,7 +3831,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playerReady.on {
@@ -3887,7 +3887,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playerFinished.on {
@@ -3937,7 +3937,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...);
      * api.soundFontLoaded.on {
@@ -3993,7 +3993,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.midiLoad.on { file ->
@@ -4040,7 +4040,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.midiLoaded.on { e ->
@@ -4086,7 +4086,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playerStateChanged.on { args ->
@@ -4143,7 +4143,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playerPositionChanged.on { args ->
@@ -4217,7 +4217,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...);
      * api.midiEventsPlayedFilter = alphaTab.collections.List<alphaTab.midi.MidiEventType>( alphaTab.midi.MidiEventType.AlphaTabMetronome )
@@ -4297,7 +4297,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.playbackRangeChanged.on { args ->
@@ -4348,7 +4348,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val api = AlphaTabApi<MyControl>(...)
      * api.SettingsUpdated.on {
@@ -4403,7 +4403,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * fun init() = kotlinx.coroutines.runBlocking {
      *   val api = AlphaTabApi<MyControl>(...)
@@ -4455,7 +4455,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * fun init() = kotlinx.coroutines.runBlocking {
      *   val api = AlphaTabApi<MyControl>(...)
@@ -4501,7 +4501,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * fun init() = kotlinx.coroutines.runBlocking {
      *   val api = AlphaTabApi<MyControl>(...)

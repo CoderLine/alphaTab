@@ -3,11 +3,12 @@ import Link from '@docusaurus/Link';
 import { IconArrow } from '@coderline/alphatab-ui';
 import styles from './styles.module.scss';
 
-export type Platform = 'web' | 'net' | 'android';
+export type Platform = 'web' | 'net' | 'kotlin' | 'android';
 
 const PLATFORM_LABEL: Record<Platform, string> = {
   web: 'Web',
   net: '.NET',
+  kotlin: 'Kotlin',
   android: 'Android',
 };
 

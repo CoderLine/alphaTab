@@ -8,7 +8,8 @@ import TabItem from '@theme/TabItem';
 This guide explains how to use the low level APIs of alphaTab in case the full API object cannot be used or is not needed. 
 
 The full API object is usually linked directly to a UI via a `IUiFacade`. There exist various `IUiFacade` implementations
-for the different platforms like for Web, .net WPF and .net WinForms. 
+for the different platforms like for Web, .NET WPF, .NET WinForms and Android. On the JVM, `net.alphatab:alphaTab-core` has no UI
+integration, so these low level APIs are the way to use alphaTab there; see [Render on the JVM](/docs/getting-started/installation-kotlin#render-on-the-jvm). 
 
 In scenarios where none of these UI platforms are used or if not even a UI exists, you will need to use the low level APIs 
 of alphaTab to setup the individual steps manually. The following examples show the
@@ -30,7 +31,8 @@ a `AlphaTab.Settings` object which might control some aspects of the import sequ
   defaultValue="js"
   values={[
     { label: 'JavaScript', value: 'js', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Kotlin', value: 'kt', }
   ]
 }>
 <TabItem value="js">
@@ -57,6 +59,15 @@ var score = AlphaTab.Importer.ScoreLoader.LoadScoreFromBytes(data, settings);
 ```
 
 </TabItem>
+<TabItem value="kt">
+
+```kotlin
+val data = java.io.File("MyFile.gp").readBytes()
+val settings = alphaTab.Settings()
+val score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(alphaTab.core.ecmaScript.Uint8Array(data.asUByteArray()), settings)
+```
+
+</TabItem>
 </Tabs>
 
 ## Rendering Files via ScoreRenderer
@@ -75,7 +86,8 @@ This logic is part of the `AlphaTabApi` which wraps a ScoreRenderer into a worke
   defaultValue="js"
   values={[
     { label: 'JavaScript', value: 'js', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Kotlin', value: 'kt', }
   ]
 }>
 <TabItem value="js">
@@ -160,6 +172,42 @@ renderer.ResizeRender();
 ```
 
 </TabItem>
+<TabItem value="kt">
+
+```kotlin
+// 1. Setup renderer
+val score: alphaTab.model.Score = /* Load score here */
+val settings = alphaTab.Settings()
+settings.core.engine = "svg"
+val renderer = alphaTab.rendering.ScoreRenderer(settings)
+renderer.width = 1200.0
+
+// 2. Listen to Events
+val svgChunks = mutableListOf<Triple<String, Double, Double>>() // svg, width, height
+renderer.preRender.on { isResize ->
+    svgChunks.clear() // clear on new rendering
+}
+// request rendering of each chunk layed out.
+// you can defer rendering based on your needs.
+renderer.partialLayoutFinished.on { r ->
+    renderer.renderResult(r.id)
+}
+renderer.partialRenderFinished.on { r ->
+    svgChunks.add(Triple(r.renderResult as String, r.width, r.height))
+}
+renderer.renderFinished.on { r ->
+    displayResult(svgChunks, r.totalWidth, r.totalHeight)
+}
+
+// 3. Fire off rendering
+renderer.renderScore(score, alphaTab.collections.DoubleList(0.0), null)
+
+// 4. resize
+renderer.width = 800.0
+renderer.resizeRender()
+```
+
+</TabItem>
 </Tabs>
 
 ## Generating Midi Files via MidiFileGenerator
@@ -176,7 +224,8 @@ Midi Synthesis engine. The main classes related to midi generation are:
   defaultValue="js"
   values={[
     { label: 'JavaScript', value: 'js', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Kotlin', value: 'kt', }
   ]
 }>
 <TabItem value="js">
@@ -217,6 +266,25 @@ SaveToFile(midiFile);
 ```
 
 </TabItem>
+<TabItem value="kt">
+
+```kotlin
+val score: alphaTab.model.Score = /* Load score here */
+val settings = alphaTab.Settings()
+
+// Setup generator and midi file handler
+val midiFile = alphaTab.midi.MidiFile()
+val handler = alphaTab.midi.AlphaSynthMidiFileHandler(midiFile, true /* For SMF1.0 export */)
+val generator = alphaTab.midi.MidiFileGenerator(score, settings, handler)
+
+// start generation
+generator.generate()
+
+// use midi file
+java.io.File("MyFile.mid").writeBytes(midiFile.toBinary().buffer.asByteArray())
+```
+
+</TabItem>
 </Tabs>
 
 ## Playing Files via AlphaSynth
@@ -233,7 +301,8 @@ to ensure smooth playback.
   defaultValue="js"
   values={[
     { label: 'JavaScript', value: 'js', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Kotlin', value: 'kt', }
   ]
 }>
 <TabItem value="js">
@@ -290,6 +359,22 @@ player.Play();
 ```
 
 </TabItem>
+<TabItem value="kt">
+
+```kotlin
+val midiFile: alphaTab.midi.MidiFile = /* Load score and convert it to midi here */
+val soundFont: alphaTab.core.ecmaScript.Uint8Array = /* Load SoundFont2 as Uint8Array here */
+
+// alphaTab-core has no audio output of its own: MySynthOutput implements
+// alphaTab.synth.ISynthOutput for the sound API of your platform.
+// On Android, the AlphaTabView plays through AudioTrack.
+val player = alphaTab.synth.AlphaSynth(MySynthOutput(), 500.0)
+player.loadSoundFont(soundFont, false)
+player.loadMidiFile(midiFile)
+player.play()
+```
+
+</TabItem>
 </Tabs>
 
 ## Serialize Data Model from/to JSON 
@@ -321,7 +406,8 @@ For the conversions back to `Score` objects a `Settings` object can/should be pa
   defaultValue="js"
   values={[
     { label: 'JavaScript', value: 'js', },
-    { label: 'C#', value: 'cs', }
+    { label: 'C#', value: 'cs', },
+    { label: 'Kotlin', value: 'kt', }
   ]
 }>
 <TabItem value="js">
@@ -339,6 +425,14 @@ const json = alphaTab.model.JsonConverter.jsonToScore(json, api.settings);
 ```cs
 var map = AlphaTab.Model.JsonConverter.ScoreToJsObject(api.Score);
 var score = AlphaTab.Model.JsonConverter.JsObjectToScore(map, api.Settings);
+```
+
+</TabItem>
+<TabItem value="kt">
+
+```kotlin
+val map = alphaTab.model.JsonConverter.scoreToJsObject(score)
+val score2 = alphaTab.model.JsonConverter.jsObjectToScore(map, settings)
 ```
 
 </TabItem>

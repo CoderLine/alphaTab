@@ -25,9 +25,9 @@ SVG is the default backend on Web and the recommended output whenever the render
 - **Scales without loss.** Zoom or export at any DPI; the glyph outlines stay crisp.
 - **Prints cleanly.** Browsers rasterize SVG at printer resolution, so bar lines and note heads land pixel-accurate on paper.
 - **Hit-testable.** Each rendered element sits in the DOM, so custom overlays and DOM queries work directly against the score geometry.
-- **Available on every platform.** SVG runs the same on Web, .NET, and Android — pass `engine: 'svg'` anywhere and get identical output.
+- **Available on every platform.** SVG runs the same on Web, .NET, and Kotlin — pass `engine: 'svg'` anywhere and get identical output.
 
-The trade-off is throughput. On very dense scores (hundreds of bars in a single view) the DOM grows large and layout thrash can appear during scroll. For that case, reach for [HTML5 Canvas](html5-canvas) on Web or [Skia](skia-backend) on .NET / Android.
+The trade-off is throughput. On very dense scores (hundreds of bars in a single view) the DOM grows large and layout thrash can appear during scroll. For that case, reach for [HTML5 Canvas](html5-canvas) on Web or [Skia](skia-backend) on .NET / Kotlin.
 
 ## Show it in code
 
@@ -48,6 +48,6 @@ const api = new alphaTab.AlphaTabApi(container, {
 ## Where to look next
 
 - [HTML5 Canvas](html5-canvas) — Web-only raster alternative for dense scores.
-- [Skia rendering (.NET / Android)](skia-backend) — native raster on non-web runtimes.
+- [Skia rendering (.NET / Kotlin)](skia-backend) — native raster on non-web runtimes.
 - [Choosing a backend](choosing-a-backend) — side-by-side comparison.
 - [`core.engine`](/docs/reference/settings/core/engine) in the settings reference.

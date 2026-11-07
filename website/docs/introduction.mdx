@@ -12,7 +12,7 @@ keywords:
   - Guitar Pro
 ---
 
-alphaTab is an SDK for rendering and playing interactive music notation. Use it in JavaScript for the browser and Node.js, in .NET for desktop or server, or in Kotlin for Android. Feed it a Guitar Pro, MusicXML, CapXML, or alphaTex file, wire it into your UI, and you get engraved sheet music that resizes, scrolls, and plays back.
+alphaTab is an SDK for rendering and playing interactive music notation. Use it in JavaScript for the browser and Node.js, in .NET for desktop or server, or in Kotlin on the JVM and Android. Feed it a Guitar Pro, MusicXML, CapXML, or alphaTex file, wire it into your UI, and you get engraved sheet music that resizes, scrolls, and plays back.
 
 ## An SDK, not a widget
 
@@ -41,7 +41,7 @@ Parsers that fill the data model from a file. Currently supported:
 
 ### Render engine
 
-The render engine takes the data model and produces engraved music notation following the rules of traditional music engraving. It builds a visual tree of every symbol and relayouts dynamically when the container resizes. Symbols come from the [SMuFL](https://www.smufl.org/) music font [Bravura](https://github.com/steinbergmedia/bravura). Output goes to HTML Canvas or SVG in the browser, and to Skia or the platform-native canvas on .NET and Android.
+The render engine takes the data model and produces engraved music notation following the rules of traditional music engraving. It builds a visual tree of every symbol and relayouts dynamically when the container resizes. Symbols come from the [SMuFL](https://www.smufl.org/) music font [Bravura](https://github.com/steinbergmedia/bravura). Output goes to HTML Canvas or SVG in the browser, and to Skia, SVG or the platform-native canvas on .NET, the JVM and Android.
 
 ### Audio engine
 
@@ -49,7 +49,7 @@ The audio engine converts the data model to MIDI, then plays the MIDI through an
 
 ## Where it runs
 
-The three implementations share one source. TypeScript is authoritative; a toolchain compiles it to C# and Kotlin so every platform gets the same features on the same release cycle.
+The three implementations share one source. TypeScript is authoritative; a toolchain compiles it to C# and Kotlin so every platform gets the same features on the same release cycle. [Platforms and packages](platforms) lists every package and what it contains.
 
 ### JavaScript / TypeScript {#javascript}
 
@@ -66,9 +66,12 @@ Two NuGet packages, depending on where you need it:
 
 The .NET build has a small number of third-party dependencies for drawing (through alphaSkia) and audio (NAudio).
 
-### Kotlin for Android {#android}
+### Kotlin (JVM and Android) {#android}
 
-Distributed on Maven Central as [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab). It ships an `AlphaTabView` for classic Android layouts. A Jetpack Compose control is not included yet — [vote on the roadmap issue](https://github.com/CoderLine/alphaTab/issues/1475) or [wrap the classic view](https://developer.android.com/develop/ui/compose/libraries) inside a Compose tree.
+Two packages on Maven Central, depending on where you need it:
+
+- [`net.alphatab:alphaTab-core`](https://central.sonatype.com/artifact/net.alphatab/alphaTab-core) runs on any JVM 17 or newer for servers, command-line tools, and headless use.
+- [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab) is the Android library with an `AlphaTabView` for classic Android layouts. A Jetpack Compose control is not included yet — [vote on the roadmap issue](https://github.com/CoderLine/alphaTab/issues/1475) or [wrap the classic view](https://developer.android.com/develop/ui/compose/libraries) inside a Compose tree.
 
 ## Next steps
 
@@ -76,6 +79,6 @@ Pick your platform:
 
 - [Getting Started (Web)](/docs/getting-started/installation-web)
 - [Getting Started (.NET)](/docs/getting-started/installation-net)
-- [Getting Started (Android)](/docs/getting-started/installation-android)
+- [Getting Started (Kotlin)](/docs/getting-started/installation-kotlin)
 
 Once installed, browse the [Features](/docs/features/) catalog to see what alphaTab does grouped by capability, or explore [alphaTex](/docs/alphatex/introduction), the text format for authoring music notation.

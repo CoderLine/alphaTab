@@ -16,7 +16,7 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 import * as Riffs from '@site/src/tex-riffs';
 
 
-Hosting alphaTab in a UI framework it does not know about — WinUI, MAUI, Avalonia, a mobile framework, a game engine, a custom canvas layer — means implementing `IUiFacade`, the contract alphaTab uses to talk to its host. Every shipped platform already provides one: `BrowserUiFacade` on the web, WPF and WinForms facades on .NET, `AndroidUiFacade` on Android. Ship your own facade to reach anywhere else.
+Hosting alphaTab in a UI framework it does not know about — WinUI, MAUI, Avalonia, Swing or JavaFX on the JVM, a mobile framework, a game engine, a custom canvas layer — means implementing `IUiFacade`, the contract alphaTab uses to talk to its host. Every shipped platform already provides one: `BrowserUiFacade` on the web, WPF and WinForms facades on .NET, `AndroidUiFacade` on Android. Ship your own facade to reach anywhere else.
 
 <AlphaTab tex={true}>{Riffs.AM_VERSE_CHORUS}</AlphaTab>
 

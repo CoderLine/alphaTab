@@ -22,7 +22,7 @@ Three render backends ship with alphaTab, each optimizing for a different constr
 
 - **Web** — SVG (default) or HTML5 Canvas. Skia is not available in the browser.
 - **.NET** — Skia (default). SVG works too if you need scalable text output.
-- **Android** — Skia (default). SVG works too.
+- **Kotlin** — Skia (default) on the JVM and on Android. SVG works too.
 - **Node.js** — SVG for text output; Skia (via [alphaSkia](https://github.com/CoderLine/alphaSkia)) for PNG.
 
 Leaving `core.engine` at `'default'` picks the right backend for the runtime you are on.
@@ -44,8 +44,8 @@ Leaving `core.engine` at `'default'` picks the right backend for the runtime you
 
 **Reach for [Skia](skia-backend) when:**
 
-- You are on .NET or Android and want the platform default — consistent output across Windows, macOS, Linux, and Android.
-- You need PNG or raster export from a headless environment (Node.js, CI, server pipelines).
+- You are on .NET or Kotlin and want the platform default — consistent output across Windows, macOS, Linux, and Android.
+- You need PNG or raster export from a headless environment (Node.js, the JVM, CI, server pipelines).
 - You register custom `.ttf` / `.otf` fonts and want them applied via [`registerAlphaSkiaCustomFont`](/docs/features/render/custom-fonts-on-skia).
 
 ## Show it in code
@@ -68,6 +68,6 @@ const api = new alphaTab.AlphaTabApi(container, {
 
 - [SVG rendering](svg-output) — the vector default.
 - [HTML5 Canvas](html5-canvas) — Web-only raster.
-- [Skia rendering (.NET / Android)](skia-backend) — native raster off the Web.
+- [Skia rendering (.NET / Kotlin)](skia-backend) — native raster off the Web.
 - [Node.js headless rendering](nodejs-headless-rendering) — server-side image pipelines.
 - [`core.engine`](/docs/reference/settings/core/engine) in the settings reference.

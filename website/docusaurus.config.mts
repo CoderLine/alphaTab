@@ -567,7 +567,7 @@ async function createConfig(): Promise<Config> {
             { label: "Getting started", to: "/docs/introduction" },
             { label: "Web", to: "/docs/getting-started/installation-web" },
             { label: ".NET", to: "/docs/getting-started/installation-net" },
-            { label: "Android", to: "/docs/getting-started/installation-android" },
+            { label: "Kotlin", to: "/docs/getting-started/installation-kotlin" },
             { label: "API reference", to: "/docs/reference/api" },
           ],
         },
@@ -649,6 +649,7 @@ async function createConfig(): Promise<Config> {
           { from: "/docs/migration/data-attributes", to: "/docs/getting-started/configuration-web" },
           { from: "/docs/migration/dom-events", to: "/docs/getting-started/configuration-web" },
           { from: "/docs/migration/jquery", to: "/docs/getting-started/installation-web" },
+          { from: "/docs/getting-started/installation-android", to: "/docs/getting-started/installation-kotlin" },
           {
             from: "/docs/showcase/general",
             to: "/docs/features/render/coverage-repeats",

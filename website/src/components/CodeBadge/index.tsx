@@ -13,7 +13,7 @@ export type Platform =
   | "json"
   | "json-html"
   | "html"
-  | "android";
+  | "kotlin";
 
 export type CodeBadgeProps = {
   type?: Platform;
@@ -37,8 +37,8 @@ export const CodeBadge: React.FC<CodeBadgeProps> = ({ type, name, link }) => {
     case "net":
       title = ".net";
       break;
-    case "android":
-      title = "Android";
+    case "kotlin":
+      title = "Kotlin";
       break;
     case "net-wf":
       title = ".net WinForms";

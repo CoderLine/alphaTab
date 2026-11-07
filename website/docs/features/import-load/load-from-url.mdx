@@ -29,7 +29,7 @@ Both paths run the same fetch pipeline internally and fire `scoreLoaded` on comp
 
 ## Browser fetch, not universal
 
-URL loading uses the browser `XMLHttpRequest`. It works in every Web target and follows the page's origin and CORS rules. On Node.js, .NET, and Android the URL path is not wired up — read the bytes yourself and pass them through `api.load(bytes)` instead. The `readScoreFile()` placeholder in the [bytes page](load-from-bytes) covers that pattern.
+URL loading uses the browser `XMLHttpRequest`. It works in every Web target and follows the page's origin and CORS rules. On Node.js, .NET, and Kotlin the URL path is not wired up — read the bytes yourself and pass them through `api.load(bytes)` instead. The `readScoreFile()` placeholder in the [bytes page](load-from-bytes) covers that pattern.
 
 ## Show it in code
 

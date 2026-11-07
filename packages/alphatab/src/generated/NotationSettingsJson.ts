@@ -108,7 +108,7 @@ export interface NotationSettingsJson {
      * settings.Notation.Elements[AlphaTab.NotationElement.TrackNames] = false;
      * ```
      * @example
-     * Android
+     * Kotlin
      * ```kotlin
      * val settings = AlphaTab.Settings();
      * settings.notation.elements[alphaTab.NotationElement.ScoreTitle] = false;

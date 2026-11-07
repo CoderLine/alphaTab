@@ -16,7 +16,7 @@ export const LandingHero: React.FC = () => {
 
         <p className={styles.lede}>
           alphaTab renders interactive guitar tabs and sheet music from Guitar&nbsp;Pro, MusicXML, Capella, and the
-          built-in alphaTex syntax. One core, three runtimes — JavaScript, .NET, and Kotlin&nbsp;for&nbsp;Android.
+          built-in alphaTex syntax. One core, three runtimes — JavaScript, .NET, and Kotlin&nbsp;for the&nbsp;JVM and&nbsp;Android.
         </p>
 
         <div className={styles.ctas}>

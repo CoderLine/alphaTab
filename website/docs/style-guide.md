@@ -44,7 +44,7 @@ Every operational page opens with:
 
 Elaboration and edge cases come after those three. Concept content ("what alphaTab is") stays on the introduction page, not mixed into installation.
 
-Multi-platform documentation uses parallel pages, not tabs. Web, .NET, and Android each get their own installation and configuration pages. Tabs are reserved for package managers (npm / pnpm / yarn) and other truly interchangeable choices.
+Multi-platform documentation uses parallel pages, not tabs. Web, .NET, and Kotlin each get their own installation and configuration pages. Tabs are reserved for package managers (npm / pnpm / yarn) and other truly interchangeable choices.
 
 ## Code samples
 

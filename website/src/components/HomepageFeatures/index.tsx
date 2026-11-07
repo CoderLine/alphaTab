@@ -51,7 +51,7 @@ const FeatureList: FeatureItem[] = [
       <>
         The core of alphaTab is designed to run with minimal external dependencies
         and on multiple platforms and runtime environments. From one central code base we provide
-        alphaTab for web based apps (JavaScript), apps using .net and Kotlin for Android.
+        alphaTab for web based apps (JavaScript), apps using .NET and Kotlin for the JVM and Android.
         Use alphaTab in your backend and frontend using your preferred technologies to build the app you want.
       </>
     ),

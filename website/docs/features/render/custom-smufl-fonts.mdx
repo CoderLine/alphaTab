@@ -73,7 +73,7 @@ If you want to author a new SMuFL font instead of adopting an existing one:
 
 - Start from the [SMuFL specification](https://www.smufl.org/) — glyph codepoints are stable across every compliant font.
 - Publish a `metadata.json` following the [Bravura reference](https://github.com/steinbergmedia/bravura/blob/master/redist/bravura_metadata.json). alphaTab reads `engravingDefaults`, glyph anchor points (`stemUpSE`, `stemDownNW`, `cutOutNW`, etc.), and bounding boxes.
-- Ship at least `.woff2` and `.otf`. On .NET and Android alphaTab uses the OpenType variant.
+- Ship at least `.woff2` and `.otf`. On .NET and Kotlin alphaTab uses the OpenType variant.
 - Cover the full glyph range alphaTab draws (listed above). Missing glyphs do not fall back — they render as gaps.
 
 ## Licensing
@@ -83,6 +83,6 @@ The default Bravura font is licensed under [SIL Open Font License 1.1](https://s
 ## Where to look next
 
 - [Bravura and SMuFL](/docs/features/render/bravura-default) — the default font and why SMuFL matters.
-- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — the equivalent workflow on .NET and Android.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — the equivalent workflow on .NET and Kotlin.
 - [`CoreSettings.smuflFontSources`](/docs/reference/settings/core/smuflfontsources) and [`EngravingSettings.fillFromSmufl`](/docs/reference/types/engravingsettings) in the reference.
 - [Petaluma](https://github.com/steinbergmedia/petaluma) and [Leland](https://github.com/MuseScoreFonts/Leland) — two alternate SMuFL fonts that pair well with alphaTab.

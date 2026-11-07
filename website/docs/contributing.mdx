@@ -44,7 +44,7 @@ alphaTab lives in one monorepo — [github.com/CoderLine/alphaTab](https://githu
 - `alphatab` — the main library and the source of truth for all platforms
 - `alphatex` — the alphaTex text-format parser and tools
 - `csharp` — the .NET build, transpiled from the TypeScript source
-- `kotlin` — the Kotlin/Android build, transpiled from the TypeScript source
+- `kotlin` — the Kotlin build, transpiled from the TypeScript source: the Gradle module `core` (the platform-independent JVM library and all tests) and `android` (the Android integration)
 - `transpiler` — the TypeScript-to-C#-and-Kotlin transpiler both platforms consume
 - `vite`, `webpack` — the bundler plugins
 - `monaco`, `lsp` — the Monaco editor integration and alphaTex language server
@@ -81,7 +81,7 @@ You will need:
 
 - [Node.js](https://nodejs.org/) 20 or newer — for TypeScript builds, tests, and workspace management
 - [.NET SDK](https://dotnet.microsoft.com/download) 8.0 or newer — only if you plan to build or test the C# port
-- [Java 17+](https://adoptium.net/) and the [Android SDK](https://developer.android.com/studio) — only if you plan to build or test the Kotlin/Android port
+- [Java 17+](https://adoptium.net/) and the [Android SDK](https://developer.android.com/studio) — only if you plan to build or test the Kotlin port
 
 Any modern web-focused IDE works. Visual Studio Code is a good default — the repository ships editor settings and recommended extensions it picks up automatically.
 
@@ -126,11 +126,11 @@ npm run build-csharp   # transpile TypeScript to C#, then run dotnet build
 npm run test-csharp    # run the .NET unit tests via dotnet test
 ```
 
-**Kotlin for Android**
+**Kotlin**
 
 ```bash
-npm run build-kotlin   # transpile TypeScript to Kotlin, then run gradle assembleRelease
-npm run test-kotlin    # run the Android instrumentation tests
+npm run build-kotlin   # transpile TypeScript to Kotlin, then build the core JAR and the Android AAR with gradle
+npm run test-kotlin    # run the unit tests and the Android API check of the core on the JVM
 ```
 
 **Bundler plugins in isolation**
@@ -148,7 +148,7 @@ TypeScript is the source of truth. All alphaTab development happens in the [`pac
 
 <img src="/img/toolchain.svg" alt="alphaTab toolchain: TypeScript source, cross-compiled to JavaScript, C#, and Kotlin" />
 
-alphaTab targets zero runtime dependencies. The core modules are written to run on any platform with a garbage collector — JavaScript, .NET, or Kotlin for Android — without pulling in third-party libraries. Contributions to the core need to keep this constraint in mind: no new runtime dependencies without an architectural discussion first.
+alphaTab targets zero runtime dependencies. The core modules are written to run on any platform with a garbage collector — JavaScript, .NET, or Kotlin — without pulling in third-party libraries. Contributions to the core need to keep this constraint in mind: no new runtime dependencies without an architectural discussion first.
 
 ### Code style
 
