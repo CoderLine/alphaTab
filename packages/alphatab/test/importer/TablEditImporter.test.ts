@@ -7,6 +7,7 @@ import { UnsupportedFormatError } from '@coderline/alphatab/importer/Unsupported
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
 import { OverflowError } from '@coderline/alphatab/io/IReadable';
+import { MidiFileGenerator } from '@coderline/alphatab/midi/MidiFileGenerator';
 import { MidiUtils } from '@coderline/alphatab/midi/MidiUtils';
 import { AccentuationType } from '@coderline/alphatab/model/AccentuationType';
 import { AutomationType } from '@coderline/alphatab/model/Automation';
@@ -38,6 +39,7 @@ import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { BeamDirection } from '@coderline/alphatab/rendering/utils/BeamDirection';
 import { Settings } from '@coderline/alphatab/Settings';
+import { FlatMidiEventGenerator, FlatNoteEvent } from 'test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from 'test/TestPlatform';
 import { describe, expect, it } from 'vitest';
 
@@ -1097,6 +1099,71 @@ describe('TablEditImporterTest', () => {
         expect(single(lower(3)[1]).string).toBe(2);
         expect(single(lower(3)[1]).fret).toBe(3);
         expect(lower(3).every(b => b.preferredBeamDirection === BeamDirection.Down)).toBe(true);
+    });
+
+    it('voices-ties', async () => {
+        // TablEdit ties a note to the previous note on its string, in any voice
+        const score = await load('voices-ties');
+        const bars = score.tracks[0].staves[0].bars;
+        const half = quarter * 2;
+        const noteAt = (bar: number, start: number, string: number): Note => {
+            const found: Note[] = [];
+            for (const voice of bars[bar].voices) {
+                for (const b of voice.beats) {
+                    for (const n of b.notes) {
+                        if (b.playbackStart === start && n.string === string) {
+                            found.push(n);
+                        }
+                    }
+                }
+            }
+            expect(found.length, `bar ${bar} start ${start} string ${string}`).toBe(1);
+            return found[0];
+        };
+
+        // [bar, start, string] of the tied note and of the note it continues; all but the third last in other voices
+        const ties: [number, number, number, number, number, number][] = [
+            [0, half, 4, 0, 0, 4],
+            [1, 0, 2, 0, half, 2],
+            [2, half, 6, 2, 0, 6],
+            [3, half, 5, 3, 0, 5],
+            [3, half, 4, 3, 0, 4],
+            [3, half, 2, 3, 0, 2]
+        ];
+        for (const t of ties) {
+            const label = `tie in bar ${t[0]} on string ${t[2]}`;
+            const destination = noteAt(t[0], t[1], t[2]);
+            const origin = noteAt(t[3], t[4], t[5]);
+            expect(destination.isTieDestination, label).toBe(true);
+            expect(destination.tieOrigin, label).toBe(origin);
+            expect(origin.tieDestination, label).toBe(destination);
+            expect(destination.fret, label).toBe(origin.fret);
+            expect(destination.beat.voice.index !== origin.beat.voice.index, label).toBe(t[2] !== 4 || t[0] !== 3);
+        }
+
+        // only the untied notes are struck, each tied note extends the note it continues
+        const handler = new FlatMidiEventGenerator();
+        new MidiFileGenerator(score, null, handler).generate();
+        const notes: number[][] = [];
+        for (const e of handler.midiEvents) {
+            if (e instanceof FlatNoteEvent) {
+                notes.push([e.tick, e.key, e.length]);
+            }
+        }
+        notes.sort((a, b) => (a[0] !== b[0] ? a[0] - b[0] : a[1] - b[1]));
+        const bar = quarter * 4;
+        expect(notes).toEqual([
+            [0, 48, half],
+            [0, 57, bar],
+            [half, 47, half + bar],
+            [bar, 60, half],
+            [bar + half, 62, half],
+            [2 * bar, 52, half],
+            [2 * bar, 67, bar],
+            [3 * bar, 48, bar],
+            [3 * bar, 55, bar],
+            [3 * bar, 60, bar]
+        ]);
     });
 
     describe('effects', () => {

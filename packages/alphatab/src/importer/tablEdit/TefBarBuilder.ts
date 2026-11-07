@@ -141,6 +141,15 @@ class TefEvent {
      * The next note on the same string.
      */
     public next: TefEvent | null = null;
+    /**
+     * The previous note on the same string, in any voice.
+     */
+    public previous: TefEvent | null = null;
+    /**
+     * The first and the last note created for this event (more than one when it is split into tied beats).
+     */
+    public firstNote: Note | null = null;
+    public lastNote: Note | null = null;
     public extension: Uint8Array | null = null;
     /**
      * A hammer-on or pull-off grace on another string, slurred to this note.
@@ -1014,6 +1023,7 @@ export class TefBarBuilder {
                 const previous = lastOnString.get(e.stringIndex);
                 if (previous) {
                     previous.next = e;
+                    e.previous = previous;
                 }
                 lastOnString.set(e.stringIndex, e);
             }
@@ -1045,6 +1055,20 @@ export class TefBarBuilder {
 
         const laneCounts = this._assignLanes(units);
         this._createVoices(info, units, laneCounts);
+        TefBarBuilder._linkTies(events);
+    }
+
+    /**
+     * TablEdit ties a note to the previous note on its string, which may be in another voice.
+     */
+    private static _linkTies(events: TefEvent[]): void {
+        for (const e of events) {
+            const origin = e.previous ? e.previous.lastNote : null;
+            if (e.isTied && e.firstNote && origin) {
+                e.firstNote.tieOrigin = origin;
+                origin.tieDestination = e.firstNote;
+            }
+        }
     }
 
     /**
@@ -1489,6 +1513,12 @@ export class TefBarBuilder {
             const note = new Note();
             TefBarBuilder._setPosition(info, note, e.stringIndex, e.fret);
             note.isTieDestination = e.isTied || isContinuation;
+            if (isContinuation) {
+                note.tieOrigin = e.lastNote;
+            } else {
+                e.firstNote = note;
+            }
+            e.lastNote = note;
             switch (e.accidental) {
                 case 1:
                     note.accidentalMode = NoteAccidentalMode.ForceSharp;

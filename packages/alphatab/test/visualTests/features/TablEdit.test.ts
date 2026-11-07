@@ -17,4 +17,8 @@ describe('TablEditTests', () => {
     it('chords', async () => {
         await VisualTestHelper.runVisualTest('tabledit/markers-text-chords.tef');
     });
+
+    it('voices-ties', async () => {
+        await VisualTestHelper.runVisualTest('tabledit/voices-ties.tef');
+    });
 });
