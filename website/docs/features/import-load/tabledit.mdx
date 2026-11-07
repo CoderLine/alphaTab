@@ -24,7 +24,7 @@ alphaTab reads files saved by TablEdit 3. Files of TablEdit 1 and 2 are rejected
 
 TablEdit stores notes on a time grid rather than in beats. The importer rebuilds the beats and voices: notes of different length that sound together are placed in additional voices, so the rhythm of every note is kept. Tuplets, special effects, grace notes, fingerings, chord diagrams, texts, tempo changes and swing are mapped to their alphaTab counterparts.
 
-The playback order of a TablEdit file is its reading list. alphaTab expresses it through repeats, alternate endings and D.C., D.S., Coda and Fine directions. An order that these cannot express is played as closely as possible, with a warning in the log.
+The playback order of a TablEdit file is its reading list. alphaTab expresses it through repeats, alternate endings and D.C., D.S., Coda and Fine directions. An order that these cannot express is played as closely as possible, with a warning in the log. For example, after a D.C. or D.S. alphaTab plays every repeat once until the coda, so a reading list that repeats a section again after the jump is shortened.
 
 Non-chromatic instruments such as the mountain dulcimer play with their correct pitches, but the tablature shows chromatic fret numbers. The [compatibility page](/docs/formats/tabledit) lists every TablEdit feature and its status.
 

@@ -25,6 +25,41 @@ export class TefReadingGuide {
 }
 
 /**
+ * A D.C. or D.S. jump of the derived structure and the bars played after it.
+ * @internal
+ */
+export class TefJumpPass {
+    /**
+     * The bar holding the jump.
+     */
+    public jump: number = 0;
+    /**
+     * The bar jumped to, 0 for a D.C.
+     */
+    public target: number = 0;
+    /**
+     * The index of the segno kind, -1 for a D.C.
+     */
+    public segnoKind: number = -1;
+    /**
+     * The bars played after the jump, in order.
+     */
+    public played: number[] = [];
+    /**
+     * The bar holding the To Coda, -1 while playing on.
+     */
+    public end: number = -1;
+    /**
+     * The bar of the coda, -1 while playing on.
+     */
+    public coda: number = -1;
+    /**
+     * The index of the coda kind, -1 while playing on.
+     */
+    public codaKind: number = -1;
+}
+
+/**
  * Expresses the TablEdit reading list, which defines the playback order as a list of bar ranges,
  * through repeats, alternate endings and jump directions.
  * @internal
@@ -32,6 +67,12 @@ export class TefReadingGuide {
 export class TefReadingList {
     private static readonly _repeatStart = 0x40;
     private static readonly _repeatEnd = 0x80;
+    private static readonly _firstEnding = 0x01;
+    private static readonly _secondEnding = 0x02;
+    private static readonly _segnoTargets = [Direction.TargetSegno, Direction.TargetSegnoSegno];
+    private static readonly _segnoJumps = [Direction.JumpDalSegno, Direction.JumpDalSegnoSegno];
+    private static readonly _codaJumps = [Direction.JumpDaCoda, Direction.JumpDaDoubleCoda];
+    private static readonly _codaTargets = [Direction.TargetCoda, Direction.TargetDoubleCoda];
 
     /**
      * Applies the structure before the score is finished.
@@ -132,91 +173,266 @@ export class TefReadingList {
         return runs;
     }
 
+    /**
+     * Marks repeats, alternate endings and jumps so that alphaTab's playback controller plays the runs in order.
+     * Before a jump and after a coda playback is normal: going back becomes a repeat, or a D.C./D.S. when a repeat
+     * cannot express it. After a jump repeats play only their final pass, so skipping the first ending needs no
+     * marking, any other skip forward is the To Coda and its coda, and the end of the list is the Fine.
+     */
     private static _derive(bars: MasterBar[], runs: number[][]): void {
+        const passes: TefJumpPass[] = [];
+        let pass: TefJumpPass | null = null;
         let furthest = -1;
         let lastRepeatEnd = -1;
-        let jump: MasterBar | null = null;
-        let jumpToStart = false;
-        let segnoCount = 0;
-        let codaCount = 0;
         let i = 0;
         while (i < runs.length) {
             const last = runs[i][1];
             furthest = Math.max(furthest, last);
+            if (pass) {
+                for (let b = runs[i][0]; b <= last; b++) {
+                    pass.played.push(b);
+                }
+            }
             if (i + 1 >= runs.length) {
                 // the list stops before the end of the piece
-                if (jump && last < bars.length - 1) {
+                if (pass && last < bars.length - 1) {
                     bars[last].addDirection(Direction.TargetFine);
-                    TefReadingList._replaceJump(jump, Direction.TargetFine);
+                    TefReadingList._replaceJump(bars[pass.jump], Direction.TargetFine);
                 }
                 break;
             }
             const nextFirst = runs[i + 1][0];
-            const nextLast = runs[i + 1][1];
 
-            if (nextFirst <= last) {
-                if (!jump && last === furthest && nextFirst > lastRepeatEnd) {
-                    bars[nextFirst].isRepeatStart = true;
-                    lastRepeatEnd = last;
-                    if (nextLast === last) {
-                        let passes = 2;
-                        let k = i + 1;
-                        while (k + 1 < runs.length && runs[k + 1][0] === nextFirst && runs[k + 1][1] === last) {
-                            passes++;
-                            k++;
-                        }
-                        // a last pass merged with the bars after the repeat
-                        if (k + 1 < runs.length && runs[k + 1][0] === nextFirst && runs[k + 1][1] > last) {
-                            passes++;
-                            k++;
-                            runs[k][0] = last + 1;
-                        }
-                        bars[last].repeatCount = passes;
-                        i = k;
-                        continue;
-                    }
-                    bars[last].repeatCount = 2;
-                    if (nextLast < last) {
-                        const endingLength = last - nextLast;
-                        for (let b = nextLast + 1; b <= last; b++) {
-                            bars[b].alternateEndings |= 0x01;
-                        }
-                        if (i + 2 < runs.length && runs[i + 2][0] === last + 1) {
-                            const end = Math.min(runs[i + 2][1], last + endingLength);
-                            for (let b = last + 1; b <= end; b++) {
-                                bars[b].alternateEndings |= 0x02;
-                            }
-                        }
-                        i += 2;
-                        continue;
-                    }
-                    // the second pass continues after the repeat
-                    runs[i + 1][0] = last + 1;
-                    i++;
-                    continue;
-                }
-
-                jump = bars[last];
-                jumpToStart = nextFirst === 0;
-                if (jumpToStart) {
-                    jump.addDirection(Direction.JumpDaCapo);
-                } else {
-                    bars[nextFirst].addDirection(segnoCount === 0 ? Direction.TargetSegno : Direction.TargetSegnoSegno);
-                    jump.addDirection(segnoCount === 0 ? Direction.JumpDalSegno : Direction.JumpDalSegnoSegno);
-                    segnoCount++;
+            if (pass) {
+                // going back cannot be expressed after a jump, the pass goes on
+                if (nextFirst > last + 1 && !TefReadingList._isFirstEnding(bars, last + 1, nextFirst)) {
+                    TefReadingList._addCoda(bars, passes, pass, nextFirst);
+                    pass = null;
                 }
                 i++;
                 continue;
             }
 
-            if (nextFirst > last + 1 && jump) {
-                bars[last].addDirection(codaCount === 0 ? Direction.JumpDaCoda : Direction.JumpDaDoubleCoda);
-                bars[nextFirst].addDirection(codaCount === 0 ? Direction.TargetCoda : Direction.TargetDoubleCoda);
-                TefReadingList._replaceJump(jump, codaCount === 0 ? Direction.TargetCoda : Direction.TargetDoubleCoda);
-                codaCount++;
+            if (nextFirst > last) {
+                // skipping bars without a jump cannot be expressed
+                i++;
+                continue;
             }
+
+            if (last === furthest && nextFirst > lastRepeatEnd) {
+                const next = TefReadingList._addRepeat(bars, runs, i);
+                if (next >= 0) {
+                    lastRepeatEnd = last;
+                    i = next;
+                    continue;
+                }
+            }
+
+            pass = TefReadingList._addJump(bars, passes, last, nextFirst);
             i++;
         }
+    }
+
+    /**
+     * Expresses going back from the run at the given index as a repeat.
+     * @returns the index of the run to continue with, or -1 if a repeat cannot express it.
+     */
+    private static _addRepeat(bars: MasterBar[], runs: number[][], i: number): number {
+        const last = runs[i][1];
+        const nextFirst = runs[i + 1][0];
+        const nextLast = runs[i + 1][1];
+        if (nextLast < last) {
+            // the second pass skips the first ending, then the bars after the repeat follow
+            if (i + 2 >= runs.length || runs[i + 2][0] !== last + 1) {
+                return -1;
+            }
+            TefReadingList._startRepeat(bars, nextFirst);
+            bars[last].repeatCount = 2;
+            const endingLength = last - nextLast;
+            for (let b = nextLast + 1; b <= last; b++) {
+                bars[b].alternateEndings |= TefReadingList._firstEnding;
+            }
+            const end = Math.min(runs[i + 2][1], last + endingLength);
+            for (let b = last + 1; b <= end; b++) {
+                bars[b].alternateEndings |= TefReadingList._secondEnding;
+            }
+            return i + 2;
+        }
+
+        TefReadingList._startRepeat(bars, nextFirst);
+        if (nextLast === last) {
+            let passes = 2;
+            let k = i + 1;
+            while (k + 1 < runs.length && runs[k + 1][0] === nextFirst && runs[k + 1][1] === last) {
+                passes++;
+                k++;
+            }
+            // a last pass merged with the bars after the repeat
+            if (k + 1 < runs.length && runs[k + 1][0] === nextFirst && runs[k + 1][1] > last) {
+                passes++;
+                k++;
+                runs[k][0] = last + 1;
+            }
+            bars[last].repeatCount = passes;
+            return k;
+        }
+        // the second pass continues after the repeat
+        bars[last].repeatCount = 2;
+        runs[i + 1][0] = last + 1;
+        return i + 1;
+    }
+
+    /**
+     * Opens a repeat. A second ending of the previous repeat ends before it.
+     */
+    private static _startRepeat(bars: MasterBar[], first: number): void {
+        bars[first].isRepeatStart = true;
+        for (let b = first; b < bars.length && bars[b].alternateEndings === TefReadingList._secondEnding; b++) {
+            bars[b].alternateEndings = 0;
+        }
+    }
+
+    /**
+     * Whether all bars of the range are first endings, which the final pass of their repeat skips.
+     */
+    private static _isFirstEnding(bars: MasterBar[], from: number, to: number): boolean {
+        for (let b = from; b < to; b++) {
+            if (bars[b].alternateEndings !== TefReadingList._firstEnding) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Adds a D.C. (jump to the first bar) or D.S. to the given target.
+     * @returns the pass played after the jump, or null if the bar already jumps elsewhere.
+     */
+    private static _addJump(
+        bars: MasterBar[],
+        passes: TefJumpPass[],
+        jump: number,
+        target: number
+    ): TefJumpPass | null {
+        if (passes.some(p => p.jump === jump)) {
+            // a jump is only taken once
+            return null;
+        }
+        const pass = new TefJumpPass();
+        pass.jump = jump;
+        pass.target = target;
+        if (target === 0) {
+            bars[jump].addDirection(Direction.JumpDaCapo);
+        } else {
+            pass.segnoKind = TefReadingList._segnoKind(passes, pass);
+            bars[target].addDirection(TefReadingList._segnoTargets[pass.segnoKind]);
+            bars[jump].addDirection(TefReadingList._segnoJumps[pass.segnoKind]);
+        }
+        passes.push(pass);
+        return pass;
+    }
+
+    /**
+     * A D.S. to a bar with a segno reuses it. Every other target gets the sign not used yet, or else
+     * the one that all jumps still find, as the playback controller looks for the nearest sign before the jump.
+     */
+    private static _segnoKind(passes: TefJumpPass[], pass: TefJumpPass): number {
+        for (const p of passes) {
+            if (p.segnoKind >= 0 && p.target === pass.target) {
+                return p.segnoKind;
+            }
+        }
+        for (let kind = 0; kind < TefReadingList._segnoTargets.length; kind++) {
+            if (!passes.some(p => p.segnoKind === kind)) {
+                return kind;
+            }
+        }
+        for (let kind = 0; kind < TefReadingList._segnoTargets.length; kind++) {
+            const same = passes.filter(p => p.segnoKind === kind);
+            same.push(pass);
+            const targets = same.map(p => p.target);
+            if (same.every(p => TefReadingList._nearest(targets, p.jump, true) === p.target)) {
+                return kind;
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Ends the pass with a To Coda on its last bar and continues at the given coda.
+     */
+    private static _addCoda(bars: MasterBar[], passes: TefJumpPass[], pass: TefJumpPass, coda: number): void {
+        pass.end = pass.played[pass.played.length - 1];
+        pass.coda = coda;
+        let preferred = -1;
+        for (const p of passes) {
+            if (p.codaKind >= 0 && p.coda === coda) {
+                preferred = p.codaKind;
+                break;
+            }
+        }
+        for (let kind = 0; preferred < 0 && kind < TefReadingList._codaTargets.length; kind++) {
+            if (!passes.some(p => p.codaKind === kind)) {
+                preferred = kind;
+            }
+        }
+        if (preferred < 0) {
+            preferred = 0;
+        }
+        let kind = preferred;
+        for (let k = 0; k < TefReadingList._codaTargets.length; k++) {
+            const candidate = (preferred + k) % TefReadingList._codaTargets.length;
+            if (TefReadingList._codasResolve(passes, pass, candidate)) {
+                kind = candidate;
+                break;
+            }
+        }
+        pass.codaKind = kind;
+        bars[pass.end].addDirection(TefReadingList._codaJumps[kind]);
+        bars[coda].addDirection(TefReadingList._codaTargets[kind]);
+        TefReadingList._replaceJump(bars[pass.jump], TefReadingList._codaTargets[kind]);
+    }
+
+    /**
+     * Whether every pass ending with the given To Coda kind (including the new pass) reaches its own
+     * To Coda first and finds its own coda from there.
+     */
+    private static _codasResolve(passes: TefJumpPass[], pass: TefJumpPass, kind: number): boolean {
+        const same = passes.filter(p => p !== pass && p.codaKind === kind);
+        same.push(pass);
+        const ends = same.map(p => p.end);
+        const codas = same.map(p => p.coda);
+        for (const p of same) {
+            let first = 0;
+            while (ends.indexOf(p.played[first]) < 0) {
+                first++;
+            }
+            if (first !== p.played.length - 1 || TefReadingList._nearest(codas, p.end, false) !== p.coda) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * The target the playback controller finds from the given bar: the nearest one in the preferred
+     * direction (including the bar itself), else the nearest one in the other direction.
+     */
+    private static _nearest(targets: number[], from: number, backwardsFirst: boolean): number {
+        let before = -1;
+        let after = -1;
+        for (const t of targets) {
+            if (t <= from && (before < 0 || t > before)) {
+                before = t;
+            }
+            if (t >= from && (after < 0 || t < after)) {
+                after = t;
+            }
+        }
+        if (backwardsFirst) {
+            return before >= 0 ? before : after;
+        }
+        return after >= 0 ? after : before;
     }
 
     /**

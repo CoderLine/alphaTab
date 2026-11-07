@@ -57,6 +57,7 @@ interface ExpectedTupletBeat {
  * @internal
  */
 interface ReadingListStructure {
+    file?: string;
     list: [number, number][];
     tablEdit: number[];
     alphaTab?: number[];
@@ -2470,10 +2471,8 @@ describe('TablEditImporterTest', () => {
             return block;
         }
 
-        async function withReadingList(entries: [number, number][]): Promise<Score> {
-            return readBytes(
-                withBlock(await loadData('reading-list-voltas'), readingListPointer, readingListBlock(entries))
-            );
+        async function withReadingList(entries: [number, number][], file: string): Promise<Score> {
+            return readBytes(withBlock(await loadData(file), readingListPointer, readingListBlock(entries)));
         }
 
         it('reading-list-labels', async () => {
@@ -2790,19 +2789,145 @@ describe('TablEditImporterTest', () => {
             'S16 linear': {
                 list: [[1, 8]],
                 tablEdit: range(0, 7)
+            },
+            // playback is normal again after the coda, its repeat plays both passes
+            'S17 repeat with endings after the coda': {
+                list: [
+                    [1, 2],
+                    [1, 4],
+                    [1, 2],
+                    [5, 7],
+                    [5, 6],
+                    [8, 8]
+                ],
+                tablEdit: [0, 1, 0, 1, 2, 3, 0, 1, 4, 5, 6, 4, 5, 7],
+                repeatStart: [0, 4],
+                repeatCount: [
+                    [1, 2],
+                    [6, 2]
+                ],
+                endings: [
+                    [6, 1],
+                    [7, 2]
+                ],
+                directions: [
+                    [1, [Direction.JumpDaCoda]],
+                    [3, [Direction.JumpDaCapoAlCoda]],
+                    [4, [Direction.TargetCoda]]
+                ]
+            },
+            // after the D.S. the repeat plays its final pass, which skips the first ending by itself
+            'S18 first ending skipped after a jump': {
+                list: [
+                    [1, 4],
+                    [2, 3],
+                    [5, 6],
+                    [2, 3],
+                    [5, 5],
+                    [8, 8]
+                ],
+                tablEdit: [0, 1, 2, 3, 1, 2, 4, 5, 1, 2, 4, 7],
+                repeatStart: [1],
+                repeatCount: [[3, 2]],
+                endings: [
+                    [3, 1],
+                    [4, 2]
+                ],
+                directions: [
+                    [1, [Direction.TargetSegno]],
+                    [4, [Direction.JumpDaCoda]],
+                    [5, [Direction.JumpDalSegnoAlCoda]],
+                    [7, [Direction.TargetCoda]]
+                ]
+            },
+            // two D.S. to one segno; the second stops before the To Coda of the first, so it needs the double coda
+            'S19 segno shared, codas apart': {
+                list: [
+                    [1, 3],
+                    [2, 4],
+                    [2, 3],
+                    [5, 6],
+                    [2, 2],
+                    [5, 8]
+                ],
+                tablEdit: [0, 1, 2, 1, 2, 3, 1, 2, 4, 5, 1, 4, 5, 6, 7],
+                repeatStart: [1],
+                repeatCount: [[2, 2]],
+                directions: [
+                    [1, [Direction.TargetSegno, Direction.JumpDaDoubleCoda]],
+                    [2, [Direction.JumpDaCoda]],
+                    [3, [Direction.JumpDalSegnoAlCoda]],
+                    [4, [Direction.TargetCoda, Direction.TargetDoubleCoda]],
+                    [5, [Direction.JumpDalSegnoAlDoubleCoda]]
+                ]
+            },
+            // the reading list of Calliope Rag (discussion #2963); TablEdit's MIDI export plays it as listed
+            'S20 Calliope Rag': {
+                file: 'reading-list-long',
+                list: [
+                    [1, 20],
+                    [5, 19],
+                    [21, 37],
+                    [22, 37],
+                    [5, 19],
+                    [21, 21],
+                    [38, 45],
+                    [38, 43],
+                    [46, 47],
+                    [5, 19],
+                    [48, 49]
+                ],
+                tablEdit: [
+                    ...range(0, 19),
+                    ...range(4, 18),
+                    ...range(20, 36),
+                    ...range(21, 36),
+                    ...range(4, 18),
+                    20,
+                    ...range(37, 44),
+                    ...range(37, 42),
+                    45,
+                    46,
+                    ...range(4, 18),
+                    47,
+                    48
+                ],
+                repeatStart: [4, 21, 37],
+                repeatCount: [
+                    [19, 2],
+                    [36, 2],
+                    [44, 2]
+                ],
+                endings: [
+                    [19, 1],
+                    [20, 2],
+                    [43, 1],
+                    [44, 1],
+                    [45, 2],
+                    [46, 2]
+                ],
+                directions: [
+                    [4, [Direction.TargetSegno]],
+                    [18, [Direction.JumpDaDoubleCoda]],
+                    [20, [Direction.JumpDaCoda]],
+                    [36, [Direction.JumpDalSegnoAlCoda]],
+                    [37, [Direction.TargetCoda]],
+                    [46, [Direction.JumpDalSegnoAlDoubleCoda]],
+                    [47, [Direction.TargetDoubleCoda]]
+                ]
             }
         };
 
         it('reading-list-structures', async () => {
             for (const [name, s] of Object.entries(structures)) {
-                const score = await withReadingList(s.list);
+                const score = await withReadingList(s.list, s.file ?? 'reading-list-voltas');
                 const items = s.list.map(entry => {
                     const item = new TefReadingListItem();
                     item.first = entry[0] - 1;
                     item.last = entry[1] - 1;
                     return item;
                 });
-                expect(TefReadingList.playbackOrder(score, 100), name).toEqual(s.alphaTab ?? s.tablEdit);
+                expect(TefReadingList.playbackOrder(score, 1000), name).toEqual(s.alphaTab ?? s.tablEdit);
                 expect(TefReadingList.verify(score, items), name).toBe(s.alphaTab === undefined);
 
                 const repeatCount = s.repeatCount ? new Map(s.repeatCount) : new Map<number, number>();
