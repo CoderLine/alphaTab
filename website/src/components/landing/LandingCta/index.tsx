@@ -17,7 +17,7 @@ export const LandingCta: React.FC = () => {
   const installs: Install[] = [
     { platform: 'JavaScript', cmd: 'npm i @coderline/alphatab' },
     { platform: '.NET', cmd: 'dotnet add package AlphaTab' },
-    { platform: 'Kotlin', cmd: `implementation("net.alphatab:alphatab:${version}")` },
+    { platform: 'Kotlin', cmd: `implementation("net.alphatab:alphaTab:${version}")` },
   ];
 
   return (
