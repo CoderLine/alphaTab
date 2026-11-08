@@ -2895,4 +2895,21 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars.map(mb => mb.barNumberText)).toEqual(['0', '1', '2']);
         expect(score.masterBars[0].customBarNumber).toBe(0);
     });
+
+    it('pitched-notes-across-octave-boundary', () => {
+        const score = parseTex('\\tuning piano . B#3 B##3 Cb4 Cbb4');
+        const notes = score.tracks[0].staves[0].bars[0].voices[0].beats.map(b => b.notes[0]);
+        expect(notes.map(n => n.tone)).toEqual([12, 13, 11, 10]);
+        expect(notes.map(n => n.octave)).toEqual([4, 4, 4, 4]);
+        expect(notes.map(n => n.realValue)).toEqual([60, 61, 59, 58]);
+    });
+
+    it('rest-display-pitch-across-octave-boundary', () => {
+        const score = parseTex('\\tuning piano . r.4{restDisplayPitch Cb4} r.4{restDisplayPitch B#3}');
+        const beats = score.tracks[0].staves[0].bars[0].voices[0].beats;
+        expect(beats[0].restDisplayTone).toBe(11);
+        expect(beats[0].restDisplayOctave).toBe(3);
+        expect(beats[1].restDisplayTone).toBe(12);
+        expect(beats[1].restDisplayOctave).toBe(3);
+    });
 });

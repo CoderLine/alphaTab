@@ -1,5 +1,5 @@
 import { TrackSubElement } from '@coderline/alphatab/model/Track';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -28,7 +28,7 @@ export class InlineTuningGlyph extends Glyph {
 
         let textWidth = 0;
         for (const tuning of this._tunings) {
-            textWidth = Math.max(textWidth, canvas.measureText(Tuning.getTextForTuning(tuning, false)).width);
+            textWidth = Math.max(textWidth, canvas.measureText(SpelledPitch.formatValue(tuning, false, true)).width);
         }
 
         canvas.font = oldFont;
@@ -56,7 +56,7 @@ export class InlineTuningGlyph extends Glyph {
 
         for (let i = 0, j = this._tunings.length; i < j; i++) {
             canvas.fillText(
-                Tuning.getTextForTuning(this._tunings[i], false),
+                SpelledPitch.formatValue(this._tunings[i], false, true),
                 textEndX,
                 cy + this.renderer.y + (this.renderer as LineBarRenderer).getLineY(i)
             );

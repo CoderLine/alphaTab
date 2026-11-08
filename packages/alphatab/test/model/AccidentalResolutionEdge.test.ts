@@ -8,8 +8,8 @@ describe('AccidentalResolutionEdgeTests', () => {
         const ks = KeySignature.CSharp;
         const noteValue = 60; // C4
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-        expect(spelling.degree).toBe(6); // B
-        expect(spelling.accidentalOffset).toBe(1); // B#
+        expect(spelling.step).toBe(6); // B
+        expect(spelling.alter).toBe(1); // B#
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, false, null);
         expect(accidental).toBe(AccidentalType.None);
     });
@@ -18,8 +18,8 @@ describe('AccidentalResolutionEdgeTests', () => {
         const ks = KeySignature.Cb;
         const noteValue = 64; // E4
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-        expect(spelling.degree).toBe(3); // F
-        expect(spelling.accidentalOffset).toBe(-1); // Fb
+        expect(spelling.step).toBe(3); // F
+        expect(spelling.alter).toBe(-1); // Fb
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, false, null);
         expect(accidental).toBe(AccidentalType.None);
     });
@@ -28,8 +28,8 @@ describe('AccidentalResolutionEdgeTests', () => {
         const ks = KeySignature.C;
         const noteValue = 62; // D
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceDoubleSharp);
-        expect(spelling.degree).toBe(0); // C
-        expect(spelling.accidentalOffset).toBe(2); // C##
+        expect(spelling.step).toBe(0); // C
+        expect(spelling.alter).toBe(2); // C##
         const accidental = ModelUtils.computeAccidentalForSpelling(
             ks,
             NoteAccidentalMode.ForceDoubleSharp,
@@ -44,8 +44,8 @@ describe('AccidentalResolutionEdgeTests', () => {
         const ks = KeySignature.C;
         const noteValue = 62; // D
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceDoubleFlat);
-        expect(spelling.degree).toBe(2); // E
-        expect(spelling.accidentalOffset).toBe(-2); // Ebb
+        expect(spelling.step).toBe(2); // E
+        expect(spelling.alter).toBe(-2); // Ebb
         const accidental = ModelUtils.computeAccidentalForSpelling(
             ks,
             NoteAccidentalMode.ForceDoubleFlat,

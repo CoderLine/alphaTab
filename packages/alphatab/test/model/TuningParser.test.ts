@@ -8,7 +8,7 @@ describe('TuningParserTest', () => {
         const tuning = new Array<number>(tuningText.length);
         const tuningText2: string[] = new Array<string>(tuningText.length);
         for (let i: number = 0; i < tuningText.length; i++) {
-            tuning[i] = ModelUtils.getTuningForText(tuningText[i]);
+            tuning[i] = ModelUtils.parsePitch(tuningText[i])!.pitch.value;
             tuningText2[i] = Tuning.getTextForTuning(tuning[i], true);
         }
         expect(tuning.join(',')).toBe(standard.tunings.join(','));

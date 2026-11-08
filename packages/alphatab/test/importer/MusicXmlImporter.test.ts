@@ -364,8 +364,8 @@ describe('MusicXmlImporterTests', () => {
                     );
                     const context = `note ${i}`;
                     expect(bar.index, context).toBe(expected[i][0]);
-                    expect(spelling.degree, context).toBe(expected[i][1]);
-                    expect(spelling.accidentalOffset, context).toBe(expected[i][2]);
+                    expect(spelling.step, context).toBe(expected[i][1]);
+                    expect(spelling.alter, context).toBe(expected[i][2]);
                     expect(spelling.octave, context).toBe(expected[i][3]);
                     i++;
                 }

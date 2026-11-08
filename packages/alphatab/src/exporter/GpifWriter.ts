@@ -41,6 +41,7 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
@@ -450,7 +451,6 @@ export class GpifWriter {
         }
     }
 
-    private static readonly _steps: string[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     private static readonly _accidentals: string[] = ['bb', 'b', '', '#', 'x'];
 
     private _writePitchForValue(
@@ -465,9 +465,9 @@ export class GpifWriter {
         this._writePitch(
             properties,
             propertyName,
-            GpifWriter._steps[spelling.degree],
+            SpelledPitch.stepName(spelling.step),
             (spelling.octave + 1).toString(),
-            GpifWriter._accidentals[spelling.accidentalOffset + 2]
+            GpifWriter._accidentals[spelling.alter + 2]
         );
     }
 

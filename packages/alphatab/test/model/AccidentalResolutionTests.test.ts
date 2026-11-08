@@ -35,8 +35,8 @@ describe('AccidentalResolutionTests', () => {
             for (let degree = 0; degree < 7; degree++) {
                 const noteValue = noteValueForDegree(ks, degree, 4);
                 const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-                expect(spelling.degree, `ks=${ks} degree=${degree}`).toBe(degree);
-                expect(spelling.accidentalOffset, `ks=${ks} degree=${degree}`).toBe(
+                expect(spelling.step, `ks=${ks} degree=${degree}`).toBe(degree);
+                expect(spelling.alter, `ks=${ks} degree=${degree}`).toBe(
                     ModelUtils.getKeySignatureAccidentalOffset(ks, degree)
                 );
 
@@ -56,8 +56,8 @@ describe('AccidentalResolutionTests', () => {
         const ks = KeySignature.FSharp;
         const noteValue = 65; // F natural
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-        expect(spelling.degree).toBe(2); // E
-        expect(spelling.accidentalOffset).toBe(1); // E#
+        expect(spelling.step).toBe(2); // E
+        expect(spelling.alter).toBe(1); // E#
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, false, null);
         expect(accidental).toBe(AccidentalType.None);
     });
@@ -66,8 +66,8 @@ describe('AccidentalResolutionTests', () => {
         const ks = KeySignature.Cb;
         const noteValue = 59; // B natural
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.Default);
-        expect(spelling.degree).toBe(0); // C
-        expect(spelling.accidentalOffset).toBe(-1); // Cb
+        expect(spelling.step).toBe(0); // C
+        expect(spelling.alter).toBe(-1); // Cb
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.Default, spelling, false, null);
         expect(accidental).toBe(AccidentalType.None);
     });
@@ -76,8 +76,8 @@ describe('AccidentalResolutionTests', () => {
         const ks = KeySignature.C;
         const noteValue = 61; // C# / Db
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceFlat);
-        expect(spelling.degree).toBe(1); // D
-        expect(spelling.accidentalOffset).toBe(-1); // Db
+        expect(spelling.step).toBe(1); // D
+        expect(spelling.alter).toBe(-1); // Db
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.ForceFlat, spelling, false, null);
         expect(accidental).toBe(AccidentalType.Flat);
     });
@@ -86,8 +86,8 @@ describe('AccidentalResolutionTests', () => {
         const ks = KeySignature.C;
         const noteValue = 61; // C# / Db
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceSharp);
-        expect(spelling.degree).toBe(0); // C
-        expect(spelling.accidentalOffset).toBe(1); // C#
+        expect(spelling.step).toBe(0); // C
+        expect(spelling.alter).toBe(1); // C#
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.ForceSharp, spelling, false, null);
         expect(accidental).toBe(AccidentalType.Sharp);
     });
@@ -96,8 +96,8 @@ describe('AccidentalResolutionTests', () => {
         const ks = KeySignature.D; // F#, C#
         const noteValue = 65; // F natural
         const spelling = ModelUtils.resolveSpelling(ks, noteValue, NoteAccidentalMode.ForceNatural);
-        expect(spelling.degree).toBe(3); // F
-        expect(spelling.accidentalOffset).toBe(0); // natural
+        expect(spelling.step).toBe(3); // F
+        expect(spelling.alter).toBe(0); // natural
         const accidental = ModelUtils.computeAccidentalForSpelling(ks, NoteAccidentalMode.ForceNatural, spelling, false, null);
         expect(accidental).toBe(AccidentalType.Natural);
     });
@@ -142,8 +142,8 @@ describe('AccidentalResolutionTests', () => {
                         const noteValue = (octave + 1) * 12 + degreeSemitones[degree] + offset;
                         const spelling = ModelUtils.resolveSpelling(ks, noteValue, modes[offset + 2]);
                         const context = `ks=${ks} degree=${degree} offset=${offset} octave=${octave}`;
-                        expect(spelling.degree, context).toBe(degree);
-                        expect(spelling.accidentalOffset, context).toBe(offset);
+                        expect(spelling.step, context).toBe(degree);
+                        expect(spelling.alter, context).toBe(offset);
                         expect(spelling.octave, context).toBe(octave);
                     }
                 }

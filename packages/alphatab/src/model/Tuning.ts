@@ -1,3 +1,5 @@
+import type { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
+
 /**
  * This public class represents a predefined string tuning.
  * @json
@@ -11,13 +13,25 @@ export class Tuning {
     private static _fourStrings: Tuning[] = [];
     private static _defaultTunings: Map<number, Tuning> = new Map();
 
+    /**
+     * The flat spelled note names of the 12 pitch classes.
+     * @deprecated Use {@link SpelledPitch} for the written name of a pitch.
+     */
     public static readonly noteNames: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
+    /**
+     * Gets the flat spelled name of the given tuning value, optionally with octave.
+     * @deprecated Use {@link SpelledPitch.toNameString} or {@link SpelledPitch.toString} for the written name of a pitch.
+     */
     public static getTextForTuning(tuning: number, includeOctave: boolean): string {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
     }
 
+    /**
+     * Gets the flat spelled name and the octave of the given tuning value.
+     * @deprecated Use {@link SpelledPitch} for the written name of a pitch.
+     */
     public static getTextPartsForTuning(tuning: number, octaveShift: number = -1): string[] {
         const octave: number = (tuning / 12) | 0;
         const note: number = tuning % 12;

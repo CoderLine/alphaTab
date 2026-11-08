@@ -44,6 +44,7 @@ import { PickStroke } from '@coderline/alphatab/model/PickStroke';
 import { BarNumberDisplay, LyricsPlacement } from '@coderline/alphatab/model/RenderStylesheet';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
@@ -1993,7 +1994,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
             }
         }
-        const tuning: number = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
+        const tuning: number = (ModelUtils.parsePitch(tuningStep + tuningOctave)?.pitch.value ?? -1) + tuningAlter;
         staff.tuning[staff.tuning.length - line] = tuning;
     }
 
@@ -4338,12 +4339,17 @@ export class MusicXmlImporter extends ScoreImporter {
             note.octave = 0;
             note.tone = 0;
         } else {
-            const value: number = octave * 12 + (ModelUtils.getToneForText(step)?.noteValue ?? 0);
+            const value: number = octave * 12 + MusicXmlImporter._stepSemitones(step);
             note.octave = (value / 12) | 0;
             note.tone = value - note.octave * 12;
         }
 
         return note;
+    }
+
+    private static _stepSemitones(step: string): number {
+        const s = step.length === 1 ? SpelledPitch.stepForLetter(step.charCodeAt(0)) : -1;
+        return s >= 0 ? SpelledPitch.stepSemitones(s) : 0;
     }
 
     private _parsePitch(element: XmlNode): Note {
@@ -4369,7 +4375,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         semitones = semitones | 0; // no microtones supported
-        const value: number = octave * 12 + (ModelUtils.getToneForText(step)?.noteValue ?? 0) + semitones;
+        const value: number = octave * 12 + MusicXmlImporter._stepSemitones(step) + semitones;
         const note = new Note();
 
         note.octave = (value / 12) | 0;

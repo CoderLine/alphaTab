@@ -598,7 +598,7 @@ export class Gp3To5Importer extends ScoreImporter {
     /**
      * Guitar Pro 3-6 changes to a bass clef if any string tuning is below B1
      */
-    private static readonly _bassClefTuningThreshold = ModelUtils.parseTuning('B1')!.realValue;
+    private static readonly _bassClefTuningThreshold = ModelUtils.parsePitch('B1')!.pitch.value;
 
     public readTrack(): void {
         const newTrack: Track = new Track();

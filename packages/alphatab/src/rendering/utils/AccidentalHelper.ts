@@ -2,11 +2,12 @@ import { AccidentalType } from '@coderline/alphatab/model/AccidentalType';
 import type { Bar } from '@coderline/alphatab/model/Bar';
 import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Clef } from '@coderline/alphatab/model/Clef';
-import { ModelUtils, type ResolvedSpelling } from '@coderline/alphatab/model/ModelUtils';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
+import type { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import type { LineBarRenderer } from '@coderline/alphatab/rendering/LineBarRenderer';
 import type { ScoreBarRenderer } from '@coderline/alphatab/rendering/ScoreBarRenderer';
 
@@ -201,7 +202,7 @@ export class AccidentalHelper {
                     registered = new Map<number, number>();
                     this._registeredAccidentals = registered;
                 }
-                registered.set(steps, spelling.accidentalOffset);
+                registered.set(steps, spelling.alter);
             }
         }
 
@@ -287,7 +288,7 @@ export class AccidentalHelper {
         return beatSteps ? beatSteps.minStepsNote : null;
     }
 
-    public static calculateNoteSteps(clef: Clef, spelling: ResolvedSpelling): number {
+    public static calculateNoteSteps(clef: Clef, spelling: SpelledPitch): number {
         const clefValue: number = clef as number;
 
         // Initial Position
@@ -295,7 +296,7 @@ export class AccidentalHelper {
         // Move to Octave
         steps -= spelling.octave * AccidentalHelper._stepsPerOctave;
         // Move within octave
-        steps -= AccidentalHelper._diatonicSteps[spelling.degree];
+        steps -= AccidentalHelper._diatonicSteps[spelling.step];
 
         return steps;
     }
