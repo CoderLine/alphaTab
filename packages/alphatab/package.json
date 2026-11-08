@@ -93,9 +93,9 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^2.6.4",
-        "@coderline/alphaskia": "^3.5.147",
-        "@coderline/alphaskia-linux": "^3.5.147",
-        "@coderline/alphaskia-windows": "^3.5.147",
+        "@coderline/alphaskia": "^4.0.157",
+        "@coderline/alphaskia-linux": "^4.0.157",
+        "@coderline/alphaskia-windows": "^4.0.157",
         "@types/node": "^26.6.6",
         "opentype.js": "^2.0.0",
         "rimraf": "^6.1.3",
