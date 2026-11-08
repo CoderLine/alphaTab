@@ -9,6 +9,7 @@ import { GpifParser } from '@coderline/alphatab/importer/GpifParser';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
 import { ByteBuffer } from '@coderline/alphatab/io/ByteBuffer';
 import { IOHelper } from '@coderline/alphatab/io/IOHelper';
+import { BackingTrack } from '@coderline/alphatab/model/BackingTrack';
 import { TechniqueSymbolPlacement } from '@coderline/alphatab/model/InstrumentArticulation';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
@@ -23,6 +24,17 @@ import { TestPlatform } from 'test/TestPlatform';
 import { describe, expect, it } from 'vitest';
 
 describe('Gp7ExporterTest', () => {
+    it('sets the backing track visibility preference only for embedded audio', () => {
+        const score = ScoreLoader.loadAlphaTex('3.3.4');
+        const entriesWithoutAudio = new ZipReader(ByteBuffer.fromBuffer(exportGp7(score)), new Settings().importer.maxDecodingBufferSize).read();
+        expect(entriesWithoutAudio.some(e => e.fileName.endsWith('Preferences.json'))).toBe(false);
+        score.backingTrack = new BackingTrack();
+        score.backingTrack.rawAudioFile = new Uint8Array([1, 2, 3, 4]);
+        const entries = new ZipReader(ByteBuffer.fromBuffer(exportGp7(score)), new Settings().importer.maxDecodingBufferSize).read();
+        const preferences = entries.find(e => e.fileName.endsWith('Preferences.json'));
+        expect(preferences).toBeDefined();
+        expect(JSON.parse(IOHelper.toString(preferences!.data, '')).view.backingTrackVisible).toBe(true);
+    });
     async function loadScore(name: string): Promise<Score | null> {
         try {
             const data = await TestPlatform.loadFile(`test-data/${name}`);
