@@ -55,7 +55,7 @@ The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renders
 #### render: sharp and flat tunings
 https://github.com/CoderLine/alphaTab/issues/2802
 
-Tunings keep the sharp or flat spelling of the source file per string, and the score tuning and the staff tuning draw the accidentals as music symbols. alphaTex keeps the spelling written in `\tuning` and writes it back on export, the Guitar Pro 7 and 8 importer and exporter read and write the sharp or flat choice of the tuning, and the MusicXML importer reads the spelling from `tuning-step` and `tuning-alter`. The new [`Tuning.spellings`](/docs/reference/types/model/tuning/#spellings) holds the written pitch of every string as a [`SpelledPitch`](/docs/reference/types/model/spelledpitch). Details: [Sharp and flat tunings](/docs/features/render/tuning-display#sharp-and-flat-tunings).
+Tunings keep the sharp or flat spelling of the source file per string, and the score tuning and the staff tuning show the accidentals as ♯ and ♭. alphaTex keeps the spelling written in `\tuning` and writes it back on export, the Guitar Pro importer and exporter read and write the sharp or flat choice of the tuning, and the MusicXML importer reads the spelling from `tuning-step` and `tuning-alter`. The new [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) holds the written pitch of every string as a [`SpelledPitch`](/docs/reference/types/model/spelledpitch); [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings) gives the MIDI values of the same strings. Details: [Sharp and flat tunings](/docs/features/render/tuning-display#sharp-and-flat-tunings).
 
 <AlphaTab tex={true}>{`
 \\track "Guitar"
@@ -77,12 +77,18 @@ alphaTab for Kotlin is published as two packages, like the .NET version. The new
 
 * Low octave dots on numbered staves sit below the duration lines instead of between digit and lines, as in printed jiǎnpǔ.
 * Numbered staves show all notes of chords and all voices. Set `notes` of the numbered staff configuration to `NumberedNoteMode.SingleNote` (alphaTex: `\defaultStaffDisplay numbered { notes singleNote }`) for one digit per beat; see [Single note mode](/docs/features/render/numbered-notation#single-note-mode).
-* Tuning names show the accidental as a music symbol (`E♭`) instead of the letter `b` (`Eb`).
+* Tuning names show the accidental as `♭` and `♯` (`E♭`) instead of the letter `b` (`Eb`).
+* Guitar Pro tunings with accidentals are written with sharps unless the file marks them as flat, like in Guitar Pro. Guitar Pro 6 files have no such mark and show sharps.
 * Lyrics of tab-only tracks are shown below the tab staff instead of above it. With standard notation and tabs, they sit directly below the standard notation staff. Set [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) to `LyricsPlacement.Above` (alphaTex: `\lyricsPlacement above`) to show them above the staff.
+
+#### Tuning pitches
+
+* [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) is the stored tuning, [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings) is derived from it. Assign a new array to change a tuning: changing the array returned by `tunings` in place does not change the tuning anymore.
+* The score JSON stores the tuning as `pitches` with the written names like `"D#4"`. JSON with the `tunings` values of earlier versions is still read.
 
 #### Deprecated APIs
 
-* `Tuning.noteNames`, `Tuning.getTextForTuning` and `Tuning.getTextPartsForTuning` are deprecated and keep their behavior. Use [`Tuning.getSpelling`](/docs/reference/types/model/tuning/#getspelling) and [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for the written name of a string.
+* `Tuning.noteNames`, `Tuning.getTextForTuning` and `Tuning.getTextPartsForTuning` are deprecated and keep their behavior. Use [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) and [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for the written name of a string.
 
 #### Kotlin packages
 

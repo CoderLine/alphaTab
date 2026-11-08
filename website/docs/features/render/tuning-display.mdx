@@ -51,7 +51,7 @@ With `TuningDisplayMode.Staff`, alphaTab writes the note name of each open strin
 
 ## Sharp and flat tunings *(new in 1.10)* {#sharp-and-flat-tunings}
 
-alphaTab labels every string with its written pitch. A string tuned to the same pitch as `F#3` or `Gb3` keeps the spelling of the source file, and the accidental is drawn as a music symbol in both the score tuning and the staff tuning.
+alphaTab labels every string with its written pitch. A string tuned to the same pitch as `F#3` or `Gb3` keeps the spelling of the source file, and the score tuning and the staff tuning show it with the accidental characters ♯ and ♭ of the tuning font.
 
 <AlphaTexSample tracks="all">{`
 \\track "Guitar"
@@ -66,10 +66,10 @@ alphaTab labels every string with its written pitch. A string tuned to the same 
 
 - alphaTex keeps the tuning as written in [`\tuning`](/docs/alphatex/staff-metadata#tuning) and writes it back on export.
 - MusicXML files define the spelling with `tuning-step` and `tuning-alter`.
-- Guitar Pro 7 and 8 files store one sharp or flat choice per tuning, which alphaTab reads and writes back in the [Guitar Pro 7 exporter](/docs/features/export/export-to-guitar-pro-7). Guitar Pro 6 files have no such choice.
-- Without a known spelling, the strings are labeled with flats, as in earlier versions.
+- Guitar Pro files mark a tuning written with flats, all other tunings are written with sharps. The [Guitar Pro 7 exporter](/docs/features/export/export-to-guitar-pro-7) writes the choice back.
+- Formats without a spelling, like Guitar Pro 3-5, and tunings set as MIDI values are written with flats, as in earlier versions.
 
-In code, [`Tuning.spellings`](/docs/reference/types/model/tuning/#spellings) holds a [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for every string, in the order of [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings). [`Tuning.getSpelling`](/docs/reference/types/model/tuning/#getspelling) returns the written pitch of a string, falling back to the flat spelling when no spelling is stored or the tuning value was changed afterwards. Set both arrays to change the tuning together with its spelling:
+In code, [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) holds a [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for every string, starting with the highest string. [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings) gives the MIDI values of the same strings; setting it spells the strings with flats. Assign a new array to change the tuning:
 
 ```js
 import * as alphaTab from '@coderline/alphatab';
@@ -82,8 +82,7 @@ const api = new alphaTab.AlphaTabApi(container, {
 api.scoreLoaded.on((score) => {
   const tuning = score.tracks[0].staves[0].stringTuning;
   // D# A# F# C# G# D#, written with sharps
-  tuning.tunings = [63, 58, 54, 49, 44, 39];
-  tuning.spellings = [
+  tuning.pitches = [
     new alphaTab.model.SpelledPitch(1, 1, 4),
     new alphaTab.model.SpelledPitch(5, 1, 3),
     new alphaTab.model.SpelledPitch(3, 1, 3),
@@ -91,12 +90,10 @@ api.scoreLoaded.on((score) => {
     new alphaTab.model.SpelledPitch(4, 1, 2),
     new alphaTab.model.SpelledPitch(1, 1, 2),
   ];
-  console.log(tuning.getSpelling(0).toString()); // D#4
+  console.log(tuning.pitches[0].toString(), tuning.tunings[0]); // D#4 63
   api.render();
 });
 ```
-
-[`EngravingSettings.tuningGlyphAccidentalScale`](/docs/reference/types/engravingsettings/) sets the size of the accidentals next to the note names.
 
 ## Show it in code
 
