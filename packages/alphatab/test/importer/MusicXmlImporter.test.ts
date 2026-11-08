@@ -432,9 +432,9 @@ describe('MusicXmlImporterTests', () => {
         const tuning = score.tracks[0].staves[0].stringTuning;
 
         // top string first, line 1 is the lowest string
-        expect(tuning.tunings).toEqual([64.5, 58, 54, 50, 44, 39]);
-        expect(tuning.spellings!.map(s => [s.step, s.alter, s.octave])).toEqual([
-            // quarter tone alter: no spelling, fallback from the tuning value
+        // the quarter tone alter of the highest string is truncated
+        expect(tuning.tunings).toEqual([64, 58, 54, 50, 44, 39]);
+        expect(tuning.pitches.map(p => [p.step, p.alter, p.octave])).toEqual([
             [2, 0, 4],
             [5, 1, 3],
             [4, -1, 3],
@@ -442,7 +442,7 @@ describe('MusicXmlImporterTests', () => {
             [4, 1, 2],
             [2, -1, 2]
         ]);
-        expect(tuning.tunings.map((_, i) => tuning.getSpelling(i).toNameString())).toEqual([
+        expect(tuning.pitches.map(p => p.toNameString())).toEqual([
             'E',
             'A#',
             'Gb',

@@ -2900,7 +2900,7 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex('\\tuning (D#4 Bb3 Gb3 c#3 ab2 Fb2) . 0.6');
         const tuning = score.tracks[0].staves[0].stringTuning;
         expect(tuning.tunings).toEqual([63, 58, 54, 49, 44, 40]);
-        expect(tuning.spellings!.map(s => [s.step, s.alter, s.octave])).toEqual([
+        expect(tuning.pitches.map(p => [p.step, p.alter, p.octave])).toEqual([
             [1, 1, 4],
             [6, -1, 3],
             [4, -1, 3],
@@ -2910,9 +2910,9 @@ describe('AlphaTexImporterTest', () => {
         ]);
     });
 
-    it('tuning-mode-without-spellings', () => {
+    it('tuning-mode-without-strings', () => {
         const score = parseTex('\\tuning piano . C4');
-        expect(score.tracks[0].staves[0].stringTuning.spellings).toBeNull();
+        expect(score.tracks[0].staves[0].stringTuning.pitches).toHaveLength(0);
     });
 
     it('pitched-notes-across-octave-boundary', () => {

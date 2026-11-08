@@ -1952,7 +1952,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _parseStaffDetails(element: XmlNode, staff: Staff): void {
-        let spellings: Map<number, SpelledPitch> | null = null;
+        let pitches: SpelledPitch[] | null = null;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'staff-type': Ignored
@@ -1961,8 +1961,10 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'line-detail': Not supported
                 case 'staff-tuning':
-                    spellings ??= new Map<number, SpelledPitch>();
-                    this._parseStaffTuning(c, staff, spellings);
+                    if (pitches === null) {
+                        pitches = this._startStaffTuning(staff);
+                    }
+                    MusicXmlImporter._parseStaffTuning(c, pitches);
                     break;
                 case 'capo':
                     staff.capo = Number.parseInt(c.innerText, 10);
@@ -1971,20 +1973,27 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        if (spellings !== null && spellings.size > 0) {
-            const tuning = staff.stringTuning;
-            const parsed = spellings;
-            tuning.spellings = tuning.tunings.map((_, i) => (parsed.has(i) ? parsed.get(i)! : tuning.getSpelling(i)));
+        if (pitches !== null) {
+            staff.stringTuning.pitches = pitches;
         }
     }
 
-    private _parseStaffTuning(element: XmlNode, staff: Staff, spellings: Map<number, SpelledPitch>): void {
-        if (staff.stringTuning.tunings.length === 0) {
-            staff.showTablature = true;
-            staff.showStandardNotation = false;
-            staff.stringTuning.tunings = new Array<number>(staff.standardNotationLineCount).fill(0);
+    private _startStaffTuning(staff: Staff): SpelledPitch[] {
+        if (staff.stringTuning.pitches.length > 0) {
+            return staff.stringTuning.pitches.slice();
         }
 
+        staff.showTablature = true;
+        staff.showStandardNotation = false;
+        const pitches: SpelledPitch[] = [];
+        const lowestC = SpelledPitch.fromValue(0, true);
+        for (let i = 0; i < staff.standardNotationLineCount; i++) {
+            pitches.push(lowestC);
+        }
+        return pitches;
+    }
+
+    private static _parseStaffTuning(element: XmlNode, pitches: SpelledPitch[]): void {
         const line: number = Number.parseInt(element.getAttribute('line'), 10);
         let tuningStep: string = 'C';
         let tuningOctave: string = '';
@@ -1996,19 +2005,27 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 case 'tuning-alter':
                     tuningAlter = Number.parseFloat(c.innerText);
+                    tuningAlter = Number.isNaN(tuningAlter) ? 0 : tuningAlter | 0; // no microtones supported
                     break;
                 case 'tuning-octave':
                     tuningOctave = c.innerText;
                     break;
             }
         }
-        const index = staff.tuning.length - line;
-        const natural = ModelUtils.parsePitch(tuningStep + tuningOctave);
-        staff.tuning[index] = (natural !== null ? natural.pitch.value : -1) + tuningAlter;
 
-        const isSpellableAlter = Number.isInteger(tuningAlter) && tuningAlter >= -2 && tuningAlter <= 2;
-        if (natural !== null && isSpellableAlter && index >= 0 && index < staff.tuning.length) {
-            spellings.set(index, new SpelledPitch(natural.pitch.step, tuningAlter, natural.pitch.octave));
+        // line 1 is the lowest string, the pitches start with the highest string
+        const index = pitches.length - line;
+        if (index < 0 || index >= pitches.length) {
+            return;
+        }
+
+        const natural = ModelUtils.parsePitch(tuningStep + tuningOctave);
+        if (natural === null) {
+            pitches[index] = SpelledPitch.fromValue(-1 + tuningAlter, true);
+        } else if (tuningAlter >= -2 && tuningAlter <= 2) {
+            pitches[index] = new SpelledPitch(natural.pitch.step, tuningAlter, natural.pitch.octave);
+        } else {
+            pitches[index] = SpelledPitch.fromValue(natural.pitch.value + tuningAlter, true);
         }
     }
 

@@ -392,11 +392,6 @@ export interface EngravingSettingsJson {
      */
     tuningGlyphStringRowPadding?: number;
     /**
-     * The scale of the accidentals shown next to the note names of tunings.
-     * @since 1.10.0
-     */
-    tuningGlyphAccidentalScale?: number;
-    /**
      * The relative scale of any directions glyphs drawn like coda or segno.
      */
     directionsScale?: number;

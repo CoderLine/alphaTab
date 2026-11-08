@@ -156,8 +156,6 @@ import { Score } from "@coderline/alphatab/model/Score";
 import { ScoreSerializer } from "@coderline/alphatab/generated/model/ScoreSerializer";
 import { Track } from "@coderline/alphatab/model/Track";
 import { SectionSerializer } from "@coderline/alphatab/generated/model/SectionSerializer";
-import { SpelledPitch } from "@coderline/alphatab/model/SpelledPitch";
-import { SpelledPitchSerializer } from "@coderline/alphatab/generated/model/SpelledPitchSerializer";
 import { Staff } from "@coderline/alphatab/model/Staff";
 import { StaffSerializer } from "@coderline/alphatab/generated/model/StaffSerializer";
 import { Tuning } from "@coderline/alphatab/model/Tuning";
@@ -173,6 +171,7 @@ import { TrackSerializer } from "@coderline/alphatab/generated/model/TrackSerial
 import { TremoloPickingEffectSerializer } from "@coderline/alphatab/generated/model/TremoloPickingEffectSerializer";
 import { TremoloPickingStyle } from "@coderline/alphatab/model/TremoloPickingEffect";
 import { TuningSerializer } from "@coderline/alphatab/generated/model/TuningSerializer";
+import { SpelledPitch } from "@coderline/alphatab/model/SpelledPitch";
 import { VoiceStyle } from "@coderline/alphatab/model/Voice";
 import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
 import { VoiceSubElement } from "@coderline/alphatab/model/Voice";
@@ -232,7 +231,6 @@ export class SerializerFill {
         { name: 'ScoreStyle', write: (o: unknown, w: IObjectWriter) => ScoreStyleSerializer.write(o as ScoreStyle, w), read: (o: unknown, r: IObjectReader) => ScoreStyleSerializer.read(o as ScoreStyle, r), fromJson: (o: unknown, r: IObjectReader) => ScoreStyleSerializer.read(o as ScoreStyle, r), create: () => new ScoreStyle() as unknown, fill: (o: unknown) => SerializerFill.fillScoreStyle(o as ScoreStyle) },
         { name: 'Score', write: (o: unknown, w: IObjectWriter) => ScoreSerializer.write(o as Score, w), read: (o: unknown, r: IObjectReader) => ScoreSerializer.read(o as Score, r), fromJson: (o: unknown, r: IObjectReader) => ScoreSerializer.read(o as Score, r), create: () => new Score() as unknown, fill: (o: unknown) => SerializerFill.fillScore(o as Score) },
         { name: 'Section', write: (o: unknown, w: IObjectWriter) => SectionSerializer.write(o as Section, w), read: (o: unknown, r: IObjectReader) => SectionSerializer.read(o as Section, r), fromJson: (o: unknown, r: IObjectReader) => SectionSerializer.read(o as Section, r), create: () => new Section() as unknown, fill: (o: unknown) => SerializerFill.fillSection(o as Section) },
-        { name: 'SpelledPitch', write: (o: unknown, w: IObjectWriter) => SpelledPitchSerializer.write(o as SpelledPitch, w), read: (o: unknown, r: IObjectReader) => SpelledPitchSerializer.read(o as SpelledPitch, r), fromJson: (o: unknown, r: IObjectReader) => SpelledPitchSerializer.read(o as SpelledPitch, r), create: () => new SpelledPitch() as unknown, fill: (o: unknown) => SerializerFill.fillSpelledPitch(o as SpelledPitch) },
         { name: 'Staff', write: (o: unknown, w: IObjectWriter) => StaffSerializer.write(o as Staff, w), read: (o: unknown, r: IObjectReader) => StaffSerializer.read(o as Staff, r), fromJson: (o: unknown, r: IObjectReader) => StaffSerializer.read(o as Staff, r), create: () => new Staff() as unknown, fill: (o: unknown) => SerializerFill.fillStaff(o as Staff) },
         { name: 'ScoreStaffConfig', write: (o: unknown, w: IObjectWriter) => ScoreStaffConfigSerializer.write(o as ScoreStaffConfig, w), read: (o: unknown, r: IObjectReader) => ScoreStaffConfigSerializer.read(o as ScoreStaffConfig, r), fromJson: (o: unknown, r: IObjectReader) => ScoreStaffConfigSerializer.readFlexible(o as ScoreStaffConfig, r), create: () => ({}) as unknown, fill: (o: unknown) => SerializerFill.fillScoreStaffConfig(o as ScoreStaffConfig) },
         { name: 'TabStaffConfig', write: (o: unknown, w: IObjectWriter) => TabStaffConfigSerializer.write(o as TabStaffConfig, w), read: (o: unknown, r: IObjectReader) => TabStaffConfigSerializer.read(o as TabStaffConfig, r), fromJson: (o: unknown, r: IObjectReader) => TabStaffConfigSerializer.readFlexible(o as TabStaffConfig, r), create: () => ({}) as unknown, fill: (o: unknown) => SerializerFill.fillTabStaffConfig(o as TabStaffConfig) },
@@ -431,7 +429,6 @@ export class SerializerFill {
         obj.tuningGlyphCircleNumberScale = 7.25;
         obj.tuningGlyphStringColumnScale = 7.25;
         obj.tuningGlyphStringRowPadding = 7.25;
-        obj.tuningGlyphAccidentalScale = 7.25;
         obj.directionsScale = 7.25;
         obj.multiVoiceDisplacedNoteHeadSpacing = 7.25;
         obj.staffContentPadding = 7.25;
@@ -1154,14 +1151,6 @@ export class SerializerFill {
         obj.marker = 'x ä€𝄞';
         obj.text = 'x ä€𝄞';
     }
-    public static fillSpelledPitch(obj: SpelledPitch, depth: number = 0): void {
-        if (depth > 8) {
-            return;
-        }
-        obj.step = 7.25;
-        obj.alter = 7.25;
-        obj.octave = 7.25;
-    }
     public static fillStaff(obj: Staff, depth: number = 0): void {
         if (depth > 8) {
             return;
@@ -1346,13 +1335,8 @@ export class SerializerFill {
         obj.isStandard = !obj.isStandard;
         obj.name = 'x ä€𝄞';
         {
-            obj.tunings = [7.25];
-        }
-        {
-            const v0 = new SpelledPitch();
-            SerializerFill.fillSpelledPitch(v0, depth + 1);
-            obj.spellings = [];
-            obj.spellings.push(v0);
+            obj.pitches = [];
+            obj.pitches.push(new SpelledPitch(3, 1, 4));
         }
     }
     public static fillVoiceStyle(obj: VoiceStyle, depth: number = 0): void {

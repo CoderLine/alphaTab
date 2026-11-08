@@ -305,15 +305,13 @@ describe('AlphaTexExporterTest', () => {
 
         const reimported = ScoreLoader.loadAlphaTex(exported);
         const tuning = reimported.tracks[0].staves[0].stringTuning;
-        expect(tuning.spellings!.map(s => s.toString())).toEqual(['D#4', 'Bb3', 'Gb3', 'C#3', 'Ab2', 'Eb2']);
+        expect(tuning.pitches.map(p => p.toString())).toEqual(['D#4', 'Bb3', 'Gb3', 'C#3', 'Ab2', 'Eb2']);
         ComparisonHelpers.alphaTexExportRoundtripEqual('tuning-spellings', reimported, score);
     });
 
-    it('tuning-without-spellings-uses-flats', () => {
+    it('tuning-values-use-flats', () => {
         const score = ScoreLoader.loadAlphaTex('\\tuning (E4 B3 G3 D3 A2 E2) . 0.6');
-        const tuning = score.tracks[0].staves[0].stringTuning;
-        tuning.tunings = [63, 58, 54, 49, 44, 39];
-        tuning.spellings = null;
+        score.tracks[0].staves[0].stringTuning.tunings = [63, 58, 54, 49, 44, 39];
         expect(exportAlphaTex(score)).toContain('\\tuning (Eb4 Bb3 Gb3 Db3 Ab2 Eb2)');
     });
 

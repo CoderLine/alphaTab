@@ -871,8 +871,8 @@ describe('Gp7ExporterTest', () => {
         for (let i = 0; i < expected.tracks.length; i++) {
             const expectedTuning = expected.tracks[i].staves[0].stringTuning;
             const actualTuning = actual.tracks[i].staves[0].stringTuning;
-            expect(actualTuning.tunings.map((_, s) => actualTuning.getSpelling(s).toString())).toEqual(
-                expectedTuning.tunings.map((_, s) => expectedTuning.getSpelling(s).toString())
+            expect(actualTuning.pitches.map(p => p.toString())).toEqual(
+                expectedTuning.pitches.map(p => p.toString())
             );
         }
     });

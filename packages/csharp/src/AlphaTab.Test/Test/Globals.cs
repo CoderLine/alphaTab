@@ -34,6 +34,11 @@ internal static class TestGlobals
         return new Expector<Action>(actual);
     }
 
+    public static Expector<Action> Expect(Action actual, string message)
+    {
+        return new Expector<Action>(actual, message);
+    }
+
     public static void Fail(object? message)
     {
         Assert.Fail(Convert.ToString(message) ?? string.Empty);

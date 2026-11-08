@@ -46,8 +46,7 @@ export class Tuning {
      */
     public static getDefaultTuningFor(stringCount: number): Tuning | null {
         if (Tuning._defaultTunings.has(stringCount)) {
-            const d = Tuning._defaultTunings.get(stringCount)!;
-            return new Tuning(d.name, d.tunings, d.isStandard);
+            return Tuning._defaultTunings.get(stringCount)!._copy();
         }
         return null;
     }
@@ -137,6 +136,10 @@ export class Tuning {
      * @returns The known tuning.
      */
     public static findTuning(strings: number[]): Tuning | null {
+        return Tuning._findPreset(strings)?._copy() ?? null;
+    }
+
+    private static _findPreset(strings: number[]): Tuning | null {
         const tunings: Tuning[] = Tuning.getPresetsFor(strings.length);
         for (let t: number = 0, tc: number = tunings.length; t < tc; t++) {
             const tuning: Tuning = tunings[t];
@@ -148,10 +151,16 @@ export class Tuning {
                 }
             }
             if (equals) {
-                return new Tuning(tuning.name, tuning.tunings, tuning.isStandard);
+                return tuning;
             }
         }
         return null;
+    }
+
+    private _copy(): Tuning {
+        const copy = new Tuning(this.name, null, this.isStandard);
+        copy.pitches = this._pitches.slice();
+        return copy;
     }
 
     /**
@@ -164,19 +173,36 @@ export class Tuning {
      */
     public name: string;
 
-    /**
-     * Gets or sets the values for each string of the instrument.
-     */
-    public tunings: number[];
+    private _pitches: SpelledPitch[] = [];
+    private _tunings: number[] = [];
 
     /**
-     * Gets or sets the written pitches of the strings in the same order as {@link tunings},
-     * or null if the spelling of the strings is not known.
-     * An entry is only used while its {@link SpelledPitch.value} matches the value in {@link tunings}.
-     * Use {@link getSpelling} to get the written pitch of a string.
+     * Gets or sets the MIDI values of the strings, starting with the highest string.
+     * The values are taken from {@link pitches}: setting them spells the strings with flats,
+     * changing the returned array does not change the tuning.
+     * @json_read_only
+     */
+    public get tunings(): number[] {
+        return this._tunings;
+    }
+
+    public set tunings(value: number[]) {
+        this.pitches = value.map(v => SpelledPitch.fromValue(v, true));
+    }
+
+    /**
+     * Gets or sets the written pitches of the strings, starting with the highest string.
+     * Changing the returned array does not change the tuning, assign a new array instead.
      * @since 1.10.0
      */
-    public spellings: SpelledPitch[] | null = null;
+    public get pitches(): SpelledPitch[] {
+        return this._pitches;
+    }
+
+    public set pitches(value: SpelledPitch[]) {
+        this._pitches = value;
+        this._tunings = value.map(p => p.value);
+    }
 
     /**
      * Initializes a new instance of the {@link Tuning} class.
@@ -187,33 +213,15 @@ export class Tuning {
     public constructor(name: string = '', tuning: number[] | null = null, isStandard: boolean = false) {
         this.isStandard = isStandard;
         this.name = name;
-        this.tunings = tuning ?? [];
-    }
-
-    /**
-     * Gets the written pitch of a string.
-     * @param index The index of the string within {@link tunings}.
-     * @returns The entry of {@link spellings} if it matches the tuning value of the string,
-     * otherwise the tuning value spelled with flats.
-     * @since 1.10.0
-     */
-    public getSpelling(index: number): SpelledPitch {
-        const value = this.tunings[index];
-        const spellings = this.spellings;
-        if (spellings !== null && index < spellings.length) {
-            const spelling = spellings[index];
-            if (spelling.value === value) {
-                return spelling;
-            }
+        if (tuning !== null) {
+            this.tunings = tuning;
         }
-        return SpelledPitch.fromValue(value, true);
     }
 
     public reset() {
         this.isStandard = false;
         this.name = '';
-        this.tunings = [];
-        this.spellings = null;
+        this.pitches = [];
     }
 
     /**
@@ -221,7 +229,7 @@ export class Tuning {
      * on the string values.
      */
     public finish() {
-        const knownTuning = Tuning.findTuning(this.tunings);
+        const knownTuning = Tuning._findPreset(this._tunings);
         if (knownTuning) {
             if (this.name.length === 0) {
                 this.name = knownTuning.name;

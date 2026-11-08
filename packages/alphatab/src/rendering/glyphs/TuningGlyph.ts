@@ -1,10 +1,9 @@
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
 import type { Tuning } from '@coderline/alphatab/model/Tuning';
-import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
-import { PitchNameGlyph } from '@coderline/alphatab/rendering/glyphs/PitchNameGlyph';
 import type { Color } from '@coderline/alphatab/model/Color';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
@@ -86,11 +85,18 @@ export class TuningGlyph extends GlyphGroup {
         let nameWidth = this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width;
 
         // strings are only listed for non-standard tunings
-        let names: PitchNameGlyph[] | null = null;
+        let names: TextGlyph[] | null = null;
         if (!tuning.isStandard) {
             names = [];
-            for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
-                const name = new PitchNameGlyph(0, 0, ' = ', tuning.getSpelling(i), font);
+            for (const pitch of tuning.pitches) {
+                const name = new TextGlyph(
+                    0,
+                    0,
+                    ` = ${pitch.toDisplayNameString()}`,
+                    font,
+                    TextAlign.Left,
+                    TextBaseline.Middle
+                );
                 name.renderer = this.renderer;
                 name.doLayout();
                 nameWidth = Math.max(nameWidth, name.width);

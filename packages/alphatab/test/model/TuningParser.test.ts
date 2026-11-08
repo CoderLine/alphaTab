@@ -16,10 +16,10 @@ describe('TuningParserTest', () => {
         expect(tuningText2.join(',')).toBe(tuningText.join(','));
     });
 
-    describe('getSpelling', () => {
+    describe('pitches', () => {
         function createTuning(): Tuning {
-            const tuning = new Tuning('', [63, 58, 54, 49, 44, 39]);
-            tuning.spellings = [
+            const tuning = new Tuning();
+            tuning.pitches = [
                 new SpelledPitch(1, 1, 4),
                 new SpelledPitch(6, -1, 3),
                 new SpelledPitch(3, 1, 3),
@@ -30,49 +30,36 @@ describe('TuningParserTest', () => {
             return tuning;
         }
 
-        it('uses-stored-spelling', () => {
+        it('tunings-from-pitches', () => {
             const tuning = createTuning();
-            expect(tuning.tunings.map((_, i) => tuning.getSpelling(i).toString())).toEqual([
-                'D#4',
-                'Bb3',
-                'F#3',
-                'C#3',
-                'Ab2',
-                'Eb2'
-            ]);
+            expect(tuning.tunings).toEqual([63, 58, 54, 49, 44, 39]);
+            expect(tuning.pitches.map(p => p.toString())).toEqual(['D#4', 'Bb3', 'F#3', 'C#3', 'Ab2', 'Eb2']);
         });
 
-        it('falls-back-without-spellings', () => {
+        it('tunings-spelled-with-flats', () => {
             const tuning = createTuning();
-            tuning.spellings = null;
-            expect(tuning.tunings.map((_, i) => tuning.getSpelling(i).toString())).toEqual([
-                'Eb4',
-                'Bb3',
-                'Gb3',
-                'Db3',
-                'Ab2',
-                'Eb2'
-            ]);
+            tuning.tunings = [64, 61, 54, 49, 44, 40];
+            expect(tuning.tunings).toEqual([64, 61, 54, 49, 44, 40]);
+            expect(tuning.pitches.map(p => p.toString())).toEqual(['E4', 'Db4', 'Gb3', 'Db3', 'Ab2', 'E2']);
         });
 
-        it('falls-back-on-changed-tuning-value', () => {
-            const tuning = createTuning();
-            tuning.tunings[2] = 55;
-            expect(tuning.getSpelling(2).toString()).toBe('G3');
-            expect(tuning.getSpelling(3).toString()).toBe('C#3');
+        it('constructor-spelled-with-flats', () => {
+            const tuning = new Tuning('Test', [63, 58]);
+            expect(tuning.pitches.map(p => p.toString())).toEqual(['Eb4', 'Bb3']);
         });
 
-        it('falls-back-on-missing-entries', () => {
-            const tuning = createTuning();
-            tuning.spellings = tuning.spellings!.slice(0, 2);
-            expect(tuning.getSpelling(1).toString()).toBe('Bb3');
-            expect(tuning.getSpelling(2).toString()).toBe('Gb3');
-        });
-
-        it('reset-clears-spellings', () => {
+        it('reset-clears-strings', () => {
             const tuning = createTuning();
             tuning.reset();
-            expect(tuning.spellings).toBeNull();
+            expect(tuning.tunings).toHaveLength(0);
+            expect(tuning.pitches).toHaveLength(0);
+        });
+
+        it('presets-are-copies', () => {
+            const tuning = Tuning.getDefaultTuningFor(6)!;
+            tuning.pitches = [new SpelledPitch(1, 1, 4)];
+            expect(Tuning.getDefaultTuningFor(6)!.tunings).toEqual([64, 59, 55, 50, 45, 40]);
+            expect(Tuning.findTuning([64, 59, 55, 50, 45, 40])!.pitches).toHaveLength(6);
         });
     });
 });

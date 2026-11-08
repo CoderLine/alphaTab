@@ -118,8 +118,8 @@ export class GpifWriter {
                 // routes through staff.tuning — needs to match the tuning we
                 // gave the assigner. The notes are modified, hence the
                 // Gp7Exporter passes a copy of the input score.
-                const savedTunings = staff.tuning;
-                if (needsFingering && stringedTuning !== null && savedTunings.length === 0) {
+                const savedPitches = staff.stringTuning.pitches;
+                if (needsFingering && stringedTuning !== null && savedPitches.length === 0) {
                     staff.stringTuning.tunings = stringedTuning.slice();
                 }
 
@@ -151,7 +151,7 @@ export class GpifWriter {
                         }
                     }
                 }
-                staff.stringTuning.tunings = savedTunings;
+                staff.stringTuning.pitches = savedPitches;
             }
         }
     }
@@ -1345,12 +1345,12 @@ export class GpifWriter {
      */
     private static _isTuningFlat(staff: Staff, tuning: number[]): boolean {
         const stringTuning = staff.stringTuning;
-        if (tuning !== stringTuning.tunings || stringTuning.spellings === null) {
+        if (tuning !== stringTuning.tunings) {
             return true;
         }
         let hasSharp = false;
-        for (let i = 0; i < tuning.length; i++) {
-            const alter = stringTuning.getSpelling(i).alter;
+        for (const pitch of stringTuning.pitches) {
+            const alter = pitch.alter;
             if (alter < 0) {
                 return true;
             }

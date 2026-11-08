@@ -68,4 +68,42 @@ describe('SpelledPitchTests', () => {
             }
         });
     });
+
+    describe('json', () => {
+        it('writes-name', () => expect(SpelledPitch.toJson(new SpelledPitch(4, -1, 3))).toBe('Gb3'));
+        it('reads-name', () => expect(SpelledPitch.fromJson('F#3')!.toString()).toBe('F#3'));
+        it('reads-double-accidentals', () => {
+            expect(SpelledPitch.fromJson('C##4')!.toString()).toBe('C##4');
+            expect(SpelledPitch.fromJson('Bbb2')!.toString()).toBe('Bbb2');
+        });
+        it('reads-negative-octave', () => expect(SpelledPitch.fromJson('C-1')!.value).toBe(0));
+        it('reads-value-as-flat', () => expect(SpelledPitch.fromJson(63)!.toString()).toBe('Eb4'));
+        it('reads-null', () => expect(SpelledPitch.fromJson(null)).toBeNull());
+        it('round-trips-all-spellings', () => {
+            for (let step = 0; step < 7; step++) {
+                for (let alter = -2; alter <= 2; alter++) {
+                    const pitch = new SpelledPitch(step, alter, 3);
+                    const read = SpelledPitch.fromJson(SpelledPitch.toJson(pitch))!;
+                    expect(read.step).toBe(step);
+                    expect(read.alter).toBe(alter);
+                    expect(read.octave).toBe(3);
+                }
+            }
+        });
+        it('rejects-invalid', () => {
+            for (const invalid of ['', 'H4', 'C', 'C#', 'C###4', 'Cb#4', 'C4x', '4']) {
+                expect(() => SpelledPitch.fromJson(invalid), invalid).toThrow();
+            }
+        });
+    });
+
+    describe('display', () => {
+        it('symbols', () => {
+            expect(new SpelledPitch(3, 1, 3).toDisplayNameString()).toBe('F\u266F');
+            expect(new SpelledPitch(4, -1, 3).toDisplayNameString()).toBe('G\u266D');
+            expect(new SpelledPitch(0, 2, 3).toDisplayNameString()).toBe('C\uD834\uDD2A');
+            expect(new SpelledPitch(6, -2, 3).toDisplayNameString()).toBe('B\uD834\uDD2B');
+            expect(new SpelledPitch(2, 0, 3).toDisplayNameString()).toBe('E');
+        });
+    });
 });

@@ -1,9 +1,11 @@
+import { FormatError } from '@coderline/alphatab/FormatError';
+
 /**
  * A pitch as it is written in notation: a diatonic step with an accidental in an octave.
  * Enharmonic spellings like `F#3` and `Gb3` share the same {@link value} but are distinct pitches.
+ * Pitches are immutable, in JSON they are written as text like `F#3`.
  * @since 1.10.0
- * @json
- * @json_strict
+ * @json_immutable
  * @public
  */
 export class SpelledPitch {
@@ -42,24 +44,27 @@ export class SpelledPitch {
         'B'
     ];
 
+    // indexed by step * 5 + alter + 2
+    private static readonly _displayNames: string[] = SpelledPitch._buildDisplayNames();
+
     /**
      * The diatonic step (letter) of the pitch: 0 = C, 1 = D, 2 = E, 3 = F, 4 = G, 5 = A, 6 = B.
      * @since 1.10.0
      */
-    public step: number;
+    public readonly step: number;
 
     /**
      * The accidental of the pitch in semitones: -2 = double flat, -1 = flat, 0 = natural, 1 = sharp, 2 = double sharp.
      * @since 1.10.0
      */
-    public alter: number;
+    public readonly alter: number;
 
     /**
      * The octave of the written step in scientific pitch notation (`C4` is the middle C).
      * The accidental does not change the octave: `B#3` sounds like `C4` and `Cb4` sounds like `B3`.
      * @since 1.10.0
      */
-    public octave: number;
+    public readonly octave: number;
 
     /**
      * Initializes a new instance of the {@link SpelledPitch} class.
@@ -103,6 +108,110 @@ export class SpelledPitch {
      */
     public toString(): string {
         return this.toNameString() + this.octave.toString();
+    }
+
+    /**
+     * The written name of the pitch without octave with the accidental as music symbol character, like `F♯`.
+     * @internal
+     */
+    public toDisplayNameString(): string {
+        if (this.alter < -2 || this.alter > 2) {
+            return this.toNameString();
+        }
+        return SpelledPitch._displayNames[this.step * 5 + this.alter + 2];
+    }
+
+    private static _buildDisplayNames(): string[] {
+        // double flat, flat, natural, sharp, double sharp
+        const accidentals = ['\uD834\uDD2B', '\u266D', '', '\u266F', '\uD834\uDD2A'];
+        const names: string[] = [];
+        for (const step of SpelledPitch._stepNames) {
+            for (const accidental of accidentals) {
+                names.push(step + accidental);
+            }
+        }
+        return names;
+    }
+
+    /**
+     * Creates a pitch from its JSON representation: the written name with octave like `F#3`,
+     * or a MIDI value which is spelled with flats.
+     * @internal
+     */
+    public static fromJson(v: unknown): SpelledPitch | null {
+        if (v === null || v === undefined) {
+            return null;
+        }
+
+        if (v instanceof SpelledPitch) {
+            return v;
+        }
+
+        switch (typeof v) {
+            case 'number':
+                return SpelledPitch.fromValue(v as number, true);
+            case 'string': {
+                const pitch = SpelledPitch._parseName(v as string);
+                if (pitch !== null) {
+                    return pitch;
+                }
+                break;
+            }
+        }
+        throw new FormatError('Unsupported format for spelled pitch');
+    }
+
+    /**
+     * @internal
+     */
+    public static toJson(obj: SpelledPitch | null): string | null {
+        return obj === null ? null : obj.toString();
+    }
+
+    /**
+     * Parses the text written by {@link toString}.
+     */
+    private static _parseName(text: string): SpelledPitch | null {
+        if (text.length < 2) {
+            return null;
+        }
+        const step = SpelledPitch.stepForLetter(text.charCodeAt(0));
+        if (step < 0) {
+            return null;
+        }
+
+        let i = 1;
+        let alter = 0;
+        while (i < text.length && text.charCodeAt(i) === 0x23 /* # */) {
+            alter++;
+            i++;
+        }
+        if (alter === 0) {
+            while (i < text.length && text.charCodeAt(i) === 0x62 /* b */) {
+                alter--;
+                i++;
+            }
+        }
+        if (alter < -2 || alter > 2) {
+            return null;
+        }
+
+        const octaveStart = i;
+        if (i < text.length && text.charCodeAt(i) === 0x2d /* - */) {
+            i++;
+        }
+        if (i === text.length) {
+            return null;
+        }
+        while (i < text.length) {
+            const c = text.charCodeAt(i);
+            if (c < 0x30 || c > 0x39) {
+                return null;
+            }
+            i++;
+        }
+
+        return new SpelledPitch(step, alter, Number.parseInt(text.substring(octaveStart), 10));
     }
 
     /**

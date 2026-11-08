@@ -91,7 +91,6 @@ export class EngravingSettingsCloner {
         clone.tuningGlyphCircleNumberScale = original.tuningGlyphCircleNumberScale;
         clone.tuningGlyphStringColumnScale = original.tuningGlyphStringColumnScale;
         clone.tuningGlyphStringRowPadding = original.tuningGlyphStringRowPadding;
-        clone.tuningGlyphAccidentalScale = original.tuningGlyphAccidentalScale;
         clone.directionsScale = original.directionsScale;
         clone.multiVoiceDisplacedNoteHeadSpacing = original.multiVoiceDisplacedNoteHeadSpacing;
         clone.staffContentPadding = original.staffContentPadding;

@@ -398,8 +398,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 staff.capo = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                 return ApplyNodeResult.Applied;
             case 'tuning':
-                const tuning: number[] = [];
-                const spellings: SpelledPitch[] = [];
+                const pitches: SpelledPitch[] = [];
                 let hideTuning = false;
                 let tuningName = '';
                 for (let i = 0; i < metaData.arguments!.arguments.length; i++) {
@@ -426,9 +425,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         default:
                             const t = ModelUtils.parsePitch(text);
                             if (t) {
-                                tuning.push(t.pitch.value);
-                                spellings.push(t.pitch);
-                            } else if (i === metaData.arguments!.arguments.length - 1 && tuning.length > 0) {
+                                pitches.push(t.pitch);
+                            } else if (i === metaData.arguments!.arguments.length - 1 && pitches.length > 0) {
                                 tuningName = text;
                                 importer.addSemanticDiagnostic({
                                     code: AlphaTexDiagnosticCode.AT305,
@@ -455,8 +453,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 importer.state.staffHasExplicitTuning.add(staff);
                 importer.state.staffTuningApplied.delete(staff);
                 staff.stringTuning = new Tuning();
-                staff.stringTuning.tunings = tuning;
-                staff.stringTuning.spellings = spellings.length > 0 ? spellings : null;
+                staff.stringTuning.pitches = pitches;
                 staff.stringTuning.name = tuningName;
 
                 this._tuningProperties(importer, staff, staff.stringTuning, metaData);
@@ -3252,9 +3249,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             const tuning = Atnf.meta(
                 'tuning',
                 Atnf.args(
-                    staff.stringTuning.tunings.map(
-                        (_, i) => Atnf.ident(staff.stringTuning.getSpelling(i).toString()) as IAlphaTexArgumentValue
-                    )
+                    staff.stringTuning.pitches.map(p => Atnf.ident(p.toString()) as IAlphaTexArgumentValue)
                 )
             );
             nodes.push(tuning);

@@ -1,6 +1,7 @@
 import { MapObjectReader } from '@coderline/alphatab/io/MapObjectReader';
 import { describe, expect, it } from 'vitest';
 import { NoteSerializer } from '@coderline/alphatab/generated/model/NoteSerializer';
+import { TuningSerializer } from '@coderline/alphatab/generated/model/TuningSerializer';
 import { SettingsSerializer } from '@coderline/alphatab/generated/SettingsSerializer';
 import { AlphaTexImporter } from '@coderline/alphatab/importer/AlphaTexImporter';
 import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
@@ -15,6 +16,7 @@ import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { Note, NoteStyle, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
+import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { TrackStyle, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { VoiceStyle, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
@@ -511,11 +513,9 @@ describe('JsonConverterTest', () => {
         expect(drum.realValue).toBe(42);
     });
 
-    it('tuning-spellings', () => {
+    it('tuning-pitches', () => {
         const expected = ScoreLoader.loadAlphaTex('\\tuning E4 B3 G3 D3 A2 E2 . 0.6');
-        const tuning = expected.tracks[0].staves[0].stringTuning;
-        tuning.tunings = [63, 58, 54, 49, 44, 39];
-        tuning.spellings = [
+        expected.tracks[0].staves[0].stringTuning.pitches = [
             new SpelledPitch(1, 1, 4),
             new SpelledPitch(6, -1, 3),
             new SpelledPitch(3, 1, 3),
@@ -527,15 +527,30 @@ describe('JsonConverterTest', () => {
         const actual = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(expected));
         const actualTuning = actual.tracks[0].staves[0].stringTuning;
         expect(actualTuning.tunings).toEqual([63, 58, 54, 49, 44, 39]);
-        expect(actualTuning.spellings!.map(s => s.toString())).toEqual(['D#4', 'Bb3', 'F#3', 'C#3', 'Ab2', 'Eb2']);
+        expect(actualTuning.pitches.map(p => p.toString())).toEqual(['D#4', 'Bb3', 'F#3', 'C#3', 'Ab2', 'Eb2']);
     });
 
-    it('tuning-spellings-unknown', () => {
-        const expected = ScoreLoader.loadAlphaTex('\\tuning E4 B3 G3 D3 A2 E2 . 0.6');
-        expected.tracks[0].staves[0].stringTuning.spellings = null;
+    function tuningFromJson(raw: Map<string, unknown>): Tuning {
+        const tuning = new Tuning();
+        TuningSerializer.read(tuning, new MapObjectReader(raw));
+        return tuning;
+    }
 
-        const json = JsonConverter.scoreToJsObject(expected);
-        const actual = JsonConverter.jsObjectToScore(json);
-        expect(actual.tracks[0].staves[0].stringTuning.spellings).toBeNull();
+    it('tuning-pitches-json', () => {
+        const names: string[] = ['D#4', 'bb3', 'Cbb-1'];
+        const tuning = tuningFromJson(new Map<string, unknown>([['pitches', names]]));
+        expect(tuning.pitches.map(p => p.toString())).toEqual(['D#4', 'Bb3', 'Cbb-1']);
+        expect(tuning.tunings).toEqual([63, 58, -2]);
+
+        // MIDI values are spelled with flats
+        const values: unknown[] = [54];
+        expect(tuningFromJson(new Map<string, unknown>([['pitches', values]])).pitches[0].toString()).toBe('Gb3');
+    });
+
+    it('tuning-legacy-json', () => {
+        // up to 1.9 the strings were stored as MIDI values
+        const values: number[] = [63, 58, 54];
+        const tuning = tuningFromJson(new Map<string, unknown>([['tunings', values]]));
+        expect(tuning.pitches.map(p => p.toString())).toEqual(['Eb4', 'Bb3', 'Gb3']);
     });
 });

@@ -7,13 +7,12 @@ import { Tuning } from "@coderline/alphatab/model/Tuning";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
 import { RecordFields } from "@coderline/alphatab/io/RecordFields";
 import { SpelledPitch } from "@coderline/alphatab/model/SpelledPitch";
-import { SpelledPitchSerializer } from "@coderline/alphatab/generated/model/SpelledPitchSerializer";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class TuningSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["isstandard", "name", "tunings", "spellings"]);
+    private static readonly _fields: RecordFields = new RecordFields(["isstandard", "name", "tunings", "pitches"]);
     public static read(obj: Tuning, reader: IObjectReader): void {
         reader.readRecord(TuningSerializer._fields, (id, k, r) => {
             switch (id) {
@@ -27,21 +26,18 @@ export class TuningSerializer {
                     obj.tunings = r.readValue()! as number[];
                     return true;
                 case 3:
-                    TuningSerializer._readSpellings(obj, r);
+                    TuningSerializer._readPitches(obj, r);
                     return true;
             }
             return false;
         });
     }
-    private static _readSpellings(obj: Tuning, r: IObjectReader): void {
-        if (!r.isNullish()) {
-            obj.spellings = [];
-            r.readArray(rr => {
-                const i = new SpelledPitch();
-                SpelledPitchSerializer.read(i, rr);
-                obj.spellings!.push(i);
-            });
-        }
+    private static _readPitches(obj: Tuning, r: IObjectReader): void {
+        const items: SpelledPitch[] = [];
+        r.readArray(rr => {
+            items.push(SpelledPitch.fromJson(rr.readValue())!);
+        });
+        obj.pitches = items;
     }
     public static write(obj: Tuning | null | undefined, w: IObjectWriter): void {
         if (!obj) {
@@ -51,14 +47,11 @@ export class TuningSerializer {
         w.startObject(TuningSerializer._fields);
         w.booleanField(0, obj.isStandard);
         w.stringField(1, obj.name);
-        w.valueField(2, obj.tunings);
-        if (obj.spellings !== null) {
-            w.arrayField(3, obj.spellings!.length);
-            for (const i of obj.spellings!) {
-                SpelledPitchSerializer.write(i, w);
-            }
-            w.endArray();
+        w.arrayField(3, obj.pitches!.length);
+        for (const i of obj.pitches!) {
+            w.writeValue(SpelledPitch.toJson(i));
         }
+        w.endArray();
         w.endObject();
     }
 }
