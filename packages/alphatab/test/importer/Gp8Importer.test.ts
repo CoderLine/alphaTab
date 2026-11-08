@@ -558,6 +558,21 @@ describe('Gp8ImporterTest', () => {
         expect(checkPercussionStrings(orphan)).toBe(1301);
     });
 
+    it('tuning-alteration', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/tuning-alteration.gp')).readScore();
+        const spellings = score.tracks.map(t => {
+            const tuning = t.staves[0].stringTuning;
+            return tuning.tunings.map((_, i) => tuning.getSpelling(i).toString()).join(' ');
+        });
+        expect(spellings).toEqual([
+            'D#4 A#3 F#3 C#3 G#2 D#2',
+            'Eb4 Bb3 Gb3 Db3 Ab2 Eb2',
+            'D#4 A#3 F#3 C#3 G#2 C#2',
+            'E4 B3 G3 D3 A2 E2'
+        ]);
+        expect(score.tracks.every(t => t.staves[0].stringTuning.spellings !== null)).toBe(true);
+    });
+
     it('tuning-before-staff', async () =>{
         const reader = await prepareImporterWithFile('guitarpro8/tuning-before-staff.gp');
         const score = reader.readScore();

@@ -402,4 +402,20 @@ describe('GpxImporterTest', () => {
         expect(drums.showTablature).toBe(true);
         expect(drums.showStandardNotation).toBe(true);
     });
+
+    it('tuning-alteration', async () => {
+        // the GP6 format has no sharp or flat preference for tunings
+        const score = (await prepareImporterWithFile('guitarpro6/tuning-alteration.gpx')).readScore();
+        const spellings = score.tracks.map(t => {
+            const tuning = t.staves[0].stringTuning;
+            expect(tuning.spellings).toBeNull();
+            return tuning.tunings.map((_, i) => tuning.getSpelling(i).toString()).join(' ');
+        });
+        expect(spellings).toEqual([
+            'Eb4 Bb3 Gb3 Db3 Ab2 Eb2',
+            'Eb4 Bb3 Gb3 Db3 Ab2 Eb2',
+            'Eb4 Bb3 Gb3 Db3 Ab2 Db2',
+            'E4 B3 G3 D3 A2 E2'
+        ]);
+    });
 });

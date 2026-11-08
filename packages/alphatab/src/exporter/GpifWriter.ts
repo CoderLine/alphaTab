@@ -1259,6 +1259,7 @@ export class GpifWriter {
             }
         }
         this._tuningByStaff.set(staff, tuning);
+        const isTuningFlat = GpifWriter._isTuningFlat(staff, tuning);
 
         if (tuning.length > 0) {
             const tuningProperty = properties.addElement('Property');
@@ -1266,7 +1267,9 @@ export class GpifWriter {
             tuningProperty.addElement('Pitches').innerText = tuning.slice().reverse().join(' ');
             tuningProperty.addElement('Label').setCData(tuningName);
             tuningProperty.addElement('LabelVisible').innerText = tuningName ? 'true' : 'false';
-            tuningProperty.addElement('Flat');
+            if (isTuningFlat) {
+                tuningProperty.addElement('Flat');
+            }
 
             if (staff.isPercussion) {
                 tuningProperty.addElement('Instrument').innerText = 'Undefined';
@@ -1328,10 +1331,34 @@ export class GpifWriter {
             staff.tuning.map(_ => '0').join('')
         );
 
-        this._writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
+        if (isTuningFlat) {
+            this._writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
+        }
 
         this._writeDiagramCollection(properties, staff, 'DiagramCollection');
         this._writeDiagramCollection(properties, staff, 'DiagramWorkingSet');
+    }
+
+    /**
+     * Guitar Pro stores one sharp or flat preference per tuning.
+     * Sharps are written if every string with an accidental is spelled with a sharp, otherwise flats.
+     */
+    private static _isTuningFlat(staff: Staff, tuning: number[]): boolean {
+        const stringTuning = staff.stringTuning;
+        if (tuning !== stringTuning.tunings || stringTuning.spellings === null) {
+            return true;
+        }
+        let hasSharp = false;
+        for (let i = 0; i < tuning.length; i++) {
+            const alter = stringTuning.getSpelling(i).alter;
+            if (alter < 0) {
+                return true;
+            }
+            if (alter > 0) {
+                hasSharp = true;
+            }
+        }
+        return !hasSharp;
     }
 
     private _writeDiagramCollection(properties: XmlNode, staff: Staff, name: string) {

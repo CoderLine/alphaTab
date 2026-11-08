@@ -829,4 +829,60 @@ describe('Gp7ExporterTest', () => {
 
         // await TestPlatform.saveFile('test-data/exporter/articulations.exported.gp', exported);
     });
+
+    function readTuningFlags(exported: Uint8Array): boolean[] {
+        const settings = new Settings();
+        const zip = new ZipReader(ByteBuffer.fromBuffer(exported), settings.importer.maxDecodingBufferSize).read();
+        const gpif = IOHelper.toString(zip.find(e => e.fileName === 'score.gpif')!.data, settings.importer.encoding);
+        const xml = new XmlDocument();
+        xml.parse(gpif);
+
+        const flags: boolean[] = [];
+        for (const track of xml.findChildElement('GPIF')!.findChildElement('Tracks')!.childElements()) {
+            const staffProps = track
+                .findChildElement('Staves')!
+                .findChildElement('Staff')!
+                .findChildElement('Properties')!;
+            let tuningFlat = false;
+            let flat = false;
+            for (const prop of staffProps.childElements()) {
+                const name = prop.getAttribute('name');
+                if (name === 'Tuning') {
+                    flat = prop.findChildElement('Flat') !== null;
+                } else if (name === 'TuningFlat') {
+                    tuningFlat = true;
+                }
+            }
+            // both are written together
+            expect(tuningFlat).toBe(flat);
+            flags.push(flat);
+        }
+        return flags;
+    }
+
+    it('tuning-alteration', async () => {
+        const expected = (await loadScore('guitarpro8/tuning-alteration.gp'))!;
+        const exported = exportGp7(expected);
+
+        // tunings without accidentals keep the flat preference
+        expect(readTuningFlags(exported)).toEqual([false, true, false, true]);
+
+        const actual = prepareImporterWithBytes(exported).readScore();
+        for (let i = 0; i < expected.tracks.length; i++) {
+            const expectedTuning = expected.tracks[i].staves[0].stringTuning;
+            const actualTuning = actual.tracks[i].staves[0].stringTuning;
+            expect(actualTuning.tunings.map((_, s) => actualTuning.getSpelling(s).toString())).toEqual(
+                expectedTuning.tunings.map((_, s) => expectedTuning.getSpelling(s).toString())
+            );
+        }
+    });
+
+    it('tuning-alteration-mixed', async () => {
+        // Guitar Pro has one preference per tuning: mixed spellings are written with flats
+        const score = ScoreLoader.loadAlphaTex('\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Eb2) . 0.6');
+        expect(readTuningFlags(exportGp7(score))).toEqual([true]);
+
+        const sharp = ScoreLoader.loadAlphaTex('\\tuning (D#4 A#3 F#3 C#3 G#2 D#2) . 0.6');
+        expect(readTuningFlags(exportGp7(sharp))).toEqual([false]);
+    });
 });

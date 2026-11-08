@@ -44,6 +44,7 @@ import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
@@ -1000,6 +1001,13 @@ export class GpifParser {
                             staff.stringTuning.name = c.innerText;
                             break;
                     }
+                }
+
+                // GP7+ stores one sharp or flat preference per tuning, GP6 stores none
+                if (!this.isGp6) {
+                    const preferFlat = node.findChildElement('Flat') !== null;
+                    const tunings = staff.stringTuning.tunings;
+                    staff.stringTuning.spellings = tunings.map(v => SpelledPitch.fromValue(v, preferFlat));
                 }
 
                 break;
