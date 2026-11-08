@@ -46,11 +46,11 @@ repositories {
 
 dependencies {
     // Android apps:
-    implementation("net.alphatab:alphaTab:1.10.0")
+    implementation("net.alphatab:alphaTab:{{alphaTabVersion}}")
 
     // JVM applications, with the native Skia library of the target OS:
-    // implementation("net.alphatab:alphaTab-core:1.10.0")
-    // implementation("net.alphatab:alphaSkia-linux:3.5.147")
+    // implementation("net.alphatab:alphaTab-core:{{alphaTabVersion}}")
+    // implementation("net.alphatab:alphaSkia-linux:{{alphaSkiaVersion}}")
 }
 ```
 
@@ -69,11 +69,11 @@ repositories {
 
 dependencies {
     // Android apps:
-    implementation "net.alphatab:alphaTab:1.10.0"
+    implementation "net.alphatab:alphaTab:{{alphaTabVersion}}"
 
     // JVM applications, with the native Skia library of the target OS:
-    // implementation "net.alphatab:alphaTab-core:1.10.0"
-    // implementation "net.alphatab:alphaSkia-linux:3.5.147"
+    // implementation "net.alphatab:alphaTab-core:{{alphaTabVersion}}"
+    // implementation "net.alphatab:alphaSkia-linux:{{alphaSkiaVersion}}"
 }
 ```
 
@@ -87,13 +87,13 @@ dependencies {
         <dependency>
             <groupId>net.alphatab</groupId>
             <artifactId>alphaTab-core</artifactId>
-            <version>1.10.0</version>
+            <version>{{alphaTabVersion}}</version>
         </dependency>
         <!-- The native Skia library of the target OS: -->
         <dependency>
             <groupId>net.alphatab</groupId>
             <artifactId>alphaSkia-linux</artifactId>
-            <version>3.5.147</version>
+            <version>{{alphaSkiaVersion}}</version>
         </dependency>
     </dependencies>
 </project>
@@ -104,7 +104,7 @@ dependencies {
 
 ## Render on the JVM {#render-on-the-jvm}
 
-On a JVM, alphaTab renders through alphaSkia, which needs a native library per operating system: `net.alphatab:alphaSkia-windows`, `alphaSkia-linux` or `alphaSkia-macos`, with the entry points `AlphaSkiaWindows`, `AlphaSkiaLinux` and `AlphaSkiaMacOs`. Use the alphaSkia version that `alphaTab-core` depends on.
+On a JVM, alphaTab renders through alphaSkia, which needs a native library per operating system: `net.alphatab:alphaSkia-windows`, `alphaSkia-linux` or `alphaSkia-macos`, with the entry points `AlphaSkiaWindows`, `AlphaSkiaLinux` and `AlphaSkiaMacOs`. Use alphaSkia `{{alphaSkiaVersion}}`, the version `alphaTab-core` depends on.
 
 alphaSkia also needs the Bravura music font. It ships as `dist/font/Bravura.otf` in the [`@coderline/alphatab`](https://www.npmjs.com/package/@coderline/alphatab) npm package.
 

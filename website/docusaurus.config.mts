@@ -6,6 +6,7 @@ import type {
   SidebarItemsGeneratorDoc,
 } from "@docusaurus/plugin-content-docs/src/sidebars/types.js";
 import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
+import remarkVersionPlaceholders from "./src/remark/version-placeholders";
 
 import * as path from "path";
 import * as fs from "fs";
@@ -109,6 +110,14 @@ if (isPreRelease) {
   alphaTabVersion = alphaTabVersionFull;
   algoliaIndexName = 'alphaTab';
 }
+
+// alphaSkia version the Kotlin alphaTab-core depends on, shown in the JVM install snippets.
+const alphaSkiaVersion = /^alphaskia\s*=\s*"([^"]+)"/m.exec(
+  fs.readFileSync(
+    path.resolve(siteDir, "../packages/kotlin/src/gradle/libs.versions.toml"),
+    "utf8"
+  )
+)![1];
 
 function getSortValue(
   prop: string,
@@ -250,6 +259,7 @@ async function createConfig(): Promise<Config> {
               ? undefined
               : `https://github.com/CoderLine/alphaTab/edit/develop/website/${versionDocsDirPath}/${docPath}`,
           beforeDefaultRemarkPlugins: [remarkGithubAdmonitionsToDirectives],
+          remarkPlugins: [[remarkVersionPlaceholders, { alphaTabVersion, alphaSkiaVersion }]],
           async sidebarItemsGenerator({
             defaultSidebarItemsGenerator,
             ...args

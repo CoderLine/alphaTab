@@ -65,6 +65,8 @@ const api = new alphaTab.AlphaTabApi(element, {
 });
 ```
 
+Never hard-code a package version in an install snippet. Write `\{{alphaTabVersion}}` or `\{{alphaSkiaVersion}}` in code blocks and inline code; the build replaces them with the versions the site is built for. For CDN URLs use the `@latest` tag.
+
 ## Canonical spellings
 
 - `alphaTab` — lowercase *a*, capital *T*, always. Never *AlphaTab* in prose (only in class names like `AlphaTabApi`).
