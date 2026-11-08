@@ -226,6 +226,8 @@ export class VisualTestHelper {
             'font/noto-serif/NotoSerif-Bold.otf',
             'font/noto-serif/NotoSerif-BoldItalic.otf',
             'font/noto-music/NotoMusic-Regular.otf',
+            'font/noto-sans-math/NotoSansMath-Regular.ttf',
+            'font/noto-sans-sc/NotoSansSC-Regular.otf',
             'font/noto-color-emoji/NotoColorEmoji_WindowsCompatible.ttf',
             'font/petaluma/Petaluma.otf'
         ];
@@ -251,18 +253,26 @@ export class VisualTestHelper {
         Environment.highDpiFactor = 1; // test data is in scale 1
         settings.core.enableLazyLoading = false;
 
-        settings.display.resources.tablatureFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.graceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.numberedNotationFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.tablatureFont.families = VisualTestHelper._testFontFamilies('Noto Sans');
+        settings.display.resources.graceFont.families = VisualTestHelper._testFontFamilies('Noto Sans');
+        settings.display.resources.numberedNotationFont.families = VisualTestHelper._testFontFamilies('Noto Sans');
+        settings.display.resources.numberedNotationGraceFont.families = VisualTestHelper._testFontFamilies('Noto Sans');
 
         for (const f of settings.display.resources.elementFonts.values()) {
             if (f.families.includes('sans-serif')) {
-                f.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+                f.families = VisualTestHelper._testFontFamilies('Noto Sans');
             } else {
-                f.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+                f.families = VisualTestHelper._testFontFamilies('Noto Serif');
             }
         }
+    }
+
+    /**
+     * The registered test fonts covering every character drawn by the tests, so no font of the operating system is used.
+     * Noto Sans Math also has the accidentals and must come after Noto Music.
+     */
+    private static _testFontFamilies(textFamily: string): string[] {
+        return [textFamily, 'Noto Music', 'Noto Sans Math', 'Noto Sans SC', 'Noto Color Emoji'];
     }
 
     /**
