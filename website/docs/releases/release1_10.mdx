@@ -52,6 +52,18 @@ The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renders
 :4 7.3{b (0 4)} 9.3 :8 7.3 9.3 :4 7.2{v} | :2 9.3{b (0 4 0)} 7.3
 `}</AlphaTab>
 
+#### render: sharp and flat tunings
+https://github.com/CoderLine/alphaTab/issues/2802
+
+Tunings keep the sharp or flat spelling of the source file per string, and the score tuning and the staff tuning draw the accidentals as music symbols. alphaTex keeps the spelling written in `\tuning` and writes it back on export, and the MusicXML importer reads it from `tuning-step` and `tuning-alter`. The new [`Tuning.spellings`](/docs/reference/types/model/tuning/#spellings) holds the written pitch of every string as a [`SpelledPitch`](/docs/reference/types/model/spelledpitch). Details: [Sharp and flat tunings](/docs/features/render/tuning-display#sharp-and-flat-tunings).
+
+<AlphaTab tex={true}>{`
+\\track "Guitar"
+\\staff {tabs}
+\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Eb2)
+:4 0.6 2.5 2.4 0.3 | 0.2 2.3 0.1 r
+`}</AlphaTab>
+
 ### Kotlin
 
 #### kotlin: platform-independent alphaTab-core library
@@ -65,7 +77,12 @@ alphaTab for Kotlin is published as two packages, like the .NET version. The new
 
 * Low octave dots on numbered staves sit below the duration lines instead of between digit and lines, as in printed jiǎnpǔ.
 * Numbered staves show all notes of chords and all voices. Set `notes` of the numbered staff configuration to `NumberedNoteMode.SingleNote` (alphaTex: `\defaultStaffDisplay numbered { notes singleNote }`) for one digit per beat; see [Single note mode](/docs/features/render/numbered-notation#single-note-mode).
+* Tuning names show the accidental as a music symbol (`E♭`) instead of the letter `b` (`Eb`).
 * Lyrics of tab-only tracks are shown below the tab staff instead of above it. With standard notation and tabs, they sit directly below the standard notation staff. Set [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) to `LyricsPlacement.Above` (alphaTex: `\lyricsPlacement above`) to show them above the staff.
+
+#### Deprecated APIs
+
+* `Tuning.noteNames`, `Tuning.getTextForTuning` and `Tuning.getTextPartsForTuning` are deprecated and keep their behavior. Use [`Tuning.getSpelling`](/docs/reference/types/model/tuning/#getspelling) and [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for the written name of a string.
 
 #### Kotlin packages
 

@@ -3552,8 +3552,8 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                         tex={[FeatureStatus.NotSupported]} />
         <FileFormatFeatureRow feature="staff-tuning" 
                         model={[FeatureStatus.Supported]}
-                        reading={[FeatureStatus.Supported]}
-                        render={[FeatureStatus.Supported]}
+                        reading={[FeatureStatus.Supported, "1.10.0", "tuning-step and tuning-alter keep the sharp or flat spelling of each string"]}
+                        render={[FeatureStatus.Supported, "1.10.0", "Strings are labeled with their sharp or flat spelling"]}
                         audio={[FeatureStatus.Supported]}
                         tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="capo" 
