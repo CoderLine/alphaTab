@@ -42,7 +42,7 @@ The previous display with a single digit of the first voice, as in Guitar Pro, i
 #### render: lyrics above or below the staff, or hidden
 https://github.com/CoderLine/alphaTab/issues/2776
 
-The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) places lyrics [`LyricsPlacement.Below`](/docs/reference/types/model/lyricsplacement) (default) or `LyricsPlacement.Above` the standard notation staff, or hides them with `LyricsPlacement.Hidden`, like the lyrics setting of the Guitar Pro stylesheet. Without standard notation, the lyrics move to the next shown staff (tablature, slash, numbered). alphaTex sets it with `\lyricsPlacement`, and the Guitar Pro importer and exporter read and write it. Details: [Lyrics placement](/docs/features/render/coverage-lyrics#placement).
+The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) places lyrics [`LyricsPlacement.Below`](/docs/reference/types/model/lyricsplacement) (default) or `LyricsPlacement.Above` the standard notation staff, or hides them with `LyricsPlacement.Hidden`, like the lyrics setting of the Guitar Pro stylesheet. Without standard notation, the lyrics move to the next shown staff (tablature, slash, numbered). alphaTex sets it with `\lyricsPlacement`, the Guitar Pro importer and exporter read and write it, and the MusicXML importer sets `Above` when all lyrics are placed above the staff. Details: [Lyrics placement](/docs/features/render/coverage-lyrics#placement).
 
 <AlphaTab tex={true}>{`
 \\lyricsPlacement above

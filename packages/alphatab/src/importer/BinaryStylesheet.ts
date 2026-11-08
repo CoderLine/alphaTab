@@ -146,8 +146,16 @@ export class BinaryStylesheet {
     }
 
     public apply(score: Score): void {
+        let hideLyrics = false;
+        let drawLyricsUpside = false;
         for (const [key, value] of this.raw) {
             switch (key) {
+                case 'System/hideLyrics':
+                    hideLyrics = value as boolean;
+                    break;
+                case 'System/drawLyricsUpside':
+                    drawLyricsUpside = value as boolean;
+                    break;
                 case 'StandardNotation/hideDynamics':
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
@@ -387,10 +395,9 @@ export class BinaryStylesheet {
             }
         }
 
-        // hiding wins over the placement, independent of the key order
-        if (this.raw.get('System/hideLyrics') === true) {
+        if (hideLyrics) {
             score.stylesheet.lyricsPlacement = LyricsPlacement.Hidden;
-        } else if (this.raw.get('System/drawLyricsUpside') === true) {
+        } else if (drawLyricsUpside) {
             score.stylesheet.lyricsPlacement = LyricsPlacement.Above;
         }
     }

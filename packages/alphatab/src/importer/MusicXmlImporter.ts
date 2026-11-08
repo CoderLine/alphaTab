@@ -41,7 +41,7 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, LyricsPlacement } from '@coderline/alphatab/model/RenderStylesheet';
 import { Score } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { Staff } from '@coderline/alphatab/model/Staff';
@@ -282,6 +282,8 @@ export class MusicXmlImporter extends ScoreImporter {
      * Used to only store custom bar numbers where the measure number differs from it.
      */
     private _nextBarNumber: number = 1;
+    private _lyricsCount: number = 0;
+    private _lyricsAboveCount: number = 0;
 
     private _divisionsPerQuarterNote: number = 1;
     /**
@@ -308,6 +310,7 @@ export class MusicXmlImporter extends ScoreImporter {
         this._parseDom(dom);
         this._applySpans();
         this._applyDynamics();
+        this._applyLyricsPlacement();
         ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
@@ -3654,7 +3657,19 @@ export class MusicXmlImporter extends ScoreImporter {
         newBeat.updateDurations();
     }
 
+    private _applyLyricsPlacement() {
+        // the placement is per lyric, the stylesheet score-wide: above only if no lyric is below
+        if (this._lyricsCount > 0 && this._lyricsAboveCount === this._lyricsCount) {
+            this._score.stylesheet.lyricsPlacement = LyricsPlacement.Above;
+        }
+    }
+
     private _parseLyric(element: XmlNode, beat: Beat, track: Track) {
+        this._lyricsCount++;
+        if (element.getAttribute('placement', '') === 'above') {
+            this._lyricsAboveCount++;
+        }
+
         const info = this._indexToTrackInfo.get(track.index)!;
         const index = info.getLyricLine(element.getAttribute('number', ''));
         if (beat.lyrics === null) {

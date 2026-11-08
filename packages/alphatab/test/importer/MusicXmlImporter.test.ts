@@ -15,7 +15,7 @@ import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Note } from '@coderline/alphatab/model/Note';
-import { BarNumberDisplay } from '@coderline/alphatab/model/RenderStylesheet';
+import { BarNumberDisplay, LyricsPlacement } from '@coderline/alphatab/model/RenderStylesheet';
 import type { Score } from '@coderline/alphatab/model/Score';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
@@ -2071,6 +2071,45 @@ describe('MusicXmlImporterTests', () => {
             };
             expect(tempoPosition('')).toBe(0.25);
             expect(tempoPosition(' sound="yes"')).toBe(0.5);
+        });
+    });
+
+    describe('lyrics-placement', () => {
+        function placement(lyricAttributes: string[]): LyricsPlacement {
+            let notes = '';
+            for (const attributes of lyricAttributes) {
+                notes += `<note><pitch><step>C</step><octave>4</octave></pitch><duration>1</duration><type>quarter</type><lyric number="1"${attributes}><text>la</text></lyric></note>`;
+            }
+            const xml = `<?xml version="1.0" encoding="UTF-8"?><score-partwise version="4.0"><part-list><score-part id="P1"><part-name>P1</part-name></score-part></part-list><part id="P1"><measure number="1"><attributes><divisions>1</divisions><time><beats>4</beats><beat-type>4</beat-type></time><clef><sign>G</sign><line>2</line></clef></attributes>${notes}</measure></part></score-partwise>`;
+            const score = MusicXmlImporterTestHelper.prepareImporterWithBytes(IOHelper.stringToBytes(xml)).readScore();
+            return score.stylesheet.lyricsPlacement;
+        }
+
+        it('all-above', () => {
+            expect(placement([' placement="above"', ' placement="above"'])).toBe(LyricsPlacement.Above);
+        });
+
+        it('mixed', () => {
+            expect(placement([' placement="above"', ' placement="below"'])).toBe(LyricsPlacement.Below);
+            expect(placement([' placement="above"', ''])).toBe(LyricsPlacement.Below);
+        });
+
+        it('unspecified', () => {
+            expect(placement(['', ''])).toBe(LyricsPlacement.Below);
+            const noLyrics: string[] = [];
+            expect(placement(noLyrics)).toBe(LyricsPlacement.Below);
+        });
+
+        it('testsuite-mixed-voices', async () => {
+            // voice 1 above, voice 2 below the staff: the score-wide placement stays below
+            const twoVoices = await MusicXmlImporterTestHelper.loadFile(
+                'test-data/musicxml-testsuite/42a-MultiVoice-TwoVoicesOnStaff-Lyrics.xml'
+            );
+            expect(twoVoices.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
+            const multiStaff = await MusicXmlImporterTestHelper.loadFile(
+                'test-data/musicxml-testsuite/43f-MultiStaff-Lyrics.xml'
+            );
+            expect(multiStaff.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
         });
     });
 });

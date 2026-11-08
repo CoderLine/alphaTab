@@ -566,15 +566,15 @@ describe('Gp8ImporterTest', () => {
         
     })
 
-    it('lyrics-placement', async () => {
-        async function placement(name: string): Promise<LyricsPlacement> {
-            const reader = await prepareImporterWithFile(`guitarpro8/lyrics-placement-${name}.gp`);
-            return reader.readScore().stylesheet.lyricsPlacement;
-        }
+    async function lyricsPlacement(name: string): Promise<LyricsPlacement> {
+        const reader = await prepareImporterWithFile(`guitarpro8/lyrics-placement-${name}.gp`);
+        return reader.readScore().stylesheet.lyricsPlacement;
+    }
 
-        expect(await placement('above-score-tab')).toBe(LyricsPlacement.Above);
-        expect(await placement('below-score-tab')).toBe(LyricsPlacement.Below);
-        expect(await placement('below-tab')).toBe(LyricsPlacement.Below);
-        expect(await placement('hide-score-tab')).toBe(LyricsPlacement.Hidden);
+    it('lyrics-placement', async () => {
+        expect(await lyricsPlacement('above-score-tab')).toBe(LyricsPlacement.Above);
+        expect(await lyricsPlacement('below-score-tab')).toBe(LyricsPlacement.Below);
+        expect(await lyricsPlacement('below-tab')).toBe(LyricsPlacement.Below);
+        expect(await lyricsPlacement('hide-score-tab')).toBe(LyricsPlacement.Hidden);
     });
 });
