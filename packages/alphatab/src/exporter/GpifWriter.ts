@@ -211,6 +211,15 @@ export class GpifWriter {
 
         this._writeNoteProperties(noteNode, note);
 
+        const gpVelocity = note.gpVelocity;
+        if (gpVelocity !== null) {
+            noteNode.addElement('Velocity').innerText = gpVelocity.toString();
+        }
+        const gpRelativeVelocity = note.gpRelativeVelocity;
+        if (gpRelativeVelocity !== null) {
+            noteNode.addElement('RelativeVelocity').innerText = gpRelativeVelocity.toString();
+        }
+
         if (note.isGhost) {
             noteNode.addElement('AntiAccent').innerText = 'normal';
         }

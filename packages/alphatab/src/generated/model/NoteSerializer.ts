@@ -28,7 +28,7 @@ import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
  * @internal
  */
 export class NoteSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["id", "accentuated", "bendtype", "bendstyle", "iscontinuedbend", "bendpoints", "fret", "string", "showstringnumber", "octave", "tone", "percussionarticulation", "isvisible", "islefthandtapped", "ishammerpullorigin", "isslurdestination", "harmonictype", "harmonicvalue", "isghost", "isletring", "ispalmmute", "isdead", "isstaccato", "slideintype", "slideouttype", "vibrato", "istiedestination", "lefthandfinger", "righthandfinger", "trillvalue", "trillspeed", "istrillstart", "durationpercent", "accidentalmode", "dynamics", "ornament", "style"]);
+    private static readonly _fields: RecordFields = new RecordFields(["id", "accentuated", "bendtype", "bendstyle", "iscontinuedbend", "bendpoints", "fret", "string", "showstringnumber", "octave", "tone", "percussionarticulation", "isvisible", "islefthandtapped", "ishammerpullorigin", "isslurdestination", "harmonictype", "harmonicvalue", "isghost", "isletring", "ispalmmute", "isdead", "isstaccato", "slideintype", "slideouttype", "vibrato", "istiedestination", "lefthandfinger", "righthandfinger", "trillvalue", "trillspeed", "istrillstart", "durationpercent", "accidentalmode", "dynamics", "gpvelocity", "gprelativevelocity", "ornament", "style"]);
     public static read(obj: Note, reader: IObjectReader): void {
         reader.readRecord(NoteSerializer._fields, (id, k, r) => {
             switch (id) {
@@ -138,9 +138,15 @@ export class NoteSerializer {
                     obj.dynamics = JsonHelper.parseEnum<DynamicValue>(r.readValue(), DynamicValue)!;
                     return true;
                 case 35:
-                    obj.ornament = JsonHelper.parseEnum<NoteOrnament>(r.readValue(), NoteOrnament)!;
+                    obj.gpVelocity = r.readValue() as number | null;
                     return true;
                 case 36:
+                    obj.gpRelativeVelocity = r.readValue() as number | null;
+                    return true;
+                case 37:
+                    obj.ornament = JsonHelper.parseEnum<NoteOrnament>(r.readValue(), NoteOrnament)!;
+                    return true;
+                case 38:
                     if (r.isNullish()) {
                         obj.style = undefined;
                     }
@@ -221,9 +227,11 @@ export class NoteSerializer {
         w.numberField(32, obj.durationPercent);
         w.numberField(33, obj.accidentalMode as number);
         w.numberField(34, obj.dynamics as number);
-        w.numberField(35, obj.ornament as number);
+        w.valueField(35, obj.gpVelocity);
+        w.valueField(36, obj.gpRelativeVelocity);
+        w.numberField(37, obj.ornament as number);
         if (obj.style) {
-            w.field(36);
+            w.field(38);
             NoteStyleSerializer.write(obj.style, w);
         }
         obj.toJson(w);
