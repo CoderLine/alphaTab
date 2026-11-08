@@ -2814,6 +2814,7 @@ export class GpifParser {
                     continue;
                 }
 
+                staff.stringTuning.spellings = null;
                 if (isPercussion) {
                     staff.stringTuning.tunings = [0, 0, 0, 0, 0, 0];
                 } else {

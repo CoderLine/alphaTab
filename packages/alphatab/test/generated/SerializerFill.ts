@@ -1347,6 +1347,12 @@ export class SerializerFill {
         {
             obj.tunings = [7.25];
         }
+        {
+            const v0 = new SpelledPitch();
+            SerializerFill.fillSpelledPitch(v0, depth + 1);
+            obj.spellings = [];
+            obj.spellings.push(v0);
+        }
     }
     public static fillVoiceStyle(obj: VoiceStyle, depth: number = 0): void {
         if (depth > 8) {

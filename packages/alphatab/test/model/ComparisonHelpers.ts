@@ -51,10 +51,13 @@ export class ComparisonHelpers {
     /**
      * Accidental modes are spelling hints, formats store them differently (e.g. Guitar Pro always stores the spelling).
      * This reduces them to the hints which matter for the rendering to compare them across formats.
+     * Tuning spellings are replaced by the spelling which is effectively used for every string.
      */
     public static simplifyAccidentalModes(score: Score) {
         for (const track of score.tracks) {
             for (const staff of track.staves) {
+                const tuning = staff.stringTuning;
+                tuning.spellings = tuning.tunings.map((_, i) => tuning.getSpelling(i));
                 for (const bar of staff.bars) {
                     for (const voice of bar.voices) {
                         for (const beat of voice.beats) {

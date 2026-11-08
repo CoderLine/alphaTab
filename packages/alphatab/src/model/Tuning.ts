@@ -1,4 +1,4 @@
-import type { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 
 /**
  * This public class represents a predefined string tuning.
@@ -170,6 +170,15 @@ export class Tuning {
     public tunings: number[];
 
     /**
+     * Gets or sets the written pitches of the strings in the same order as {@link tunings},
+     * or null if the spelling of the strings is not known.
+     * An entry is only used while its {@link SpelledPitch.value} matches the value in {@link tunings}.
+     * Use {@link getSpelling} to get the written pitch of a string.
+     * @since 1.10.0
+     */
+    public spellings: SpelledPitch[] | null = null;
+
+    /**
      * Initializes a new instance of the {@link Tuning} class.
      * @param name The name.
      * @param tuning The tuning.
@@ -181,12 +190,31 @@ export class Tuning {
         this.tunings = tuning ?? [];
     }
 
+    /**
+     * Gets the written pitch of a string.
+     * @param index The index of the string within {@link tunings}.
+     * @returns The entry of {@link spellings} if it matches the tuning value of the string,
+     * otherwise the tuning value spelled with flats.
+     * @since 1.10.0
+     */
+    public getSpelling(index: number): SpelledPitch {
+        const value = this.tunings[index];
+        const spellings = this.spellings;
+        if (spellings !== null && index < spellings.length) {
+            const spelling = spellings[index];
+            if (spelling.value === value) {
+                return spelling;
+            }
+        }
+        return SpelledPitch.fromValue(value, true);
+    }
+
     public reset() {
         this.isStandard = false;
         this.name = '';
         this.tunings = [];
+        this.spellings = null;
     }
-    
 
     /**
      * Tries to detect the name and standard flag of the tuning from a known tuning list based

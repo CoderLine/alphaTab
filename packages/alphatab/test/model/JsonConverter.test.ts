@@ -14,6 +14,7 @@ import { Font, FontStyle, FontWeight } from '@coderline/alphatab/model/Font';
 import { JsonConverter } from '@coderline/alphatab/model/JsonConverter';
 import { Note, NoteStyle, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { type Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import { TrackStyle, TrackSubElement } from '@coderline/alphatab/model/Track';
 import { VoiceStyle, VoiceSubElement } from '@coderline/alphatab/model/Voice';
 import { FingeringMode, NotationElement, NotationMode, TabRhythmMode } from '@coderline/alphatab/NotationSettings';
@@ -508,5 +509,33 @@ describe('JsonConverterTest', () => {
         expect(drum.isPiano).toBe(false);
         expect(drum.percussionArticulation).toBe(0);
         expect(drum.realValue).toBe(42);
+    });
+
+    it('tuning-spellings', () => {
+        const expected = ScoreLoader.loadAlphaTex('\\tuning E4 B3 G3 D3 A2 E2 . 0.6');
+        const tuning = expected.tracks[0].staves[0].stringTuning;
+        tuning.tunings = [63, 58, 54, 49, 44, 39];
+        tuning.spellings = [
+            new SpelledPitch(1, 1, 4),
+            new SpelledPitch(6, -1, 3),
+            new SpelledPitch(3, 1, 3),
+            new SpelledPitch(0, 1, 3),
+            new SpelledPitch(5, -1, 2),
+            new SpelledPitch(2, -1, 2)
+        ];
+
+        const actual = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(expected));
+        const actualTuning = actual.tracks[0].staves[0].stringTuning;
+        expect(actualTuning.tunings).toEqual([63, 58, 54, 49, 44, 39]);
+        expect(actualTuning.spellings!.map(s => s.toString())).toEqual(['D#4', 'Bb3', 'F#3', 'C#3', 'Ab2', 'Eb2']);
+    });
+
+    it('tuning-spellings-unknown', () => {
+        const expected = ScoreLoader.loadAlphaTex('\\tuning E4 B3 G3 D3 A2 E2 . 0.6');
+        expected.tracks[0].staves[0].stringTuning.spellings = null;
+
+        const json = JsonConverter.scoreToJsObject(expected);
+        const actual = JsonConverter.jsObjectToScore(json);
+        expect(actual.tracks[0].staves[0].stringTuning.spellings).toBeNull();
     });
 });
