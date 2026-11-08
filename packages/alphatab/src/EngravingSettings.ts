@@ -774,6 +774,12 @@ export class EngravingSettings {
     public tuningGlyphStringRowPadding = 0;
 
     /**
+     * The scale of the accidentals shown next to the note names of tunings.
+     * @since 1.10.0
+     */
+    public tuningGlyphAccidentalScale = 0.5;
+
+    /**
      * The relative scale of any directions glyphs drawn like coda or segno.
      */
     public directionsScale = 0.6;

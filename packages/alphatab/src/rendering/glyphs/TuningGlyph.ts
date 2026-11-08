@@ -1,10 +1,10 @@
 import { MusicFontSymbol } from '@coderline/alphatab/model/MusicFontSymbol';
-import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import type { Tuning } from '@coderline/alphatab/model/Tuning';
-import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
+import { type ICanvas, TextAlign } from '@coderline/alphatab/platform/ICanvas';
 import { GlyphGroup } from '@coderline/alphatab/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@coderline/alphatab/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@coderline/alphatab/rendering/glyphs/MusicFontGlyph';
+import { PitchNameGlyph } from '@coderline/alphatab/rendering/glyphs/PitchNameGlyph';
 import type { Color } from '@coderline/alphatab/model/Color';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
@@ -81,17 +81,31 @@ export class TuningGlyph extends GlyphGroup {
         const circleScale = this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
         const circleHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
-        this.renderer.scoreRenderer.canvas!.font = res.elementFonts.get(NotationElement.GuitarTuning)!;
-        const stringColumnWidth =
-            (circleHeight + this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width) *
-            res.engravingSettings.tuningGlyphStringColumnScale;
+        const font = res.elementFonts.get(NotationElement.GuitarTuning)!;
+        this.renderer.scoreRenderer.canvas!.font = font;
+        let nameWidth = this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width;
+
+        // strings are only listed for non-standard tunings
+        let names: PitchNameGlyph[] | null = null;
+        if (!tuning.isStandard) {
+            names = [];
+            for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
+                const name = new PitchNameGlyph(0, 0, ' = ', tuning.getSpelling(i), font);
+                name.renderer = this.renderer;
+                name.doLayout();
+                nameWidth = Math.max(nameWidth, name.width);
+                names.push(name);
+            }
+        }
+
+        const stringColumnWidth = (circleHeight + nameWidth) * res.engravingSettings.tuningGlyphStringColumnScale;
 
         this.width = Math.max(
             this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel).width,
             Math.max(this.renderer.scoreRenderer.canvas!.measureText(tuning.name).width, 2 * stringColumnWidth)
         );
 
-        if (!tuning.isStandard) {
+        if (names !== null) {
             // Strings
             const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
@@ -101,17 +115,10 @@ export class TuningGlyph extends GlyphGroup {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
                 this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight, circleScale, symbol));
 
-                const str: string = ` = ${SpelledPitch.formatValue(tuning.tunings[i], false, true)}`;
-                this.addGlyph(
-                    new TextGlyph(
-                        currentX + circleHeight,
-                        currentY + circleHeight / 2,
-                        str,
-                        res.elementFonts.get(NotationElement.GuitarTuning)!,
-                        TextAlign.Left,
-                        TextBaseline.Middle
-                    )
-                );
+                const name = names[i];
+                name.x = currentX + circleHeight;
+                name.y = currentY + circleHeight / 2;
+                this.addGlyph(name);
                 currentY += circleHeight + this.renderer.smuflMetrics.tuningGlyphStringRowPadding;
                 const bottomY = currentY;
                 if (this.height < bottomY) {

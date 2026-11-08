@@ -431,6 +431,7 @@ export class SerializerFill {
         obj.tuningGlyphCircleNumberScale = 7.25;
         obj.tuningGlyphStringColumnScale = 7.25;
         obj.tuningGlyphStringRowPadding = 7.25;
+        obj.tuningGlyphAccidentalScale = 7.25;
         obj.directionsScale = 7.25;
         obj.multiVoiceDisplacedNoteHeadSpacing = 7.25;
         obj.staffContentPadding = 7.25;

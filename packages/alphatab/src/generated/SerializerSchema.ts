@@ -12,5 +12,5 @@ export class SerializerSchema {
     /**
      * A hash of the field ids, keys and types of all serialized classes (51 classes).
      */
-    public static readonly fingerprint: number = 0xfd67bdf5;
+    public static readonly fingerprint: number = 0x0a536ef9;
 }
