@@ -20,4 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "alphaTab"
+include(":core")
 include(":android")

@@ -39,9 +39,21 @@ Numbered staves write every note instead of a single digit per beat. A chord is 
 
 The previous display with a single digit of the first voice, as in Guitar Pro, is available as the new [`NumberedNoteMode.SingleNote`](/docs/reference/types/model/numberednotemode); it now shows the highest note of a chord. Details: [Chords and multiple voices](/docs/features/render/numbered-notation#chords-and-multiple-voices).
 
+### Kotlin
+
+#### kotlin: platform-independent alphaTab-core library
+https://github.com/CoderLine/alphaTab/issues/2458
+
+alphaTab for Kotlin is published as two packages, like the .NET version. The new [`net.alphatab:alphaTab-core`](https://central.sonatype.com/artifact/net.alphatab/alphaTab-core) runs on any JVM 17 or newer: load files, render to PNG or SVG through alphaSkia, generate MIDI and synthesize audio on servers, in command-line tools or in desktop applications. [`net.alphatab:alphaTab`](https://central.sonatype.com/artifact/net.alphatab/alphaTab) stays the Android library with the `AlphaTabView` and is built on top of the core. Details: [Platforms and packages](/docs/platforms) and [Render on the JVM](/docs/getting-started/installation-kotlin#render-on-the-jvm).
+
 ### Upgrade Notes
 
 #### Visual changes
 
 * Low octave dots on numbered staves sit below the duration lines instead of between digit and lines, as in printed jiǎnpǔ.
 * Numbered staves show all notes of chords and all voices. Set `notes` of the numbered staff configuration to `NumberedNoteMode.SingleNote` (alphaTex: `\defaultStaffDisplay numbered { notes singleNote }`) for one digit per beat; see [Single note mode](/docs/features/render/numbered-notation#single-note-mode).
+
+#### Kotlin packages
+
+* Android apps need no change: `net.alphatab:alphaTab` brings in `net.alphatab:alphaTab-core` in the same version. Builds that do not resolve transitive dependencies must add `alphaTab-core` themselves.
+* The Android installation page moved to [Installation (Kotlin)](/docs/getting-started/installation-kotlin); the old address redirects there.

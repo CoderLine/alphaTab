@@ -1,15 +1,16 @@
 ---
 title: "Custom fonts on Skia"
-description: "Register any font with the Skia rendering backend used on .NET and Android via Environment.registerAlphaSkiaCustomFont."
+description: "Register any font with the Skia rendering backend used on .NET and Kotlin via Environment.registerAlphaSkiaCustomFont."
 sidebar_custom_props:
   feature_chapter: fonts
   feature_order: 30
-  feature_platforms: [net, android]
+  feature_platforms: [net, kotlin]
 keywords:
   - alphaTab
   - Skia
   - custom font
   - .NET
+  - Kotlin
   - Android
 ---
 
@@ -17,9 +18,9 @@ import { AlphaTab } from '@site/src/components/AlphaTab';
 import * as Riffs from '@site/src/tex-riffs';
 
 
-Building a .NET desktop app or Android app that uses non-system fonts — a corporate typography brief for titles and lyrics, a language-specific font for East-Asian lyric text, or a hand-lettered wordmark for the score header? The Skia rendering backend that powers alphaTab on those runtimes does not read fonts from the operating system's font store. Every font used around the notation — titles, lyrics, chord names, fingerings — must be registered with Skia explicitly first.
+Building a .NET desktop app, a JVM service or an Android app that uses non-system fonts — a corporate typography brief for titles and lyrics, a language-specific font for East-Asian lyric text, or a hand-lettered wordmark for the score header? The Skia rendering backend that powers alphaTab on those runtimes does not read fonts from the operating system's font store. Every font used around the notation — titles, lyrics, chord names, fingerings — must be registered with Skia explicitly first.
 
-This registration flow is Skia-only. The preview below is a browser render for illustration; the code snippet configures the exact pipeline that runs inside a .NET or Android app.
+This registration flow is Skia-only. The preview below is a browser render for illustration; the code snippet configures the exact pipeline that runs inside a .NET, JVM or Android app.
 
 <AlphaTab tex={true}>{Riffs.AMAZING_GRACE}</AlphaTab>
 
@@ -45,7 +46,7 @@ const container = getAlphaTabContainer();
 const api = new alphaTab.AlphaTabApi(container, settings);
 ```
 
-`loadFontBytes()` and `getAlphaTabContainer()` are placeholders for the platform-specific pieces. On .NET, read the font with `File.ReadAllBytes` or from an embedded resource stream. On Android, open it from `assets/` via `AssetManager` and copy into a `ByteArray`. Every line after registration runs unchanged on both runtimes.
+`loadFontBytes()` and `getAlphaTabContainer()` are placeholders for the platform-specific pieces. On .NET, read the font with `File.ReadAllBytes` or from an embedded resource stream. On the JVM, read it with `File.readBytes()`. On Android, open it from `assets/` via `AssetManager` and copy into a `ByteArray`. Every line after registration runs unchanged on both runtimes.
 
 ## What to register
 

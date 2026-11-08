@@ -13,6 +13,8 @@ import alphaTab.platform.Cursors
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
 import alphaTab.platform.IUiFacade
+import alphaTab.platform.jvm.JavaThreadAlphaSynthWorker
+import alphaTab.platform.jvm.JavaThreadAlphaTabRendererWorker
 import alphaTab.platform.skia.AlphaSkiaImage
 import alphaTab.platform.worker.AlphaSynthAudioExporterWorkerApi
 import alphaTab.platform.worker.AlphaSynthWebWorkerApi

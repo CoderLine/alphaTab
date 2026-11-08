@@ -209,7 +209,7 @@ export interface DisplaySettingsJson {
      * | JSON       | `display.resources.`      | `var settings = { display: { resources: { wordsFonts: '...'} } };` |
      * | JSON       | `resources.`              | `var settings = { resources: { wordsFonts: '...'} };`              |
      * | .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
-     * | Android    | `display.resources.`      | `settings.display.resources.wordsFonts = ...`                      |
+     * | Kotlin     | `display.resources.`      | `settings.display.resources.wordsFonts = ...`                      |
      * ## Types
      *
      * ### Fonts

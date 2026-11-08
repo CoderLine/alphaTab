@@ -14,6 +14,8 @@ junitVersion = "1.3.0"
 alphaskia = "3.5.147"
 mavenPublish = "0.37.0"
 klaxon = "5.6"
+animalsniffer = "2.0.1"
+gummybears = "0.16.0"
 
 
 [libraries]
@@ -33,8 +35,12 @@ alphaskia-linux = { group = "net.alphatab", name="alphaSkia-linux", version.ref 
 alphaskia-macos = { group = "net.alphatab", name="alphaSkia-macos", version.ref = "alphaskia" }
 alphaskia-android = { group = "net.alphatab", name="alphaSkia-android", version.ref = "alphaskia" }
 
+gummybears-api26 = { group = "com.toasttab.android", name="gummy-bears-api-26", version.ref = "gummybears" }
+
 [plugins]
 android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 mavenPublish = { id = "com.vanniktech.maven.publish", version.ref = "mavenPublish" }
+animalsniffer = { id = "ru.vyarus.animalsniffer", version.ref = "animalsniffer" }

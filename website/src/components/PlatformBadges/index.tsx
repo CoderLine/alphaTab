@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './styles.module.scss';
 
-export type Platform = 'web' | 'net' | 'android';
+export type Platform = 'web' | 'net' | 'kotlin' | 'android';
 
 const LABELS: Record<Platform, string> = {
   web: 'Web',
   net: '.NET',
+  kotlin: 'Kotlin',
   android: 'Android',
 };
 
@@ -15,7 +16,7 @@ export interface PlatformBadgesProps {
 }
 
 export const PlatformBadges: React.FC<PlatformBadgesProps> = ({
-  platforms = ['web', 'net', 'android'],
+  platforms = ['web', 'net', 'kotlin'],
   children,
 }) => {
   return (

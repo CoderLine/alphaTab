@@ -9,7 +9,7 @@ export enum LogLevel {
      * Trace level (high-volume internal flow details, implies all other levels).
      * @remarks
      * The published JavaScript files do not contain trace messages; they are only written when running alphaTab
-     * from its TypeScript sources and on .NET and Android.
+     * from its TypeScript sources and on .NET and Kotlin.
      * @since 1.9.0
      */
     Trace = -1,

@@ -28,7 +28,7 @@ export const PropertyDescription: React.FC<PropertyDescriptionProps> = ({
         <CodeBadge key={`net-${n}`} type="net" name={n} />
       ))}
       {androidNames.map((n) => (
-        <CodeBadge key={`android-${n}`} type="android" name={n} />
+        <CodeBadge key={`kotlin-${n}`} type="kotlin" name={n} />
       ))}
     </div>
   );

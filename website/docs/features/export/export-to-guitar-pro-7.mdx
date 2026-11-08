@@ -50,7 +50,7 @@ api.scoreLoaded.on(() => {
 });
 ```
 
-`getAlphaTabContainer()` is the platform-specific step — a `<div>` on Web, an `AlphaTab` control on .NET, an `AlphaTabView` on Android. The exporter itself runs on every runtime; only the download link is browser-specific. On .NET or Android, write the byte array to disk with the native file API instead.
+`getAlphaTabContainer()` is the platform-specific step — a `<div>` on Web, an `AlphaTab` control on .NET, an `AlphaTabView` on Android. The exporter itself runs on every runtime; only the download link is browser-specific. On .NET or Kotlin, write the byte array to disk with the native file API instead.
 
 ## What the exporter emits
 

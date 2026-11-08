@@ -44,7 +44,7 @@ Every operational page opens with:
 
 Elaboration and edge cases come after those three. Concept content ("what alphaTab is") stays on the introduction page, not mixed into installation.
 
-Multi-platform documentation uses parallel pages, not tabs. Web, .NET, and Android each get their own installation and configuration pages. Tabs are reserved for package managers (npm / pnpm / yarn) and other truly interchangeable choices.
+Multi-platform documentation uses parallel pages, not tabs. Web, .NET, and Kotlin each get their own installation and configuration pages. Tabs are reserved for package managers (npm / pnpm / yarn) and other truly interchangeable choices.
 
 ## Code samples
 
@@ -64,6 +64,8 @@ const api = new alphaTab.AlphaTabApi(element, {
     // ...settings
 });
 ```
+
+Never hard-code a package version in an install snippet. Write `\{{alphaTabVersion}}` or `\{{alphaSkiaVersion}}` in code blocks and inline code; the build replaces them with the versions the site is built for. For CDN URLs use the `@latest` tag.
 
 ## Canonical spellings
 

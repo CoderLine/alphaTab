@@ -4,6 +4,7 @@ const sidebars: SidebarsConfig = {
   docs: {
     alphaTab: [
       "introduction",
+      "platforms",
       "contributing",
       "attribution"
     ],
@@ -49,8 +50,8 @@ const sidebars: SidebarsConfig = {
       "getting-started/installation-net",
       "getting-started/configuration-net",
     ],
-    "Getting Started (Android)": [
-      "getting-started/installation-android",
+    "Getting Started (Kotlin)": [
+      "getting-started/installation-kotlin",
       "getting-started/configuration-android",
     ],
     Guides: [

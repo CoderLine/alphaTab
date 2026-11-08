@@ -39,7 +39,7 @@ You can express a `Font` in three shapes and each one supports fallback:
 - **JSON object** — `{ families: ['Playfair Display', 'Georgia', 'serif'], size: 20, style: 'Italic', weight: 'Bold' }`.
 - **`Font` instance** — `Font.withFamilyList(['Playfair Display', 'Georgia', 'serif'], 20, ...)` for programmatic construction.
 
-The Web backend hands the family list to CSS as-is, so browser font matching does the work. The Skia backend (used on .NET and Android via alphaSkia) walks the list in order and uses the first family registered through `registerAlphaSkiaCustomFont`.
+The Web backend hands the family list to CSS as-is, so browser font matching does the work. The Skia backend (used on .NET and Kotlin via alphaSkia) walks the list in order and uses the first family registered through `registerAlphaSkiaCustomFont`.
 
 ## Show it in code
 
@@ -66,5 +66,5 @@ The same fallback rule applies to the deprecated `family` getter for backward co
 ## Where to look next
 
 - [Custom text fonts](/docs/features/render/custom-text-fonts) — every text field you can target.
-- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — register families for the .NET and Android backends.
+- [Custom fonts on Skia](/docs/features/render/custom-fonts-on-skia) — register families for the .NET and Kotlin backends.
 - [`Font`](/docs/reference/types/model/font) in the reference.
