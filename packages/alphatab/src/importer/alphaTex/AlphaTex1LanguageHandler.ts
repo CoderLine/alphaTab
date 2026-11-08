@@ -79,7 +79,12 @@ import { NoteOrnament } from '@coderline/alphatab/model/NoteOrnament';
 import { Ottavia } from '@coderline/alphatab/model/Ottavia';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import { PickStroke } from '@coderline/alphatab/model/PickStroke';
-import { BarNumberDisplay, type RenderStylesheet, TuningDisplayMode } from '@coderline/alphatab/model/RenderStylesheet';
+import {
+    BarNumberDisplay,
+    LyricsPlacement,
+    type RenderStylesheet,
+    TuningDisplayMode
+} from '@coderline/alphatab/model/RenderStylesheet';
 import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@coderline/alphatab/model/Score';
 import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
@@ -215,6 +220,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     return ApplyNodeResult.NotAppliedSemanticError;
                 }
                 score.stylesheet.tuningDisplayMode = tuningDisplayMode!;
+                return ApplyNodeResult.Applied;
+            case 'lyricsplacement':
+                const lyricsPlacement = AlphaTex1LanguageHandler._parseEnumValue(
+                    importer,
+                    metaData.arguments!,
+                    'lyrics placement',
+                    AlphaTex1EnumMappings.lyricsPlacement
+                );
+                if (lyricsPlacement === undefined) {
+                    return ApplyNodeResult.NotAppliedSemanticError;
+                }
+                score.stylesheet.lyricsPlacement = lyricsPlacement!;
                 return ApplyNodeResult.Applied;
             case 'multibarrest':
                 score.stylesheet.multiTrackMultiBarRest = true;
@@ -2823,6 +2840,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 Atnf.identMeta(
                     'tuningDisplayMode',
                     AlphaTex1EnumMappings.tuningDisplayModeReversed.get(stylesheet.tuningDisplayMode)!
+                )
+            );
+        }
+        if (stylesheet.lyricsPlacement !== LyricsPlacement.Auto) {
+            nodes.push(
+                Atnf.identMeta(
+                    'lyricsPlacement',
+                    AlphaTex1EnumMappings.lyricsPlacementReversed.get(stylesheet.lyricsPlacement)!
                 )
             );
         }

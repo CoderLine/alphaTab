@@ -34,6 +34,7 @@ import { Rasgueado } from '@coderline/alphatab/model/Rasgueado';
 import {
     BarNumberDisplay,
     BracketExtendMode,
+    LyricsPlacement,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy,
@@ -1850,6 +1851,7 @@ describe('AlphaTexImporterTest', () => {
             \\bracketExtendMode nobrackets
             \\useSystemSignSeparator
             \\tuningDisplayMode staff
+            \\lyricsPlacement below
             \\singleTrackTrackNamePolicy allsystems
             \\multiTrackTrackNamePolicy Hidden
             \\firstSystemTrackNameMode fullname
@@ -1868,6 +1870,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.bracketExtendMode).toBe(BracketExtendMode.NoBrackets);
         expect(score.stylesheet.useSystemSignSeparator).toBe(true);
         expect(score.stylesheet.tuningDisplayMode).toBe(TuningDisplayMode.Staff);
+        expect(score.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
         expect(score.stylesheet.singleTrackTrackNamePolicy).toBe(TrackNamePolicy.AllSystems);
         expect(score.stylesheet.multiTrackTrackNamePolicy).toBe(TrackNamePolicy.Hidden);
         expect(score.stylesheet.firstSystemTrackNameMode).toBe(TrackNameMode.FullName);
@@ -1875,6 +1878,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.firstSystemTrackNameOrientation).toBe(TrackNameOrientation.Horizontal);
         expect(score.stylesheet.otherSystemsTrackNameOrientation).toBe(TrackNameOrientation.Horizontal);
         testExportRoundtrip(score);
+    });
+
+    it('lyrics-placement', () => {
+        expect(parseTex('.').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Auto);
+        expect(parseTex('\\lyricsPlacement auto .').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Auto);
+
+        const hidden = parseTex('\\lyricsPlacement hidden .');
+        expect(hidden.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Hidden);
+        testExportRoundtrip(hidden);
     });
 
     it('bar-sizing', () => {
@@ -2430,6 +2442,7 @@ describe('AlphaTexImporterTest', () => {
             it('bar optional', () => importErrorTest('. \\section ("a" 1)'));
 
             it('bracketextendmode', () => importErrorTest('\\bracketextendmode invalid'));
+            it('lyricsplacement', () => importErrorTest('\\lyricsplacement invalid'));
             it('singletracktracknamepolicy', () => importErrorTest('\\singletracktracknamepolicy invalid'));
             it('multitracktracknamepolicy', () => importErrorTest('\\multitracktracknamepolicy invalid'));
             it('firstsystemtracknamemode', () => importErrorTest('\\firstsystemtracknamemode invalid'));

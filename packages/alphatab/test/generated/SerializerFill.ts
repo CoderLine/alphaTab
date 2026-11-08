@@ -138,6 +138,7 @@ import { RenderStylesheet } from "@coderline/alphatab/model/RenderStylesheet";
 import { RenderStylesheetSerializer } from "@coderline/alphatab/generated/model/RenderStylesheetSerializer";
 import { BracketExtendMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TuningDisplayMode } from "@coderline/alphatab/model/RenderStylesheet";
+import { LyricsPlacement } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNamePolicy } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameMode } from "@coderline/alphatab/model/RenderStylesheet";
 import { TrackNameOrientation } from "@coderline/alphatab/model/RenderStylesheet";
@@ -1027,6 +1028,7 @@ export class SerializerFill {
         obj.useSystemSignSeparator = !obj.useSystemSignSeparator;
         obj.globalDisplayTuning = !obj.globalDisplayTuning;
         obj.tuningDisplayMode = SerializerFill.otherEnumValue(TuningDisplayMode, obj.tuningDisplayMode) as TuningDisplayMode;
+        obj.lyricsPlacement = SerializerFill.otherEnumValue(LyricsPlacement, obj.lyricsPlacement) as LyricsPlacement;
         {
             obj.perTrackDisplayTuning = new Map<number, boolean>();
             obj.perTrackDisplayTuning!.set(3, true);

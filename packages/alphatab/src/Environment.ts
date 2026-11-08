@@ -12,6 +12,7 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
+import { LyricsPlacement } from '@coderline/alphatab/model/RenderStylesheet';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { AlphaSynthWebWorklet } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { BrowserUiFacade } from '@coderline/alphatab/platform/javascript/BrowserUiFacade';
@@ -43,7 +44,7 @@ import { createGolpeEffectInfo } from '@coderline/alphatab/rendering/effects/Gol
 import { createHarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { leftHandTapEffectInfo } from '@coderline/alphatab/rendering/effects/LeftHandTapEffectInfo';
 import { letRingEffectInfo } from '@coderline/alphatab/rendering/effects/LetRingEffectInfo';
-import { lyricsEffectInfo } from '@coderline/alphatab/rendering/effects/LyricsEffectInfo';
+import { createLyricsEffectInfo } from '@coderline/alphatab/rendering/effects/LyricsEffectInfo';
 import { markerEffectInfo } from '@coderline/alphatab/rendering/effects/MarkerEffectInfo';
 import { noteOrnamentEffectInfo } from '@coderline/alphatab/rendering/effects/NoteOrnamentEffectInfo';
 import { numberedBarKeySignatureEffectInfo } from '@coderline/alphatab/rendering/effects/NumberedBarKeySignatureEffectInfo';
@@ -543,7 +544,7 @@ export class Environment {
         //
         // Tabs
         new TabBarRendererFactory([
-            { effect: lyricsEffectInfo, mode: EffectBandMode.SharedTop },
+            { effect: createLyricsEffectInfo(LyricsPlacement.Auto), mode: EffectBandMode.SharedTop },
 
             { effect: tabWhammyEffectInfo, mode: EffectBandMode.OwnedTop },
             { effect: trillEffectInfo, mode: EffectBandMode.OwnedTop },
@@ -578,7 +579,9 @@ export class Environment {
                 effect: createGolpeEffectInfo(GolpeType.Thumb),
                 mode: EffectBandMode.OwnedBottom,
                 shouldCreate: staff => !staff.showStandardNotation
-            }
+            },
+            // shared and last: bottom of the tab staff, or of the last shown staff without tabs
+            { effect: createLyricsEffectInfo(LyricsPlacement.Below), mode: EffectBandMode.SharedBottom }
         ])
     ];
 

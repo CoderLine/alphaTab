@@ -203,6 +203,66 @@ describe('EffectPlacementTests', () => {
         expect(band(staff.barRenderers[0], 'EffectLyrics', false)).toBeTruthy();
     });
 
+    describe('lyrics-placement', () => {
+        /**
+         * @returns the staves and sides with a lyrics band in the first bar, as `staffId-top` or `staffId-bottom`
+         */
+        async function lyricsBands(placement: string, staff: string): Promise<string[]> {
+            const renderer = await render(`
+                ${placement ? `\\lyricsPlacement ${placement}` : ''}
+                \\lyrics "this is my life"
+                \\staff {${staff}}
+                :4 3.3 5.3 7.3 8.3
+            `);
+            const locations: string[] = [];
+            for (const renderStaff of renderer.layout!.systems[0].allStaves) {
+                const r = renderStaff.barRenderers[0];
+                for (const top of [true, false]) {
+                    for (const effectId of ['EffectLyrics', 'EffectLyricsBelow']) {
+                        if (band(r, effectId, top)) {
+                            locations.push(`${renderStaff.staffId}-${top ? 'top' : 'bottom'}`);
+                        }
+                    }
+                }
+            }
+            return locations;
+        }
+
+        it('auto-score-tab', async () => {
+            expect(await lyricsBands('', 'score tabs')).toEqual(['tab-top']);
+        });
+
+        it('auto-tab', async () => {
+            expect(await lyricsBands('auto', 'tabs')).toEqual(['tab-top']);
+        });
+
+        it('auto-score', async () => {
+            expect(await lyricsBands('auto', 'score')).toEqual(['score-bottom']);
+        });
+
+        it('below-score-tab', async () => {
+            expect(await lyricsBands('below', 'score tabs')).toEqual(['tab-bottom']);
+        });
+
+        it('below-tab', async () => {
+            expect(await lyricsBands('below', 'tabs')).toEqual(['tab-bottom']);
+        });
+
+        it('below-score', async () => {
+            expect(await lyricsBands('below', 'score')).toEqual(['score-bottom']);
+        });
+
+        it('below-slash', async () => {
+            expect(await lyricsBands('below', 'slash')).toEqual(['slash-bottom']);
+        });
+
+        it('hidden', async () => {
+            expect((await lyricsBands('hidden', 'score tabs')).length).toBe(0);
+            expect((await lyricsBands('hidden', 'tabs')).length).toBe(0);
+            expect((await lyricsBands('hidden', 'score')).length).toBe(0);
+        });
+    });
+
     it('key-signature-skyline-per-accidental', async () => {
         // the flats of A flat major sit at different heights, each takes only its own width
         const renderer = await render(`

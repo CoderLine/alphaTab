@@ -6170,6 +6170,26 @@ exports[`AlphaTexImporterTest > errors > at219 > gracetype > semantic-diagnostic
 ]
 `;
 
+exports[`AlphaTexImporterTest > errors > at219 > lyricsplacement > lexer-diagnostics 1`] = `[]`;
+
+exports[`AlphaTexImporterTest > errors > at219 > lyricsplacement > parser-diagnostics 1`] = `
+[
+  Map {
+    "code" => 219,
+    "severity" => 2,
+    "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
+(auto|below|hidden)",
+    "start" => Map {
+      "col" => 17,
+      "line" => 1,
+      "offset" => 16,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexImporterTest > errors > at219 > lyricsplacement > semantic-diagnostics 1`] = `[]`;
+
 exports[`AlphaTexImporterTest > errors > at219 > multitracktracknamepolicy > lexer-diagnostics 1`] = `[]`;
 
 exports[`AlphaTexImporterTest > errors > at219 > multitracktracknamepolicy > parser-diagnostics 1`] = `

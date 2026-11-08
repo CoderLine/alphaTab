@@ -118,6 +118,28 @@ export enum BarNumberDisplay {
 }
 
 /**
+ * Lists the places where lyrics are displayed.
+ * @since 1.10.0
+ * @public
+ */
+export enum LyricsPlacement {
+    /**
+     * Lyrics are displayed above the tablature staff. Staves without a tablature staff display them below the staff.
+     */
+    Auto = 0,
+
+    /**
+     * Lyrics are displayed below the last staff (e.g. below the tablature staff for standard notation and tablature).
+     */
+    Below = 1,
+
+    /**
+     * Lyrics are not displayed.
+     */
+    Hidden = 2
+}
+
+/**
  * This class represents the rendering stylesheet.
  * It contains settings which control the display of the score when rendered.
  * @json
@@ -150,6 +172,12 @@ export class RenderStylesheet {
      * @since 1.9.0
      */
     public tuningDisplayMode: TuningDisplayMode = TuningDisplayMode.Score;
+
+    /**
+     * The place where lyrics are displayed.
+     * @since 1.10.0
+     */
+    public lyricsPlacement: LyricsPlacement = LyricsPlacement.Auto;
 
     /**
      * Whether to show the tuning.(per-track)

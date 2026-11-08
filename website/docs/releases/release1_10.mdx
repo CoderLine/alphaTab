@@ -39,6 +39,19 @@ Numbered staves write every note instead of a single digit per beat. A chord is 
 
 The previous display with a single digit of the first voice, as in Guitar Pro, is available as the new [`NumberedNoteMode.SingleNote`](/docs/reference/types/model/numberednotemode); it now shows the highest note of a chord. Details: [Chords and multiple voices](/docs/features/render/numbered-notation#chords-and-multiple-voices).
 
+#### render: lyrics below the staff or hidden
+https://github.com/CoderLine/alphaTab/issues/2776
+
+The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) moves lyrics below the last staff of a track with [`LyricsPlacement.Below`](/docs/reference/types/model/lyricsplacement), which keeps the space above the tabs free for bends, whammy bar and vibrato, or hides them with `LyricsPlacement.Hidden`. alphaTex sets it with `\lyricsPlacement`. The default `LyricsPlacement.Auto` keeps the current placement. Details: [Lyrics placement](/docs/features/render/coverage-lyrics#placement).
+
+<AlphaTab tex={true}>{`
+\\lyricsPlacement below
+\\track "Guitar"
+\\staff {score tabs}
+\\lyrics "Bend it up and let it ring"
+:4 7.3{b (0 4)} 9.3 :8 7.3 9.3 :4 7.2{v} | :2 9.3{b (0 4 0)} 7.3
+`}</AlphaTab>
+
 ### Kotlin
 
 #### kotlin: platform-independent alphaTab-core library

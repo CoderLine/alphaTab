@@ -44,6 +44,7 @@ import { systemsLayout } from '@coderline/alphatab-alphatex//metadata/score/syst
 import { tab } from '@coderline/alphatab-alphatex//metadata/score/tab';
 import { title } from '@coderline/alphatab-alphatex//metadata/score/title';
 import { tuningDisplayMode } from '@coderline/alphatab-alphatex//metadata/score/tuningdisplaymode';
+import { lyricsPlacement } from '@coderline/alphatab-alphatex/metadata/score/lyricsplacement';
 import { useSystemSignSeparator } from '@coderline/alphatab-alphatex//metadata/score/usesystemsignseparator';
 import { words } from '@coderline/alphatab-alphatex//metadata/score/words';
 import { wordsAndMusic } from '@coderline/alphatab-alphatex//metadata/score/wordsandmusic';
@@ -185,6 +186,7 @@ export const scoreMetaData = metadata(
     hideDynamics,
     useSystemSignSeparator,
     tuningDisplayMode,
+    lyricsPlacement,
     multiBarRest,
     bracketExtendMode,
     singleTrackTrackNamePolicy,
