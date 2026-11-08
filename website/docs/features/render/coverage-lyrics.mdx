@@ -11,7 +11,7 @@ keywords:
 
 import { AlphaTab } from '@site/src/components/AlphaTab';
 
-Lyrics render below the staff with each syllable positioned under the beat it belongs to. alphaTab reads lyric lines from the source file or accepts them programmatically through the API.
+Lyrics render with each syllable positioned under the beat it belongs to. alphaTab reads lyric lines from the source file or accepts them programmatically through the API.
 
 ## Aligning to beats {#alignment}
 
@@ -40,6 +40,18 @@ Multiple verses stack below the staff, one line per verse — the way hymnals an
 \\lyrics "Se-cond verse rides the same phrase"
 .
 :4 G3 :8 C4 :4 E4 D4 | :4 C4 :8 D4 :4 E4 C4
+`}</AlphaTab>
+
+## Placement {#placement}
+
+[`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) decides where the lyrics go, like the lyrics setting of the Guitar Pro stylesheet. The placement is relative to the standard notation staff: [`LyricsPlacement.Below`](/docs/reference/types/model/lyricsplacement) (the default) shows them below it, `LyricsPlacement.Above` above it. When standard notation is not shown, the lyrics move to the next shown staff, in the order tablature, slash, numbered: a tab-only guitar part shows them below the tabs, which keeps the space above the tabs free for bends, whammy bar and vibrato. `LyricsPlacement.Hidden` hides the lyrics of the score. In alphaTex, use `\lyricsPlacement below|above|hidden`. The Guitar Pro importer and exporter read and write the setting; the MusicXML importer sets `Above` when all lyrics of the file are placed above the staff.
+
+<AlphaTab tex={true}>{`
+\\lyricsPlacement above
+\\track "Guitar"
+\\staff {score tabs}
+\\lyrics "Bend it up and let it ring"
+:4 7.3{b (0 4)} 9.3 :8 7.3 9.3 :4 7.2{v} | :2 9.3{b (0 4 0)} 7.3
 `}</AlphaTab>
 
 ## Rendering fonts {#fonts}
@@ -82,6 +94,7 @@ const api = new alphaTab.AlphaTabApi(container, {
 ## Where to look next
 
 - [Toggling notation elements off](./coverage-toggle-elements) — hide any category globally.
+- [`RenderStylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) — the stylesheet entry for the lyrics placement.
 - [Custom text fonts](./custom-text-fonts) — configure the lyric font family and size.
 - [Font family fallbacks](./font-family-fallbacks) — handle missing font families gracefully.
 - [`notation.elements`](/docs/reference/settings/notation/elements) — the settings entry point for the element map.

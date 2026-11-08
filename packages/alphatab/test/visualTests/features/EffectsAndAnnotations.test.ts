@@ -631,6 +631,33 @@ describe('EffectsAndAnnotationsTests', () => {
                 }
             );
         });
+
+        describe('placement', () => {
+            async function test(name: string, placement: string, staff: string) {
+                await VisualTestHelper.runVisualTestTex(
+                    `
+                    \\lyricsPlacement ${placement}
+                    \\lyrics "Do Re Mi Fa So La Ti Do"
+                    \\lyrics "One Two Three Four"
+                    \\staff {${staff}}
+                    :4 3.3{b (0 4)} 5.3{v} 7.3 8.3 | 5.2{b (0 4 0)} 5.2 7.2{v} 8.2
+                    `,
+                    `test-data/visual-tests/effects-and-annotations/lyrics-placement-${name}.png`,
+                    undefined,
+                    o => {
+                        // second system: the lyrics below must not run into it
+                        o.settings.display.barsPerRow = 1;
+                    }
+                );
+            }
+
+            it('below-score-tab', async () => await test('below-score-tab', 'below', 'score tabs'));
+            it('below-tab', async () => await test('below-tab', 'below', 'tabs'));
+            it('below-score', async () => await test('below-score', 'below', 'score'));
+            it('above-score-tab', async () => await test('above-score-tab', 'above', 'score tabs'));
+            it('above-tab', async () => await test('above-tab', 'above', 'tabs'));
+            it('hidden', async () => await test('hidden', 'hidden', 'score tabs'));
+        });
     });
 
     describe('hopo-arcs', () => {

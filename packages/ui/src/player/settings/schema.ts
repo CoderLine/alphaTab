@@ -502,6 +502,7 @@ export function buildSchema(module: AlphaTabModule): SchemaGroup[] {
                 stylesheet('useSystemSignSeparator', 'System sign separator', { type: 'toggle' }),
                 stylesheet('globalDisplayTuning', 'Show guitar tuning', { type: 'toggle' }),
                 stylesheet('tuningDisplayMode', 'Tuning placement', { type: 'enum', options: enumOptions(m.TuningDisplayMode as unknown as EnumObject, { Score: 'Above the score', Staff: 'At the staff' }) }),
+                stylesheet('lyricsPlacement', 'Lyrics placement', { type: 'enum', options: enumOptions(m.LyricsPlacement as unknown as EnumObject, { Below: 'Below the staff', Above: 'Above the staff', Hidden: 'Hidden' }) }),
                 stylesheet('globalDisplayChordDiagramsOnTop', 'Chord diagrams on top', { type: 'toggle' }),
                 stylesheet('globalDisplayChordDiagramsInScore', 'Chord diagrams in the score', { type: 'toggle' }),
                 stylesheet('singleTrackTrackNamePolicy', 'Track names (single track)', { type: 'enum', options: enumOptions(m.TrackNamePolicy as unknown as EnumObject) }),

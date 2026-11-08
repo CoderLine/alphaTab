@@ -21,6 +21,7 @@ export const alphaTexMappedEnumLookup = {
     TrackNameOrientation: alphaTab.model.TrackNameOrientation,
     TrackNameMode: alphaTab.model.TrackNameMode,
     TuningDisplayMode: alphaTab.model.TuningDisplayMode,
+    LyricsPlacement: alphaTab.model.LyricsPlacement,
     TextAlign: alphaTab.platform.TextAlign,
     BendType: alphaTab.model.BendType,
     KeySignature: alphaTab.model.KeySignature,
@@ -246,6 +247,11 @@ export const alphaTexMappedEnumMapping: {
     TuningDisplayMode: {
         Score: { snippet: 'score', shortDescription: 'Display tuning information above the score.' },
         Staff: { snippet: 'staff', shortDescription: 'Display tuning note names beside tab staff lines.' }
+    },
+    LyricsPlacement: {
+        Below: { snippet: 'below', shortDescription: 'Display lyrics below the standard notation staff.' },
+        Above: { snippet: 'above', shortDescription: 'Display lyrics above the standard notation staff.' },
+        Hidden: { snippet: 'hidden', shortDescription: 'Do not display lyrics.' }
     },
     TextAlign: {
         Left: {

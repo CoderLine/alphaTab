@@ -39,6 +39,19 @@ Numbered staves write every note instead of a single digit per beat. A chord is 
 
 The previous display with a single digit of the first voice, as in Guitar Pro, is available as the new [`NumberedNoteMode.SingleNote`](/docs/reference/types/model/numberednotemode); it now shows the highest note of a chord. Details: [Chords and multiple voices](/docs/features/render/numbered-notation#chords-and-multiple-voices).
 
+#### render: lyrics above or below the staff, or hidden
+https://github.com/CoderLine/alphaTab/issues/2776
+
+The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) places lyrics [`LyricsPlacement.Below`](/docs/reference/types/model/lyricsplacement) (default) or `LyricsPlacement.Above` the standard notation staff, or hides them with `LyricsPlacement.Hidden`, like the lyrics setting of the Guitar Pro stylesheet. Without standard notation, the lyrics move to the next shown staff (tablature, slash, numbered). alphaTex sets it with `\lyricsPlacement`, the Guitar Pro importer and exporter read and write it, and the MusicXML importer sets `Above` when all lyrics are placed above the staff. Details: [Lyrics placement](/docs/features/render/coverage-lyrics#placement).
+
+<AlphaTab tex={true}>{`
+\\lyricsPlacement above
+\\track "Guitar"
+\\staff {score tabs}
+\\lyrics "Bend it up and let it ring"
+:4 7.3{b (0 4)} 9.3 :8 7.3 9.3 :4 7.2{v} | :2 9.3{b (0 4 0)} 7.3
+`}</AlphaTab>
+
 ### Kotlin
 
 #### kotlin: platform-independent alphaTab-core library
@@ -52,6 +65,7 @@ alphaTab for Kotlin is published as two packages, like the .NET version. The new
 
 * Low octave dots on numbered staves sit below the duration lines instead of between digit and lines, as in printed jiǎnpǔ.
 * Numbered staves show all notes of chords and all voices. Set `notes` of the numbered staff configuration to `NumberedNoteMode.SingleNote` (alphaTex: `\defaultStaffDisplay numbered { notes singleNote }`) for one digit per beat; see [Single note mode](/docs/features/render/numbered-notation#single-note-mode).
+* Lyrics of tab-only tracks are shown below the tab staff instead of above it. With standard notation and tabs, they sit directly below the standard notation staff. Set [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) to `LyricsPlacement.Above` (alphaTex: `\lyricsPlacement above`) to show them above the staff.
 
 #### Kotlin packages
 

@@ -212,7 +212,7 @@ export enum NotationElement {
     EffectLetRing = 23,
 
     /**
-     * The lyrics of the track shown above the staff.
+     * The lyrics of the track, placed as configured in `RenderStylesheet.lyricsPlacement`.
      */
     EffectLyrics = 24,
 

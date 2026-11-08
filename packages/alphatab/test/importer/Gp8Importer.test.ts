@@ -8,6 +8,7 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import {
     BarNumberDisplay,
     BracketExtendMode,
+    LyricsPlacement,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy,
@@ -564,4 +565,16 @@ describe('Gp8ImporterTest', () => {
         expect(score.stylesheet.tuningDisplayMode).toBe(TuningDisplayMode.Staff);
         
     })
+
+    async function lyricsPlacement(name: string): Promise<LyricsPlacement> {
+        const reader = await prepareImporterWithFile(`guitarpro8/lyrics-placement-${name}.gp`);
+        return reader.readScore().stylesheet.lyricsPlacement;
+    }
+
+    it('lyrics-placement', async () => {
+        expect(await lyricsPlacement('above-score-tab')).toBe(LyricsPlacement.Above);
+        expect(await lyricsPlacement('below-score-tab')).toBe(LyricsPlacement.Below);
+        expect(await lyricsPlacement('below-tab')).toBe(LyricsPlacement.Below);
+        expect(await lyricsPlacement('hide-score-tab')).toBe(LyricsPlacement.Hidden);
+    });
 });

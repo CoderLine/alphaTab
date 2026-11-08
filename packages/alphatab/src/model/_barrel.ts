@@ -52,7 +52,8 @@ export {
     TrackNameMode,
     TrackNameOrientation,
     TuningDisplayMode,
-    BarNumberDisplay
+    BarNumberDisplay,
+    LyricsPlacement
 } from '@coderline/alphatab/model/RenderStylesheet';
 export { RepeatGroup } from '@coderline/alphatab/model/RepeatGroup';
 export { Score, ScoreSubElement, ScoreStyle, HeaderFooterStyle } from '@coderline/alphatab/model/Score';

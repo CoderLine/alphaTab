@@ -8,6 +8,7 @@ import { Color } from '@coderline/alphatab/model/Color';
 import {
     BarNumberDisplay,
     type BracketExtendMode,
+    LyricsPlacement,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy,
@@ -145,8 +146,16 @@ export class BinaryStylesheet {
     }
 
     public apply(score: Score): void {
+        let hideLyrics = false;
+        let drawLyricsUpside = false;
         for (const [key, value] of this.raw) {
             switch (key) {
+                case 'System/hideLyrics':
+                    hideLyrics = value as boolean;
+                    break;
+                case 'System/drawLyricsUpside':
+                    drawLyricsUpside = value as boolean;
+                    break;
                 case 'StandardNotation/hideDynamics':
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
@@ -385,6 +394,12 @@ export class BinaryStylesheet {
                     break;
             }
         }
+
+        if (hideLyrics) {
+            score.stylesheet.lyricsPlacement = LyricsPlacement.Hidden;
+        } else if (drawLyricsUpside) {
+            score.stylesheet.lyricsPlacement = LyricsPlacement.Above;
+        }
     }
     private _toTextAlign(value: number): TextAlign {
         switch (value) {
@@ -566,6 +581,16 @@ export class BinaryStylesheet {
         }
 
         binaryStylesheet.addValue('System/ExtendedBarLines', score.stylesheet.extendBarLines, DataType.Boolean);
+        binaryStylesheet.addValue(
+            'System/hideLyrics',
+            score.stylesheet.lyricsPlacement === LyricsPlacement.Hidden,
+            DataType.Boolean
+        );
+        binaryStylesheet.addValue(
+            'System/drawLyricsUpside',
+            score.stylesheet.lyricsPlacement === LyricsPlacement.Above,
+            DataType.Boolean
+        );
 
         const scoreStyle = score.style;
         if (scoreStyle) {
