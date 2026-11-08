@@ -182,7 +182,7 @@ export class AlphaTex1LanguageDefinitions {
         ['hidedynamics', null],
         ['usesystemsignseparator', null],
         ['tuningdisplaymode', [[[[100, 107], 0, ['score', 'staff']]]]],
-        ['lyricsplacement', [[[[100, 107], 0, ['auto', 'below', 'hidden']]]]],
+        ['lyricsplacement', [[[[100, 107], 0, ['below', 'above', 'hidden']]]]],
         ['multibarrest', null],
         ['bracketextendmode', [[[[100, 107], 0, ['nobrackets', 'groupstaves', 'groupsimilarinstruments']]]]],
         ['singletracktracknamepolicy', [[[[100, 107], 0, ['hidden', 'firstsystem', 'allsystems']]]]],

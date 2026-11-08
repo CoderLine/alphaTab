@@ -2843,7 +2843,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 )
             );
         }
-        if (stylesheet.lyricsPlacement !== LyricsPlacement.Auto) {
+        if (stylesheet.lyricsPlacement !== LyricsPlacement.Below) {
             nodes.push(
                 Atnf.identMeta(
                     'lyricsPlacement',

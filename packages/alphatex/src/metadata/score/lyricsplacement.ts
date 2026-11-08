@@ -4,7 +4,7 @@ import type { MetadataTagDefinition } from '@coderline/alphatab-alphatex/types';
 
 export const lyricsPlacement: MetadataTagDefinition = {
     tag: '\\lyricsPlacement',
-    snippet: '\\lyricsPlacement ${1:below}$0',
+    snippet: '\\lyricsPlacement ${1:above}$0',
     shortDescription: 'Sets where lyrics are displayed.',
     signatures: [
         {
@@ -19,7 +19,7 @@ export const lyricsPlacement: MetadataTagDefinition = {
         }
     ],
     examples: `
-        \\lyricsPlacement below
+        \\lyricsPlacement above
         \\track "Guitar"
             \\staff { score tabs }
             \\lyrics "Do Re Mi Fa"

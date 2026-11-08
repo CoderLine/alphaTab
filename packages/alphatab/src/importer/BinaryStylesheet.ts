@@ -8,6 +8,7 @@ import { Color } from '@coderline/alphatab/model/Color';
 import {
     BarNumberDisplay,
     type BracketExtendMode,
+    LyricsPlacement,
     TrackNameMode,
     TrackNameOrientation,
     TrackNamePolicy,
@@ -385,6 +386,13 @@ export class BinaryStylesheet {
                     break;
             }
         }
+
+        // hiding wins over the placement, independent of the key order
+        if (this.raw.get('System/hideLyrics') === true) {
+            score.stylesheet.lyricsPlacement = LyricsPlacement.Hidden;
+        } else if (this.raw.get('System/drawLyricsUpside') === true) {
+            score.stylesheet.lyricsPlacement = LyricsPlacement.Above;
+        }
     }
     private _toTextAlign(value: number): TextAlign {
         switch (value) {
@@ -566,6 +574,16 @@ export class BinaryStylesheet {
         }
 
         binaryStylesheet.addValue('System/ExtendedBarLines', score.stylesheet.extendBarLines, DataType.Boolean);
+        binaryStylesheet.addValue(
+            'System/hideLyrics',
+            score.stylesheet.lyricsPlacement === LyricsPlacement.Hidden,
+            DataType.Boolean
+        );
+        binaryStylesheet.addValue(
+            'System/drawLyricsUpside',
+            score.stylesheet.lyricsPlacement === LyricsPlacement.Above,
+            DataType.Boolean
+        );
 
         const scoreStyle = score.style;
         if (scoreStyle) {

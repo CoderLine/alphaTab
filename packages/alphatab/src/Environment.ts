@@ -12,7 +12,6 @@ import { Logger } from '@coderline/alphatab/Logger';
 import type { Font } from '@coderline/alphatab/model/Font';
 import { GolpeType } from '@coderline/alphatab/model/GolpeType';
 import { HarmonicType } from '@coderline/alphatab/model/HarmonicType';
-import { LyricsPlacement } from '@coderline/alphatab/model/RenderStylesheet';
 import type { ICanvas } from '@coderline/alphatab/platform/ICanvas';
 import { AlphaSynthWebWorklet } from '@coderline/alphatab/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { BrowserUiFacade } from '@coderline/alphatab/platform/javascript/BrowserUiFacade';
@@ -44,7 +43,10 @@ import { createGolpeEffectInfo } from '@coderline/alphatab/rendering/effects/Gol
 import { createHarmonicsEffectInfo } from '@coderline/alphatab/rendering/effects/HarmonicsEffectInfo';
 import { leftHandTapEffectInfo } from '@coderline/alphatab/rendering/effects/LeftHandTapEffectInfo';
 import { letRingEffectInfo } from '@coderline/alphatab/rendering/effects/LetRingEffectInfo';
-import { createLyricsEffectInfo } from '@coderline/alphatab/rendering/effects/LyricsEffectInfo';
+import {
+    lyricsAboveEffectInfo,
+    lyricsBelowEffectInfo
+} from '@coderline/alphatab/rendering/effects/LyricsEffectInfo';
 import { markerEffectInfo } from '@coderline/alphatab/rendering/effects/MarkerEffectInfo';
 import { noteOrnamentEffectInfo } from '@coderline/alphatab/rendering/effects/NoteOrnamentEffectInfo';
 import { numberedBarKeySignatureEffectInfo } from '@coderline/alphatab/rendering/effects/NumberedBarKeySignatureEffectInfo';
@@ -468,6 +470,8 @@ export class Environment {
         //
         // Slash
         new SlashBarRendererFactory([
+            { effect: lyricsAboveEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: lyricsBelowEffectInfo, mode: EffectBandMode.OwnedBottom },
             { effect: tempoEffectInfo, mode: EffectBandMode.SharedTop },
             { effect: tripletFeelEffectInfo, mode: EffectBandMode.SharedTop },
             { effect: markerEffectInfo, mode: EffectBandMode.SharedTop },
@@ -483,6 +487,8 @@ export class Environment {
         //
         // Score (standard notation)
         new ScoreBarRendererFactory([
+            { effect: lyricsAboveEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: lyricsBelowEffectInfo, mode: EffectBandMode.OwnedBottom },
             { effect: capoEffectInfo, mode: EffectBandMode.SharedTop },
             { effect: fermataEffectInfo, mode: EffectBandMode.SharedTop },
             { effect: beatBarreEffectInfo, mode: EffectBandMode.SharedTop },
@@ -536,6 +542,8 @@ export class Environment {
         //
         // Numbered
         new NumberedBarRendererFactory([
+            { effect: lyricsAboveEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: lyricsBelowEffectInfo, mode: EffectBandMode.OwnedBottom },
             { effect: numberedBarKeySignatureEffectInfo, mode: EffectBandMode.OwnedTop, order: 1000 },
             { effect: slideLabelEffectInfo, mode: EffectBandMode.OwnedTop },
             { effect: hammerPullLabelEffectInfo, mode: EffectBandMode.OwnedTop }
@@ -544,8 +552,8 @@ export class Environment {
         //
         // Tabs
         new TabBarRendererFactory([
-            { effect: createLyricsEffectInfo(LyricsPlacement.Auto), mode: EffectBandMode.SharedTop },
-
+            { effect: lyricsAboveEffectInfo, mode: EffectBandMode.OwnedTop },
+            { effect: lyricsBelowEffectInfo, mode: EffectBandMode.OwnedBottom },
             { effect: tabWhammyEffectInfo, mode: EffectBandMode.OwnedTop },
             { effect: trillEffectInfo, mode: EffectBandMode.OwnedTop },
             { effect: wideBeatVibratoEffectInfo, mode: EffectBandMode.OwnedTop },
@@ -579,9 +587,7 @@ export class Environment {
                 effect: createGolpeEffectInfo(GolpeType.Thumb),
                 mode: EffectBandMode.OwnedBottom,
                 shouldCreate: staff => !staff.showStandardNotation
-            },
-            // shared and last: bottom of the tab staff, or of the last shown staff without tabs
-            { effect: createLyricsEffectInfo(LyricsPlacement.Below), mode: EffectBandMode.SharedBottom }
+            }
         ])
     ];
 

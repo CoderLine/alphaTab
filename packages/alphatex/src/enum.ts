@@ -249,11 +249,8 @@ export const alphaTexMappedEnumMapping: {
         Staff: { snippet: 'staff', shortDescription: 'Display tuning note names beside tab staff lines.' }
     },
     LyricsPlacement: {
-        Auto: {
-            snippet: 'auto',
-            shortDescription: 'Display lyrics above the tab staff, or below the staff if no tabs are shown.'
-        },
-        Below: { snippet: 'below', shortDescription: 'Display lyrics below the last staff.' },
+        Below: { snippet: 'below', shortDescription: 'Display lyrics below the standard notation staff.' },
+        Above: { snippet: 'above', shortDescription: 'Display lyrics above the standard notation staff.' },
         Hidden: { snippet: 'hidden', shortDescription: 'Do not display lyrics.' }
     },
     TextAlign: {

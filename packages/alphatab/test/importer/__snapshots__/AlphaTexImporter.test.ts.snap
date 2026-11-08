@@ -6178,7 +6178,7 @@ exports[`AlphaTexImporterTest > errors > at219 > lyricsplacement > parser-diagno
     "code" => 219,
     "severity" => 2,
     "message" => "Error parsing arguments: no overload matched arguments (). Signatures:
-(auto|below|hidden)",
+(below|above|hidden)",
     "start" => Map {
       "col" => 17,
       "line" => 1,

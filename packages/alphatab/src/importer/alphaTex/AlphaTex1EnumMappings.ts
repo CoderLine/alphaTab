@@ -224,8 +224,8 @@ export class AlphaTex1EnumMappings {
         AlphaTex1EnumMappings.tuningDisplayMode
     );
     public static readonly lyricsPlacement = new Map<string, LyricsPlacement>([
-        ['auto', 0],
-        ['below', 1],
+        ['below', 0],
+        ['above', 1],
         ['hidden', 2]
     ]);
     public static readonly lyricsPlacementReversed = AlphaTex1EnumMappings._reverse(

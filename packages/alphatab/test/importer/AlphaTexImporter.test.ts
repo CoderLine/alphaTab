@@ -1851,7 +1851,7 @@ describe('AlphaTexImporterTest', () => {
             \\bracketExtendMode nobrackets
             \\useSystemSignSeparator
             \\tuningDisplayMode staff
-            \\lyricsPlacement below
+            \\lyricsPlacement above
             \\singleTrackTrackNamePolicy allsystems
             \\multiTrackTrackNamePolicy Hidden
             \\firstSystemTrackNameMode fullname
@@ -1870,7 +1870,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.bracketExtendMode).toBe(BracketExtendMode.NoBrackets);
         expect(score.stylesheet.useSystemSignSeparator).toBe(true);
         expect(score.stylesheet.tuningDisplayMode).toBe(TuningDisplayMode.Staff);
-        expect(score.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
+        expect(score.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Above);
         expect(score.stylesheet.singleTrackTrackNamePolicy).toBe(TrackNamePolicy.AllSystems);
         expect(score.stylesheet.multiTrackTrackNamePolicy).toBe(TrackNamePolicy.Hidden);
         expect(score.stylesheet.firstSystemTrackNameMode).toBe(TrackNameMode.FullName);
@@ -1881,8 +1881,8 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('lyrics-placement', () => {
-        expect(parseTex('.').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Auto);
-        expect(parseTex('\\lyricsPlacement auto .').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Auto);
+        expect(parseTex('.').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
+        expect(parseTex('\\lyricsPlacement below .').stylesheet.lyricsPlacement).toBe(LyricsPlacement.Below);
 
         const hidden = parseTex('\\lyricsPlacement hidden .');
         expect(hidden.stylesheet.lyricsPlacement).toBe(LyricsPlacement.Hidden);

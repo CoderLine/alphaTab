@@ -44,10 +44,10 @@ Multiple verses stack below the staff, one line per verse — the way hymnals an
 
 ## Placement {#placement}
 
-[`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) decides where the lyrics go. The default [`LyricsPlacement.Auto`](/docs/reference/types/model/lyricsplacement) shows them above the tab staff, between standard notation and tabs; a staff without tabs, like a vocal line, shows them below. `LyricsPlacement.Below` moves them below the last staff of the track, which keeps the space above the tabs free for bends, whammy bar and vibrato. `LyricsPlacement.Hidden` hides the lyrics of the score. In alphaTex, use `\lyricsPlacement auto|below|hidden`.
+[`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renderstylesheet/#lyricsplacement) decides where the lyrics go, like the lyrics setting of the Guitar Pro stylesheet. The placement is relative to the standard notation staff: [`LyricsPlacement.Below`](/docs/reference/types/model/lyricsplacement) (the default) shows them below it, `LyricsPlacement.Above` above it. When standard notation is not shown, the lyrics move to the next shown staff, in the order tablature, slash, numbered: a tab-only guitar part shows them below the tabs, which keeps the space above the tabs free for bends, whammy bar and vibrato. `LyricsPlacement.Hidden` hides the lyrics of the score. In alphaTex, use `\lyricsPlacement below|above|hidden`. The Guitar Pro importer and exporter read and write the setting.
 
 <AlphaTab tex={true}>{`
-\\lyricsPlacement below
+\\lyricsPlacement above
 \\track "Guitar"
 \\staff {score tabs}
 \\lyrics "Bend it up and let it ring"

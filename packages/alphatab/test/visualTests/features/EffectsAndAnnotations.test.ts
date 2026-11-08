@@ -654,6 +654,8 @@ describe('EffectsAndAnnotationsTests', () => {
             it('below-score-tab', async () => await test('below-score-tab', 'below', 'score tabs'));
             it('below-tab', async () => await test('below-tab', 'below', 'tabs'));
             it('below-score', async () => await test('below-score', 'below', 'score'));
+            it('above-score-tab', async () => await test('above-score-tab', 'above', 'score tabs'));
+            it('above-tab', async () => await test('above-tab', 'above', 'tabs'));
             it('hidden', async () => await test('hidden', 'hidden', 'score tabs'));
         });
     });

@@ -218,7 +218,7 @@ describe('EffectPlacementTests', () => {
             for (const renderStaff of renderer.layout!.systems[0].allStaves) {
                 const r = renderStaff.barRenderers[0];
                 for (const top of [true, false]) {
-                    for (const effectId of ['EffectLyrics', 'EffectLyricsBelow']) {
+                    for (const effectId of ['EffectLyrics', 'EffectLyricsAbove']) {
                         if (band(r, effectId, top)) {
                             locations.push(`${renderStaff.staffId}-${top ? 'top' : 'bottom'}`);
                         }
@@ -228,20 +228,12 @@ describe('EffectPlacementTests', () => {
             return locations;
         }
 
-        it('auto-score-tab', async () => {
-            expect(await lyricsBands('', 'score tabs')).toEqual(['tab-top']);
-        });
-
-        it('auto-tab', async () => {
-            expect(await lyricsBands('auto', 'tabs')).toEqual(['tab-top']);
-        });
-
-        it('auto-score', async () => {
-            expect(await lyricsBands('auto', 'score')).toEqual(['score-bottom']);
+        it('below-default-score-tab', async () => {
+            expect(await lyricsBands('', 'score tabs')).toEqual(['score-bottom']);
         });
 
         it('below-score-tab', async () => {
-            expect(await lyricsBands('below', 'score tabs')).toEqual(['tab-bottom']);
+            expect(await lyricsBands('below', 'score tabs')).toEqual(['score-bottom']);
         });
 
         it('below-tab', async () => {
@@ -254,6 +246,19 @@ describe('EffectPlacementTests', () => {
 
         it('below-slash', async () => {
             expect(await lyricsBands('below', 'slash')).toEqual(['slash-bottom']);
+        });
+
+        it('above-score-tab', async () => {
+            expect(await lyricsBands('above', 'score tabs')).toEqual(['score-top']);
+        });
+
+        it('above-tab', async () => {
+            expect(await lyricsBands('above', 'tabs')).toEqual(['tab-top']);
+        });
+
+        it('above-slash-tab', async () => {
+            // tabs come before slash in the staff cascade
+            expect(await lyricsBands('above', 'slash tabs')).toEqual(['tab-top']);
         });
 
         it('hidden', async () => {

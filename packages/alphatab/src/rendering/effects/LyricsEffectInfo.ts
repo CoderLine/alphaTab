@@ -10,20 +10,25 @@ import { LyricsGlyph } from '@coderline/alphatab/rendering/glyphs/LyricsGlyph';
 import { OverlayRodPolicy } from '@coderline/alphatab/rendering/OverlayRodPolicy';
 
 /**
- * Creates the lyrics effect for one placement. Only the effect matching the
- * `lyricsPlacement` of the score stylesheet creates glyphs.
+ * Creates the lyrics effect for one side of the staff. Glyphs are created only on the
+ * cascade-primary staff (standard notation, else the next shown one) and only for the
+ * `lyricsPlacement` of the score stylesheet.
  * @internal
  */
-export function createLyricsEffectInfo(placement: LyricsPlacement): EffectInfo {
+function createLyricsEffectInfo(placement: LyricsPlacement): EffectInfo {
     return {
-        effectId: placement === LyricsPlacement.Below ? 'EffectLyricsBelow' : 'EffectLyrics',
+        effectId: placement === LyricsPlacement.Above ? 'EffectLyricsAbove' : 'EffectLyrics',
         notationElement: NotationElement.EffectLyrics,
         hideOnMultiTrack: false,
         sizingMode: EffectBarGlyphSizing.SingleOnBeat,
         placementCategory: EffectBandPlacementCategory.HorizontalRow,
         overlayRodPolicy: OverlayRodPolicy.Centered,
-        shouldCreateGlyph: (_renderer: BarRendererBase, beat: Beat): boolean => {
-            return !!beat.lyrics && beat.voice.bar.staff.track.score.stylesheet.lyricsPlacement === placement;
+        shouldCreateGlyph: (renderer: BarRendererBase, beat: Beat): boolean => {
+            return (
+                !!beat.lyrics &&
+                beat.voice.bar.staff.track.score.stylesheet.lyricsPlacement === placement &&
+                renderer.staff!.isCascadePrimary
+            );
         },
         createNewGlyph: (renderer: BarRendererBase, beat: Beat): EffectGlyph => {
             return new LyricsGlyph(
@@ -37,3 +42,13 @@ export function createLyricsEffectInfo(placement: LyricsPlacement): EffectInfo {
         canExpand: (_from: Beat, _to: Beat): boolean => true
     };
 }
+
+/**
+ * @internal
+ */
+export const lyricsAboveEffectInfo: EffectInfo = createLyricsEffectInfo(LyricsPlacement.Above);
+
+/**
+ * @internal
+ */
+export const lyricsBelowEffectInfo: EffectInfo = createLyricsEffectInfo(LyricsPlacement.Below);
