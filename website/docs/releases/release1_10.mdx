@@ -55,7 +55,7 @@ The new [`score.stylesheet.lyricsPlacement`](/docs/reference/types/model/renders
 #### render: sharp and flat tunings
 https://github.com/CoderLine/alphaTab/issues/2802
 
-Tunings keep the sharp or flat spelling of the source file per string, and the score tuning and the staff tuning draw the accidentals as music symbols. alphaTex keeps the spelling written in `\tuning` and writes it back on export, and the MusicXML importer reads it from `tuning-step` and `tuning-alter`. The new [`Tuning.spellings`](/docs/reference/types/model/tuning/#spellings) holds the written pitch of every string as a [`SpelledPitch`](/docs/reference/types/model/spelledpitch). Details: [Sharp and flat tunings](/docs/features/render/tuning-display#sharp-and-flat-tunings).
+Tunings keep the sharp or flat spelling of the source file per string, and the score tuning and the staff tuning draw the accidentals as music symbols. alphaTex keeps the spelling written in `\tuning` and writes it back on export, the Guitar Pro 7 and 8 importer and exporter read and write the sharp or flat choice of the tuning, and the MusicXML importer reads the spelling from `tuning-step` and `tuning-alter`. The new [`Tuning.spellings`](/docs/reference/types/model/tuning/#spellings) holds the written pitch of every string as a [`SpelledPitch`](/docs/reference/types/model/spelledpitch). Details: [Sharp and flat tunings](/docs/features/render/tuning-display#sharp-and-flat-tunings).
 
 <AlphaTab tex={true}>{`
 \\track "Guitar"

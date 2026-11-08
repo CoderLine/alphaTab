@@ -66,6 +66,7 @@ alphaTab labels every string with its written pitch. A string tuned to the same 
 
 - alphaTex keeps the tuning as written in [`\tuning`](/docs/alphatex/staff-metadata#tuning) and writes it back on export.
 - MusicXML files define the spelling with `tuning-step` and `tuning-alter`.
+- Guitar Pro 7 and 8 files store one sharp or flat choice per tuning, which alphaTab reads and writes back in the [Guitar Pro 7 exporter](/docs/features/export/export-to-guitar-pro-7). Guitar Pro 6 files have no such choice.
 - Without a known spelling, the strings are labeled with flats, as in earlier versions.
 
 In code, [`Tuning.spellings`](/docs/reference/types/model/tuning/#spellings) holds a [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for every string, in the order of [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings). [`Tuning.getSpelling`](/docs/reference/types/model/tuning/#getspelling) returns the written pitch of a string, falling back to the flat spelling when no spelling is stored or the tuning value was changed afterwards. Set both arrays to change the tuning together with its spelling:
