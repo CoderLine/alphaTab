@@ -399,6 +399,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'tuning':
                 const tuning: number[] = [];
+                const spellings: SpelledPitch[] = [];
                 let hideTuning = false;
                 let tuningName = '';
                 for (let i = 0; i < metaData.arguments!.arguments.length; i++) {
@@ -426,6 +427,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             const t = ModelUtils.parsePitch(text);
                             if (t) {
                                 tuning.push(t.pitch.value);
+                                spellings.push(t.pitch);
                             } else if (i === metaData.arguments!.arguments.length - 1 && tuning.length > 0) {
                                 tuningName = text;
                                 importer.addSemanticDiagnostic({
@@ -454,6 +456,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 importer.state.staffTuningApplied.delete(staff);
                 staff.stringTuning = new Tuning();
                 staff.stringTuning.tunings = tuning;
+                staff.stringTuning.spellings = spellings.length > 0 ? spellings : null;
                 staff.stringTuning.name = tuningName;
 
                 this._tuningProperties(importer, staff, staff.stringTuning, metaData);
@@ -3250,7 +3253,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 'tuning',
                 Atnf.args(
                     staff.stringTuning.tunings.map(
-                        t => Atnf.ident(SpelledPitch.formatValue(t, true, true)) as IAlphaTexArgumentValue
+                        (_, i) => Atnf.ident(staff.stringTuning.getSpelling(i).toString()) as IAlphaTexArgumentValue
                     )
                 )
             );

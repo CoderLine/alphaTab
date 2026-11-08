@@ -44,7 +44,7 @@ export const tuning: MetadataTagDefinition = {
                 {
                     name: 'strings',
                     shortDescription: 'The tuning values as pitched notes',
-                    longDescription: `The tuning values as [pitched notes](https://alphatab.net/docs/alphatex/document-structure#pitched-notes)`,
+                    longDescription: `The tuning values as [pitched notes](https://alphatab.net/docs/alphatex/document-structure#pitched-notes). The tuning is displayed as written: \`F#3\` and \`Gb3\` are the same tuning value but keep their sharp or flat spelling.`,
                     type: alphaTab.importer.alphaTex.AlphaTexNodeType.Ident,
                     allowAllStringTypes: true,
                     parseMode: alphaTab.importer.alphaTex.ArgumentListParseTypesMode.ValueListWithoutParenthesis
@@ -58,6 +58,10 @@ export const tuning: MetadataTagDefinition = {
           \\tuning (A1 D2 A2 D3 G3 B3 E4) { hide label "Special Guitar Tuning" }
           4.1 3.1 2.1 1.1
         \\track "Track 2"
+          \\staff {tabs}
+          \\tuning (D#4 A#3 F#3 C#3 G#2 D#2)
+          4.1 3.1 2.1 1.1
+        \\track "Track 3"
           \\tuning piano
           C4 D4 E4 F4
         `,
