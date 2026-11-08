@@ -1952,6 +1952,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private _parseStaffDetails(element: XmlNode, staff: Staff): void {
+        let spellings: Map<number, SpelledPitch> | null = null;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'staff-type': Ignored
@@ -1960,7 +1961,8 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'line-detail': Not supported
                 case 'staff-tuning':
-                    this._parseStaffTuning(c, staff);
+                    spellings ??= new Map<number, SpelledPitch>();
+                    this._parseStaffTuning(c, staff, spellings);
                     break;
                 case 'capo':
                     staff.capo = Number.parseInt(c.innerText, 10);
@@ -1968,9 +1970,15 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'staff-size': Not supported
             }
         }
+
+        if (spellings !== null && spellings.size > 0) {
+            const tuning = staff.stringTuning;
+            const parsed = spellings;
+            tuning.spellings = tuning.tunings.map((_, i) => (parsed.has(i) ? parsed.get(i)! : tuning.getSpelling(i)));
+        }
     }
 
-    private _parseStaffTuning(element: XmlNode, staff: Staff): void {
+    private _parseStaffTuning(element: XmlNode, staff: Staff, spellings: Map<number, SpelledPitch>): void {
         if (staff.stringTuning.tunings.length === 0) {
             staff.showTablature = true;
             staff.showStandardNotation = false;
@@ -1994,8 +2002,14 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
             }
         }
-        const tuning: number = (ModelUtils.parsePitch(tuningStep + tuningOctave)?.pitch.value ?? -1) + tuningAlter;
-        staff.tuning[staff.tuning.length - line] = tuning;
+        const index = staff.tuning.length - line;
+        const natural = ModelUtils.parsePitch(tuningStep + tuningOctave);
+        staff.tuning[index] = (natural?.pitch.value ?? -1) + tuningAlter;
+
+        const isSpellableAlter = Number.isInteger(tuningAlter) && tuningAlter >= -2 && tuningAlter <= 2;
+        if (natural !== null && isSpellableAlter && index >= 0 && index < staff.tuning.length) {
+            spellings.set(index, new SpelledPitch(natural.pitch.step, tuningAlter, natural.pitch.octave));
+        }
     }
 
     private _parseClef(element: XmlNode, bar: Bar): void {

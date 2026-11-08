@@ -427,6 +427,31 @@ describe('MusicXmlImporterTests', () => {
         expect(trumpet.isPalmMute).toBe(false);
     });
 
+    it('tuning-alter', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/tuning-alter.xml');
+        const tuning = score.tracks[0].staves[0].stringTuning;
+
+        // top string first, line 1 is the lowest string
+        expect(tuning.tunings).toEqual([64.5, 58, 54, 50, 44, 39]);
+        expect(tuning.spellings!.map(s => [s.step, s.alter, s.octave])).toEqual([
+            // quarter tone alter: no spelling, fallback from the tuning value
+            [2, 0, 4],
+            [5, 1, 3],
+            [4, -1, 3],
+            [1, 0, 3],
+            [4, 1, 2],
+            [2, -1, 2]
+        ]);
+        expect(tuning.tunings.map((_, i) => tuning.getSpelling(i).toNameString())).toEqual([
+            'E',
+            'A#',
+            'Gb',
+            'D',
+            'G#',
+            'Eb'
+        ]);
+    });
+
     it('string-annotation', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/string-annotation.xml');
 
