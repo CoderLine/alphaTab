@@ -188,7 +188,13 @@ function propertyRead(serializable: TypeSchema, prop: TypeProperty, importer: Im
         if (!itemType.isOwnType || itemType.isEnumType) {
             return `${field} = ${readValueExpr(type, 'r')};`;
         }
-        const add = jsonAddMethod(prop) ?? `${prop.name}.push`;
+        if (itemType.isJsonImmutable) {
+            importer(itemType.typeAsString, itemType.modulePath);
+            const read = `const items: ${itemType.typeAsString}[] = [];\nr.readArray(rr => {\nitems.push(${itemType.typeAsString}.fromJson(rr.readValue())!);\n});\n${field} = items;`;
+            return isNullableOrOptional(type) ? `if (!r.isNullish()) {\n${read}\n} else {\n${field} = null;\n}` : read;
+        }
+        // the item callback is a closure in which the null check of the field does not narrow
+        const add = jsonAddMethod(prop) ?? `${prop.name}${isNullableOrOptional(type) ? '!' : ''}.push`;
         const read = `${field} = [];\nr.readArray(rr => {\nconst i = ${constructExpr(itemType, importer)};\n${childRead(itemType, 'i', 'rr', ctx, importer)}\nobj.${add}(i);\n});`;
         return isNullableOrOptional(type) ? `if (!r.isNullish()) {\n${read}\n}` : read;
     }

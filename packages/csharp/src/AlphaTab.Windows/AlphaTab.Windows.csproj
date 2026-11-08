@@ -27,7 +27,7 @@
 
     <ItemGroup>
       <PackageReference Include="NAudio" Version="2.4.0" />
-      <PackageReference Include="AlphaSkia.Native.Windows" Version="3.5.147" />
+      <PackageReference Include="AlphaSkia.Native.Windows" Version="4.0.157" />
     </ItemGroup>
 
 </Project>

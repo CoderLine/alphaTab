@@ -171,6 +171,7 @@ import { TrackSerializer } from "@coderline/alphatab/generated/model/TrackSerial
 import { TremoloPickingEffectSerializer } from "@coderline/alphatab/generated/model/TremoloPickingEffectSerializer";
 import { TremoloPickingStyle } from "@coderline/alphatab/model/TremoloPickingEffect";
 import { TuningSerializer } from "@coderline/alphatab/generated/model/TuningSerializer";
+import { SpelledPitch } from "@coderline/alphatab/model/SpelledPitch";
 import { VoiceStyle } from "@coderline/alphatab/model/Voice";
 import { VoiceStyleSerializer } from "@coderline/alphatab/generated/model/VoiceStyleSerializer";
 import { VoiceSubElement } from "@coderline/alphatab/model/Voice";
@@ -1334,7 +1335,8 @@ export class SerializerFill {
         obj.isStandard = !obj.isStandard;
         obj.name = 'x ä€𝄞';
         {
-            obj.tunings = [7.25];
+            obj.pitches = [];
+            obj.pitches.push(new SpelledPitch(3, 1, 4));
         }
     }
     public static fillVoiceStyle(obj: VoiceStyle, depth: number = 0): void {

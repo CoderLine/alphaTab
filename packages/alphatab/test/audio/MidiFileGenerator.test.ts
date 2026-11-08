@@ -25,8 +25,8 @@ import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { Note } from '@coderline/alphatab/model/Note';
 import type { PlaybackInformation } from '@coderline/alphatab/model/PlaybackInformation';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import { TremoloPickingEffect, TremoloPickingStyle } from '@coderline/alphatab/model/TremoloPickingEffect';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { VibratoType } from '@coderline/alphatab/model/VibratoType';
 import { Settings } from '@coderline/alphatab/Settings';
 import { AlphaSynth } from '@coderline/alphatab/synth/AlphaSynth';
@@ -2246,7 +2246,7 @@ describe('MidiFileGeneratorTest', () => {
                 .filter<FlatMidiEvent>(e => e instanceof FlatNoteEvent)
                 .map(
                     e =>
-                        `Note: ${Tuning.getTextForTuning((e as FlatNoteEvent).key, true)} ${(e as FlatNoteEvent).length}`
+                        `Note: ${SpelledPitch.formatValue((e as FlatNoteEvent).key, true, true)} ${(e as FlatNoteEvent).length}`
                 );
 
             expect(noteEvents).toMatchSnapshot();

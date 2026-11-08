@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { StaveProfile } from '@coderline/alphatab/StaveProfile';
 import { TabRhythmMode } from '@coderline/alphatab/NotationSettings';
 import { Settings } from '@coderline/alphatab/Settings';
-import { VisualTestHelper } from 'test/visualTests/VisualTestHelper';
+import { VisualTestHelper, type VisualTestOptions } from 'test/visualTests/VisualTestHelper';
 import { TestPlatform } from 'test/TestPlatform';
 import { Logger } from '@coderline/alphatab/Logger';
 import { BarStyle, BarSubElement } from '@coderline/alphatab/model/Bar';
@@ -290,17 +290,28 @@ describe('GeneralTests', () => {
         );
     });
 
+    async function renderColors(failures: Error[], configure: (o: VisualTestOptions) => void): Promise<void> {
+        try {
+            await VisualTestHelper.runVisualTest('general/colors.gp', undefined, configure);
+        } catch (e) {
+            failures.push(e as Error);
+        }
+    }
+
     it('color-performance', async () => {
+        // both references are compared on every run, a mismatch of the first one must not hide the second one
+        const failures: Error[] = [];
+
         // warm-up
         for (let i = 0; i < 5; i++) {
-            await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
+            await renderColors(failures, o => {
                 enableColoring(o.score);
             });
         }
 
         for (let i = 0; i < 10; i++) {
             let coloredStart: number = 0;
-            await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
+            await renderColors(failures, o => {
                 enableColoring(o.score);
                 coloredStart = performance.now();
             });
@@ -308,7 +319,7 @@ describe('GeneralTests', () => {
 
             let defaultStart: number = 0;
 
-            await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
+            await renderColors(failures, o => {
                 o.runs[0].referenceFileName = 'test-data/visual-tests/general/colors-disabled.png';
                 defaultStart = performance.now();
             });
@@ -321,6 +332,10 @@ describe('GeneralTests', () => {
 
             Logger.info('Test-color-performance', 'Colored', i, coloredDuration);
             Logger.info('Test-color-performance', 'Default', i, defaultDuration);
+        }
+
+        if (failures.length > 0) {
+            throw failures[0];
         }
     });
 

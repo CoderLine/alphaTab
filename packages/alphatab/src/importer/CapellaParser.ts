@@ -838,9 +838,9 @@ export class CapellaParser {
 
     private _parseHead(beat: Beat, articulation: Note, element: XmlNode) {
         const note = new Note();
-        const pitch = ModelUtils.parseTuning(element.getAttribute('pitch'));
-        note.octave = pitch!.octave - 1;
-        note.tone = pitch!.tone.noteValue;
+        const pitch = ModelUtils.parsePitch(element.getAttribute('pitch'));
+        note.octave = pitch!.noteOctave - 1;
+        note.tone = pitch!.noteTone;
         note.isStaccato = articulation.isStaccato;
         note.accentuated = articulation.accentuated;
         beat.addNote(note);

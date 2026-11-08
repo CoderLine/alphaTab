@@ -173,8 +173,8 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
 
         <FileFormatFeatureRow feature="Tuning" 
                                     model={[FeatureStatus.Supported]}
-                                    reading={[FeatureStatus.Supported]}
-                                    render={[FeatureStatus.Supported]}
+                                    reading={[FeatureStatus.Supported, "1.10.0", "The sharp or flat display of the tuning is kept"]}
+                                    render={[FeatureStatus.Supported, "1.10.0", "Strings are labeled with sharps or flats as in Guitar Pro"]}
                                     audio={[FeatureStatus.Supported]}
                                     tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Tuning > Capo" 

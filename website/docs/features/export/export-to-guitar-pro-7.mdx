@@ -70,6 +70,7 @@ Since 1.9.0 the exporter also handles the following:
 - Guitar Pro supports four voices per bar. Voices with a higher index move into unused slots. When all four slots are taken, the remaining voices are dropped and a warning is logged.
 - Notes keep their spelling in every key, for example a B♭ in F major stays a B♭.
 - The tuning display mode of the stylesheet (tuning above the score or on the staff lines) is written to the binary stylesheet. See [Tuning display](/docs/features/render/tuning-display).
+- Since 1.10.0 the tuning keeps its sharp or flat display. Guitar Pro stores one choice per tuning: it is written as sharps when every string with an accidental is spelled with a sharp, otherwise as flats. See [Sharp and flat tunings](/docs/features/render/tuning-display#sharp-and-flat-tunings).
 - Percussion notes keep their string, so drum tablature survives the round trip. See [Drum and percussion notation](/docs/features/render/drum-tabs).
 - The exporter works on a copy of the score. `api.score` stays unchanged.
 

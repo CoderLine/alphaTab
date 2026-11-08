@@ -28,9 +28,9 @@ import type { Beat } from '@coderline/alphatab/model/Beat';
 import type { Note } from '@coderline/alphatab/model/Note';
 import { PercussionMapper } from '@coderline/alphatab/model/PercussionMapper';
 import type { Score } from '@coderline/alphatab/model/Score';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
 import { Settings } from '@coderline/alphatab/Settings';
 
 /**
@@ -677,7 +677,7 @@ export class AlphaTexExporter extends ScoreExporter {
         } else if (data.isPiano) {
             note.noteValue = {
                 nodeType: AlphaTexNodeType.Ident,
-                text: Tuning.getTextForTuning(data.realValueWithoutHarmonic, true)
+                text: SpelledPitch.formatValue(data.realValueWithoutHarmonic, true, true)
             } as AlphaTexIdentifier;
         } else if (data.isStringed) {
             note.noteValue = {

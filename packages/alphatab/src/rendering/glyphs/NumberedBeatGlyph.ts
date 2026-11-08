@@ -6,9 +6,10 @@ import { Duration } from '@coderline/alphatab/model/Duration';
 import { GraceType } from '@coderline/alphatab/model/GraceType';
 import type { KeySignature } from '@coderline/alphatab/model/KeySignature';
 import { KeySignatureType } from '@coderline/alphatab/model/KeySignatureType';
-import { ModelUtils, type ResolvedSpelling } from '@coderline/alphatab/model/ModelUtils';
+import { ModelUtils } from '@coderline/alphatab/model/ModelUtils';
 import { type Note, NoteSubElement } from '@coderline/alphatab/model/Note';
 import { NoteAccidentalMode } from '@coderline/alphatab/model/NoteAccidentalMode';
+import type { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import { NoteXPosition, NoteYPosition } from '@coderline/alphatab/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGlyph';
 import { AccidentalGroupGlyph } from '@coderline/alphatab/rendering/glyphs/AccidentalGroupGlyph';
@@ -379,7 +380,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             kst === KeySignatureType.Minor
                 ? (tonicDegree + 2) % 7 // relative major
                 : tonicDegree;
-        const degree = (spelling.degree - effectiveTonic + 7) % 7;
+        const degree = (spelling.step - effectiveTonic + 7) % 7;
         const octave = NumberedBeatGlyph._getOctave(bar, note);
         const head = new NumberedNoteHeadGlyph(
             0,
@@ -398,14 +399,14 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     private static _resolveAccidental(
         keySignature: KeySignature,
         note: Note,
-        spelling: ResolvedSpelling
+        spelling: SpelledPitch
     ): AccidentalType {
         if (note.accidentalMode === NoteAccidentalMode.ForceNone) {
             return AccidentalType.None;
         }
 
-        const ksOffset = ModelUtils.getKeySignatureAccidentalOffset(keySignature, spelling.degree);
-        const requiredOffset = spelling.accidentalOffset - ksOffset;
+        const ksOffset = ModelUtils.getKeySignatureAccidentalOffset(keySignature, spelling.step);
+        const requiredOffset = spelling.alter - ksOffset;
 
         if (note.hasQuarterToneOffset) {
             if (requiredOffset > 0) {

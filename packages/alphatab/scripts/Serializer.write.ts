@@ -95,6 +95,14 @@ function propertyWrite(serializable: TypeSchema, prop: TypeProperty, id: number,
     }
     if (type.isArray) {
         const itemType = type.arrayItemType!;
+        if (itemType.isJsonImmutable) {
+            importer(itemType.typeAsString, itemType.modulePath);
+            return nullGuard(
+                type,
+                field,
+                `w.arrayField(${id}, ${field}!.length);\nfor (const i of ${field}!) {\nw.writeValue(${itemType.typeAsString}.toJson(i));\n}\nw.endArray();`
+            );
+        }
         if (itemType.isOwnType && !itemType.isEnumType) {
             const itemSerializer = `${itemType.typeAsString}Serializer`;
             importer(itemSerializer, findSerializerModule(itemType));

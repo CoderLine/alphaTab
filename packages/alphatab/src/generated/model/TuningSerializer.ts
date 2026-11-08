@@ -6,12 +6,13 @@
 import { Tuning } from "@coderline/alphatab/model/Tuning";
 import type { IObjectReader } from "@coderline/alphatab/io/IObjectReader";
 import { RecordFields } from "@coderline/alphatab/io/RecordFields";
+import { SpelledPitch } from "@coderline/alphatab/model/SpelledPitch";
 import type { IObjectWriter } from "@coderline/alphatab/io/IObjectWriter";
 /**
  * @internal
  */
 export class TuningSerializer {
-    private static readonly _fields: RecordFields = new RecordFields(["isstandard", "name", "tunings"]);
+    private static readonly _fields: RecordFields = new RecordFields(["isstandard", "name", "tunings", "pitches"]);
     public static read(obj: Tuning, reader: IObjectReader): void {
         reader.readRecord(TuningSerializer._fields, (id, k, r) => {
             switch (id) {
@@ -24,9 +25,19 @@ export class TuningSerializer {
                 case 2:
                     obj.tunings = r.readValue()! as number[];
                     return true;
+                case 3:
+                    TuningSerializer._readPitches(obj, r);
+                    return true;
             }
             return false;
         });
+    }
+    private static _readPitches(obj: Tuning, r: IObjectReader): void {
+        const items: SpelledPitch[] = [];
+        r.readArray(rr => {
+            items.push(SpelledPitch.fromJson(rr.readValue())!);
+        });
+        obj.pitches = items;
     }
     public static write(obj: Tuning | null | undefined, w: IObjectWriter): void {
         if (!obj) {
@@ -36,7 +47,11 @@ export class TuningSerializer {
         w.startObject(TuningSerializer._fields);
         w.booleanField(0, obj.isStandard);
         w.stringField(1, obj.name);
-        w.valueField(2, obj.tunings);
+        w.arrayField(3, obj.pitches!.length);
+        for (const i of obj.pitches!) {
+            w.writeValue(SpelledPitch.toJson(i));
+        }
+        w.endArray();
         w.endObject();
     }
 }

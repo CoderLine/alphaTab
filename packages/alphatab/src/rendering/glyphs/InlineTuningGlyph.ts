@@ -1,5 +1,5 @@
 import { TrackSubElement } from '@coderline/alphatab/model/Track';
-import { Tuning } from '@coderline/alphatab/model/Tuning';
+import type { Tuning } from '@coderline/alphatab/model/Tuning';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 import { type ICanvas, TextAlign, TextBaseline } from '@coderline/alphatab/platform/ICanvas';
 import { Glyph } from '@coderline/alphatab/rendering/glyphs/Glyph';
@@ -13,12 +13,12 @@ import { ElementStyleHelper } from '@coderline/alphatab/rendering/utils/ElementS
 export class InlineTuningGlyph extends Glyph {
     public readonly staff: RenderStaff;
 
-    private readonly _tunings: number[];
+    private readonly _tuning: Tuning;
 
     public constructor(staff: RenderStaff) {
         super(0, 0);
         this.staff = staff;
-        this._tunings = staff.modelStaff.stringTuning.tunings;
+        this._tuning = staff.modelStaff.stringTuning;
     }
 
     public override doLayout(): void {
@@ -26,9 +26,10 @@ export class InlineTuningGlyph extends Glyph {
         const oldFont = canvas.font;
         canvas.font = this.renderer.resources.elementFonts.get(NotationElement.GuitarTuning)!;
 
+        const textMeasures = this.renderer.scoreRenderer.layout!.textMeasures;
         let textWidth = 0;
-        for (const tuning of this._tunings) {
-            textWidth = Math.max(textWidth, canvas.measureText(Tuning.getTextForTuning(tuning, false)).width);
+        for (const pitch of this._tuning.pitches) {
+            textWidth = Math.max(textWidth, textMeasures.measureText(canvas, pitch.toDisplayNameString()).width);
         }
 
         canvas.font = oldFont;
@@ -54,9 +55,10 @@ export class InlineTuningGlyph extends Glyph {
 
         using _ = ElementStyleHelper.track(canvas, TrackSubElement.StringTuning, this.staff.modelStaff.track, true);
 
-        for (let i = 0, j = this._tunings.length; i < j; i++) {
+        const pitches = this._tuning.pitches;
+        for (let i = 0, j = pitches.length; i < j; i++) {
             canvas.fillText(
-                Tuning.getTextForTuning(this._tunings[i], false),
+                pitches[i].toDisplayNameString(),
                 textEndX,
                 cy + this.renderer.y + (this.renderer as LineBarRenderer).getLineY(i)
             );

@@ -232,6 +232,21 @@ describe('LayoutTests', () => {
         );
     });
 
+    it('inline-tuning-accidentals', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Parchment;
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tuningDisplayMode staff
+            \\tuning (D#4 Bb3 Gb3 C#3 Ab2 Ebb2)
+            \\staff { tabs }
+            0.6.4 2.6.4 3.6.4 0.5.4 |
+        `,
+            'test-data/visual-tests/layout/inline-tuning-accidentals.png',
+            settings
+        );
+    });
+
     it('inline-tuning-per-track-hidden', async () => {
         const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Parchment;

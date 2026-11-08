@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score-partwise version="4.0">
+    <part-list>
+        <score-part id="P1">
+            <part-name>Guitar Tab</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>1</divisions>
+                <key>
+                    <fifths>0</fifths>
+                </key>
+                <time>
+                    <beats>4</beats>
+                    <beat-type>4</beat-type>
+                </time>
+                <staves>1</staves>
+                <clef>
+                    <sign>TAB</sign>
+                    <line>5</line>
+                </clef>
+                <staff-details>
+                    <staff-lines>6</staff-lines>
+                    <staff-tuning line="1">
+                        <tuning-step>E</tuning-step>
+                        <tuning-alter>-1</tuning-alter>
+                        <tuning-octave>2</tuning-octave>
+                    </staff-tuning>
+                    <staff-tuning line="2">
+                        <tuning-step>G</tuning-step>
+                        <tuning-alter>1</tuning-alter>
+                        <tuning-octave>2</tuning-octave>
+                    </staff-tuning>
+                    <staff-tuning line="3">
+                        <tuning-step>D</tuning-step>
+                        <tuning-octave>3</tuning-octave>
+                    </staff-tuning>
+                    <staff-tuning line="4">
+                        <tuning-step>G</tuning-step>
+                        <tuning-alter>-1</tuning-alter>
+                        <tuning-octave>3</tuning-octave>
+                    </staff-tuning>
+                    <staff-tuning line="5">
+                        <tuning-step>A</tuning-step>
+                        <tuning-alter>1</tuning-alter>
+                        <tuning-octave>3</tuning-octave>
+                    </staff-tuning>
+                    <staff-tuning line="6">
+                        <tuning-step>E</tuning-step>
+                        <tuning-alter>0.5</tuning-alter>
+                        <tuning-octave>4</tuning-octave>
+                    </staff-tuning>
+                </staff-details>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <alter>-1</alter>
+                    <octave>2</octave>
+                </pitch>
+                <duration>4</duration>
+                <voice>1</voice>
+                <type>whole</type>
+                <notations>
+                    <technical>
+                        <string>6</string>
+                        <fret>0</fret>
+                    </technical>
+                </notations>
+            </note>
+        </measure>
+    </part>
+</score-partwise>

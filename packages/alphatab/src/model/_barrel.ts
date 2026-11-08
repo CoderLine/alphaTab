@@ -61,6 +61,7 @@ export { Section } from '@coderline/alphatab/model/Section';
 export { SimileMark } from '@coderline/alphatab/model/SimileMark';
 export { SlideInType } from '@coderline/alphatab/model/SlideInType';
 export { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+export { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 export { Staff } from '@coderline/alphatab/model/Staff';
 export { Track, TrackSubElement, TrackStyle } from '@coderline/alphatab/model/Track';
 export { TripletFeel } from '@coderline/alphatab/model/TripletFeel';

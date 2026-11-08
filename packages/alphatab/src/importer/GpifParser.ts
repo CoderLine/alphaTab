@@ -44,6 +44,7 @@ import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import { Track } from '@coderline/alphatab/model/Track';
 import { TremoloPickingEffect } from '@coderline/alphatab/model/TremoloPickingEffect';
@@ -984,24 +985,14 @@ export class GpifParser {
         const propertyName: string = node.getAttribute('name');
         switch (propertyName) {
             case 'Tuning':
-                for (const c of node.childElements()) {
-                    switch (c.localName) {
-                        case 'Pitches':
-                            const tuningParts: string[] = GpifParser._splitSafe(
-                                node.findChildElement('Pitches')?.innerText
-                            );
-                            const tuning = new Array<number>(tuningParts.length);
-                            for (let i: number = 0; i < tuning.length; i++) {
-                                tuning[tuning.length - 1 - i] = GpifParser._parseIntSafe(tuningParts[i], 0);
-                            }
-                            staff.stringTuning.tunings = tuning;
-                            break;
-                        case 'Label':
-                            staff.stringTuning.name = c.innerText;
-                            break;
-                    }
+                const staffPitches = GpifParser._parseTuningPitches(node);
+                if (staffPitches !== null) {
+                    staff.stringTuning.pitches = staffPitches;
                 }
-
+                const label = node.findChildElement('Label');
+                if (label !== null) {
+                    staff.stringTuning.name = label.innerText;
+                }
                 break;
             case 'DiagramCollection':
             case 'ChordCollection':
@@ -1169,17 +1160,37 @@ export class GpifParser {
         }
     }
 
+    /**
+     * Parses the strings of a tuning property, they are spelled with sharps unless the tuning is marked as flat.
+     * @returns The pitches of the strings or null if the property has no pitches.
+     */
+    private static _parseTuningPitches(node: XmlNode): SpelledPitch[] | null {
+        let values: number[] | null = null;
+        let preferFlat = false;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Pitches':
+                    const tuningParts: string[] = GpifParser._splitSafe(c.innerText);
+                    values = new Array<number>(tuningParts.length);
+                    for (let i: number = 0; i < values.length; i++) {
+                        values[values.length - 1 - i] = GpifParser._parseIntSafe(tuningParts[i], 0);
+                    }
+                    break;
+                case 'Flat':
+                    preferFlat = true;
+                    break;
+            }
+        }
+        return values === null ? null : values.map(v => SpelledPitch.fromValue(v, preferFlat));
+    }
+
     private _parseTrackProperty(track: Track, node: XmlNode): void {
         const propertyName: string = node.getAttribute('name');
         switch (propertyName) {
             case 'Tuning':
-                const tuningParts: string[] = GpifParser._splitSafe(node.findChildElement('Pitches')?.innerText);
-                const tuning = new Array<number>(tuningParts.length);
-                for (let i: number = 0; i < tuning.length; i++) {
-                    tuning[tuning.length - 1 - i] = GpifParser._parseIntSafe(tuningParts[i], 0);
-                }
+                const trackPitches = GpifParser._parseTuningPitches(node) ?? [];
                 for (const staff of track.staves) {
-                    staff.stringTuning.tunings = tuning;
+                    staff.stringTuning.pitches = trackPitches.slice();
                 }
                 break;
             case 'DiagramCollection':

@@ -402,4 +402,19 @@ describe('GpxImporterTest', () => {
         expect(drums.showTablature).toBe(true);
         expect(drums.showStandardNotation).toBe(true);
     });
+
+    it('tuning-alteration', async () => {
+        // GP6 has no flat preference for tunings, strings are spelled with sharps like in GP7+ without the preference
+        const score = (await prepareImporterWithFile('guitarpro6/tuning-alteration.gpx')).readScore();
+        const spellings = score.tracks.map(t => {
+            const tuning = t.staves[0].stringTuning;
+            return tuning.pitches.map(p => p.toString()).join(' ');
+        });
+        expect(spellings).toEqual([
+            'D#4 A#3 F#3 C#3 G#2 D#2',
+            'D#4 A#3 F#3 C#3 G#2 D#2',
+            'D#4 A#3 F#3 C#3 G#2 C#2',
+            'E4 B3 G3 D3 A2 E2'
+        ]);
+    });
 });

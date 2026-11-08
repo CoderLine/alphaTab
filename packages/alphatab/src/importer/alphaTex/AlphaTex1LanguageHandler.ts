@@ -90,6 +90,7 @@ import { Section } from '@coderline/alphatab/model/Section';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import { Staff } from '@coderline/alphatab/model/Staff';
 import {
     NumberedNoteMode,
@@ -397,7 +398,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 staff.capo = (metaData.arguments!.arguments[0] as AlphaTexNumberLiteral).value;
                 return ApplyNodeResult.Applied;
             case 'tuning':
-                const tuning: number[] = [];
+                const pitches: SpelledPitch[] = [];
                 let hideTuning = false;
                 let tuningName = '';
                 for (let i = 0; i < metaData.arguments!.arguments.length; i++) {
@@ -422,10 +423,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             });
                             break;
                         default:
-                            const t = ModelUtils.parseTuning(text);
+                            const t = ModelUtils.parsePitch(text);
                             if (t) {
-                                tuning.push(t.realValue);
-                            } else if (i === metaData.arguments!.arguments.length - 1 && tuning.length > 0) {
+                                pitches.push(t.pitch);
+                            } else if (i === metaData.arguments!.arguments.length - 1 && pitches.length > 0) {
                                 tuningName = text;
                                 importer.addSemanticDiagnostic({
                                     code: AlphaTexDiagnosticCode.AT305,
@@ -452,7 +453,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 importer.state.staffHasExplicitTuning.add(staff);
                 importer.state.staffTuningApplied.delete(staff);
                 staff.stringTuning = new Tuning();
-                staff.stringTuning.tunings = tuning;
+                staff.stringTuning.pitches = pitches;
                 staff.stringTuning.name = tuningName;
 
                 this._tuningProperties(importer, staff, staff.stringTuning, metaData);
@@ -1846,10 +1847,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.text = (p.arguments!.arguments[0] as AlphaTexTextNode).text;
                 return ApplyNodeResult.Applied;
             case 'restdisplaypitch': {
-                const tuning = ModelUtils.parseTuning((p.arguments!.arguments[0] as AlphaTexTextNode).text);
-                if (tuning !== null) {
-                    beat.restDisplayTone = tuning.tone.noteValue;
-                    beat.restDisplayOctave = tuning.octave - 1;
+                const pitch = ModelUtils.parsePitch((p.arguments!.arguments[0] as AlphaTexTextNode).text);
+                if (pitch !== null) {
+                    beat.restDisplayTone = pitch.noteTone;
+                    beat.restDisplayOctave = pitch.noteOctave - 1;
                 } else {
                     importer.addSemanticDiagnostic({
                         code: AlphaTexDiagnosticCode.AT212,
@@ -3248,9 +3249,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             const tuning = Atnf.meta(
                 'tuning',
                 Atnf.args(
-                    staff.stringTuning.tunings.map(
-                        t => Atnf.ident(Tuning.getTextForTuning(t, true)) as IAlphaTexArgumentValue
-                    )
+                    staff.stringTuning.pitches.map(p => Atnf.ident(p.toString()) as IAlphaTexArgumentValue)
                 )
             );
             nodes.push(tuning);

@@ -1,7 +1,9 @@
 import { describe, it } from 'vitest';
 import { LayoutMode } from '@coderline/alphatab/LayoutMode';
 import { Settings } from '@coderline/alphatab/Settings';
-import { VisualTestHelper, VisualTestOptions } from 'test/visualTests/VisualTestHelper';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from 'test/visualTests/VisualTestHelper';
+import { ScoreLoader } from '@coderline/alphatab/importer/ScoreLoader';
+import { TestPlatform } from 'test/TestPlatform';
 import { NotationElement } from '@coderline/alphatab/NotationSettings';
 
 describe('NotationElements', () => {
@@ -97,6 +99,38 @@ describe('NotationElements', () => {
             'test-data/visual-tests/notation-elements/guitar-tuning-on.png',
             settings
         );
+    });
+
+    it('guitar-tuning-accidentals', async () => {
+        const tex = '\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Ebb2) . 3.3*4';
+
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Page;
+
+        settings.notation.elements.set(NotationElement.GuitarTuning, true);
+        await VisualTestHelper.runVisualTestTex(
+            tex,
+            'test-data/visual-tests/notation-elements/guitar-tuning-accidentals.png',
+            settings
+        );
+    });
+
+    it('guitar-tuning-alteration', async () => {
+        const settings: Settings = new Settings();
+        settings.display.layoutMode = LayoutMode.Page;
+        settings.notation.elements.set(NotationElement.GuitarTuning, true);
+
+        const score = ScoreLoader.loadScoreFromBytes(
+            await TestPlatform.loadFile('test-data/guitarpro8/tuning-alteration.gp'),
+            settings
+        );
+        const options = new VisualTestOptions(
+            score,
+            [new VisualTestRun(-1, 'test-data/visual-tests/notation-elements/guitar-tuning-alteration.png')],
+            settings
+        );
+        options.tracks = score.tracks.map(t => t.index);
+        await VisualTestHelper.runVisualTestFull(options);
     });
 
     it('guitar-tuning-off', async () => {

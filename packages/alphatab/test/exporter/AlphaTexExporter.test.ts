@@ -298,6 +298,23 @@ describe('AlphaTexExporterTest', () => {
         ComparisonHelpers.alphaTexExportRoundtripEqual('accidental-mode-only-when-needed', reimported, score);
     });
 
+    it('tuning-spellings', () => {
+        const score = ScoreLoader.loadAlphaTex('\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Eb2) . 0.6');
+        const exported = exportAlphaTex(score);
+        expect(exported).toContain('\\tuning (D#4 Bb3 Gb3 C#3 Ab2 Eb2)');
+
+        const reimported = ScoreLoader.loadAlphaTex(exported);
+        const tuning = reimported.tracks[0].staves[0].stringTuning;
+        expect(tuning.pitches.map(p => p.toString())).toEqual(['D#4', 'Bb3', 'Gb3', 'C#3', 'Ab2', 'Eb2']);
+        ComparisonHelpers.alphaTexExportRoundtripEqual('tuning-spellings', reimported, score);
+    });
+
+    it('tuning-values-use-flats', () => {
+        const score = ScoreLoader.loadAlphaTex('\\tuning (E4 B3 G3 D3 A2 E2) . 0.6');
+        score.tracks[0].staves[0].stringTuning.tunings = [63, 58, 54, 49, 44, 39];
+        expect(exportAlphaTex(score)).toContain('\\tuning (Eb4 Bb3 Gb3 Db3 Ab2 Eb2)');
+    });
+
     it('staff-display', () => {
         const score = ScoreLoader.loadAlphaTex(
             '\\track \\staff {score tabs} \\tuning (E4 B3 G3 D3 A2 E2) 3.3.4 3.3 3.3 3.3 | 3.3 3.3 3.3 3.3 | 3.3 3.3 3.3 3.3'

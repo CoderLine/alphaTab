@@ -41,6 +41,7 @@ import type { Score } from '@coderline/alphatab/model/Score';
 import { SimileMark } from '@coderline/alphatab/model/SimileMark';
 import { SlideInType } from '@coderline/alphatab/model/SlideInType';
 import { SlideOutType } from '@coderline/alphatab/model/SlideOutType';
+import { SpelledPitch } from '@coderline/alphatab/model/SpelledPitch';
 import type { Staff } from '@coderline/alphatab/model/Staff';
 import type { Track } from '@coderline/alphatab/model/Track';
 import { TripletFeel } from '@coderline/alphatab/model/TripletFeel';
@@ -117,8 +118,8 @@ export class GpifWriter {
                 // routes through staff.tuning — needs to match the tuning we
                 // gave the assigner. The notes are modified, hence the
                 // Gp7Exporter passes a copy of the input score.
-                const savedTunings = staff.tuning;
-                if (needsFingering && stringedTuning !== null && savedTunings.length === 0) {
+                const savedPitches = staff.stringTuning.pitches;
+                if (needsFingering && stringedTuning !== null && savedPitches.length === 0) {
                     staff.stringTuning.tunings = stringedTuning.slice();
                 }
 
@@ -150,7 +151,7 @@ export class GpifWriter {
                         }
                     }
                 }
-                staff.stringTuning.tunings = savedTunings;
+                staff.stringTuning.pitches = savedPitches;
             }
         }
     }
@@ -450,7 +451,6 @@ export class GpifWriter {
         }
     }
 
-    private static readonly _steps: string[] = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     private static readonly _accidentals: string[] = ['bb', 'b', '', '#', 'x'];
 
     private _writePitchForValue(
@@ -465,9 +465,9 @@ export class GpifWriter {
         this._writePitch(
             properties,
             propertyName,
-            GpifWriter._steps[spelling.degree],
+            SpelledPitch.stepName(spelling.step),
             (spelling.octave + 1).toString(),
-            GpifWriter._accidentals[spelling.accidentalOffset + 2]
+            GpifWriter._accidentals[spelling.alter + 2]
         );
     }
 
@@ -1259,6 +1259,7 @@ export class GpifWriter {
             }
         }
         this._tuningByStaff.set(staff, tuning);
+        const isTuningFlat = GpifWriter._isTuningFlat(staff, tuning);
 
         if (tuning.length > 0) {
             const tuningProperty = properties.addElement('Property');
@@ -1266,7 +1267,9 @@ export class GpifWriter {
             tuningProperty.addElement('Pitches').innerText = tuning.slice().reverse().join(' ');
             tuningProperty.addElement('Label').setCData(tuningName);
             tuningProperty.addElement('LabelVisible').innerText = tuningName ? 'true' : 'false';
-            tuningProperty.addElement('Flat');
+            if (isTuningFlat) {
+                tuningProperty.addElement('Flat');
+            }
 
             if (staff.isPercussion) {
                 tuningProperty.addElement('Instrument').innerText = 'Undefined';
@@ -1328,10 +1331,34 @@ export class GpifWriter {
             staff.tuning.map(_ => '0').join('')
         );
 
-        this._writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
+        if (isTuningFlat) {
+            this._writeSimplePropertyNode(properties, 'TuningFlat', 'Enable', null);
+        }
 
         this._writeDiagramCollection(properties, staff, 'DiagramCollection');
         this._writeDiagramCollection(properties, staff, 'DiagramWorkingSet');
+    }
+
+    /**
+     * Guitar Pro stores one sharp or flat preference per tuning.
+     * Sharps are written if every string with an accidental is spelled with a sharp, otherwise flats.
+     */
+    private static _isTuningFlat(staff: Staff, tuning: number[]): boolean {
+        const stringTuning = staff.stringTuning;
+        if (tuning !== stringTuning.tunings) {
+            return true;
+        }
+        let hasSharp = false;
+        for (const pitch of stringTuning.pitches) {
+            const alter = pitch.alter;
+            if (alter < 0) {
+                return true;
+            }
+            if (alter > 0) {
+                hasSharp = true;
+            }
+        }
+        return !hasSharp;
     }
 
     private _writeDiagramCollection(properties: XmlNode, staff: Staff, name: string) {

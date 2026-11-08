@@ -364,8 +364,8 @@ describe('MusicXmlImporterTests', () => {
                     );
                     const context = `note ${i}`;
                     expect(bar.index, context).toBe(expected[i][0]);
-                    expect(spelling.degree, context).toBe(expected[i][1]);
-                    expect(spelling.accidentalOffset, context).toBe(expected[i][2]);
+                    expect(spelling.step, context).toBe(expected[i][1]);
+                    expect(spelling.alter, context).toBe(expected[i][2]);
                     expect(spelling.octave, context).toBe(expected[i][3]);
                     i++;
                 }
@@ -425,6 +425,31 @@ describe('MusicXmlImporterTests', () => {
         const trumpet = notes(6, 0)[0];
         expect(trumpet.isDead).toBe(false);
         expect(trumpet.isPalmMute).toBe(false);
+    });
+
+    it('tuning-alter', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/tuning-alter.xml');
+        const tuning = score.tracks[0].staves[0].stringTuning;
+
+        // top string first, line 1 is the lowest string
+        // the quarter tone alter of the highest string is truncated
+        expect(tuning.tunings).toEqual([64, 58, 54, 50, 44, 39]);
+        expect(tuning.pitches.map(p => [p.step, p.alter, p.octave])).toEqual([
+            [2, 0, 4],
+            [5, 1, 3],
+            [4, -1, 3],
+            [1, 0, 3],
+            [4, 1, 2],
+            [2, -1, 2]
+        ]);
+        expect(tuning.pitches.map(p => p.toNameString())).toEqual([
+            'E',
+            'A#',
+            'Gb',
+            'D',
+            'G#',
+            'Eb'
+        ]);
     });
 
     it('string-annotation', async () => {

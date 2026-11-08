@@ -37,13 +37,22 @@ describe('ModelUtilsTests', () => {
         );
     });
 
-    describe('parseTuning', () => {
+    describe('parsePitch', () => {
         function test(s:string, toneValue:number, accidental:NoteAccidentalMode, octave:number) {
-            const result = ModelUtils.parseTuning(s);
+            const result = ModelUtils.parsePitch(s);
             expect(result).toBeTruthy();
-            expect(result!.tone.noteValue).toBe(toneValue);
-            expect(result!.tone.accidentalMode).toBe(accidental);
-            expect(result!.octave).toBe(octave);
+            expect(result!.noteTone).toBe(toneValue);
+            expect(result!.accidentalMode).toBe(accidental);
+            expect(result!.noteOctave).toBe(octave);
+        }
+
+        function testSpelling(s: string, step: number, alter: number, octave: number, value: number) {
+            const result = ModelUtils.parsePitch(s);
+            expect(result).toBeTruthy();
+            expect(result!.pitch.step).toBe(step);
+            expect(result!.pitch.alter).toBe(alter);
+            expect(result!.pitch.octave).toBe(octave);
+            expect(result!.pitch.value).toBe(value);
         }
 
         it('octave-c', () => test('C4', 0, NoteAccidentalMode.Default, 5))
@@ -76,5 +85,24 @@ describe('ModelUtilsTests', () => {
         it('c-forceDoubleSharp-short2', () => test('Cx4', 2, NoteAccidentalMode.ForceDoubleSharp, 5))
         it('c-forceFlat-short', () => test('Cb4', 11, NoteAccidentalMode.ForceFlat, 4))
         it('c-forceDoubleFlat-short', () => test('Cbb4', 10, NoteAccidentalMode.ForceDoubleFlat, 4))
+
+        it('b-forceSharp-short', () => test('B#3', 12, NoteAccidentalMode.ForceSharp, 4))
+        it('b-forceDoubleSharp-short', () => test('B##3', 13, NoteAccidentalMode.ForceDoubleSharp, 4))
+
+        it('spelling-natural', () => testSpelling('E4', 2, 0, 4, 64))
+        it('spelling-sharp', () => testSpelling('F#3', 3, 1, 3, 54))
+        it('spelling-flat', () => testSpelling('Gb3', 4, -1, 3, 54))
+        it('spelling-lowercase', () => testSpelling('gb3', 4, -1, 3, 54))
+        it('spelling-flat-below-c', () => testSpelling('Cb4', 0, -1, 4, 59))
+        it('spelling-sharp-above-b', () => testSpelling('B#3', 6, 1, 3, 60))
+        it('spelling-double-flat', () => testSpelling('Bbb2', 6, -2, 2, 45))
+        it('spelling-natural-sign', () => testSpelling('Cn4', 0, 0, 4, 60))
+        it('spelling-octave-after-accidental-digit', () => testSpelling('C4#', 0, 1, 4, 61))
+
+        it('invalid-accidental-only', () => expect(ModelUtils.parsePitch('#4')).toBeNull())
+        it('invalid-no-octave', () => expect(ModelUtils.parsePitch('C')).toBeNull())
+        it('invalid-octave-first', () => expect(ModelUtils.parsePitch('4C')).toBeNull())
+        it('invalid-letter', () => expect(ModelUtils.parsePitch('H4')).toBeNull())
+        it('invalid-accidental', () => expect(ModelUtils.parsePitch('Cq4')).toBeNull())
     });
 });

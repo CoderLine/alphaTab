@@ -25,10 +25,9 @@ function inspect(score: alphaTab.model.Score): InspectedScore {
     trackCount: score.tracks.length,
     tracks: score.tracks.map((track) => {
       const bars = track.staves[0]?.bars.length ?? 0;
-      const stringTunings = track.staves[0]?.stringTuning?.tunings ?? [];
-      const tuningNames = [...stringTunings]
+      const tuningNames = (track.staves[0]?.stringTuning?.pitches ?? [])
+        .map((pitch) => pitch.toNameString())
         .reverse()
-        .map((midi) => alphaTab.model.Tuning.getTextForTuning(midi, false))
         .join(" ");
       return {
         name: track.name || "(unnamed)",

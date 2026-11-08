@@ -40,6 +40,8 @@ function immutableValue(type: TypeWithNullableInfo, importer: Importer): string 
     switch (type.typeAsString) {
         case 'Color':
             return 'new Color(1, 2, 3, 4)';
+        case 'SpelledPitch':
+            return 'new SpelledPitch(3, 1, 4)';
         case 'Font':
             importer('FontStyle', type.modulePath);
             importer('FontWeight', type.modulePath);

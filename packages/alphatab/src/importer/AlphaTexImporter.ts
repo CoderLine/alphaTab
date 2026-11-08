@@ -575,13 +575,13 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         detectedNoteKind = undefined; // don't know on those notes
                     }
                 } else {
-                    const tuning = ModelUtils.parseTuning(str);
-                    if (tuning) {
+                    const pitch = ModelUtils.parsePitch(str);
+                    if (pitch) {
                         detectedNoteKind = AlphaTexStaffNoteKind.Pitched;
-                        octave = tuning.octave;
-                        tone = tuning.tone.noteValue;
+                        octave = pitch.noteOctave;
+                        tone = pitch.noteTone;
                         if (this._state.accidentalMode === AlphaTexAccidentalMode.Explicit) {
-                            accidentalMode = tuning.tone.accidentalMode;
+                            accidentalMode = pitch.accidentalMode;
                         }
                     } else {
                         detectedNoteKind = AlphaTexStaffNoteKind.Articulation;

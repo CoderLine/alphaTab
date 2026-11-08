@@ -49,6 +49,52 @@ With `TuningDisplayMode.Staff`, alphaTab writes the note name of each open strin
 - In alphaTex, [`\tuningDisplayMode`](/docs/alphatex/score-metadata#tuningdisplaymode) takes `score` or `staff`. The alphaTex exporter writes the tag when the mode is not `score`.
 - Guitar Pro 7 and 8 files store the mode in their stylesheet. alphaTab reads it on import and writes it back in the [Guitar Pro 7 exporter](/docs/features/export/export-to-guitar-pro-7).
 
+## Sharp and flat tunings *(new in 1.10)* {#sharp-and-flat-tunings}
+
+alphaTab labels every string with its written pitch. A string tuned to the same pitch as `F#3` or `Gb3` keeps the spelling of the source file, and the score tuning and the staff tuning show it with the accidental characters ♯ and ♭ of the tuning font.
+
+<AlphaTexSample tracks="all">{`
+\\track "Guitar"
+\\staff { tabs }
+\\tuning (D#4 A#3 F#3 C#3 G#2 D#2)
+:4 0.6 2.5 2.4 0.3 | 0.2 2.3 0.1 r
+\\track "Baritone"
+\\staff { tabs }
+\\tuning (Bb3 F3 Db3 Ab2 Eb2 Bb1)
+:4 0.6 2.5 2.4 0.3 | 0.2 2.3 0.1 r
+`}</AlphaTexSample>
+
+- alphaTex keeps the tuning as written in [`\tuning`](/docs/alphatex/staff-metadata#tuning) and writes it back on export.
+- MusicXML files define the spelling with `tuning-step` and `tuning-alter`.
+- Guitar Pro files mark a tuning written with flats, all other tunings are written with sharps. The [Guitar Pro 7 exporter](/docs/features/export/export-to-guitar-pro-7) writes the choice back.
+- Formats without a spelling, like Guitar Pro 3-5, and tunings set as MIDI values are written with flats, as in earlier versions.
+
+In code, [`Tuning.pitches`](/docs/reference/types/model/tuning/#pitches) holds a [`SpelledPitch`](/docs/reference/types/model/spelledpitch) for every string, starting with the highest string. [`Tuning.tunings`](/docs/reference/types/model/tuning/#tunings) gives the MIDI values of the same strings; setting it spells the strings with flats. Assign a new array to change the tuning:
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+
+const container = getAlphaTabContainer();
+const api = new alphaTab.AlphaTabApi(container, {
+  core: { file: '/scores/song.gp' },
+});
+
+api.scoreLoaded.on((score) => {
+  const tuning = score.tracks[0].staves[0].stringTuning;
+  // D# A# F# C# G# D#, written with sharps
+  tuning.pitches = [
+    new alphaTab.model.SpelledPitch(1, 1, 4),
+    new alphaTab.model.SpelledPitch(5, 1, 3),
+    new alphaTab.model.SpelledPitch(3, 1, 3),
+    new alphaTab.model.SpelledPitch(0, 1, 3),
+    new alphaTab.model.SpelledPitch(4, 1, 2),
+    new alphaTab.model.SpelledPitch(1, 1, 2),
+  ];
+  console.log(tuning.pitches[0].toString(), tuning.tunings[0]); // D#4 63
+  api.render();
+});
+```
+
 ## Show it in code
 
 ```js
@@ -86,5 +132,6 @@ api.scoreLoaded.on((score) => {
 - [Toggling notation elements off](/docs/features/render/coverage-toggle-elements) — hide the `GuitarTuning` element globally through `notation.elements`.
 - [`globalDisplayTuning`](/docs/reference/types/model/renderstylesheet/#globaldisplaytuning), [`perTrackDisplayTuning`](/docs/reference/types/model/renderstylesheet/#pertrackdisplaytuning), and [`tuningDisplayMode`](/docs/reference/types/model/renderstylesheet/#tuningdisplaymode) on the [`RenderStylesheet`](/docs/reference/types/model/renderstylesheet) reference.
 - [`TuningDisplayMode`](/docs/reference/types/model/tuningdisplaymode) — the enum reference.
+- [`Tuning`](/docs/reference/types/model/tuning) and [`SpelledPitch`](/docs/reference/types/model/spelledpitch) — the tuning values and their written spelling.
 - [`display.inlineTuningPaddingRight`](/docs/reference/settings/display/inlinetuningpaddingright) and [`\tuningDisplayMode`](/docs/alphatex/score-metadata#tuningdisplaymode) — the padding setting and the alphaTex tag.
 - [`scoreLoaded`](/docs/reference/api/scoreloaded) and [`render`](/docs/reference/api/render) — the API surface used above.
