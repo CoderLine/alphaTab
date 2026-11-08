@@ -95,6 +95,14 @@ public class DoubleList : IDoubleIterable {
         return mapped
     }
 
+    public fun <TOut> map(transform: (v: Double, i: Double) -> TOut): List<TOut> {
+        val mapped = List<TOut>()
+        for (i in 0 until _size) {
+            mapped.push(transform(_items[i], i.toDouble()))
+        }
+        return mapped
+    }
+
     public fun map(transform: (v: Double) -> Double): DoubleList {
         val mapped = DoubleList(_size)
         for (i in 0 until _size) {

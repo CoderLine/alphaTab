@@ -2004,7 +2004,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         const index = staff.tuning.length - line;
         const natural = ModelUtils.parsePitch(tuningStep + tuningOctave);
-        staff.tuning[index] = (natural?.pitch.value ?? -1) + tuningAlter;
+        staff.tuning[index] = (natural !== null ? natural.pitch.value : -1) + tuningAlter;
 
         const isSpellableAlter = Number.isInteger(tuningAlter) && tuningAlter >= -2 && tuningAlter <= 2;
         if (natural !== null && isSpellableAlter && index >= 0 && index < staff.tuning.length) {

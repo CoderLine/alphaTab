@@ -10,6 +10,11 @@ internal static class Number
     public const double MAX_SAFE_INTEGER = 9007199254740991.0;
     public const double NaN = double.NaN;
 
+    public static bool IsInteger(double v)
+    {
+        return !double.IsNaN(v) && !double.IsInfinity(v) && System.Math.Floor(v) == v;
+    }
+
     public static double ParseInt(char c)
     {
         return ParseInt(c.ToString());

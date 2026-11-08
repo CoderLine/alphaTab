@@ -185,6 +185,10 @@ public class List<T> : Iterable<T> {
         return List(ArrayListWithRemoveRange(_data.subList(start.toInt(), _data.size)))
     }
 
+    public fun slice(start: Double, end: Double): List<T> {
+        return List(ArrayListWithRemoveRange(_data.subList(start.toInt(), end.toInt())))
+    }
+
     public fun shift(): T {
         return _data.removeAt(0)
     }

@@ -17,6 +17,10 @@ internal class Number {
             return s.isNaN()
         }
 
+        inline fun isInteger(v: Double): Boolean {
+            return v.isFinite() && kotlin.math.floor(v) == v
+        }
+
         inline fun parseFloat(s: String): Double {
             return s.toDoubleOrNaN()
         }
