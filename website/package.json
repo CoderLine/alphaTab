@@ -40,7 +40,7 @@
     "webpack": "^5.98.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.6.4",
+    "@biomejs/biome": "^2.6.6",
     "@coderline/alphatab-language-server": "*",
     "@coderline/alphatab-webpack": "*",
     "@docusaurus/faster": "3.10.2",
@@ -51,10 +51,10 @@
     "docusaurus-plugin-sass": "^0.2.6",
     "remark-github-admonitions-to-directives": "^2.1.0",
     "resolve-url-loader": "^5.0.0",
-    "sass": "^1.85.1",
+    "sass": "^1.108.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "browserslist": {
     "production": [
