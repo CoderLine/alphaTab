@@ -2273,6 +2273,12 @@ export class GpifParser {
                 case 'Properties':
                     this._parseNoteProperties(c, note, noteId);
                     break;
+                case 'Velocity':
+                    note.gpVelocity = GpifParser._parseIntSafe(c.innerText, 0);
+                    break;
+                case 'RelativeVelocity':
+                    note.gpRelativeVelocity = GpifParser._parseFloatSafe(c.innerText, 0);
+                    break;
                 case 'AntiAccent':
                     if (c.innerText.toLowerCase() === 'normal') {
                         note.isGhost = true;

@@ -51,6 +51,8 @@ export class NoteCloner {
         clone.durationPercent = original.durationPercent;
         clone.accidentalMode = original.accidentalMode;
         clone.dynamics = original.dynamics;
+        clone.gpVelocity = original.gpVelocity;
+        clone.gpRelativeVelocity = original.gpRelativeVelocity;
         clone.ornament = original.ornament;
         return clone;
     }

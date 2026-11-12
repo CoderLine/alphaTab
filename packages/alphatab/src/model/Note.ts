@@ -592,6 +592,21 @@ export class Note {
     public dynamics: DynamicValue = DynamicValue.F;
 
     /**
+     * Guitar Pro's optional per-note MIDI velocity field. Preserved on GP import
+     * and export; alphaTab playback currently uses {@link dynamics} instead.
+     * @since 1.10.0
+     */
+    public gpVelocity: number | null = null;
+
+    /**
+     * Guitar Pro's optional per-note relative velocity field in decibels.
+     * Preserved on GP import and export; not currently applied to playback.
+     * @since 1.10.0
+     */
+    public gpRelativeVelocity: number | null = null;
+
+
+    /**
      * @clone_ignore
      * @json_ignore
      */

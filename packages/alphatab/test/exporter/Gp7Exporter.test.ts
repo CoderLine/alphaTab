@@ -23,6 +23,19 @@ import { TestPlatform } from 'test/TestPlatform';
 import { describe, expect, it } from 'vitest';
 
 describe('Gp7ExporterTest', () => {
+    it('preserves per-note GP velocity metadata through repeated round trips', () => {
+        for (const relative of [2.75, -1.5]) {
+            const score = ScoreLoader.loadAlphaTex('3.3.4');
+            const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+            note.gpVelocity = 100;
+            note.gpRelativeVelocity = relative;
+            const imported = prepareImporterWithBytes(exportGp7(score)).readScore();
+            const roundTripped = prepareImporterWithBytes(exportGp7(imported)).readScore();
+            const result = roundTripped.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+            expect(result.gpVelocity).toBe(100);
+            expect(result.gpRelativeVelocity).toBe(relative);
+        }
+    });
     async function loadScore(name: string): Promise<Score | null> {
         try {
             const data = await TestPlatform.loadFile(`test-data/${name}`);
