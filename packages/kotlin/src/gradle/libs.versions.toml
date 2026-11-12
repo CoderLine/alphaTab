@@ -3,7 +3,7 @@ agp = "9.5.0"
 kotlin = "2.4.21"
 
 kotlinx-coroutines = "1.11.0"
-dokka = "2.2.0"
+dokka = "2.3.0"
 
 espressoCore = "3.7.0"
 appcompat = "1.8.0"
