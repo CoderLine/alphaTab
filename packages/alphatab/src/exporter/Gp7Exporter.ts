@@ -40,8 +40,12 @@ export class Gp7Exporter extends ScoreExporter {
         fileSystem.writeEntry(new ZipEntry('Content/LayoutConfiguration', layoutConfiguration));
         fileSystem.writeEntry(new ZipEntry('Content/score.gpif', IOHelper.stringToBytes(gpifXml)));
 
-        if(gpifWriter.backingTrackAssetFileName) {
+        if (gpifWriter.backingTrackAssetFileName) {
             fileSystem.writeEntry(new ZipEntry(gpifWriter.backingTrackAssetFileName!, score.backingTrack!.rawAudioFile!));
+            // Let Guitar Pro open the embedded audio panel by default.
+            fileSystem.writeEntry(
+                new ZipEntry('Content/Preferences.json', IOHelper.stringToBytes('{"view":{"backingTrackVisible":true}}'))
+            );
         }
 
         fileSystem.end();
