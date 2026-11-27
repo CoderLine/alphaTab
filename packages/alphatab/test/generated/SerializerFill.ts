@@ -999,6 +999,8 @@ export class SerializerFill {
         obj.durationPercent = 7.25;
         obj.accidentalMode = SerializerFill.otherEnumValue(NoteAccidentalMode, obj.accidentalMode) as NoteAccidentalMode;
         obj.dynamics = SerializerFill.otherEnumValue(DynamicValue, obj.dynamics) as DynamicValue;
+        obj.gpVelocity = 7.25;
+        obj.gpRelativeVelocity = 7.25;
         obj.ornament = SerializerFill.otherEnumValue(NoteOrnament, obj.ornament) as NoteOrnament;
         {
             const v0 = new NoteStyle();
