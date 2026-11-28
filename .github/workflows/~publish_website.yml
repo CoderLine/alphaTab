@@ -1,5 +1,6 @@
-# Builds the website against the published npm packages of the given dist-tag and deploys it to
-# docs-deploy.alphaTab.net. Only the private react/ui packages are built from source.
+# Builds the website against the published npm packages of the given dist-tag and deploys it through
+# deploy.alphatab.net (CoderLine/alphaTabSiteDeployHost, DeployContract 1). Only the private react/ui packages are
+# built from source.
 on:
   workflow_call:
     inputs:
@@ -12,7 +13,7 @@ on:
         type: string
         required: true
       deploy_branch:
-        description: The deploy target on docs-deploy.alphaTab.net (develop or main)
+        description: The deploy target, develop (next.alphatab.net) or main (alphatab.net)
         type: string
         required: true
       expected_versions:
@@ -22,10 +23,6 @@ on:
       dry_run:
         type: boolean
         default: false
-    secrets:
-      DEPLOY_TOKEN:
-        description: Bearer token of docs-deploy.alphaTab.net
-        required: true
 
 permissions:
   contents: read
@@ -44,6 +41,20 @@ jobs:
     if: ${{ !cancelled() && (needs.gate.result == 'success' || needs.gate.result == 'skipped') }}
     runs-on: ubuntu-latest
     steps:
+      # fails before the build; the deploy host enforces the ref independently
+      - name: Check the channel matches the ref
+        run: |
+          case "$CHANNEL:$DEPLOY_BRANCH:$GITHUB_REF" in
+            next:develop:refs/heads/develop) ;;
+            stable:main:refs/heads/main | stable:main:refs/tags/v*) ;;
+            *)
+              echo "::error::Refusing to deploy channel '$CHANNEL' to '$DEPLOY_BRANCH' from '$GITHUB_REF'"
+              exit 1
+              ;;
+          esac
+        env:
+          CHANNEL: ${{ inputs.channel }}
+          DEPLOY_BRANCH: ${{ inputs.deploy_branch }}
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
@@ -143,45 +154,24 @@ jobs:
     needs: build
     if: ${{ !cancelled() && needs.build.result == 'success' && !inputs.dry_run }}
     runs-on: ubuntu-latest
-    environment:
-      name: website
-      url: ${{ inputs.deploy_branch == 'main' && 'https://alphatab.net' || 'https://next.alphatab.net' }}
+    # The only job here that may request an OIDC token; it runs no npm code (see alphaTabSiteDeployHost/Docs/DeployStep.yml).
+    permissions:
+      contents: read
+      id-token: write
     concurrency:
       group: website-deploy-${{ inputs.deploy_branch }}
       cancel-in-progress: false
     steps:
-      - name: Check the channel matches the ref
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with: { name: website, path: site }
+      - name: Deploy (DeployContract 1)
+        env: { SITE: "${{ inputs.deploy_branch == 'main' && 'alphatab.net' || 'next.alphatab.net' }}" }
         run: |
-          case "$CHANNEL:$DEPLOY_BRANCH:$GITHUB_REF" in
-            next:develop:refs/heads/develop) ;;
-            stable:main:refs/heads/main | stable:main:refs/tags/v*) ;;
-            *)
-              echo "::error::Refusing to deploy channel '$CHANNEL' to '$DEPLOY_BRANCH' from '$GITHUB_REF'"
-              exit 1
-              ;;
-          esac
-        env:
-          CHANNEL: ${{ inputs.channel }}
-          DEPLOY_BRANCH: ${{ inputs.deploy_branch }}
-      - uses: actions/download-artifact@v8
-        with:
-          name: website
-          path: build
-      - name: Package Zip
-        run: zip -qq -r ../website.zip . && ls -l ../website.zip
-        working-directory: build
-      - name: Push Zip To Server
-        run: |
-          if [ -z "$DEPLOY_TOKEN" ]; then
-            echo "::error::The DEPLOY_TOKEN secret is empty"
-            exit 1
-          fi
-          curl --request POST \
-          --url https://docs-deploy.alphaTab.net/ \
-          --header "authorization: Bearer $DEPLOY_TOKEN" \
-          --header "branch: $DEPLOY_BRANCH" \
-          -F 'website=@./website.zip' \
-          --fail-with-body
-        env:
-          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
-          DEPLOY_BRANCH: ${{ inputs.deploy_branch }}
+          set -euo pipefail
+          (cd site && zip -qq -r "$RUNNER_TEMP/site.zip" .)
+          jwt=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+                "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://deploy.alphatab.net" | jq -r .value)
+          echo "::add-mask::$jwt"
+          curl -sS --fail-with-body -X PUT -H "Authorization: Bearer $jwt" \
+               -H "Content-Type: application/zip" -H "DeployContract: 1" \
+               --data-binary @"$RUNNER_TEMP/site.zip" "https://deploy.alphatab.net/sites/$SITE/releases"
