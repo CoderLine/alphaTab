@@ -36,7 +36,7 @@
     },
     "dependencies": {
         "@coderline/alphatab": "^1.10.0",
-        "vscode-languageserver": "^11.0.0",
+        "vscode-languageserver": "^11.0.1",
         "vscode-languageserver-protocol": "^3.18.5",
         "vscode-languageserver-textdocument": "^1.0.16",
         "vscode-languageserver-types": "^3.18.4"
